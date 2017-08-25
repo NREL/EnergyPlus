@@ -2218,6 +2218,7 @@ namespace SystemReports {
 		Array1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
 		Array1D_int IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
 		Array1D_string UnitsStrings; // UnitsStrings for each variable
+		Array1D < OutputProcessor::Unit> unitsForVar; // units from enum for each variable
 		Array1D_int ResourceTypes; // ResourceTypes for each variable
 		Array1D_string EndUses; // EndUses for each variable
 		Array1D_string Groups; // Groups for each variable
@@ -2338,7 +2339,7 @@ namespace SystemReports {
 						VarIndexes.allocate( NumVariables );
 						VarTypes.allocate( NumVariables );
 						IndexTypes.allocate( NumVariables );
-						UnitsStrings.allocate( NumVariables );
+						unitsForVar.allocate( NumVariables );
 						ResourceTypes.allocate( NumVariables );
 						EndUses.allocate( NumVariables );
 						Groups.allocate( NumVariables );
@@ -2346,12 +2347,12 @@ namespace SystemReports {
 						thisComp.MeteredVar.allocate( NumVariables );
 
 						thisComp.NumMeteredVars = NumVariables;
-						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 						ModeFlagOn = true;
 						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 							{ auto & thisVar( thisComp.MeteredVar( VarNum ) );
 							thisVar.ReportVarName = Names( VarNum );
-							thisVar.ReportVarUnits = UnitsStrings( VarNum );
+							thisVar.ReportVarUnits = unitsForVar( VarNum );
 							thisVar.ReportVarIndex = VarIndexes( VarNum );
 							thisVar.ReportVarIndexType = IndexTypes( VarNum );
 							thisVar.ReportVarType = VarTypes( VarNum );
@@ -2377,7 +2378,7 @@ namespace SystemReports {
 						VarIndexes.deallocate();
 						VarTypes.deallocate();
 						IndexTypes.deallocate();
-						UnitsStrings.deallocate();
+						unitsForVar.deallocate();
 						ResourceTypes.deallocate();
 						EndUses.deallocate();
 						Groups.deallocate();
@@ -2392,20 +2393,20 @@ namespace SystemReports {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
-							UnitsStrings.allocate( NumVariables );
+							unitsForVar.allocate( NumVariables );
 							ResourceTypes.allocate( NumVariables );
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
 							Names.allocate( NumVariables );
 							thisComp.SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
 
-							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 								{ auto & thisVar( thisComp.SubComp( SubCompNum ).MeteredVar( VarNum ) );
 								thisVar.ReportVarName = Names( VarNum );
-								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarUnits = unitsForVar( VarNum );
 								thisVar.ReportVarIndex = VarIndexes( VarNum );
 								thisVar.ReportVarIndexType = IndexTypes( VarNum );
 								thisVar.ReportVarType = VarTypes( VarNum );
@@ -2431,7 +2432,7 @@ namespace SystemReports {
 							VarIndexes.deallocate();
 							VarTypes.deallocate();
 							IndexTypes.deallocate();
-							UnitsStrings.deallocate();
+							unitsForVar.deallocate();
 							ResourceTypes.deallocate();
 							EndUses.deallocate();
 							Groups.deallocate();
@@ -2449,20 +2450,20 @@ namespace SystemReports {
 								VarIndexes.allocate( NumVariables );
 								VarTypes.allocate( NumVariables );
 								IndexTypes.allocate( NumVariables );
-								UnitsStrings.allocate( NumVariables );
+								unitsForVar.allocate( NumVariables );
 								ResourceTypes.allocate( NumVariables );
 								EndUses.allocate( NumVariables );
 								Groups.allocate( NumVariables );
 								Names.allocate( NumVariables );
 								thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar.allocate( NumVariables );
 
-								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 								ModeFlagOn = true;
 								for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 									{ auto & thisVar( thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ) );
 									thisVar.ReportVarName = Names( VarNum );
-									thisVar.ReportVarUnits = UnitsStrings( VarNum );
+									thisVar.ReportVarUnits = unitsForVar( VarNum );
 									thisVar.ReportVarIndex = VarIndexes( VarNum );
 									thisVar.ReportVarIndexType = IndexTypes( VarNum );
 									thisVar.ReportVarType = VarTypes( VarNum );
@@ -2488,7 +2489,7 @@ namespace SystemReports {
 								VarIndexes.deallocate();
 								VarTypes.deallocate();
 								IndexTypes.deallocate();
-								UnitsStrings.deallocate();
+								unitsForVar.deallocate();
 								ResourceTypes.deallocate();
 								EndUses.deallocate();
 								Groups.deallocate();
@@ -2533,20 +2534,20 @@ namespace SystemReports {
 					VarIndexes.allocate( NumVariables );
 					VarTypes.allocate( NumVariables );
 					IndexTypes.allocate( NumVariables );
-					UnitsStrings.allocate( NumVariables );
+					unitsForVar.allocate( NumVariables );
 					ResourceTypes.allocate( NumVariables );
 					EndUses.allocate( NumVariables );
 					Groups.allocate( NumVariables );
 					Names.allocate( NumVariables );
 					thisEquipData.MeteredVar.allocate( NumVariables );
 
-					GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+					GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 					ModeFlagOn = true;
 					for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 						{ auto & thisVar( thisEquipData.MeteredVar( VarNum ) );
 						thisVar.ReportVarName = Names( VarNum );
-						thisVar.ReportVarUnits = UnitsStrings( VarNum );
+						thisVar.ReportVarUnits = unitsForVar( VarNum );
 						thisVar.ReportVarIndex = VarIndexes( VarNum );
 						thisVar.ReportVarIndexType = IndexTypes( VarNum );
 						thisVar.ReportVarType = VarTypes( VarNum );
@@ -2572,7 +2573,7 @@ namespace SystemReports {
 					VarIndexes.deallocate();
 					VarTypes.deallocate();
 					IndexTypes.deallocate();
-					UnitsStrings.deallocate();
+					unitsForVar.deallocate();
 					ResourceTypes.deallocate();
 					EndUses.deallocate();
 					Groups.deallocate();
@@ -2659,20 +2660,20 @@ namespace SystemReports {
 						VarIndexes.allocate( NumVariables );
 						VarTypes.allocate( NumVariables );
 						IndexTypes.allocate( NumVariables );
-						UnitsStrings.allocate( NumVariables );
+						unitsForVar.allocate( NumVariables );
 						ResourceTypes.allocate( NumVariables );
 						EndUses.allocate( NumVariables );
 						Groups.allocate( NumVariables );
 						Names.allocate( NumVariables );
 						thisSubEquipData.MeteredVar.allocate( NumVariables );
 
-						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 						ModeFlagOn = true;
 						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 							{ auto & thisVar( thisSubEquipData.MeteredVar( VarNum ) );
 							thisVar.ReportVarName = Names( VarNum );
-							thisVar.ReportVarUnits = UnitsStrings( VarNum );
+							thisVar.ReportVarUnits = unitsForVar( VarNum );
 							thisVar.ReportVarIndex = VarIndexes( VarNum );
 							thisVar.ReportVarIndexType = IndexTypes( VarNum );
 							thisVar.ReportVarType = VarTypes( VarNum );
@@ -2698,7 +2699,7 @@ namespace SystemReports {
 						VarIndexes.deallocate();
 						VarTypes.deallocate();
 						IndexTypes.deallocate();
-						UnitsStrings.deallocate();
+						unitsForVar.deallocate();
 						ResourceTypes.deallocate();
 						EndUses.deallocate();
 						Groups.deallocate();
@@ -2715,20 +2716,20 @@ namespace SystemReports {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
-							UnitsStrings.allocate( NumVariables );
+							unitsForVar.allocate( NumVariables );
 							ResourceTypes.allocate( NumVariables );
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
 							Names.allocate( NumVariables );
 							thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar.allocate( NumVariables );
 
-							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 								{ auto & thisVar( thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ) );
 								thisVar.ReportVarName = Names( VarNum );
-								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarUnits = unitsForVar( VarNum );
 								thisVar.ReportVarIndex = VarIndexes( VarNum );
 								thisVar.ReportVarIndexType = IndexTypes( VarNum );
 								thisVar.ReportVarType = VarTypes( VarNum );
@@ -2754,7 +2755,7 @@ namespace SystemReports {
 							VarIndexes.deallocate();
 							VarTypes.deallocate();
 							IndexTypes.deallocate();
-							UnitsStrings.deallocate();
+							unitsForVar.deallocate();
 							ResourceTypes.deallocate();
 							EndUses.deallocate();
 							Groups.deallocate();
@@ -2933,7 +2934,7 @@ namespace SystemReports {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
-							UnitsStrings.allocate( NumVariables );
+							unitsForVar.allocate( NumVariables );
 							ResourceTypes.allocate( NumVariables );
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
@@ -2941,13 +2942,13 @@ namespace SystemReports {
 							thisComp.MeteredVar.allocate( NumVariables );
 
 							thisComp.NumMeteredVars = NumVariables;
-							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 								{ auto & thisVar( thisComp.MeteredVar( VarNum ) );
 								thisVar.ReportVarName = Names( VarNum );
-								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarUnits = unitsForVar( VarNum );
 								thisVar.ReportVarIndex = VarIndexes( VarNum );
 								thisVar.ReportVarIndexType = IndexTypes( VarNum );
 								thisVar.ReportVarType = VarTypes( VarNum );
@@ -2973,7 +2974,7 @@ namespace SystemReports {
 							VarIndexes.deallocate();
 							VarTypes.deallocate();
 							IndexTypes.deallocate();
-							UnitsStrings.deallocate();
+							unitsForVar.deallocate();
 							ResourceTypes.deallocate();
 							EndUses.deallocate();
 							Groups.deallocate();
@@ -2988,20 +2989,20 @@ namespace SystemReports {
 								VarIndexes.allocate( NumVariables );
 								VarTypes.allocate( NumVariables );
 								IndexTypes.allocate( NumVariables );
-								UnitsStrings.allocate( NumVariables );
+								unitsForVar.allocate( NumVariables );
 								ResourceTypes.allocate( NumVariables );
 								EndUses.allocate( NumVariables );
 								Groups.allocate( NumVariables );
 								Names.allocate( NumVariables );
 								thisComp.SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
 
-								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 								ModeFlagOn = true;
 								for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 									{ auto & thisVar( thisComp.SubComp( SubCompNum ).MeteredVar( VarNum ) );
 									thisVar.ReportVarName = Names( VarNum );
-									thisVar.ReportVarUnits = UnitsStrings( VarNum );
+									thisVar.ReportVarUnits = unitsForVar( VarNum );
 									thisVar.ReportVarIndex = VarIndexes( VarNum );
 									thisVar.ReportVarIndexType = IndexTypes( VarNum );
 									thisVar.ReportVarType = VarTypes( VarNum );
@@ -3027,7 +3028,7 @@ namespace SystemReports {
 								VarIndexes.deallocate();
 								VarTypes.deallocate();
 								IndexTypes.deallocate();
-								UnitsStrings.deallocate();
+								unitsForVar.deallocate();
 								ResourceTypes.deallocate();
 								EndUses.deallocate();
 								Groups.deallocate();

@@ -7184,7 +7184,7 @@ namespace SetPointManager {
 		Array1D_int VarIndexes; // Variable Numbers
 		Array1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
 		Array1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
-		Array1D_string UnitsStrings; // UnitsStrings for each variable
+		Array1D < OutputProcessor::Unit> unitsForVar; // units from enum for each variable
 		Array1D_int ResourceTypes; // ResourceTypes for each variable
 		Array1D_string EndUses; // EndUses for each variable
 		Array1D_string Groups; // Groups for each variable
@@ -7210,13 +7210,13 @@ namespace SetPointManager {
 		VarIndexes.allocate( NumVariables );
 		VarTypes.allocate( NumVariables );
 		IndexTypes.allocate( NumVariables );
-		UnitsStrings.allocate( NumVariables );
+		unitsForVar.allocate( NumVariables );
 		ResourceTypes.allocate( NumVariables );
 		EndUses.allocate( NumVariables );
 		Groups.allocate( NumVariables );
 		Names.allocate( NumVariables );
 
-		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 		this->ChllrVarType = VarTypes( 1 );
 		this->ChllrVarIndex = VarIndexes( 1 );
 
@@ -7226,13 +7226,13 @@ namespace SetPointManager {
 		VarIndexes.allocate( NumVariables );
 		VarTypes.allocate( NumVariables );
 		IndexTypes.allocate( NumVariables );
-		UnitsStrings.allocate( NumVariables );
+		unitsForVar.allocate( NumVariables );
 		ResourceTypes.allocate( NumVariables );
 		EndUses.allocate( NumVariables );
 		Groups.allocate( NumVariables );
 		Names.allocate( NumVariables );
 
-		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 		this->ChlPumpVarType = VarTypes( 1 );
 		this->ChlPumpVarIndex = VarIndexes( 1 );
 
@@ -7243,13 +7243,13 @@ namespace SetPointManager {
 			VarIndexes.allocate( NumVariables );
 			VarTypes.allocate( NumVariables );
 			IndexTypes.allocate( NumVariables );
-			UnitsStrings.allocate( NumVariables );
+			unitsForVar.allocate( NumVariables );
 			ResourceTypes.allocate( NumVariables );
 			EndUses.allocate( NumVariables );
 			Groups.allocate( NumVariables );
 			Names.allocate( NumVariables );
 
-			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 			this->ClTowerVarType.push_back( VarTypes( 1 ) );
 			this->ClTowerVarIndex.push_back( VarIndexes( 1 ) );
 
@@ -7261,13 +7261,13 @@ namespace SetPointManager {
 		VarIndexes.allocate( NumVariables );
 		VarTypes.allocate( NumVariables );
 		IndexTypes.allocate( NumVariables );
-		UnitsStrings.allocate( NumVariables );
+		unitsForVar.allocate( NumVariables );
 		ResourceTypes.allocate( NumVariables );
 		EndUses.allocate( NumVariables );
 		Groups.allocate( NumVariables );
 		Names.allocate( NumVariables );
 
-		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 		this->CndPumpVarType = VarTypes( 1 );
 		this->CndPumpVarIndex = VarIndexes( 1 );
 

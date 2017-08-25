@@ -1170,7 +1170,7 @@ GetMeteredVariables(
 	Array1S_int VarIndexes, // Variable Numbers
 	Array1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
 	Array1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
-	Array1S_string UnitsStrings, // UnitsStrings for each variable
+	Array1A < OutputProcessor::Unit> unitsForVar, // units from enum for each variable
 	Array1S_int ResourceTypes, // ResourceTypes for each variable
 	Optional< Array1S_string > EndUses = _, // EndUses for each variable
 	Optional< Array1S_string > Groups = _, // Groups for each variable

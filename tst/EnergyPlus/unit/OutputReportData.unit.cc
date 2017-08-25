@@ -93,7 +93,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_getVariableKeys )
 	int typeVar = 0;
 	int avgSumVar = 0;
 	int stepTypeVar = 0;
-	std::string unitsVar = "";
+	OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
 
 	fldStTest.m_variMeter = "EXTERIOR LIGHTS ELECTRIC ENERGY";
 	keyCount = fldStTest.getVariableKeyCountandTypeFromFldSt( typeVar, avgSumVar, stepTypeVar, unitsVar );
