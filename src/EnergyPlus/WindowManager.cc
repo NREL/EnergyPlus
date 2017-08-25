@@ -2448,6 +2448,8 @@ namespace WindowManager {
 				thetas( i ) = window.ThetaFace( i );
 			}
 			hcout = HextConvCoeff;
+			hcin = HConvIn( SurfNum );
+			tin = MAT( surface.Zone ) + TKelvin; // Inside air temperature
 
 			// This is code repeating and it is necessary to calculate report variables.  Do not know
 			// how to solve this in more elegant way :(
@@ -2460,6 +2462,10 @@ namespace WindowManager {
 			} else { // Window not exposed to wind
 				tout = surface.OutDryBulbTemp + TKelvin;
 			}
+
+			Ebout = sigma * pow_4( tout );
+			Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + 
+				( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout;
 
 		} else if ( window.WindowModelType == WindowEQLModel ) {
 
