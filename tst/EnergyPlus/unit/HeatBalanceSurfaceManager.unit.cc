@@ -1362,7 +1362,6 @@ namespace EnergyPlus {
 
 		// Test if local value used in surface hc calculation
 		// Surface(1) - local; Surface(2) - global;
-		Real64 Hc = 0.0;
 		for (int SurfNum = 1; SurfNum <= 6; SurfNum++ ) {
 			DataSurfaces::Surface( SurfNum ).ExtConvCoeff = -1;
 		}		

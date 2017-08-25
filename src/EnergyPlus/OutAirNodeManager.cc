@@ -187,7 +187,6 @@ namespace OutAirNodeManager {
 		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using ScheduleManager::GetScheduleIndex;
-		using CurveManager::GetCurveIndex;
 
 
 		// Locals
@@ -336,6 +335,8 @@ namespace OutAirNodeManager {
 				// Set additional node properties
 				if ( NumNums > 0 ) Node( NodeNums( 1 ) ).Height = Numbers( 1 );
 
+				if ( NumAlphas > 1 ) AnyLocalEnvironmentsInModel = true;
+
 				if ( NumAlphas > 1 && !lAlphaBlanks( 2 ) ) {
 					Node( NodeNums( 1 ) ).OutAirDryBulbSchedNum = GetScheduleIndex( Alphas( 2 ) );
 				}
@@ -352,27 +353,6 @@ namespace OutAirNodeManager {
 					Node( NodeNums( 1 ) ).OutAirWindDirSchedNum = GetScheduleIndex( Alphas( 5 ) );
 				}
 
-				if ( NumAlphas > 5 && !lAlphaBlanks( 6 ) ) {
-					Node( NodeNums( 1 ) ).WindCoefCurveNum = GetCurveIndex( Alphas( 6 ) );
-				}
-
-				if ( NumAlphas > 6 && !lAlphaBlanks( 7 ) ) {
-					if ( SameString( Alphas( 3 ), "Yes" ) ) {
-						Node( NodeNums( 1 ) ).symmetricCurve = true;
-					} else if ( !SameString(Alphas( 3 ), "No" ) ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
-						ShowContinueError( "The default value is assigned as No." );
-					}
-				}
-
-				if ( NumAlphas > 7 && !lAlphaBlanks( 8 ) ) {
-					if ( SameString( Alphas( 4 ), "Relative" ) ) {
-						Node( NodeNums( 1 ) ).useRelativeAngle = true;
-					} else if ( !SameString(Alphas( 4 ), "Absolute" ) ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
-						ShowContinueError( "The default value is assigned as Absolute." );
-					}
-				}
 				if ( NumAlphas > 8 ) {
 					ShowSevereError( CurrentModuleObject + ", " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
 					ShowContinueError( "Object Definition indicates more than 7 Alpha Objects." );

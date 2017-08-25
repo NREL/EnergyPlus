@@ -6229,7 +6229,6 @@ CalcOutsideSurfTemp(
 	int SrdSurfNum; // Surrounding surface number DO loop counter
 	Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
 	Real64 SrdSurfViewFac; // View factor of a surrounding surface
-	Real64 AbsThermSurf;
 
 	Real64 Ueff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
 	Real64 RadTemp; // local value for Effective radiation temperature for OtherSideConditions model

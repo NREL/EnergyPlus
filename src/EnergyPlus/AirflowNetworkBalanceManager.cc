@@ -528,6 +528,8 @@ namespace AirflowNetworkBalanceManager {
 		using DataLoopNode::NodeConnectionType_Inlet;
 		using DataLoopNode::ObjectIsParent;
 		using DataGlobals::AnyLocalEnvironmentsInModel;
+		using OutAirNodeManager::SetOutAirNodes;
+		using CurveManager::GetCurveIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1218,37 +1220,15 @@ namespace AirflowNetworkBalanceManager {
 		// *** Read AirflowNetwork external node
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
 			// Wind coefficient == Surface-Average does not need inputs of external nodes
-			CurrentModuleObject = "AirflowNetwork:MultiZone:ExternalNode";
-			AirflowNetworkNumOfExtNode = GetNumObjectsFound( CurrentModuleObject );
+			AirflowNetworkNumOfExtNode = GetNumObjectsFound( "AirflowNetwork:MultiZone:ExternalNode" );
+			SetOutAirNodes();
 			if ( AnyLocalEnvironmentsInModel ) {
- 				CurrentModuleObject = "OutdoorAir:Node";
- 				AirflowNetworkNumOfOutAirNode = GetNumObjectsFound( CurrentModuleObject );
- 				AirflowNetworkNumOfExtNode += AirflowNetworkNumOfOutAirNode;
- 			}
+				AirflowNetworkNumOfOutAirNode = GetNumObjectsFound( "OutdoorAir:Node" );
+				AirflowNetworkNumOfExtNode += AirflowNetworkNumOfOutAirNode;
+			}
+
 			if ( AirflowNetworkNumOfExtNode > 0 ) {
-				MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtNode );
-				if ( AnyLocalEnvironmentsInModel ){
- 					CurrentModuleObject = "OutdoorAir:Node";
- 					for ( i = AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode + 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
- 						GetObjectItem( CurrentModuleObject, i - ( AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode ), Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
- 						IsNotOK = false;
- 						IsBlank = false;
- 						VerifyName( Alphas( 1 ), MultizoneExternalNodeData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
- 						if ( IsNotOK ) {
- 							ErrorsFound = true;
- 							if ( IsBlank ) Alphas( 1 ) = "xxxxx";
- 						}
- 						MultizoneExternalNodeData( i ).Name = Alphas( 1 ) ; // Name of external node
- 						NodeNum = GetOnlySingleNode( Alphas( 1 ) , ErrorsFound, CurrentModuleObject, "AirflowNetwork:Multizone:Surface", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
- 						MultizoneExternalNodeData( i ).OutAirNodeNum = NodeNum; // Name of outdoor air node
- 						MultizoneExternalNodeData( i ).height = Node( NodeNum ).Height; // Nodal height
- 						MultizoneExternalNodeData( i ).ExtNum = AirflowNetworkNumOfZones + i; // External node number
- 						MultizoneExternalNodeData( i ).curve = Node( NodeNum ).WindCoefCurveNum; // Wind pressure curve
-						MultizoneExternalNodeData( i ).symmetricCurve = Node( NodeNum ).symmetricCurve; // Symmetric curve
-						MultizoneExternalNodeData( i ).useRelativeAngle = Node( NodeNum ).useRelativeAngle; // Relative or absolute wind angle
- 					}
- 				}
- 				
+				MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtNode ); 				
  				CurrentModuleObject = "AirflowNetwork:MultiZone:ExternalNode";
 				for ( i = 1; i <= AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode; ++i ) {
 					GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
@@ -1283,12 +1263,56 @@ namespace AirflowNetworkBalanceManager {
 					if ( NumAlphas == 4 && !lAlphaBlanks( 4 ) ) { // Relative or absolute wind angle
 						if ( SameString( Alphas( 4 ), "Relative" ) ) {
 							MultizoneExternalNodeData( i ).useRelativeAngle = true;
-						} else if ( !SameString(Alphas( 4 ), "Absolute" ) ) {
+						} else if ( !SameString( Alphas( 4 ), "Absolute" ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
 							ShowContinueError( "The default value is assigned as Absolute." );
 						}
 					}
 				}
+ 				CurrentModuleObject = "OutdoorAir:Node";
+ 				for ( i = AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode + 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
+ 					GetObjectItem( CurrentModuleObject, i - ( AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode ), Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+ 					IsNotOK = false;
+ 					IsBlank = false;
+ 					VerifyName( Alphas( 1 ), MultizoneExternalNodeData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+ 					if ( IsNotOK ) {
+ 						ErrorsFound = true;
+ 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+ 					}
+						
+					if ( NumAlphas > 5 && !lAlphaBlanks( 6 ) ) { // Wind pressure curve
+						MultizoneExternalNodeData( i ).curve = GetCurveIndex( Alphas( 6 ) );
+						if ( MultizoneExternalNodeData( i ).curve == 0 ) {
+							ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 6 ) + "=" + Alphas( 6 ) );
+							ShowContinueError( "Entered in " + CurrentModuleObject + '=' + Alphas( 1 ) );
+							ErrorsFound = true;
+						}
+					}
+
+					if ( NumAlphas > 6 && !lAlphaBlanks( 7 ) ) { // Symmetric curve
+						if ( SameString( Alphas( 7 ), "Yes" ) ) {
+							MultizoneExternalNodeData( i ).symmetricCurve = true;
+						} else if ( !SameString(Alphas( 7 ), "No" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
+							ShowContinueError( "The default value is assigned as No." );
+						}
+					}
+
+					if ( NumAlphas > 7 && !lAlphaBlanks( 8 ) ) { // Relative or absolute wind angle
+						if ( SameString( Alphas( 8 ), "Relative" ) ) {
+							MultizoneExternalNodeData( i ).useRelativeAngle = true;
+						} else if ( !SameString(Alphas( 8 ), "Absolute" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 8 ) + " = " + Alphas( 8 ) );
+							ShowContinueError( "The default value is assigned as Absolute." );
+						}
+					}
+
+ 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ) ; // Name of external node
+ 					NodeNum = GetOnlySingleNode( Alphas( 1 ) , ErrorsFound, CurrentModuleObject, "AirflowNetwork:Multizone:Surface", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+ 					MultizoneExternalNodeData( i ).OutAirNodeNum = NodeNum; // Name of outdoor air node
+ 					MultizoneExternalNodeData( i ).height = Node( NodeNum ).Height; // Nodal height
+ 					MultizoneExternalNodeData( i ).ExtNum = AirflowNetworkNumOfZones + i; // External node number
+ 				}
 			} else {
 				ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required but not found when Wind Pressure Coefficient Type = Input." );
 				ErrorsFound = true;
@@ -1314,6 +1338,12 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneSurfaceData( i ).OpeningName = Alphas( 2 ); // Name of crack or opening component,
 				// either simple or detailed large opening, or crack
 				MultizoneSurfaceData( i ).ExternalNodeName = Alphas( 3 ); // Name of external node, but not used at WPC="INPUT"
+				if ( FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) && 
+					MultizoneExternalNodeData( FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) ).curve == 0 ) {
+					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + "=" + Alphas( 3 ) );
+					ShowContinueError( "A valid wind pressure coefficient curve name is required but not found when Wind Pressure Coefficient Type = Input." );
+					ErrorsFound = true;
+				}
 				MultizoneSurfaceData( i ).Factor = Numbers( 1 ); // Crack Actual Value or Window Open Factor for Ventilation
 				if ( MultizoneSurfaceData( i ).Factor > 1.0 || MultizoneSurfaceData( i ).Factor <= 0.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + " object=" + MultizoneSurfaceData( i ).SurfName + ", " + cNumericFields( 1 ) + " is out of range (0.0,1.0]" );
@@ -4147,8 +4177,6 @@ namespace AirflowNetworkBalanceManager {
 
 		// USE STATEMENTS:
 		using DataHVACGlobals::TimeStepSys;
-		using DataEnvironment::DryBulbTempAtNode;
-		using DataEnvironment::HumRatAtNode;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4565,11 +4593,7 @@ namespace AirflowNetworkBalanceManager {
 		using DataAirLoop::LoopFanOperationMode;
 		using DataAirLoop::LoopOnOffFanPartLoadRatio;
 		using DataGlobals::AnyLocalEnvironmentsInModel;
-		using DataEnvironment::HumRatAtNode;
-		using DataEnvironment::WindSpeedAtNode;
-		using DataEnvironment::WindDirAtNode;
-		using DataEnvironment::DryBulbTempAtNode;
-		using OutAirNodeManager::SetOutAirNodes;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -4639,29 +4663,20 @@ namespace AirflowNetworkBalanceManager {
 							AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve,
 								MultizoneExternalNodeData(i).symmetricCurve, MultizoneExternalNodeData(i).useRelativeAngle,
 								LocalAzimuth, LocalWindSpeed, WindDir, LocalDryBulb, OutHumRat );
-						}
-						else {
+						} else {
 							// If and outdoor air node object is defined as the External Node Name in AirflowNetwork:MultiZone:Surface,
 							// the node object requires to define the Wind Pressure Coefficient Curve Name.
 							NodeNum = MultizoneExternalNodeData( i ).OutAirNodeNum;
-							if ( Node( NodeNum ).WindCoefCurveNum == 0 ) {
-								ShowSevereError("GetAirflowNetworkInput: AIRFLOWNETWORK:DISTRIBUTION:NODE: Invalid external node at " + AirflowNetworkNodeData( n ).Name + ": No wind coefficient is defined for airnode when used in the airflow network." );
-								ErrorsFound = true;								
-							}
-							else {
-								LocalWindSpeed = WindSpeedAtNode( NodeNum );
-								LocalWindDir = WindDirAtNode( NodeNum );
-								LocalHumRat = HumRatAtNode( NodeNum );
-								LocalDryBulb = DryBulbTempAtNode( NodeNum );
-								LocalAzimuth = MultizoneExternalNodeData( i ).azimuth;
-								AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve, 
-									MultizoneExternalNodeData( i ).symmetricCurve, MultizoneExternalNodeData( i ).useRelativeAngle, 
-									LocalAzimuth, LocalWindSpeed, LocalWindDir, LocalDryBulb, LocalHumRat );
-								AirflowNetworkNodeSimu( n ).TZ = LocalDryBulb;
-								AirflowNetworkNodeSimu( n ).WZ = LocalHumRat;
-								
-							}
-
+							LocalWindSpeed = Node ( ( NodeNum ) ).OutAirWindSpeed;
+							LocalWindDir = Node ( ( NodeNum ) ).OutAirWindDir;
+							LocalHumRat = Node ( ( NodeNum ) ).HumRat;
+							LocalDryBulb = Node ( ( NodeNum ) ).OutAirDryBulb;
+							LocalAzimuth = MultizoneExternalNodeData( i ).azimuth;
+							AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve, 
+								MultizoneExternalNodeData( i ).symmetricCurve, MultizoneExternalNodeData( i ).useRelativeAngle, 
+								LocalAzimuth, LocalWindSpeed, LocalWindDir, LocalDryBulb, LocalHumRat );
+							AirflowNetworkNodeSimu( n ).TZ = LocalDryBulb;
+							AirflowNetworkNodeSimu( n ).WZ = LocalHumRat;
 						}
 					}
 					
@@ -8121,6 +8136,16 @@ namespace AirflowNetworkBalanceManager {
 				if ( NodeFound( k ) ) continue;
 				if ( Node( k ).FluidType == 2 ) {
 					NodeFound( k ) = true;
+				}
+			}
+
+			// Eliminate external air node for network
+			for ( k = 1; k <= NumOfNodes; ++k ) {
+				if ( NodeFound( k ) ) continue;
+				for ( j = 1; j <= AirflowNetworkNumOfExtNode; ++j ) {
+					if ( MultizoneExternalNodeData( j ).OutAirNodeNum == k ) {
+						NodeFound( k ) = true;
+					}
 				}
 			}
 

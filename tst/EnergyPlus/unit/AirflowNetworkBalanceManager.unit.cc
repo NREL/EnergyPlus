@@ -7962,7 +7962,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, TestExternalNodesWithLocalAirNode ) {
 		std::string const idf_objects = delimited_string({
-			"Version,8.6;",
+			"Version,8.8;",
 			"Material,",
 			"  A1 - 1 IN STUCCO,        !- Name",
 			"  Smooth,                  !- Roughness",
@@ -8485,7 +8485,7 @@ namespace EnergyPlus {
 			"  NFacade_WPCCurve;        !- Wind Pressure Coefficient Values Object Name",
 			"OutdoorAir:Node,",
 			"  SFacade,                 !- Name",
-			"  1.524,                   !- Height Above Ground",
+			"  ,                        !- Height Above Ground",
 			"  ,                        !- Drybulb Temperature Schedule Name",
 			"  ,                        !- Wetbulb Temperature Schedule Name",
 			"  ,                        !- Wind Speed Schedule Name",
@@ -8569,21 +8569,30 @@ namespace EnergyPlus {
 		DataEnvironment::SiteWindExp = 0.0; // Disconnect variation by height
 		DataEnvironment::WindSpeed = 10.0;
 
-		HeatBalanceManager::GetMaterialData( errors ); // read material data
-		EXPECT_FALSE( errors ); // expect no errors
-
-		HeatBalanceManager::GetConstructData( errors ); // read construction data
-		EXPECT_FALSE(errors); // expect no errors
-
-		HeatBalanceManager::GetZoneData( errors ); // read zone data
-		EXPECT_FALSE( errors ); // expect no errors
+		bool ErrorsFound = false;
+        // Read objects
+		SimulationManager::GetProjectData();
+		HeatBalanceManager::GetProjectControlData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+		HeatBalanceManager::GetZoneData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+		HeatBalanceManager::GetWindowGlassSpectralData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+		HeatBalanceManager::GetMaterialData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+		HeatBalanceManager::GetConstructData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+		HeatBalanceManager::GetHeatBalanceInput();
+		HeatBalanceManager::AllocateHeatBalArrays();
+		DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+		SurfaceGeometry::GetGeometryParameters( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
 
 		// Magic to get surfaces read in correctly
 		DataHeatBalance::HeatTransferAlgosUsed.allocate( 1 );
 		DataHeatBalance::HeatTransferAlgosUsed( 1 ) = OverallHeatTransferSolutionAlgo;
 		SurfaceGeometry::CosBldgRotAppGonly = 1.0;
 		SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-
 		SurfaceGeometry::GetSurfaceData( errors ); // setup zone geometry and get zone data
 		EXPECT_FALSE( errors ); // expect no errors
 
@@ -8592,7 +8601,8 @@ namespace EnergyPlus {
 
 		DataGlobals::AnyLocalEnvironmentsInModel = true;
 		OutAirNodeManager::SetOutAirNodes();
-		AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+		GetAirflowNetworkInput();
+		InitAirflowNetwork();
 
 		// Check the airflow elements
 		EXPECT_EQ( 2u, DataAirflowNetwork::MultizoneExternalNodeData.size() );
@@ -8613,30 +8623,34 @@ namespace EnergyPlus {
 
 		// Make sure we can compute the right wind pressure
 		Node( 1 ).OutAirWindSpeed = 1.0;
-		Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, 
-			DataEnvironment::DryBulbTempAtNode( 1 ),
-			DataEnvironment::HumRatAtNode( 1 ) );
-		EXPECT_DOUBLE_EQ( 1.1841123742118911, rho );
+		Node( 1 ).OutAirDryBulb = 15.0;
+		Real64 rho_1 = Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, 
+			DataLoopNode::Node( 1 ).OutAirDryBulb,
+			DataLoopNode::Node( 1 ).HumRat );
+		Real64 rho_2 = Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress,
+			DataEnvironment::OutDryBulbTemp ,
+			DataEnvironment::OutHumRat );
+		EXPECT_DOUBLE_EQ( 1.2252059842834473, rho_1 );
+		EXPECT_DOUBLE_EQ( 1.1841123742118911, rho_2 );
 
 		Real64 p = AirflowNetworkBalanceManager::CalcWindPressure( DataAirflowNetwork::MultizoneExternalNodeData( 1 ).curve, 
 			false, false, 0.0, 
-			DataEnvironment::WindSpeedAtNode( 1 ), 
-			DataEnvironment::WindDirAtNode( 1 ), 
-			DataEnvironment::DryBulbTempAtNode( 1 ), 
-			DataEnvironment::HumRatAtNode( 1 ) );
-		EXPECT_DOUBLE_EQ( -0.56*0.5*1.1841123742118911, p );
-
-		EXPECT_EQ( 5u, DataAirflowNetwork::AirflowNetworkNodeSimu.size() );
+			DataLoopNode::Node( 1 ).OutAirWindSpeed, 
+			DataLoopNode::Node( 1 ).OutAirWindDir,
+			DataLoopNode::Node( 1 ).OutAirDryBulb,
+			DataLoopNode::Node( 1 ).HumRat );
+		EXPECT_DOUBLE_EQ( -0.56*0.5*1.2252059842834473, p );
 
 		// Run the balance routine, for now only to get the pressure set at the external nodes
-		Node( 1 ).OutAirDryBulb = 15.0;
+
 		AirflowNetworkBalanceManager::CalcAirflowNetworkAirBalance();
 		// Make sure we set the right temperature
 		EXPECT_DOUBLE_EQ( 25.0, DataAirflowNetwork::AirflowNetworkNodeSimu( 4 ).TZ );
 		EXPECT_DOUBLE_EQ( 15.0, DataAirflowNetwork::AirflowNetworkNodeSimu( 5 ).TZ );
+		EXPECT_DOUBLE_EQ( 4.7384645696854548, DataEnvironment::WindSpeedAt( 1.524 ) );
 		// Global wind speed 10 m/s, temp 25 C; Local wind speed 1 m/s, temp 15 C;
-		EXPECT_DOUBLE_EQ( -0.56*0.5*118.41123742118911, DataAirflowNetwork::AirflowNetworkNodeSimu( 4 ).PZ );
-		EXPECT_DOUBLE_EQ( -0.26*0.5*1.2252059842834473, DataAirflowNetwork::AirflowNetworkNodeSimu( 5 ).PZ );
+		EXPECT_DOUBLE_EQ( -0.56 * 0.5 * rho_2 * 4.7384645696854548 * 4.7384645696854548, DataAirflowNetwork::AirflowNetworkNodeSimu( 4 ).PZ );
+		EXPECT_DOUBLE_EQ( -0.26 * 0.5 * rho_1, DataAirflowNetwork::AirflowNetworkNodeSimu( 5 ).PZ );
 	}
 
 	TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided) {
