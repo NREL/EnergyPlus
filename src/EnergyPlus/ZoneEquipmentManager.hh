@@ -164,7 +164,7 @@ namespace ZoneEquipmentManager {
 	void
 	CalcZoneReturnFlows(
 		int const ZoneNum,
-		Real64 const ExpTotalReturnMassFlow, // Expected total return air mass flow rate
+		Real64 & ExpTotalReturnMassFlow, // Expected total return air mass flow rate
 		Real64 & FinalTotalReturnMassFlow // Final total return air mass flow rate
 	);
 
