@@ -4188,6 +4188,15 @@ namespace PackagedTerminalHeatPump {
 		if ( CurZoneEqNum > 0 ) {
 			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
+			// save air flow rates for child object sizing
+			if( PTUnit( PTUnitNum ).MaxCoolAirVolFlow > 0.0 ) {
+				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+				ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+			}
+			if( PTUnit( PTUnitNum ).MaxHeatAirVolFlow > 0.0 ) {
+				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+				ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
+			}
 		}
 
 		if ( ErrorsFound ) {
