@@ -334,8 +334,9 @@ namespace DataZoneEquipment {
 		Array1D_int InletNode; // zone supply air inlet nodes
 		Array1D_int InletNodeAirLoopNum; // air loop number connected to this inlet node (0 if not an airloop node)
 		Array1D_int ExhaustNode; // zone air exhaust nodes
-		Array1D_int ReturnNode; // zone return air nodes
+		Array1D_int ReturnNode; // zone return air nodes (node numbers)
 		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
+		Array1D_int ReturnNodeInletNodeNum; // node number of the inlet node for this zone that is attached to the same air loop
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
 		int AirLoopNum; // the air loop index for this controlled zone

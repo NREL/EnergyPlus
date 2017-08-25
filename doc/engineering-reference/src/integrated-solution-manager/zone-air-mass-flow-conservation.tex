@@ -27,27 +27,15 @@ The return air flow rate is calculated one of several ways, depending on whether
 
 \paragraph{Base Zone Total Return Flow}\label{base-zone-total-return-flow}
 
-The default zone return flow calculation with one airloop and no ZoneAirMassFlowConservation is the sum of the zone inlets less the sum of the zone exhausts adjusted for any balanced exhaust fan flow:
+The total zone return flow calculation with no ZoneAirMassFlowConservation is the sum of the zone inlets less the sum of the zone exhausts adjusted for any balanced exhaust fan flow:
 
 \begin{equation}
 {\dot m_{R}} = MAX\left( {0.0,\,{{\dot m}_S} - [{{\dot m}_{EX,tot}} - {\dot m_{EXF,bal}}]} \right)
 \end{equation}
 
-If the airloop has no outdoor air system, then all exhaust fan flow is excluded:
-
-\begin{equation}
-{\dot m_{R}} = MAX\left( {0.0,\,{{\dot m}_S} - [{{\dot m}_{EX,tot}} - {\dot m_{EXF,tot}}]} \right)
-\end{equation}
-
-\paragraph{Base Zone Total Return Flow with ZoneAirMassFlowConservation}\label{base-zone-total-return-flow-with-masscons}
-
 If ZoneAirMassFlowConservation is active, then the total zone return air flow rate is 
 \begin{equation}
 {\dot m_{R}} = MAX\left( {0.0,\,{{\dot m}_S} - [{{\dot m}_{EX,tot}} - {\dot m_{EXF,bal}}] + [{{\dot m}_{XR}} - {{\dot m}_{XS}}]} \right)
-\end{equation}
-or
-\begin{equation}
-{\dot m_{R}} = MAX\left( {0.0,\,{{\dot m}_S} - [{{\dot m}_{EX,tot}} - {\dot m_{EXF,tot}}] + [{{\dot m}_{XR}} - {{\dot m}_{XS}}]} \right)
 \end{equation}
 
 \paragraph{Zone Return Air Node 1}\label{zone-return-air-node1}

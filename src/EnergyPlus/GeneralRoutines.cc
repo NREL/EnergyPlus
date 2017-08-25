@@ -2014,8 +2014,6 @@ TestReturnAirPathIntegrity(
 					}
 					break; // leave air loops loop
 				}
-			} else {
-				ShowWarningError( "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo( Count2 ).AirLoopName );
 			}
 		}
 
