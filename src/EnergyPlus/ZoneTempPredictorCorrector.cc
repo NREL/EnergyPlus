@@ -115,9 +115,6 @@ namespace ZoneTempPredictorCorrector {
 	//    "Predict" step is used to get zone loads for HVAC equipment
 	//    "correct" step determines zone air temp with available HVAC
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
@@ -390,6 +387,7 @@ namespace ZoneTempPredictorCorrector {
 		using WeatherManager::NumDaysInYear;
 
 		// Locals
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneAirSetpoints: " );
 
@@ -4495,8 +4493,6 @@ namespace ZoneTempPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// Locals
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
 		int LoopNode;
@@ -4909,8 +4905,6 @@ namespace ZoneTempPredictorCorrector {
 		// This routine assumes that the direction is to a shorter timestep.
 		// The down step ratio, DSRatio = OldTimeStep/ NewTimeStep
 		//  is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
-
-		// Locals
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 oldTime0;
@@ -5717,8 +5711,6 @@ namespace ZoneTempPredictorCorrector {
 		// until that is reached unless it goes to less than the
 		// MinTimeStepSys.
 
-		// Locals
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iZone;
 		Real64 NegOscillateMagnitude;
@@ -5812,8 +5804,6 @@ namespace ZoneTempPredictorCorrector {
 		// Using/Aliasing
 		using DataHeatBalance::MRT;
 		using ScheduleManager::GetCurrentScheduleValue;
-
-		// Locals
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 thisMRT; // local variable for mean radiant temperature in this zone
@@ -6230,7 +6220,6 @@ namespace ZoneTempPredictorCorrector {
 		// This routine sets what the thermal comfort setpoints for each controlled zone should be based on air tempeature
 		// obtained from thermal comfort models.
 		// This is called each time step.
-
 
 		// Using/Aliasing
 		using General::SolveRoot;

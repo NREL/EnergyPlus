@@ -2980,9 +2980,8 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFactors ) {
 
 		std::string const idf_objects = delimited_string( {
-			"  Version,",
-			"    8.7;                     !- Version Identifier",
-
+			"  Version,8.8;",
+			
 			"  SimulationControl,",
 			"    No,                      !- Do Zone Sizing Calculation",
 			"    No,                      !- Do System Sizing Calculation",
@@ -8642,7 +8641,7 @@ namespace EnergyPlus {
 
 	TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided) {
 		std::string const idf_objects = delimited_string({
-			"Version,8.7;",
+			"Version,8.8;",
 			"SimulationControl,",
 			"  No,                      !- Do Zone Sizing Calculation",
 			"  No,                      !- Do System Sizing Calculation",

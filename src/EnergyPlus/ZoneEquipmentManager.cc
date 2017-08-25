@@ -777,8 +777,6 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatMassFlow = MassFlowRate;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneTemp = Node( ZoneNode ).Temp;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneHumRat = Node( ZoneNode ).HumRat;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutTemp = OutDryBulbTemp;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutHumRat = OutHumRat;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolLoad = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolMassFlow = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneTemp = 0.0;
@@ -788,13 +786,15 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolMassFlow = MassFlowRate;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneTemp = Node( ZoneNode ).Temp;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolZoneHumRat = Node( ZoneNode ).HumRat;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutTemp = OutDryBulbTemp;
-				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutHumRat = OutHumRat;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatLoad = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatMassFlow = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneTemp = 0.0;
 				CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatZoneHumRat = 0.0;
 			}
+			CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutTemp = OutDryBulbTemp;
+			CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).HeatOutHumRat = OutHumRat;
+			CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutTemp = OutDryBulbTemp;
+			CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolOutHumRat = OutHumRat;
 
 			if ( SupplyAirNode > 0 ) {
 				Node( SupplyAirNode ).Temp = Temp;
@@ -2910,8 +2910,10 @@ namespace ZoneEquipmentManager {
 							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = *std::max_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.end() );
+							FinalZoneSizing( CtrlZoneNum ).OutTempAtHeatPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).HeatOutTempSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).HeatOutTempSeq.end() );
 						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepAtPeakF );
+						FinalZoneSizing( CtrlZoneNum ).OutHumRatAtHeatPeak = ZoneSizing( DDNumF, CtrlZoneNum ).HeatOutHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak > 0.0 ) {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak, StdBaroPress, RoutineName ) );
 						} else {

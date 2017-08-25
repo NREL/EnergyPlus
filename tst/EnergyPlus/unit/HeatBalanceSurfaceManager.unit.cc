@@ -70,6 +70,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DataOutputs.hh>
 
 using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
@@ -331,7 +332,7 @@ namespace EnergyPlus {
 	{
 
 		std::string const idf_objects = delimited_string( {
-			"  Version,8.7;",
+			"  Version,8.8;",
 
 			"  Building,",
 			"    House with AirflowNetwork simulation,  !- Name",
@@ -1955,4 +1956,46 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( 0.0, DataHeatBalSurface::QRadLWOutSrdSurfs( 4 ) );
 	}
 
+	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest )
+	{
+
+		std::string const idf_objects = delimited_string( {
+			"  Version,8.7;",
+			" Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;",
+			" Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;",
+			" Output:Diagnostics, DisplayAdvancedReportVariables;",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::DisplayAdvancedReportVariables = true;
+
+		DataSurfaces::TotSurfaces = 1;
+		DataGlobals::NumOfZones = 1;
+		DataHeatBalance::TotConstructs = 1;
+		DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+		DataSurfaces::Surface.allocate( DataSurfaces::TotSurfaces );
+		DataSurfaces::SurfaceWindow.allocate( DataSurfaces::TotSurfaces );
+		DataHeatBalance::Construct.allocate( DataHeatBalance::TotConstructs );
+		DataHeatBalance::AnyConstructInternalSourceInInput = true;
+
+		DataSurfaces::Surface( 1 ).Class = DataSurfaces::SurfaceClass_Wall;
+		DataSurfaces::Surface( 1 ).HeatTransSurf = true;
+		DataSurfaces::Surface( 1 ).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+		DataSurfaces::Surface( 1 ).ExtBoundCond = 1;
+		DataSurfaces::Surface( 1 ).Construction = 1;
+
+		DataHeatBalance::Construct( 1 ).NumCTFTerms = 2;
+		DataHeatBalance::Construct( 1 ).SourceSinkPresent = true;
+		DataHeatBalance::Construct( 1 ).NumHistories = 1;
+		DataHeatBalance::Construct( 1 ).CTFTUserOut( 0 ) = 0.5;
+		DataHeatBalance::Construct( 1 ).CTFTUserIn( 0 ) = 0.25;
+		DataHeatBalance::Construct( 1 ).CTFTUserSource( 0 ) = 0.25;
+
+		AllocateSurfaceHeatBalArrays( ); // allocates a host of variables related to CTF calculations
+		OutputProcessor::GetReportVariableInput( );
+
+		EXPECT_EQ( OutputProcessor::ReqRepVars( 2 ).VarName, "SURFACE CONSTRUCTION INDEX" );
+
+	}
 }
