@@ -2714,6 +2714,7 @@ namespace RuntimeLanguageProcessor {
 		std::string::size_type lbracket;
 		std::string UnitsA;
 		std::string UnitsB;
+		OutputProcessor::Unit curUnit( OutputProcessor::Unit::None );
 		std::string::size_type ptr;
 
 		// FLOW:
@@ -3179,7 +3180,8 @@ namespace RuntimeLanguageProcessor {
 							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
+					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
+//ou					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3251,7 +3253,7 @@ namespace RuntimeLanguageProcessor {
 						ErrorsFound = true;
 					}}
 
-					SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
 					// Last field is index key, no indexing here so mimic weather output data
 
 				} // RuntimeReportVarNum
@@ -3319,7 +3321,8 @@ namespace RuntimeLanguageProcessor {
 							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
+					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
+//ou					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3513,9 +3516,9 @@ namespace RuntimeLanguageProcessor {
 					if ( ! lAlphaFieldBlanks( 8 ) ) {
 						EndUseSubCatString = cAlphaArgs( 8 );
 
-						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
 					} else { // no subcat
-						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
 					}
 
 				}

@@ -240,7 +240,8 @@ namespace OutputProcessor {
 		J_m2,
 		clo,
 		W_K,
-		kgWater_s
+		kgWater_s,
+		unknown
 	};
 
 	struct TimeSteps
@@ -794,11 +795,9 @@ namespace OutputProcessor {
 
 	void
 	AttachCustomMeters(
-		std::string const & MtrUnits, // Units for this meter
 		int const RepVarNum, // Number of this report variable
 		int & MeterArrayPtr, // Input/Output set of Pointers to Meters
-		int const MeterIndex, // Which meter this is
-		bool & ErrorsFound // True if errors in this call
+		int const MeterIndex // Which meter this is
 	);
 
 	void
@@ -816,7 +815,7 @@ namespace OutputProcessor {
 	DetermineMeterIPUnits(
 		int & CodeForIPUnits, // Output Code for IP Units
 		std::string const & ResourceType, // Resource Type
-		std::string const & MtrUnits, // Meter units
+		OutputProcessor::Unit const & MtrUnits, // Meter units
 		bool & ErrorsFound // true if errors found during subroutine
 	);
 
@@ -935,7 +934,7 @@ namespace OutputProcessor {
 		std::string const & indexGroup, // The reporting group for the variable
 		std::string const & reportIDChr, // The reporting ID in for the variable
 		std::string const & meterName, // The variable's meter name
-		std::string const & UnitsString, // The variables units
+		OutputProcessor::Unit const & unit, // The variables units
 		bool const cumulativeMeterFlag, // A flag indicating cumulative data
 		bool const meterFileOnlyFlag // A flag indicating whether the data is to be written to standard output
 	);
@@ -1038,6 +1037,11 @@ namespace OutputProcessor {
 	std::string
 	unitEnumToString(
 		OutputProcessor::Unit const & unitIn
+	);
+
+	OutputProcessor::Unit
+	unitStringToEnum(
+		std::string const & unitIn
 	);
 
 } // OutputProcessor
@@ -1182,7 +1186,7 @@ GetVariableKeyCountandType(
 	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
 	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
 	int & varStepType, // Variable time step is Zone=1 or HVAC=2
-	std::string & varUnits // Units sting, may be blank
+	OutputProcessor::Unit varUnits // Units enumeration
 );
 
 void
