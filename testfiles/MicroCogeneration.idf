@@ -3873,7 +3873,7 @@
   WaterHeater:Stratified,
     SHWSys1 Water Heater,    !- Name
     tank backup,             !- End-Use Subcategory
-    1.0000,                  !- Tank Volume {m3}
+    1.5000,                  !- Tank Volume {m3}
     0.9697,                  !- Tank Height {m}
     VerticalCylinder,        !- Tank Shape
     ,                        !- Tank Perimeter {m}
