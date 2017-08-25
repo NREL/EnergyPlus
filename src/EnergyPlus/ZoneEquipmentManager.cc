@@ -2780,11 +2780,13 @@ namespace ZoneEquipmentManager {
 							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.end() );
+							FinalZoneSizing( CtrlZoneNum ).OutTempAtCoolPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).CoolOutTempSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).CoolOutTempSeq.end() );
 						}
 						FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolZoneHumRatSeq( TimeStepAtPeakF );
+						FinalZoneSizing( CtrlZoneNum ).OutHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolOutHumRatSeq( TimeStepAtPeakF );
 						if ( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak > 0.0 ) {
-							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = min( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, RoutineName ) );
-
+							// should use max here for cooling and min for heating ?
+							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = max( FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, PsyWFnTdpPb( FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak, StdBaroPress, RoutineName ) );
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak = ZoneSizing( DDNumF, CtrlZoneNum ).CoolDesHumRat;
 						}
