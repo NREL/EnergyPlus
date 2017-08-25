@@ -1136,9 +1136,6 @@ namespace ReportSizingManager {
 							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
 						} else {
 							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-							// DELETE THIS MESSAGE: only testing to see if any example files use this line of code
-							// can probably combine the ZoneEqFanCoil code above and this to consolidate?
-							ShowWarningMessage( CallingRoutine + ": Sizing for " + CompType + ' ' + CompName + " using DesHeatCoilInTemp without checking for OA fraction. " );
 						}
 						if ( ( TermUnitSingDuct || TermUnitPIU ) && ( CurTermUnitSizingNum > 0 ) ) {
 							CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
