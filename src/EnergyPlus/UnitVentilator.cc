@@ -2105,6 +2105,11 @@ namespace UnitVentilator {
 		if ( CurZoneEqNum > 0 ) {
 			ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow = UnitVent( UnitVentNum ).MaxVolHotWaterFlow;
 			ZoneEqSizing( CurZoneEqNum ).MaxCWVolFlow = UnitVent( UnitVentNum ).MaxVolColdWaterFlow;
+			ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+			ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = UnitVent( UnitVentNum ).MaxAirVolFlow;
+			ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+			ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = UnitVent( UnitVentNum ).MaxAirVolFlow;
+			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = UnitVent( UnitVentNum ).OutAirVolFlow;
 		}
 
 		if ( ErrorsFound ) {
