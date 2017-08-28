@@ -1513,7 +1513,7 @@ namespace HeatBalanceSurfaceManager {
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Surface( loop ).OutDryBulbTemp, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Surface( loop ).OutWetBulbTemp, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Surface( loop ).WindSpeed, "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Surface( loop ).WindDir, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Direction", OutputProcessor::Unit::degree, Surface( loop ).WindDir, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate", OutputProcessor::Unit::W, QdotConvOutRep( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotConvOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Energy", OutputProcessor::Unit::J, QConvOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
@@ -1570,7 +1570,7 @@ namespace HeatBalanceSurfaceManager {
 			if ( Surface( loop ).Class == SurfaceClass_Window ) { // CurrentModuleObject='Windows'
 				SetupOutputVariable( "Surface Shading Device Is On Time Fraction", OutputProcessor::Unit::None, SurfaceWindow( loop ).FracTimeShadingDeviceOn, "Zone", "Average", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Storm Window On Off Status", OutputProcessor::Unit::None, SurfaceWindow( loop ).StormWinFlag, "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Window Blind Slat Angle", OutputProcessor::Unit::deg, SurfaceWindow( loop ).SlatAngThisTSDeg, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Window Blind Slat Angle", OutputProcessor::Unit::degree, SurfaceWindow( loop ).SlatAngThisTSDeg, "Zone", "State", Surface( loop ).Name );
 			}
 			//    IF (DisplayAdvancedReportVariables) THEN  !CurrentModuleObject='Opaque Surfaces(Advanced)'
 			SetupOutputVariable( "Surface Inside Face Convection Classification Index", OutputProcessor::Unit::None, Surface( loop ).IntConvClassification, "Zone", "Average", Surface( loop ).Name );

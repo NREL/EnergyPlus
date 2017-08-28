@@ -853,7 +853,7 @@ namespace WeatherManager {
 			SetupOutputVariable( "Site Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc, OutRelHum, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Outdoor Air Barometric Pressure", OutputProcessor::Unit::Pa, OutBaroPress, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Wind Speed", OutputProcessor::Unit::m_s, WindSpeed, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Wind Direction", OutputProcessor::Unit::deg, WindDir, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Wind Direction", OutputProcessor::Unit::degree, WindDir, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Sky Temperature", OutputProcessor::Unit::C, SkyTemp, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Horizontal Infrared Radiation Rate per Area", OutputProcessor::Unit::W_m2, HorizIRSky, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Diffuse Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, DifSolarRad, "Zone", "Average", "Environment" );
@@ -866,9 +866,9 @@ namespace WeatherManager {
 			SetupOutputVariable( "Site Simple Factor Model Ground Temperature", OutputProcessor::Unit::C, GroundTempFC, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, OutEnthalpy, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Outdoor Air Density", OutputProcessor::Unit::kg_m3, OutAirDensity, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Azimuth Angle", OutputProcessor::Unit::deg, SolarAzimuthAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Altitude Angle", OutputProcessor::Unit::deg, SolarAltitudeAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Hour Angle", OutputProcessor::Unit::deg, HrAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Azimuth Angle", OutputProcessor::Unit::degree, SolarAzimuthAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Altitude Angle", OutputProcessor::Unit::degree, SolarAltitudeAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Hour Angle", OutputProcessor::Unit::degree, HrAngle, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Rain Status", OutputProcessor::Unit::None, RptIsRain, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Snow on Ground Status", OutputProcessor::Unit::None, RptIsSnow, "Zone", "Average", "Environment" );
 			SetupOutputVariable( "Site Exterior Horizontal Sky Illuminance", OutputProcessor::Unit::lux, HISKF, "Zone", "Average", "Environment" );

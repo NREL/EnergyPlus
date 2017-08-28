@@ -3840,7 +3840,7 @@ namespace OutputProcessor {
 				Multipliers += ", Zone List Multiplier = " + stripped( String ) + ')';
 			}
 
-			gio::write( OutputFileMeterDetails, "(/,A)" ) << " Meters for " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ReportIDChr + ',' + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + " [" + mtrUnitString + ']' + Multipliers;
+			gio::write( OutputFileMeterDetails, "(/,A)" ) << " Meters for " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ReportIDChr + ',' + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + mtrUnitString + Multipliers;
 
 			for ( I = 1; I <= VarMeterArrays( VarMeter ).NumOnMeters; ++I ) {
 				gio::write( OutputFileMeterDetails, fmtA ) << "  OnMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnMeters( I ) ).Name + mtrUnitString;
@@ -5158,7 +5158,7 @@ namespace OutputProcessor {
 			case OutputProcessor::Unit::Perc:
 				return "%";
 				break;
-			case OutputProcessor::Unit::deg:
+			case OutputProcessor::Unit::degree:
 				return "deg";
 				break;
 			case OutputProcessor::Unit::s:
@@ -5283,8 +5283,8 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::kg_kg;
 		} else if ( InputProcessor::SameString( unitIn, "%" ) ) {
 			return OutputProcessor::Unit::Perc;
-		} else if ( InputProcessor::SameString( unitIn, "deg" ) ) {
-			return OutputProcessor::Unit::deg;
+		} else if ( InputProcessor::SameString( unitIn, "degree" ) ) {
+			return OutputProcessor::Unit::degree;
 		} else if ( InputProcessor::SameString( unitIn, "s" ) ) {
 			return OutputProcessor::Unit::s;
 		} else if ( InputProcessor::SameString( unitIn, "kg/m3" ) ) {
@@ -5444,11 +5444,11 @@ SetupOutputVariable(
 	std::string Group; // Will hold value of GroupKey
 	std::string ZoneName; // Will hold value of ZoneKey
 	static bool ErrorsFound( false ); // True if Errors Found
-	std::string::size_type Item;
+//ou	std::string::size_type Item;
 	bool ThisOneOnTheList;
 //ou	static std::string UnitsString; // Units for Variable (no brackets)
 	int localIndexGroupKey;
-	bool invalidUnits;
+//ou	bool invalidUnits;
 
 	if ( ! OutputInitialized ) InitializeOutput();
 
@@ -5701,7 +5701,7 @@ SetupOutputVariable(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int CV;
-	std::string::size_type Item;
+//ou	std::string::size_type Item;
 	std::string IDOut;
 	std::string VarName; // Variable without units
 	//  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
@@ -5709,7 +5709,7 @@ SetupOutputVariable(
 	int VariableType; // 1=Average, 2=Sum, 3=Min/Max
 	int localIndexGroupKey;
 	bool ThisOneOnTheList;
-	bool invalidUnits;
+//ou	bool invalidUnits;
 //ou	static std::string UnitsString; // Units for Variable (no brackets)
 	int Loop;
 	int RepFreq( ReportHourly );

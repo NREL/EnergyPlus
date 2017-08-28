@@ -225,7 +225,7 @@ namespace OutputProcessor {
 		J_kg,
 		kg_kg,
 		Perc,
-		deg,
+		degree,
 		s,
 		kg_m3,
 		kg_m2s,

@@ -448,8 +448,8 @@ namespace NodeInputManager {
 					SetupOutputVariable( "System Node Enthalpy", OutputProcessor::Unit::J_kg, MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Wetbulb Temperature", OutputProcessor::Unit::C, MoreNodeInfo( NumNode ).WetBulbTemp, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Dewpoint Temperature", OutputProcessor::Unit::C, MoreNodeInfo( NumNode ).AirDewPointTemp, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable(" System Node Wind Speed", OutputProcessor::Unit::m_s, Node( NumNode ).OutAirWindSpeed, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable(" System Node Wind Direction", OutputProcessor::Unit::deg, Node( NumNode ).OutAirWindDir, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Wind Speed", OutputProcessor::Unit::m_s, Node( NumNode ).OutAirWindSpeed, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Wind Direction", OutputProcessor::Unit::degree, Node( NumNode ).OutAirWindDir, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Quality", OutputProcessor::Unit::None, Node( NumNode ).Quality, "System", "Average", NodeID( NumNode ) );
 					SetupOutputVariable( "System Node Height", OutputProcessor::Unit::m, Node( NumNode ).Height, "System", "Average", NodeID( NumNode ) );
 					if ( DisplayAdvancedReportVariables ) {
