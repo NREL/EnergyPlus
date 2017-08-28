@@ -917,7 +917,7 @@ namespace PlantChillers {
 
 		for ( ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum ) {
 			SetupOutputVariable( "Chiller Electric Power", OutputProcessor::Unit::W, ElectricChillerReport( ChillerNum ).Base.Power, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
-			SetupOutputVariable( "Chiller Electric Energy", OutputProcessor::Unit::J, ElectricChillerReport( ChillerNum ).Base.Energy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Electric Energy", OutputProcessor::Unit::J, ElectricChillerReport( ChillerNum ).Base.Energy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ELECTRICITY", "Cooling", ElectricChiller( ChillerNum ).EndUseSubcategory, "Plant" );
 
 			SetupOutputVariable( "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, ElectricChillerReport( ChillerNum ).Base.QEvap, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
 			SetupOutputVariable( "Chiller Evaporator Cooling Energy", OutputProcessor::Unit::J, ElectricChillerReport( ChillerNum ).Base.EvapEnergy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );

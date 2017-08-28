@@ -1513,6 +1513,7 @@ namespace HeatBalanceSurfaceManager {
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Surface( loop ).OutDryBulbTemp, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Surface( loop ).OutWetBulbTemp, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Surface( loop ).WindSpeed, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Surface( loop ).WindDir, "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate", OutputProcessor::Unit::W, QdotConvOutRep( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotConvOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Energy", OutputProcessor::Unit::J, QConvOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
@@ -1523,7 +1524,6 @@ namespace HeatBalanceSurfaceManager {
 				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HAirExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HSkyExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HGrdExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]", HGrdExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
 				if ( Surface( loop ).Class != SurfaceClass_Window ) {
 					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Rate", OutputProcessor::Unit::W, SWOutAbsTotalReport( loop ), "Zone", "Average", Surface( loop ).Name );
 					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QRadSWOutAbs( loop ), "Zone", "Average", Surface( loop ).Name );

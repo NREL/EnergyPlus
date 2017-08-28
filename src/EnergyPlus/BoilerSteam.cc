@@ -453,7 +453,7 @@ namespace BoilerSteam {
 			} else {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", _, "Plant" );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Boiler Steam Inlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Outlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );

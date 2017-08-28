@@ -2058,14 +2058,14 @@ namespace CondenserLoopTowers {
 			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleTowerReport( TowerNum ).WaterMassFlowRate, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).Qactual, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).FanPower, "System", "Average", SimpleTower( TowerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", SimpleTower( TowerNum ).EndUseSubcategory, "Plant" );
 			// Added for fluid bypass
 			SetupOutputVariable( "Cooling Tower Bypass Fraction", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).BypassFraction, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).NumCellOn, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).FanCyclingRatio, "System", "Average", SimpleTower( TowerNum ).Name );
 			if ( SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 				SetupOutputVariable( "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).BasinHeaterPower, "System", "Average", SimpleTower( TowerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", "BasinHeater", "Plant" );
 			}
 		}
 
@@ -2076,13 +2076,13 @@ namespace CondenserLoopTowers {
 			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleTowerReport( TowerNum ).WaterMassFlowRate, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).Qactual, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).FanPower, "System", "Average", SimpleTower( TowerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", SimpleTower( TowerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).FanCyclingRatio, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Fan Speed Level", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).SpeedSelected, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).NumCellOn, "System", "Average", SimpleTower( TowerNum ).Name );
 			if ( SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 				SetupOutputVariable( "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).BasinHeaterPower, "System", "Average", SimpleTower( TowerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", "BasinHeater", "Plant" );
 			}
 		}
 
@@ -2093,13 +2093,13 @@ namespace CondenserLoopTowers {
 			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleTowerReport( TowerNum ).WaterMassFlowRate, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).Qactual, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).FanPower, "System", "Average", SimpleTower( TowerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", SimpleTower( TowerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Cooling Tower Air Flow Rate Ratio", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).AirFlowRatio, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Fan Part Load Ratio", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).FanCyclingRatio, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).NumCellOn, "System", "Average", SimpleTower( TowerNum ).Name );
 			if ( SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 				SetupOutputVariable( "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).BasinHeaterPower, "System", "Average", SimpleTower( TowerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", "BasinHeater", "Plant" );
 			}
 
 			//    CALL SetupOutputVariable('Tower Makeup Water Consumption [m3]', &
@@ -2115,13 +2115,13 @@ namespace CondenserLoopTowers {
 			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleTowerReport( TowerNum ).WaterMassFlowRate, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).Qactual, "System", "Average", SimpleTower( TowerNum ).Name );
 			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).FanPower, "System", "Average", SimpleTower( TowerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).FanEnergy, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", SimpleTower( TowerNum ).EndUseSubcategory, "Plant" );
 			SetupOutputVariable( "Cooling Tower Fan Speed Ratio", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).AirFlowRatio, "System", "Average", SimpleTower( TowerNum ).Name );
 
 			SetupOutputVariable( "Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, SimpleTowerReport( TowerNum ).NumCellOn, "System", "Average", SimpleTower( TowerNum ).Name );
 			if ( SimpleTower( TowerNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 				SetupOutputVariable( "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, SimpleTowerReport( TowerNum ).BasinHeaterPower, "System", "Average", SimpleTower( TowerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Basin Heater Electric Energy", OutputProcessor::Unit::J, SimpleTowerReport( TowerNum ).BasinHeaterConsumption, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Electric", "HeatRejection", "BasinHeater", "Plant" );
 			}
 		}
 		// setup common water reporting for all types of towers.
