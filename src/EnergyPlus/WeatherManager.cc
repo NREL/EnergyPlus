@@ -56,7 +56,7 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <CommandLineInterface.hh>
@@ -67,6 +67,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataSurfaces.hh>
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
@@ -77,8 +78,10 @@
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SurfaceGeometry.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
+#include <Vectors.hh>
 
 namespace EnergyPlus {
 
@@ -346,6 +349,8 @@ namespace WeatherManager {
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
 
+	std::vector< UnderwaterBoundary > underwaterBoundaries;
+	
 	// MODULE SUBROUTINES:
 
 	// Functions
@@ -518,6 +523,8 @@ namespace WeatherManager {
 		SpecialDays.deallocate();
 		DataPeriods.deallocate();
 
+		underwaterBoundaries.clear();
+
 	} //clear_state, for unit tests
 
 	void
@@ -586,32 +593,159 @@ namespace WeatherManager {
 		// counter (used by GetNextEnvironment) is reset before SetupSimulation or
 		// Simulating.  May not be necessary, but just in case.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		Envrn = 0;
 
+	}
+
+	bool
+	CheckIfAnyUnderwaterBoundaries()
+	{
+		bool errorsFound = false;
+		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
+		DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
+		int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+		for ( int i = 1; i <= Num; i++ ) {
+			InputProcessor::GetObjectItem(
+				DataIPShortCuts::cCurrentModuleObject, i, 
+				DataIPShortCuts::cAlphaArgs, 
+				NumAlpha, 
+				DataIPShortCuts::rNumericArgs, 
+				NumNumber, 
+				IOStat, 
+				DataIPShortCuts::lNumericFieldBlanks, 
+				DataIPShortCuts::lAlphaFieldBlanks, 
+				DataIPShortCuts::cAlphaFieldNames, 
+				DataIPShortCuts::cNumericFieldNames
+			);
+			underwaterBoundaries.push_back( UnderwaterBoundary() );
+			underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
+			underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
+			underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+			if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
+				ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
+				errorsFound = true;
+			}
+			underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+				ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+				errorsFound = true;
+			}
+			if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
+				// that's OK, we can have a blank schedule, the water will just have no free stream velocity
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
+			} else {
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+				if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+					ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+					errorsFound = true;
+				}
+			}
+			if ( errorsFound ) break;
+		}
+		if ( errorsFound ) {
+			ShowFatalError( "Previous input problems cause program termination" );
+		}
+		return ( Num > 0 );
+	}
+
+	Real64
+	calculateWaterBoundaryConvectionCoefficient(
+		Real64 const curWaterTemp,
+		Real64 const freeStreamVelocity,
+		Real64 const distanceFromLeadingEdge
+	) {
+		Real64 const waterKinematicViscosity = 1e-6; // m2/s
+		Real64 const waterPrandtlNumber = 6; // -
+		Real64 const waterThermalConductivity = 0.6; // W/mK
+		// do some calculation for forced convection from the leading edge of the ship
+		Real64 const localReynoldsNumber = freeStreamVelocity * distanceFromLeadingEdge / waterKinematicViscosity;
+		Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0 / 3.0 );
+		Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / distanceFromLeadingEdge;
+
+		// do some calculations for natural convection from the bottom of the ship
+		Real64 const distanceFromBottomOfHull = 12;   // meters, assumed for now
+		// this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
+		Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221 * pow( waterPrandtlNumber, 0.5 ) + 1.238 * waterPrandtlNumber, 0.25 );
+		// calculate the Grashof number
+		Real64 const gravity = 9.81; // m/s2
+		Real64 const beta = 0.000214;  // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
+		Real64 const assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
+		Real64 const localGrashofNumber = ( gravity * beta * ( assumedSurfaceTemp - curWaterTemp ) * pow( distanceFromBottomOfHull, 3 ) ) / pow( waterKinematicViscosity, 2 );
+		Real64 const localNusseltFreeConvection = pow( localGrashofNumber / 4, 0.25 ) * prandtlCorrection;
+		Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
+		return max( localConvectionCoeff, localConvectionCoeffFreeConv );
+	}
+
+	void
+	UpdateUnderwaterBoundaries()
+	{
+		for ( auto & thisBoundary : underwaterBoundaries ) {
+			Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue( thisBoundary.WaterTempScheduleIndex ); // C
+			Real64 freeStreamVelocity = 0;
+			if ( thisBoundary.VelocityScheduleIndex > 0 ) {
+				freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
+			}
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TConv = curWaterTemp;
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HConv = WeatherManager::calculateWaterBoundaryConvectionCoefficient(curWaterTemp, freeStreamVelocity, thisBoundary.distanceFromLeadingEdge);
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TRad = curWaterTemp;
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HRad = 0.0;
+		}
+	}
+
+	void
+	ReadVariableLocationOrientation()
+	{
+		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
+		DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
+		if ( InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
+		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1, 
+			DataIPShortCuts::cAlphaArgs, 
+			NumAlpha, 
+			DataIPShortCuts::rNumericArgs, 
+			NumNumber, 
+			IOStat, 
+			DataIPShortCuts::lNumericFieldBlanks, 
+			DataIPShortCuts::lAlphaFieldBlanks, 
+			DataIPShortCuts::cAlphaFieldNames, 
+			DataIPShortCuts::cNumericFieldNames
+		);
+		DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 1 ) );
+		DataEnvironment::varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+		DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+	}
+
+	void
+	UpdateLocationAndOrientation()
+	{
+		if ( DataEnvironment::varyingLocationSchedIndexLat > 0 ) {
+			DataEnvironment::Latitude = ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingLocationSchedIndexLat );
+		}
+		if ( DataEnvironment::varyingLocationSchedIndexLong > 0 ) {
+			DataEnvironment::Longitude = ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingLocationSchedIndexLong );
+		}
+		CheckLocationValidity();
+		if ( DataEnvironment::varyingOrientationSchedIndex > 0 ) {
+			DataHeatBalance::BuildingAzimuth = mod( ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingOrientationSchedIndex ), 360.0 );
+			SurfaceGeometry::CosBldgRelNorth = std::cos( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
+			SurfaceGeometry::SinBldgRelNorth = std::sin( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
+			for ( size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum ) {
+				for ( int n = 1; n <= DataSurfaces::Surface( SurfNum ).Sides; ++n ) {
+					Real64 Xb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x;
+					Real64 Yb = DataSurfaces::Surface( SurfNum ).Vertex( n ).y;
+					DataSurfaces::Surface( SurfNum ).NewVertex( n ).x = Xb * SurfaceGeometry::CosBldgRelNorth - Yb * SurfaceGeometry::SinBldgRelNorth;
+					DataSurfaces::Surface( SurfNum ).NewVertex( n ).y = Xb * SurfaceGeometry::SinBldgRelNorth + Yb * SurfaceGeometry::CosBldgRelNorth;
+					DataSurfaces::Surface( SurfNum ).NewVertex( n ).z = DataSurfaces::Surface( SurfNum ).Vertex( n ).z;
+				}
+				Vectors::CreateNewellSurfaceNormalVector( DataSurfaces::Surface( SurfNum ).NewVertex, DataSurfaces::Surface( SurfNum ).Sides, DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector );
+				Real64 SurfWorldAz = 0.0;
+				Real64 SurfTilt = 0.0;
+				Vectors::DetermineAzimuthAndTilt( DataSurfaces::Surface( SurfNum ).NewVertex, DataSurfaces::Surface( SurfNum ).Sides, SurfWorldAz, SurfTilt, DataSurfaces::Surface( SurfNum ).lcsx, DataSurfaces::Surface( SurfNum ).lcsy, DataSurfaces::Surface( SurfNum ).lcsz, DataSurfaces::Surface( SurfNum ).GrossArea, DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector );
+				DataSurfaces::Surface( SurfNum ).Azimuth = SurfWorldAz;
+				DataSurfaces::Surface( SurfNum ).SinAzim = std::sin( SurfWorldAz * DegToRadians );
+				DataSurfaces::Surface( SurfNum ).CosAzim = std::cos( SurfWorldAz * DegToRadians );
+				DataSurfaces::Surface( SurfNum ).OutNormVec = DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector;
+			}
+		}
 	}
 
 	void
@@ -4941,7 +5075,9 @@ Label9999: ;
 		// different, notify the user.  If StdTimeMerid couldn't be calculated,
 		// produce an error message.
 
-		if ( StdTimeMerid >= -12.0 && StdTimeMerid <= 12.0 ) {
+		if ( DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ) {
+			// don't do any warnings, the building is moving
+		} else if ( StdTimeMerid >= -12.0 && StdTimeMerid <= 12.0 ) {
 			if ( TimeZoneNumber != StdTimeMerid ) {
 				DiffCalc = std::abs( TimeZoneNumber - StdTimeMerid );
 				if ( DiffCalc > 1.0 && DiffCalc < 24.0 ) {
@@ -7474,7 +7610,7 @@ Label9999: ;
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, "(' ',A,$)" ) << "Site:GroundReflectance";
 		for ( I = 1; I <= 12; ++I ) {
-			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I ); 
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I );
 		}
 		gio::write( OutputFileInits );
 

@@ -146,7 +146,7 @@
 !
 !
 
-  VERSION,8.6;
+  Version,8.8;
 
   Building,
     Exercise 1D,             !- Name

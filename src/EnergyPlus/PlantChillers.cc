@@ -903,6 +903,11 @@ namespace PlantChillers {
 					ShowWarningError( cCurrentModuleObject + ", \"" + ElectricChiller( ChillerNum ).Base.Name + "\" TRIM(cAlphaFieldNames(10)) \"" + cAlphaArgs( 10 ) + "\" was not found. Basin heater operation will not be modeled and the simulation continues" );
 				}
 			}
+			if ( NumAlphas > 12 ) {
+				ElectricChiller( ChillerNum ).EndUseSubcategory = cAlphaArgs( 13 );
+			} else {
+				ElectricChiller( ChillerNum ).EndUseSubcategory = "General";
+			}
 
 		}
 

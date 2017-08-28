@@ -488,7 +488,7 @@ namespace CondenserLoopTowers {
 		std::string OutputCharHi; // report variable for warning messages
 		Array1D< Real64 > NumArray( 33 ); // Numeric input data array
 		Array1D< Real64 > NumArray2( 43 ); // Numeric input data array for VS tower coefficients
-		Array1D_string AlphArray( 15 ); // Character string input data array
+		Array1D_string AlphArray( 16 ); // Character string input data array
 		Array1D_string AlphArray2( 1 ); // Character string input data array for VS tower coefficients
 
 		// Get number of all cooling towers specified in the input data file (idf)
@@ -821,6 +821,11 @@ namespace CondenserLoopTowers {
 				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
 				ShowContinueError( "Tower Performanace Input Method currently specified as: " + AlphArray( 4 ) );
 				ErrorsFound = true;
+			}
+			if ( NumAlphas > 12 ) {
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 13 );
+			} else {
+				SimpleTower( TowerNum ).EndUseSubcategory = "General";
 			}
 		} // End Single-Speed Tower Loop
 
@@ -1159,6 +1164,11 @@ namespace CondenserLoopTowers {
 				ShowSevereError( cCurrentModuleObject + " \"" + SimpleTower( TowerNum ).Name + "\". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\"." );
 				ShowContinueError( "Tower Performanace Input Method currently specified as: " + AlphArray( 4 ) );
 				ErrorsFound = true;
+			}
+			if ( NumAlphas > 11 ) {
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 12 );
+			} else {
+				SimpleTower( TowerNum ).EndUseSubcategory = "General";
 			}
 		} // End Two-Speed Tower Loop
 
@@ -1761,6 +1771,11 @@ namespace CondenserLoopTowers {
 					ErrorsFound = true;
 				}
 			}
+			if ( NumAlphas > 13 ) {
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 14 );
+			} else {
+				SimpleTower( TowerNum ).EndUseSubcategory = "General";
+			}
 
 		} // End Variable-Speed Tower Loop
 
@@ -2023,6 +2038,11 @@ namespace CondenserLoopTowers {
 					ShowContinueError( "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node." );
 					ErrorsFound = true;
 				}
+			}
+			if ( NumAlphas > 15 ) {
+				SimpleTower( TowerNum ).EndUseSubcategory = AlphArray( 16 );
+			} else {
+				SimpleTower( TowerNum ).EndUseSubcategory = "General";
 			}
 
 		} // end merkel vs tower loop

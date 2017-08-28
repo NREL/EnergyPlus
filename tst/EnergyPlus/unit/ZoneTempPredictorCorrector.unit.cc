@@ -117,6 +117,9 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	Node.allocate( 5 );
 
@@ -1141,4 +1144,111 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest )
 
 }
 
+TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
+{
+	// J.Glazer - August 2017
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.8;",
+		" ",
+		"ScheduleTypeLimits,",
+		"  Any Number;              !- Name",
+		" ",
+		"Schedule:Compact,",
+		" Sched1,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 20.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" Sched2,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 1/31,            !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 24.0,        !- Field 26",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 26.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" Sched3,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 1/31,            !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 09:00, 24.0,        !- Field 26",
+		" Until: 17:00, 26.0,        !- Field 26",
+		" Until: 24:00, 24.0,        !- Field 26",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 26.0;        !- Field 26",
+
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 15;
+	DataEnvironment::CurrentYearIsLeapYear = false;
+
+	Real64 valueAtTime;
+	int numDays;
+	std::string monthAssumed;
+	const int wednesday = 4;
+
+	DataEnvironment::Latitude = 30.; //northern hemisphere
+	int sched1Index = GetScheduleIndex( "SCHED1" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 20, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	// test month selected based on hemisphere and isSummer flag.
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, true, wednesday, 11 );
+	EXPECT_EQ( "July", monthAssumed );
+
+	DataEnvironment::Latitude = -30.; //southern hemisphere
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, false, wednesday, 11 );
+	EXPECT_EQ( "July", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, true, wednesday, 11 );
+	EXPECT_EQ( "January", monthAssumed );
+
+	DataEnvironment::Latitude = 30.; //northern hemisphere
+	int sched2Index = GetScheduleIndex( "SCHED2" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched2Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 24, valueAtTime );
+	EXPECT_EQ( 31, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched2Index, true, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 334, numDays );
+	EXPECT_EQ( "July", monthAssumed );
+
+	int sched3Index = GetScheduleIndex( "SCHED3" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, true, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "July", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, false, wednesday, 19 );
+
+	EXPECT_EQ( 24, valueAtTime );
+	EXPECT_EQ( 31, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+
+}
 

@@ -596,7 +596,7 @@ namespace EcoRoofManager {
 			if ( Vfluxf < 0.0 ) Vfluxf = 0.0; // According to FASST Veg. Models p. 11, eqn 26-27, if Qfsat > qaf the actual
 			if ( Vfluxg < 0.0 ) Vfluxg = 0.0; // evaporative fluxes should be set to zero (delta_c = 1 or 0).
 
-			// P1, P2, P3 corespond to first, second and third terms of equation 37 in the main report.
+			// P1, P2, P3 correspond to first, second and third terms of equation 37 in the main report.
 
 			//   Note: the FASST model has a term -gamma_p*(1.0-exp...) in first line for P1 (c1_f) where gamma_p is
 			//   a precipitation variable. So, if we assume no precip this term vanishes. We should
@@ -605,7 +605,7 @@ namespace EcoRoofManager {
 			//   Prior experience suggests that no more than 3 iterations are likely needed
 			LeafTK = Tf + KelvinConv;
 			SoilTK = Tg + KelvinConv;
-
+			
 			for ( EcoLoop = 1; EcoLoop <= 3; ++EcoLoop ) {
 				P1 = sigmaf * ( RS * ( 1.0 - Alphaf ) + epsilonf * Latm ) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * pow_4( SoilTK ) / EpsilonOne - 3.0 * ( -sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_4( LeafTK ) + sheatf * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * ( qsf - LeafTK * dqf ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 0.1 * sigmaf * Mg ) / dOne ) * ( qsg - SoilTK * dqg );
 				P2 = 4.0 * ( sigmaf * epsilonf * epsilong * Sigma ) * pow_3( SoilTK ) / EpsilonOne + 0.1 * sigmaf * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( 0.1 * sigmaf * Mg ) / dOne * dqg;
@@ -653,7 +653,7 @@ namespace EcoRoofManager {
 		Real64 const SoilThickness,
 		Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
 		Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-		int & ConstrNum, // Indicator for contruction index for the current surface
+		int & ConstrNum, // Indicator for construction index for the current surface
 		Real64 & Alphag,
 		int const EP_UNUSED( unit ), // unused1208
 		Real64 const EP_UNUSED( Tg ), // unused1208

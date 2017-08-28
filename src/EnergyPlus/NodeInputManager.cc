@@ -445,11 +445,13 @@ namespace NodeInputManager {
 						SetupOutputVariable( "System Node Specific Heat", OutputProcessor::Unit::J_kgK, MoreNodeInfo( NumNode ).SpecificHeat, "System", "Average", NodeID( NumNode ) );
 					}
 
-					SetupOutputVariable( "System Node Enthalpy", OutputProcessor::Unit::J_kg, MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Wetbulb Temperature", OutputProcessor::Unit::C, MoreNodeInfo( NumNode ).WetBulbTemp, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Dewpoint Temperature", OutputProcessor::Unit::C, MoreNodeInfo( NumNode ).AirDewPointTemp, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Quality", OutputProcessor::Unit::None, Node( NumNode ).Quality, "System", "Average", NodeID( NumNode ) );
-					SetupOutputVariable( "System Node Height", OutputProcessor::Unit::m, Node( NumNode ).Height, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Enthalpy [J/kg]", MoreNodeInfo( NumNode ).ReportEnthalpy, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Wetbulb Temperature [C]", MoreNodeInfo( NumNode ).WetBulbTemp, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Dewpoint Temperature [C]", MoreNodeInfo( NumNode ).AirDewPointTemp, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable(" System Node Wind Speed [m/s]", Node( NumNode ).OutAirWindSpeed, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable(" System Node Wind Direction [degree]", Node( NumNode ).OutAirWindDir, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Quality []", Node( NumNode ).Quality, "System", "Average", NodeID( NumNode ) );
+					SetupOutputVariable( "System Node Height [m]", Node( NumNode ).Height, "System", "Average", NodeID( NumNode ) );
 					if ( DisplayAdvancedReportVariables ) {
 						SetupOutputVariable( "System Node Minimum Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempMin, "System", "Average", NodeID( NumNode ) );
 						SetupOutputVariable( "System Node Maximum Temperature", OutputProcessor::Unit::C, Node( NumNode ).TempMax, "System", "Average", NodeID( NumNode ) );

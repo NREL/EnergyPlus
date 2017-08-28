@@ -76,7 +76,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -300,8 +300,6 @@
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
-
- Lead Input;
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
@@ -618,9 +616,6 @@
     CONTINUOUS;              !- Numeric Type
 
   Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
-
- End Lead Input;
- Simulation Data;
 
   Zone,
     ZONE 1,                  !- Name
@@ -1457,4 +1452,3 @@
     ZONE 4 INLETS,           !- Name
     ZONE 4 INLET;            !- Node 1 Name
 
- End Simulation Data;

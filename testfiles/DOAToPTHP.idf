@@ -1,4 +1,4 @@
-.!-Generator IDFEditor 1.44
+!-Generator IDFEditor 1.44
 !-Option SortedOrder
 !
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

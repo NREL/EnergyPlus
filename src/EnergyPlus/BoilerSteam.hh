@@ -115,6 +115,7 @@ namespace BoilerSteam {
 		int CompNum; // Plant loop component index number
 		int PressErrIndex; // index pointer for recurring errors
 		int FluidIndex; // Steam index
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		BoilerSpecs() :

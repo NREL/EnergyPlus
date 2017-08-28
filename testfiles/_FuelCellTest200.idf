@@ -23,7 +23,7 @@
 
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Test Harness for MicroCogen,  !- Name

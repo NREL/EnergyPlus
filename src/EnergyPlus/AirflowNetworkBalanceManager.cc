@@ -992,6 +992,19 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( !lAlphaBlanks( 7 ) && SameString( Alphas( 7 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
 
+		if ( lAlphaBlanks( 8 ) ) {
+			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::SkylineLU;
+		} else if ( SameString( Alphas( 8 ), "SkylineLU" ) ) {
+			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::SkylineLU;
+		} else if ( SameString( Alphas( 8 ), "ConjugateGradient" ) ) {
+			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::ConjugateGradient;
+		} else {
+			AirflowNetworkSimu.solver = AirflowNetworkSimuProp::Solver::SkylineLU;
+			ShowWarningError(RoutineName + CurrentModuleObject + " object, ");
+			ShowContinueError("..Specified " + cAlphaFields(8) + " = \"" + Alphas(8) + "\" is unrecognized.");
+			ShowContinueError("..Default value \"SkylineLU\" will be used.");
+		}
+
 		if ( SimObjectError ) {
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
 		}

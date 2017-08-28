@@ -102,6 +102,7 @@
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
 #include <PhaseChangeModeling/HysteresisModel.hh>
+#include <OutAirNodeManager.hh>
 
 namespace EnergyPlus {
 
@@ -388,7 +389,6 @@ namespace HeatBalanceManager {
 		if ( ! WarmupFlag && EndDayFlag && DayOfSim == 1 && ! DoingSizing ) {
 			ReportWarmupConvergence();
 		}
-
 	}
 
 	// Get Input Section of the Module
@@ -1927,7 +1927,7 @@ namespace HeatBalanceManager {
 				ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", Illegal value." );
 				ShowContinueError( cNumericFieldNames( 4 ) + " must be Yes or No, entered value=" + MaterialNames( 4 ) );
 			}
-			// Get SpectralAndAngle table names 
+			// Get SpectralAndAngle table names
 			if ( Material( MaterNum ).GlassSpectralAndAngle ) {
 				if ( lAlphaFieldBlanks( 5 ) ) {
 					ErrorsFound = true;
@@ -4515,10 +4515,133 @@ namespace HeatBalanceManager {
 			} // GroupNum
 		}
 
+		GetZoneLocalEnvData( ErrorsFound );
+
 		//allocate the array the holds the predefined report data
 		ZonePreDefRep.allocate( NumOfZones );
 
 	}
+
+	void
+	GetZoneLocalEnvData( bool & ErrorsFound ) // Error flag indicator (true if errors found)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X LUO
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// load input data for Outdoor Air Node for zones
+
+		// METHODOLOGY EMPLOYED:
+		// usual E+ input processes
+
+
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+
+		using DataHeatBalance::ZoneLocalEnvironment;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetZoneLocalEnvData: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS:na
+		// DERIVED TYPE DEFINITIONS:na
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlpha;
+		int NumNumeric;
+
+		int Loop;
+		int ZoneLoop;
+		int ZoneNum; // DO loop counter for zones
+		int TotZoneEnv;
+		bool ErrorInName;
+		bool IsBlank;
+		int IOStat;
+		int NodeNum;
+
+		//-----------------------------------------------------------------------
+		//               ZoneProperty:LocalEnvironment
+		//-----------------------------------------------------------------------
+
+		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
+		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( TotZoneEnv > 0 ) {
+			// Check if IDD definition is correct
+			AnyLocalEnvironmentsInModel = true;
+
+			if ( !allocated( ZoneLocalEnvironment ) ) {
+				ZoneLocalEnvironment.allocate( TotZoneEnv );
+			}
+
+			for ( Loop = 1; Loop <= TotZoneEnv; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				ErrorInName = false;
+				IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), ZoneLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 1 ) + " has been found." );
+					ShowContinueError( "...each ZoneProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
+					ErrorsFound = true;
+					continue;
+				}
+
+				ZoneLocalEnvironment( Loop ).Name = cAlphaArgs( 1 );
+
+				// Assign zone number
+				ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+				if ( ZoneNum == 0 ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding zone has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					ZoneLocalEnvironment( Loop ).ZonePtr = ZoneNum;
+				}
+
+				//Assign outdoor air node number;
+				NodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+				if ( NodeNum == 0 && CheckOutAirNodeNumber( NodeNum ) ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 3 ) + " entered value = \"" + cAlphaArgs( 3 ) + "\" no corresponding schedule has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr = NodeNum;
+				}
+			}
+		}
+		// Link zone properties to zone object
+		for ( ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) {
+			for ( Loop = 1; Loop <= TotZoneEnv; ++Loop ) {
+				if ( ZoneLocalEnvironment( Loop ).ZonePtr == ZoneLoop ) {
+					if ( ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
+						Zone( ZoneLoop ).HasLinkedOutAirNode = true;
+						Zone( ZoneLoop ).LinkedOutAirNode = ZoneLocalEnvironment( Loop ).OutdoorAirNodePtr;
+
+					}
+				}
+			}
+		}
+	}
+
 
 	void
 	ProcessZoneData(
@@ -4666,6 +4789,8 @@ namespace HeatBalanceManager {
 		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
 		SetupOutputVariable( "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Direction [degree]", Zone( ZoneLoop ).WindDir, "Zone", "Average", Zone( ZoneLoop ).Name );
+
 
 		if ( FlagHybridModel ){
 			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate", OutputProcessor::Unit::ach, Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
@@ -4705,6 +4830,8 @@ namespace HeatBalanceManager {
 		using namespace ConductionTransferFunctionCalc;
 		using namespace WindowManager;
 		using namespace SolarShading;
+		using DataLoopNode::Node;
+		using OutAirNodeManager::SetOutAirNodes;
 		using DaylightingDevices::InitDaylightingDevices;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		//  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -4726,6 +4853,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int StormWinNum; // Number of StormWindow object
 		int SurfNum; // Surface number
+		int ZoneNum;
 		static bool ChangeSet( true ); // Toggle for checking storm windows
 
 		// FLOW:
@@ -4790,6 +4918,10 @@ namespace HeatBalanceManager {
 			}
 		}
 
+		if ( BeginSimFlag && DataSystemVariables::ReportExtShadingSunlitFrac ) {
+			OpenShadingFile();
+		}
+
 		if ( BeginDayFlag ) {
 			if ( ! WarmupFlag ) {
 				if ( DayOfSim == 1 ) {
@@ -4807,6 +4939,56 @@ namespace HeatBalanceManager {
 		if ( DetailedSolarTimestepIntegration ) { // always redo solar calcs
 			PerformSolarCalculations();
 		}
+
+		// Initialize zone outdoor environmental variables
+		// Bulk Initialization for Temperatures & WindSpeed
+		// using the zone, modify the zone  Dry/Wet BulbTemps
+		SetZoneOutBulbTempAt();
+		CheckZoneOutBulbTempAt();
+
+		// set zone level wind dir to global value
+		SetZoneWindSpeedAt();
+		SetZoneWindDirAt();
+
+		// Set zone data to linked air node value if defined.
+		if ( AnyLocalEnvironmentsInModel ) {
+			SetOutAirNodes();
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
+						Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
+						Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
+						Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+					}
+					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
+						Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
+					}
+				}
+			}
+		}
+
+		// Overwriting surface and zone level environmental data with EMS override value
+		if ( AnyEnergyManagementSystemInModel ) {
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				if ( Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn ) {
+					Zone( ZoneNum ).OutDryBulbTemp = Zone( ZoneNum ).OutDryBulbTempEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).OutWetBulbTempEMSOverrideOn ) {
+					Zone( ZoneNum ).OutWetBulbTemp = Zone( ZoneNum ).OutWetBulbTempEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).WindSpeedEMSOverrideOn ) {
+					Zone( ZoneNum ).WindSpeed = Zone( ZoneNum ).WindSpeedEMSOverrideValue;
+				}
+				if ( Zone( ZoneNum ).WindDirEMSOverrideOn ) {
+					Zone( ZoneNum ).WindDir = Zone( ZoneNum ).WindDirEMSOverrideValue;
+				}
+			}
+		}
+
 
 	}
 
@@ -5109,6 +5291,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxHeatLoadZone( ZoneNum ) > 1.0e-4 ) { // make sure load big enough to divide
 					MaxHeatLoadZone( ZoneNum ) = std::abs( max( MaxHeatLoadZone( ZoneNum ), MinLoad ) );
+					MaxHeatLoadPrevDay( ZoneNum ) = std::abs( max( MaxHeatLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue = std::abs( ( MaxHeatLoadZone( ZoneNum ) - MaxHeatLoadPrevDay( ZoneNum ) ) / MaxHeatLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 3 ) = 2;
@@ -5122,6 +5305,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxCoolLoadZone( ZoneNum ) > 1.0e-4 ) {
 					MaxCoolLoadZone( ZoneNum ) = std::abs( max( MaxCoolLoadZone( ZoneNum ), MinLoad ) );
+					MaxCoolLoadPrevDay( ZoneNum ) = std::abs( max( MaxCoolLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue = std::abs( ( MaxCoolLoadZone( ZoneNum ) - MaxCoolLoadPrevDay( ZoneNum ) ) / MaxCoolLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 4 ) = 2;
@@ -5337,6 +5521,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
 		static gio::Fmt EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt EndOfDataFormat( "(\"End of Data\")" ); // Signifies the end of the data block in the output file
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5346,12 +5531,12 @@ namespace HeatBalanceManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  LOGICAL, SAVE :: PrintEnvrnStamp=.FALSE.
-
 		// FLOW:
 
 		// Time step level reporting:
 
 		ReportScheduleValues();
+
 		if ( !WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
@@ -5401,6 +5586,41 @@ namespace HeatBalanceManager {
 
 	//        End of Reporting subroutines for the HB Module
 
+	void
+	OpenShadingFile()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X Luo
+		//       DATE WRITTEN   August 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Open and set up headers for a external shading fraction export file.
+
+		// Using/Aliasing
+		using DataSurfaces::Surface;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int write_stat;
+		int SurfNum;
+		static gio::Fmt ShdFracFmtName("(A, A)");
+		static gio::Fmt fmtN("('\n')");
+
+		OutputFileShadingFrac = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags ); write_stat = flags.ios(); }
+		if ( write_stat != 0 ) {
+			ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write)." );
+		}
+		gio::write( OutputFileShadingFrac, fmtA ) << "This file contains external shading fractions for all shading surfaces of all zones.";
+		{ IOFlags flags; flags.ADVANCE("No"); gio::write( OutputFileShadingFrac, fmtA, flags ) << "Surface Name,"; }
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			{ IOFlags flags; flags.ADVANCE("No"); gio::write( OutputFileShadingFrac, ShdFracFmtName, flags ) << Surface( SurfNum ).Name << ","; }
+		}
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtN, flags ); }
+
+	}
 	void
 	GetFrameAndDividerData( bool & ErrorsFound ) // set to true if errors found in input
 	{
@@ -5659,7 +5879,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > CosPhiIndepVar( 10 ); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
 		int IPhi; // Incidence angle counter
 		Real64 Phi; // Incidence angle (deg)
-		Real64 CosPhi; // Cosine of incidence angle
+		Array1D< Real64 >CosPhi( 10 ); // Cosine of incidence angle
 		Array1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
 		Array1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
 		Array1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
@@ -6084,6 +6304,18 @@ Label20: ;
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
 			++FileLineCount;
 
+			// Pre-calculate constants
+			for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
+			}
+
+			// Pre-calculate constants
+			for( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				Phi = double( IPhi - 1 ) * 10.0;
+				CosPhi( IPhi ) =  std::cos( Phi * DegToRadians );
+				if ( std::abs( CosPhi( IPhi ) ) < 0.0001 ) CosPhi( IPhi ) = 0.0;
+			}
+
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				ConstrNum = TotConstructs - NGlSys + IGlSys;
 				if ( IGlSys == 1 ) {
@@ -6164,10 +6396,6 @@ Label20: ;
 				Construct( ConstrNum ).W5FileMullionWidth = MullionWidth;
 
 				// Fill Construct with system transmission, reflection and absorption properties
-
-				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
-				}
 
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
@@ -6278,20 +6506,17 @@ Label20: ;
 
 				// For comparing fitted vs. input distribution in incidence angle
 				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					Phi = double( IPhi - 1 ) * 10.0;
-					CosPhi = std::cos( Phi * DegToRadians );
-					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
-					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef );
-					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef );
-					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
+					tsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
+						solabsFit( IGlass, IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
 				}
 				// end
 
 				// NominalRforNominalUCalculation of this construction (actually the total resistance of all of its layers; gas layer
-				// conductivity here ignores convective efffects in gap.)
+				// conductivity here ignores convective effects in gap.)
 				NominalRforNominalUCalculation( ConstrNum ) = 0.0;
 				for ( loop = 1; loop <= NGlass( IGlSys ) + NGaps( IGlSys ); ++loop ) {
 					MatNum = Construct( ConstrNum ).LayerPoint( loop );

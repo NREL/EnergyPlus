@@ -3599,8 +3599,9 @@ namespace EnergyPlus {
 			GenOutputVariablesAuditReport();
 
 			std::string errMsg = delimited_string ({
-				"   ** Warning ** The following Report Variables were requested but not generated",
-				"   **   ~~~   ** because IDF did not contain these elements or misspelled variable name -- check .rdd file",
+				"   ** Warning ** The following Report Variables were requested but not generated -- check.rdd file",
+				"   **   ~~~   ** Either the IDF did not contain these elements, the variable name is misspelled,",
+				"   **   ~~~   ** or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;",
 				"   ************* Key=*, VarName=BOILER GAS RATE, Frequency=Detailed",
 				"   ************* Key=*, VarName=BOILER HEATING RATE, Frequency=Detailed",
 			});

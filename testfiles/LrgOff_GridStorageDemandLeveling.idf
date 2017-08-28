@@ -38,7 +38,7 @@
 !
 ! Number of Zones: 19
 
-  Version,8.7;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation

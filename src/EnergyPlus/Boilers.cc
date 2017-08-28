@@ -519,6 +519,11 @@ namespace Boilers {
 				Boiler( BoilerNum ).FlowMode = NotModulated;
 			}}
 
+			if ( NumAlphas > 7 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 8 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since it appears this way in existing output files.
+			}
 		}
 
 		if ( ErrorsFound ) {

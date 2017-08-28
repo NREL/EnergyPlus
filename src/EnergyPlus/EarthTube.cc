@@ -122,7 +122,7 @@ namespace EarthTube {
 		ZnRptET.deallocate();
 	}
 
-	
+
 	void
 	ManageEarthTube()
 	{
@@ -353,7 +353,7 @@ namespace EarthTube {
 					SetupOutputVariable( "Earth Tube Outdoor Air Heat Transfer Rate", OutputProcessor::Unit::W, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeOATreatmentPower, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Zone Inlet Wet Bulb Temperature", OutputProcessor::Unit::C, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeWetBulbTemp, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Zone Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHumRat, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-				
+
 				}
 			}
 		}
@@ -366,7 +366,7 @@ namespace EarthTube {
 
 	}
 
-	
+
 	void
 	CheckEarthTubesInZones
 	(
@@ -378,7 +378,7 @@ namespace EarthTube {
 
 		int Loop;
 		int Loop1;
-		
+
 		// Check to make sure there is only one earth tube statement per zone
 		for ( Loop = 1; Loop <= TotEarthTube - 1; ++Loop ) {
 			for ( Loop1 = Loop + 1; Loop1 <= TotEarthTube; ++Loop1 ) {
@@ -391,9 +391,9 @@ namespace EarthTube {
 			}
 		}
 
-		
+
 	}
-	
+
 	void
 	CalcEarthTube()
 	{
@@ -515,7 +515,7 @@ namespace EarthTube {
 			}
 
 			CalcEarthTubeHumRat( Loop, NZ );
-			
+
 		}
 
 	}
@@ -526,16 +526,16 @@ namespace EarthTube {
 		int const NZ // Zone number (index)
 	)
 	{
-		
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   November 2005
 		//       MODIFIED       Rick Strand, June 2017 (made this a separate subroutine)
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine determines the leaving humidity ratio for the EarthTube
 		// and calculates parameters associated with humidity ratio.
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 InsideEnthalpy;
 		Real64 OutletAirEnthalpy;
@@ -543,7 +543,7 @@ namespace EarthTube {
 		Real64 InsideHumRat;
 
 		InsideDewPointTemp = PsyTdpFnWPb( OutHumRat, OutBaroPress );
-		
+
 		if ( EarthTubeSys( Loop ).InsideAirTemp >= InsideDewPointTemp ) {
 			InsideHumRat = OutHumRat;
 			InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, OutHumRat );
@@ -559,7 +559,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).AirTemp = EarthTubeSys( Loop ).InsideAirTemp;
 			}
 			MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
-			
+
 		} else {
 			InsideHumRat = PsyWFnTdpPb( EarthTubeSys( Loop ).InsideAirTemp, OutBaroPress );
 			InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat );
@@ -576,13 +576,13 @@ namespace EarthTube {
 			}
 			MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
 		}
-		
+
 		EarthTubeSys( Loop ).HumRat = InsideHumRat;
 		EarthTubeSys( Loop ).WetBulbTemp = PsyTwbFnTdbWPb( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat, OutBaroPress );
-		EAMFLxHumRat( NZ ) = EAMFL( NZ ) * InsideHumRat;		
-		
+		EAMFLxHumRat( NZ ) = EAMFL( NZ ) * InsideHumRat;
+
 	}
-	
+
 	void
 	ReportEarthTube()
 	{

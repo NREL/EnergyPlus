@@ -203,6 +203,7 @@ namespace DataSizing {
 	extern int CurSysNum; // Current Air System index (0 if not in air loop)
 	extern int CurOASysNum; // Current outside air system index (0 if not in OA Sys)
 	extern int CurZoneEqNum; // Current Zone Equipment index (0 if not simulating ZoneEq)
+	extern int CurTermUnitSizingNum; // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
 	extern int CurBranchNum; // Index of branch being simulated (or 0 if not air loop)
 	extern int CurDuctType; // Duct type of current branch
 	extern int CurLoopNum; // the current plant loop index
@@ -268,7 +269,9 @@ namespace DataSizing {
 	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
 	extern int DataZoneUsedForSizing; // pointer to control zone for air loop equipment
 	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
-	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
+	extern int NumZoneHVACSizing; // Number of design specification zone HVAC sizing objects
+	extern int NumAirTerminalSizingSpec; // Number of design specification air terminal sizing objects
+	extern int NumAirTerminalUnits; // Number of air terminal units (same as total number of zone inlet nodes)
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit
@@ -713,6 +716,7 @@ namespace DataSizing {
 	struct TermUnitSizingData
 	{
 		// Members
+		int CtrlZoneNum; // Controlled zone number (index to FinalZoneSizing, etc.)
 		Real64 AirVolFlow; // design air vol flow rate for single duct terminal unit [m3/s]
 		Real64 MaxHWVolFlow; // design Hot Water vol flow for single duct terminal unit [m3/s]
 		Real64 MaxSTVolFlow; // design Steam vol flow rate for single duct terminal unit [m3/s]
@@ -724,9 +728,15 @@ namespace DataSizing {
 		Real64 ReheatLoadMult; // multiplier for load in reheat coil UA calculation
 		Real64 DesCoolingLoad; // design cooling load used for zone equipment [W]
 		Real64 DesHeatingLoad; // design heating load used for zone equipment [W]
+		Real64 SpecDesSensCoolingFrac; // Fraction of Design Sensible Cooling Load from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesCoolSATRatio; // Cooling Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesSensHeatingFrac; // Fraction of Design Sensible Heating Load from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesHeatSATRatio; // Heating Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecMinOAFrac; // Fraction of Minimum Outdoor Air Flow from DesignSpecification:AirTerminal:Sizing
 
 		// Default Constructor
 		TermUnitSizingData() :
+			CtrlZoneNum( 0 ),
 			AirVolFlow( 0.0 ),
 			MaxHWVolFlow( 0.0 ),
 			MaxSTVolFlow( 0.0 ),
@@ -737,7 +747,12 @@ namespace DataSizing {
 			ReheatAirFlowMult( 1.0 ),
 			ReheatLoadMult( 1.0 ),
 			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 )
+			DesHeatingLoad( 0.0 ),
+			SpecDesSensCoolingFrac( 1.0 ),
+			SpecDesCoolSATRatio( 1.0 ),
+			SpecDesSensHeatingFrac( 1.0 ),
+			SpecDesHeatSATRatio( 1.0 ),
+			SpecMinOAFrac ( 1.0 )
 		{}
 
 	};
@@ -825,6 +840,29 @@ namespace DataSizing {
 		{}
 
 	};
+
+	// Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit and AirTerminal:SingleDuct:Uncontrolled
+	struct AirTerminalSizingSpecData
+	{
+		// Members
+		std::string Name;
+		Real64 DesSensCoolingFrac; // Fraction of Design Sensible Cooling Load
+		Real64 DesCoolSATRatio; // Cooling Design Supply Air Temperature Difference Ratio
+		Real64 DesSensHeatingFrac; // Fraction of Design Sensible Heating Load
+		Real64 DesHeatSATRatio; // Heating Design Supply Air Temperature Difference Ratio
+		Real64 MinOAFrac; // Fraction of Minimum Outdoor Air Flow
+
+		// Default Constructor
+		AirTerminalSizingSpecData() :
+			DesSensCoolingFrac( 1.0 ),
+			DesCoolSATRatio( 1.0 ),
+			DesSensHeatingFrac( 1.0 ),
+			DesHeatSATRatio( 1.0 ),
+			MinOAFrac( 1.0 )
+		{}
+
+	};
+
 
 	struct SystemSizingInputData
 	{
@@ -1335,6 +1373,7 @@ namespace DataSizing {
 	extern Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	extern Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	extern Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	extern Array1D< AirTerminalSizingSpecData > AirTerminalSizingSpec; // Input data for air terminal sizing
 	// used only for Facility Load Component Summary
 	extern Array1D< FacilitySizingData > CalcFacilitySizing; // Data for facility sizing 
 	extern FacilitySizingData CalcFinalFacilitySizing; // Final data for facility sizing 

@@ -242,6 +242,7 @@ namespace OutputReportTabular {
 	extern Array1D< Real64 > gatherDemandTotal;
 	extern Array2D< Real64 > gatherDemandEndUse;
 	extern Array3D< Real64 > gatherDemandEndUseSub;
+	extern Array3D< Real64 > gatherDemandIndEndUseSub;
 	extern Array1D_int gatherDemandTimeStamp;
 	// to keep track of hours for the BEPS report gathering
 	extern Real64 gatherElapsedTimeBEPS;

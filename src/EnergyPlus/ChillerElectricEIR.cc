@@ -776,6 +776,11 @@ namespace ChillerElectricEIR {
 				}
 			}
 
+			if ( NumAlphas > 15 ) {
+				ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory = cAlphaArgs( 16 );
+			} else {
+				ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory = "General";
+			}
 		}
 
 		if ( ErrorsFound ) {

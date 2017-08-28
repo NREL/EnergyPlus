@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder )
 {
 	std::string const idf_objects = delimited_string( {
-		"Version,8.7;",
+		"Version,8.8;",
 		"Output:Table:Annual,",
 		"Test Report, !- Name",
 		", !- Filter",
