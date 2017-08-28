@@ -335,7 +335,10 @@ namespace OutAirNodeManager {
 				// Set additional node properties
 				if ( NumNums > 0 ) Node( NodeNums( 1 ) ).Height = Numbers( 1 );
 
-				if ( NumAlphas > 1 ) AnyLocalEnvironmentsInModel = true;
+				if ( NumAlphas > 1 ) {
+					AnyLocalEnvironmentsInModel = true;
+					Node( NodeNums( 1 ) ).IsLocalNode = true;
+				}
 
 				if ( NumAlphas > 1 && !lAlphaBlanks( 2 ) ) {
 					Node( NodeNums( 1 ) ).OutAirDryBulbSchedNum = GetScheduleIndex( Alphas( 2 ) );
@@ -444,7 +447,7 @@ namespace OutAirNodeManager {
 			if ( Node( NodeNum ).EMSOverrideOutAirWindDir ) Node( NodeNum ).OutAirWindDir = Node( NodeNum ).EMSValueForOutAirWindDir;
 
 			Node( NodeNum ).Temp = Node( NodeNum ).OutAirDryBulb;
-			if ( Node( NodeNum ).OutAirDryBulbSchedNum != 0 || Node( NodeNum ).OutAirWetBulbSchedNum != 0 ) {
+			if ( Node( NodeNum ).IsLocalNode ) {
 				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );				
 			}
 			else {
@@ -597,7 +600,7 @@ namespace OutAirNodeManager {
 				Node( NodeNumber ).OutAirWindDir = WindDir;
 
 				Node( NodeNumber ).Temp = Node( NodeNumber ).OutAirDryBulb;
-				if ( Node( NodeNumber ).OutAirDryBulbSchedNum != 0  || Node( NodeNumber ).OutAirWetBulbSchedNum != 0 ) {
+				if ( Node( NodeNumber ).IsLocalNode ) {
 					Node( NodeNumber ).HumRat = PsyHFnTdbW( Node( NodeNumber ).OutAirDryBulb, Node( NodeNumber ).OutAirWetBulb );
 				}
 				else {

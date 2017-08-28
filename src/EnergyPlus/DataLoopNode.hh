@@ -147,6 +147,7 @@ namespace DataLoopNode {
 
 
 		//  Following are for Outdoor Air Nodes Scheduled Properties
+		bool IsLocalNode;
 		int  OutAirDryBulbSchedNum;
 		int  OutAirWetBulbSchedNum;
 		int  OutAirWindSpeedSchedNum;
@@ -200,6 +201,7 @@ namespace DataLoopNode {
 			TempSetPointHi( SensedNodeFlagValue ),
 			TempSetPointLo( SensedNodeFlagValue ),
 			Height( -1.0 ),
+			IsLocalNode( false ),
 			OutAirDryBulbSchedNum( 0.0 ),
 			OutAirWetBulbSchedNum( 0.0 ),
 			OutAirWindSpeedSchedNum( 0.0 ),
@@ -250,6 +252,7 @@ namespace DataLoopNode {
 			Real64 const TempSetPointHi, // {C}
 			Real64 const TempSetPointLo, // {C}
 			Real64 const Height, // {m}
+			bool   const IsLocalNode,
 			int    const OutAirDryBulbSchedNum, // schedule value in {C}
 			int    const OutAirWetBulbSchedNum, // schedule value in {C}
 			int    const OutAirWindSpeedSchedNum, // schedule value in {m/s}
@@ -297,6 +300,7 @@ namespace DataLoopNode {
 			TempSetPointHi( TempSetPointHi ),
 			TempSetPointLo( TempSetPointLo ),
 			Height( Height ),
+			IsLocalNode( IsLocalNode ),
 			OutAirDryBulbSchedNum( OutAirDryBulbSchedNum ),
 			OutAirWetBulbSchedNum( OutAirWetBulbSchedNum ),
 			OutAirWindSpeedSchedNum( OutAirWindSpeedSchedNum ),

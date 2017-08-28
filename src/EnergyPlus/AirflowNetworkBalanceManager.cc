@@ -3324,6 +3324,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkNodeData( i ).EPlusZoneNum = 0;
 				AirflowNetworkNodeData( i ).NodeHeight = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).height;
 				AirflowNetworkNodeData( i ).ExtNodeNum = i - AirflowNetworkNumOfZones;
+				AirflowNetworkNodeData( i ).OutAirNodeNum = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).OutAirNodeNum;
 			}
 		} else { // Surface-Average input
 			for ( i = AirflowNetworkNumOfZones + 1; i <= NumOfNodesMultiZone; ++i ) {
@@ -4294,15 +4295,18 @@ namespace AirflowNetworkBalanceManager {
 						if ( Contaminant.GenericContamSimulation ) AirflowNetworkNodeSimu( i ).GCZ = ANGC( AirflowNetworkNodeData( i ).EPlusZoneNum );
 					}
 					if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 ) {
-						AirflowNetworkNodeSimu( i ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );
-						AirflowNetworkNodeSimu( i ).WZ = OutHumRat;
+						if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 && Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).IsLocalNode ) {
+							AirflowNetworkNodeSimu( i ).TZ = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulb;
+							AirflowNetworkNodeSimu( i ).WZ = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).HumRat;
+						} else {
+							AirflowNetworkNodeSimu( i ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );
+							AirflowNetworkNodeSimu( i ).WZ = OutHumRat;
+						}
+
 						if ( Contaminant.CO2Simulation ) AirflowNetworkNodeSimu( i ).CO2Z = OutdoorCO2;
 						if ( Contaminant.GenericContamSimulation ) AirflowNetworkNodeSimu( i ).GCZ = OutdoorGC;
 					}
-					//if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 ) {				
- 				//		AirflowNetworkNodeSimu( i ).TZ = DryBulbTempAtNode( AirflowNetworkNodeData( i ).OutAirNodeNum );
- 				//		AirflowNetworkNodeSimu( i ).WZ = HumRatAtNode( AirflowNetworkNodeData( i ).OutAirNodeNum );
- 				//	}
+
 					if ( AirflowNetworkNodeData( i ).RAFNNodeNum > 0 ) {
 						ZoneNum = AirflowNetworkNodeData( i ).EPlusZoneNum;
 						if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirflowNetworkNodeID == i ) {
@@ -5674,6 +5678,7 @@ namespace AirflowNetworkBalanceManager {
 		int NT;
 		int CompTypeNum;
 		int TypeNum;
+		int ExtNodeNum;
 		std::string CompName;
 		Real64 Ei;
 		Real64 DirSign;
@@ -5717,8 +5722,15 @@ namespace AirflowNetworkBalanceManager {
 				}
 
 				if ( AirflowNetworkLinkageData( i ).ZoneNum < 0 ) {
-					Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).NodeHeight );
-					Wamb = OutHumRat;
+					ExtNodeNum = AirflowNetworkLinkageData( i ).NodeNums( 2 );
+					if ( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum > 0 &&
+						Node( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum ).IsLocalNode ) {
+						Tamb = Node( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum ).OutAirDryBulb;
+						Wamb = Node( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum ).HumRat;
+					} else {
+						Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( ExtNodeNum ).NodeHeight );
+						Wamb = OutHumRat;
+					}
 				} else if ( AirflowNetworkLinkageData( i ).ZoneNum == 0 ) {
 					Tamb = AirflowNetworkNodeSimu( LT ).TZ;
 					Wamb = AirflowNetworkNodeSimu( LT ).WZ;
@@ -6008,7 +6020,11 @@ namespace AirflowNetworkBalanceManager {
 			}
 			if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 && MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 0.9e10 ) {
 				MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) = 1.0e10;
-				MV( i ) = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight ) * 1.0e10;
+				if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 && Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulbSchedNum != 0 ) {
+					MV( i ) = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulb;
+				} else {
+					MV( i ) = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight ) * 1.0e10;
+				}
 			}
 			if ( AirflowNetworkNodeData( i ).RAFNNodeNum > 0 && MA( ( i - 1 )*AirflowNetworkNumOfNodes + i ) < 0.9e10 ) {
 				MA( ( i - 1 )*AirflowNetworkNumOfNodes + i ) = 1.0e10;
@@ -6934,6 +6950,8 @@ namespace AirflowNetworkBalanceManager {
 			e.TotalLatLossJ = 0.0;
 		}
 
+		// TODO: Check this.
+
 		// Calculate sensible and latent loads in each zone from multizone airflows
 		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) { // Multizone airflow energy
@@ -7303,6 +7321,7 @@ namespace AirflowNetworkBalanceManager {
 		Real64 Qlat;
 		Real64 AirDensity;
 		Real64 Tamb;
+		Real64 Wamb;
 		Real64 PartLoadRatio;
 		Real64 OnOffRatio;
 		Real64 NodeMass;
@@ -7413,8 +7432,10 @@ namespace AirflowNetworkBalanceManager {
 
 		// Rewrite AirflowNetwork airflow rate
 		for ( i = 1; i <= NumOfLinksMultiZone; ++i ) {
+			//TODO: Check this.
 			Tamb = OutDryBulbTempAt( AirflowNetworkLinkageData( i ).NodeHeights( 1 ) );
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
+			Wamb = OutHumRat;
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, Wamb );
 			AirflowNetworkLinkSimu( i ).VolFLOW = AirflowNetworkLinkSimu( i ).FLOW / AirDensity;
 			AirflowNetworkLinkSimu( i ).VolFLOW2 = AirflowNetworkLinkSimu( i ).FLOW2 / AirDensity;
 		}
@@ -8139,14 +8160,10 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 
-			// Eliminate external air node for network
+			// Eliminate local external air node for network
 			for ( k = 1; k <= NumOfNodes; ++k ) {
 				if ( NodeFound( k ) ) continue;
-				for ( j = 1; j <= AirflowNetworkNumOfExtNode; ++j ) {
-					if ( MultizoneExternalNodeData( j ).OutAirNodeNum == k ) {
-						NodeFound( k ) = true;
-					}
-				}
+				if ( Node( k ).IsLocalNode ) NodeFound( k ) = true;
 			}
 
 			// Ensure all the nodes used in Eplus are a subset of AirflowNetwork Nodes
@@ -9210,7 +9227,12 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( MinTimeControlOnly ) return;
 
-		OutDryBulb = OutDryBulbTempAt( Zone( ZoneNum ).Centroid.z );
+		if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
+			OutDryBulb = Zone( ZoneNum ).OutDryBulbTemp;
+		} else {
+			OutDryBulb = OutDryBulbTempAt( Zone( ZoneNum ).Centroid.z );
+		}
+
 		if ( OutDryBulb < ComfortBouPoint ) {
 			Tcomfort = CurveValue( ComfortLowTempCurveNum, OutDryBulb );
 		} else {

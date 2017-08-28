@@ -1012,6 +1012,7 @@ namespace DataAirflowNetwork {
 		int EPlusZoneNum; // E+ zone number
 		int EPlusNodeNum;
 		int ExtNodeNum;
+		int OutAirNodeNum;
 		int EPlusTypeNum;
 		int RAFNNodeNum;  // RoomAir model node number
 		int NumOfLinks; // Number of links for RoomAir model
@@ -1024,6 +1025,7 @@ namespace DataAirflowNetwork {
 			EPlusZoneNum( 0 ),
 			EPlusNodeNum( 0 ),
 			ExtNodeNum( 0 ),
+			OutAirNodeNum( 0 ),
 			EPlusTypeNum( 0 ),
 			RAFNNodeNum( 0 ),
 			NumOfLinks( 0 )
