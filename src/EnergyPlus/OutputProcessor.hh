@@ -231,7 +231,6 @@ namespace OutputProcessor {
 		kg_m2s,
 		J_kgK,
 		L,
-		Kg,
 		K_m,
 		m2,
 		W_m2C,
@@ -1033,6 +1032,10 @@ namespace OutputProcessor {
 		int const SetIntVal // integer value to set if type is integer
 	);
 
+	std::string
+	unitEnumToStringBrackets(
+		Unit const & unitIn
+	);
 
 	std::string
 	unitEnumToString(
@@ -1186,7 +1189,7 @@ GetVariableKeyCountandType(
 	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
 	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
 	int & varStepType, // Variable time step is Zone=1 or HVAC=2
-	OutputProcessor::Unit varUnits // Units enumeration
+	OutputProcessor::Unit & varUnits // Units enumeration
 );
 
 void

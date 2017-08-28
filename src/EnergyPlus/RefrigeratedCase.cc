@@ -5985,7 +5985,7 @@ namespace RefrigeratedCase {
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Heater Electric Power", OutputProcessor::Unit::W, WarehouseCoil( CoilNum ).ElecHeaterPower, "HVAC", "Average", WarehouseCoil( CoilNum ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Heater Electric Energy", OutputProcessor::Unit::J, WarehouseCoil( CoilNum ).ElecHeaterConsumption, "HVAC", "Sum", WarehouseCoil( CoilNum ).Name, _, "ELECTRICITY", "REFRIGERATION", "General", "Building" );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Sensible Heat Ratio", OutputProcessor::Unit::None, WarehouseCoil( CoilNum ).SensHeatRatio, "HVAC", "Average", WarehouseCoil( CoilNum ).Name );
-					SetupOutputVariable( "Refrigeration Zone Air Chiller Frost Accumulation Mass", OutputProcessor::Unit::Kg, WarehouseCoil( CoilNum ).KgFrost, "HVAC", "Average", WarehouseCoil( CoilNum ).Name );
+					SetupOutputVariable( "Refrigeration Zone Air Chiller Frost Accumulation Mass", OutputProcessor::Unit::kg, WarehouseCoil( CoilNum ).KgFrost, "HVAC", "Average", WarehouseCoil( CoilNum ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Zone Total Cooling Rate", OutputProcessor::Unit::W, WarehouseCoil( CoilNum ).ReportTotalCoolCreditRate, "HVAC", "Average", WarehouseCoil( CoilNum ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Zone Total Cooling Energy", OutputProcessor::Unit::J, WarehouseCoil( CoilNum ).ReportTotalCoolCreditEnergy, "HVAC", "Sum", WarehouseCoil( CoilNum ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Zone Sensible Cooling Rate", OutputProcessor::Unit::W, WarehouseCoil( CoilNum ).ReportSensCoolCreditRate, "HVAC", "Average", WarehouseCoil( CoilNum ).Name );

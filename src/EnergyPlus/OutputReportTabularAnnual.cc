@@ -727,7 +727,7 @@ namespace EnergyPlus {
 				}
 				//do the unit conversions
 				if ( unitsStyle == OutputReportTabular::unitsStyleInchPound ) {
-					varNameWithUnits =  fldStIt->m_variMeter + '[' + unitEnumToString( fldStIt->m_varUnits ) + ']';
+					varNameWithUnits =  fldStIt->m_variMeter + unitEnumToStringBrackets( fldStIt->m_varUnits );
 					OutputReportTabular::LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 					OutputReportTabular::GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 				}

@@ -3766,10 +3766,10 @@ namespace OutputReportTabular {
 								curTable = OutputTableBinned( iInput ).resIndex + ( jTable - 1 );
 								curName = "";
 								if ( unitsStyle == unitsStyleInchPound ) {
-									origName = OutputTableBinned( iInput ).varOrMeter + " [" + unitEnumToString( OutputTableBinned( iInput ).units ) + ']';
+									origName = OutputTableBinned( iInput ).varOrMeter + unitEnumToStringBrackets( OutputTableBinned( iInput ).units );
 									LookupSItoIP( origName, indexUnitConv, curName );
 								} else {
-									curName = OutputTableBinned( iInput ).varOrMeter + " [" + unitEnumToString( OutputTableBinned( iInput ).units ) + ']';
+									curName = OutputTableBinned( iInput ).varOrMeter + unitEnumToStringBrackets( OutputTableBinned( iInput ).units );
 								}
 								if ( OutputTableBinned( iInput ).scheduleIndex == 0 ) {
 									tbl_stream << "<a href=\"#" << MakeAnchorName( curName, BinObjVarID( curTable ).namesOfObj ) << "\">" << BinObjVarID( curTable ).namesOfObj << "</a>   |  \n";
@@ -6524,7 +6524,7 @@ namespace OutputReportTabular {
 					}
 					//do the unit conversions
 					if ( unitsStyle == unitsStyleInchPound ) {
-						varNameWithUnits = MonthlyColumns( curCol ).varName + '[' + unitEnumToString( MonthlyColumns( curCol ).units ) + ']';
+						varNameWithUnits = MonthlyColumns( curCol ).varName + unitEnumToStringBrackets( MonthlyColumns( curCol ).units );
 						LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 						GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 					} else { //just do the Joule conversion
@@ -6863,7 +6863,7 @@ namespace OutputReportTabular {
 		rowHead( 39 ) = "Total";
 		for ( iInObj = 1; iInObj <= OutputTableBinnedCount; ++iInObj ) {
 			firstReport = OutputTableBinned( iInObj ).resIndex;
-			curNameWithSIUnits = OutputTableBinned( iInObj ).varOrMeter + " [" + unitEnumToString( OutputTableBinned( iInObj ).units ) + ']';
+			curNameWithSIUnits = OutputTableBinned( iInObj ).varOrMeter + unitEnumToStringBrackets( OutputTableBinned( iInObj ).units );
 			if ( unitsStyle == unitsStyleInchPound ) {
 				LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 				curIntervalStart = ConvertIP( indexUnitConv, OutputTableBinned( iInObj ).intervalStart );

@@ -1142,7 +1142,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( RT_IPUnits_OtherM3, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			DetermineMeterIPUnits( ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound );
+			DetermineMeterIPUnits( ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound );
 			EXPECT_EQ( RT_IPUnits_OtherKG, ipUnits );
 			EXPECT_FALSE( errorFound );
 
@@ -1169,8 +1169,8 @@ namespace EnergyPlus {
 			auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
 			ASSERT_EQ(2ul, errorData.size());
-			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[badUnits].", "1"};
-			std::vector<std::string> errorData1 {"2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[kWh].", "1"};
+			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
+			std::vector<std::string> errorData1 {"2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
 			EXPECT_EQ(errorData0, errorData[0]);
 			EXPECT_EQ(errorData1, errorData[1]);
 
@@ -1325,36 +1325,36 @@ namespace EnergyPlus {
 
 			std::vector< std::vector<std::string> > reportDataDictionary(
 			{
-				{"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
-				{"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
-				{"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"},
-				{"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
-				{"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"},
-				{"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
-				{"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
-				{"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"},
-				{"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
-				{"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"},
-				{"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
-				{"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
-				{"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"},
-				{"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
-				{"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"},
-				{"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
-				{"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
-				{"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"},
-				{"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
-				{"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"}
+				{"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "J"},
+				{"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "W"},
+				{"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "J"},
+				{"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "W"},
+				{"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "W"},
+				{"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
+				{"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
+				{"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
+				{"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
+				{"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
+				{"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "J"},
+				{"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", ""},
+				{"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", ""},
+				{"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", ""},
+				{"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", ""},
+				{"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", ""},
+				{"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", ""},
+				{"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "deltaC"},
+				{"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "deltaC"},
+				{"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "deltaC"},
+				{"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
+				{"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
+				{"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "deltaC"},
+				{"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
+				{"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "deltaC"},
+				{"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
+				{"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
+				{"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "deltaC"},
+				{"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
+				{"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "deltaC"}
 			});
 			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
 
@@ -1500,36 +1500,36 @@ namespace EnergyPlus {
 
 			std::vector< std::vector<std::string> > reportDataDictionary(
 			{
-				{"1", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"2", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"3", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "scheduleName", "variableUnits"},
-				{"4", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"5", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"6", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"7", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"8", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "variableUnits"},
-				{"9", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"10", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"11", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"12", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"13", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "scheduleName", "variableUnits"},
-				{"14", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"15", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"16", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"17", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"18", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "scheduleName", "variableUnits"},
-				{"19", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"20", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"21", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"22", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"23", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "scheduleName", "variableUnits"},
-				{"24", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"25", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"26", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
-				{"27", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
-				{"28", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "scheduleName", "variableUnits"},
-				{"29", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
-				{"30", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Run Period", "", "variableUnits"}
+				{"1", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"2", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"3", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "scheduleName", "m3/s"},
+				{"4", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"5", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"6", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"7", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"8", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "m3/s"},
+				{"9", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"10", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"11", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"12", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"13", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "scheduleName", "m3/s"},
+				{"14", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"15", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"16", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"17", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"18", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "scheduleName", "m3/s"},
+				{"19", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"20", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"21", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"22", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"23", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "scheduleName", "m3/s"},
+				{"24", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"25", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"26", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "m3/s"},
+				{"27", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "m3/s"},
+				{"28", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "scheduleName", "m3/s"},
+				{"29", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Run Period", "", "m3/s"},
+				{"30", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Run Period", "", "m3/s"}
 			});
 			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
 
@@ -1888,7 +1888,7 @@ namespace EnergyPlus {
 			auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
 			ASSERT_EQ(1ul, errorData.size());
-			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[kWh].  ..on Meter=\"testMeter2\".  ..requests for IP units from this meter will be ignored.", "1"};
+			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].  ..on Meter=\"testMeter2\".  ..requests for IP units from this meter will be ignored.", "1"};
 			EXPECT_EQ(errorData0, errorData[0]);
 
 			ASSERT_EQ( 2, NumEnergyMeters );

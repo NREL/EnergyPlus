@@ -3825,7 +3825,7 @@ namespace OutputProcessor {
 
 		for ( VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter ) {
 
-			std::string mtrUnitString = unitEnumToString( RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).units );
+			std::string mtrUnitString = unitEnumToStringBrackets( RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).units );
 
 			Multipliers = "";
 			ZoneMult = RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ZoneMult;
@@ -3843,16 +3843,16 @@ namespace OutputProcessor {
 			gio::write( OutputFileMeterDetails, "(/,A)" ) << " Meters for " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ReportIDChr + ',' + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + " [" + mtrUnitString + ']' + Multipliers;
 
 			for ( I = 1; I <= VarMeterArrays( VarMeter ).NumOnMeters; ++I ) {
-				gio::write( OutputFileMeterDetails, fmtA ) << "  OnMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnMeters( I ) ).Name + " [" + mtrUnitString + ']';
+				gio::write( OutputFileMeterDetails, fmtA ) << "  OnMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnMeters( I ) ).Name + mtrUnitString;
 			}
 
 			for ( I = 1; I <= VarMeterArrays( VarMeter ).NumOnCustomMeters; ++I ) {
-				gio::write( OutputFileMeterDetails, fmtA ) << "  OnCustomMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnCustomMeters( I ) ).Name + " [" + mtrUnitString + ']';
+				gio::write( OutputFileMeterDetails, fmtA ) << "  OnCustomMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnCustomMeters( I ) ).Name + mtrUnitString;
 			}
 		}
 
 		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, "(/,A)", flags ) << " For Meter=" + EnergyMeters( Meter ).Name + " [" + unitEnumToString( EnergyMeters( Meter ).Units ) + ']'; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, "(/,A)", flags ) << " For Meter=" + EnergyMeters( Meter ).Name + unitEnumToStringBrackets( EnergyMeters( Meter ).Units ); }
 			if ( EnergyMeters( Meter ).ResourceType != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", ResourceType=" + EnergyMeters( Meter ).ResourceType; };
 			if ( EnergyMeters( Meter ).EndUse != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", EndUse=" + EnergyMeters( Meter ).EndUse; };
 			if ( EnergyMeters( Meter ).Group != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", Group=" + EnergyMeters( Meter ).Group; };
@@ -5042,164 +5042,170 @@ namespace OutputProcessor {
 	}
 
 	std::string
+	unitEnumToStringBrackets(
+		Unit const & unitIn
+	)
+	{
+		return " [" + unitEnumToString(unitIn) + "]";
+	}
+
+
+	std::string
 		unitEnumToString(
 			Unit const & unitIn
 		)
 	{
 		switch ( unitIn ) {
 			case OutputProcessor::Unit::kg_s:
-				return " [kg/s]";
+				return "kg/s";
 				break;
 			case OutputProcessor::Unit::C:
-				return " [C]";
+				return "C";
 				break;
 			case OutputProcessor::Unit::kgWater_kgDryAir:
-				return " [kgWater/kgDryAir]";
+				return "kgWater/kgDryAir";
 				break;
 			case OutputProcessor::Unit::ppm:
-				return " [ppm]";
+				return "ppm";
 				break;
 			case OutputProcessor::Unit::Pa:
-				return " [Pa]";
+				return "Pa";
 				break;
 			case OutputProcessor::Unit::m3_s:
-				return " [m3/s]";
+				return "m3/s";
 				break;
 			case OutputProcessor::Unit::None:
-				return " []";
+				return "";
 				break;
 			case OutputProcessor::Unit::min:
-				return " [min]";
+				return "min";
 				break;
 			case OutputProcessor::Unit::W:
-				return " [W]";
+				return "W";
 				break;
 			case OutputProcessor::Unit::J:
-				return " [J]";
+				return "J";
 				break;
 			case OutputProcessor::Unit::m3:
-				return " [m3]";
+				return "m3";
 				break;
 			case OutputProcessor::Unit::kg:
-				return " [kg]";
+				return "kg";
 				break;
 			case OutputProcessor::Unit::ach:
-				return " [ach]";
+				return "ach";
 				break;
 			case OutputProcessor::Unit::W_W:
-				return " [W/W]";
+				return "W/W";
 				break;
 			case OutputProcessor::Unit::lux:
-				return " [lux]";
+				return "lux";
 				break;
 			case OutputProcessor::Unit::lum_W:
-				return " [lum/W]";
+				return "lum/W";
 				break;
 			case OutputProcessor::Unit::hr:
-				return " [hr]";
+				return "hr";
 				break;
 			case OutputProcessor::Unit::cd_m2:
-				return " [cd/m2]";
+				return "cd/m2";
 				break;
 			case OutputProcessor::Unit::J_kgWater:
-				return " [J/kgWater]";
+				return "J/kgWater";
 				break;
 			case OutputProcessor::Unit::m_s:
-				return " [m/s]";
+				return "m/s";
 				break;
 			case OutputProcessor::Unit::W_m2:
-				return " [W/m2]";
+				return "W/m2";
 				break;
 			case OutputProcessor::Unit::m:
-				return " [m]";
+				return "m";
 				break;
 			case OutputProcessor::Unit::Ah:
-				return " [Ah]";
+				return "Ah";
 				break;
 			case OutputProcessor::Unit::A:
-				return " [A]";
+				return "A";
 				break;
 			case OutputProcessor::Unit::V:
-				return " [V]";
+				return "V";
 				break;
 			case OutputProcessor::Unit::deltaC:
-				return " [deltaC]";
+				return "deltaC";
 				break;
 			case OutputProcessor::Unit::kmol_s:
-				return " [kmol/s]";
+				return "kmol/s";
 				break;
 			case OutputProcessor::Unit::Kg_s:
-				return " [Kg/s]";
+				return "kg/s";
 				break;
 			case OutputProcessor::Unit::rev_min:
-				return " [rev/min]";
+				return "rev/min";
 				break;
 			case OutputProcessor::Unit::Btu_h_W:
-				return " [Btu/h/W]";
+				return "Btu/h-W";
 				break;
 			case OutputProcessor::Unit::W_m2K:
-				return " [W/m2-K]";
+				return "W/m2-K";
 				break;
 			case OutputProcessor::Unit::J_kg:
-				return " [J/kg]";
+				return "J/kg";
 				break;
 			case OutputProcessor::Unit::kg_kg:
-				return " [kg/kg]";
+				return "kg/kg";
 				break;
 			case OutputProcessor::Unit::Perc:
-				return " [%]";
+				return "%";
 				break;
 			case OutputProcessor::Unit::deg:
-				return " [deg]";
+				return "deg";
 				break;
 			case OutputProcessor::Unit::s:
-				return " [s]";
+				return "s";
 				break;
 			case OutputProcessor::Unit::kg_m3:
-				return " [kg/m3]";
+				return "kg/m3";
 				break;
 			case OutputProcessor::Unit::kg_m2s:
-				return " [kg/m2-s]";
+				return "kg/m2-s";
 				break;
 			case OutputProcessor::Unit::J_kgK:
-				return " [J/kg-K]";
+				return "J/kg-K";
 				break;
 			case OutputProcessor::Unit::L:
-				return " [L]";
-				break;
-			case OutputProcessor::Unit::Kg:
-				return " [Kg]";
+				return "L";
 				break;
 			case OutputProcessor::Unit::K_m:
-				return " [K/m]";
+				return "K/m";
 				break;
 			case OutputProcessor::Unit::m2:
-				return " [m2]";
+				return "m2";
 				break;
 			case OutputProcessor::Unit::W_m2C:
-				return " [W/m2-C]";
+				return "W/m2-C";
 				break;
 			case OutputProcessor::Unit::rad:
-				return " [rad]";
+				return "rad";
 				break;
 			case OutputProcessor::Unit::ACH:
-				return " [ACH]";
+				return "ACH";
 				break;
 			case OutputProcessor::Unit::J_m2:
-				return " [J/m2]";
+				return "J/m2";
 				break;
 			case OutputProcessor::Unit::clo:
-				return " [clo]";
+				return "clo";
 				break;
 			case OutputProcessor::Unit::W_K:
-				return " [W/K]";
+				return "W/K";
 				break;
 			case OutputProcessor::Unit::kgWater_s:
-				return " [kgWater/s]";
+				return "kgWater/s";
 				break;
 
 			default:
-				return " [unknown]";
+				return "unknown";
 				break;
 		}
 	}
@@ -5289,8 +5295,6 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::J_kgK;
 		} else if ( InputProcessor::SameString( unitIn, "L" ) ) {
 			return OutputProcessor::Unit::L;
-		} else if ( InputProcessor::SameString( unitIn, "Kg" ) ) {
-			return OutputProcessor::Unit::Kg;
 		} else if ( InputProcessor::SameString( unitIn, "K/m" ) ) {
 			return OutputProcessor::Unit::K_m;
 		} else if ( InputProcessor::SameString( unitIn, "m2" ) ) {
@@ -5480,6 +5484,8 @@ SetupOutputVariable(
 //ou		ShowSevereError( "Variable Name has no units in call=" + VariableName );
 //ou		ShowFatalError( "Program terminates." );
 //ou	}
+
+	VarName = VariableName;
 
 	// Determine whether to Report or not
 	CheckReportVariable( KeyedValue, VarName );
@@ -5742,6 +5748,8 @@ SetupOutputVariable(
 //ou		ShowSevereError( "Variable Name has no units in call=" + VariableName );
 //ou		ShowFatalError( "Program terminates." );
 //ou	}
+
+	VarName = VariableName;
 
 	// Determine whether to Report or not
 	CheckReportVariable( KeyedValue, VarName );
@@ -7693,7 +7701,7 @@ GetVariableKeyCountandType(
 	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
 	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
 	int & varStepType, // Variable time step is Zone=1 or HVAC=2
-	OutputProcessor::Unit varUnits // Units enumeration
+	OutputProcessor::Unit & varUnits // Units enumeration
 )
 {
 
@@ -8377,7 +8385,7 @@ ProduceRDDMDD()
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
 //ou				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << unitEnumToString( DDVariableTypes( ItemPtr ).units ) << ']' << '\n';
+				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitEnumToStringBrackets( DDVariableTypes( ItemPtr ).units ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8386,7 +8394,7 @@ ProduceRDDMDD()
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
 //ou					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << unitEnumToString( DDVariableTypes( ItemPtr ).units ) << ']' << '\n';
+					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitEnumToStringBrackets( DDVariableTypes( ItemPtr ).units ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
@@ -8394,7 +8402,7 @@ ProduceRDDMDD()
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
 //ou				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << unitEnumToString( DDVariableTypes( ItemPtr ).units ) << ']' << '\n';
+				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitEnumToStringBrackets( DDVariableTypes( ItemPtr ).units ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8403,7 +8411,7 @@ ProduceRDDMDD()
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
 //ou					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << unitEnumToString( DDVariableTypes( ItemPtr ).units ) << ']' << '\n';
+					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitEnumToString( DDVariableTypes( ItemPtr ).units ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
@@ -8429,10 +8437,10 @@ ProduceRDDMDD()
 	for ( Item = 1; Item <= NumEnergyMeters; ++Item ) {
 		ItemPtr = iVariableNames( Item );
 		if ( ProduceReportVDD == ReportVDD_Yes ) {
-			mdd_stream << "Zone,Meter," << EnergyMeters( ItemPtr ).Name << " [" << unitEnumToString( EnergyMeters( ItemPtr ).Units ) << ']' << '\n';
+			mdd_stream << "Zone,Meter," << EnergyMeters( ItemPtr ).Name << unitEnumToStringBrackets( EnergyMeters( ItemPtr ).Units ) << '\n';
 		} else if ( ProduceReportVDD == ReportVDD_IDF ) {
-			mdd_stream << "Output:Meter," << EnergyMeters( ItemPtr ).Name << ",hourly; !- [" << unitEnumToString( EnergyMeters( ItemPtr ).Units ) << ']' << '\n';
-			mdd_stream << "Output:Meter:Cumulative," << EnergyMeters( ItemPtr ).Name << ",hourly; !- [" << unitEnumToString( EnergyMeters( ItemPtr ).Units ) << ']' << '\n';
+			mdd_stream << "Output:Meter," << EnergyMeters( ItemPtr ).Name << ",hourly; !-" << unitEnumToStringBrackets( EnergyMeters( ItemPtr ).Units ) << '\n';
+			mdd_stream << "Output:Meter:Cumulative," << EnergyMeters( ItemPtr ).Name << ",hourly; !-" << unitEnumToStringBrackets( EnergyMeters( ItemPtr ).Units ) << '\n';
 		}
 	}
 	if ( mdd_stream.is_open() ) mdd_stream.close();
