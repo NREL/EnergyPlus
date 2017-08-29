@@ -4588,17 +4588,17 @@ namespace WaterThermalTanks {
 							SetupOutputVariable( "Water Heater Heater 2 Heating Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).HeaterEnergy2, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
 							SetupOutputVariable( "Water Heater Heater 1 Cycle On Count", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).CycleOnCount1, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
-							SetupOutputVariable( "Water Heater Heater 2 Cycle On Count ", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).CycleOnCount2, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 2 Cycle On Count", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).CycleOnCount2, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
 							SetupOutputVariable( "Water Heater Heater 1 Runtime Fraction", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).RuntimeFraction1, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							SetupOutputVariable( "Water Heater Heater 2 Runtime Fraction", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).RuntimeFraction2, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Water Heater Temperature Node " + TrimSigDigits( NodeNum ) + "", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Water Heater Temperature Node " + TrimSigDigits( NodeNum ), OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Water Heater Final Temperature Node " + TrimSigDigits( NodeNum ) + " ", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Water Heater Final Temperature Node " + TrimSigDigits( NodeNum ), OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 						}
 

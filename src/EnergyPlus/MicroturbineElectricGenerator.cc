@@ -1091,7 +1091,7 @@ namespace MicroturbineElectricGenerator {
 			//   Report combustion air outlet conditions if exhaust air calculations are active
 			if ( MTGenerator( GeneratorNum ).ExhAirCalcsActive ) {
 				SetupOutputVariable( "Generator Exhaust Air Mass Flow Rate", OutputProcessor::Unit::kg_s, MTGeneratorReport( GeneratorNum ).ExhAirMassFlowRate, "System", "Average", MTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Exhaust Air Temperature ", OutputProcessor::Unit::C, MTGeneratorReport( GeneratorNum ).ExhAirTemperature, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, MTGeneratorReport( GeneratorNum ).ExhAirTemperature, "System", "Average", MTGenerator( GeneratorNum ).Name );
 			}
 
 		}

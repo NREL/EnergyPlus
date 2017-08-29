@@ -6739,12 +6739,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).TempRangeSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value ", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
+							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).TempRangeSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value ", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
+							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
 						}
 						if ( cAlphaArgs( 3 ) == "MultiplierSchedule" ) {
 							if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).TempRangeSchPtr, 0.0, ">=", 1.0, "<=" ) ) {
@@ -6942,12 +6942,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).HumIndSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value ", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
+							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).HumIndSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value ", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
+							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
 						}
 
 						{ auto const SELECT_CASE_var( DesDayInput( EnvrnNum ).HumIndType );
@@ -7046,12 +7046,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).BeamSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value ", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
+							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).BeamSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value ", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
+							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
 						}
 						if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).BeamSolarSchPtr, 0.0, ">=" ) ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -7082,12 +7082,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).DiffuseSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value ", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
+							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).DiffuseSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value ", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
+							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
 						}
 						if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, 0.0, ">=" ) ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -7446,12 +7446,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = Found;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value ", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
+							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = Found;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value ", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
+							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
 						}
 						WPSkyTemperature( Item ).IsSchedule = true;
 						WPSkyTemperature( Item ).SchedulePtr = Found;
