@@ -152,7 +152,7 @@ namespace EnergyPlus {
 
 		private:
 			CWindowConstructionsBSDF();
-			std::shared_ptr< std::vector< Real64 > > getCommonWavelengths(
+			std::vector< Real64 > getCommonWavelengths(
 				FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum ) const;
 			std::shared_ptr< IGU_BSDFLayers > getLayers( FenestrationCommon::WavelengthRange const t_Range,
 			                                             int const t_ConstrNum ) const;

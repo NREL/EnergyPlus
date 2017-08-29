@@ -135,6 +135,14 @@ INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen-3.3.2/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/jsoncpp)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/MultiLayerOptics/include)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SingleLayerOptics/include)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
 INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
 
 if( BUILD_TESTING )
@@ -157,14 +165,12 @@ IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 ADD_SUBDIRECTORY(third_party/jsoncpp)
+ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
 
 # Kiva
 option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF )
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
-
-# Windows-CalcEngine exterior library
-include(externalGitHubLibs/CMakeLists-Windows-CalcEngine.txt)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
@@ -174,6 +180,14 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
   ADD_SUBDIRECTORY(tst/jsoncpp/unit)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/Chromogenics/tst)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/Common/tst)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/Gases/tst)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/MultiLayerOptics/tst)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/SingleLayerOptics/tst)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/SpectralAveraging/tst)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/Tarcog/tst)
+  # ADD_SUBDIRECTORY(third_party/Windows-CalcEngine/src/Viewer/tst)
 
   option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
 

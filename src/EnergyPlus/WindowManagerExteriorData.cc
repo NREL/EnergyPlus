@@ -200,10 +200,10 @@ namespace EnergyPlus {
 				std::make_shared< CMaterialSingleBand >( Tvis, Tvis, Rfvis, Rbvis, 0.38, 0.78 );
 
 			CMaterialDualBand aMat = CMaterialDualBand( aVisMat, aSolMat, 0.49 );
-			std::vector< Real64 > aWl = *aMat.getBandWavelengths();
-			std::vector< Real64 > aTf = *aMat.getBandProperties( Property::T, Side::Front );
-			std::vector< Real64 > aRf = *aMat.getBandProperties( Property::R, Side::Front );
-			std::vector< Real64 > aRb = *aMat.getBandProperties( Property::R, Side::Back );
+			std::vector< Real64 > aWl = aMat.getBandWavelengths();
+			std::vector< Real64 > aTf = aMat.getBandProperties( Property::T, Side::Front );
+			std::vector< Real64 > aRf = aMat.getBandProperties( Property::R, Side::Front );
+			std::vector< Real64 > aRb = aMat.getBandProperties( Property::R, Side::Back );
 			std::shared_ptr< CSpectralSampleData > aSampleData = std::make_shared< CSpectralSampleData >();
 			for ( size_t i = 0; i < aWl.size(); ++i ) {
 				aSampleData->addRecord( aWl[ i ], aTf[ i ], aRf[ i ], aRb[ i ] );
@@ -225,7 +225,7 @@ namespace EnergyPlus {
 			m_Layers[ WavelengthRange::Visible ] = std::make_shared< LayersBSDF_Map >();
 		}
 
-		std::shared_ptr< std::vector< Real64 > > CWindowConstructionsBSDF::getCommonWavelengths( WavelengthRange const t_Range,
+		std::vector< Real64 > CWindowConstructionsBSDF::getCommonWavelengths( WavelengthRange const t_Range,
 		                                                                                         int const t_ConstrNum ) const {
 			std::shared_ptr< IGU_BSDFLayers > iguLayers = getLayers( t_Range, t_ConstrNum );
 			CCommonWavelengths aCommonWL;
@@ -267,7 +267,7 @@ namespace EnergyPlus {
 			auto it = m_Equivalent.find( std::make_pair( t_Range, t_ConstrNum ) );
 			if ( it == m_Equivalent.end() ) {
 				// Layer was not requested before. Need to create it now.
-				std::shared_ptr< std::vector< double > > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
+				std::vector< double > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
 				std::shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
 				IGU_BSDFLayers iguLayers = *getLayers( t_Range, t_ConstrNum );
 				std::shared_ptr< CEquivalentBSDFLayer > aEqLayer = std::make_shared< CEquivalentBSDFLayer >( commonWl, iguLayers[ 0 ] );
