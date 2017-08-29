@@ -57,6 +57,7 @@
 #include <DataLoopNode.hh>
 #include <NodeInputManager.hh>
 #include <DataDefineEquip.hh>
+#include <GeneralRoutines.hh>
 #include <SimulationManager.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputReportPredefined.hh>
@@ -1637,6 +1638,7 @@ namespace EnergyPlus {
 		DataGlobals::KickOffSimulation = true;
 
 		WeatherManager::ResetEnvironmentCounter();
+		TestAirPathIntegrity( ErrorsFound ); // Needed to initialize return node connections to airloops and inlet nodes
 		SimulationManager::SetupSimulation( ErrorsFound );
 		DataGlobals::KickOffSimulation = false;
 

@@ -1693,14 +1693,6 @@ namespace SimAirServingZones {
 										TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
 										ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
 										ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
-										// Find matching return node (connected to the same air loop) if any
-										for ( int returnNum = 1; returnNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++returnNum ) {
-											if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( returnNum ) == AirLoopNum ) {
-												ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNodeNum( returnNum ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
-												break;
-											}
-										}
-
 									}
 									FoundSupPathZoneConnect = true;
 
@@ -1733,13 +1725,6 @@ namespace SimAirServingZones {
 										TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
 										if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
 										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
-										// Find matching return node (connected to the same air loop) if any
-										for ( int returnNum = 1; returnNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++returnNum ) {
-											if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( returnNum ) == AirLoopNum ) {
-												ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNodeNum( returnNum ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
-												break;
-											}
-										}
 									}
 									FoundSupPathZoneConnect = true;
 
@@ -1794,13 +1779,6 @@ namespace SimAirServingZones {
 									TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
 									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
 									if (ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
-									// Find matching return node (connected to the same air loop) if any
-									for ( int returnNum = 1; returnNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++returnNum ) {
-										if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( returnNum ) == AirLoopNum ) {
-											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNodeNum( returnNum ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
-											break;
-										}
-									}
 									goto ControlledZoneLoop2_exit;
 
 								}
@@ -1817,13 +1795,6 @@ namespace SimAirServingZones {
 									TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
 									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
 									if (ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
-									// Find matching return node (connected to the same air loop) if any
-									for ( int returnNum = 1; returnNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++returnNum ) {
-										if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( returnNum ) == AirLoopNum ) {
-											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNodeNum( returnNum ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
-											break;
-										}
-									}
 									goto ControlledZoneLoop2_exit;
 
 								}

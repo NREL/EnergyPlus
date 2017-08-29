@@ -3739,7 +3739,6 @@ namespace ZoneEquipmentManager {
 		using DataAirSystems::PrimaryAirSystem;
 		using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 		using DataGlobals::isPulseZoneSizing;
-		using DataGlobals::DoingSizing;
 
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::MassConservation;
@@ -3780,7 +3779,6 @@ namespace ZoneEquipmentManager {
 		Real64 BuildingZoneMixingFlowOld;
 		Real64 BuildingZoneMixingFlow;
 		Real64 StdTotalReturnMassFlow; // Standard method (inlets - outlets) total return mass flow rate
-		Real64 UserReturnNode1MassFlow; // User-specified flow for return node 1
 		Real64 UnbalancedExhaustDelta;
 		int Iteration;
 		int ZoneNum1;
@@ -3840,14 +3838,16 @@ namespace ZoneEquipmentManager {
 					TotInletAirMassFlowRateMaxAvail += thisNode.MassFlowRateMaxAvail;
 					TotInletAirMassFlowRateMin += thisNode.MassFlowRateMin;
 					TotInletAirMassFlowRateMinAvail += thisNode.MassFlowRateMinAvail;
-					// Accumulate air loop supply flow - need to reach back to airdist unit inlet
-					int airLoop = ZoneEquipConfig( ZoneNum ).InletNodeAirLoopNum( NodeNum );
-					int airDistCoolNodeNum = ZoneEquipConfig( ZoneNum ).AirDistUnitCool( NodeNum ).InNode;
-					int airDistHeatNodeNum = ZoneEquipConfig( ZoneNum ).AirDistUnitHeat( NodeNum ).InNode;
-					if ( airLoop > 0 ) {
-						AirLoopFlow( airLoop ).SupFlow += Node( airDistCoolNodeNum ).MassFlowRate;
-						if ( airDistHeatNodeNum != airDistCoolNodeNum ) {
-							AirLoopFlow( airLoop ).SupFlow += Node( airDistHeatNodeNum ).MassFlowRate;
+					if ( ZoneEquipInputsFilled ) {
+						// Accumulate air loop supply flow - need to reach back to airdist unit inlet
+						int airLoop = ZoneEquipConfig( ZoneNum ).InletNodeAirLoopNum( NodeNum );
+						int airDistCoolNodeNum = ZoneEquipConfig( ZoneNum ).AirDistUnitCool( NodeNum ).InNode;
+						int airDistHeatNodeNum = ZoneEquipConfig( ZoneNum ).AirDistUnitHeat( NodeNum ).InNode;
+						if ( airLoop > 0 ) {
+							AirLoopFlow( airLoop ).SupFlow += Node( airDistCoolNodeNum ).MassFlowRate;
+							if ( ( airDistHeatNodeNum > 0 ) && ( airDistHeatNodeNum != airDistCoolNodeNum ) ) {
+								AirLoopFlow( airLoop ).SupFlow += Node( airDistHeatNodeNum ).MassFlowRate;
+							}
 						}
 					}
 				}}
@@ -3938,14 +3938,16 @@ namespace ZoneEquipmentManager {
 
 				TotSupplyAirMassFlowRate = TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow;
 
-				int airLoop1 = ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 );
-				if ( ( airLoop1 > 0 ) && ( ZoneEquipConfig( ZoneNum ).NumReturnNodes == 1 ) ) {
-					int RetNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
-					AirLoopFlow( airLoop1 ).ZoneExhaust += ZoneEquipConfig( ZoneNum ).ZoneExh;
-					AirLoopFlow( airLoop1 ).ZoneExhaustBalanced += ZoneEquipConfig( ZoneNum ).ZoneExhBalanced;
-					AirLoopFlow( airLoop1 ).RetFlow0 += Node( RetNode1 ).MassFlowRate;
-					AirLoopFlow( airLoop1 ).RecircFlow += ZoneEquipConfig( ZoneNum ).PlenumMassFlow;
-					AirLoopFlow( airLoop1 ).RetFlowAdjustment += ( FinalTotalReturnMassFlow - StdTotalReturnMassFlow );
+				if ( ZoneEquipInputsFilled ) {
+					int airLoop1 = ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 );
+					if ( ( airLoop1 > 0 ) && ( ZoneEquipConfig( ZoneNum ).NumReturnNodes == 1 ) ) {
+						int RetNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
+						AirLoopFlow( airLoop1 ).ZoneExhaust += ZoneEquipConfig( ZoneNum ).ZoneExh;
+						AirLoopFlow( airLoop1 ).ZoneExhaustBalanced += ZoneEquipConfig( ZoneNum ).ZoneExhBalanced;
+						AirLoopFlow( airLoop1 ).RetFlow0 += Node( RetNode1 ).MassFlowRate;
+						AirLoopFlow( airLoop1 ).RecircFlow += ZoneEquipConfig( ZoneNum ).PlenumMassFlow;
+						AirLoopFlow( airLoop1 ).RetFlowAdjustment += ( FinalTotalReturnMassFlow - StdTotalReturnMassFlow );
+					}
 				}
 				BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
 			}
@@ -4050,7 +4052,7 @@ namespace ZoneEquipmentManager {
 				// Return node 1 is special
 				if( returnNum == 1 ){ 
 					// Make no return air flow adjustments during sizing
-					if (DataGlobals::DoingSizing || DataGlobals::isPulseZoneSizing && numRetNodes == 1 ){
+					if ( ( DataGlobals::DoingSizing || DataGlobals::isPulseZoneSizing ) && numRetNodes == 1 ) {
 						returnNodeMassFlow = ExpTotalReturnMassFlow;
 						if ( airLoop > 0 ) {
 							if ( !DataAirSystems::PrimaryAirSystem( airLoop ).OASysExists ) {

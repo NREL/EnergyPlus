@@ -1717,12 +1717,11 @@ TestReturnAirPathIntegrity(
 	// SUBROUTINE INFORMATION:
 	//       AUTHOR         Linda Lawrie
 	//       DATE WRITTEN   March 2003
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS SUBROUTINE:
 	// This subroutine tests return air path integrity and displays the loop for each branch.
 	// Also, input and output nodes.
+	// This also initializes ZoneEquipConfig.ReturnNodeInletNodeNum and ReturnNodeAirLoopNum
 
 	// METHODOLOGY EMPLOYED:
 	// na
@@ -2005,6 +2004,13 @@ TestReturnAirPathIntegrity(
 								if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNode( ZoneOutNum ) == AllNodes( RetPathNode ) ) {
 									ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( ZoneOutNum ) = WAirLoop;
 									RetNodeFound = true;
+									// Find matching inlet node connected to the same air loop
+									for ( int inletNum = 1; inletNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++inletNum ) {
+										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneOutNum ) == WAirLoop ) {
+											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNodeNum( ZoneOutNum ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( inletNum );
+											break;
+										}
+									}
 									break; // leave zone return node loop
 								}
 							if ( RetNodeFound ) break; // leave controlled zone loop

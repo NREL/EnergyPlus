@@ -120,6 +120,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 	GetZoneData(ErrorsFound);
 	AllocateHeatBalArrays();
 	GetZoneEquipmentData1();
+	ZoneEquipInputsFilled = true;
 	GetSimpleAirModelInputs(ErrorsFound);
 
 	int ZoneNum = 1;
@@ -134,6 +135,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 	DataHVACGlobals::NumPrimaryAirSys = 1;
 
 	ZoneEquipConfig(ZoneNum).AirLoopNum = 1;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum = 1;
 	DataHVACGlobals::AirLoopsSimOnce = true;
 	CalcZoneMassBalance( );
 	EXPECT_FALSE(has_err_output());
