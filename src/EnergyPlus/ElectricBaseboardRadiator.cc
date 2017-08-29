@@ -802,20 +802,20 @@ namespace ElectricBaseboardRadiator {
 				} else {
 
 					UpdateElectricBaseboardOn( AirOutletTemp, ElecBaseboard( BaseboardNum ).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
-					
+	
 				}
 
 			} else { // zero radiant fraction, no need of recalculation of heat balances
 
 				LoadMet = QBBCap;
 				UpdateElectricBaseboardOn( AirOutletTemp, ElecBaseboard( BaseboardNum ).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
-				
+
 			}
 
 		} else { // If there is an off condition the BB does nothing.
 
 			UpdateElectricBaseboardOff( LoadMet, QBBCap, RadHeat, QBBElecRadSource( BaseboardNum ), ElecBaseboard( BaseboardNum ).ElecUseRate, AirOutletTemp, AirInletTemp );
-			
+
 		}
 
 		// Assign calculated ones
@@ -842,16 +842,16 @@ namespace ElectricBaseboardRadiator {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   August 2017
-		
+
 		// PURPOSE OF THIS SUBROUTINE: Zero out appropriate system variables when it is off
-		
+
 		QBBCap = 0.0;
 		LoadMet = 0.0;
 		RadHeat = 0.0;
 		AirOutletTemp = AirInletTemp;
 		QBBElecRadSrc = 0.0;
 		ElecUseRate = 0.0;
-		
+
 	}
 
 	void
@@ -863,20 +863,20 @@ namespace ElectricBaseboardRadiator {
 		Real64 const CapacitanceAir,
 		Real64 const Effic )
 	{
-		
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   August 2017
-		
+
 		// PURPOSE OF THIS SUBROUTINE: System is on, so calculate some of the result variables
-		
+
 		AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
 		// This could be utilized somehow or even reported so the data structures are left in place
 		// The Baseboard electric Load is calculated using the efficiency
 		ElecUseRate = QBBCap / Effic;
 
 	}
-	
+
 	void
 	UpdateElectricBaseboard( int const BaseboardNum )
 	{
