@@ -241,29 +241,29 @@ namespace SpectralAveraging {
 			// Otherwise, just use measured data.
 			if ( m_SourceData != nullptr ) {
 
-				m_IncomingSource = std::move( m_SourceData->interpolate( m_Wavelengths ) );
+				m_IncomingSource = m_SourceData->interpolate( m_Wavelengths );
 
 
 				if ( m_DetectorData != nullptr ) {
 					auto interpolatedDetector = *m_DetectorData->interpolate( m_Wavelengths );
-					m_IncomingSource = std::move( m_IncomingSource->mMult( interpolatedDetector ) );
+					m_IncomingSource = m_IncomingSource->mMult( interpolatedDetector );
 				}
 
 				calculateProperties();
 
-				m_IncomingSource = std::move( m_IncomingSource->integrate( m_IntegrationType ) );
-				m_TransmittedSource = std::move( m_TransmittedSource->integrate( m_IntegrationType ) );
-				m_ReflectedFrontSource = std::move( m_ReflectedFrontSource->integrate( m_IntegrationType ) );
-				m_ReflectedBackSource = std::move( m_ReflectedBackSource->integrate( m_IntegrationType ) );
-				m_AbsorbedFrontSource = std::move( m_AbsorbedFrontSource->integrate( m_IntegrationType ) );
-				m_AbsorbedBackSource = std::move( m_AbsorbedBackSource->integrate( m_IntegrationType ) );
+				m_IncomingSource = m_IncomingSource->integrate( m_IntegrationType );
+				m_TransmittedSource = m_TransmittedSource->integrate( m_IntegrationType );
+				m_ReflectedFrontSource = m_ReflectedFrontSource->integrate( m_IntegrationType );
+				m_ReflectedBackSource = m_ReflectedBackSource->integrate( m_IntegrationType );
+				m_AbsorbedFrontSource = m_AbsorbedFrontSource->integrate( m_IntegrationType );
+				m_AbsorbedBackSource = m_AbsorbedBackSource->integrate( m_IntegrationType );
 
 				m_StateCalculated = true;
-			}
+      }
 		}
-	}
+}
 
-	//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 	////  CSpectralSample
 	//////////////////////////////////////////////////////////////////////////////////////
 

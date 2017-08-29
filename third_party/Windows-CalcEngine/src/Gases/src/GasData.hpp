@@ -2,6 +2,7 @@
 #define GASDATA_H
 
 #include <map>
+#include <string>
 
 #include "GasProperties.hpp"
 
