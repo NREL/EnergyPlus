@@ -5159,7 +5159,7 @@ namespace OutputProcessor {
 				return "%";
 				break;
 			case OutputProcessor::Unit::degree:
-				return "deg";
+				return "degree";
 				break;
 			case OutputProcessor::Unit::s:
 				return "s";
