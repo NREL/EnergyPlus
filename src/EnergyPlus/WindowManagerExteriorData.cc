@@ -212,76 +212,76 @@ namespace EnergyPlus {
 			return aSampleData;
 		}
 
-		///////////////////////////////////////////////////////////////////////////////
-		//       CWindowConstructionsBSDF
-		///////////////////////////////////////////////////////////////////////////////
-		CWindowConstructionsBSDF& CWindowConstructionsBSDF::instance() {
-			static CWindowConstructionsBSDF p_inst;
-			return p_inst;
-		}
-
-		CWindowConstructionsBSDF::CWindowConstructionsBSDF() {
-			m_Layers[ WavelengthRange::Solar ] = std::make_shared< LayersBSDF_Map >();
-			m_Layers[ WavelengthRange::Visible ] = std::make_shared< LayersBSDF_Map >();
-		}
-
-		std::vector< Real64 > CWindowConstructionsBSDF::getCommonWavelengths( WavelengthRange const t_Range,
-		                                                                                         int const t_ConstrNum ) const {
-			std::shared_ptr< IGU_BSDFLayers > iguLayers = getLayers( t_Range, t_ConstrNum );
-			CCommonWavelengths aCommonWL;
-			for ( auto layer : *iguLayers ) {
-				aCommonWL.addWavelength( layer->getBandWavelengths() );
-			}
-
-			return aCommonWL.getCombinedWavelengths( Combine::Interpolate );
-		}
-
-		std::shared_ptr< IGU_BSDFLayers > CWindowConstructionsBSDF::getLayers( WavelengthRange const t_Range,
-		                                                                       int const t_ConstrNum ) const {
-			LayersBSDF_Map aMap = *m_Layers.at( t_Range );
-			auto it = aMap.find( t_ConstrNum );
-			if ( it == aMap.end() ) {
-				throw std::runtime_error( "Incorrect construction selection." );
-			}
-			return aMap.at( t_ConstrNum );
-		}
-
-		void CWindowConstructionsBSDF::pushBSDFLayer( WavelengthRange const t_Range, int const t_ConstrNum,
-		                                              std::shared_ptr< CBSDFLayer > const& t_Layer ) {
-			std::shared_ptr< LayersBSDF_Map > aMap = m_Layers.at( t_Range );
-			auto it = aMap->find( t_ConstrNum );
-			std::shared_ptr< IGU_BSDFLayers > iguLayers = nullptr;
-			if ( it != aMap->end() ) {
-				iguLayers = it->second;
-			}
-			else {
-				iguLayers = std::make_shared< IGU_BSDFLayers >();
-				( *aMap )[ t_ConstrNum ] = iguLayers;
-			}
-
-			iguLayers->push_back( t_Layer );
-		}
-
-		std::shared_ptr< CMultiPaneBSDF > CWindowConstructionsBSDF::getEquivalentLayer(
-			WavelengthRange const t_Range, int const t_ConstrNum ) {
-			auto it = m_Equivalent.find( std::make_pair( t_Range, t_ConstrNum ) );
-			if ( it == m_Equivalent.end() ) {
-				// Layer was not requested before. Need to create it now.
-				std::vector< double > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
-				std::shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
-				IGU_BSDFLayers iguLayers = *getLayers( t_Range, t_ConstrNum );
-				std::shared_ptr< CEquivalentBSDFLayer > aEqLayer = std::make_shared< CEquivalentBSDFLayer >( commonWl, iguLayers[ 0 ] );
-				for ( auto i = 1u; i < iguLayers.size(); ++i ) {
-					aEqLayer->addLayer( iguLayers[ i ] );
-				}
-				std::shared_ptr< CMultiPaneBSDF > aMultiLayer =
-					std::make_shared< CMultiPaneBSDF >( aEqLayer, aSolarSpectrum );
-
-				m_Equivalent[ std::make_pair( t_Range, t_ConstrNum ) ] = aMultiLayer;
-			}
-
-			return m_Equivalent.at( std::make_pair( t_Range, t_ConstrNum ) );
-		}
+		// ///////////////////////////////////////////////////////////////////////////////
+		// //       CWindowConstructionsBSDF
+		// ///////////////////////////////////////////////////////////////////////////////
+		// CWindowConstructionsBSDF& CWindowConstructionsBSDF::instance() {
+		// 	static CWindowConstructionsBSDF p_inst;
+		// 	return p_inst;
+		// }
+		// 
+		// CWindowConstructionsBSDF::CWindowConstructionsBSDF() {
+		// 	m_Layers[ WavelengthRange::Solar ] = std::make_shared< LayersBSDF_Map >();
+		// 	m_Layers[ WavelengthRange::Visible ] = std::make_shared< LayersBSDF_Map >();
+		// }
+		// 
+		// std::vector< Real64 > CWindowConstructionsBSDF::getCommonWavelengths( WavelengthRange const t_Range,
+		//                                                                                          int const t_ConstrNum ) const {
+		// 	std::shared_ptr< IGU_BSDFLayers > iguLayers = getLayers( t_Range, t_ConstrNum );
+		// 	CCommonWavelengths aCommonWL;
+		// 	for ( auto layer : *iguLayers ) {
+		// 		aCommonWL.addWavelength( layer->getBandWavelengths() );
+		// 	}
+		// 
+		// 	return aCommonWL.getCombinedWavelengths( Combine::Interpolate );
+		// }
+		// 
+		// std::shared_ptr< IGU_BSDFLayers > CWindowConstructionsBSDF::getLayers( WavelengthRange const t_Range,
+		//                                                                        int const t_ConstrNum ) const {
+		// 	LayersBSDF_Map aMap = *m_Layers.at( t_Range );
+		// 	auto it = aMap.find( t_ConstrNum );
+		// 	if ( it == aMap.end() ) {
+		// 		throw std::runtime_error( "Incorrect construction selection." );
+		// 	}
+		// 	return aMap.at( t_ConstrNum );
+		// }
+		// 
+		// void CWindowConstructionsBSDF::pushBSDFLayer( WavelengthRange const t_Range, int const t_ConstrNum,
+		//                                               std::shared_ptr< CBSDFLayer > const& t_Layer ) {
+		// 	std::shared_ptr< LayersBSDF_Map > aMap = m_Layers.at( t_Range );
+		// 	auto it = aMap->find( t_ConstrNum );
+		// 	std::shared_ptr< IGU_BSDFLayers > iguLayers = nullptr;
+		// 	if ( it != aMap->end() ) {
+		// 		iguLayers = it->second;
+		// 	}
+		// 	else {
+		// 		iguLayers = std::make_shared< IGU_BSDFLayers >();
+		// 		( *aMap )[ t_ConstrNum ] = iguLayers;
+		// 	}
+		// 
+		// 	iguLayers->push_back( t_Layer );
+		// }
+		// 
+		// std::shared_ptr< CMultiPaneBSDF > CWindowConstructionsBSDF::getEquivalentLayer(
+		// 	WavelengthRange const t_Range, int const t_ConstrNum ) {
+		// 	auto it = m_Equivalent.find( std::make_pair( t_Range, t_ConstrNum ) );
+		// 	if ( it == m_Equivalent.end() ) {
+		// 		// Layer was not requested before. Need to create it now.
+		// 		std::vector< double > commonWl = getCommonWavelengths( t_Range, t_ConstrNum );
+		// 		std::shared_ptr< CSeries > aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum();
+		// 		IGU_BSDFLayers iguLayers = *getLayers( t_Range, t_ConstrNum );
+		// 		std::shared_ptr< CEquivalentBSDFLayer > aEqLayer = std::make_shared< CEquivalentBSDFLayer >( commonWl, iguLayers[ 0 ] );
+		// 		for ( auto i = 1u; i < iguLayers.size(); ++i ) {
+		// 			aEqLayer->addLayer( iguLayers[ i ] );
+		// 		}
+		// 		std::shared_ptr< CMultiPaneBSDF > aMultiLayer =
+		// 			std::make_shared< CMultiPaneBSDF >( aEqLayer, aSolarSpectrum );
+		// 
+		// 		m_Equivalent[ std::make_pair( t_Range, t_ConstrNum ) ] = aMultiLayer;
+		// 	}
+		// 
+		// 	return m_Equivalent.at( std::make_pair( t_Range, t_ConstrNum ) );
+		// }
 
 		///////////////////////////////////////////////////////////////////////////////
 		//   CWindowConstructionsSimplified
