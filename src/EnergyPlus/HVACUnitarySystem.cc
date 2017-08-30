@@ -1783,8 +1783,6 @@ namespace HVACUnitarySystem {
 		Real64 CoolCapAtPeak; // cooling capacity at peak [W]
 		Real64 HeatCapAtPeak; // heating capacity at peak [W]
 		std::string SystemType; // type of air loop equipment
-		Real64 OnOffAirFlowRatio; // used to pass to cooling coil for sizing
-		Real64 PartLoadRatio; // used to pass to cooling coil for sizing
 		bool TempCoolingLoad; // size cooling coils with a cooling load, save actual load
 		bool TempHeatingLoad; // save actual load
 		Real64 SysCoolingFlow; // individually sized cooling flow rate [m3/s]
