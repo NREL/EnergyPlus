@@ -499,7 +499,7 @@ namespace SimulationManager {
 				isFinalYear = true;
 			}
 
-			HVACManager::ResetNodeData(); // Reset here, because some zone loads rely on node date (e.g. ZoneITEquip)
+			HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
 			bool anyEMSRan;
 			ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
