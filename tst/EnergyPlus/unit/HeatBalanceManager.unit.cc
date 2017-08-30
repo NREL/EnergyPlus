@@ -722,4 +722,69 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInputTest )
+	{
+		// Test eio output for HVACSystemRootFindingAlgorithm
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.8;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"None, !- Infiltration Balancing Method",
+			"Ignored;                !- Infiltration Balancing Zones",
+			" HVACSystemRootFindingAlgorithm,",
+			" RegulaFalsiThenBisection,!- Algorithm",
+			" 5;                       !- Number of Iterations Before Algorithm Switch",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false
+		EXPECT_FALSE( ErrorsFound );
+		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION" );
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInputTest )
+	{
+		// Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.8;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"None, !- Infiltration Balancing Method",
+			"Ignored;                !- Infiltration Balancing Zones",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false
+		EXPECT_FALSE( ErrorsFound );
+		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi" );
+	}
+
 }
