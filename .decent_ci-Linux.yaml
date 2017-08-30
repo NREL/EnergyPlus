@@ -14,7 +14,7 @@ compilers:
     compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*"
 
   - name: "gcc"
-    version: "4.9"
+    version: "4.8"
     build_type: Debug
     build_package_generator: "STGZ"
     cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PYTHON_TESTS:BOOL=ON
