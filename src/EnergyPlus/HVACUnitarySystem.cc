@@ -2241,7 +2241,7 @@ namespace HVACUnitarySystem {
 			}
 
 			// set the multi-speed high flow rate variable in case a non-zero air flow rate resides on the coil inlet during sizing (e.g., upstream system ran prior to this one)
-			MSHPMassFlowRateHigh = 1.0; // doesn't matter what this value is since only coil size is needed and CompOn = 0 here
+			MSHPMassFlowRateHigh = EqSizing.CoolingAirVolFlow * StdRhoAir; // doesn't matter what this value is since only coil size is needed and CompOn = 0 here
 			SimDXCoilMultiSpeed( BlankString, 1.0, 1.0, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 0, 0, 0 );
 			DXCoolCap = GetCoilCapacityByIndexType( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).CoolingCoilType_Num, ErrFound );
 			EqSizing.DesCoolingLoad = DXCoolCap;
