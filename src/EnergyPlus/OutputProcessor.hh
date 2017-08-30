@@ -225,6 +225,7 @@ namespace OutputProcessor {
 		J_kg,
 		kg_kg,
 		Perc,
+		deg,
 		degree,
 		s,
 		kg_m3,
@@ -749,8 +750,8 @@ namespace OutputProcessor {
 	std::string
 	StandardVariableTypeKey( int const VariableType );
 
-	std::string
-	GetVariableUnitsString( std::string const & VariableName );
+//ou	std::string
+//ou	GetVariableUnitsString( std::string const & VariableName );
 
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.

@@ -2177,24 +2177,24 @@ namespace EnergyPlus {
 
 		}
 
-		TEST_F( SQLiteFixture, OutputProcessor_getVariableUnitsString )
-		{
-			EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
-			EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
-			EXPECT_EQ( "kgWater/kgDryAir", GetVariableUnitsString( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]" ) );
-			EXPECT_EQ( "", GetVariableUnitsString( "Site Daylighting Model Sky Clearness []" ) );
-			EXPECT_EQ( "", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature" ) );
-			EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
-
-		}
-
-		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_getVariableUnitsString )
-		{
-			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ) );
-			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ) );
-			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ) );
-
-		}
+//ou		TEST_F( SQLiteFixture, OutputProcessor_getVariableUnitsString )
+//ou		{
+//ou			EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
+//ou			EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
+//ou			EXPECT_EQ( "kgWater/kgDryAir", GetVariableUnitsString( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]" ) );
+//ou			EXPECT_EQ( "", GetVariableUnitsString( "Site Daylighting Model Sky Clearness []" ) );
+//ou			EXPECT_EQ( "", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature" ) );
+//ou			EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
+//ou
+//ou		}
+//ou
+//ou		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_getVariableUnitsString )
+//ou		{
+//ou			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ) );
+//ou			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ) );
+//ou			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ) );
+//ou
+//ou		}
 
 		TEST_F( SQLiteFixture, OutputProcessor_getReportVariableInput )
 		{

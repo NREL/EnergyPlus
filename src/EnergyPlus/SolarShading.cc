@@ -1174,8 +1174,8 @@ namespace SolarShading {
 					}
 
 					// CurrentModuleObject='Windows'
-					SetupOutputVariable( "Surface Window Solar Horizontal Profile Angle", OutputProcessor::Unit::degree, SurfaceWindow( SurfLoop ).ProfileAngHor, "Zone", "State", Surface( SurfLoop ).Name );
-					SetupOutputVariable( "Surface Window Solar Vertical Profile Angle", OutputProcessor::Unit::degree, SurfaceWindow( SurfLoop ).ProfileAngVert, "Zone", "State", Surface( SurfLoop ).Name );
+					SetupOutputVariable( "Surface Window Solar Horizontal Profile Angle", OutputProcessor::Unit::deg, SurfaceWindow( SurfLoop ).ProfileAngHor, "Zone", "State", Surface( SurfLoop ).Name );
+					SetupOutputVariable( "Surface Window Solar Vertical Profile Angle", OutputProcessor::Unit::deg, SurfaceWindow( SurfLoop ).ProfileAngVert, "Zone", "State", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Glazing Beam to Beam Solar Transmittance", OutputProcessor::Unit::None, SurfaceWindow( SurfLoop ).GlTsolBmBm, "Zone", "State", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Glazing Beam to Diffuse Solar Transmittance", OutputProcessor::Unit::None, SurfaceWindow( SurfLoop ).GlTsolBmDif, "Zone", "State", Surface( SurfLoop ).Name );
 					SetupOutputVariable( "Surface Window Glazing Diffuse to Diffuse Solar Transmittance", OutputProcessor::Unit::None, SurfaceWindow( SurfLoop ).GlTsolDifDif, "Zone", "State", Surface( SurfLoop ).Name );
@@ -1261,8 +1261,8 @@ namespace SolarShading {
 							SetupOutputVariable( "Surface Window Screen and Glazing System Diffuse Solar Transmittance", OutputProcessor::Unit::None, SurfaceWindow( SurfLoop ).ScGlSysTsolDifDif, "Zone", "State", Surface( SurfLoop ).Name );
 						}
 
-						SetupOutputVariable( "Surface Window Solar Horizontal Profile Angle", OutputProcessor::Unit::degree, SurfaceWindow( SurfLoop ).ProfileAngHor, "Zone", "State", Surface( SurfLoop ).Name );
-						SetupOutputVariable( "Surface Window Solar Vertical Profile Angle", OutputProcessor::Unit::degree, SurfaceWindow( SurfLoop ).ProfileAngVert, "Zone", "State", Surface( SurfLoop ).Name );
+						SetupOutputVariable( "Surface Window Solar Horizontal Profile Angle", OutputProcessor::Unit::deg, SurfaceWindow( SurfLoop ).ProfileAngHor, "Zone", "State", Surface( SurfLoop ).Name );
+						SetupOutputVariable( "Surface Window Solar Vertical Profile Angle", OutputProcessor::Unit::deg, SurfaceWindow( SurfLoop ).ProfileAngVert, "Zone", "State", Surface( SurfLoop ).Name );
 						SetupOutputVariable( "Surface Window Glazing Beam to Beam Solar Transmittance", OutputProcessor::Unit::None, SurfaceWindow( SurfLoop ).GlTsolBmBm, "Zone", "State", Surface( SurfLoop ).Name );
 						SetupOutputVariable( "Surface Window Glazing Beam to Diffuse Solar Transmittance", OutputProcessor::Unit::None, SurfaceWindow( SurfLoop ).GlTsolBmDif, "Zone", "State", Surface( SurfLoop ).Name );
 						SetupOutputVariable( "Surface Window Glazing Diffuse to Diffuse Solar Transmittance", OutputProcessor::Unit::None, SurfaceWindow( SurfLoop ).GlTsolDifDif, "Zone", "State", Surface( SurfLoop ).Name );

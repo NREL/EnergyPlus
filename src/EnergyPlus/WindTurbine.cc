@@ -604,7 +604,7 @@ namespace WindTurbine {
 				SetupOutputVariable( "Generator Turbine Chordal Component Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).ChordalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 				SetupOutputVariable( "Generator Turbine Normal Component Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).NormalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 				SetupOutputVariable( "Generator Turbine Relative Flow Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).RelFlowVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-				SetupOutputVariable( "Generator Turbine Attack Angle", OutputProcessor::Unit::degree, WindTurbineSys( WindTurbineNum ).AngOfAttack, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Attack Angle", OutputProcessor::Unit::deg, WindTurbineSys( WindTurbineNum ).AngOfAttack, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 			}}
 		}
 

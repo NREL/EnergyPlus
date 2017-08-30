@@ -1407,71 +1407,71 @@ namespace OutputProcessor {
 
 	}
 
-	std::string
-	GetVariableUnitsString( std::string const & VariableName )
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   October 2003
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function extracts the units from a Variable Name string supplied by
-		// the developer in the call to SetupOutputVariable(s).
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::TrimSigDigits;
-
-		// Return value
-		std::string ThisUnitsString;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		// Units are marked with a [
-
-		//!! Errors here are fatal because should only be encountered during development.
-		ThisUnitsString = BlankString;
-		std::string::size_type lbpos = index( VariableName, '[', true ); // from end of variable name
-		if ( lbpos != std::string::npos ) {
-			std::string::size_type rbpos = index( VariableName, ']', true );
-			if ( rbpos == std::string::npos || rbpos < lbpos ) {
-				ShowFatalError( "Ill formed Variable Name Units String, VariableName=" + VariableName );
-				ThisUnitsString = VariableName.substr( lbpos + 1 );
-			} else {
-				if ( ( rbpos - 1 ) - ( lbpos + 1 ) + 1 > UnitsStringLength ) {
-					ShowFatalError( "Units String too long for VariableName=" + VariableName + "; will be truncated to " + TrimSigDigits( UnitsStringLength ) + " characters." );
-				}
-				if ( lbpos + 1 <= rbpos - 1 ) {
-					ThisUnitsString = VariableName.substr( lbpos + 1, rbpos - lbpos - 1 );
-				} else {
-					ThisUnitsString = BlankString;
-				}
-			}
-		}
-
-		return ThisUnitsString;
-
-	}
+//ou	std::string
+//ou	GetVariableUnitsString( std::string const & VariableName )
+//ou	{
+//ou
+//ou		// FUNCTION INFORMATION:
+//ou		//       AUTHOR         Linda K. Lawrie
+//ou		//       DATE WRITTEN   October 2003
+//ou		//       MODIFIED       na
+//ou		//       RE-ENGINEERED  na
+//ou
+//ou		// PURPOSE OF THIS FUNCTION:
+//ou		// This function extracts the units from a Variable Name string supplied by
+//ou		// the developer in the call to SetupOutputVariable(s).
+//ou
+//ou		// METHODOLOGY EMPLOYED:
+//ou		// na
+//ou
+//ou		// REFERENCES:
+//ou		// na
+//ou
+//ou		// Using/Aliasing
+//ou		using General::TrimSigDigits;
+//ou
+//ou		// Return value
+//ou		std::string ThisUnitsString;
+//ou
+//ou		// Locals
+//ou		// FUNCTION ARGUMENT DEFINITIONS:
+//ou
+//ou		// FUNCTION PARAMETER DEFINITIONS:
+//ou		// na
+//ou
+//ou		// INTERFACE BLOCK SPECIFICATIONS:
+//ou		// na
+//ou
+//ou		// DERIVED TYPE DEFINITIONS:
+//ou		// na
+//ou
+//ou		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+//ou
+//ou		// Units are marked with a [
+//ou
+//ou		//!! Errors here are fatal because should only be encountered during development.
+//ou		ThisUnitsString = BlankString;
+//ou		std::string::size_type lbpos = index( VariableName, '[', true ); // from end of variable name
+//ou		if ( lbpos != std::string::npos ) {
+//ou			std::string::size_type rbpos = index( VariableName, ']', true );
+//ou			if ( rbpos == std::string::npos || rbpos < lbpos ) {
+//ou				ShowFatalError( "Ill formed Variable Name Units String, VariableName=" + VariableName );
+//ou				ThisUnitsString = VariableName.substr( lbpos + 1 );
+//ou			} else {
+//ou				if ( ( rbpos - 1 ) - ( lbpos + 1 ) + 1 > UnitsStringLength ) {
+//ou					ShowFatalError( "Units String too long for VariableName=" + VariableName + "; will be truncated to " + TrimSigDigits( UnitsStringLength ) + " characters." );
+//ou				}
+//ou				if ( lbpos + 1 <= rbpos - 1 ) {
+//ou					ThisUnitsString = VariableName.substr( lbpos + 1, rbpos - lbpos - 1 );
+//ou				} else {
+//ou					ThisUnitsString = BlankString;
+//ou				}
+//ou			}
+//ou		}
+//ou
+//ou		return ThisUnitsString;
+//ou
+//ou	}
 
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.
@@ -5158,7 +5158,7 @@ namespace OutputProcessor {
 			case OutputProcessor::Unit::Perc:
 				return "%";
 				break;
-			case OutputProcessor::Unit::degree:
+			case OutputProcessor::Unit::deg:
 				return "degree";
 				break;
 			case OutputProcessor::Unit::s:
@@ -5284,7 +5284,7 @@ namespace OutputProcessor {
 		} else if ( InputProcessor::SameString( unitIn, "%" ) ) {
 			return OutputProcessor::Unit::Perc;
 		} else if ( InputProcessor::SameString( unitIn, "degree" ) ) {
-			return OutputProcessor::Unit::degree;
+			return OutputProcessor::Unit::deg;
 		} else if ( InputProcessor::SameString( unitIn, "s" ) ) {
 			return OutputProcessor::Unit::s;
 		} else if ( InputProcessor::SameString( unitIn, "kg/m3" ) ) {
