@@ -224,12 +224,6 @@ namespace ZoneAirLoopEquipmentManager {
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
 
-		// Accumulate air loop supply flow here for use in CalcZoneMassBalance
-		int airLoop = AirDistUnit( AirDistUnitNum ).AirLoopNum;
-		if  (airLoop > 0 ) {
-			DataAirLoop::AirLoopFlow( airLoop ).SupFlow += AirDistUnit( AirDistUnitNum ).MassFlowRateZSup;
-		}
-
 		//  CALL RecordZoneAirLoopEquipment
 
 		// ReportZoneAirLoopEquipment( AirDistUnitNum );

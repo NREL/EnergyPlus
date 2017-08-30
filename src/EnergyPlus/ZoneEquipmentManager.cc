@@ -65,6 +65,7 @@
 #include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
+#include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -3113,11 +3114,6 @@ namespace ZoneEquipmentManager {
 			CalcAirFlowSimple( 0, AdjustZoneMassFlowFlag );
 		}
 
-		// Zero the air loop supply flow and accumulate in ManageZoneAirLoopEquipment (for ADUs) and SimDirectAir (for direct air)
-		for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
-			DataAirLoop::AirLoopFlow( airLoop ).SupFlow = 0.0;
-		}
-
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
@@ -3793,12 +3789,28 @@ namespace ZoneEquipmentManager {
 		BuildingZoneMixingFlow = 0.0;
 		BuildingZoneMixingFlowOld = 0.0;
 
+		// Total loop supply flows for multireturn node cases
+		for ( int airDistUnit = 1; airDistUnit <= DataDefineEquip::NumAirDistUnits; ++airDistUnit ) {
+			int airLoop = DataDefineEquip::AirDistUnit( airDistUnit ).AirLoopNum;
+			if  ( airLoop > 0 ) {
+				DataAirLoop::AirLoopFlow( airLoop ).SupFlowMulti += DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRateZSup;
+			}
+		}
+		// Accumulate air loop supply flow here for use in CalcZoneMassBalance
+		for ( int directAirUnit = 1; directAirUnit <= DirectAirManager::NumDirectAir; ++directAirUnit ) {
+			int airLoop = DirectAirManager::DirectAir( directAirUnit ).AirLoopNum;
+			if  ( airLoop > 0 ) {
+				DataAirLoop::AirLoopFlow( airLoop ).SupFlowMulti += Node( DirectAirManager::DirectAir( directAirUnit ).ZoneSupplyAirNode ).MassFlowRate ;
+			}
+		}	
+
 		do {
 			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
 				// These are also reset in ZoneEquipmentManager::InitZoneEquipment, reset again here for each zone mass balance iteration
 				for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
 					AirLoopFlow( airLoop ).ZoneExhaust = 0.0;
 					AirLoopFlow( airLoop ).ZoneExhaustBalanced = 0.0;
+					AirLoopFlow( airLoop ).SupFlow = 0.0;
 					AirLoopFlow( airLoop ).RetFlow = 0.0;
 					AirLoopFlow( airLoop ).RetFlow0 = 0.0;
 					AirLoopFlow( airLoop ).RecircFlow = 0.0;
@@ -3938,6 +3950,7 @@ namespace ZoneEquipmentManager {
 						int RetNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
 						AirLoopFlow( airLoop1 ).ZoneExhaust += ZoneEquipConfig( ZoneNum ).ZoneExh;
 						AirLoopFlow( airLoop1 ).ZoneExhaustBalanced += ZoneEquipConfig( ZoneNum ).ZoneExhBalanced;
+						AirLoopFlow( airLoop1 ).SupFlow += TotSupplyAirMassFlowRate;
 						AirLoopFlow( airLoop1 ).RetFlow0 += Node( RetNode1 ).MassFlowRate;
 						AirLoopFlow( airLoop1 ).RecircFlow += ZoneEquipConfig( ZoneNum ).PlenumMassFlow;
 						AirLoopFlow( airLoop1 ).RetFlowAdjustment += ( FinalTotalReturnMassFlow - StdTotalReturnMassFlow );

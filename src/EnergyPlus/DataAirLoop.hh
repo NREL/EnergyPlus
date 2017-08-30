@@ -267,6 +267,7 @@ namespace DataAirLoop {
 		Real64 OAMinFrac; // minimum outside air flow fraction this time step
 		Real64 Previous; // Previous mass air flow rate for this loop [kg/s]
 		Real64 SupFlow; // supply air flow rate [kg/s]
+		Real64 SupFlowMulti; // supply air flow rate for cases with multiple return nodes [kg/s]
 		Real64 RetFlow; // return air flow rate [kg/s]
 		Real64 RetFlow0; // sum of zone return flows before adjusting for total loop exhaust
 		Real64 RecircFlow; // sum of zone plenum recirculated flows
@@ -289,6 +290,7 @@ namespace DataAirLoop {
 			OAMinFrac( 0.0 ),
 			Previous( 0.0 ),
 			SupFlow( 0.0 ),
+			SupFlowMulti( 0.0 ),
 			RetFlow( 0.0 ),
 			RetFlow0( 0.0 ),
 			RecircFlow( 0.0 ),

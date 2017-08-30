@@ -2006,7 +2006,7 @@ TestReturnAirPathIntegrity(
 									RetNodeFound = true;
 									// Find matching inlet node connected to the same air loop
 									for ( int inletNum = 1; inletNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++inletNum ) {
-										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneOutNum ) == WAirLoop ) {
+										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( inletNum ) == WAirLoop ) {
 											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNodeNum( ZoneOutNum ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( inletNum );
 											break;
 										}
@@ -2026,6 +2026,35 @@ TestReturnAirPathIntegrity(
 	}
 
 	AllNodes.deallocate();
+
+	// Check for any air loops that may be connected directly to a zone return node
+	for ( int airLoopNum = 1; airLoopNum <= NumPrimaryAirSys; ++airLoopNum) {
+		bool returnFound = false;
+		if ( AirToZoneNodeInfo( airLoopNum ).NumReturnNodes > 0 ) {
+			int zeqReturnNodeNum = AirToZoneNodeInfo( airLoopNum ).ZoneEquipReturnNodeNum( 1 );
+			if ( zeqReturnNodeNum > 0 ) {
+				for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+					{ auto & thisZoneEquip( ZoneEquipConfig( CtrlZoneNum ) );
+					if ( !thisZoneEquip.IsControlled ) continue;
+					for ( int znReturnNum = 1; znReturnNum <= thisZoneEquip.NumReturnNodes; ++znReturnNum ) {
+						if ( thisZoneEquip.ReturnNode( znReturnNum ) == zeqReturnNodeNum ) {
+							thisZoneEquip.ReturnNodeAirLoopNum( znReturnNum ) = airLoopNum;
+							returnFound = true;
+							// Find matching inlet node connected to the same air loop
+							for ( int inletNum = 1; inletNum <= thisZoneEquip.NumInletNodes; ++inletNum ) {
+								if ( thisZoneEquip.InletNodeAirLoopNum( inletNum ) == airLoopNum ) {
+									thisZoneEquip.ReturnNodeInletNodeNum( znReturnNum ) = thisZoneEquip.InletNode( inletNum );
+									break;
+								}
+							}
+							break; // leave zone return node loop
+						}
+					if ( returnFound ) break; // leave controlled zone loop
+					}}
+				}
+			}
+		}
+	}
 
 	if ( NumMixers == 0 ) {
 		if ( GetNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
