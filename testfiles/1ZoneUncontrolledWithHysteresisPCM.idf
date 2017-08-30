@@ -90,7 +90,7 @@
 
   Version,8.8;
 
-  Timestep,4;
+  Timestep,20;
 
   Building,
     Simple One Zone (Wireframe DXF),  !- Name
@@ -404,28 +404,6 @@
 
   Output:Variable,ZN001:FLR001,CondFD Phase Change State 5,hourly;
 
-  Output:Variable,ZN001:FLR001,CondFD Phase Change State 6,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change State 7,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change State 8,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 1,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 2,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 3,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 4,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 5,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 6,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 7,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Specific Heat 8,hourly;
-
   Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 1,hourly;
 
   Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 2,hourly;
@@ -436,12 +414,6 @@
 
   Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 5,hourly;
 
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 6,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 7,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Previous State 8,hourly;
-
   Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 1,hourly;
 
   Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 2,hourly;
@@ -451,12 +423,6 @@
   Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 4,hourly;
 
   Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 5,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 6,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 7,hourly;
-
-  Output:Variable,ZN001:FLR001,CondFD Phase Change Node Temperature 8,hourly;
 
   Output:VariableDictionary,IDF;
 
