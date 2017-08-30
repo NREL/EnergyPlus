@@ -3113,6 +3113,11 @@ namespace ZoneEquipmentManager {
 			CalcAirFlowSimple( 0, AdjustZoneMassFlowFlag );
 		}
 
+		// Zero the air loop supply flow and accumulate in ManageZoneAirLoopEquipment (for ADUs) and SimDirectAir (for direct air)
+		for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
+			DataAirLoop::AirLoopFlow( airLoop ).SupFlow = 0.0;
+		}
+
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
@@ -3794,7 +3799,6 @@ namespace ZoneEquipmentManager {
 				for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
 					AirLoopFlow( airLoop ).ZoneExhaust = 0.0;
 					AirLoopFlow( airLoop ).ZoneExhaustBalanced = 0.0;
-					AirLoopFlow( airLoop ).SupFlow = 0.0;
 					AirLoopFlow( airLoop ).RetFlow = 0.0;
 					AirLoopFlow( airLoop ).RetFlow0 = 0.0;
 					AirLoopFlow( airLoop ).RecircFlow = 0.0;
@@ -3838,18 +3842,6 @@ namespace ZoneEquipmentManager {
 					TotInletAirMassFlowRateMaxAvail += thisNode.MassFlowRateMaxAvail;
 					TotInletAirMassFlowRateMin += thisNode.MassFlowRateMin;
 					TotInletAirMassFlowRateMinAvail += thisNode.MassFlowRateMinAvail;
-					if ( ZoneEquipInputsFilled ) {
-						// Accumulate air loop supply flow - need to reach back to airdist unit inlet
-						int airLoop = ZoneEquipConfig( ZoneNum ).InletNodeAirLoopNum( NodeNum );
-						int airDistCoolNodeNum = ZoneEquipConfig( ZoneNum ).AirDistUnitCool( NodeNum ).InNode;
-						int airDistHeatNodeNum = ZoneEquipConfig( ZoneNum ).AirDistUnitHeat( NodeNum ).InNode;
-						if ( airLoop > 0 ) {
-							AirLoopFlow( airLoop ).SupFlow += Node( airDistCoolNodeNum ).MassFlowRate;
-							if ( ( airDistHeatNodeNum > 0 ) && ( airDistHeatNodeNum != airDistCoolNodeNum ) ) {
-								AirLoopFlow( airLoop ).SupFlow += Node( airDistHeatNodeNum ).MassFlowRate;
-							}
-						}
-					}
 				}}
 
 				for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
@@ -3888,6 +3880,8 @@ namespace ZoneEquipmentManager {
 
 				Real64 FinalTotalReturnMassFlow = 0;
 				CalcZoneReturnFlows( ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow );
+
+				MassConservation( ZoneNum ).RetMassFlowRate = FinalTotalReturnMassFlow;
 
 				// Set zone infiltration flow rate
 				if ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) {

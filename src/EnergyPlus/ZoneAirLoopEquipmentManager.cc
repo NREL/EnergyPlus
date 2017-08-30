@@ -224,6 +224,12 @@ namespace ZoneAirLoopEquipmentManager {
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
 
+		// Accumulate air loop supply flow here for use in CalcZoneMassBalance
+		int airLoop = AirDistUnit( AirDistUnitNum ).AirLoopNum;
+		if  (airLoop > 0 ) {
+			DataAirLoop::AirLoopFlow( airLoop ).SupFlow += AirDistUnit( AirDistUnitNum ).MassFlowRateZSup;
+		}
+
 		//  CALL RecordZoneAirLoopEquipment
 
 		// ReportZoneAirLoopEquipment( AirDistUnitNum );
@@ -549,6 +555,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// every time step
 		AirDistUnit( AirDistUnitNum ).MassFlowRateDnStrLk = 0.0;
+		AirDistUnit( AirDistUnitNum ).MassFlowRateUpStrLk = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateTU = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateSup = 0.0;
@@ -728,6 +735,10 @@ namespace ZoneAirLoopEquipmentManager {
 					Node( OutNodeNum ).MassFlowRateMinAvail = max( 0.0, MassFlowRateMinAvail - AirDistUnit( AirDistUnitNum ).MassFlowRateDnStrLk - AirDistUnit( AirDistUnitNum ).MassFlowRateUpStrLk );
 					AirDistUnit( AirDistUnitNum ).MaxAvailDelta = MassFlowRateMaxAvail - Node( OutNodeNum ).MassFlowRateMaxAvail;
 					AirDistUnit( AirDistUnitNum ).MinAvailDelta = MassFlowRateMinAvail - Node( OutNodeNum ).MassFlowRateMinAvail;
+				} else {
+					AirDistUnit( AirDistUnitNum ).MassFlowRateTU = Node( InNodeNum ).MassFlowRate;
+					AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = Node( InNodeNum ).MassFlowRate;
+					AirDistUnit( AirDistUnitNum ).MassFlowRateSup = Node( InNodeNum ).MassFlowRate;
 				}
 			}
 		}

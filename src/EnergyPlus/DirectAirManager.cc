@@ -230,6 +230,11 @@ namespace DirectAirManager {
 
 		CalcDirectAir( DirectAirNum, ControlledZoneNum, SensOutputProvided, LatOutputProvided );
 
+		// Accumulate air loop supply flow here for use in CalcZoneMassBalance
+		int airLoop = DirectAir( DirectAirNum ).AirLoopNum;
+		if  (airLoop > 0 ) {
+			DataAirLoop::AirLoopFlow( airLoop ).SupFlow += Node( DirectAir( DirectAirNum ).ZoneSupplyAirNode ).MassFlowRate ;
+		}
 		// No Update
 
 		// ReportDirectAir( DirectAirNum );
