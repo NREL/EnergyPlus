@@ -15,7 +15,7 @@
 ! Infiltration:
 !   * Infiltration air flow rate is guessed as a small value.
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -362,6 +362,7 @@ WindowsCalculationEngine,
     ,                        !- Availability Schedule Name
     Room 102 INLETS,         !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- Supply Inlet Air Node Name
     26,                      !- Maximum Heating Supply Air Temperature {C}
     15,                      !- Minimum Cooling Supply Air Temperature {C}
     0.01,                    !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
