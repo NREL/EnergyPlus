@@ -6021,7 +6021,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 && MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 0.9e10 ) {
 				MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) = 1.0e10;
 				if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 && Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulbSchedNum != 0 ) {
-					MV( i ) = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulb;
+					MV( i ) = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulb * 1.0e10;
 				} else {
 					MV( i ) = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight ) * 1.0e10;
 				}
@@ -6950,8 +6950,6 @@ namespace AirflowNetworkBalanceManager {
 			e.TotalLatLossJ = 0.0;
 		}
 
-		// TODO: Check this.
-
 		// Calculate sensible and latent loads in each zone from multizone airflows
 		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) { // Multizone airflow energy
@@ -7321,7 +7319,6 @@ namespace AirflowNetworkBalanceManager {
 		Real64 Qlat;
 		Real64 AirDensity;
 		Real64 Tamb;
-		Real64 Wamb;
 		Real64 PartLoadRatio;
 		Real64 OnOffRatio;
 		Real64 NodeMass;
@@ -7432,10 +7429,8 @@ namespace AirflowNetworkBalanceManager {
 
 		// Rewrite AirflowNetwork airflow rate
 		for ( i = 1; i <= NumOfLinksMultiZone; ++i ) {
-			//TODO: Check this.
 			Tamb = OutDryBulbTempAt( AirflowNetworkLinkageData( i ).NodeHeights( 1 ) );
-			Wamb = OutHumRat;
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, Wamb );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
 			AirflowNetworkLinkSimu( i ).VolFLOW = AirflowNetworkLinkSimu( i ).FLOW / AirDensity;
 			AirflowNetworkLinkSimu( i ).VolFLOW2 = AirflowNetworkLinkSimu( i ).FLOW2 / AirDensity;
 		}
