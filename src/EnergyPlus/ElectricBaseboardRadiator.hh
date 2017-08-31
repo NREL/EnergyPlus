@@ -190,7 +190,28 @@ namespace ElectricBaseboardRadiator {
 		int const BaseboardNum,
 		int const ControlledZoneNum
 	);
+	
+	void
+	UpdateElectricBaseboardOff(
+		Real64 & LoadMet,
+		Real64 & QBBCap,
+		Real64 & RadHeat,
+		Real64 & QBBElecRadSrc,
+		Real64 & ElecUseRate,
+		Real64 & AirOutletTemp,
+		Real64 const AirInletTemp
+	);
 
+	void
+	UpdateElectricBaseboardOn(
+		Real64 & AirOutletTemp,
+		Real64 & ElecUseRate,
+		Real64 const AirInletTemp,
+		Real64 const QBBCap,
+		Real64 const CapacitanceAir,
+		Real64 const Effic
+	);
+	
 	void
 	UpdateElectricBaseboard( int const BaseboardNum );
 
