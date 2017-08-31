@@ -5159,6 +5159,9 @@ namespace OutputProcessor {
 				return "%";
 				break;
 			case OutputProcessor::Unit::deg:
+				return "deg";
+				break;
+			case OutputProcessor::Unit::degree:
 				return "degree";
 				break;
 			case OutputProcessor::Unit::s:
@@ -5283,8 +5286,10 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::kg_kg;
 		} else if ( InputProcessor::SameString( unitIn, "%" ) ) {
 			return OutputProcessor::Unit::Perc;
-		} else if ( InputProcessor::SameString( unitIn, "degree" ) ) {
+		} else if ( InputProcessor::SameString( unitIn, "deg" ) ) {
 			return OutputProcessor::Unit::deg;
+		} else if ( InputProcessor::SameString( unitIn, "degree" ) ) {
+			return OutputProcessor::Unit::degree;
 		} else if ( InputProcessor::SameString( unitIn, "s" ) ) {
 			return OutputProcessor::Unit::s;
 		} else if ( InputProcessor::SameString( unitIn, "kg/m3" ) ) {
