@@ -5056,146 +5056,98 @@ namespace OutputProcessor {
 		)
 	{
 		switch ( unitIn ) {
-			case OutputProcessor::Unit::kg_s:
-				return "kg/s";
-				break;
-			case OutputProcessor::Unit::C:
-				return "C";
-				break;
-			case OutputProcessor::Unit::kgWater_kgDryAir:
-				return "kgWater/kgDryAir";
-				break;
-			case OutputProcessor::Unit::ppm:
-				return "ppm";
-				break;
-			case OutputProcessor::Unit::Pa:
-				return "Pa";
-				break;
-			case OutputProcessor::Unit::m3_s:
-				return "m3/s";
-				break;
-			case OutputProcessor::Unit::None:
-				return "";
-				break;
-			case OutputProcessor::Unit::min:
-				return "min";
+			case OutputProcessor::Unit::J:
+				return "J";
 				break;
 			case OutputProcessor::Unit::W:
 				return "W";
 				break;
-			case OutputProcessor::Unit::J:
-				return "J";
+			case OutputProcessor::Unit::C:
+				return "C";
 				break;
-			case OutputProcessor::Unit::m3:
-				return "m3";
+			case OutputProcessor::Unit::None:
+				return "";
 				break;
 			case OutputProcessor::Unit::kg:
 				return "kg";
 				break;
-			case OutputProcessor::Unit::ach:
-				return "ach";
+			case OutputProcessor::Unit::W_m2:
+				return "W/m2";
 				break;
-			case OutputProcessor::Unit::W_W:
-				return "W/W";
-				break;
-			case OutputProcessor::Unit::lux:
-				return "lux";
-				break;
-			case OutputProcessor::Unit::lum_W:
-				return "lum/W";
+			case OutputProcessor::Unit::m3:
+				return "m3";
 				break;
 			case OutputProcessor::Unit::hr:
 				return "hr";
 				break;
-			case OutputProcessor::Unit::cd_m2:
-				return "cd/m2";
-				break;
-			case OutputProcessor::Unit::J_kgWater:
-				return "J/kgWater";
-				break;
-			case OutputProcessor::Unit::m_s:
-				return "m/s";
-				break;
-			case OutputProcessor::Unit::W_m2:
-				return "W/m2";
-				break;
-			case OutputProcessor::Unit::m:
-				return "m";
-				break;
-			case OutputProcessor::Unit::Ah:
-				return "Ah";
-				break;
-			case OutputProcessor::Unit::A:
-				return "A";
-				break;
-			case OutputProcessor::Unit::V:
-				return "V";
-				break;
-			case OutputProcessor::Unit::deltaC:
-				return "deltaC";
-				break;
-			case OutputProcessor::Unit::kmol_s:
-				return "kmol/s";
-				break;
-			case OutputProcessor::Unit::Kg_s:
+			case OutputProcessor::Unit::kg_s:
 				return "kg/s";
-				break;
-			case OutputProcessor::Unit::rev_min:
-				return "rev/min";
-				break;
-			case OutputProcessor::Unit::Btu_h_W:
-				return "Btu/h-W";
-				break;
-			case OutputProcessor::Unit::W_m2K:
-				return "W/m2-K";
-				break;
-			case OutputProcessor::Unit::J_kg:
-				return "J/kg";
-				break;
-			case OutputProcessor::Unit::kg_kg:
-				return "kg/kg";
-				break;
-			case OutputProcessor::Unit::Perc:
-				return "%";
-				break;
-			case OutputProcessor::Unit::deg:
-				return "deg";
 				break;
 			case OutputProcessor::Unit::degree:
 				return "degree";
 				break;
-			case OutputProcessor::Unit::s:
-				return "s";
+			case OutputProcessor::Unit::deg:
+				return "deg";
 				break;
-			case OutputProcessor::Unit::kg_m3:
-				return "kg/m3";
+			case OutputProcessor::Unit::m3_s:
+				return "m3/s";
 				break;
-			case OutputProcessor::Unit::kg_m2s:
-				return "kg/m2-s";
+			case OutputProcessor::Unit::W_m2K:
+				return "W/m2-K";
 				break;
-			case OutputProcessor::Unit::J_kgK:
-				return "J/kg-K";
+			case OutputProcessor::Unit::kgWater_kgDryAir:
+				return "kgWater/kgDryAir";
 				break;
-			case OutputProcessor::Unit::L:
-				return "L";
+			case OutputProcessor::Unit::Perc:
+				return "%";
 				break;
-			case OutputProcessor::Unit::K_m:
-				return "K/m";
+			case OutputProcessor::Unit::m_s:
+				return "m/s";
 				break;
-			case OutputProcessor::Unit::m2:
-				return "m2";
+			case OutputProcessor::Unit::lux:
+				return "lux";
 				break;
-			case OutputProcessor::Unit::W_m2C:
-				return "W/m2-C";
+			case OutputProcessor::Unit::kgWater_s:
+				return "kgWater/s";
 				break;
 			case OutputProcessor::Unit::rad:
 				return "rad";
 				break;
-			case OutputProcessor::Unit::ACH:
+			case OutputProcessor::Unit::Pa:
+				return "Pa";
+				break;
+			case OutputProcessor::Unit::J_kg:
+				return "J/kg";
+				break;
+			case OutputProcessor::Unit::m:
+				return "m";
+				break;
+			case OutputProcessor::Unit::lum_W:
+				return "lum/W";
+				break;
+			case OutputProcessor::Unit::kg_m3:
+				return "kg/m3";
+				break;
+			case OutputProcessor::Unit::L:
+				return "L";
+				break;
+			case OutputProcessor::Unit::ACH:  //ou redundant
 				return "ACH";
 				break;
-			case OutputProcessor::Unit::J_m2:
-				return "J/m2";
+			case OutputProcessor::Unit::ach:
+				return "ach";
+				break;
+			case OutputProcessor::Unit::m2:
+				return "m2";
+				break;
+			case OutputProcessor::Unit::deltaC:
+				return "deltaC";
+				break;
+			case OutputProcessor::Unit::J_kgK:
+				return "J/kg-K";
+				break;
+			case OutputProcessor::Unit::W_W:
+				return "W/W";
 				break;
 			case OutputProcessor::Unit::clo:
 				return "clo";
@@ -5203,10 +5155,57 @@ namespace OutputProcessor {
 			case OutputProcessor::Unit::W_K:
 				return "W/K";
 				break;
-			case OutputProcessor::Unit::kgWater_s:
-				return "kgWater/s";
+			case OutputProcessor::Unit::ppm:
+				return "ppm";
 				break;
-
+			case OutputProcessor::Unit::kg_kg:
+				return "kg/kg";
+				break;
+			case OutputProcessor::Unit::s:
+				return "s";
+				break;
+			case OutputProcessor::Unit::cd_m2:
+				return "cd/m2";
+				break;
+			case OutputProcessor::Unit::Kg_s:
+				return "kg/s";
+				break;
+			case OutputProcessor::Unit::kmol_s:
+				return "kmol/s";
+				break;
+			case OutputProcessor::Unit::K_m:
+				return "K/m";
+				break;
+			case OutputProcessor::Unit::min:
+				return "min";
+				break;
+			case OutputProcessor::Unit::J_kgWater:
+				return "J/kgWater";
+				break;
+			case OutputProcessor::Unit::rev_min:
+				return "rev/min";
+				break;
+			case OutputProcessor::Unit::kg_m2s:
+				return "kg/m2-s";
+				break;
+			case OutputProcessor::Unit::J_m2:
+				return "J/m2";
+				break;
+			case OutputProcessor::Unit::A:
+				return "A";
+				break;
+			case OutputProcessor::Unit::V:
+				return "V";
+				break;
+			case OutputProcessor::Unit::W_m2C:
+				return "W/m2-C";
+				break;
+			case OutputProcessor::Unit::Ah:
+				return "Ah";
+				break;
+			case OutputProcessor::Unit::Btu_h_W:
+				return "Btu/h-W";
+				break;
 			default:
 				return "unknown";
 				break;
@@ -5218,105 +5217,106 @@ namespace OutputProcessor {
 		std::string const & unitIn
 	)
 	{
-		if ( InputProcessor::SameString( unitIn, "kg/s" ) ) {
-			return OutputProcessor::Unit::kg_s;
-		} else if ( InputProcessor::SameString( unitIn, "C" ) ) {
-			return OutputProcessor::Unit::C;
-		} else if ( InputProcessor::SameString( unitIn, "kgWater/kgDryAir" ) ) {
-			return OutputProcessor::Unit::kgWater_kgDryAir;
-		} else if ( InputProcessor::SameString( unitIn, "ppm" ) ) {
-			return OutputProcessor::Unit::ppm;
-		} else if ( InputProcessor::SameString( unitIn, "Pa" ) ) {
-			return OutputProcessor::Unit::Pa;
-		} else if ( InputProcessor::SameString( unitIn, "m3/s" ) ) {
-			return OutputProcessor::Unit::m3_s;
-		} else if ( InputProcessor::SameString( unitIn, "" ) ) {
-			return OutputProcessor::Unit::None;
-		} else if ( InputProcessor::SameString( unitIn, "min" ) ) {
-			return OutputProcessor::Unit::min;
-		} else if ( InputProcessor::SameString( unitIn, "W" ) ) {
-			return OutputProcessor::Unit::W;
-		} else if ( InputProcessor::SameString( unitIn, "J" ) ) {
+		std::string unitUpper = InputProcessor::MakeUPPERCase(unitIn);
+		if ( unitUpper == "J" ) {
 			return OutputProcessor::Unit::J;
-		} else if ( InputProcessor::SameString( unitIn, "m3" ) ) {
-			return OutputProcessor::Unit::m3;
-		} else if ( InputProcessor::SameString( unitIn, "kg" ) ) {
-			return OutputProcessor::Unit::kg;
-		} else if ( InputProcessor::SameString( unitIn, "ach" ) ) {
-			return OutputProcessor::Unit::ach;
-		} else if ( InputProcessor::SameString( unitIn, "W/W" ) ) {
-			return OutputProcessor::Unit::W_W;
-		} else if ( InputProcessor::SameString( unitIn, "lux" ) ) {
-			return OutputProcessor::Unit::lux;
-		} else if ( InputProcessor::SameString( unitIn, "lum/W" ) ) {
-			return OutputProcessor::Unit::lum_W;
-		} else if ( InputProcessor::SameString( unitIn, "hr" ) ) {
-			return OutputProcessor::Unit::hr;
-		} else if ( InputProcessor::SameString( unitIn, "cd/m2" ) ) {
-			return OutputProcessor::Unit::cd_m2;
-		} else if ( InputProcessor::SameString( unitIn, "J/kgWater" ) ) {
-			return OutputProcessor::Unit::J_kgWater;
-		} else if ( InputProcessor::SameString( unitIn, "m/s" ) ) {
-			return OutputProcessor::Unit::m_s;
-		} else if ( InputProcessor::SameString( unitIn, "W/m2" ) ) {
-			return OutputProcessor::Unit::W_m2;
-		} else if ( InputProcessor::SameString( unitIn, "m" ) ) {
-			return OutputProcessor::Unit::m;
-		} else if ( InputProcessor::SameString( unitIn, "Ah" ) ) {
-			return OutputProcessor::Unit::Ah;
-		} else if ( InputProcessor::SameString( unitIn, "A" ) ) {
-			return OutputProcessor::Unit::A;
-		} else if ( InputProcessor::SameString( unitIn, "V" ) ) {
-			return OutputProcessor::Unit::V;
-		} else if ( InputProcessor::SameString( unitIn, "deltaC" ) ) {
+		} else if ( unitUpper == "DELTAC" ) {
 			return OutputProcessor::Unit::deltaC;
-		} else if ( InputProcessor::SameString( unitIn, "kmol/s" ) ) {
+		} else if ( unitUpper == "" ) {
+			return OutputProcessor::Unit::None;
+		} else if ( unitUpper == "W" ) {
+			return OutputProcessor::Unit::W;
+		} else if ( unitUpper == "C" ) {
+			return OutputProcessor::Unit::C;
+		} else if ( unitUpper == "KG/S" ) {
+			return OutputProcessor::Unit::kg_s;
+		} else if ( unitUpper == "KGWATER/KGDRYAIR" ) {
+			return OutputProcessor::Unit::kgWater_kgDryAir;
+		} else if ( unitUpper == "PPM" ) {
+			return OutputProcessor::Unit::ppm;
+		} else if ( unitUpper == "PA" ) {
+			return OutputProcessor::Unit::Pa;
+		} else if ( unitUpper == "M3/S" ) {
+			return OutputProcessor::Unit::m3_s;
+		} else if ( unitUpper == "MIN" ) {
+			return OutputProcessor::Unit::min;
+		} else if ( unitUpper == "M3" ) {
+			return OutputProcessor::Unit::m3;
+		} else if ( unitUpper == "KG" ) {
+			return OutputProcessor::Unit::kg;
+		} else if ( unitUpper == "ACH" ) {   //ou duplicate unit remove
+			return OutputProcessor::Unit::ach;
+		} else if ( unitUpper == "W/W" ) {
+			return OutputProcessor::Unit::W_W;
+		} else if ( unitUpper == "LUX" ) {
+			return OutputProcessor::Unit::lux;
+		} else if ( unitUpper == "LUM/W" ) {
+			return OutputProcessor::Unit::lum_W;
+		} else if ( unitUpper == "HR" ) {
+			return OutputProcessor::Unit::hr;
+		} else if ( unitUpper == "CD/M2" ) {
+			return OutputProcessor::Unit::cd_m2;
+		} else if ( unitUpper == "J/KGWATER" ) {
+			return OutputProcessor::Unit::J_kgWater;
+		} else if ( unitUpper == "M/S" ) {
+			return OutputProcessor::Unit::m_s;
+		} else if ( unitUpper == "W/M2" ) {
+			return OutputProcessor::Unit::W_m2;
+		} else if ( unitUpper == "M" ) {
+			return OutputProcessor::Unit::m;
+		} else if ( unitUpper == "AH" ) {
+			return OutputProcessor::Unit::Ah;
+		} else if ( unitUpper == "A" ) {
+			return OutputProcessor::Unit::A;
+		} else if ( unitUpper == "V" ) {
+			return OutputProcessor::Unit::V;
+		} else if ( unitUpper == "KMOL/S" ) {
 			return OutputProcessor::Unit::kmol_s;
-		} else if ( InputProcessor::SameString( unitIn, "Kg/s" ) ) {
+		} else if ( unitUpper == "KG/S" ) {
 			return OutputProcessor::Unit::Kg_s;
-		} else if ( InputProcessor::SameString( unitIn, "rev/min" ) ) {
+		} else if ( unitUpper == "REV/MIN" ) {
 			return OutputProcessor::Unit::rev_min;
-		} else if ( InputProcessor::SameString( unitIn, "Btu/h/W" ) ) {
+		} else if ( unitUpper == "BTU/H/W" ) { //ou fix
 			return OutputProcessor::Unit::Btu_h_W;
-		} else if ( InputProcessor::SameString( unitIn, "W/m2-K" ) ) {
+		} else if ( unitUpper == "W/M2-K" ) {
 			return OutputProcessor::Unit::W_m2K;
-		} else if ( InputProcessor::SameString( unitIn, "J/kg" ) ) {
+		} else if ( unitUpper == "J/KG" ) {
 			return OutputProcessor::Unit::J_kg;
-		} else if ( InputProcessor::SameString( unitIn, "kg/kg" ) ) {
+		} else if ( unitUpper == "KG/KG" ) {
 			return OutputProcessor::Unit::kg_kg;
-		} else if ( InputProcessor::SameString( unitIn, "%" ) ) {
+		} else if ( unitUpper == "%" ) {
 			return OutputProcessor::Unit::Perc;
-		} else if ( InputProcessor::SameString( unitIn, "deg" ) ) {
+		} else if ( unitUpper == "DEG" ) { //ou remove later
 			return OutputProcessor::Unit::deg;
-		} else if ( InputProcessor::SameString( unitIn, "degree" ) ) {
+		} else if ( unitUpper == "DEGREE" ) {
 			return OutputProcessor::Unit::degree;
-		} else if ( InputProcessor::SameString( unitIn, "s" ) ) {
+		} else if ( unitUpper == "S" ) {
 			return OutputProcessor::Unit::s;
-		} else if ( InputProcessor::SameString( unitIn, "kg/m3" ) ) {
+		} else if ( unitUpper == "KG/M3" ) {
 			return OutputProcessor::Unit::kg_m3;
-		} else if ( InputProcessor::SameString( unitIn, "kg/m2-s" ) ) {
+		} else if ( unitUpper == "KG/M2-S" ) {
 			return OutputProcessor::Unit::kg_m2s;
-		} else if ( InputProcessor::SameString( unitIn, "J/kg-K" ) ) {
+		} else if ( unitUpper == "J/KG-K" ) {
 			return OutputProcessor::Unit::J_kgK;
-		} else if ( InputProcessor::SameString( unitIn, "L" ) ) {
+		} else if ( unitUpper == "L" ) {
 			return OutputProcessor::Unit::L;
-		} else if ( InputProcessor::SameString( unitIn, "K/m" ) ) {
+		} else if ( unitUpper == "K/M" ) {
 			return OutputProcessor::Unit::K_m;
-		} else if ( InputProcessor::SameString( unitIn, "m2" ) ) {
+		} else if ( unitUpper == "M2" ) {
 			return OutputProcessor::Unit::m2;
-		} else if ( InputProcessor::SameString( unitIn, "W/m2-C" ) ) {
+		} else if ( unitUpper == "W/M2-C" ) {
 			return OutputProcessor::Unit::W_m2C;
-		} else if ( InputProcessor::SameString( unitIn, "rad" ) ) {
+		} else if ( unitUpper == "RAD" ) {
 			return OutputProcessor::Unit::rad;
-		} else if ( InputProcessor::SameString( unitIn, "ACH" ) ) {
+		} else if ( unitUpper == "ACH" ) {
 			return OutputProcessor::Unit::ACH;
-		} else if ( InputProcessor::SameString( unitIn, "J/m2" ) ) {
+		} else if ( unitUpper == "J/M2" ) {
 			return OutputProcessor::Unit::J_m2;
-		} else if ( InputProcessor::SameString( unitIn, "clo" ) ) {
+		} else if ( unitUpper == "CLO" ) {
 			return OutputProcessor::Unit::clo;
-		} else if ( InputProcessor::SameString( unitIn, "W/K" ) ) {
+		} else if ( unitUpper == "W/K" ) {
 			return OutputProcessor::Unit::W_K;
-		} else if ( InputProcessor::SameString( unitIn, "kgWater/s" ) ) {
+		} else if ( unitUpper == "KGWATER/S" ) {
 			return OutputProcessor::Unit::kgWater_s;
 		} else {
 			return OutputProcessor::Unit::unknown;
