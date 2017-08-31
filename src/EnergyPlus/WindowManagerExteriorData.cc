@@ -56,9 +56,7 @@
 // computer software, distribute, and sublicense such enhancements or derivative works thereof,
 // in binary and source code form.
 
-#include <assert.h>
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cassert>
 
 #include <WindowManager.hh>
 #include <DataHeatBalance.hh>
