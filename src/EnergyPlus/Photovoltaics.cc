@@ -856,47 +856,45 @@ namespace Photovoltaics {
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Jan. 2004
 		//       MODIFIED       B. Griffith, Aug. 2008
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// collect statements that assign to variables tied to output variables
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
 		using DataSurfaces::Surface;
 		using DataHeatBalFanSys::QPVSysSource;
 		using TranspiredCollector::SetUTSCQdotSource;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		using InputProcessor::FindItemInList;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int thisZone; // working index for zones
+		int thisSurface; // index for PV surface
+		Array1D< bool > PVarrayZoneInitialized; // avoid doing the zone check too often
+		bool FirstTimeThru( true );
 
 		PVarray( PVnum ).Report.DCEnergy = PVarray( PVnum ).Report.DCPower * ( TimeStepSys * SecInHour );
 
+		thisSurface = PVarray( PVnum ).SurfacePtr;
+
+		if ( FirstTimeThru ) {
+			PVarrayZoneInitialized.dimension( NumPVs, false );
+			FirstTimeThru = false;
+		}
+
+		if ( ! PVarrayZoneInitialized( PVnum ) ) {
+			if ( Surface( thisSurface ).Zone == 0 ) { // might need to get the zone number from the name
+				Surface( thisSurface ).Zone = FindItemInList( Surface( thisSurface ).ZoneName, Zone, NumOfZones );
+			}
+			PVarrayZoneInitialized( PVnum ) = true;
+		}
+		
 		// add check for multiplier.  if surface is attached to a zone that is on a multiplier
 		// then PV production should be multiplied out as well
 
-		if ( Surface( PVarray( PVnum ).SurfacePtr ).Zone != 0 ) { // might need to apply multiplier
-			thisZone = Surface( PVarray( PVnum ).SurfacePtr ).Zone;
+		if ( Surface( thisSurface ).Zone != 0 ) { // might need to apply multiplier
+			thisZone = Surface( thisSurface ).Zone;
 			PVarray( PVnum ).Report.DCEnergy *= ( Zone( thisZone ).Multiplier * Zone( thisZone ).ListMultiplier );
 			PVarray( PVnum ).Report.DCPower *= ( Zone( thisZone ).Multiplier * Zone( thisZone ).ListMultiplier );
 		}
@@ -904,7 +902,7 @@ namespace Photovoltaics {
 		{ auto const SELECT_CASE_var( PVarray( PVnum ).CellIntegrationMode );
 		// SurfaceSink is not multiplied...
 		if ( SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration ) {
-			QPVSysSource( PVarray( PVnum ).SurfacePtr ) = -1.0 * PVarray( PVnum ).SurfaceSink;
+			QPVSysSource( thisSurface ) = -1.0 * PVarray( PVnum ).SurfaceSink;
 
 		} else if ( SELECT_CASE_var == iTranspiredCollectorCellIntegration ) {
 			SetUTSCQdotSource( PVarray( PVnum ).UTSCPtr, - 1.0 * PVarray( PVnum ).SurfaceSink );
