@@ -741,6 +741,8 @@ namespace HeatBalanceManager {
 		static gio::Fmt Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
 		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration {AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')" );
 		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_734( "('! <HVACSystemRootFindingAlgorithm>, Value {RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}')" );
+		static gio::Fmt Format_735( "(' HVACSystemRootFindingAlgorithm, ',A)" );
 
 		//Assign the values to the building data
 
@@ -1266,8 +1268,8 @@ namespace HeatBalanceManager {
 		}
 
 		// Write Solution Algorithm to the initialization output file for User Verification
-		gio::write( OutputFileInits, Format_726 );
-		gio::write( OutputFileInits, Format_727 ) << AlphaName( 1 );
+		gio::write( OutputFileInits, Format_734 );
+		gio::write( OutputFileInits, Format_735 ) << HVACSystemRootFinding.Algorithm;
 
 	}
 
