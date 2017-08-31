@@ -6367,7 +6367,7 @@ CalcOutsideSurfTemp(
 			QRadLWOutSrdSurfsRep += StefanBoltzmann * Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) - pow_4( TH11 + KelvinConv) );
 		}
 	}
-	QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac + QRadLWOutSrdSurfsRep;	
+	QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac + Surface( SurfNum ).Area * QRadLWOutSrdSurfsRep;
 	QdotRadOutRepPerArea( SurfNum ) = QdotRadOutRep( SurfNum ) / Surface( SurfNum ).Area;
 
 	QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;
