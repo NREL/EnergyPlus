@@ -380,10 +380,10 @@ namespace HVACManager {
 		NumOfSysTimeSteps = 1;
 		FracTimeStepZone = TimeStepSys / TimeStepZone;
 
+		SetOutAirNodes();
+
 		bool anyEMSRan;
 		ManageEMS( emsCallFromBeginTimestepBeforePredictor, anyEMSRan ); //calling point
-
-		SetOutAirNodes();
 
 		ManageRefrigeratedCaseRacks();
 
