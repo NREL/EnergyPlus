@@ -89752,6 +89752,9 @@ UtilityCost:Tariff,
         \key kBtu
         \key MCF
         \key CCF
+!        \key m3
+!        \key gal
+!        \key kgal
         \note A choice that allows several different predefined conversion factors to be used; otherwise user
         \note defined conversion factors are used as defined in the next two fields.
    N1,  \field Energy Conversion Factor

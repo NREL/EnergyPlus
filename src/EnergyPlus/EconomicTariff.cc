@@ -107,7 +107,11 @@ namespace EconomicTariff {
 	int const conversionKBTU( 5 );
 	int const conversionMCF( 6 ); // thousand cubic feet
 	int const conversionCCF( 7 ); // hundred cubic feet
+	int const conversionM3 ( 8 ); // cubic meter
+	int const conversionGAL ( 9 );
+	int const conversionKGAL ( 10 ); // thousand gallons
 
+	// TODO: Modify this to append the water stuff?
 	Array1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
 	Array1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
 
@@ -246,6 +250,9 @@ namespace EconomicTariff {
 	int const kindMeterNotWater( 0 );
 	int const kindMeterWater( 1 );
 
+	int const kindMeterNotGas( 0 );
+	int const kindMeterGas( 1 );
+
 	int const varUnitTypeEnergy( 1 );
 	int const varUnitTypeDemand( 2 );
 	int const varUnitTypeDimensionless( 3 );
@@ -365,10 +372,16 @@ namespace EconomicTariff {
 	void
 	GetInputEconomicsTariff( bool & ErrorsFound ) // true if errors found during getting input objects.
 	{
-		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
-		//    DATE WRITTEN   May 2004
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason Glazer of GARD Analytics, Inc.
+		//       DATE WRITTEN   May 2004
+		//       MODIFIED       Aug. 2017, Julien Marrec of EffiBEM. Handled conversions factor based on meter resources
+		//
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine reads the input file for "UtilityCost:Tariff" objects
+		// It will be the right conversion factors based on the associated meter resource type
+		// meaning if "CCF" is picked, the conversion factor isn't the same whether it's a water meter or a fuel meter.
 
-		//    Read the input file for "Economics:Tariff" objects.
 
 		using DataGlobals::NumOfTimeStepInHour;
 		using OutputReportTabular::AddTOCEntry;
@@ -451,102 +464,211 @@ namespace EconomicTariff {
 				NamesOfKeys.deallocate();
 				IndexesForKeyVar.deallocate();
 			}
-			//conversion factor
-			if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
-				tariff( iInObj ).convChoice = conversionUSERDEF;
-				tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
-				tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
-			} else if ( SameString( cAlphaArgs( 3 ), "KWH" ) ) {
-				tariff( iInObj ).convChoice = conversionKWH;
-				tariff( iInObj ).energyConv = 0.0000002778;
-				tariff( iInObj ).demandConv = 0.001;
-			} else if ( SameString( cAlphaArgs( 3 ), "THERM" ) ) {
-				tariff( iInObj ).convChoice = conversionTHERM;
-				tariff( iInObj ).energyConv = 9.4781712e-9;
-				tariff( iInObj ).demandConv = 0.00003412;
-			} else if ( SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
-				tariff( iInObj ).convChoice = conversionMMBTU;
-				tariff( iInObj ).energyConv = 9.4781712e-10;
-				tariff( iInObj ).demandConv = 0.000003412;
-			} else if ( SameString( cAlphaArgs( 3 ), "MJ" ) ) {
-				tariff( iInObj ).convChoice = conversionMJ;
-				tariff( iInObj ).energyConv = 0.000001;
-				tariff( iInObj ).demandConv = 0.0036;
-			} else if ( SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
-				tariff( iInObj ).convChoice = conversionKBTU;
-				tariff( iInObj ).energyConv = 9.4781712e-7;
-				tariff( iInObj ).demandConv = 0.003412;
-			} else if ( SameString( cAlphaArgs( 3 ), "MCF" ) ) {
-				tariff( iInObj ).convChoice = conversionMCF;
-				tariff( iInObj ).energyConv = 9.4781712e-10;
-				tariff( iInObj ).demandConv = 0.000003412;
-			} else if ( SameString( cAlphaArgs( 3 ), "CCF" ) ) {
-				tariff( iInObj ).convChoice = conversionCCF;
-				tariff( iInObj ).energyConv = 9.4781712e-9;
-				tariff( iInObj ).demandConv = 0.00003412;
-			} else {
 
+			// Start by checking what type of meter we do have, some units can be used for several resources with different conversion factors
+			// Explicitly assume it's not a water meter nor an electric meter nor a gas meter (was already done in constructor though)
+			tariff( iInObj ).kindWaterMtr = kindMeterNotWater;
+			tariff( iInObj ).kindElectricMtr = kindMeterNotElectric;
+			tariff( iInObj ).kindGasMtr = kindMeterNotGas;
 
-				// TODO: is this needed?
-				// Assume it's not a water meter (already handled in the constructor, since set to 0)
-				tariff( iInObj ).kindWaterMtr = kindMeterNotWater;
+			// Determine whether this meter is related to electricity, or water, or gas
+			if ( tariff( iInObj ).reportMeterIndx != 0 ) {
 
-				//determine if this is meter related to electricity, or water
-				if ( tariff( iInObj ).reportMeterIndx != 0 ) {
-					{ auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iInObj ).reportMeterIndx ).ResourceType ) );
+				auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iInObj ).reportMeterIndx ).ResourceType ) );
 
-					// TODO: wouldn't it be better to check whether it's electric here rather than in SelectTariff?
-					// For now, only check water
-					if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
-						  || SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
-						  || SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
-						  || SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
-						tariff( iInObj ).kindWaterMtr = kindMeterWater;
-					} }
+				// Various types of electricity meters
+				if ( SELECT_CASE_var == "ELECTRICITY" ) {
+					tariff( iInObj ).kindElectricMtr = kindMeterElecSimple;
+				} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
+					tariff( iInObj ).kindElectricMtr = kindMeterElecProduced;
+				} else if ( SELECT_CASE_var == "ELECTRICITYPURCHASED" ) {
+					tariff( iInObj ).kindElectricMtr = kindMeterElecPurchased;
+				} else if ( SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD" ) {
+					tariff( iInObj ).kindElectricMtr = kindMeterElecSurplusSold;
+				} else if ( SELECT_CASE_var == "ELECTRICITYNET" ) {
+					tariff( iInObj ).kindElectricMtr = kindMeterElecNet;
+
+					// Handle the case where its a water meter
+				} else if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
+						|| SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
+						|| SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
+						|| SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
+					tariff( iInObj ).kindWaterMtr = kindMeterWater;
+					// Or a Natural Gas meter
+				} else if (SELECT_CASE_var == "GAS" || SELECT_CASE_var == "NATURALGAS" || SELECT_CASE_var == "NATURAL GAS" )  {
+					tariff( iInObj ).kindGasMtr = kindMeterGas;
 				}
+			}
 
+			// Assign the right conversion factors based on the resource type
 
-					/**if ( SELECT_CASE_var == "ELECTRICITY" ) {
-						tariff( iTariff ).kindElectricMtr = kindMeterElecSimple;
-					} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
-						tariff( iTariff ).kindElectricMtr = kindMeterElecProduced;
-					} else if ( SELECT_CASE_var == "ELECTRICITYPURCHASED" ) {
-						tariff( iTariff ).kindElectricMtr = kindMeterElecPurchased;
-					} else if ( SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD" ) {
-						tariff( iTariff ).kindElectricMtr = kindMeterElecSurplusSold;
-					} else if ( SELECT_CASE_var == "ELECTRICITYNET" ) {
-						tariff( iTariff ).kindElectricMtr = kindMeterElecNet;
-					} else {
-						tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
-						// Handle the case where its a water meter
-						if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
-							  || SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
-							  || SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
-							  || SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
-							tariff( iTariff ).kindWaterMtr = kindMeterWater;
-						}
-					}}
+			// If it's a water meter
+			// TODO for reviewer: should we set demandConv to 0.0 instead?
+			if ( tariff( iInObj ).kindWaterMtr == kindMeterWater ) {
+				//conversion factor
+				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+					tariff( iInObj ).convChoice = conversionUSERDEF;
+					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
+					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
+				} else if ( SameString( cAlphaArgs( 3 ), "M3" ) ) {
+					tariff( iInObj ).convChoice = conversionM3;
+					tariff( iInObj ).energyConv = 1.0;
+					tariff( iInObj ).demandConv = 1.0;
+				} else if ( SameString( cAlphaArgs( 3 ), "CCF" ) ) {
+					tariff( iInObj ).convChoice = conversionCCF;
+					tariff( iInObj ).energyConv = 0.35314666721488586;
+					tariff( iInObj ).demandConv = 0.35314666721488586;
+				} else if ( SameString( cAlphaArgs( 3 ), "GAL" ) ) {
+					tariff( iInObj ).convChoice = conversionGAL;
+					tariff( iInObj ).energyConv = 264.1720523602524;
+					tariff( iInObj ).demandConv = 264.1720523602524;
+				} else if ( SameString( cAlphaArgs( 3 ), "KGAL" ) ) {
+					tariff( iInObj ).convChoice = conversionKGAL;
+					tariff( iInObj ).energyConv = 0.2641720523602524;
+					tariff( iInObj ).demandConv = 0.2641720523602524;
 				} else {
-					tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
-				}**/
-
-
-				// If it's a water meter, default to m^3, otherwise will default to kWh
-				if ( tariff( iInObj ).kindWaterMtr == kindMeterWater ) {
-					tariff( iInObj ).convChoice= conversionUSERDEF;
+					// ERROR: not a valid conversion, default to M3
+					tariff( iInObj ).convChoice= conversionM3;
 					tariff( iInObj ).energyConv = 1.0;
 					tariff( iInObj ).demandConv = 1.0;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to m^3 (Water resource detected)." );
+				}
 
+			// If it's an electric meter
+			// TODO For reviewer: do we want to actually limit the accepted choices?
+			// Does THERM make sense for an electric meter?
+			// Volumetric units such as MCF or CCF doesn't make sense IMHO
+			// Currently I accept but issue a warning.
+			} else if ( tariff( iInObj ).kindElectricMtr != kindMeterNotElectric ) {
+				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+					tariff( iInObj ).convChoice = conversionUSERDEF;
+					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
+					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
+				} else if ( SameString( cAlphaArgs( 3 ), "KWH" ) ) {
+					tariff( iInObj ).convChoice = conversionKWH;
+					tariff( iInObj ).energyConv = 0.0000002778;
+					tariff( iInObj ).demandConv = 0.001;
+				} else if ( SameString( cAlphaArgs( 3 ), "MJ" ) ) {
+					tariff( iInObj ).convChoice = conversionMJ;
+					tariff( iInObj ).energyConv = 0.000001;
+					tariff( iInObj ).demandConv = 0.0036;
+				} else if ( SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
+					tariff( iInObj ).convChoice = conversionMMBTU;
+					tariff( iInObj ).energyConv = 9.4781712e-10;
+					tariff( iInObj ).demandConv = 0.000003412;
+				} else if ( SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
+					tariff( iInObj ).convChoice = conversionKBTU;
+					tariff( iInObj ).energyConv = 9.4781712e-7;
+					tariff( iInObj ).demandConv = 0.003412;
+
+				// We accept the following choices, but issue a warning
+				} else if ( SameString( cAlphaArgs( 3 ), "THERM" ) ) {
+					tariff( iInObj ).convChoice = conversionTHERM;
+					tariff( iInObj ).energyConv = 9.4781712e-9;
+					tariff( iInObj ).demandConv = 0.00003412;
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" potentially invalid data" );
+					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Therm is an unusual choice for an electric resource.)" );
+
+				// Otherwise, default to kWh
 				} else {
 					tariff( iInObj ).convChoice = conversionKWH;
 					tariff( iInObj ).energyConv = 0.0000002778;
 					tariff( iInObj ).demandConv = 0.001;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
-					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to KWH." );
+					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to kWh (Electric resource detected)" );
 				}
-			}
+
+			// If it's a gas meter
+			} else if ( tariff( iInObj ).kindGasMtr == kindMeterGas ) {
+				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+					tariff( iInObj ).convChoice = conversionUSERDEF;
+					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
+					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
+				} else if ( SameString( cAlphaArgs( 3 ), "KWH" ) ) {
+					tariff( iInObj ).convChoice = conversionKWH;
+					tariff( iInObj ).energyConv = 0.0000002778;
+					tariff( iInObj ).demandConv = 0.001;
+				} else if ( SameString( cAlphaArgs( 3 ), "THERM" ) ) {
+					tariff( iInObj ).convChoice = conversionTHERM;
+					tariff( iInObj ).energyConv = 9.4781712e-9;
+					tariff( iInObj ).demandConv = 0.00003412;
+				} else if ( SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
+					tariff( iInObj ).convChoice = conversionMMBTU;
+					tariff( iInObj ).energyConv = 9.4781712e-10;
+					tariff( iInObj ).demandConv = 0.000003412;
+				} else if ( SameString( cAlphaArgs( 3 ), "MJ" ) ) {
+					tariff( iInObj ).convChoice = conversionMJ;
+					tariff( iInObj ).energyConv = 0.000001;
+					tariff( iInObj ).demandConv = 0.0036;
+				} else if ( SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
+					tariff( iInObj ).convChoice = conversionKBTU;
+					tariff( iInObj ).energyConv = 9.4781712e-7;
+					tariff( iInObj ).demandConv = 0.003412;
+
+				// Volumetric units for natural gas
+				// Actually assuming 1 therm = 1 CCF
+				} else if ( SameString( cAlphaArgs( 3 ), "MCF" ) ) {
+					tariff( iInObj ).convChoice = conversionMCF;
+					tariff( iInObj ).energyConv = 9.4781712e-10;
+					tariff( iInObj ).demandConv = 0.000003412;
+				} else if ( SameString( cAlphaArgs( 3 ), "CCF" ) ) {
+					tariff( iInObj ).convChoice = conversionCCF;
+					tariff( iInObj ).energyConv = 9.4781712e-9;
+					tariff( iInObj ).demandConv = 0.00003412;
+				} else if ( SameString( cAlphaArgs( 3 ), "M3" ) ) {
+					// Obtained from converting CCF above to m^3 so the same heat content of natural gas is used (1 therm = 1 CCF)
+					tariff( iInObj ).convChoice = conversionM3;
+					tariff( iInObj ).energyConv = 2.6839192e-10;
+					tariff( iInObj ).demandConv = 9.6617081E-05;
+
+				// Otherwise, default to kWh
+				} else {
+					tariff( iInObj ).convChoice = conversionKWH;
+					tariff( iInObj ).energyConv = 0.0000002778;
+					tariff( iInObj ).demandConv = 0.001;
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to kWh." );
+				}
+
+			// It it's neither an electric, water or gas meter, we cannot accept volumetric units
+			// because we cannot infer the heat content
+			} else {
+				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+					tariff( iInObj ).convChoice = conversionUSERDEF;
+					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
+					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
+				} else if ( SameString( cAlphaArgs( 3 ), "KWH" ) ) {
+					tariff( iInObj ).convChoice = conversionKWH;
+					tariff( iInObj ).energyConv = 0.0000002778;
+					tariff( iInObj ).demandConv = 0.001;
+				} else if ( SameString( cAlphaArgs( 3 ), "THERM" ) ) {
+					tariff( iInObj ).convChoice = conversionTHERM;
+					tariff( iInObj ).energyConv = 9.4781712e-9;
+					tariff( iInObj ).demandConv = 0.00003412;
+				} else if ( SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
+					tariff( iInObj ).convChoice = conversionMMBTU;
+					tariff( iInObj ).energyConv = 9.4781712e-10;
+					tariff( iInObj ).demandConv = 0.000003412;
+				} else if ( SameString( cAlphaArgs( 3 ), "MJ" ) ) {
+					tariff( iInObj ).convChoice = conversionMJ;
+					tariff( iInObj ).energyConv = 0.000001;
+					tariff( iInObj ).demandConv = 0.0036;
+				} else if ( SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
+					tariff( iInObj ).convChoice = conversionKBTU;
+					tariff( iInObj ).energyConv = 9.4781712e-7;
+					tariff( iInObj ).demandConv = 0.003412;
+
+				// Otherwise, default to kWh
+				} else {
+					tariff( iInObj ).convChoice = conversionKWH;
+					tariff( iInObj ).energyConv = 0.0000002778;
+					tariff( iInObj ).demandConv = 0.001;
+					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
+					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to kWh." );
+				}
+			} // Default conversion factors have been applied from here on
+
 			//schedules
 			// period schedule
 			if ( len( cAlphaArgs( 4 ) ) > 0 ) {
@@ -4640,37 +4762,6 @@ namespace EconomicTariff {
 		numMins = 0;
 		MinTariffIndex.dimension( numTariff, 0 );
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-			// TODO: is this needed?
-			// Assume it's not a water meter (already handled in the constructor, since set to 0)
-			tariff( iTariff ).kindWaterMtr = kindMeterNotWater;
-
-			//determine if this is meter related to electricity, or water
-			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
-				{ auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) );
-
-				if ( SELECT_CASE_var == "ELECTRICITY" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecSimple;
-				} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecProduced;
-				} else if ( SELECT_CASE_var == "ELECTRICITYPURCHASED" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecPurchased;
-				} else if ( SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecSurplusSold;
-				} else if ( SELECT_CASE_var == "ELECTRICITYNET" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecNet;
-				} else {
-					tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
-					// Handle the case where its a water meter
-					if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
-						  || SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
-						  || SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
-						  || SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
-						tariff( iTariff ).kindWaterMtr = kindMeterWater;
-					}
-				}}
-			} else {
-				tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
-			}
 			// compute the total annual cost of each tariff
 			totalVarPt = tariff( iTariff ).ptTotal;
 			totEneVarPt = tariff( iTariff ).nativeTotalEnergy;
@@ -4730,6 +4821,7 @@ namespace EconomicTariff {
 		// on, need to determine which combination should be selected. Within each group select just one set
 		// of electric results.  The electric results can be either the buy rate only, the buy rate plus the
 		// sell rate, or the netmetering rate, whichever of these three is the lowest combination.
+		// (The kindElectricMtr was assigned in GetInputEconomicsTariff)
 		for ( mGroup = 1; mGroup <= groupCount; ++mGroup ) {
 			lowestSimpleTariff = 0;
 			lowestPurchaseTariff = 0;
