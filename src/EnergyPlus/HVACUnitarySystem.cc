@@ -2294,9 +2294,10 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).HeatMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) * StdRhoAir;
 					UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( Iter ) = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( Iter ) / UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating );
 				}
-				UnitarySystem( UnitarySysNum ).IdleVolumeAirRate = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( 1 );
-				UnitarySystem( UnitarySysNum ).IdleMassFlowRate = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 );
-				UnitarySystem( UnitarySysNum ).IdleSpeedRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 );
+				// these coil types do not have an idle speed air flow rate
+				UnitarySystem( UnitarySysNum ).IdleVolumeAirRate = 0.0;
+				UnitarySystem( UnitarySysNum ).IdleMassFlowRate = 0.0;
+				UnitarySystem( UnitarySysNum ).IdleSpeedRatio = 0.0;
 			}
 		} else if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
 
@@ -3608,6 +3609,8 @@ namespace HVACUnitarySystem {
 					ErrorsFound = true;
 					errFlag = false;
 				}
+
+				UnitarySystem( UnitarySysNum ).HeatingCoilAvailSchPtr = GetCoilAvailScheduleIndex( HeatingCoilType, HeatingCoilName, errFlag );
 
 				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetHeatingCoilCapacity( HeatingCoilType, HeatingCoilName, errFlag );
 
@@ -12504,7 +12507,7 @@ namespace HVACUnitarySystem {
 			SpeedNum = int( Par( 5 ) );
 			FanOpMode = int( Par( 6 ) );
 
-			CalcMultiStageElectricHeatingCoil( CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
+			CalcMultiStageGasHeatingCoil( CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode );
 
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum ).Temp;
 
