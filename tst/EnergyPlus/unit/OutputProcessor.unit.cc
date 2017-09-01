@@ -3624,6 +3624,43 @@ namespace EnergyPlus {
 			compare_err_stream(errMsg);
 		}
 
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitStringToEnum )
+		{
+
+			EXPECT_EQ( OutputProcessor::Unit::J, unitStringToEnum( "J" ) );
+			EXPECT_EQ( OutputProcessor::Unit::J, unitStringToEnum( "j" ) );
+
+			EXPECT_EQ( OutputProcessor::Unit::kgWater_kgDryAir, unitStringToEnum( "kgWater/kgDryAir" ) );
+			EXPECT_EQ( OutputProcessor::Unit::kgWater_s, unitStringToEnum( "kgWater/s" ) );
+
+			EXPECT_EQ( OutputProcessor::Unit::unknown, unitStringToEnum( "junk" ) );
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitEnumToString )
+		{
+
+			EXPECT_EQ( "J", unitEnumToString( OutputProcessor::Unit::J ) );
+
+			EXPECT_EQ( "kgWater/kgDryAir", unitEnumToString( OutputProcessor::Unit::kgWater_kgDryAir ) );
+			EXPECT_EQ( "kgWater/s",  unitEnumToString( OutputProcessor::Unit::kgWater_s ) );
+
+			EXPECT_EQ( "unknown", unitEnumToString( OutputProcessor::Unit::unknown ) );
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitEnumToStringBrackets )
+		{
+
+			EXPECT_EQ( " [J]", unitEnumToStringBrackets( OutputProcessor::Unit::J ) );
+
+			EXPECT_EQ( " [kgWater/kgDryAir]", unitEnumToStringBrackets( OutputProcessor::Unit::kgWater_kgDryAir ) );
+			EXPECT_EQ( " [kgWater/s]", unitEnumToStringBrackets( OutputProcessor::Unit::kgWater_s ) );
+
+			EXPECT_EQ( " [unknown]", unitEnumToStringBrackets( OutputProcessor::Unit::unknown ) );
+
+		}
+
 	}
 
 }
