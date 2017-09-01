@@ -3055,7 +3055,7 @@
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE1-1 In Node,        !- Air Outlet Node Name
     SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name
-    0.3,                     !- Maximum Air Flow Rate {m3/s}
+    autosize,                !- Maximum Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Reheat Coil Object Type
     SPACE1-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
