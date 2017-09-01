@@ -4125,7 +4125,7 @@ namespace InternalHeatGains {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int ZoneLoop; // Counter for the # of zones (nz)
-		static Array1D_int TradIntGainTypes( 7, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int TradIntGainTypes( 8, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_ElectricEquipmentITEAirCooled, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
 
 		// FLOW:
 		for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
@@ -5341,7 +5341,7 @@ namespace InternalHeatGains {
 		static int TimeStepInDay( 0 );
 		static Array1D_int IntGainTypesPeople( 1, { IntGainTypeOf_People } );
 		static Array1D_int IntGainTypesLight( 1, { IntGainTypeOf_Lights } );
-		static Array1D_int IntGainTypesEquip( 5, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int IntGainTypesEquip( 6, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_ElectricEquipmentITEAirCooled, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
 		static Array1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 		static Array1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
 		static Array1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
