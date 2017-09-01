@@ -2177,25 +2177,6 @@ namespace EnergyPlus {
 
 		}
 
-//ou		TEST_F( SQLiteFixture, OutputProcessor_getVariableUnitsString )
-//ou		{
-//ou			EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
-//ou			EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
-//ou			EXPECT_EQ( "kgWater/kgDryAir", GetVariableUnitsString( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]" ) );
-//ou			EXPECT_EQ( "", GetVariableUnitsString( "Site Daylighting Model Sky Clearness []" ) );
-//ou			EXPECT_EQ( "", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature" ) );
-//ou			EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
-//ou
-//ou		}
-//ou
-//ou		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_getVariableUnitsString )
-//ou		{
-//ou			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ) );
-//ou			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ) );
-//ou			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ) );
-//ou
-//ou		}
-
 		TEST_F( SQLiteFixture, OutputProcessor_getReportVariableInput )
 		{
 			std::string const idf_objects = delimited_string({
@@ -2425,7 +2406,6 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 1 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 1 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Drybulb Temperature", DDVariableTypes( 1 ).VarNameOnly );
-//ou			EXPECT_EQ( "C", DDVariableTypes( 1 ).UnitsString );
 			EXPECT_EQ( OutputProcessor::Unit::C, DDVariableTypes( 1 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 2 ).IndexType );
@@ -2434,7 +2414,6 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 2 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 2 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Wetbulb Temperature", DDVariableTypes( 2 ).VarNameOnly );
-//ou			EXPECT_EQ( "C", DDVariableTypes( 2 ).UnitsString );
 			EXPECT_EQ( OutputProcessor::Unit::C, DDVariableTypes( 2 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 3 ).IndexType );
@@ -2443,7 +2422,6 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 3 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 3 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Humidity Ratio", DDVariableTypes( 3 ).VarNameOnly );
-//ou			EXPECT_EQ( "kgWater/kgDryAir", DDVariableTypes( 3 ).UnitsString );
 			EXPECT_EQ( OutputProcessor::Unit::kgWater_kgDryAir, DDVariableTypes( 3 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 4 ).IndexType );
@@ -2452,7 +2430,6 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 4 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 4 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Relative Humidity", DDVariableTypes( 4 ).VarNameOnly );
-//ou			EXPECT_EQ( "%", DDVariableTypes( 4 ).UnitsString );
 			EXPECT_EQ( OutputProcessor::Unit::Perc, DDVariableTypes( 4 ).units );
 
 		}

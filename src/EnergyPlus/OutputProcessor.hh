@@ -753,9 +753,6 @@ namespace OutputProcessor {
 	std::string
 	StandardVariableTypeKey( int const VariableType );
 
-//ou	std::string
-//ou	GetVariableUnitsString( std::string const & VariableName );
-
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.
 	// *****************************************************************************

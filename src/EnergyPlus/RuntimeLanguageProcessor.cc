@@ -3181,7 +3181,6 @@ namespace RuntimeLanguageProcessor {
 						}
 					}
 					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
-//ou					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3326,7 +3325,6 @@ namespace RuntimeLanguageProcessor {
 						}
 					}
 					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
-//ou					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 

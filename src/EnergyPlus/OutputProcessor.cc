@@ -1407,72 +1407,6 @@ namespace OutputProcessor {
 
 	}
 
-//ou	std::string
-//ou	GetVariableUnitsString( std::string const & VariableName )
-//ou	{
-//ou
-//ou		// FUNCTION INFORMATION:
-//ou		//       AUTHOR         Linda K. Lawrie
-//ou		//       DATE WRITTEN   October 2003
-//ou		//       MODIFIED       na
-//ou		//       RE-ENGINEERED  na
-//ou
-//ou		// PURPOSE OF THIS FUNCTION:
-//ou		// This function extracts the units from a Variable Name string supplied by
-//ou		// the developer in the call to SetupOutputVariable(s).
-//ou
-//ou		// METHODOLOGY EMPLOYED:
-//ou		// na
-//ou
-//ou		// REFERENCES:
-//ou		// na
-//ou
-//ou		// Using/Aliasing
-//ou		using General::TrimSigDigits;
-//ou
-//ou		// Return value
-//ou		std::string ThisUnitsString;
-//ou
-//ou		// Locals
-//ou		// FUNCTION ARGUMENT DEFINITIONS:
-//ou
-//ou		// FUNCTION PARAMETER DEFINITIONS:
-//ou		// na
-//ou
-//ou		// INTERFACE BLOCK SPECIFICATIONS:
-//ou		// na
-//ou
-//ou		// DERIVED TYPE DEFINITIONS:
-//ou		// na
-//ou
-//ou		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-//ou
-//ou		// Units are marked with a [
-//ou
-//ou		//!! Errors here are fatal because should only be encountered during development.
-//ou		ThisUnitsString = BlankString;
-//ou		std::string::size_type lbpos = index( VariableName, '[', true ); // from end of variable name
-//ou		if ( lbpos != std::string::npos ) {
-//ou			std::string::size_type rbpos = index( VariableName, ']', true );
-//ou			if ( rbpos == std::string::npos || rbpos < lbpos ) {
-//ou				ShowFatalError( "Ill formed Variable Name Units String, VariableName=" + VariableName );
-//ou				ThisUnitsString = VariableName.substr( lbpos + 1 );
-//ou			} else {
-//ou				if ( ( rbpos - 1 ) - ( lbpos + 1 ) + 1 > UnitsStringLength ) {
-//ou					ShowFatalError( "Units String too long for VariableName=" + VariableName + "; will be truncated to " + TrimSigDigits( UnitsStringLength ) + " characters." );
-//ou				}
-//ou				if ( lbpos + 1 <= rbpos - 1 ) {
-//ou					ThisUnitsString = VariableName.substr( lbpos + 1, rbpos - lbpos - 1 );
-//ou				} else {
-//ou					ThisUnitsString = BlankString;
-//ou				}
-//ou			}
-//ou		}
-//ou
-//ou		return ThisUnitsString;
-//ou
-//ou	}
-
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.
 	// *****************************************************************************
@@ -5360,47 +5294,6 @@ namespace OutputProcessor {
 // within the OutputProcessor.
 // *****************************************************************************
 
-
-
-//ou void
-//ou SetupOutputVariable(
-//ou	std::string const & VariableName, // String Name of variable (with units)
-//ou	Unit const & VariableUnit, // Actual units corresponding to the actual variable
-//ou 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
-//ou 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-//ou 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
-//ou 	std::string const & KeyedValue, // Associated Key for this variable
-//ou 	Optional_string_const ReportFreq, // Internal use -- causes reporting at this freqency
-//ou 	Optional_string_const ResourceTypeKey, // Meter Resource Type (Electricity, Gas, etc)
-//ou 	Optional_string_const EndUseKey, // Meter End Use Key (Lights, Heating, Cooling, etc)
-//ou 	Optional_string_const EndUseSubKey, // Meter End Use Sub Key (General Lights, Task Lights, etc)
-//ou 	Optional_string_const GroupKey, // Meter Super Group Key (Building, System, Plant)
-//ou 	Optional_string_const ZoneKey, // Meter Zone Key (zone name)
-//ou 	Optional_int_const ZoneMult, // Zone Multiplier, defaults to 1
-//ou 	Optional_int_const ZoneListMult, // Zone List Multiplier, defaults to 1
-//ou 	Optional_int_const indexGroupKey // Group identifier for SQL output
-//ou )
-//ou {
-//ou 	std::string oldStyleVariableName = VariableName + unitEnumToString(VariableUnit);
-//ou 	SetupOutputVariable(oldStyleVariableName, ActualVariable, IndexTypeKey, VariableTypeKey, KeyedValue, ReportFreq, ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult, indexGroupKey);
-//ou }
-
-//ou void
-//ou SetupOutputVariable(
-//ou 	std::string const & VariableName, // String Name of variable
-//ou 	Unit const & VariableUnit, // Actual units corresponding to the actual variable
-//ou 	int & ActualVariable, // Actual Variable, used to set up pointer
-//ou 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-//ou 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
-//ou 	std::string const & KeyedValue, // Associated Key for this variable
-//ou 	Optional_string_const ReportFreq, // Internal use -- causes reporting at this freqency
-//ou 	Optional_int_const indexGroupKey // Group identifier for SQL output
-//ou )
-//ou {
-//ou 	std::string oldStyleVariableName = VariableName + unitEnumToString( VariableUnit );
-//ou 	SetupOutputVariable( oldStyleVariableName, ActualVariable, IndexTypeKey, VariableTypeKey, KeyedValue, ReportFreq, indexGroupKey );
-//ou }
-
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable (with units)
@@ -5476,46 +5369,10 @@ SetupOutputVariable(
 	std::string Group; // Will hold value of GroupKey
 	std::string ZoneName; // Will hold value of ZoneKey
 	static bool ErrorsFound( false ); // True if Errors Found
-//ou	std::string::size_type Item;
 	bool ThisOneOnTheList;
-//ou	static std::string UnitsString; // Units for Variable (no brackets)
 	int localIndexGroupKey;
-//ou	bool invalidUnits;
 
 	if ( ! OutputInitialized ) InitializeOutput();
-
-//ou	//! Errors are severe and fatal because should only be encountered during development.
-//ou	Item = index( VariableName, '[' );
-//ou	if ( Item != std::string::npos ) {
-//ou		UnitsString = GetVariableUnitsString( VariableName );
-//ou		strip( UnitsString );
-//ou		VarName = stripped( VariableName.substr( 0, Item ) );
-//ou		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-//ou		// Check name length for variable name
-//ou		invalidUnits = false;
-//ou		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-//ou		if ( SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
-//ou		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-//ou			ShowSevereError( "Variable Name length (including units) [" + TrimSigDigits( len( stripped( VariableName ) ) ) + "] exceeds maximum=" + VariableName );
-//ou			if ( invalidUnits ) ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-//ou			ShowFatalError( "Program terminates." );
-//ou		}
-//ou		if ( invalidUnits ) {
-//ou			ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-//ou			ShowFatalError( "Program terminates." );
-//ou		}
-//ou	} else { // no units
-//ou		UnitsString = BlankString;
-//ou		VarName = stripped( VariableName );
-//ou		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-//ou		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-//ou			ShowSevereError( "Variable Name has no units in call=" + VariableName );
-//ou			ShowSevereError( "Variable Name length exceeds maximum=" + VariableName );
-//ou			ShowFatalError( "Program terminates." );
-//ou		}
-//ou		ShowSevereError( "Variable Name has no units in call=" + VariableName );
-//ou		ShowFatalError( "Program terminates." );
-//ou	}
 
 	VarName = VariableName;
 
@@ -5740,7 +5597,6 @@ SetupOutputVariable(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int CV;
-//ou	std::string::size_type Item;
 	std::string IDOut;
 	std::string VarName; // Variable without units
 	//  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
@@ -5748,45 +5604,10 @@ SetupOutputVariable(
 	int VariableType; // 1=Average, 2=Sum, 3=Min/Max
 	int localIndexGroupKey;
 	bool ThisOneOnTheList;
-//ou	bool invalidUnits;
-//ou	static std::string UnitsString; // Units for Variable (no brackets)
 	int Loop;
 	int RepFreq( ReportHourly );
 
 	if ( ! OutputInitialized ) InitializeOutput();
-
-//ou	//! Errors are severe and fatal because should only be encountered during development.
-//ou	Item = index( VariableName, '[' );
-//ou	if ( Item != std::string::npos ) {
-//ou		UnitsString = GetVariableUnitsString( VariableName );
-//ou		strip( UnitsString );
-//ou		invalidUnits = false;
-//ou		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-//ou		if ( SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
-//ou		VarName = stripped( VariableName.substr( 0, Item ) );
-//ou		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-//ou		// Check name length for variable name
-//ou		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-//ou			ShowSevereError( "Variable Name length (including units) [" + TrimSigDigits( len( stripped( VariableName ) ) ) + "] exceeds maximum=" + VariableName );
-//ou			if ( invalidUnits ) ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-//ou			ShowFatalError( "Program terminates." );
-//ou		}
-//ou		if ( invalidUnits ) {
-//ou			ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-//ou			ShowFatalError( "Program terminates." );
-//ou		}
-//ou	} else {
-//ou		UnitsString = BlankString;
-//ou		VarName = stripped( VariableName );
-//ou		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-//ou		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-//ou			ShowSevereError( "Variable Name has no units in call=" + VariableName );
-//ou			ShowSevereError( "Variable Name length exceeds maximum=" + VariableName );
-//ou			ShowFatalError( "Program terminates." );
-//ou		}
-//ou		ShowSevereError( "Variable Name has no units in call=" + VariableName );
-//ou		ShowFatalError( "Program terminates." );
-//ou	}
 
 	VarName = VariableName;
 
@@ -8424,7 +8245,6 @@ ProduceRDDMDD()
 		if ( ProduceReportVDD == ReportVDD_Yes ) {
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
-//ou				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
 				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitStringFromDDitem( ItemPtr ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
@@ -8433,7 +8253,6 @@ ProduceRDDMDD()
 					} else {
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
-//ou					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
 					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitStringFromDDitem( ItemPtr ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
@@ -8441,7 +8260,6 @@ ProduceRDDMDD()
 		} else if ( ProduceReportVDD == ReportVDD_IDF ) {
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
-//ou				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
 				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitStringFromDDitem( ItemPtr ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
@@ -8450,7 +8268,6 @@ ProduceRDDMDD()
 					} else {
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
-//ou					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
 					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitStringFromDDitem( ItemPtr ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
