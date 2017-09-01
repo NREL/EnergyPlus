@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -1138,84 +1138,84 @@
     ,                        !- Availability Schedule Name
     NODE_1,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
-    50,                      !- Maximum Heating Supply Air Temperature {C}
-    13,                      !- Minimum Cooling Supply Air Temperature {C}
-    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.009,                   !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
-    NoLimit,                 !- Heating Limit
-    autosize,                !- Maximum Heating Air Flow Rate {m3/s}
-    ,                        !- Maximum Sensible Heating Capacity {W}
-    NoLimit,                 !- Cooling Limit
-    autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
+    50,                      !- System Inlet Air Node Name
+    13,                      !- Maximum Heating Supply Air Temperature {C}
+    0.015,                   !- Minimum Cooling Supply Air Temperature {C}
+    0.009,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    autosize,                !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    NoLimit,                 !- Maximum Sensible Heating Capacity {W}
+    autosize,                !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
     ,                        !- Maximum Total Cooling Capacity {W}
     ,                        !- Heating Availability Schedule Name
-    ,                        !- Cooling Availability Schedule Name
-    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
-    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
-    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ConstantSupplyHumidityRatio,  !- Cooling Availability Schedule Name
+    ,                        !- Dehumidification Control Type
+    ConstantSupplyHumidityRatio,  !- Cooling Sensible Heat Ratio {dimensionless}
+    ,                        !- Humidification Control Type
     ,                        !- Design Specification Outdoor Air Object Name
     ,                        !- Outdoor Air Inlet Node Name
     ,                        !- Demand Controlled Ventilation Type
     ,                        !- Outdoor Air Economizer Type
     ,                        !- Heat Recovery Type
-    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
-    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Sensible Heat Recovery Effectiveness {dimensionless}
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone2Air,                !- Name
     ,                        !- Availability Schedule Name
     NODE_2,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
-    50,                      !- Maximum Heating Supply Air Temperature {C}
-    13,                      !- Minimum Cooling Supply Air Temperature {C}
-    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.009,                   !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
-    NoLimit,                 !- Heating Limit
-    autosize,                !- Maximum Heating Air Flow Rate {m3/s}
-    ,                        !- Maximum Sensible Heating Capacity {W}
-    NoLimit,                 !- Cooling Limit
-    autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
+    50,                      !- System Inlet Air Node Name
+    13,                      !- Maximum Heating Supply Air Temperature {C}
+    0.015,                   !- Minimum Cooling Supply Air Temperature {C}
+    0.009,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    autosize,                !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    NoLimit,                 !- Maximum Sensible Heating Capacity {W}
+    autosize,                !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
     ,                        !- Maximum Total Cooling Capacity {W}
     ,                        !- Heating Availability Schedule Name
-    ,                        !- Cooling Availability Schedule Name
-    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
-    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
-    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ConstantSupplyHumidityRatio,  !- Cooling Availability Schedule Name
+    ,                        !- Dehumidification Control Type
+    ConstantSupplyHumidityRatio,  !- Cooling Sensible Heat Ratio {dimensionless}
+    ,                        !- Humidification Control Type
     ,                        !- Design Specification Outdoor Air Object Name
     ,                        !- Outdoor Air Inlet Node Name
     ,                        !- Demand Controlled Ventilation Type
     ,                        !- Outdoor Air Economizer Type
     ,                        !- Heat Recovery Type
-    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
-    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Sensible Heat Recovery Effectiveness {dimensionless}
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone3Air,                !- Name
     ,                        !- Availability Schedule Name
     NODE_3,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
-    50,                      !- Maximum Heating Supply Air Temperature {C}
-    13,                      !- Minimum Cooling Supply Air Temperature {C}
-    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.009,                   !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
-    NoLimit,                 !- Heating Limit
-    autosize,                !- Maximum Heating Air Flow Rate {m3/s}
-    ,                        !- Maximum Sensible Heating Capacity {W}
-    NoLimit,                 !- Cooling Limit
-    autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
+    50,                      !- System Inlet Air Node Name
+    13,                      !- Maximum Heating Supply Air Temperature {C}
+    0.015,                   !- Minimum Cooling Supply Air Temperature {C}
+    0.009,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    autosize,                !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    NoLimit,                 !- Maximum Sensible Heating Capacity {W}
+    autosize,                !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
     ,                        !- Maximum Total Cooling Capacity {W}
     ,                        !- Heating Availability Schedule Name
-    ,                        !- Cooling Availability Schedule Name
-    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
-    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
-    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ConstantSupplyHumidityRatio,  !- Cooling Availability Schedule Name
+    ,                        !- Dehumidification Control Type
+    ConstantSupplyHumidityRatio,  !- Cooling Sensible Heat Ratio {dimensionless}
+    ,                        !- Humidification Control Type
     ,                        !- Design Specification Outdoor Air Object Name
     ,                        !- Outdoor Air Inlet Node Name
     ,                        !- Demand Controlled Ventilation Type
     ,                        !- Outdoor Air Economizer Type
     ,                        !- Heat Recovery Type
-    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
-    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Sensible Heat Recovery Effectiveness {dimensionless}
 
   NodeList,
     Zone1Inlets,             !- Name

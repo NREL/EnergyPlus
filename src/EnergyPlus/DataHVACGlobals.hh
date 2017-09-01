@@ -354,6 +354,7 @@ namespace DataHVACGlobals {
 	extern Real64 HPWHCrankcaseDBTemp; // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
 	extern bool AirLoopInit; // flag for whether InitAirLoops has been called
 	extern bool AirLoopsSimOnce; // True means that the air loops have been simulated once in this environment
+	extern bool GetAirPathDataDone; // True means that air loops inputs have been processed
 
 	// Hybrid ventilation control part
 	extern int NumHybridVentSysAvailMgrs; // Number of hybrid ventilation control

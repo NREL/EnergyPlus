@@ -1,4 +1,4 @@
-/* Objexx Engineering, Inc. Web CSS Style Sheet  Rev: 2007.06 */
+/* Objexx Engineering, Inc. CSS Style Sheet */
 
 body{ font: 12px Verdana,Arial,Helvetica,sans-serif; line-height: 16px; margin: 0; padding: 0; }
 
@@ -7,11 +7,11 @@ a:link{ color: #CB3266; }
 a:hover{ color: #F36; }
 a:visited{ color: #903; }
 
-h1{ font: bold 18px Verdana,Arial,Helvetica,sans-serif; color: #757D59; margin:  0   0 15px; padding: 0; }
-h2{ font: bold 16px Verdana,Arial,Helvetica,sans-serif; color: #757D59; margin: 10px 0 11px; padding: 0; }
-h3{ font: bold 14px Verdana,Arial,Helvetica,sans-serif; color: #757D59; margin:  9px 0 10px; padding: 0; }
-h4{ font: bold 13px Verdana,Arial,Helvetica,sans-serif; color: #757D59; margin:  8px 0  9px; padding: 0; }
-h5{ font: bold 12px Verdana,Arial,Helvetica,sans-serif; color: #757D59; margin:  7px 0  8px; padding: 0; }
+h1{ font: bold 18px Verdana,Arial,Helvetica,sans-serif; color: #9B1727; margin:  0   0 15px; padding: 0; }
+h2{ font: bold 16px Verdana,Arial,Helvetica,sans-serif; color: #9B1727; margin: 10px 0 11px; padding: 0; }
+h3{ font: bold 14px Verdana,Arial,Helvetica,sans-serif; color: #9B1727; margin:  9px 0 10px; padding: 0; }
+h4{ font: bold 13px Verdana,Arial,Helvetica,sans-serif; color: #9B1727; margin:  8px 0  9px; padding: 0; }
+h5{ font: bold 12px Verdana,Arial,Helvetica,sans-serif; color: #9B1727; margin:  7px 0  8px; padding: 0; }
 
 ul{ list-style-type: square; }
 ul li{ margin: 6px 0 0 -16px; }
@@ -24,7 +24,7 @@ label{ font: bold 1em Arial,sans-serif; color: #334D55; }
 input{ font-family: Arial,sans-serif; }
 
 .footer_text{ font: 9px Verdana,Arial,Helvetica,sans-serif; color: #000; line-height: 12px; }
-.footer_link{ font: bold 9px Verdana,Arial,Helvetica,sans-serif; color: #757D59; text-decoration: none; }
+.footer_link{ font: bold 9px Verdana,Arial,Helvetica,sans-serif; color: #9B1727; text-decoration: none; }
 
 .table_text { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; }
 .source { font-family: monospace, Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, Courier, sans serif, serif; font-size: 12px; }
@@ -36,4 +36,4 @@ input{ font-family: Arial,sans-serif; }
 #sectionLinks, #sectionLinksTop{ margin: 0; padding: 0; }
 #sectionLinks a:link, #sectionLinks a:visited, #sectionLinksTop a:link, #sectionLinksTop a:visited{ display: block; border-bottom: 1px solid #CCC; font: bold 11px 'Trebuchet MS',Helvetica,Arial,clean,sans-serif; color: #333; padding: 3px 0 3px 10px; }
 #sectionLinksTop a:link, #sectionLinksTop a:visited{ border-top: 1px solid #CCC; }
-#sectionLinks a:hover, #sectionLinksTop a:hover{ background-color: #CFD8B4; }
+#sectionLinks a:hover, #sectionLinksTop a:hover{ background-color: #FCFAFB; }

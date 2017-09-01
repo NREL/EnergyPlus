@@ -102,6 +102,8 @@ For inputs with MaterialProperty:PhaseChangeHysteresis, the specific heat is not
 Cp = f\left(T_{i,new}, T_{i, prev}, PhaseState_{new}, PhaseState_{prev}\right)
 \end{equation}
 
+The hysteresis model also has inputs for solid and liquid state values for thermal conductivity and density.  Within the transition region of the hysteresis model the average of the two is used.  If the dynamic nature of these parameters is not known, the user may enter the same value for both states and that static value will be used throughout.
+
 The actual formulation of the hysteresis model is captured in Figure~\ref{fig:PCMHysteresis}.  The inputs that led to those curves were as follows:
 
 \begin{itemize}
@@ -124,7 +126,7 @@ The actual formulation of the hysteresis model is captured in Figure~\ref{fig:PC
 
 The iteration scheme assures that the correct enthalpy, and therefore the correct Cp is used in each time step, and the enthalpy of the material is accounted for accurately. Of course, if the material is regular, the user input constant Cp is used.
 
-The algorithm also has a provision for including a temperature coefficient to modify the thermal conductivity. The thermal conductivity is obtained from:
+For non-hysteresis finite difference calculations, the algorithm also has a provision for including a temperature coefficient to modify the thermal conductivity. The thermal conductivity is obtained from:
 
 \begin{equation}
 k = {k_o} + {k_1}\left( {{T_i} - 20} \right)

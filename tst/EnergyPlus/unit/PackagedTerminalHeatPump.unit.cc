@@ -488,7 +488,7 @@ namespace EnergyPlus {
 
 		// This VS coil is rather quirky. It sizes the capacity based on zone sizing air flow rate.
 		// Then uses that capacity to back calculate the air flow needed to keep the reference air flow per capacity ratio constant.
-		// For this reason, the parent object would size to an air flow that was different than the chile.
+		// For this reason, the parent object would size to an air flow that was different than the child.
 
 		// identify coil
 		EXPECT_EQ ( VariableSpeedCoils::VarSpeedCoil( 1 ).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE" );
@@ -497,7 +497,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate, PTUnit( 1 ).MaxCoolAirVolFlow );
 		EXPECT_EQ( VariableSpeedCoils::VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 9 ), PTUnit( 1 ).MaxCoolAirVolFlow );
 
-		// expect the ratio of air flow to capacity to equal to the reference air flow and capacity specified in coil input
+		// expect the ratio of air flow to capacity to be equal to the reference air flow and capacity ratio specified in coil input
 		Real64 refAirflowCapacityRatio = 0.891980668 / 16092.825525; // speed 9 reference cooling data
 		Real64 sizingAirflowCapacityRatio = VariableSpeedCoils::VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 9 ) / VariableSpeedCoils::VarSpeedCoil( 1 ).MSRatedTotCap( 9 );
 		EXPECT_EQ( refAirflowCapacityRatio, sizingAirflowCapacityRatio );
@@ -525,6 +525,34 @@ namespace EnergyPlus {
 		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, max( VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil( 2 ).RatedAirVolFlowRate ) );
 		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, max( PTUnit( 1 ).MaxCoolAirVolFlow, PTUnit( 1 ).MaxHeatAirVolFlow ) );
 
+		// Initialize the packaged terminal heat pump
+		Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor ON airflow to average airflow over timestep
+		Real64 ZoneLoad( 0.0 );// cooling or heating needed by zone [watts]
+
+		InitPTUnit( 1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad );
+
+		// check that an intermediate speed has the correct flow ratio
+		Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
+		Real64 expectedAirFlowRate = refAirflowRatio * PTUnit( 1 ).MaxCoolAirVolFlow;
+		EXPECT_NEAR( expectedAirFlowRate, PTUnit( 1 ).CoolVolumeFlowRate( 4 ), 0.00001 );
+		EXPECT_NEAR( expectedAirFlowRate, 3.9343830134190632, 0.00001 );
+
+		refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference heating data and full flow rate at speed 9
+		expectedAirFlowRate = refAirflowRatio * PTUnit( 1 ).MaxHeatAirVolFlow;
+		EXPECT_NEAR( expectedAirFlowRate, PTUnit( 1 ).HeatVolumeFlowRate( 4 ), 0.00001 );
+		EXPECT_NEAR( expectedAirFlowRate, 3.0302392264439715, 0.00001 );
+
+
+		// #6028 child components not sizing correctly on air flow rate
+		// VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and HeatingAirVolFlow
+		EXPECT_TRUE( ZoneEqSizing( 1 ).SystemAirFlow );
+		EXPECT_EQ( ZoneEqSizing( 1 ).AirVolFlow, VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate );
+		EXPECT_TRUE( ZoneEqSizing( 1 ).CoolingAirFlow );
+		EXPECT_TRUE( ZoneEqSizing( 1 ).HeatingAirFlow );
+		EXPECT_EQ( ZoneEqSizing( 1 ).CoolingAirVolFlow, PTUnit( 1 ).MaxCoolAirVolFlow );
+		EXPECT_EQ( ZoneEqSizing( 1 ).HeatingAirVolFlow, PTUnit( 1 ).MaxHeatAirVolFlow );
+		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, ZoneEqSizing( 1 ).AirVolFlow );
+		EXPECT_EQ( Fan( 1 ).MaxAirFlowRate, max( ZoneEqSizing( 1 ).CoolingAirVolFlow, ZoneEqSizing( 1 ).HeatingAirVolFlow ) );
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest ) {
@@ -541,7 +569,7 @@ namespace EnergyPlus {
 		int PTUnitNum( 1 );
 
 		std::string const idf_objects = delimited_string( {
-			"Version,8.7;",
+			"Version,8.8;",
 
 			"Schedule:Compact,",
 			"    FanAvailSched,           !- Name",
@@ -875,3 +903,4 @@ namespace EnergyPlus {
 
 	}
 }
+

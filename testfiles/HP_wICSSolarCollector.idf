@@ -116,7 +116,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -162,8 +162,8 @@
   Site:Location,
     Miami Intl Ap FL USA WMO=722020,  !- Name
     25.82,                   !- Latitude {deg}
-    -80.3,                  !- Longitude {deg}
-    -5.0,                   !- Time Zone {hr}
+    -80.3,                   !- Longitude {deg}
+    -5.0,                    !- Time Zone {hr}
     11.00;                   !- Elevation {m}
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
@@ -651,7 +651,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    Absolute;                   !- Coordinate System
+    Absolute;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 ! original zone origin (0,0,0)
@@ -949,7 +949,7 @@
     Zn002:Wall006,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
-    Attic ZONE,               !- Zone Name
+    Attic ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1039,7 +1039,6 @@
     12.192000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     12.192000000000,6.096000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
     12.192000000000,6.096000000000,3.048000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   BuildingSurface:Detailed,
     Zn002:Flr001,            !- Name
@@ -2910,3 +2909,4 @@
     Until: 20:00,0.0,        !- Field 3
     Until: 20:30,1.0,        !- Field 5
     Until: 24:00,0.0;        !- Field 7
+
