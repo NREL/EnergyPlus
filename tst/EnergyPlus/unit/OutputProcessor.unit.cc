@@ -3661,6 +3661,36 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitStringFromDDitem )
+		{
+
+			AddToOutputVariableList( "energy variable 1", 1, 1, 1, OutputProcessor::Unit::J );
+			AddToOutputVariableList( "energy variable 2", 1, 1, 1, OutputProcessor::Unit::J );
+			AddToOutputVariableList( "energy variable 3", 1, 1, 1, OutputProcessor::Unit::J );
+
+			AddToOutputVariableList( "humidity ratio variable 1", 1, 1, 1, OutputProcessor::Unit::kgWater_kgDryAir );
+			AddToOutputVariableList( "humidity ratio variable 2", 1, 1, 1, OutputProcessor::Unit::kgWater_kgDryAir );
+
+			AddToOutputVariableList( "flow variable 1", 1, 1, 1, OutputProcessor::Unit::kgWater_s );
+			AddToOutputVariableList( "flow variable 2", 1, 1, 1, OutputProcessor::Unit::kgWater_s );
+
+			AddToOutputVariableList( "user defined EMS variable 1", 1, 1, 1, OutputProcessor::Unit::customEMS, "ergs/century" );
+			AddToOutputVariableList( "user defined EMS variable 2", 1, 1, 1, OutputProcessor::Unit::customEMS, "swamps/county" );
+
+			EXPECT_EQ( " [J]", unitStringFromDDitem( 3 ) );
+
+			EXPECT_EQ( " [kgWater/kgDryAir]", unitStringFromDDitem( 4 ) );
+
+			EXPECT_EQ( " [kgWater/s]", unitStringFromDDitem( 6 ) );
+
+			EXPECT_EQ( " [ergs/century]", unitStringFromDDitem( 8 ) );
+
+			EXPECT_EQ( " [swamps/county]", unitStringFromDDitem( 9 ) );
+
+
+		}
+
+
 	}
 
 }
