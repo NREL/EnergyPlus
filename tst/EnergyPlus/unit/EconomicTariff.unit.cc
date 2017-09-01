@@ -264,8 +264,12 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
 	EXPECT_EQ( 1, numTariff );
 	EXPECT_EQ( "EXAMPLEWATERTARIFF", tariff( 1 ).tariffName );
 
-	// Check that it correctly defaults the conversion factor
+	// Check that it correctly assesses the meter type
 	EXPECT_EQ( kindMeterWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_EQ( kindMeterNotElectric, tariff( 1 ).kindElectricMtr);
+	EXPECT_EQ( kindMeterNotGas, tariff( 1 ).kindGasMtr);
+
+	// Check that if defaults the conversion choice correctly
 	EXPECT_EQ( conversionM3, tariff( 1 ).convChoice );
 	EXPECT_EQ( 1, tariff( 1 ).energyConv );
 	EXPECT_EQ( 1, tariff( 1 ).demandConv );
@@ -287,14 +291,6 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 		"    ,                        !- Month Schedule Name                         ",
 		"    ,                        !- Demand Window Length                        ",
 		"    10;                      !- Monthly Charge or Variable Name             ",
-		"                                                                            ",
-		"  UtilityCost:Charge:Simple,                                                ",
-		"    FlatWaterChargePerm3,    !- Name                                        ",
-		"    ExampleWaterTariff,      !- Tariff Name                                 ",
-		"    totalEnergy,             !- Source Variable                             ",
-		"    Annual,                  !- Season                                      ",
-		"    EnergyCharges,           !- Category Variable Name                      ",
-		"    3.3076;                  !- Cost per Unit Value or Variable Name        ",
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -309,10 +305,13 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 
 	// tariff
 	EXPECT_EQ( 1, numTariff );
-	EXPECT_EQ( "EXAMPLEWATERTARIFF", tariff( 1 ).tariffName );
 
-	// Check that it correctly defaults the conversion factor
+	// Check that it correctly assesses the meter type (water)
 	EXPECT_EQ( kindMeterWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_EQ( kindMeterNotElectric, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterNotGas, tariff( 1 ).kindGasMtr );
+
+	// Check conversion choice
 	EXPECT_EQ( conversionCCF, tariff( 1 ).convChoice );
 	ASSERT_FLOAT_EQ( 0.35314666721488586, tariff( 1 ).energyConv );
 }
@@ -322,7 +321,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 {
 	std::string const idf_objects = delimited_string( {
 		"  UtilityCost:Tariff,                                                       ",
-		"    ExampleWaterTariff,      !- Name                                        ",
+		"    ExampleTariff,           !- Name                                        ",
 		"    Gas:Facility,            !- Output Meter Name                           ",
 		"    CCF,                     !- Conversion Factor Choice                    ",
 		"    ,                        !- Energy Conversion Factor                    ",
@@ -332,14 +331,6 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 		"    ,                        !- Month Schedule Name                         ",
 		"    ,                        !- Demand Window Length                        ",
 		"    10;                      !- Monthly Charge or Variable Name             ",
-		"                                                                            ",
-		"  UtilityCost:Charge:Simple,                                                ",
-		"    FlatWaterChargePerm3,    !- Name                                        ",
-		"    ExampleWaterTariff,      !- Tariff Name                                 ",
-		"    totalEnergy,             !- Source Variable                             ",
-		"    Annual,                  !- Season                                      ",
-		"    EnergyCharges,           !- Category Variable Name                      ",
-		"    3.3076;                  !- Cost per Unit Value or Variable Name        ",
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -354,6 +345,14 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 
 	// tariff
 	EXPECT_EQ( 1, numTariff );
+
+	// Check that it correctly assesses the meter type (gas)
+	EXPECT_EQ( kindMeterNotWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_EQ( kindMeterNotElectric, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterGas, tariff( 1 ).kindGasMtr );
+
+	// Check conversion choice
+
 	EXPECT_EQ( conversionCCF, tariff( 1 ).convChoice );
 	ASSERT_FLOAT_EQ( 9.4781712e-9, tariff( 1 ).energyConv );
 }
@@ -364,7 +363,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 {
 	std::string const idf_objects = delimited_string( {
 		"  UtilityCost:Tariff,                                                       ",
-		"    ExampleWaterTariff,      !- Name                                        ",
+		"    ExampleTariff,           !- Name                                        ",
 		"    Electricity:Facility,    !- Output Meter Name                           ",
 		"    CCF,                     !- Conversion Factor Choice                    ",
 		"    ,                        !- Energy Conversion Factor                    ",
@@ -374,14 +373,6 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 		"    ,                        !- Month Schedule Name                         ",
 		"    ,                        !- Demand Window Length                        ",
 		"    10;                      !- Monthly Charge or Variable Name             ",
-		"                                                                            ",
-		"  UtilityCost:Charge:Simple,                                                ",
-		"    FlatWaterChargePerm3,    !- Name                                        ",
-		"    ExampleWaterTariff,      !- Tariff Name                                 ",
-		"    totalEnergy,             !- Source Variable                             ",
-		"    Annual,                  !- Season                                      ",
-		"    EnergyCharges,           !- Category Variable Name                      ",
-		"    3.3076;                  !- Cost per Unit Value or Variable Name        ",
 	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -396,6 +387,14 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 
 	// tariff
 	EXPECT_EQ( 1, numTariff );
+
+	// Check that it correctly assesses the meter type (electricity, and electric simple in particular)
+	EXPECT_EQ( kindMeterNotWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_NE( kindMeterNotElectric, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterElecSimple, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterNotGas, tariff( 1 ).kindGasMtr );
+
+	// Check conversion choice, should force back to kWh
 	EXPECT_EQ( conversionKWH, tariff( 1 ).convChoice );
 	ASSERT_FLOAT_EQ( 0.0000002778, tariff( 1 ).energyConv );
 	ASSERT_FLOAT_EQ( 0.001, tariff( 1 ).demandConv );
