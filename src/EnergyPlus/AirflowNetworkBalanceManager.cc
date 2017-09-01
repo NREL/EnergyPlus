@@ -946,6 +946,8 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		SetOutAirNodes();
+
 		if ( SameString( AirflowNetworkSimu.WPCCntr, "Input" ) ) {
 			AirflowNetworkSimu.iWPCCntr = iWPCCntr_Input;
 			if ( lAlphaBlanks( 4 ) ) {
@@ -980,6 +982,17 @@ namespace AirflowNetworkBalanceManager {
 				ErrorsFound = true;
 				SimObjectError = true;
 			}
+			for ( k = 1; k <= NumOfNodes; ++k ) {
+				if ( Node( k ).IsLocalNode ) {
+					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + "=" + Alphas( 3 ) );
+					ShowContinueError( "A local air node is defined to input the wind pressure coefficient curve, while Wind Pressure Coefficient Type = SurfaceAverageCalculation. ");
+					ShowContinueError( "It requires tha Wind Pressure Coefficient Type = Input to use the local air node. ");
+					ErrorsFound = true;
+					SimObjectError = true;
+					break;
+				}
+			}
+
 		} else {
 			ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 3 ) + " = " + AirflowNetworkSimu.WPCCntr + " is not valid." );
 			ShowContinueError( "Valid choices are Input or SurfaceAverageCalculation. " + CurrentModuleObject + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
@@ -1221,7 +1234,6 @@ namespace AirflowNetworkBalanceManager {
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
 			// Wind coefficient == Surface-Average does not need inputs of external nodes
 			AirflowNetworkNumOfExtNode = GetNumObjectsFound( "AirflowNetwork:MultiZone:ExternalNode" );
-			SetOutAirNodes();
 			if ( AnyLocalEnvironmentsInModel ) {
 				AirflowNetworkNumOfOutAirNode = GetNumObjectsFound( "OutdoorAir:Node" );
 				AirflowNetworkNumOfExtNode += AirflowNetworkNumOfOutAirNode;
