@@ -4101,6 +4101,7 @@ namespace OutputProcessor {
 		std::string const & variableName, // The variable's actual name
 		int const indexType,
 		OutputProcessor::Unit const & unitsForVar, // The variables units
+		Optional_string_const customUnitName, 
 		Optional_string_const ScheduleName
 	)
 	{
@@ -4145,7 +4146,12 @@ namespace OutputProcessor {
 			FreqString += "," + ScheduleName;
 		}
 
-		std::string UnitsString = unitEnumToString( unitsForVar );
+		std::string UnitsString;
+		if ( unitsForVar == OutputProcessor::Unit::customEMS && present( customUnitName )) {
+			UnitsString = customUnitName;
+		} else {
+			UnitsString = unitEnumToString( unitsForVar );
+		}
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) ) {
 			if ( eso_stream ) *eso_stream << reportIDChr << ",1," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
 		} else if ( reportingInterval == ReportHourly ) {
@@ -5041,20 +5047,38 @@ namespace OutputProcessor {
 
 	}
 
+	// returns the string corresponding to the OutputProcessor::Unit enum in brackets
 	std::string
 	unitEnumToStringBrackets(
 		Unit const & unitIn
 	)
 	{
+		// J.Glazer - August/September 2017
 		return " [" + unitEnumToString(unitIn) + "]";
 	}
 
+	// returns the unit string for a DDVariableTypes item and custom string when customEMS is used
+	std::string
+	unitStringFromDDitem(
+		int const ddItemPtr //index provided for DDVariableTypes
+	)
+	{
+		// J.Glazer - August/September 2017
+		OutputProcessor::Unit ddUnit = DDVariableTypes(ddItemPtr).units;
+		if ( ddUnit != OutputProcessor::Unit::customEMS ) {
+			return unitEnumToStringBrackets( ddUnit );
+		} else {
+			return " [" + DDVariableTypes(ddItemPtr).unitNameCustomEMS + "]";
+		}
+	}
 
+	// returns the string corresponding to the OutputProcessor::Unit enum
 	std::string
 		unitEnumToString(
 			Unit const & unitIn
 		)
 	{
+		// J.Glazer - August/September 2017
 		switch ( unitIn ) {
 			case OutputProcessor::Unit::J:
 				return "J";
@@ -5212,11 +5236,13 @@ namespace OutputProcessor {
 		}
 	}
 
+	// returns the OutputProcessor::Unit enum value when a string containing the units is provided without brackets
 	OutputProcessor::Unit
 	unitStringToEnum(
 		std::string const & unitIn
 	)
 	{
+		// J.Glazer - August/September 2017
 		std::string unitUpper = InputProcessor::MakeUPPERCase(unitIn);
 		if ( unitUpper == "J" ) {
 			return OutputProcessor::Unit::J;
@@ -5391,7 +5417,8 @@ SetupOutputVariable(
 	Optional_string_const ZoneKey, // Meter Zone Key (zone name)
 	Optional_int_const ZoneMult, // Zone Multiplier, defaults to 1
 	Optional_int_const ZoneListMult, // Zone List Multiplier, defaults to 1
-	Optional_int_const indexGroupKey // Group identifier for SQL output
+	Optional_int_const indexGroupKey, // Group identifier for SQL output
+	Optional_string_const customUnitName // the custom name for the units from EMS definition of units
 )
 {
 
@@ -5551,7 +5578,11 @@ SetupOutputVariable(
 		IndexType = ValidateIndexType( IndexTypeKey, "SetupOutputVariable" );
 		VariableType = ValidateVariableType( VariableTypeKey );
 
-		AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Real, VariableUnit );
+		if ( present( customUnitName ) ) {
+			AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Real, VariableUnit, customUnitName );
+		} else {
+			AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Real, VariableUnit );
+		}
 		++NumTotalRVariable;
 
 		if ( ! OnMeter && ! ThisOneOnTheList ) continue;
@@ -5575,6 +5606,9 @@ SetupOutputVariable(
 		RVariableTypes( CV ).VarNameUC = MakeUPPERCase( RVariableTypes( CV ).VarName );
 		RVariableTypes( CV ).KeyNameOnlyUC = MakeUPPERCase( KeyedValue );
 		RVariableTypes( CV ).units = VariableUnit;
+		if ( VariableUnit == OutputProcessor::Unit::customEMS ) {
+			RVariableTypes( CV ).unitNameCustomEMS = customUnitName;
+		}
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
@@ -5645,9 +5679,9 @@ SetupOutputVariable(
 			}
 
 			if ( RVariable().SchedPtr != 0 ) {
-				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).units, ReqRepVars( ReportList( Loop ) ).SchedName );
+				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).units, RVariableTypes( CV ).unitNameCustomEMS, ReqRepVars( ReportList( Loop ) ).SchedName );
 			} else {
-				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).units );
+				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).units, RVariableTypes( CV ).unitNameCustomEMS );
 			}
 		}
 	}
@@ -8391,7 +8425,7 @@ ProduceRDDMDD()
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
 //ou				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitEnumToStringBrackets( DDVariableTypes( ItemPtr ).units ) << '\n';
+				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitStringFromDDitem( ItemPtr ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8400,7 +8434,7 @@ ProduceRDDMDD()
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
 //ou					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitEnumToStringBrackets( DDVariableTypes( ItemPtr ).units ) << '\n';
+					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitStringFromDDitem( ItemPtr ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
@@ -8408,7 +8442,7 @@ ProduceRDDMDD()
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
 //ou				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitEnumToStringBrackets( DDVariableTypes( ItemPtr ).units ) << '\n';
+				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitStringFromDDitem( ItemPtr ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8417,7 +8451,7 @@ ProduceRDDMDD()
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
 //ou					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
-					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitEnumToString( DDVariableTypes( ItemPtr ).units ) << '\n';
+					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitStringFromDDitem( ItemPtr ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
@@ -8459,7 +8493,8 @@ AddToOutputVariableList(
 	int const IndexType,
 	int const StateType,
 	int const VariableType,
-	OutputProcessor::Unit const unitsForVar
+	OutputProcessor::Unit const unitsForVar,
+	Optional_string_const customUnitName // the custom name for the units from EMS definition of units
 )
 {
 
@@ -8514,6 +8549,9 @@ AddToOutputVariableList(
 		DDVariableTypes( NumVariablesForOutput ).VariableType = VariableType;
 		DDVariableTypes( NumVariablesForOutput ).VarNameOnly = VarName;
 		DDVariableTypes( NumVariablesForOutput ).units = unitsForVar;
+		if ( present( customUnitName ) && unitsForVar == OutputProcessor::Unit::customEMS ) {
+			DDVariableTypes( NumVariablesForOutput ).unitNameCustomEMS = customUnitName;
+		}
 	} else if ( unitsForVar != DDVariableTypes( dup ).units ) { // not the same as first units
 		int dup2 = 0;// for duplicate variable name
 		while ( DDVariableTypes( dup ).Next != 0 ) {
@@ -8534,6 +8572,9 @@ AddToOutputVariableList(
 			DDVariableTypes( NumVariablesForOutput ).VariableType = VariableType;
 			DDVariableTypes( NumVariablesForOutput ).VarNameOnly = VarName;
 			DDVariableTypes( NumVariablesForOutput ).units = unitsForVar;
+			if ( present( customUnitName ) && unitsForVar == OutputProcessor::Unit::customEMS ) {
+				DDVariableTypes( NumVariablesForOutput ).unitNameCustomEMS = customUnitName;
+			}
 			DDVariableTypes( dup ).Next = NumVariablesForOutput;
 		}
 	}

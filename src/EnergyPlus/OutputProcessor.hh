@@ -241,7 +241,8 @@ namespace OutputProcessor {
 		clo,
 		W_K,
 		kgWater_s,
-		unknown
+		unknown,
+		customEMS
 	};
 
 	struct TimeSteps
@@ -368,6 +369,7 @@ namespace OutputProcessor {
 		bool ReportedOnDDFile; // true after written to .rdd/.mdd file
 		std::string VarNameOnly; // Name of Variable
 		OutputProcessor::Unit units; // Units for Variable
+		std::string unitNameCustomEMS; //name of units when customEMS is used for EMS variables that are unusual
 
 		// Default Constructor
 		VariableTypeForDDOutput() :
@@ -393,6 +395,7 @@ namespace OutputProcessor {
 		std::string VarNameOnlyUC; // Name of Variable with out key in uppercase
 		std::string KeyNameOnlyUC; // Name of key only witht out variable in uppercase
 		OutputProcessor::Unit units; // Units for Variable
+		std::string unitNameCustomEMS; //name of units when customEMS is used for EMS variables that are unusual
 		Reference< RealVariables > VarPtr; // Pointer used to real Variables structure
 
 		// Default Constructor
@@ -922,6 +925,7 @@ namespace OutputProcessor {
 		std::string const & variableName, // The variable's actual name
 		int const indexType,
 		OutputProcessor::Unit const & unitsForVar, // The variables units
+		Optional_string_const customUnitName = _,
 		Optional_string_const ScheduleName = _
 	);
 
@@ -1048,6 +1052,11 @@ namespace OutputProcessor {
 		std::string const & unitIn
 	);
 
+	std::string
+	unitStringFromDDitem(
+		int const ddItemPtr //index provided for DDVariableTypes
+	);
+
 } // OutputProcessor
 
 //==============================================================================================
@@ -1076,7 +1085,8 @@ SetupOutputVariable(
 	Optional_string_const ZoneKey = _, // Meter Zone Key (zone name)
 	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
 	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
-	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
+	Optional_int_const indexGroupKey = _, // Group identifier for SQL output
+	Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
 
 
@@ -1216,7 +1226,8 @@ AddToOutputVariableList(
 	int const IndexType,
 	int const StateType,
 	int const VariableType,
-	OutputProcessor::Unit const unitsForVar
+	OutputProcessor::Unit const unitsForVar,
+	Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
 
 

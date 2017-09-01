@@ -3253,7 +3253,11 @@ namespace RuntimeLanguageProcessor {
 						ErrorsFound = true;
 					}}
 
-					SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					if ( curUnit != OutputProcessor::Unit::unknown ) {
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					} else {
+						SetupOutputVariable( cAlphaArgs( 1 ), OutputProcessor::Unit::customEMS, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _ , _ , _ , _ , _ , _ , _ , _ , _ , UnitsB );
+					}
 					// Last field is index key, no indexing here so mimic weather output data
 
 				} // RuntimeReportVarNum
