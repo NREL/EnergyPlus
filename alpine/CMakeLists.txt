@@ -85,8 +85,8 @@ include_directories(${LLVM_INCLUDE_DIRS})
 include_directories(${CLANG_INCLUDE_DIRS})
 include_directories("${JMODELICA_ROOT_DIR}/include/RuntimeLibrary")
 
-add_executable(alpine 
-  main.cpp 
+add_library(alpine 
+  #main.cpp 
   cc.hpp
   cc.cpp
   EModelica.hpp

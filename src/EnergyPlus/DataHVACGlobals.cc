@@ -74,6 +74,8 @@ namespace DataHVACGlobals {
 
 	// MODULE PARAMETER DEFINITIONS:
 
+  EModelica EMO;
+
 	Real64 const SmallTempDiff( 1.0E-5 );
 	Real64 const SmallMassFlow( 0.001 );
 	Real64 const VerySmallMassFlow( 1.0E-30 );

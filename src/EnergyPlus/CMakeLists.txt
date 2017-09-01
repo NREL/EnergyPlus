@@ -2,6 +2,10 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # public API headers go in the src/EnergyPlus/public folder
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
+INCLUDE_DIRECTORIES("${JMODELICA_ROOT_DIR}/include/RuntimeLibrary")
+INCLUDE_DIRECTORIES(third-party/FMUParser/)
+INCLUDE_DIRECTORIES("${JAVA_INCLUDE_PATH}")
+INCLUDE_DIRECTORIES("${JAVA_INCLUDE_PATH2}")
 
 # Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
 if(NOT PROFILE_USE)
@@ -582,7 +586,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva)
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva alpine)
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )

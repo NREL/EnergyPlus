@@ -202,6 +202,8 @@ namespace DataGlobals {
 	extern bool CreateMinimalSurfaceVariables; // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	extern Real64 CurrentTime; // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	extern int SimTimeSteps; // Number of (Loads) timesteps since beginning of run period (environment).
+	extern Real64 SimTime; // Seconds since beginning of run period (environment).
+	extern Real64 PreSimTime; // Seconds since beginning of run period (environment), at the previous timestep.
 	extern int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
 	extern Real64 TimeStepZoneSec; // Seconds per time step
 	extern bool MetersHaveBeenInitialized;

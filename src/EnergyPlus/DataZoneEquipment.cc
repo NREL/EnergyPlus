@@ -396,542 +396,566 @@ namespace DataZoneEquipment {
 		}
 
 		ZoneEquipConfig.allocate( NumOfZones ); // Allocate the array containing the configuration
+    
+    // Begin special hot wire for modelica connection
+
+		for ( int ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) {
+      std::cout << "Adding defalt modelica nodes: " << ZoneLoop << std::endl;
+		  Zone( ZoneLoop ).IsControlled = true;
+		  ZoneEquipConfig( ZoneLoop ).IsControlled = true;
+		  ZoneEquipConfig( ZoneLoop ).ActualZoneNum = ZoneLoop;
+		  ZoneEquipConfig( ZoneLoop ).ZoneName = Zone( ZoneLoop ).Name; // for x-referencing with the geometry data
+
+			CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
+      auto ZoneNodeName = Zone( ZoneLoop ).Name + " Air Node";
+      auto ReturnNodeName = Zone( ZoneLoop ).Name + " Return Air Node";
+      auto InletNodeName = Zone( ZoneLoop ).Name + " Inlet Air Node";
+			ZoneEquipConfig( ZoneLoop ).ZoneNode = GetOnlySingleNode( ZoneNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
+			ZoneEquipConfig( ZoneLoop ).ReturnAirNode = GetOnlySingleNode( ReturnNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
+		  Zone( ZoneLoop ).SystemZoneNodeNumber = ZoneEquipConfig( ZoneLoop ).ZoneNode;
+
+      auto InletNode = GetOnlySingleNode( InletNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+		  ZoneEquipConfig( ZoneLoop ).NumInletNodes = 1;
+		  ZoneEquipConfig( ZoneLoop ).InletNode.allocate( 1 );
+		  ZoneEquipConfig( ZoneLoop ).InletNode( 1 ) = InletNode;
+    }
+
 		// data for each zone to the number of controlled zones
 		// found in the input file.  This may or may not
 		// be the same as the number of zones in the building
-		ZoneEquipList.allocate( NumOfZones );
-		ZoneEquipAvail.dimension( NumOfZones, NoAction );
-
-		if ( NumOfZoneEquipLists != NumOfControlledZones ) {
-			ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );
-			ShowContinueError( "..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList" );
-			ShowFatalError( "GetZoneEquipment: Incorrect number of zone equipment lists" );
-		}
-
-		if ( NumOfControlledZones > NumOfZones ) {
-			ShowSevereError( RoutineName + "Number of Controlled Zone objects [" + TrimSigDigits( NumOfControlledZones ) + "] greater than Number of Zones [" + TrimSigDigits( NumOfZones ) + ']' );
-			ShowFatalError( RoutineName + "Too many ZoneHVAC:EquipmentConnections objects." );
-		}
-
-		InitUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
-
-		overallEquipCount = 0;
-
-		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop ) {
-
-			CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
-
-			GetObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
-
-			ControlledZoneNum = FindItemInList( AlphArray( 1 ), Zone );
-
-			if ( ControlledZoneNum == 0 ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\"" );
-				ShowContinueError( "..Requested Controlled Zone not among Zones, remaining items for this object not processed." );
-				GetZoneEquipmentDataErrorsFound = true;
-				continue;
-			} else {
-				//    Zone(ZoneEquipConfig(ControlledZoneNum)%ActualZoneNum)%ZoneEquipConfigNum = ControlledZoneNum
-				if ( Zone( ControlledZoneNum ).IsControlled ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\"" );
-					ShowContinueError( "..Duplicate Controlled Zone entered, only one " + CurrentModuleObject + " per zone is allowed." );
-					GetZoneEquipmentDataErrorsFound = true;
-					continue;
-				}
-				Zone( ControlledZoneNum ).IsControlled = true;
-				ZoneEquipConfig( ControlledZoneNum ).IsControlled = true;
-				ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum = ControlledZoneNum;
-			}
-			ZoneEquipConfig( ControlledZoneNum ).ZoneName = AlphArray( 1 ); // for x-referencing with the geometry data
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::EquipListName, ControlledZoneLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + cAlphaFields( 2 ) );
-			if ( IsNotOK ) {
-				ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 2 ) = "xxxxx";
-			}
-			ZoneEquipConfig( ControlledZoneNum ).EquipListName = AlphArray( 2 ); // the name of the list containing all the zone eq.
-			InletNodeListName = AlphArray( 3 );
-			ExhaustNodeListName = AlphArray( 4 );
-			ZoneEquipConfig( ControlledZoneNum ).ZoneNode = GetOnlySingleNode( AlphArray( 5 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
-			if ( ZoneEquipConfig( ControlledZoneNum ).ZoneNode == 0 ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\", invalid" );
-				ShowContinueError( cAlphaFields( 5 ) + " must be present." );
-				GetZoneEquipmentDataErrorsFound = true;
-			} else {
-				UniqueNodeError = false;
-				CheckUniqueNodes( cAlphaFields( 5 ), "NodeName", UniqueNodeError, AlphArray( 5 ), _, AlphArray( 1 ) );
-				if ( UniqueNodeError ) {
-					//ShowContinueError( "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-			}
-			// assigned to this node
-			if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum > 0 ) {
-				Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
-			} // This error already detected and program will be terminated.
-
-			ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = GetOnlySingleNode( AlphArray( 6 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneReturn, 1, ObjectIsNotParent ); // all return air state variables are
-			// assigned to this node
-			if ( ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode != 0 ) {
-				UniqueNodeError = false;
-				CheckUniqueNodes( cAlphaFields( 6 ), "NodeName", UniqueNodeError, AlphArray( 6 ), _, AlphArray( 1 ) );
-				if ( UniqueNodeError ) {
-					//ShowContinueError( "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-			}
-			if ( lAlphaBlanks( 7 ) ) {
-				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
-			} else {
-				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = GetScheduleIndex( AlphArray( 7 ) );
-				if ( ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum == 0 ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields( 7 ) + " entered =" + AlphArray( 7 ) + " for " + cAlphaFields( 1 ) + '=' + AlphArray( 1 ) );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-			}
-			ReturnFlowBasisNodeListName = AlphArray( 8 );
-
-			// Read in the equipment type, name and sequence information
-			// for each equipment list
-
-			CurrentModuleObject = "ZoneHVAC:EquipmentList";
-
-			ZoneEquipListNum = GetObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
-			if ( ZoneEquipListNum > 0 ) {
-
-				GetObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), ZoneEquipList, ControlledZoneNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowContinueError( "Bad Zone Equipment name in " + CurrentModuleObject + "=\"" + ZoneEquipConfig( ControlledZoneNum ).EquipListName + "\"" );
-					ShowContinueError( "For Zone=\"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\"." );
-					GetZoneEquipmentDataErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
-				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
-
-				maxEquipCount = 0;
-				numEquipCount = ( NumAlphas - 1 ) / 2;
-				if ( numEquipCount * 2 != ( NumAlphas - 1 ) ) ++numEquipCount;
-				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= numEquipCount; ++ZoneEquipTypeNum ) {
-					if ( ! lAlphaBlanks( 2 * ZoneEquipTypeNum ) && ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 1 ) ) {
-						++maxEquipCount;
-						continue;
-					}
-					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneEquipList( ControlledZoneNum ).Name + "\", truncated list at blank field; object count=" + RoundSigDigits( maxEquipCount ) );
-					break;
-				}
-
-				overallEquipCount += maxEquipCount;
-				ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes = maxEquipCount;
-				ZoneEquipList( ControlledZoneNum ).EquipType.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).EquipType_Num.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).EquipName.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).EquipIndex.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).EquipData.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).CoolingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).HeatingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
-				ZoneEquipList( ControlledZoneNum ).EquipType = "";
-				ZoneEquipList( ControlledZoneNum ).EquipType_Num = 0;
-				ZoneEquipList( ControlledZoneNum ).EquipName = "";
-				ZoneEquipList( ControlledZoneNum ).EquipIndex = 0;
-				ZoneEquipList( ControlledZoneNum ).CoolingPriority = 0;
-				ZoneEquipList( ControlledZoneNum ).HeatingPriority = 0;
-
-				IdealLoadsOnEquipmentList = false;
-
-				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
-					ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum );
-					ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 1 );
-					ValidateComponent( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ), ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ), IsNotOK, CurrentModuleObject );
-					if ( IsNotOK ) {
-						ShowContinueError( "In " + CurrentModuleObject + '=' + ZoneEquipList( ControlledZoneNum ).Name );
-						GetZoneEquipmentDataErrorsFound = true;
-					}
-					ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) = nint( NumArray( 2 * ZoneEquipTypeNum - 1 ) );
-					if ( ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) <= 0 ) || ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
-						ShowContinueError( "invalid " + cNumericFields( 2 * ZoneEquipTypeNum - 1 ) + "=[" + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) ) + "]." );
-						ShowContinueError( "equipment sequence must be > 0 and <= number of equipments in the list." );
-						if ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > 0 ) ShowContinueError( "only " + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) + " in the list." );
-						GetZoneEquipmentDataErrorsFound = true;
-					}
-
-					ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) = nint( NumArray( 2 * ZoneEquipTypeNum ) );
-					if ( ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) <= 0 ) || ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
-						ShowContinueError( "invalid " + cNumericFields( 2 * ZoneEquipTypeNum ) + "=[" + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) ) + "]." );
-						ShowContinueError( "equipment sequence must be > 0 and <= number of equipments in the list." );
-						if ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > 0 ) ShowContinueError( "only " + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) + " in the list." );
-						GetZoneEquipmentDataErrorsFound = true;
-					}
-
-					{ auto const SELECT_CASE_var( MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
-
-					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
-
-					} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = DirectAir_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER" ) { // Window Air Conditioner
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = WindowAC_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP" ) { // Packaged Terminal Heat Pump
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PkgTermHPAirToAir_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER" ) { // Packaged Terminal Air Conditioner
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PkgTermACAirToAir_Num;
-
-					} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" ) { // Unitary System
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneUnitarySystem_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX" ) { // Zone dehumidifier
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneDXDehumidifier_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP" ) { // Zone Water to Air Heat Pump
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PkgTermHPWaterToAir_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:FOURPIPEFANCOIL" ) { // 4-Pipe Fan Coil
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = FanCoil4Pipe_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:UNITVENTILATOR" ) { // Unit Ventilator
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = UnitVentilator_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:UNITHEATER" ) { // Unit Heater
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = UnitHeater_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PurchasedAir_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER" ) { // Hot Water Baseboard
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBWater_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER" ) { // Baseboard
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBWaterConvective_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC" ) { // Electric Baseboard
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBElectricConvective_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" ) { // Simple Cooling Panel
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = CoolingPanel_Num;
-					
-					} else if ( SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT" ) { // High Temperature Radiators
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HiTempRadiant_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW" ) { // Low temperature radiant system (hydronic)
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = LoTempRadiant_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ) { // Low temperature radiant system (hydronic, constant flow)
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = LoTempRadiant_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC" ) { // Low temperature radiant system (electric)
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = LoTempRadiant_Num;
-
-					} else if ( SELECT_CASE_var == "FAN:ZONEEXHAUST" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneExhaustFan_Num;
-
-					} else if ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HeatXchngr_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:ENERGYRECOVERYVENTILATOR" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ERVStandAlone_Num;
-
-					} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP:PUMPEDCONDENSER" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HPWaterHeater_Num;
-
-					} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HPWaterHeater_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:VENTILATEDSLAB" ) { // Ventilated Slab
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = VentilatedSlab_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM" ) { // Steam Baseboard
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBSteam_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:OUTDOORAIRUNIT" ) { // Outdoor Air Unit
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = OutdoorAirUnit_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC" ) { // Radiant electric Baseboard
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBElectric_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW" ) { // VRF AC System
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = VRFTerminalUnit_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:REFRIGERATIONCHILLERSET" ) { // Refrigeration chiller designed for warehouse applications
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = RefrigerationAirChillerSet_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:FORCEDAIR:USERDEFINED" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = UserDefinedZoneHVACForcedAir_Num;
-
-					} else if ( SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT" ) {
-						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneEvaporativeCoolerUnit_Num;
-					} else {
-						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
-						ShowContinueError( "..Invalid Equipment Type = " + ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) );
-						GetZoneEquipmentDataErrorsFound = true;
-
-					}}
-				}
-				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
-					if ( count_eq( ZoneEquipList( ControlledZoneNum ).CoolingPriority, ZoneEquipTypeNum ) > 1 ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
-						ShowContinueError( "...multiple assignments for Zone Equipment Cooling Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", must be 1-1 correspondence between sequence assignments and number of equipments." );
-						GetZoneEquipmentDataErrorsFound = true;
-					} else if ( count_eq( ZoneEquipList( ControlledZoneNum ).CoolingPriority, ZoneEquipTypeNum ) == 0 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
-						ShowContinueError( "...zero assignments for Zone Equipment Cooling Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", apparent gap in sequence assignments in this equipment list." );
-					}
-					if ( count_eq( ZoneEquipList( ControlledZoneNum ).HeatingPriority, ZoneEquipTypeNum ) > 1 ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
-						ShowContinueError( "...multiple assignments for Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", must be 1-1 correspondence between sequence assignments and number of equipments." );
-						GetZoneEquipmentDataErrorsFound = true;
-					} else if ( count_eq( ZoneEquipList( ControlledZoneNum ).HeatingPriority, ZoneEquipTypeNum ) == 0 ) {
-						ShowWarningError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
-						ShowContinueError( "...zero assignments for Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", apparent gap in sequence assignments in this equipment list." );
-					}
-				}
-
-			} else {
-				ShowSevereError( RoutineName + CurrentModuleObject + " not found = " + ZoneEquipConfig( ControlledZoneNum ).EquipListName );
-				ShowContinueError( "In ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-				GetZoneEquipmentDataErrorsFound = true;
-			}
-
-			// End ZoneHVAC:EquipmentList
-
-			NodeListError = false;
-			GetNodeNums( InletNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_ZoneInlet, 1, ObjectIsNotParent );
-
-			if ( ! NodeListError ) {
-				ZoneEquipConfig( ControlledZoneNum ).NumInletNodes = NumNodes;
-
-				ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
-				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
-				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
-
-				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
-					ZoneEquipConfig( ControlledZoneNum ).InletNode( NodeNum ) = NodeNums( NodeNum );
-					UniqueNodeError = false;
-					CheckUniqueNodes( "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-					if ( UniqueNodeError ) {
-						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
-						GetZoneEquipmentDataErrorsFound = true;
-					}
-					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
-					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
-					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
-					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).OutNode = 0;
-				}
-			} else {
-				ShowContinueError( "Invalid inlet node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-				GetZoneEquipmentDataErrorsFound = true;
-			}
-
-			NodeListError = false;
-			GetNodeNums( ExhaustNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_ZoneExhaust, 1, ObjectIsNotParent );
-
-			if ( ! NodeListError ) {
-				ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes = NumNodes;
-
-				ZoneEquipConfig( ControlledZoneNum ).ExhaustNode.allocate( NumNodes );
-
-				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
-					ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( NodeNum ) = NodeNums( NodeNum );
-					UniqueNodeError = false;
-					CheckUniqueNodes( "Zone Air Exhaust Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-					if ( UniqueNodeError ) {
-						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
-						GetZoneEquipmentDataErrorsFound = true;
-					}
-				}
-			} else {
-				ShowContinueError( "Invalid exhaust node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-				GetZoneEquipmentDataErrorsFound = true;
-			}
-
-			NodeListError = false;
-			GetNodeNums( ReturnFlowBasisNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
-
-			if ( !NodeListError ) {
-				ZoneEquipConfig( ControlledZoneNum ).NumReturnFlowBasisNodes = NumNodes;
-
-				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode.allocate( NumNodes );
-
-				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
-					ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode( NodeNum ) = NodeNums( NodeNum );
-				}
-			} else {
-				ShowContinueError( "Invalid return air flow rate basis node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-				GetZoneEquipmentDataErrorsFound = true;
-			}
-
-		} // end loop over controlled zones
-
-		if ( GetZoneEquipmentDataErrorsFound ) {
-			ShowWarningError( RoutineName + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors." );
-			overallEquipCount = 0;
-		}
-		if ( overallEquipCount > 0 ) {
-			ZoneEquipListAcct.allocate( overallEquipCount );
-			overallEquipCount = 0;
-			for ( Loop1 = 1; Loop1 <= NumOfControlledZones; ++Loop1 ) {
-				for ( Loop2 = 1; Loop2 <= ZoneEquipList( Loop1 ).NumOfEquipTypes; ++Loop2 ) {
-					++overallEquipCount;
-					ZoneEquipListAcct( overallEquipCount ).ObjectType = ZoneEquipList( Loop1 ).EquipType( Loop2 );
-					ZoneEquipListAcct( overallEquipCount ).ObjectName = ZoneEquipList( Loop1 ).EquipName( Loop2 );
-					ZoneEquipListAcct( overallEquipCount ).OnListNum = Loop1;
-				}
-			}
-			// Now check for uniqueness
-			for ( Loop1 = 1; Loop1 <= overallEquipCount; ++Loop1 ) {
-				for ( Loop2 = Loop1 + 1; Loop2 <= overallEquipCount; ++Loop2 ) {
-					if ( ZoneEquipListAcct( Loop1 ).ObjectType != ZoneEquipListAcct( Loop2 ).ObjectType || ZoneEquipListAcct( Loop1 ).ObjectName != ZoneEquipListAcct( Loop2 ).ObjectName ) continue;
-					// Duplicated -- not allowed
-					ShowSevereError( RoutineName + CurrentModuleObject + ", duplicate items in ZoneHVAC:EquipmentList." );
-					ShowContinueError( "Equipment: Type=" + ZoneEquipListAcct( Loop1 ).ObjectType + ", Name=" + ZoneEquipListAcct( Loop1 ).ObjectName );
-					ShowContinueError( "Found on List=\"" + ZoneEquipList( ZoneEquipListAcct( Loop1 ).OnListNum ).Name + "\"." );
-					ShowContinueError( "Equipment Duplicated on List=\"" + ZoneEquipList( ZoneEquipListAcct( Loop2 ).OnListNum ).Name + "\"." );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-			}
-			ZoneEquipListAcct.deallocate();
-		}
-
-		//map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
-
-		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfZones; ++ControlledZoneLoop ) {
-			GetZoneEquipmentDataFound = FindItemInList( ZoneEquipList( ControlledZoneLoop ).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName );
-			if ( GetZoneEquipmentDataFound > 0 ) ZoneEquipConfig( GetZoneEquipmentDataFound ).EquipListIndex = ControlledZoneLoop;
-		} // end loop over controlled zones
-
-		EndUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
-
-		CurrentModuleObject = "AirLoopHVAC:SupplyPath";
-		for ( PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum ) {
-
-			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SupplyAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			SupplyAirPath( PathNum ).Name = AlphArray( 1 );
-			SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
-
-			SupplyAirPath( PathNum ).InletNodeNum = GetOnlySingleNode( AlphArray( 2 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-
-			SupplyAirPath( PathNum ).ComponentType.allocate( SupplyAirPath( PathNum ).NumOfComponents );
-			SupplyAirPath( PathNum ).ComponentType_Num.allocate( SupplyAirPath( PathNum ).NumOfComponents );
-			SupplyAirPath( PathNum ).ComponentType_Num = 0;
-			SupplyAirPath( PathNum ).ComponentName.allocate( SupplyAirPath( PathNum ).NumOfComponents );
-			SupplyAirPath( PathNum ).ComponentIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
-			SupplyAirPath( PathNum ).SplitterIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
-			SupplyAirPath( PathNum ).PlenumIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
-
-			Counter = 3;
-
-			for ( CompNum = 1; CompNum <= SupplyAirPath( PathNum ).NumOfComponents; ++CompNum ) {
-
-				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) ) {
-
-					SupplyAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
-					SupplyAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
-					ValidateComponent( SupplyAirPath( PathNum ).ComponentType( CompNum ), SupplyAirPath( PathNum ).ComponentName( CompNum ), IsNotOK, CurrentModuleObject );
-					SupplyAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
-					SupplyAirPath( PathNum ).SplitterIndex( CompNum ) = 0;
-					SupplyAirPath( PathNum ).PlenumIndex( CompNum ) = 0;
-					if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSplitter_Type;
-					if ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSupplyPlenum_Type;
-
-				} else {
-					ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + SupplyAirPath( PathNum ).Name + "\"" );
-					ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
-					ShowContinueError( "Must be \"AirLoopHVAC:ZoneSplitter\" or \"AirLoopHVAC:SupplyPlenum\"" );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-
-				Counter += 2;
-
-			}
-
-			SupplyAirPath( PathNum ).NumOutletNodes = 0;
-			SupplyAirPath( PathNum ).NumNodes = 0;
-
-		} // end loop over supply air paths
-
-		CurrentModuleObject = "AirLoopHVAC:ReturnPath";
-		for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
-
-			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			ReturnAirPath( PathNum ).Name = AlphArray( 1 );
-			ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
-
-			ReturnAirPath( PathNum ).OutletNodeNum = GetOnlySingleNode( AlphArray( 2 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
-
-			ReturnAirPath( PathNum ).ComponentType.allocate( ReturnAirPath( PathNum ).NumOfComponents );
-			ReturnAirPath( PathNum ).ComponentType_Num.allocate( ReturnAirPath( PathNum ).NumOfComponents );
-			ReturnAirPath( PathNum ).ComponentType_Num = 0;
-			ReturnAirPath( PathNum ).ComponentName.allocate( ReturnAirPath( PathNum ).NumOfComponents );
-			ReturnAirPath( PathNum ).ComponentIndex.allocate( ReturnAirPath( PathNum ).NumOfComponents );
-
-			Counter = 3;
-
-			for ( CompNum = 1; CompNum <= ReturnAirPath( PathNum ).NumOfComponents; ++CompNum ) {
-
-				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ) {
-
-					ReturnAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
-					ReturnAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
-					ReturnAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
-					ValidateComponent( ReturnAirPath( PathNum ).ComponentType( CompNum ), ReturnAirPath( PathNum ).ComponentName( CompNum ), IsNotOK, CurrentModuleObject );
-					if ( IsNotOK ) {
-						ShowContinueError( "In " + CurrentModuleObject + " = " + ReturnAirPath( PathNum ).Name );
-						GetZoneEquipmentDataErrorsFound = true;
-					}
-					if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
-					if ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
-				} else {
-					ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + ReturnAirPath( PathNum ).Name + "\"" );
-					ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
-					ShowContinueError( "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"" );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-
-				Counter += 2;
-
-			}
-
-		} // end loop over return air paths
-
-		AlphArray.deallocate();
-		NumArray.deallocate();
-		cAlphaFields.deallocate();
-		cNumericFields.deallocate();
-		lAlphaBlanks.deallocate();
-		lNumericBlanks.deallocate();
-
-		//setup zone equipment info for convection correlations
-		SetupZoneEquipmentForConvectionFlowRegime();
-
-		if ( GetZoneEquipmentDataErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting Zone Equipment input." );
-		}
+		//ZoneEquipList.allocate( NumOfZones );
+		//ZoneEquipAvail.dimension( NumOfZones, NoAction );
+
+		//if ( NumOfZoneEquipLists != NumOfControlledZones ) {
+		//	ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );
+		//	ShowContinueError( "..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList" );
+		//	ShowFatalError( "GetZoneEquipment: Incorrect number of zone equipment lists" );
+		//}
+
+		//if ( NumOfControlledZones > NumOfZones ) {
+		//	ShowSevereError( RoutineName + "Number of Controlled Zone objects [" + TrimSigDigits( NumOfControlledZones ) + "] greater than Number of Zones [" + TrimSigDigits( NumOfZones ) + ']' );
+		//	ShowFatalError( RoutineName + "Too many ZoneHVAC:EquipmentConnections objects." );
+		//}
+
+		//InitUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
+
+		//overallEquipCount = 0;
+
+		//for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop ) {
+
+		//	CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
+
+		//	GetObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
+
+		//	ControlledZoneNum = FindItemInList( AlphArray( 1 ), Zone );
+
+		//	if ( ControlledZoneNum == 0 ) {
+		//		ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\"" );
+		//		ShowContinueError( "..Requested Controlled Zone not among Zones, remaining items for this object not processed." );
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//		continue;
+		//	} else {
+		//		//    Zone(ZoneEquipConfig(ControlledZoneNum)%ActualZoneNum)%ZoneEquipConfigNum = ControlledZoneNum
+		//		if ( Zone( ControlledZoneNum ).IsControlled ) {
+		//			ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\"" );
+		//			ShowContinueError( "..Duplicate Controlled Zone entered, only one " + CurrentModuleObject + " per zone is allowed." );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//			continue;
+		//		}
+		//		Zone( ControlledZoneNum ).IsControlled = true;
+		//		ZoneEquipConfig( ControlledZoneNum ).IsControlled = true;
+		//		ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum = ControlledZoneNum;
+		//	}
+		//	ZoneEquipConfig( ControlledZoneNum ).ZoneName = AlphArray( 1 ); // for x-referencing with the geometry data
+
+		//	IsNotOK = false;
+		//	IsBlank = false;
+		//	VerifyName( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::EquipListName, ControlledZoneLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + cAlphaFields( 2 ) );
+		//	if ( IsNotOK ) {
+		//		ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//		if ( IsBlank ) AlphArray( 2 ) = "xxxxx";
+		//	}
+		//	ZoneEquipConfig( ControlledZoneNum ).EquipListName = AlphArray( 2 ); // the name of the list containing all the zone eq.
+		//	InletNodeListName = AlphArray( 3 );
+		//	ExhaustNodeListName = AlphArray( 4 );
+		//	ZoneEquipConfig( ControlledZoneNum ).ZoneNode = GetOnlySingleNode( AlphArray( 5 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
+		//	if ( ZoneEquipConfig( ControlledZoneNum ).ZoneNode == 0 ) {
+		//		ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\", invalid" );
+		//		ShowContinueError( cAlphaFields( 5 ) + " must be present." );
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//	} else {
+		//		UniqueNodeError = false;
+		//		CheckUniqueNodes( cAlphaFields( 5 ), "NodeName", UniqueNodeError, AlphArray( 5 ), _, AlphArray( 1 ) );
+		//		if ( UniqueNodeError ) {
+		//			//ShowContinueError( "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//		}
+		//	}
+		//	// assigned to this node
+		//	if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum > 0 ) {
+		//		Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+		//	} // This error already detected and program will be terminated.
+
+		//	ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = GetOnlySingleNode( AlphArray( 6 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneReturn, 1, ObjectIsNotParent ); // all return air state variables are
+		//	// assigned to this node
+		//	if ( ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode != 0 ) {
+		//		UniqueNodeError = false;
+		//		CheckUniqueNodes( cAlphaFields( 6 ), "NodeName", UniqueNodeError, AlphArray( 6 ), _, AlphArray( 1 ) );
+		//		if ( UniqueNodeError ) {
+		//			//ShowContinueError( "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//		}
+		//	}
+		//	if ( lAlphaBlanks( 7 ) ) {
+		//		ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+		//	} else {
+		//		ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = GetScheduleIndex( AlphArray( 7 ) );
+		//		if ( ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum == 0 ) {
+		//			ShowSevereError( RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields( 7 ) + " entered =" + AlphArray( 7 ) + " for " + cAlphaFields( 1 ) + '=' + AlphArray( 1 ) );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//		}
+		//	}
+		//	ReturnFlowBasisNodeListName = AlphArray( 8 );
+
+		//	// Read in the equipment type, name and sequence information
+		//	// for each equipment list
+
+		//	CurrentModuleObject = "ZoneHVAC:EquipmentList";
+
+		//	ZoneEquipListNum = GetObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
+		//	if ( ZoneEquipListNum > 0 ) {
+
+		//		GetObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+		//		IsNotOK = false;
+		//		IsBlank = false;
+		//		VerifyName( AlphArray( 1 ), ZoneEquipList, ControlledZoneNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+		//		if ( IsNotOK ) {
+		//			ShowContinueError( "Bad Zone Equipment name in " + CurrentModuleObject + "=\"" + ZoneEquipConfig( ControlledZoneNum ).EquipListName + "\"" );
+		//			ShowContinueError( "For Zone=\"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\"." );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//			if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+		//		}
+
+		//		ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
+
+		//		maxEquipCount = 0;
+		//		numEquipCount = ( NumAlphas - 1 ) / 2;
+		//		if ( numEquipCount * 2 != ( NumAlphas - 1 ) ) ++numEquipCount;
+		//		for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= numEquipCount; ++ZoneEquipTypeNum ) {
+		//			if ( ! lAlphaBlanks( 2 * ZoneEquipTypeNum ) && ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 1 ) ) {
+		//				++maxEquipCount;
+		//				continue;
+		//			}
+		//			ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneEquipList( ControlledZoneNum ).Name + "\", truncated list at blank field; object count=" + RoundSigDigits( maxEquipCount ) );
+		//			break;
+		//		}
+
+		//		overallEquipCount += maxEquipCount;
+		//		ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes = maxEquipCount;
+		//		ZoneEquipList( ControlledZoneNum ).EquipType.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+		//		ZoneEquipList( ControlledZoneNum ).EquipType_Num.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+		//		ZoneEquipList( ControlledZoneNum ).EquipName.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+		//		ZoneEquipList( ControlledZoneNum ).EquipIndex.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+		//		ZoneEquipList( ControlledZoneNum ).EquipData.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+		//		ZoneEquipList( ControlledZoneNum ).CoolingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+		//		ZoneEquipList( ControlledZoneNum ).HeatingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+		//		ZoneEquipList( ControlledZoneNum ).EquipType = "";
+		//		ZoneEquipList( ControlledZoneNum ).EquipType_Num = 0;
+		//		ZoneEquipList( ControlledZoneNum ).EquipName = "";
+		//		ZoneEquipList( ControlledZoneNum ).EquipIndex = 0;
+		//		ZoneEquipList( ControlledZoneNum ).CoolingPriority = 0;
+		//		ZoneEquipList( ControlledZoneNum ).HeatingPriority = 0;
+
+		//		IdealLoadsOnEquipmentList = false;
+
+		//		for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
+		//			ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum );
+		//			ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 1 );
+		//			ValidateComponent( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ), ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ), IsNotOK, CurrentModuleObject );
+		//			if ( IsNotOK ) {
+		//				ShowContinueError( "In " + CurrentModuleObject + '=' + ZoneEquipList( ControlledZoneNum ).Name );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			}
+		//			ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) = nint( NumArray( 2 * ZoneEquipTypeNum - 1 ) );
+		//			if ( ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) <= 0 ) || ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
+		//				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
+		//				ShowContinueError( "invalid " + cNumericFields( 2 * ZoneEquipTypeNum - 1 ) + "=[" + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) ) + "]." );
+		//				ShowContinueError( "equipment sequence must be > 0 and <= number of equipments in the list." );
+		//				if ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > 0 ) ShowContinueError( "only " + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) + " in the list." );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			}
+
+		//			ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) = nint( NumArray( 2 * ZoneEquipTypeNum ) );
+		//			if ( ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) <= 0 ) || ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
+		//				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
+		//				ShowContinueError( "invalid " + cNumericFields( 2 * ZoneEquipTypeNum ) + "=[" + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) ) + "]." );
+		//				ShowContinueError( "equipment sequence must be > 0 and <= number of equipments in the list." );
+		//				if ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > 0 ) ShowContinueError( "only " + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) + " in the list." );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			}
+
+		//			{ auto const SELECT_CASE_var( MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
+
+		//			if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
+
+		//			} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = DirectAir_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER" ) { // Window Air Conditioner
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = WindowAC_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP" ) { // Packaged Terminal Heat Pump
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PkgTermHPAirToAir_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER" ) { // Packaged Terminal Air Conditioner
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PkgTermACAirToAir_Num;
+
+		//			} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" ) { // Unitary System
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneUnitarySystem_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX" ) { // Zone dehumidifier
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneDXDehumidifier_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP" ) { // Zone Water to Air Heat Pump
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PkgTermHPWaterToAir_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:FOURPIPEFANCOIL" ) { // 4-Pipe Fan Coil
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = FanCoil4Pipe_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:UNITVENTILATOR" ) { // Unit Ventilator
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = UnitVentilator_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:UNITHEATER" ) { // Unit Heater
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = UnitHeater_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = PurchasedAir_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER" ) { // Hot Water Baseboard
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBWater_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER" ) { // Baseboard
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBWaterConvective_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC" ) { // Electric Baseboard
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBElectricConvective_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" ) { // Simple Cooling Panel
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = CoolingPanel_Num;
+		//			
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT" ) { // High Temperature Radiators
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HiTempRadiant_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW" ) { // Low temperature radiant system (hydronic)
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = LoTempRadiant_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ) { // Low temperature radiant system (hydronic, constant flow)
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = LoTempRadiant_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC" ) { // Low temperature radiant system (electric)
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = LoTempRadiant_Num;
+
+		//			} else if ( SELECT_CASE_var == "FAN:ZONEEXHAUST" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneExhaustFan_Num;
+
+		//			} else if ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HeatXchngr_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:ENERGYRECOVERYVENTILATOR" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ERVStandAlone_Num;
+
+		//			} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP:PUMPEDCONDENSER" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HPWaterHeater_Num;
+
+		//			} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HPWaterHeater_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:VENTILATEDSLAB" ) { // Ventilated Slab
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = VentilatedSlab_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM" ) { // Steam Baseboard
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBSteam_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:OUTDOORAIRUNIT" ) { // Outdoor Air Unit
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = OutdoorAirUnit_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC" ) { // Radiant electric Baseboard
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = BBElectric_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW" ) { // VRF AC System
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = VRFTerminalUnit_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:REFRIGERATIONCHILLERSET" ) { // Refrigeration chiller designed for warehouse applications
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = RefrigerationAirChillerSet_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:FORCEDAIR:USERDEFINED" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = UserDefinedZoneHVACForcedAir_Num;
+
+		//			} else if ( SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT" ) {
+		//				ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneEvaporativeCoolerUnit_Num;
+		//			} else {
+		//				ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
+		//				ShowContinueError( "..Invalid Equipment Type = " + ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) );
+		//				GetZoneEquipmentDataErrorsFound = true;
+
+		//			}}
+		//		}
+		//		for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
+		//			if ( count_eq( ZoneEquipList( ControlledZoneNum ).CoolingPriority, ZoneEquipTypeNum ) > 1 ) {
+		//				ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
+		//				ShowContinueError( "...multiple assignments for Zone Equipment Cooling Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", must be 1-1 correspondence between sequence assignments and number of equipments." );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			} else if ( count_eq( ZoneEquipList( ControlledZoneNum ).CoolingPriority, ZoneEquipTypeNum ) == 0 ) {
+		//				ShowWarningError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
+		//				ShowContinueError( "...zero assignments for Zone Equipment Cooling Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", apparent gap in sequence assignments in this equipment list." );
+		//			}
+		//			if ( count_eq( ZoneEquipList( ControlledZoneNum ).HeatingPriority, ZoneEquipTypeNum ) > 1 ) {
+		//				ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
+		//				ShowContinueError( "...multiple assignments for Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", must be 1-1 correspondence between sequence assignments and number of equipments." );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			} else if ( count_eq( ZoneEquipList( ControlledZoneNum ).HeatingPriority, ZoneEquipTypeNum ) == 0 ) {
+		//				ShowWarningError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
+		//				ShowContinueError( "...zero assignments for Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits( ZoneEquipTypeNum ) + ", apparent gap in sequence assignments in this equipment list." );
+		//			}
+		//		}
+
+		//	} else {
+		//		ShowSevereError( RoutineName + CurrentModuleObject + " not found = " + ZoneEquipConfig( ControlledZoneNum ).EquipListName );
+		//		ShowContinueError( "In ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//	}
+
+		//	// End ZoneHVAC:EquipmentList
+
+		//	NodeListError = false;
+		//	GetNodeNums( InletNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_ZoneInlet, 1, ObjectIsNotParent );
+
+		//	if ( ! NodeListError ) {
+		//		ZoneEquipConfig( ControlledZoneNum ).NumInletNodes = NumNodes;
+
+		//		ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
+		//		ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
+		//		ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
+
+		//		for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
+		//			ZoneEquipConfig( ControlledZoneNum ).InletNode( NodeNum ) = NodeNums( NodeNum );
+		//			UniqueNodeError = false;
+		//			CheckUniqueNodes( "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+		//			if ( UniqueNodeError ) {
+		//				//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			}
+		//			ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
+		//			ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
+		//			ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
+		//			ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).OutNode = 0;
+		//		}
+		//	} else {
+		//		ShowContinueError( "Invalid inlet node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//	}
+
+		//	NodeListError = false;
+		//	GetNodeNums( ExhaustNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_ZoneExhaust, 1, ObjectIsNotParent );
+
+		//	if ( ! NodeListError ) {
+		//		ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes = NumNodes;
+
+		//		ZoneEquipConfig( ControlledZoneNum ).ExhaustNode.allocate( NumNodes );
+
+		//		for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
+		//			ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( NodeNum ) = NodeNums( NodeNum );
+		//			UniqueNodeError = false;
+		//			CheckUniqueNodes( "Zone Air Exhaust Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+		//			if ( UniqueNodeError ) {
+		//				//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			}
+		//		}
+		//	} else {
+		//		ShowContinueError( "Invalid exhaust node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//	}
+
+		//	NodeListError = false;
+		//	GetNodeNums( ReturnFlowBasisNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+
+		//	if ( !NodeListError ) {
+		//		ZoneEquipConfig( ControlledZoneNum ).NumReturnFlowBasisNodes = NumNodes;
+
+		//		ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode.allocate( NumNodes );
+
+		//		for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
+		//			ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode( NodeNum ) = NodeNums( NodeNum );
+		//		}
+		//	} else {
+		//		ShowContinueError( "Invalid return air flow rate basis node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//	}
+
+		//} // end loop over controlled zones
+
+		//if ( GetZoneEquipmentDataErrorsFound ) {
+		//	ShowWarningError( RoutineName + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors." );
+		//	overallEquipCount = 0;
+		//}
+		//if ( overallEquipCount > 0 ) {
+		//	ZoneEquipListAcct.allocate( overallEquipCount );
+		//	overallEquipCount = 0;
+		//	for ( Loop1 = 1; Loop1 <= NumOfControlledZones; ++Loop1 ) {
+		//		for ( Loop2 = 1; Loop2 <= ZoneEquipList( Loop1 ).NumOfEquipTypes; ++Loop2 ) {
+		//			++overallEquipCount;
+		//			ZoneEquipListAcct( overallEquipCount ).ObjectType = ZoneEquipList( Loop1 ).EquipType( Loop2 );
+		//			ZoneEquipListAcct( overallEquipCount ).ObjectName = ZoneEquipList( Loop1 ).EquipName( Loop2 );
+		//			ZoneEquipListAcct( overallEquipCount ).OnListNum = Loop1;
+		//		}
+		//	}
+		//	// Now check for uniqueness
+		//	for ( Loop1 = 1; Loop1 <= overallEquipCount; ++Loop1 ) {
+		//		for ( Loop2 = Loop1 + 1; Loop2 <= overallEquipCount; ++Loop2 ) {
+		//			if ( ZoneEquipListAcct( Loop1 ).ObjectType != ZoneEquipListAcct( Loop2 ).ObjectType || ZoneEquipListAcct( Loop1 ).ObjectName != ZoneEquipListAcct( Loop2 ).ObjectName ) continue;
+		//			// Duplicated -- not allowed
+		//			ShowSevereError( RoutineName + CurrentModuleObject + ", duplicate items in ZoneHVAC:EquipmentList." );
+		//			ShowContinueError( "Equipment: Type=" + ZoneEquipListAcct( Loop1 ).ObjectType + ", Name=" + ZoneEquipListAcct( Loop1 ).ObjectName );
+		//			ShowContinueError( "Found on List=\"" + ZoneEquipList( ZoneEquipListAcct( Loop1 ).OnListNum ).Name + "\"." );
+		//			ShowContinueError( "Equipment Duplicated on List=\"" + ZoneEquipList( ZoneEquipListAcct( Loop2 ).OnListNum ).Name + "\"." );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//		}
+		//	}
+		//	ZoneEquipListAcct.deallocate();
+		//}
+
+		////map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
+
+		//for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfZones; ++ControlledZoneLoop ) {
+		//	GetZoneEquipmentDataFound = FindItemInList( ZoneEquipList( ControlledZoneLoop ).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName );
+		//	if ( GetZoneEquipmentDataFound > 0 ) ZoneEquipConfig( GetZoneEquipmentDataFound ).EquipListIndex = ControlledZoneLoop;
+		//} // end loop over controlled zones
+
+		//EndUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
+
+		//CurrentModuleObject = "AirLoopHVAC:SupplyPath";
+		//for ( PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum ) {
+
+		//	GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+		//	IsNotOK = false;
+		//	IsBlank = false;
+		//	VerifyName( AlphArray( 1 ), SupplyAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+		//	if ( IsNotOK ) {
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//		if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+		//	}
+		//	SupplyAirPath( PathNum ).Name = AlphArray( 1 );
+		//	SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
+
+		//	SupplyAirPath( PathNum ).InletNodeNum = GetOnlySingleNode( AlphArray( 2 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+
+		//	SupplyAirPath( PathNum ).ComponentType.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+		//	SupplyAirPath( PathNum ).ComponentType_Num.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+		//	SupplyAirPath( PathNum ).ComponentType_Num = 0;
+		//	SupplyAirPath( PathNum ).ComponentName.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+		//	SupplyAirPath( PathNum ).ComponentIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+		//	SupplyAirPath( PathNum ).SplitterIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+		//	SupplyAirPath( PathNum ).PlenumIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+
+		//	Counter = 3;
+
+		//	for ( CompNum = 1; CompNum <= SupplyAirPath( PathNum ).NumOfComponents; ++CompNum ) {
+
+		//		if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) ) {
+
+		//			SupplyAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
+		//			SupplyAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
+		//			ValidateComponent( SupplyAirPath( PathNum ).ComponentType( CompNum ), SupplyAirPath( PathNum ).ComponentName( CompNum ), IsNotOK, CurrentModuleObject );
+		//			SupplyAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
+		//			SupplyAirPath( PathNum ).SplitterIndex( CompNum ) = 0;
+		//			SupplyAirPath( PathNum ).PlenumIndex( CompNum ) = 0;
+		//			if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSplitter_Type;
+		//			if ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSupplyPlenum_Type;
+
+		//		} else {
+		//			ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + SupplyAirPath( PathNum ).Name + "\"" );
+		//			ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
+		//			ShowContinueError( "Must be \"AirLoopHVAC:ZoneSplitter\" or \"AirLoopHVAC:SupplyPlenum\"" );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//		}
+
+		//		Counter += 2;
+
+		//	}
+
+		//	SupplyAirPath( PathNum ).NumOutletNodes = 0;
+		//	SupplyAirPath( PathNum ).NumNodes = 0;
+
+		//} // end loop over supply air paths
+
+		//CurrentModuleObject = "AirLoopHVAC:ReturnPath";
+		//for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
+
+		//	GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+
+		//	IsNotOK = false;
+		//	IsBlank = false;
+		//	VerifyName( AlphArray( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+		//	if ( IsNotOK ) {
+		//		GetZoneEquipmentDataErrorsFound = true;
+		//		if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
+		//	}
+		//	ReturnAirPath( PathNum ).Name = AlphArray( 1 );
+		//	ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
+
+		//	ReturnAirPath( PathNum ).OutletNodeNum = GetOnlySingleNode( AlphArray( 2 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+
+		//	ReturnAirPath( PathNum ).ComponentType.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+		//	ReturnAirPath( PathNum ).ComponentType_Num.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+		//	ReturnAirPath( PathNum ).ComponentType_Num = 0;
+		//	ReturnAirPath( PathNum ).ComponentName.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+		//	ReturnAirPath( PathNum ).ComponentIndex.allocate( ReturnAirPath( PathNum ).NumOfComponents );
+
+		//	Counter = 3;
+
+		//	for ( CompNum = 1; CompNum <= ReturnAirPath( PathNum ).NumOfComponents; ++CompNum ) {
+
+		//		if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ) {
+
+		//			ReturnAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
+		//			ReturnAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
+		//			ReturnAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
+		//			ValidateComponent( ReturnAirPath( PathNum ).ComponentType( CompNum ), ReturnAirPath( PathNum ).ComponentName( CompNum ), IsNotOK, CurrentModuleObject );
+		//			if ( IsNotOK ) {
+		//				ShowContinueError( "In " + CurrentModuleObject + " = " + ReturnAirPath( PathNum ).Name );
+		//				GetZoneEquipmentDataErrorsFound = true;
+		//			}
+		//			if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
+		//			if ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
+		//		} else {
+		//			ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + ReturnAirPath( PathNum ).Name + "\"" );
+		//			ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
+		//			ShowContinueError( "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"" );
+		//			GetZoneEquipmentDataErrorsFound = true;
+		//		}
+
+		//		Counter += 2;
+
+		//	}
+
+		//} // end loop over return air paths
+
+		//AlphArray.deallocate();
+		//NumArray.deallocate();
+		//cAlphaFields.deallocate();
+		//cNumericFields.deallocate();
+		//lAlphaBlanks.deallocate();
+		//lNumericBlanks.deallocate();
+
+		////setup zone equipment info for convection correlations
+		//SetupZoneEquipmentForConvectionFlowRegime();
+
+		//if ( GetZoneEquipmentDataErrorsFound ) {
+		//	ShowFatalError( RoutineName + "Errors found in getting Zone Equipment input." );
+		//}
 
 	}
 

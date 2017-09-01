@@ -390,6 +390,8 @@ namespace SimulationManager {
 		WarmupFlag = false;
 		DoWeatherInitReporting = true;
 
+		DataZoneEquipment::GetZoneEquipmentData();
+
 		//  Note:  All the inputs have been 'gotten' by the time we get here.
 		ErrFound = false;
 		if ( DoOutputReporting ) {
@@ -428,7 +430,7 @@ namespace SimulationManager {
 			//	//      CALL ReportParentChildren
 			//}
 
-			CreateEnergyReportStructure();
+			//CreateEnergyReportStructure();
 			bool anyEMSRan;
 			ManageEMS( emsCallFromSetupSimulation, anyEMSRan ); // point to finish setup processing EMS, sensor ready now
 

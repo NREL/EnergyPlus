@@ -46,10 +46,7 @@ llvm::orc::KaleidoscopeJIT * j;
 
 extern "C" {
 
-  #include <fmiModelTypes.h>
-  #include <fmi1_types.h>
   #include <fmi1_functions.h>
-  #include <jmi_types.h>
   #include "xml_parser_cosim.h"
 
   extern char *C_GUID;

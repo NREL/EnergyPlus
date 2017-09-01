@@ -2277,6 +2277,8 @@ namespace WeatherManager {
 
 		CurrentTime = ( HourOfDay - 1 ) + TimeStep * ( TimeStepFraction );
 		SimTimeSteps = ( DayOfSim - 1 ) * 24 * NumOfTimeStepInHour + ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+    PreSimTime = SimTime;
+    SimTime = SimTimeSteps * TimeStepZoneSec;
 
 		GroundTemp = siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths( 0, Month );
 		GroundTempKelvin = GroundTemp + KelvinConv;

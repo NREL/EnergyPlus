@@ -225,6 +225,8 @@ namespace DataGlobals {
 	Real64 CurrentTime( 0.0 ); // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	int SimTimeSteps( 0 ); // Number of (Loads) timesteps since beginning of run period (environment).
 	int MinutesPerTimeStep( 0 ); // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	Real64 SimTime( 0.0 ); // Seconds since beginning of run period (environment).
+	Real64 PreSimTime( 0.0 ); // Seconds since beginning of run period (environment), at the previous timestep.
 	Real64 TimeStepZoneSec( 0.0 ); // Seconds per time step
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.

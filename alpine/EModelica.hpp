@@ -4,10 +4,7 @@
 
 extern "C" {
 
-#include <fmiModelTypes.h>
-#include <fmi1_types.h>
 #include <fmi1_functions.h>
-#include <jmi_types.h>
 
 }
 

@@ -110,6 +110,11 @@
 #include <HVACSizingSimulationManager.hh>
 #include <ElectricPowerServiceManager.hh>
 
+#include <fmiModelTypes.h>
+#include <fmi1_types.h>
+#include <fmi1_functions.h>
+#include <jmi_types.h>
+
 namespace EnergyPlus {
 
 namespace HVACManager {
@@ -290,6 +295,7 @@ namespace HVACManager {
 		using DataContaminantBalance::ZoneAirGCTemp;
 		using DataContaminantBalance::ZoneAirGCAvg;
 		using DataContaminantBalance::OutdoorGC;
+		using DataZoneEquipment::ZoneEquipConfig;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using InternalHeatGains::UpdateInternalGainValues;
 		using ZoneEquipmentManager::CalcAirFlowSimple;
@@ -381,146 +387,162 @@ namespace HVACManager {
 		NumOfSysTimeSteps = 1;
 		FracTimeStepZone = TimeStepSys / TimeStepZone;
 
-		bool anyEMSRan;
-		ManageEMS( emsCallFromBeginTimestepBeforePredictor, anyEMSRan ); //calling point
-
-		SetOutAirNodes();
-
-		ManageRefrigeratedCaseRacks();
-
-		//ZONE INITIALIZATION  'Get Zone Setpoints'
-		ManageZoneAirUpdates( iGetZoneSetPoints, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-
-		ManageHybridVentilation();
-
 		CalcAirFlowSimple();
-		//if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
-		//	RollBackFlag = false;
-		//	ManageAirflowNetworkBalance( false );
-		//}
-
-		//SetHeatToReturnAirFlag();
-
-		SysDepZoneLoadsLagged = SysDepZoneLoads;
 
 		UpdateInternalGainValues( true, true );
 
-		ManageZoneAirUpdates( iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
+    // Instead of calling SimHVAC lets use modelica to update zone inlet nodes
+    // reqlly should iterate over all ZoneEquipConfig
+    // But this is hacked to work with only a single zone model
+	  auto const & Zec( ZoneEquipConfig( 1 ) );
+    // Assume there is only one inlet node
+    // which is true in our hacked E+
+	  auto & InletNode( Node( Zec.InletNode( 1 ) ) );
+    auto & ReturnAirNode( Node( Zec.ReturnAirNode ) );
+    auto & ZoneNode( Node( Zec.ZoneNode ) );
 
-		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
+    unsigned nx;                          // number of state variables
+    unsigned nz;                          // number of state event indicators
+    double *x = NULL;                // continuous states
+    double *xdot = NULL;             // the crresponding derivatives in same order
+    double *z = NULL;                // state event indicators
+    double *prez = NULL;             // previous values of state event indicators
+    fmiStatus fmiFlag;               // return code of the fmu functions
+    fmiEventInfo eventInfo;          // updated by calls to initialize and eventUpdate
+    fmiBoolean timeEvent, stateEvent, stepEvent;
 
-		//SimHVAC();
+    fmiValueReference InputRefs[1];
+    Real64 Inputs[1];
+    InputRefs[0] = EMO.scalarVariableValueReference("zone_foo_temp");
 
-		//if ( AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && ! WarmupFlag ) {
-		//	RunOptCondEntTemp = true;
-		//	while ( RunOptCondEntTemp ) {
-		//		SimHVAC();
-		//	}
-		//}
+    fmiValueReference OutputRefs[2];
+    Real64 Outputs[2];
+    OutputRefs[0] = EMO.scalarVariableValueReference("zone_foo_inlet_temp");
+    OutputRefs[1] = EMO.scalarVariableValueReference("zone_foo_inlet_mdot");
 
-		//ManageWaterInits();
+    nx = 2;
+    nz = 1;
 
-		// Only simulate once per zone timestep; must be after SimHVAC
-		if ( FirstTimeStepSysFlag && MetersHaveBeenInitialized ) {
-			ManageDemand();
-		}
+    Real64 PreTime = DataGlobals::PreSimTime;
+    Real64 MaxSysStep = 60;
 
-		BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
+    while ( PreTime < DataGlobals::SimTime ) {
+      // Get current state
+      fmiFlag = EMO.fmiGetContinuousStates(x, nx);
+      if (fmiFlag > fmiWarning) { std::cout << "Could not retrieve states" << std::endl; std::exit(1); };
+      fmiFlag = EMO.fmiGetDerivatives(xdot, nx);
+      if (fmiFlag > fmiWarning) { std::cout << "Could not get derivatives" << std::endl; std::exit(1); };
 
-		ManageZoneAirUpdates( iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
+      // Advance time
+      Real64 Time = DataGlobals::SimTime;
 
-		if ( ZoneTempChange > MaxZoneTempDiff && ! KickOffSimulation ) {
-			//determine value of adaptive system time step
-			// model how many system timesteps we want in zone timestep
-			ZTempTrendsNumSysSteps = int( ZoneTempChange / MaxZoneTempDiff + 1.0 ); // add 1 for truncation
-			NumOfSysTimeSteps = min( ZTempTrendsNumSysSteps, LimitNumSysSteps );
-			//then determine timestep length for even distribution, protect div by zero
-			if ( NumOfSysTimeSteps > 0 ) TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
-			TimeStepSys = max( TimeStepSys, MinTimeStepSys );
-			UseZoneTimeStepHistory = false;
-			ShortenTimeStepSys = true;
-		} else {
-			NumOfSysTimeSteps = 1;
-			UseZoneTimeStepHistory = true;
-		}
+      // Reduce timestep if there is an upcoming event from the fmu
+      timeEvent = eventInfo.upcomingTimeEvent && eventInfo.nextEventTime <= Time;
+      if (timeEvent) Time = eventInfo.nextEventTime;
 
-		if ( UseZoneTimeStepHistory ) PreviousTimeStep = TimeStepZone;
-		for ( SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
+      // Reduce timestep down to the maximum allowed system step size
+      if ( Time - PreTime > MaxSysStep ) Time = PreTime + MaxSysStep;
 
-			if ( TimeStepSys < TimeStepZone ) {
+      // Consider, reduce timestep based on the rate of zone temperature change
 
-				ManageHybridVentilation();
-				CalcAirFlowSimple( SysTimestepLoop );
-				//if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
-				//	RollBackFlag = false;
-				//	ManageAirflowNetworkBalance( false );
-				//}
+      Real64 DTime = Time - PreTime;
+      PreTime = Time;
 
-				UpdateInternalGainValues( true, true );
+      // Set time
+      fmiFlag = EMO.fmiSetTime( Time);
 
-				ManageZoneAirUpdates( iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
+      // Set inputs
+      Inputs[0] = ZoneNode.Temp;
+      EMO.fmiSetReal(InputRefs,1,Inputs);
 
-				if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-				//SimHVAC();
+      // perform one step
+      for (unsigned i=0; i<nx; i++) x[i] += DTime * xdot[i]; // forward Euler method
+      fmiFlag = EMO.fmiSetContinuousStates(x, nx);
+      if (fmiFlag > fmiWarning) { std::cout << "Could not set states" << std::endl; std::exit(1); };
 
-				//if ( AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && ! WarmupFlag ) {
-				//	RunOptCondEntTemp = true;
-				//	while ( RunOptCondEntTemp ) {
-				//		SimHVAC();
-				//	}
-				//}
+      // Check for step event, e.g. dynamic state selection
+      fmiFlag = EMO.fmiCompletedIntegratorStep(&stepEvent);
+      if (fmiFlag > fmiWarning) { std::cout << "Could not complete integrator step" << std::endl; std::exit(1); };
 
-				//ManageWaterInits();
+      // Check for state event
+      for (unsigned i=0; i<nz; i++) prez[i] = z[i]; 
+      fmiFlag = EMO.fmiGetEventIndicators(z, nz);
+      if (fmiFlag > fmiWarning) { std::cout << "Could not retrieve event indicators" << std::endl; std::exit(1); }; //error("could not retrieve event indicators");
+      stateEvent = FALSE;
+      for (unsigned i=0; i<nz; i++) {
+       stateEvent = stateEvent || (prez[i] * z[i] < 0);
+      }
 
-				//Need to set the flag back since we do not need to shift the temps back again in the correct step.
-				ShortenTimeStepSys = false;
+      // handle events
+      if (timeEvent || stateEvent || stepEvent) {
+        if (timeEvent) {
+          std::cout << "time event at t= " << Time << std::endl;
+        }
+        if (stateEvent) {
+          for (unsigned i=0; i<nz; i++) {
+            std::cout << "State event at t=" << Time << std::endl;
+          }
+        }
+        if (stepEvent) {
+            std::cout << "Step event at t=" << Time << std::endl;
+        }
 
-				ManageZoneAirUpdates( iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-				if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
+        // event iteration in one step, ignoring intermediate results
+        fmiFlag = EMO.fmiEventUpdate(fmiFalse, &eventInfo);
+        if (fmiFlag > fmiWarning) {
+          std::cout << "Could not perform event update" << std::endl;
+          std::exit(1);
+        }
+        
+        // terminate simulation, if requested by the model
+        if (eventInfo.terminateSimulation) {
+          std::cout << "Model requested termination at t=" << Time << std::endl;
+          std::exit(0);
+        }
 
-				ManageZoneAirUpdates( iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-				if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPushSystemTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-				PreviousTimeStep = TimeStepSys;
-			}
+        // check for change of value of states
+        if (eventInfo.stateValuesChanged) {
+          std::cout << "State values changed at t=" << Time << std::endl;
+        }
+        
+        // check for selection of new state variables
+        if (eventInfo.stateValueReferencesChanged) {
+          std::cout << "New state variables selected at t=" << Time << std::endl;
+        }
+      } // if event
 
-			FracTimeStepZone = TimeStepSys / TimeStepZone;
+      EMO.fmiGetReal(OutputRefs,2,Outputs);
+      InletNode.Temp = Outputs[0];
+      InletNode.MassFlowRate = Outputs[1];
+      ReturnAirNode.Temp = ZoneNode.Temp;
+      ReturnAirNode.MassFlowRate = Outputs[1];
 
-			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-				ZTAV( ZoneNum ) += ZT( ZoneNum ) * FracTimeStepZone;
-				ZoneAirHumRatAvg( ZoneNum ) += ZoneAirHumRat( ZoneNum ) * FracTimeStepZone;
-				if ( Contaminant.CO2Simulation ) ZoneAirCO2Avg( ZoneNum ) += ZoneAirCO2( ZoneNum ) * FracTimeStepZone;
-				if ( Contaminant.GenericContamSimulation ) ZoneAirGCAvg( ZoneNum ) += ZoneAirGC( ZoneNum ) * FracTimeStepZone;
-			}
+      // TODO more work past this point
+      // Update zone temperature
+      //
+      // Use iCorrectStep as a guide to update zone air temp. Use the analytical method
+      // which does not require 2 and 3 history terms, and can also tolerate non uniform step size
+      //
+			//UpdateInternalGainValues( true, true );
+		  ////BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
+		  //ManageZoneAirUpdates( iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
+			//UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
+			//DummyLogical = false;
+			//facilityElectricServiceObj->manageElectricPowerService( false, DummyLogical, true );
 
-			DetectOscillatingZoneTemp();
-			UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
-			//UpdateIceFractions(); // Update fraction of ice stored in TES
-			//ManageWater();
-			// update electricity data for net, purchased, sold etc.
-			DummyLogical = false;
-			facilityElectricServiceObj->manageElectricPowerService( false, DummyLogical, true );
-
-			// Update the plant and condenser loop capacitance model temperature history.
-			//UpdateNodeThermalHistory();
-
-			ManageEMS( emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan ); // EMS calling point
-
-			// This is where output processor data is updated for System Timestep reporting
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting ) {
 					//CalcMoreNodeInfo();
 					CalculatePollution();
-					InitEnergyReports();
-					ReportSystemEnergyUse();
+					//InitEnergyReports();
+					//ReportSystemEnergyUse();
 				}
 				if ( DoOutputReporting || ( ZoneSizingCalc && CompLoadReportIsReq ) ) {
 					ReportAirHeatBalance();
 					if ( ZoneSizingCalc ) GatherComponentLoadsHVAC();
 				}
 				if ( DoOutputReporting ) {
-					ReportMaxVentilationLoads();
+					//ReportMaxVentilationLoads();
 					UpdateDataandReport( HVACTSReporting );
 					if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
 						if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
@@ -550,7 +572,7 @@ namespace HVACManager {
 					}
 					PrintedWarmup = true;
 				}
-				CalcMoreNodeInfo();
+				//CalcMoreNodeInfo();
 				UpdateDataandReport( HVACTSReporting );
 				if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ) {
 					if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
@@ -576,19 +598,12 @@ namespace HVACManager {
 				}
 				UpdateDataandReport( HVACTSReporting );
 			}
-			ManageEMS( emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan ); // EMS calling point
+
 			//UPDATE SYSTEM CLOCKS
 			SysTimeElapsed += TimeStepSys;
 
 			FirstTimeStepSysFlag = false;
-		} //system time step  loop (loops once if no downstepping)
-
-		ManageZoneAirUpdates( iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-
-		NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;
-
-		UpdateDemandManagers();
+    } // time iteration
 
 		// DO FINAL UPDATE OF RECORD KEEPING VARIABLES
 		// Report the Node Data to Aid in Debugging
