@@ -4063,7 +4063,7 @@ namespace ZoneEquipmentManager {
 						returnNodeMassFlow = ExpTotalReturnMassFlow;
 						if ( airLoop > 0 ) {
 							if ( !DataAirSystems::PrimaryAirSystem( airLoop ).OASysExists ) {
-								ExpTotalReturnMassFlow = ExpTotalReturnMassFlow - thisZoneEquip.ZoneExhBalanced + thisZoneEquip.ZoneExh;
+								ExpTotalReturnMassFlow = max( 0.0, ExpTotalReturnMassFlow - thisZoneEquip.ZoneExhBalanced + thisZoneEquip.ZoneExh );
 								returnNodeMassFlow = ExpTotalReturnMassFlow;
 							}
 						}
@@ -4104,7 +4104,10 @@ namespace ZoneEquipmentManager {
 		// Adjust return flows if greater than expected (i.e. there is exhaust or mixing flow reducing the total available for return)
 		if ( ( totReturnFlow > ExpTotalReturnMassFlow ) && ( numRetNodes > 1 ) ) {
 			Real64 newReturnFlow = 0.0;
-			Real64 returnAdjFactor = ( 1 - ( ( totReturnFlow - ExpTotalReturnMassFlow ) / totVarReturnFlow ) ); // Return flow adjustment factor
+			Real64 returnAdjFactor = 1.0;
+			if ( totVarReturnFlow > 0.0 ) {
+				returnAdjFactor = ( 1 - ( ( totReturnFlow - ExpTotalReturnMassFlow ) / totVarReturnFlow ) ); // Return flow adjustment factor
+			}
 
 			for ( int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
 				int retNode = thisZoneEquip.ReturnNode( returnNum );
