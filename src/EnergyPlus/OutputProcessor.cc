@@ -5167,7 +5167,7 @@ namespace OutputProcessor {
 			case OutputProcessor::Unit::cd_m2:
 				return "cd/m2";
 				break;
-			case OutputProcessor::Unit::Kg_s:
+			case OutputProcessor::Unit::Kg_s:  //ou redundant
 				return "kg/s";
 				break;
 			case OutputProcessor::Unit::kmol_s:
@@ -5273,7 +5273,7 @@ namespace OutputProcessor {
 		} else if ( unitUpper == "KMOL/S" ) {
 			return OutputProcessor::Unit::kmol_s;
 		} else if ( unitUpper == "KG/S" ) {
-			return OutputProcessor::Unit::Kg_s;
+			return OutputProcessor::Unit::Kg_s;  //ou duplicate remove
 		} else if ( unitUpper == "REV/MIN" ) {
 			return OutputProcessor::Unit::rev_min;
 		} else if ( unitUpper == "BTU/H/W" ) { //ou fix

@@ -6044,7 +6044,7 @@ namespace RefrigeratedCase {
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Sensible Cooling Energy", OutputProcessor::Unit::J, CoilSysCredit( ZoneID ).ReportSenCoolingToZoneEnergy, "HVAC", "Sum", Zone( ZoneID ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Latent Cooling Rate", OutputProcessor::Unit::W, CoilSysCredit( ZoneID ).ReportLatCreditToZoneRate, "HVAC", "Average", Zone( ZoneID ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Latent Cooling Energy", OutputProcessor::Unit::J, CoilSysCredit( ZoneID ).ReportLatCreditToZoneEnergy, "HVAC", "Sum", Zone( ZoneID ).Name );
-					SetupOutputVariable( "Refrigeration Zone Air Chiller Water Removed Mass Flow Rate", OutputProcessor::Unit::Kg_s, CoilSysCredit( ZoneID ).ReportH20RemovedKgPerS_FromZoneRate, "HVAC", "Average", Zone( ZoneID ).Name );
+					SetupOutputVariable( "Refrigeration Zone Air Chiller Water Removed Mass Flow Rate", OutputProcessor::Unit::kg_s, CoilSysCredit( ZoneID ).ReportH20RemovedKgPerS_FromZoneRate, "HVAC", "Average", Zone( ZoneID ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Total Cooling Rate", OutputProcessor::Unit::W, CoilSysCredit( ZoneID ).ReportTotCoolingToZoneRate, "HVAC", "Average", Zone( ZoneID ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Total Cooling Energy", OutputProcessor::Unit::J, CoilSysCredit( ZoneID ).ReportTotCoolingToZoneEnergy, "HVAC", "Sum", Zone( ZoneID ).Name );
 					SetupOutputVariable( "Refrigeration Zone Air Chiller Heating Rate", OutputProcessor::Unit::W, CoilSysCredit( ZoneID ).ReportHeatingToZoneRate, "HVAC", "Average", Zone( ZoneID ).Name );

@@ -3066,7 +3066,7 @@ namespace MixedAir {
 
 					VentMechObjectNum = loopOAController.VentMechObjectNum;
 					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
-						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate ", OutputProcessor::Unit::kg_s, loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
+						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
 						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
 							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
 						}

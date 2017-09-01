@@ -1353,7 +1353,7 @@ namespace HVACInterfaceManager {
 
 			} else if ( SELECT_CASE_var == CommonPipe_Single ) { //Uncontrolled ('single') common pipe
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_Single;
-				SetupOutputVariable( "Plant Common Pipe Mass Flow Rate", OutputProcessor::Unit::Kg_s, PlantCommonPipe( CurLoopNum ).Flow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).Flow, "System", "Average", PlantLoop( CurLoopNum ).Name );
 				SetupOutputVariable( "Plant Common Pipe Temperature", OutputProcessor::Unit::C, PlantCommonPipe( CurLoopNum ).Temp, "System", "Average", PlantLoop( CurLoopNum ).Name );
 				SetupOutputVariable( "Plant Common Pipe Flow Direction Status", OutputProcessor::Unit::None, PlantCommonPipe( CurLoopNum ).FlowDir, "System", "Average", PlantLoop( CurLoopNum ).Name );
 
