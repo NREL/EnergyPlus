@@ -327,6 +327,7 @@ namespace HVACManager {
 		bool ReportDebug;
 		int ZoneNum;
 		static bool PrintedWarmup( false );
+		Real64 const SecondsPerHour( 3600.0 );
 
 		static bool MyEnvrnFlag( true );
 		static bool InitVentReportFlag( true );
@@ -425,8 +426,12 @@ namespace HVACManager {
 
     Real64 PreTime = DataGlobals::PreSimTime;
     Real64 MaxSysStep = 60;
+		FirstTimeStepSysFlag = true;
 
+    //NumOfSysTimeSteps = 0;
     while ( PreTime < DataGlobals::SimTime ) {
+      //++NumOfSysTimeSteps;
+
       // Get current state
       fmiFlag = EMO.fmiGetContinuousStates(x, nx);
       if (fmiFlag > fmiWarning) { std::cout << "Could not retrieve states" << std::endl; std::exit(1); };
@@ -447,6 +452,8 @@ namespace HVACManager {
 
       Real64 DTime = Time - PreTime;
       PreTime = Time;
+
+			TimeStepSys = DTime / SecondsPerHour;
 
       // Set time
       fmiFlag = EMO.fmiSetTime( Time);
@@ -517,18 +524,18 @@ namespace HVACManager {
       ReturnAirNode.Temp = ZoneNode.Temp;
       ReturnAirNode.MassFlowRate = Outputs[1];
 
-      // TODO more work past this point
-      // Update zone temperature
-      //
-      // Use iCorrectStep as a guide to update zone air temp. Use the analytical method
-      // which does not require 2 and 3 history terms, and can also tolerate non uniform step size
-      //
-			//UpdateInternalGainValues( true, true );
-		  ////BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
-		  //ManageZoneAirUpdates( iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-			//UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
-			//DummyLogical = false;
-			//facilityElectricServiceObj->manageElectricPowerService( false, DummyLogical, true );
+			UpdateInternalGainValues( true, true );
+
+		  BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
+
+      // Like iCorrectStep but simpler,
+      // only use the analytical solution which does not require 2nd and third history terms
+      ZoneTempPredictorCorrector::UpdateZoneAirTemp();
+
+			UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
+
+			DummyLogical = false;
+			facilityElectricServiceObj->manageElectricPowerService( false, DummyLogical, true );
 
 			if ( ! WarmupFlag ) {
 				if ( DoOutputReporting ) {

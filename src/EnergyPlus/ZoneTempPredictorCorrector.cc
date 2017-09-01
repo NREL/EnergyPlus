@@ -4119,6 +4119,67 @@ namespace ZoneTempPredictorCorrector {
 
 	}
 
+  void
+  UpdateZoneAirTemp()
+  {
+		static std::string const RoutineName( "UpdateZoneAirTemp" );
+
+		static Real64 AirCap( 0.0 ); // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
+		static int ZoneNum( 0 );
+		static int ZoneNodeNum( 0 ); // System node number for air flow through zone either by system or as a plenum
+		static Real64 TempDepCoef( 0.0 ); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
+		static Real64 TempIndCoef( 0.0 ); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
+		static Real64 SumIntGain( 0.0 ); // Zone sum of convective internal gains
+		static Real64 SumHA( 0.0 ); // Zone sum of Hc*Area
+		static Real64 SumHATsurf( 0.0 ); // Zone sum of Hc*Area*Tsurf
+		static Real64 SumHATref( 0.0 ); // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
+		static Real64 SumMCp( 0.0 ); // Zone sum of MassFlowRate*Cp
+		static Real64 SumMCpT( 0.0 ); // Zone sum of MassFlowRate*Cp*T
+		static Real64 SumSysMCp( 0.0 ); // Zone sum of air system MassFlowRate*Cp
+		static Real64 SumSysMCpT( 0.0 ); // Zone sum of air system MassFlowRate*Cp*T
+
+		Real64 ZoneMult;
+
+		std::vector< int > controlledZoneEquipConfigNums;
+		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
+			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
+				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
+			}
+		}
+
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			ZoneT1( ZoneNum ) = ZT( ZoneNum );
+
+			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
+
+      AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+      AirCap = AIRRAT( ZoneNum );
+
+			RoomAirModelManager::ManageAirModel( ZoneNum );
+
+			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+			ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
+
+			if ( ZoneNodeNum > 0 ) { // This zone is controlled by a zone equipment configuration or zone plenum
+				TempDepCoef = SumHA + SumMCp + SumSysMCp;
+				TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT + ( NonAirSystemResponse( ZoneNum ) / ZoneMult + SysDepZoneLoadsLagged( ZoneNum ) );
+			  if ( TempDepCoef == 0.0 ) { // B=0
+			  	ZT( ZoneNum ) = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
+			  } else {
+			  	ZT( ZoneNum ) = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+			  }
+      } else {
+				TempDepCoef = SumHA + SumMCp;
+				TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT;
+				if ( TempDepCoef == 0.0 ) { // B=0
+					ZT( ZoneNum ) = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
+				} else {
+					ZT( ZoneNum ) = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+				}
+      }
+    }
+  }
+
 	void
 	CorrectZoneAirTemp(
 		Real64 & ZoneTempChange, // Temperature change in zone air between previous and current timestep
