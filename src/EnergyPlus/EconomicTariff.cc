@@ -111,9 +111,9 @@ namespace EconomicTariff {
 	int const conversionGAL ( 9 );
 	int const conversionKGAL ( 10 ); // thousand gallons
 
-	// TODO: Modify this to append the water stuff?
-	Array1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
-	Array1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	// TODO: @JasonGlazer, I extended this to include the water stuff, not sure if right for LEED or not.
+	Array1D_string const convEneStrings( {0,10}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal" } );
+	Array1D_string const convDemStrings( {0,10}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal" } );
 
 	int const demandWindowQuarter( 1 );
 	int const demandWindowHalf( 2 );
