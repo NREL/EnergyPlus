@@ -11021,7 +11021,7 @@ namespace HVACUnitarySystem {
 
 		} else if ( ( CoilTypeNum == Coil_HeatingElectric_MultiStage ) || ( CoilTypeNum == Coil_HeatingGas_MultiStage ) ) {
 
-			SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, _, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac, SpeedNum, 0.0 );
+			SimulateHeatingCoilComponents( CompName, FirstHVACIteration, _, CompIndex, _, _, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadFrac, SpeedNum, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio );
 		} else {
 
 		}
