@@ -126,7 +126,7 @@
 ! Report Variables:            All available in RDD (442 requested, monthly and annual results)
 !
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Small Office 2 Story 4 zone 550 m2,  !- Name
@@ -1002,7 +1002,7 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   Zone,
     NorthZone_1stFloor,      !- Name
@@ -1012,7 +1012,7 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   Zone,
     SouthZone_2ndFloor,      !- Name
@@ -1022,7 +1022,7 @@
     3.7,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   Zone,
     NorthZone_2ndFloor,      !- Name
@@ -1032,7 +1032,7 @@
     3.7,                     !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.4;                     !- Ceiling Height {m}
+    autocalculate;           !- Ceiling Height {m}
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -1184,10 +1184,10 @@
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,7.1,  !- X,Y,Z ==> Vertex 1 {m}
-    25,0,7.1,  !- X,Y,Z ==> Vertex 2 {m}
-    25,5.5,7.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,5.5,7.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,7.4,  !- X,Y,Z ==> Vertex 1 {m}
+    25,0,7.4,  !- X,Y,Z ==> Vertex 2 {m}
+    25,5.5,7.4,  !- X,Y,Z ==> Vertex 3 {m}
+    0,5.5,7.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   Wall:Detailed,
     EastWall_NorthZone_2ndFloor,  !- Name
@@ -1244,10 +1244,10 @@
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,5.5,7.1,  !- X,Y,Z ==> Vertex 1 {m}
-    25,5.5,7.1,  !- X,Y,Z ==> Vertex 2 {m}
-    25,11,7.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,11,7.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0,5.5,7.4,  !- X,Y,Z ==> Vertex 1 {m}
+    25,5.5,7.4,  !- X,Y,Z ==> Vertex 2 {m}
+    25,11,7.4,  !- X,Y,Z ==> Vertex 3 {m}
+    0,11,7.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   Floor:Detailed,
     Floor_SouthZone_1stFloor,!- Name
@@ -1289,10 +1289,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,3.4,  !- X,Y,Z ==> Vertex 1 {m}
-    25,0,3.4,  !- X,Y,Z ==> Vertex 2 {m}
-    25,5.5,3.4,  !- X,Y,Z ==> Vertex 3 {m}
-    0,5.5,3.4;  !- X,Y,Z ==> Vertex 4 {m}
+    0,0,3.7,  !- X,Y,Z ==> Vertex 1 {m}
+    25,0,3.7,  !- X,Y,Z ==> Vertex 2 {m}
+    25,5.5,3.7,  !- X,Y,Z ==> Vertex 3 {m}
+    0,5.5,3.7;  !- X,Y,Z ==> Vertex 4 {m}
 
   RoofCeiling:Detailed,
     Ceiling_NorthZone_1stFloor,  !- Name
@@ -1304,10 +1304,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,5.5,3.4,  !- X,Y,Z ==> Vertex 1 {m}
-    25,5.5,3.4,  !- X,Y,Z ==> Vertex 2 {m}
-    25,11,3.4,  !- X,Y,Z ==> Vertex 3 {m}
-    0,11,3.4;  !- X,Y,Z ==> Vertex 4 {m}
+    0,5.5,3.7,  !- X,Y,Z ==> Vertex 1 {m}
+    25,5.5,3.7,  !- X,Y,Z ==> Vertex 2 {m}
+    25,11,3.7,  !- X,Y,Z ==> Vertex 3 {m}
+    0,11,3.7;  !- X,Y,Z ==> Vertex 4 {m}
 
   Floor:Detailed,
     Floor_SouthZone_2ndFloor,!- Name

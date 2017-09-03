@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <string>
@@ -502,11 +490,11 @@ namespace HeatBalanceAirManager {
 		int IsSourceZone;
 
 		// Formats
-		static gio::Fmt Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
+		static gio::Fmt Format_720( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
 		static gio::Fmt Format_722( "(' ',A,', ',A)" );
-		static gio::Fmt Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
+		static gio::Fmt Format_723( "(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_724( "('! <',A,' Airflow Stats Nominal>, ',A)" );
 
 		RepVarSet.dimension( NumOfZones, true );
 
@@ -527,6 +515,8 @@ namespace HeatBalanceAirManager {
 			SetupOutputVariable( "Zone Air Heat Balance System Convective Heat Gain Rate [W]", ZnAirRpt( Loop ).SumNonAirSystem, "System", "Average", Zone( Loop ).Name );
 			SetupOutputVariable( "Zone Air Heat Balance Air Energy Storage Rate [W]", ZnAirRpt( Loop ).CzdTdt, "System", "Average", Zone( Loop ).Name );
 			if ( DisplayAdvancedReportVariables ) {
+				SetupOutputVariable( "Zone Phase Change Material Melting Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyM, "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Phase Change Material Freezing Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyH, "Zone", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Air Heat Balance Deviation Rate [W]", ZnAirRpt( Loop ).imBalance, "System", "Average", Zone( Loop ).Name );
 			}
 		}
@@ -2533,7 +2523,7 @@ namespace HeatBalanceAirManager {
 		TotInfilVentFlow.dimension( NumOfZones, 0.0 );
 
 		for ( Loop = 1; Loop <= TotInfiltration; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Infiltration" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "ZoneInfiltration" << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2},ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
 
 			ZoneNum = Infiltration( Loop ).ZonePtr;
 			if ( ZoneNum == 0 ) {
@@ -2948,12 +2938,12 @@ namespace HeatBalanceAirManager {
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
 					AirModel( ZoneNum ).SimAirModel = true;
-					ValidateComponent( "RoomAirSettings:AirflowNetwork", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
-					if ( IsNotOK ) {
-						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
+					if ( GetNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
+						ShowSevereError( "In " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + cAlphaFieldNames( 3 ) + " = AIRFLOWNETWORK."  );
+						ShowContinueError( "This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage." );
+						ShowContinueError( "AirflowNetwork:SimulationControl not found." );
 						ErrorsFound = true;
 					}
-					// Need to make sure that Room Air controls are used for this one.
 				} else {
 					ShowWarningError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef SurfaceGeometry_hh_INCLUDED
 #define SurfaceGeometry_hh_INCLUDED
@@ -67,6 +55,10 @@
 #include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
+#include <HeatBalanceKivaManager.hh>
+
+// C++ Headers
+#include <map>
 
 namespace EnergyPlus {
 
@@ -113,6 +105,8 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	extern Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	extern HeatBalanceKivaManager::KivaManager kivaManager;
+
 
 	// Functions
 
@@ -252,7 +246,13 @@ namespace SurfaceGeometry {
 		Real64 const Length,
 		Real64 const Height
 	);
-
+	
+	void
+	MakeEquivalentRectangle(
+		int const SurfNum, // Surface number
+		bool & ErrorsFound // Error flag indicator (true if errors found)
+	);
+	
 	void
 	GetAttShdSurfaceData(
 		bool & ErrorsFound, // Error flag indicator (true if errors found)
@@ -281,10 +281,29 @@ namespace SurfaceGeometry {
 	GetShadingSurfReflectanceData( bool & ErrorsFound ); // If errors found in input
 
 	void
+	GetSurfaceSrdSurfsData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+
+	void
+	GetSurfaceLocalEnvData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+
+	void
 	GetHTSurfExtVentedCavityData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
 
 	void
 	GetSurfaceHeatTransferAlgorithmOverrides( bool & ErrorsFound );
+
+	class ExposedFoundationPerimeter {
+		public:
+			void getData(bool& ErrorsFound);
+			struct Data {
+				double exposedFraction;
+				std::vector<bool> isExposedPerimeter;
+				bool useDetailedExposedPerimeter;
+			};
+			std::map<int, Data> surfaceMap;
+	};
+
+	extern ExposedFoundationPerimeter exposedFoundationPerimeter;
 
 	void
 	GetVertices(
@@ -320,12 +339,143 @@ namespace SurfaceGeometry {
 	GetOSCMData( bool & ErrorsFound );
 
 	void
+	GetFoundationData( bool & ErrorsFound );
+
+	void
 	GetMovableInsulationData( bool & ErrorsFound ); // If errors found in input
 
 	void
 	CalculateZoneVolume(
 		bool & ErrorsFound, // If errors found in input
 		Array1S_bool const CeilingHeightEntered
+	);
+
+	struct EdgeOfSurf
+	{
+		int surfNum;
+		Vector start;
+		Vector end;
+		EdgeOfSurf():
+			surfNum( 0 ),
+			start( Vector( 0., 0., 0. ) ),
+			end( Vector( 0., 0., 0. ) )
+		{}
+	};
+
+	bool
+	isEnclosedVolume(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<EdgeOfSurf> & edgeNot2
+	);
+
+	std::vector<EdgeOfSurf>
+	edgesInBoth(
+		std::vector<EdgeOfSurf> edges1,
+		std::vector<EdgeOfSurf> edges2
+	);
+
+	bool
+	edgesEqualOnSameSurface(
+		EdgeOfSurf a,
+		EdgeOfSurf b
+	);
+
+	std::vector<EdgeOfSurf>
+	edgesNotTwoForEnclosedVolumeTest(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqueVertices
+	);
+
+	void
+	makeListOfUniqueVertices(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> & uniqVertices
+	);
+
+	DataVectorTypes::Polyhedron
+	updateZonePolygonsForMissingColinearPoints(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqVertices
+	);
+
+	void
+	insertVertexOnFace(
+		DataVectorTypes::Face & face,
+		int const & indexBefore,
+		DataVectorTypes::Vector const & vertexToInsert
+	);
+
+	bool
+	areFloorAndCeilingSame(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	bool
+	areWallHeightSame(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	std::tuple< bool, bool, bool >
+	areSurfaceHorizAndVert(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	bool
+	areOppositeWallsSame(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 & oppositeWallArea,
+		Real64 & distanceBetweenOppositeWalls
+	);
+
+	std::vector<int>
+	listOfFacesFacingAzimuth(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 const & azimuth
+	);
+
+	int
+	findPossibleOppositeFace(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex
+	);
+
+	bool
+	areCornersEquidistant(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex,
+		int const & opFaceIndex,
+		Real64 & distanceBetween
+	);
+
+	bool
+	isAlmostEqual3dPt(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	);
+
+	bool
+	isAlmostEqual2dPt(
+		DataVectorTypes::Vector_2d v1,
+		DataVectorTypes::Vector_2d v2
+	);
+
+	int
+	findIndexOfVertex(
+		DataVectorTypes::Vector vertexToFind,
+		std::vector<DataVectorTypes::Vector> listOfVertices
+	);
+
+	Real64
+	distance(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	);
+
+	bool
+	isPointOnLineBetweenPoints(
+		DataVectorTypes::Vector start,
+		DataVectorTypes::Vector end,
+		DataVectorTypes::Vector test
 	);
 
 	void
@@ -386,7 +536,7 @@ namespace SurfaceGeometry {
 	isRectangle(
 		int const ThisSurf // Current surface number
 	);
-		
+
 } // SurfaceGeometry
 
 } // EnergyPlus

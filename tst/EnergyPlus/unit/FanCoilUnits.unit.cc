@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,24 +43,16 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::FanCoilUnits Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <General.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1059,6 +1048,39 @@ namespace EnergyPlus {
 		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( 4420.0, QUnitOut, 5.0 );
+
+		// Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
+		QZnReq = 80.0;
+		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 80.00;
+		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 0;
+		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
+		// FC hits the 80 W target load
+		EXPECT_NEAR( 80.0, QUnitOut, 1.0 );
+		EXPECT_NEAR( 75.0, FanCoil( 1 ).QUnitOutNoHC, 1.0 );
+		// water mass flow rate needed to provide output of 80 W (including 75 W coil off capacity)
+		EXPECT_NEAR( 0.0000315, Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, 0.000001 );
+
+		// Coil Off Capacity Test #2 - lock plant flow after previous call
+		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 1;
+		Node( OAMixer( 1 ).RetNode ).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
+		Node( OAMixer( 1 ).RetNode ).Enthalpy = 39000;
+		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
+		// FC does not hit the 80 W target load since flow is locked at a low value
+		EXPECT_NEAR( 52.0, QUnitOut, 1.0 );
+		// off coil capacity is same as just prior to flow being locked
+		EXPECT_NEAR( 75.0, FanCoil( 1 ).QUnitOutNoHC, 1.0 );
+		// same water flow rate as before
+		EXPECT_NEAR( 0.0000315, Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, 0.000001 );
+
+		// Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
+		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 0;
+		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
+		// FC hits the 80 W target load
+		EXPECT_NEAR( 80.0, QUnitOut, 1.0 );
+		// actual coil off output when inlet air temp = 25 C and h = 39000 J/kg
+		EXPECT_NEAR( 48.0, FanCoil( 1 ).QUnitOutNoHC, 1.0 ); // interesting that this is very different for a heating system (from Coil Off Capacity Test #1)
+		// water flow rate had to increase to get to 80 W since coil off capacity was much different at -1752 W
+		EXPECT_NEAR( 0.000219, Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, 0.000001 );
 
 	}
 
@@ -2071,7 +2093,31 @@ namespace EnergyPlus {
 
 	}
 
+	Real64 ResidualFancoil(
+		Real64 const mdot,
+		Array1< Real64 > const & Par // Function parameters
+	)
+	{
+		int FanCoilNum = 1;
+		int ControlledZoneNum = 1;
+		bool FirstHVACIteration = false;
+		Real64 QUnitOut;
+		Real64 QZnReq = Par( 1 );
+		Real64 Residual;
+
+		Node( 12 ).MassFlowRate = mdot;
+
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+
+		Residual = ( QUnitOut - QZnReq ) / QZnReq;
+
+		return Residual;
+	}
+
+
 	TEST_F( EnergyPlusFixture, Test_TightenWaterFlowLimits ) {
+
+		using General::SolveRoot;
 
 		int FanCoilNum( 1 );
 		bool FirstHVACIteration( false );
@@ -2263,6 +2309,27 @@ namespace EnergyPlus {
 		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
 		EXPECT_NEAR( MinWaterFlow, 0.000000, 0.0000001 );
 		EXPECT_NEAR( MaxWaterFlow, 0.000015, 0.0000001 );
+
+		MinWaterFlow = 0.0;
+		MaxWaterFlow = 1.5;
+		Real64 ErrorToler = 0.00001;
+		int MaxIte = 4;
+		int SolFla;
+		Real64 mdot;
+		Real64 minFlow;
+		Real64 maxFlow;
+		Array1D< Real64 > Par( 2 ); // Function parameters
+		Par( 1 ) = -1000.0;
+		Par( 2 ) = 0.0;
+
+		General::SolveRoot( ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par, 2, minFlow, maxFlow );
+		EXPECT_EQ( -1, SolFla );
+		EXPECT_NEAR( minFlow, 0.0, 0.0000001 );
+		EXPECT_NEAR( maxFlow, 0.09375, 0.0000001 );
+		MaxIte = 20;
+		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+		General::SolveRoot( ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par );
+		EXPECT_EQ( 3, SolFla );
 
 	}
 

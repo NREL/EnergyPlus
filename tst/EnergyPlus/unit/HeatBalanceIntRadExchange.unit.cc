@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HeatBalFiniteDiffManager Unit Tests
 
@@ -79,22 +67,22 @@ namespace EnergyPlus {
 		int N; // NUMBER OF SURFACES
 		Array1D< Real64 > A; // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
 		Array2D< Real64 > F; // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-		int ZoneNum; // Zone number being fixe
+		int ZoneNum; // Zone number being fixed
 		Real64 OriginalCheckValue; // check of SUM(F) - N
 		Real64 FixedCheckValue; // check after fixed of SUM(F) - N
 		Real64 FinalCheckValue; // the one to go with
 		int NumIterations; // number of iterations to fixed
 		Real64 RowSum; // RowSum of Fixed
-		
+
 		N = 3;
-		
+
 		A.allocate( N );
 		F.allocate( N, N );
-		
+
 		A( 1 ) = 1.0;
 		A( 2 ) = 1.0;
 		A( 3 ) = 1.0;
-		
+
 		F( 1, 1 ) = 0.0;
 		F( 1, 2 ) = 0.5;
 		F( 1, 3 ) = 0.5;
@@ -104,12 +92,12 @@ namespace EnergyPlus {
 		F( 3, 1 ) = 0.5;
 		F( 3, 2 ) = 0.5;
 		F( 3, 3 ) = 0.0;
-		
+
 		ZoneNum = 1;
 
 		DataHeatBalance::Zone.allocate( ZoneNum );
 		DataHeatBalance::Zone( ZoneNum ).Name = "Test";
-		
+
 		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
 
 		std::string const error_string = delimited_string( {
@@ -120,7 +108,7 @@ namespace EnergyPlus {
 			"   **   ~~~   ** So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but",
 			"   **   ~~~   ** it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure.",
 		} );
-		
+
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 		// Tests for correction of view factors based on GitHub Issue #5772
@@ -142,7 +130,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( F( 1, 2 ), 0.07986, 0.001 );
 		EXPECT_NEAR( F( 2, 1 ), 0.71875, 0.001 );
 		EXPECT_NEAR( F( 3, 2 ), 0.28125, 0.001 );
-		
+
 		A( 1 ) = 100.0;
 		A( 2 ) = 100.0;
 		A( 3 ) = 200.0;
@@ -155,12 +143,12 @@ namespace EnergyPlus {
 		F( 3, 1 ) = 0.5;
 		F( 3, 2 ) = 0.5;
 		F( 3, 3 ) = 0.0;
-		
+
 		FixViewFactors( N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum );
 		EXPECT_NEAR( F( 1, 2 ), 0.181818, 0.001 );
 		EXPECT_NEAR( F( 2, 3 ), 0.25, 0.001 );
 		EXPECT_NEAR( F( 3, 2 ), 0.5, 0.001 );
-		
+
 		A( 1 ) = 100.0;
 		A( 2 ) = 150.0;
 		A( 3 ) = 200.0;
@@ -184,19 +172,19 @@ namespace EnergyPlus {
 
 		A.deallocate();
 		F.deallocate();
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagTest)
 	{
-	
+
 		bool DidMIChange;
 		int SurfNum;
-		
+
 		DataHeatBalance::Construct.allocate( 1 );
 		DataHeatBalance::Material.allocate( 1 );
 		DataSurfaces::Surface.allocate( 1 );
-		
+
 		SurfNum = 1;
 		DataSurfaces::Surface( 1 ).MaterialMovInsulInt = 1;
 		DataSurfaces::Surface( 1 ).MovInsulIntPresent = false;
@@ -208,7 +196,7 @@ namespace EnergyPlus {
 		DataHeatBalance::Material( 1 ).Resistance = 1.25;
 		DataSurfaces::Surface( 1 ).SchedMovInsulInt = -1;
 		DataHeatBalance::Material( 1 ).AbsorpSolar = 0.25;
-		
+
 		// Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
 		//         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
 		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
@@ -225,7 +213,7 @@ namespace EnergyPlus {
 		DataHeatBalance::Material( 1 ).AbsorpThermal = DataHeatBalance::Construct( 1 ).InsideAbsorpThermal;
 		HeatBalanceIntRadExchange::UpdateMovableInsulationFlag( DidMIChange, SurfNum );
 		EXPECT_TRUE( !DidMIChange );
-		
+
 	}
-	
+
 }

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HeatBalanceManager Unit Tests
 
@@ -423,6 +411,9 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 1 ).InletNode( 1 ) = 2;
 		ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 		ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+		ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 		ZoneEquipConfig( 1 ).IsControlled = true;
 		ZoneEquipConfig( 1 ).AirLoopNum = 1;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
@@ -437,6 +428,9 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 2 ).InletNode( 1 ) = 6;
 		ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 7;
 		ZoneEquipConfig( 2 ).ReturnAirNode = 8;
+		ZoneEquipConfig( 2 ).NumReturnNodes = 1;
+		ZoneEquipConfig( 2 ).ReturnNode.allocate( 1 );
+		ZoneEquipConfig( 2 ).ReturnNode( 1 ) = 8;
 		ZoneEquipConfig( 2 ).IsControlled = true;
 		ZoneEquipConfig( 2 ).AirLoopNum = 1;
 		ZoneEquipConfig( 2 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
@@ -585,4 +579,194 @@ namespace EnergyPlus {
 		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
 
 	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation )
+	{
+		std::string const idf_objects = delimited_string( {
+		"  Version,8.6;",
+  
+		"  Material:RoofVegetation,",
+		"    ThickSoil,               !- Name",
+		"    0.5,                     !- Height of Plants {m}",
+		"    5,                       !- Leaf Area Index {dimensionless}",
+		"    0.2,                     !- Leaf Reflectivity {dimensionless}",
+		"    0.95,                    !- Leaf Emissivity",
+		"    180,                     !- Minimum Stomatal Resistance {s/m}",
+		"    EcoRoofSoil,             !- Soil Layer Name",
+		"    MediumSmooth,            !- Roughness",
+		"    0.36,                    !- Thickness {m}",
+		"    0.4,                     !- Conductivity of Dry Soil {W/m-K}",
+		"    641,                     !- Density of Dry Soil {kg/m3}",
+		"    1100,                    !- Specific Heat of Dry Soil {J/kg-K}",
+		"    0.95,                    !- Thermal Absorptance",
+		"    0.8,                     !- Solar Absorptance",
+		"    0.7,                     !- Visible Absorptance",
+		"    0.4,                     !- Saturation Volumetric Moisture Content of the Soil Layer",
+		"    0.01,                    !- Residual Volumetric Moisture Content of the Soil Layer",
+		"    0.45,                    !- Initial Volumetric Moisture Content of the Soil Layer",
+		"    Advanced;                !- Moisture Diffusion Calculation Method",
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false );
+		GetMaterialData( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
+
+		// check the "Material:RoofVegetation" names
+		EXPECT_EQ( Material( 1 ).Name, "THICKSOIL" );
+		// check maximum (saturated) moisture content 
+		EXPECT_EQ( 0.4, Material( 1 ).Porosity );
+		// check initial moisture Content was reset
+		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
+
+	}
+	
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest )
+	{
+
+		WarmupFlag = false;
+		DayOfSim = 7;
+		MinNumberOfWarmupDays = 25;
+		NumOfZones = 1;
+		WarmupConvergenceValues.allocate( NumOfZones );
+		TempConvergTol = 0.01;
+		LoadsConvergTol = 0.01;
+		MaxTempPrevDay.allocate( NumOfZones );
+		MaxTempPrevDay( 1 ) = 23.0;
+		MaxTempZone.allocate( NumOfZones );
+		MaxTempZone( 1 ) = 23.0;
+		MinTempPrevDay.allocate( NumOfZones );
+		MinTempPrevDay( 1 ) = 23.0;
+		MinTempZone.allocate( NumOfZones );
+		MinTempZone( 1 ) = 23.0;
+		MaxHeatLoadZone.allocate( NumOfZones );
+		MaxHeatLoadPrevDay.allocate( NumOfZones );
+		WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue = 0.0;
+		MaxCoolLoadZone.allocate( NumOfZones );
+		MaxCoolLoadPrevDay.allocate( NumOfZones );
+		WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue = 0.0;
+		
+		// Test 1: All Maxs both less than MinLoad (100.0)
+		MaxHeatLoadZone( 1 ) = 50.0;
+		MaxHeatLoadPrevDay( 1 ) = 90.0;
+		MaxCoolLoadZone( 1 ) = 50.0;
+		MaxCoolLoadPrevDay( 1 ) = 90.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.0, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.0, 0.0001 );
+		
+		// Test 2: Max Previous Day both less than MinLoad
+		MaxHeatLoadZone( 1 ) = 100.5;
+		MaxHeatLoadPrevDay( 1 ) = 90.0;
+		MaxCoolLoadZone( 1 ) = 100.5;
+		MaxCoolLoadPrevDay( 1 ) = 90.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 3: Max Current Day both less than MinLoad
+		MaxHeatLoadZone( 1 ) = 90.0;
+		MaxHeatLoadPrevDay( 1 ) = 100.5;
+		MaxCoolLoadZone( 1 ) = 90.0;
+		MaxCoolLoadPrevDay( 1 ) = 100.5;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 4: Everything greater than MinLoad (pass convergence test)
+		MaxHeatLoadZone( 1 ) = 201.0;
+		MaxHeatLoadPrevDay( 1 ) = 200.0;
+		MaxCoolLoadZone( 1 ) = 201.0;
+		MaxCoolLoadPrevDay( 1 ) = 200.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 5: Everything greater than MinLoad (fail convergence test)
+		MaxHeatLoadZone( 1 ) = 210.0;
+		MaxHeatLoadPrevDay( 1 ) = 200.0;
+		MaxCoolLoadZone( 1 ) = 210.0;
+		MaxCoolLoadPrevDay( 1 ) = 200.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 1 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 1 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.05, 0.005 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.05, 0.005 );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInputTest )
+	{
+		// Test eio output for HVACSystemRootFindingAlgorithm
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.8;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"None, !- Infiltration Balancing Method",
+			"Ignored;                !- Infiltration Balancing Zones",
+			" HVACSystemRootFindingAlgorithm,",
+			" RegulaFalsiThenBisection,!- Algorithm",
+			" 5;                       !- Number of Iterations Before Algorithm Switch",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false
+		EXPECT_FALSE( ErrorsFound );
+		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION" );
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInputTest )
+	{
+		// Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.8;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"None, !- Infiltration Balancing Method",
+			"Ignored;                !- Infiltration Balancing Zones",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false
+		EXPECT_FALSE( ErrorsFound );
+		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi" );
+	}
+
 }

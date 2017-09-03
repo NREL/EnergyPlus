@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -490,7 +478,7 @@ namespace TarcogShading {
 		//  Output:
 		//  Tgap1, Tgap2  Temperature of vented gap
 		//  hcv1, hcv2    Convective/conductive coefficient for vented gap
-		//  qv1, qv2    Heat transfer to the gap by vetilation [W/m^2]
+		//  qv1, qv2    Heat transfer to the gap by ventilation [W/m^2]
 		//  speed1, speed2  Air/gas velocities in gaps around SD layer
 		//  nperr      Error flag
 		//**************************************************************************************************************
@@ -597,9 +585,10 @@ namespace TarcogShading {
 
 		converged = false;
 		iter = 0;
-		Real64 const s1_2( pow_2( s1 ) );
-		Real64 const s2_2( pow_2( s2 ) );
-		Real64 const s1_s2_2( pow_2( s1 / s2 ) );
+		Real64 const s1_2 = pow_2( s1 );
+		Real64 const s2_2 = pow_2( s2 );
+		Real64 const s1_s2_2 = pow_2( s1 / s2 );
+		Real64 const cos_Tilt = std::cos( tilt );
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap1, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, nperr, ErrorMessage );
@@ -608,7 +597,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * GravityConstant * ABS(cos(tilt)) * ABS(Tgap1 - Tgap2) / (Tgap1 * Tgap2)
 
 			//bi...Bug fix #00005:
-			A = dens0 * T0 * GravityConstant * H * std::abs( std::cos( tilt ) ) * std::abs( Tgap1 - Tgap2 ) / ( Tgap1 * Tgap2 );
+			A = dens0 * T0 * GravityConstant * H * std::abs( cos_Tilt ) * std::abs( Tgap1 - Tgap2 ) / ( Tgap1 * Tgap2 );
 
 			if ( A == 0.0 ) {
 				qv1 = 0.0;
@@ -874,7 +863,9 @@ namespace TarcogShading {
 
 		converged = false;
 		iter = 0;
-		Real64 const s_2( pow_2( s ) );
+		Real64 const s_2 = pow_2( s );
+		Real64 const abs_cos_tilt = std::abs( std::cos( tilt ) );
+
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage );
@@ -884,7 +875,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * gravity * ABS(cos(tilt)) * ABS(Tgap - Tenv) / (Tgap * Tenv)
 
 			//bi...Bug fix #00005:
-			A = dens0 * T0 * GravityConstant * H * std::abs( std::cos( tilt ) ) * std::abs( Tgap - Tenv ) / ( Tgap * Tenv );
+			A = dens0 * T0 * GravityConstant * H * abs_cos_tilt * std::abs( Tgap - Tenv ) / ( Tgap * Tenv );
 			//  A = dens0 * T0 * GravityConstant * H * ABS(cos(tilt)) * (Tgap - Tenv) / (Tgap * Tenv)
 
 			B1 = dens2 / 2;

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef HVACVariableRefrigerantFlow_hh_INCLUDED
 #define HVACVariableRefrigerantFlow_hh_INCLUDED
@@ -890,6 +878,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CoolOutAirMassFlow; // OA mass flow rate during cooling operation [kg/s]
 		Real64 HeatOutAirMassFlow; // OA mass flow rate during heating operation [kg/s]
 		Real64 NoCoolHeatOutAirMassFlow; // OA mass flow rate when no cooling or heating [kg/s]
+		Real64 MinOperatingPLR; // minimum part-load ratio for operating of fan/coil
+		int fanType_Num; // index to fan type
 		int FanOpModeSchedPtr; // Pointer to the correct fan operating mode schedule
 		int FanAvailSchedPtr; // Pointer to the correct fan availability schedule
 		int FanIndex; // Index to fan object
@@ -944,6 +934,7 @@ namespace HVACVariableRefrigerantFlow {
 		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
 		int ATMixerSecNode; // secondary air inlet node number for the air terminal mixer
 		int ATMixerOutNode; // outlet air node number for the air terminal mixer
+		bool firstPass; // used to reset global sizing data
 		// Default Constructor
 		VRFTerminalUnitEquipment() :
 			VRFTUType_Num( 0 ),
@@ -971,6 +962,7 @@ namespace HVACVariableRefrigerantFlow {
 			CoolOutAirMassFlow( 0.0 ),
 			HeatOutAirMassFlow( 0.0 ),
 			NoCoolHeatOutAirMassFlow( 0.0 ),
+			MinOperatingPLR( 1.0E-20 ),
 			FanOpModeSchedPtr( 0 ),
 			FanAvailSchedPtr( 0 ),
 			FanIndex( 0 ),
@@ -1021,7 +1013,8 @@ namespace HVACVariableRefrigerantFlow {
 			ATMixerType( 0 ),
 			ATMixerPriNode( 0 ),
 			ATMixerSecNode( 0 ),
-			ATMixerOutNode( 0 )
+			ATMixerOutNode( 0 ),
+			firstPass( true )
 		{}
 
 		public:

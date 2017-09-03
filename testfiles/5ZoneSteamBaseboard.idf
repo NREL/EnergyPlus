@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -843,6 +843,38 @@
     3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
+    Sp01-RIGHT,              !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE1-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.5,0.0,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    30.5,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    30.5,3.7,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    30.5,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Sp01-LEFT,               !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE1-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0,3.7,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,3.7,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,0.0,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
     RIGHT-1,                 !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
@@ -853,10 +885,10 @@
     WindExposed,             !- Wind Exposure
     0.50000,                 !- View Factor to Ground
     4,                       !- Number of Vertices
-    30.5,0.0,2.4,  !- X,Y,Z ==> Vertex 1 {m}
-    30.5,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
-    30.5,15.2,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-    30.5,15.2,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+    30.5,3.7,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    30.5,3.7,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    30.5,11.6,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    30.5,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     C2-1,                    !- Name
@@ -1035,6 +1067,38 @@
     26.8,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
+    Sp03-RIGHT,              !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE3-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.5,11.6,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    30.5,11.6,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    30.5,15.2,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    30.5,15.2,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Sp03-LEFT,               !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    SPACE3-1,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0,15.2,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,15.2,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,11.6,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
     LEFT-1,                  !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
@@ -1045,10 +1109,10 @@
     WindExposed,             !- Wind Exposure
     0.50000,                 !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0,15.2,2.4,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0,15.2,0.0,  !- X,Y,Z ==> Vertex 2 {m}
-    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-    0.0,0.0,2.4;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,11.6,2.4,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,11.6,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,3.7,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     C4-1,                    !- Name
@@ -3110,7 +3174,7 @@
   Boiler:Steam,
     Steam Boiler Plant Boiler,  !- Name
     NaturalGas,              !- Fuel Type
-    160000,                  !- Maximum Operating Pressure {Kpa}
+    160000,                  !- Maximum Operating Pressure {Pa}
     0.8,                     !- Theoretical Efficiency
     115,                     !- Design Outlet Steam Temperature {C}
     autosize,                !- Nominal Capacity {W}

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -90,6 +78,7 @@
 #include <TARCOGParams.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
+#include <ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -2616,32 +2605,45 @@ namespace WindowComplexManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		UnitVect = Vector( 0.0, 0.0, 0.0 );
+
+		Real64 const sin_Phi = std::sin( Phi );
+		Real64 const cos_Phi = std::cos( Phi );
+
+		Real64 const sin_Gamma = std::sin( Gamma );
+		Real64 const cos_Gamma = std::cos( Gamma );
+
+		Real64 const sin_Alpha = std::sin( Alpha );
+		Real64 const cos_Alpha = std::cos( Alpha );
+
+		Real64 const sin_Theta = std::sin( Theta );
+		Real64 const cos_Theta = std::cos( Theta );
+
 		{ auto const SELECT_CASE_var( RadType );
 		if ( SELECT_CASE_var == Front_Incident ) { //W6 vector will point in direction of propagation, must reverse to get world vector
 			//  after the W6 vector has been rotated into the world CS
-			UnitVect.x = std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha );
-			UnitVect.z = -( std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma ) );
+			UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha;
+			UnitVect.z = -( sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma );
 		} else if ( SELECT_CASE_var == Front_Transmitted ) {
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = -( std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = -( sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha );
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Front_Reflected ) {
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) + std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Back_Incident ) {
-			UnitVect.x = std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha );
-			UnitVect.z = -std::cos( Theta ) * std::cos( Gamma ) - std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma );
+			UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * cos_Alpha;
+			UnitVect.z = -cos_Theta * cos_Gamma - sin_Theta * sin_Phi * sin_Gamma;
 		} else if ( SELECT_CASE_var == Back_Transmitted ) { //This is same as front reflected
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) + std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Back_Reflected ) { //This is same as front transmitted
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = -( std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = -( sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha );
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
 		}}
 
 		// Remove small numbers from evaluation (due to limited decimal points for pi)
@@ -2990,6 +2992,7 @@ namespace WindowComplexManager {
 		using General::InterpSw;
 		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
+		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		using DataGlobals::StefanBoltzmann;
 		using TARCOGGassesParams::maxgas;
 		using TARCOGParams::maxlay;
@@ -2997,6 +3000,8 @@ namespace WindowComplexManager {
 		using DataHeatBalance::GasCoeffsAir;
 		using DataHeatBalance::SupportPillar;
 		using TARCOGMain::TARCOG90;
+		using ScheduleManager::GetCurrentScheduleValue;
+		using DataGlobals::AnyLocalEnvironmentsInModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3290,6 +3295,11 @@ namespace WindowComplexManager {
 		Real64 Ebout;
 		Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
 
+		int SrdSurfsNum; // Surrounding surfaces list number
+		int SrdSurfNum; // Surrounding surface number DO loop counter
+		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+
 		// fill local vars
 
 		CalcDeflection = 0;
@@ -3359,7 +3369,11 @@ namespace WindowComplexManager {
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
 				// a weighted average of the inlet temperatures.
-				RefAirTemp = SumSysMCpT / SumSysMCp;
+				if ( SumSysMCp > 0.0 ) {
+					RefAirTemp = SumSysMCpT / SumSysMCp;
+				} else {
+					RefAirTemp = MAT( ZoneNum );
+				}
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
@@ -3397,7 +3411,11 @@ namespace WindowComplexManager {
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}
 					// a weighted average of the inlet temperatures.
-					RefAirTemp = SumSysMCpT / SumSysMCp;
+					if ( SumSysMCp > 0.0 ) {
+						RefAirTemp = SumSysMCpT / SumSysMCp;
+					} else {
+						RefAirTemp = MAT( ZoneNumAdj );
+					}
 				} else {
 					// currently set to mean air temp but should add error warning here
 					RefAirTemp = MAT( ZoneNumAdj );
@@ -3414,7 +3432,24 @@ namespace WindowComplexManager {
 				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QCoolingPanelSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
-
+				// Calculate LWR from surrounding surfaces if defined for an exterior window
+				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				if ( AnyLocalEnvironmentsInModel ) {
+					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						}
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+						}					
+						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+							QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+						}
+					}
+				}
 				if ( Surface( SurfNum ).ExtWind ) { // Window is exposed to wind (and possibly rain)
 					if ( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
 						tout = Surface( SurfNum ).OutWetBulbTemp + KelvinConv;
@@ -3427,7 +3462,7 @@ namespace WindowComplexManager {
 				//tsky = SkyTemp + TKelvin
 				tsky = SkyTempKelvin;
 				Ebout = sigma * pow_4( tout );
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
 
 			}
 

@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -599,7 +587,7 @@ namespace EconomicTariff {
 			if ( len( cAlphaArgs( 9 ) ) > 0 ) {
 				tariff( iInObj ).minMonthChgVal = ProcessNumber( cAlphaArgs( 9 ), isNotNumeric );
 			} else {
-				tariff( iInObj ).minMonthChgVal = -huge( -1.0 ); //set to a very negative value
+				tariff( iInObj ).minMonthChgVal = -HUGE_( -1.0 ); //set to a very negative value
 			}
 			tariff( iInObj ).minMonthChgPt = AssignVariablePt( cAlphaArgs( 9 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj );
 			//real time pricing
@@ -810,12 +798,12 @@ namespace EconomicTariff {
 		bool isNotNumeric;
 		int jBlk; // loop index for blocks
 		int alphaOffset; // offset used in blocks for alpha array
-		Real64 hugeNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
+		Real64 hugeNumber( 0.0 ); //Autodesk Value not used but suppresses warning about HUGE_() call
 		int jFld;
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Charge:Block";
-		hugeNumber = huge( hugeNumber );
+		hugeNumber = HUGE_( hugeNumber );
 		numChargeBlock = GetNumObjectsFound( CurrentModuleObject );
 		chargeBlock.allocate( numChargeBlock );
 		for ( iInObj = 1; iInObj <= numChargeBlock; ++iInObj ) {
@@ -2655,7 +2643,7 @@ namespace EconomicTariff {
 		Real64 annualAggregate;
 		int annualCnt;
 
-		hugeValue = huge( Real64() );
+		hugeValue = HUGE_( Real64() );
 		//  Clear the isEvaluated flags for all economics variables.
 		for ( nVar = 1; nVar <= numEconVar; ++nVar ) {
 			econVar( nVar ).isEvaluated = false;
@@ -3361,7 +3349,7 @@ namespace EconomicTariff {
 		if ( isMonthly ) {
 			adjSeasonal = adjustmentVals;
 		} else {
-			maximumVal = -huge( Real64() );
+			maximumVal = -HUGE_( Real64() );
 			for ( iMonth = 1; iMonth <= MaxNumMonths; ++iMonth ) {
 				if ( seasonFromMask( iMonth ) == 1 ) {
 					if ( adjustmentVals( iMonth ) > maximumVal ) {
@@ -3610,9 +3598,9 @@ namespace EconomicTariff {
 		int jPeriod;
 		int kMonth;
 		Array1D< Real64 > monthVal( MaxNumMonths );
-		Real64 bigNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
+		Real64 bigNumber( 0.0 ); //Autodesk Value not used but suppresses warning about HUGE_() call
 
-		bigNumber = huge( bigNumber );
+		bigNumber = HUGE_( bigNumber );
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 			//nativeTotalEnergy
 			monthVal = 0.0;
@@ -4379,12 +4367,12 @@ namespace EconomicTariff {
 		//    Get the annual maximum and sum for the econVariable.
 
 		Real64 sumVal;
-		Real64 maximumVal( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
+		Real64 maximumVal( 0.0 ); //Autodesk Value not used but suppresses warning about HUGE_() call
 		Real64 curVal;
 		int jMonth;
 
 		sumVal = 0.0;
-		maximumVal = -huge( maximumVal );
+		maximumVal = -HUGE_( maximumVal );
 		for ( jMonth = 1; jMonth <= 12; ++jMonth ) { //note not all months get printed out if more than 12 are used.- need to fix this later
 			curVal = econVar( varPointer ).values( jMonth );
 			sumVal += curVal;

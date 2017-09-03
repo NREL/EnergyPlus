@@ -7,6 +7,9 @@
 !
 ! Highlights:              Natural ventilation through openable exterior windows and openable interior door.
 !                          The analytical solution is used to solve zone air heat and moisture balance equations.
+!                          A rectangular window was split into two triangular windows to demonstrate how the
+!                          AirflowNetwrok model handles non-rectangular windows. Rectangular windows are recommended
+!                          to be used in most cases.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the design days only.
@@ -125,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     AirflowNetwork 3 Zone Building,  !- Name
@@ -734,7 +737,7 @@
     12.19200,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
-    WINDOW1,                 !- Name
+    WINDOW11,                !- Name
     WINDOW,                  !- Surface Type
     WIN-CON-LIGHT,           !- Construction Name
     Surface_1,               !- Building Surface Name
@@ -743,11 +746,25 @@
     ,                        !- Shading Control Name
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
-    4,                       !- Number of Vertices
+    3,                       !- Number of Vertices
     1.00000,0,2.500000,  !- X,Y,Z ==> Vertex 1 {m}
     1.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 2 {m}
-    5.000000,0,1.0000000,  !- X,Y,Z ==> Vertex 3 {m}
-    5.000000,0,2.500000;  !- X,Y,Z ==> Vertex 4 {m}
+    5.000000,0,1.0000000;  !- X,Y,Z ==> Vertex 3 {m}
+
+  FenestrationSurface:Detailed,
+    WINDOW12,                !- Name
+    WINDOW,                  !- Surface Type
+    WIN-CON-LIGHT,           !- Construction Name
+    Surface_1,               !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    3,                       !- Number of Vertices
+    5.00000,0,1.0000000,  !- X,Y,Z ==> Vertex 1 {m}
+    5.000000,0,2.5000000,  !- X,Y,Z ==> Vertex 2 {m}
+    1.000000,0,2.500000;  !- X,Y,Z ==> Vertex 3 {m}
 
   FenestrationSurface:Detailed,
     DoorInSurface_3,         !- Name
@@ -1035,7 +1052,6 @@
     NaturalVentilation,      !- Name
     MultizoneWithoutDistribution,  !- AirflowNetwork Control
     INPUT,                   !- Wind Pressure Coefficient Type
-    Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
@@ -1083,7 +1099,13 @@
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
   AirflowNetwork:MultiZone:Surface,
-    Window1,                 !- Surface Name
+    Window11,                !- Surface Name
+    WiOpen1,                 !- Leakage Component Name
+    SFacade,                 !- External Node Name
+    0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
+
+  AirflowNetwork:MultiZone:Surface,
+    Window12,                !- Surface Name
     WiOpen1,                 !- Leakage Component Name
     SFacade,                 !- External Node Name
     0.5;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
@@ -1231,22 +1253,22 @@
   AirflowNetwork:MultiZone:ExternalNode,
     NFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     EFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     SFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     WFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:WindPressureCoefficientArray,
     Every 30 Degrees,        !- Name
@@ -1343,21 +1365,29 @@
 
   Output:Variable,*,AFN Zone Mixing Volume,timestep;
 
-  Output:Variable,Window1,AFN Surface Venting Availability Status,timestep;
+  Output:Variable,Window11,AFN Surface Venting Availability Status,timestep;
 
-  Output:Variable,Window1,AFN Surface Venting Window or Door Opening Factor,timestep;
+  Output:Variable,Window11,AFN Surface Venting Window or Door Opening Factor,timestep;
 
-  Output:Variable,Window1,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
+  Output:Variable,Window11,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
 
   Output:Variable,Window2,AFN Surface Venting Availability Status,timestep;
 
   Output:Variable,Window2,AFN Surface Venting Window or Door Opening Factor,timestep;
 
-  Output:Variable,Window1,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
+  Output:Variable,Window11,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
 
   Output:Variable,Window2,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
 
   Output:Variable,Window2,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
+
+  Output:Variable,Window12,AFN Surface Venting Availability Status,timestep;
+
+  Output:Variable,Window12,AFN Surface Venting Window or Door Opening Factor,timestep;
+
+  Output:Variable,Window12,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
+
+  Output:Variable,Window12,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
 
   Output:Variable,DoorInSurface_3,AFN Surface Venting Availability Status,timestep;
 

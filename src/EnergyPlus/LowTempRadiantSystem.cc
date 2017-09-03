@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -1217,7 +1205,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).SurfacePtr.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfaceName.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfacePowerFrac.allocate( ElecRadSys( Item ).NumOfSurfaces );
-				for ( SurfNum = 1; SurfNum <= ElecRadSys( SurfListNum ).NumOfSurfaces; ++SurfNum ) {
+				for ( SurfNum = 1; SurfNum <= SurfList( SurfListNum ).NumOfSurfaces; ++SurfNum ) {
 					ElecRadSys( Item ).SurfacePtr( SurfNum ) = SurfList( SurfListNum ).SurfPtr( SurfNum );
 					ElecRadSys( Item ).SurfaceName( SurfNum ) = SurfList( SurfListNum ).SurfName( SurfNum );
 					ElecRadSys( Item ).SurfacePowerFrac( SurfNum ) = SurfList( SurfListNum ).SurfFlowFrac( SurfNum );
@@ -2090,8 +2078,8 @@ namespace LowTempRadiantSystem {
 							if ( ZoneSizingRunDone ) {
 								CheckZoneSizing( CompType, CompName );
 								SizingMethod = AutoCalculateSizing;
-								DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
-								DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								DataConstantUsedForSizing = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
+								DataFractionUsedForSizing = 1.0;
 							}
 							if ( ElecRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
 								TempSize = AutoSize;
@@ -2102,7 +2090,7 @@ namespace LowTempRadiantSystem {
 							if ( ZoneSizingRunDone ) {
 								CheckZoneSizing( CompType, CompName );
 								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							}
 							TempSize = ElecRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( ElecRadSys( RadSysNum ).ZonePtr ).FloorArea;
 							DataScalableCapSizingON = true;
@@ -2110,7 +2098,7 @@ namespace LowTempRadiantSystem {
 						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
 							DataScalableCapSizingON = true;
 						} else {
@@ -2170,8 +2158,8 @@ namespace LowTempRadiantSystem {
 							if ( ZoneSizingRunDone ) {
 								CheckZoneSizing( CompType, CompName );
 								SizingMethod = AutoCalculateSizing;
-								DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
-								DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								DataConstantUsedForSizing = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
+								DataFractionUsedForSizing = 1.0;
 							}
 							if ( HydrRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
 								TempSize = AutoSize;
@@ -2182,14 +2170,14 @@ namespace LowTempRadiantSystem {
 							if ( ZoneSizingRunDone ) {
 								CheckZoneSizing( CompType, CompName );
 								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							}
 							TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
 							DataScalableCapSizingON = true;
 						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad * HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
 							DataScalableCapSizingON = true;
 						} else {
@@ -2296,8 +2284,8 @@ namespace LowTempRadiantSystem {
 							if ( ZoneSizingRunDone ) {
 								CheckZoneSizing( CompType, CompName );
 								SizingMethod = AutoCalculateSizing;
-								DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
-								DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+								DataConstantUsedForSizing = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
+								DataFractionUsedForSizing = 1.0;
 							}
 							if ( HydrRadSys( RadSysNum ).ScaledCoolingCapacity == AutoSize ) {
 								TempSize = AutoSize;
@@ -2308,14 +2296,14 @@ namespace LowTempRadiantSystem {
 							if ( ZoneSizingRunDone ) {
 								CheckZoneSizing( CompType, CompName );
 								ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-								ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+								ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 							}
 							TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( HydrRadSys( RadSysNum ).ZonePtr ).FloorArea;
 							DataScalableCapSizingON = true;
 						} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
 							DataScalableCapSizingON = true;
 
@@ -2394,9 +2382,8 @@ namespace LowTempRadiantSystem {
 						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "User-Specified Hydronic Tubing Length [m]", HydrRadSys( RadSysNum ).TubeLength );
 					}
 				} else { // Autosize or hard-size with sizing run
-					// assume tube spacing of 15 cm
 					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-					TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+					TubeLengthDes = SizeRadSysTubeLength( SystemType, RadSysNum );
 					if ( IsAutoSize ) {
 						HydrRadSys( RadSysNum ).TubeLength = TubeLengthDes;
 						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes );
@@ -2469,13 +2456,12 @@ namespace LowTempRadiantSystem {
 											CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
 					}
 					if ( PltSizHeatNum > 0 ) {
-						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) >= SmallLoad ) {
+						if ( FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad >= SmallLoad ) {
 							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName,
 								DataGlobals::HWInitConvTemp, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
 							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName,
 								DataGlobals::HWInitConvTemp, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							WaterVolFlowMaxHeatDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor /
-                                                        ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+							WaterVolFlowMaxHeatDes = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 						} else {
 							WaterVolFlowMaxHeatDes = 0.0;
 						}
@@ -2493,13 +2479,12 @@ namespace LowTempRadiantSystem {
 							CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
 					}
 					if ( PltSizCoolNum > 0 ) {
-						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) >= SmallLoad ) {
+						if ( FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad >= SmallLoad ) {
 							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0,
                              PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
 							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0,
 								PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							WaterVolFlowMaxCoolDes = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor /
-								( PlantSizData(PltSizCoolNum).DeltaT * Cp * rho );
+							WaterVolFlowMaxCoolDes = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad / ( PlantSizData(PltSizCoolNum).DeltaT * Cp * rho );
 						} else {
 							WaterVolFlowMaxCoolDes = 0.0;
 						}
@@ -2558,9 +2543,8 @@ namespace LowTempRadiantSystem {
 							"User-Specified Hydronic Tubing Length [m]", CFloRadSys( RadSysNum ).TubeLength );
 					}
 				} else {	// Autosize or hard-size with sizing run
-					// assume tube spacing of 15 cm
 					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-					TubeLengthDes = CFloRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+					TubeLengthDes = SizeRadSysTubeLength( SystemType, RadSysNum );
 					if (IsAutoSize ) {
 						CFloRadSys( RadSysNum ).TubeLength = TubeLengthDes;
 						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
@@ -2607,6 +2591,68 @@ namespace LowTempRadiantSystem {
 
 	}
 
+	Real64
+	SizeRadSysTubeLength(
+		int const RadSysType, // type of system (hydronic or constant flow)
+		int const RadSysNum   // index number for radiant system
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   August 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine figures out the tube length based on the spacing of tubes.
+		// For single surface systems, this is fairly easy as there is only one spacing
+		// to deal with.  For multi-surface systems, more work is necessary because each
+		// surface could use a different spacing.
+
+		// Return value
+		Real64 SizeRadSysTubeLength;
+		
+		int SurfNum; // index for counting through the surfaces that are part of this radiant system
+		Real64 TubeLength; // temporary holding place for the function calculation
+		
+		// HydrRadSys( RadNum ).TotalSurfaceArea = 0.0;
+		// for ( SurfNum = 1; SurfNum <= HydrRadSys( RadNum ).NumOfSurfaces; ++SurfNum ) {
+		// 	HydrRadSys( RadNum ).TotalSurfaceArea += Surface( HydrRadSys( RadNum ).SurfacePtr( SurfNum ) ).Area;
+		// }
+
+		TubeLength = 0.0;
+		if ( RadSysType == HydronicSystem ) {
+			auto & thisHydrSys( HydrRadSys( RadSysNum ) );
+			for ( SurfNum = 1; SurfNum <= thisHydrSys.NumOfSurfaces; ++ SurfNum ) {
+				auto & thisHydrSysSurf( Surface( thisHydrSys.SurfacePtr( SurfNum ) ) );
+				auto & thisHydrSpacing( Construct( thisHydrSysSurf.Construction ).ThicknessPerpend );
+				if ( ( thisHydrSpacing > 0.005) && ( thisHydrSpacing < 0.5 ) ) { // limit allowable spacing to between 1cm and 1m
+					TubeLength += thisHydrSysSurf.Area / ( 2.0 * thisHydrSpacing );
+				} else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
+					TubeLength += thisHydrSysSurf.Area / 0.15;
+				}
+			}
+		} else if ( RadSysType == ConstantFlowSystem ) {
+			auto & thisCFloSys( CFloRadSys( RadSysNum ) );
+			for ( SurfNum = 1; SurfNum <= thisCFloSys.NumOfSurfaces; ++ SurfNum ) {
+				auto & thisCFloSysSurf( Surface( thisCFloSys.SurfacePtr( SurfNum ) ) );
+				auto & thisCFloSpacing( Construct( thisCFloSysSurf.Construction ).ThicknessPerpend );
+				if ( ( thisCFloSpacing > 0.005) && ( thisCFloSpacing < 0.5 ) ) { // limit allowable spacing to between 1cm and 1m
+					TubeLength += thisCFloSysSurf.Area / ( 2.0 * thisCFloSpacing );
+				} else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
+					TubeLength += thisCFloSysSurf.Area / 0.15;
+				}
+			}
+		} else {
+			// Return value
+			ShowWarningError( "SizeRadSysTubeLength: Illegal system type passed into this routine.  This should never happen." );
+			TubeLength = 60.0; // Assign a length to avoid any divide by zero errors. This length is a 3m by 3m room with 0.15m spacing.
+		}
+			
+		SizeRadSysTubeLength = TubeLength;
+		return SizeRadSysTubeLength;
+		
+	}
+	
 	void
 	CalcLowTempHydrRadiantSystem(
 		int const RadSysNum, // name of the low temperature radiant system
@@ -2746,12 +2792,12 @@ namespace LowTempRadiantSystem {
 
 			} else { // Temperatures for heating and cooling do not overlap--calculate the mass flow fraction
 
-				if ( ControlTemp < OffTempHeat ) { // Heating mode
+				if ( ControlTemp < OffTempHeat && HydrRadSys( RadSysNum ).HeatingSystem ) { // Heating mode
 					OperatingMode = HeatingMode;
 					ControlNode = HydrRadSys( RadSysNum ).HotWaterInNode;
 					MaxWaterFlow = HydrRadSys( RadSysNum ).WaterFlowMaxHeat;
 					MassFlowFrac = ( OffTempHeat - ControlTemp ) / HydrRadSys( RadSysNum ).HotThrottlRange;
-				} else if ( ControlTemp > OffTempCool ) { // Cooling mode
+				} else if ( ControlTemp > OffTempCool && HydrRadSys( RadSysNum ).CoolingSystem ) { // Cooling mode
 					OperatingMode = CoolingMode;
 					ControlNode = HydrRadSys( RadSysNum ).ColdWaterInNode;
 					MaxWaterFlow = HydrRadSys( RadSysNum ).WaterFlowMaxCool;
@@ -3360,7 +3406,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			// Now actually decide what to do based on the setpoint temperature in relation to the control temperatures
-			if ( SetPointTemp < OffTempHeat ) { // HEATING MODE
+			if ( SetPointTemp < OffTempHeat && CFloRadSys( RadSysNum ).HeatingSystem ) { // HEATING MODE
 
 				OperatingMode = HeatingMode;
 				
@@ -3402,7 +3448,7 @@ namespace LowTempRadiantSystem {
 
 				}
 
-			} else if ( SetPointTemp > OffTempCool ) { // COOLING MODE
+			} else if ( SetPointTemp > OffTempCool && CFloRadSys( RadSysNum ).CoolingSystem ) { // COOLING MODE
 
 				OperatingMode = CoolingMode;
 				

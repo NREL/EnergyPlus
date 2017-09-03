@@ -11,7 +11,7 @@ compilers:
     s3_upload_bucket: energyplus
 
   - name: cppcheck
-    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*"
+    compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*"
 
   - name: "gcc"
     version: "4.8"

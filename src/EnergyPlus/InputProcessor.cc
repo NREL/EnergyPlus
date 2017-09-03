@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -1207,7 +1195,7 @@ namespace InputProcessor {
 		}
 
 		if ( errFlag ) {
-			ShowContinueError( "IP: Errors occured in ObjectDefinition for Class=" + ObjectDef( NumObjectDefs ).Name + ", Object not available for IDF processing.", EchoInputFile );
+			ShowContinueError( "IP: Errors occurred in ObjectDefinition for Class=" + ObjectDef( NumObjectDefs ).Name + ", Object not available for IDF processing.", EchoInputFile );
 			ObjectDef( NumObjectDefs ).AlphaOrNumeric.deallocate();
 			ObjectDef( NumObjectDefs ).NumRangeChks.deallocate();
 			ObjectDef( NumObjectDefs ).AlphFieldChks.deallocate();
@@ -5327,7 +5315,7 @@ namespace InputProcessor {
 		int Loop;
 		int Loop1;
 
-		OutputVariablesForSimulation.allocate( 10000 );
+		OutputVariablesForSimulation.reserve( 1024 );
 		MaxConsideredOutputVariables = 10000;
 
 		// Output Variable
@@ -5441,11 +5429,6 @@ namespace InputProcessor {
 
 			}
 			CurrentRecord = FindNextRecord( OutputTableSummaries, CurrentRecord );
-		}
-
-		if ( NumConsideredOutputVariables > 0 ) {
-			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
-			MaxConsideredOutputVariables = NumConsideredOutputVariables;
 		}
 
 	}
@@ -5943,39 +5926,14 @@ namespace InputProcessor {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   July 2010
-		//       MODIFIED       na
+		//       MODIFIED       March 2017
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine adds a new record (if necessary) to the Output Variable
 		// reporting structure.  DataOutputs, OutputVariablesForSimulation
 
-		// METHODOLOGY EMPLOYED:
-		// OutputVariablesForSimulation is a linked list structure for later
-		// semi-easy perusal.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataOutputs;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CurNum;
-		int NextNum;
-		bool FoundOne;
 		std::string::size_type vnameLen; // if < length, there were units on the line/name
 
 		std::string::size_type const rbpos = index( VariableName, '[' );
@@ -5984,97 +5942,18 @@ namespace InputProcessor {
 		} else {
 			vnameLen = len_trim( VariableName.substr( 0, rbpos ) );
 		}
-
-		FoundOne = false;
 		std::string const VarName( VariableName.substr( 0, vnameLen ) );
-		for ( CurNum = 1; CurNum <= NumConsideredOutputVariables; ++CurNum ) {
-			if ( VarName == OutputVariablesForSimulation( CurNum ).VarName ) {
-				FoundOne = true;
-				break;
-			}
-		}
 
-		if ( ! FoundOne ) {
-			if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-				ReAllocateAndPreserveOutputVariablesForSimulation();
-			}
-			++NumConsideredOutputVariables;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = 0;
-			OutputVariablesForSimulation( NumConsideredOutputVariables ).Next = 0;
+		auto const found = DataOutputs::OutputVariablesForSimulation.find( VarName );
+		if ( found == DataOutputs::OutputVariablesForSimulation.end() ) {
+			std::unordered_map< std::string, DataOutputs::OutputReportingVariables > data;
+			data.reserve( 32 );
+			data.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
+			DataOutputs::OutputVariablesForSimulation.emplace( VarName, std::move( data ) );
 		} else {
-			if ( KeyValue != OutputVariablesForSimulation( CurNum ).Key ) {
-				NextNum = CurNum;
-				if ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-					while ( OutputVariablesForSimulation( NextNum ).Next != 0 ) {
-						CurNum = NextNum;
-						NextNum = OutputVariablesForSimulation( NextNum ).Next;
-					}
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = NextNum;
-					OutputVariablesForSimulation( NextNum ).Next = NumConsideredOutputVariables;
-				} else {
-					if ( NumConsideredOutputVariables == MaxConsideredOutputVariables ) {
-						ReAllocateAndPreserveOutputVariablesForSimulation();
-					}
-					++NumConsideredOutputVariables;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Key = KeyValue;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).VarName = VarName;
-					OutputVariablesForSimulation( NumConsideredOutputVariables ).Previous = CurNum;
-					OutputVariablesForSimulation( CurNum ).Next = NumConsideredOutputVariables;
-				}
-			}
+			found->second.emplace( KeyValue, DataOutputs::OutputReportingVariables( KeyValue, VarName ) );
 		}
-
-	}
-
-	void
-	ReAllocateAndPreserveOutputVariablesForSimulation()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   April 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine does a simple reallocate for the OutputVariablesForSimulation structure, preserving
-		// the data that is already in the structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataOutputs;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const OutputVarAllocInc( ObjectsIDFAllocInc );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// up allocation by OutputVarAllocInc
-		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
+		DataOutputs::NumConsideredOutputVariables++;
 	}
 
 	void

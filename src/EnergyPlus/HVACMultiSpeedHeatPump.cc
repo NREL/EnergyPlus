@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -156,7 +144,6 @@ namespace HVACMultiSpeedHeatPump {
 	using DataHVACGlobals::SmallLoad;
 	using DataHVACGlobals::DXElecCoolingPower;
 	using DataHVACGlobals::DXElecHeatingPower;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::ElecHeatingCoilPower;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
@@ -384,7 +371,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
-		FanElecPower = 0.0;
 		DXElecHeatingPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		SaveCompressorPLR = 0.0;
@@ -492,16 +478,18 @@ namespace HVACMultiSpeedHeatPump {
 		}
 
 		MSHeatPump( MSHeatPumpNum ).AuxElecPower = MSHeatPump( MSHeatPumpNum ).AuxOnCyclePower * SaveCompressorPLR + MSHeatPump( MSHeatPumpNum ).AuxOffCyclePower * ( 1.0 - SaveCompressorPLR );
+		Real64 locFanElecPower = 0.0;
+		locFanElecPower = Fans::GetFanPower( MSHeatPump( MSHeatPumpNum ).FanNum );
 		if ( MSHeatPump( MSHeatPumpNum ).HeatCoilType != MultiSpeedHeatingCoil ) {
 			{ auto const SELECT_CASE_var( MSHeatPump( MSHeatPumpNum ).HeatCoilType );
 			if ( ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) || ( SELECT_CASE_var == Coil_HeatingElectric_MultiStage ) ) {
-				MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
+				MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
 			} else if ( ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) {
-				MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower;
+				MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower;
 			} else {
 			}}
 		} else {
-			MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + MSHeatPump( MSHeatPumpNum ).AuxElecPower;
+			MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + MSHeatPump( MSHeatPumpNum ).AuxElecPower;
 		}
 
 	}
@@ -2438,7 +2426,7 @@ namespace HVACMultiSpeedHeatPump {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
@@ -2568,7 +2556,7 @@ namespace HVACMultiSpeedHeatPump {
 			if ( ( QZnReq > 0.0 && QZnReq <= LowOutput ) || ( QZnReq < 0.0 && QZnReq >= LowOutput ) ) {
 				SpeedRatio = 0.0;
 				SpeedNum = 1;
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountCyc == 0 ) {
@@ -2605,7 +2593,7 @@ namespace HVACMultiSpeedHeatPump {
 					}
 				}
 				Par( 8 ) = SpeedNum;
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountVar == 0 ) {
@@ -2642,7 +2630,7 @@ namespace HVACMultiSpeedHeatPump {
 					CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 					SpeedRatio = 0.0;
 					if ( ( QZnReq > 0.0 && QZnReq <= LowOutput ) || ( QZnReq < 0.0 && QZnReq >= LowOutput ) ) {
-						SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
+						SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
 						if ( SolFla == -1 ) {
 							if ( ! WarmupFlag ) {
 								if ( ErrCountCyc == 0 ) {
@@ -2672,7 +2660,7 @@ namespace HVACMultiSpeedHeatPump {
 						CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 1.0, 1.0, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 						if ( ( QZnReq > 0.0 && QZnReq <= FullOutput ) || ( QZnReq < 0.0 && QZnReq >= FullOutput ) ) {
 							Par( 8 ) = SpeedNum;
-							SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
+							SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( ErrCountVar == 0 ) {
@@ -3465,7 +3453,7 @@ namespace HVACMultiSpeedHeatPump {
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::SmallLoad;
 
@@ -3565,7 +3553,7 @@ namespace HVACMultiSpeedHeatPump {
 							Par( 2 ) = 0.0;
 						}
 						Par( 3 ) = HeatingLoad;
-						SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+						SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 						if ( SolFlag == -1 ) {
 							if ( MSHeatPump( MSHeatPumpNum ).HotWaterCoilMaxIterIndex == 0 ) {
 								ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed for " + CurrentModuleObject + "=\"" + MSHeatPump( MSHeatPumpNum ).Name + "\"" );

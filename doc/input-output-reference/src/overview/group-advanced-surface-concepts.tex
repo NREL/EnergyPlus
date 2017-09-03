@@ -1,3 +1,4 @@
+\section{Group -- Advanced Surface Concepts}\label{group-advanced-surface-concepts}
 
 This group of objects describe concepts applied to heat transfer surfaces that are of an advanced nature. Careful consideration must be given before using these.
 
@@ -398,7 +399,9 @@ The boundary condition values are determined dynamically by the program using in
 
 It should be noted that when other side conditions models are used, solar effects are removed from the surface's outside face heat balance, but are used in modeling the component adjacent to that surface.
 
-In addition, the other side conditions model has been modified to include underground piping system interaction. The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
+The other side conditions model also includes underground piping system interaction. The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
+
+The other side conditions model also includes an underwater boundary condition connection.  By specifying ``ConvectiveUnderwater'' as the boundary type, and including any number of ``SurfaceProperty:Underwater'' objects in the input, the user can connect sufaces to water such as for a moving vessel.
 
 \subsubsection{Inputs}\label{inputs-5}
 
@@ -408,7 +411,7 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 \paragraph{Field: Type of Modeling}\label{field-type-of-modeling}
 
-This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ''GapConvectionRadiation,'' ``UndergroundPipingSystemSurface,'' and ``GroundCoupledSurface.''
+This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ''GapConvectionRadiation,'' ``UndergroundPipingSystemSurface,'' ``GroundCoupledSurface,'' and ``ConvectiveUnderwater.''
 
 \begin{figure}[hbtp] % fig 42
 \centering
@@ -453,6 +456,700 @@ This is the effective temperature exposed to the other side of the surface for t
 \paragraph{Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient {[}W/m2-K{]}}\label{surface-other-side-conditions-modeled-radiation-heat-transfer-coefficient-wm2-k}
 
 This is the effective (Linearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
+
+\subsection{SurfaceProperty:Underwater}\label{surfacepropertyunderwater}
+
+This object captures the inputs required to model a water-connected boundary condition for a surface.
+This model is useful for either statically positioned buildings with natural convection to the water boundary condition, or a moving building (vessel).
+
+\subsubsection{Inputs}\label{surfacepropertyunderwater-inputs}
+
+\paragraph{Field: Name}\label{surfacepropertyunderwater-inputs-name}
+
+This is the string referenced in the Surface statement that is using this OtherSideModel as the Exterior Environment.
+
+\paragraph{Field: Distance from Surface Centroid to Leading Edge of Boundary Layer}\label{surfacepropertyunderwater-inputs-boundarylayerdistance}
+
+This distance represents the distance from the centroid of this particular surface to leading edge of the boundary layer.
+For a surface with zero velocity, this field will be irrelevant, because there is no forced boundary layer, and convection will be buoyantly driven.
+For a moving vessel, this distance should be the nominal distance from the leading edge of the vessel, assuming a nearly flat surface along that path.
+
+\paragraph{Field: Free Stream Water Temperature Schedule}\label{surfacepropertyunderwater-inputs-temperatureschedule}
+
+This schedule defines the temperature of the free stream water used in the convection calculations.
+
+\paragraph{Field: Free Stream Water Velocity Schedule}\label{surfacepropertyunderwater-inputs-velocityschedule}
+
+This schedule defines the average velocity of the free stream water used in the convection calculations.
+This schedule could be the water velocity as it moves past stationary surface, the surface velocity as it moves past stationary water, or an effective velocity as a result of the combination.
+
+An example specification is:
+
+\begin{lstlisting}
+  SurfaceProperty:Underwater,
+    Underwater,              !- Name
+    140,                     !- Distance from Surface Centroid to Leading Edge of Boundary Layer
+    WaterTempSchedule,       !- Free Stream Water Temperature Schedule
+    VelocitySchedule;        !- Free Stream Water Velocity Schedule
+
+  Schedule:Constant,
+    WaterTempSchedule,
+    Any Number,
+    23;
+
+  Schedule:Constant,
+    VelocitySchedule,
+    Any Number,
+    10.2;
+\end{lstlisting}
+
+\subsection{Foundation:Kiva}\label{foundationkiva}
+
+Foundation:Kiva objects describe boundary conditions for ground-coupled
+foundation surfaces. Surfaces with the ``Outside Boundary Condition''
+defined as ``Foundation'', may also refer to a Foundation:Kiva object in
+the ``Outside Boundary Condition Object'' field (if unspecified, a
+default Foundation:Kiva object will be created and applied).
+
+Limitations when using Foundation:Kiva objects include:
+
+\begin{itemize}
+\tightlist
+\item
+  Only floors and walls may use Foundation:Kiva objects as Outside
+  Boundary Conditions.
+\item
+  Exactly one floor surface must reference each Foundation:Kiva object.
+  However, multiple floors may exist in the same thermal zone so long as
+  they reference separate Foundation:Kiva objects.
+\item
+  All foundation wall surfaces must be quadrilateral.
+\end{itemize}
+
+For each floor surface with ``Foundation'' set as the ``Outside Boundary Condition''
+there must also be a corresponding ``SurfaceProperty:ExposedFoundationPerimeter''
+object to define how much of the floor perimeter is below exterior walls.
+
+The inputs from Foundation:Kiva objects are translated into Kiva's
+foundation heat transfer model. Kiva\textsuperscript{TM} generates a
+two-dimensional heat transfer calculation to represent heat flow between
+a zone and the adjacent ground. Foundation:Kiva surfaces do not use the
+same HeatBalanceAlgorithm (e.g., Conduction Transfer Functions) as the
+rest of the model.
+
+Foundation:Kiva objects are used to describe the two-dimensional
+features that cannot be captured by the typical one-dimensional
+constructions used in EnergyPlus. Figure \ref{fig:context} illustrates
+Kiva's two-dimensional context for a basement where the basement slab
+and wall both refer to ``Foundation'' as the Outside Boundary Condition,
+the ceiling of the basement and the exterior wall of the zone above the
+basement refer to ``Surface'' (or ``Zone'') and ``Outdoors'',
+respectively. Note: Not all of the foundation wall surface needs to be
+below grade (see the ``Wall Height Above Grade'' field for this object).
+Any part of the foundation wall above grade is modeled in Kiva's
+two-dimensional heat transfer calculations. The non-foundation surfaces
+are shown in Figure \ref{fig:context} for context, but are not part of the
+Kiva model.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-otherside.png}
+\caption{Outside Boundary Conditions for surfaces within Kiva's
+Two-dimensional context. Only surfaces referencing ``Foundation'' are
+simulated in Kiva\label{fig:context}}
+\end{figure}
+
+This context allows for a finer description of the structural and
+insulation components of a foundation that impact heat transfer (Figure
+\ref{fig:el}).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-elements.png}
+\caption{Structural and insulation components of Foundation:Kiva
+objects\label{fig:el}}
+\end{figure}
+
+Foundation:Kiva objects define only the aspects of the foundation that
+are not already defined by the one-dimensional constructions of the
+respective surfaces. That is, the footing wall and slab constructions
+and their relative dimensions are inferred from the respective Surface
+objects (see Figure \ref{fig:surf}).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-surfaces.png}
+\caption{Two-dimensional interpretation of foundation surface
+data\label{fig:surf}}
+\end{figure}
+
+The depth of the foundation is defined by the hight of the wall surfaces
+that reference the Foundation:Kiva boundary condition object. For
+slab-on-grade foundations, a depth of zero is implied by having no
+associated wall surfaces. Figure \ref{fig:ws} shows a slab-on-grade
+foundation with whole slab insulation. Notice there are no walls
+referencing the ``Foundation'' Outside Boundary Condition. In this case,
+the under-slab insulation is modeled as part of the slab construction,
+while the edge/gap insulation is modeled using the interior vertical
+insulation fields of a Foundation:Kiva object. Note: Since there are no
+wall surfaces for slab foundations, the footing wall construction is
+defined within the Foundation:Kiva object (or defaulted to a 0.3m wide
+cast concrete wall).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-whole-slab.png}
+\caption{Two-dimensional interpretation of foundation surface
+data\label{fig:ws}}
+\end{figure}
+
+A walkout basement (with a variable grade along the sides; see Figure
+\ref{fig:wo-r}) must be modeled using discrete quadrilateral surfaces of
+stepped height for the walls as shown in Figure \ref{fig:wo-s}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-walkout-real.png}
+\caption{Example walkout basement\label{fig:wo-r}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-walkout-segs.png}
+\caption{Walkout basement wall and floor surfaces (in gray) all
+reference the same Foundation:Kiva object\label{fig:wo-s}}
+\end{figure}
+
+The width of the floor surface in the two-dimensional context is defined
+by the area and the exposed perimeter (see
+SurfaceProperty:ExposedFoundationPerimeter) of the floor surface object.
+Details on this calculation can be found in the Engineering Reference
+document.
+
+Other components of the two-dimensional context are defined by the
+Foundation:Kiva:Settings object and applied uniformly for all instances
+of Foundation:Kiva objects. These components include:
+
+\begin{itemize}
+\tightlist
+\item
+  Far-Field width
+\item
+  Deep Ground depth (and boundary type)
+\item
+  Soil and ground surface thermal properties
+\end{itemize}
+
+\subsubsection{Example IDF}\label{example-idf}
+
+\begin{verbatim}
+BuildingSurface:Detailed,
+  Slab Floor,         !- Name
+  Floor,              !- Surface Type
+  Slab Construction,  !- Construction Name
+  Living Room,        !- Zone Name
+  Foundation,         !- Outside Boundary Condition
+  Slab Details,       !- Outside Boundary Condition Object
+  No,                 !- Sun Exposure
+  No,                 !- Wind Exposure
+  0.0,                !- View Factor to Ground
+  4,                  !- Number of Vertices
+  0.0, 0.0, 0.0,      !- Vertex 1
+  0.0, 20.0, 0.0,     !- Vertex 2
+  20.0, 20.0, 0.0,    !- Vertex 3
+  20.0, 0.0, 0.0;     !- Vertex 4
+
+Foundation:Kiva,
+  Slab Details,              !- Name
+  XPS,                       !- Interior Horizontal Insulation Material Name
+  0.2,                       !- Interior Horizontal Insulation Depth
+  0.6,                       !- Interior Horizontal Insulation Width
+  XPS,                       !- Interior Vertical Insulation Material Name
+  0.2,                       !- Interior Vertical Insulation Depth
+  ,                          !- Exterior Horizontal Insulation Material Name
+  ,                          !- Exterior Horizontal Insulation Depth
+  ,                          !- Exterior Horizontal Insulation Width
+  ,                          !- Exterior Vertical Insulation Material Name
+  ,                          !- Exterior Vertical Insulation Depth
+  0.2,                       !- Wall Height Above Grade
+  0.3,                       !- Wall Depth Below Slab
+  Slab Footing Construction; !- Footing Wall Construction Name
+
+Material,
+  XPS,    !- Name
+  Rough,  !- Roughness
+  0.05,   !- Thickness
+  0.029,  !- Conductivity
+  28,     !- Density
+  1450,   !- Specific Heat
+  0.9,    !- Thermal Absorptance
+  0.7,    !- Solar Absorptance
+  0.7;    !- Visible Absorptance
+
+Material,
+  Concrete,  !- Name
+  Rough,     !- Roughness
+  0.3,       !- Thickness
+  1.95,      !- Conductivity
+  2400,      !- Density
+  900,       !- Specific Heat
+  0.9,       !- Thermal Absorptance
+  0.7,       !- Solar Absorptance
+  0.7;       !- Visible Absorptance
+
+Construction,
+  Slab Footing Construction, !- Name
+  Concrete;                  !- Outside Layer Name
+\end{verbatim}
+
+\subsubsection{Input Description}\label{input-description}
+
+\paragraph{Field: Name}\label{field-name}
+
+The unique identifier of the Foundation:Kiva object. Referenced by a the
+``Outside Boundary Condition Object'' field in a surface object.
+
+\paragraph{Field: Interior Horizontal Insulation Material
+Name}\label{field-interior-horizontal-insulation-material-name}
+
+A reference to a material object associated with the interior horizontal
+insulation. If left blank, no interior horizontal insulation will be
+used. Default: blank.
+
+The following two fields define the placement of this material within
+Kiva's two-dimensional context and are illustrated in Figure
+\ref{fig:ihi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-ihi.png}
+\caption{Placement of interior horizontal insulation\label{fig:ihi}}
+\end{figure}
+
+\paragraph{Field: Interior Horizontal Insulation
+Depth}\label{field-interior-horizontal-insulation-depth}
+
+Distance from the wall top to the top of interior horizontal insulation,
+in m. Required if Interior Horizontal Insulation Material Name is
+defined.
+
+\paragraph{Field: Interior Horizontal Insulation
+Width}\label{field-interior-horizontal-insulation-width}
+
+Extent of insulation as measured from the wall interior to the edge of
+interior horizontal insulation, in m. Required if Interior Horizontal
+Insulation Material Name is defined.
+
+\paragraph{Field: Interior Vertical Insulation Material
+Name}\label{field-interior-vertical-insulation-material-name}
+
+A reference to a material object associated with the interior vertical
+insulation. If left blank, no interior vertical insulation will be used.
+Default: blank.
+
+The following field defines the placement of this material within Kiva's
+two-dimensional context and are illustrated in Figure \ref{fig:ivi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-ivi.png}
+\caption{Placement of interior vertical insulation\label{fig:ivi}}
+\end{figure}
+
+\paragraph{Field: Interior Vertical Insulation
+Depth}\label{field-interior-vertical-insulation-depth}
+
+Extent of insulation as measured from the wall top to the bottom edge of
+the interior vertical insulation, in m. Required if Interior Vertical
+Insulation Material Name is defined.
+
+\paragraph{Field: Exterior Horizontal Insulation Material
+Name}\label{field-exterior-horizontal-insulation-material-name}
+
+A reference to a material object associated with the exterior horizontal
+insulation. If left blank, no exterior horizontal insulation will be
+used. Default: blank.
+
+The following two fields define the placement of this material within
+Kiva's two-dimensional context and are illustrated in Figure
+\ref{fig:ehi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-ehi.png}
+\caption{Placement of exterior horizontal insulation\label{fig:ehi}}
+\end{figure}
+
+\paragraph{Field: Exterior Horizontal Insulation
+Depth}\label{field-exterior-horizontal-insulation-depth}
+
+Distance from the wall top to the top of exterior horizontal insulation,
+in m. Required if Exterior Horizontal Insulation Material Name is
+defined.
+
+\paragraph{Field: Exterior Horizontal Insulation
+Width}\label{field-exterior-horizontal-insulation-width}
+
+Extent of insulation as measured from the wall exterior to the edge of
+exterior horizontal insulation, in m. Required if Exterior Horizontal
+Insulation Material Name is defined.
+
+\paragraph{Field: Exterior Vertical Insulation Material
+Name}\label{field-exterior-vertical-insulation-material-name}
+
+A reference to a material object associated with the exterior vertical
+insulation. If left blank, no exterior vertical insulation will be used.
+Default: blank
+
+The following field defines the placement of this material within Kiva's
+two-dimensional context and are illustrated in Figure \ref{fig:evi}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-evi.png}
+\caption{Placement of exterior vertical insulation\label{fig:evi}}
+\end{figure}
+
+\paragraph{Field: Exterior Vertical Insulation
+Depth}\label{field-exterior-vertical-insulation-depth}
+
+Extent of insulation as measured from the wall top to the bottom edge of
+the exterior vertical insulation, in m. Required if Exterior Vertical
+Insulation Material Name is defined.
+
+\paragraph{Field: Wall Height Above
+Grade}\label{field-wall-height-above-grade}
+
+Distance from the exterior grade to the wall top, in m. Default: 0.2 m
+
+Figures \ref{fig:2d-w} and \ref{fig:2d-w-slab} illustrate the definition of both the ``Wall
+Height Above Grade'' and the following field, ``Wall Depth Below Slab''.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-wall.png}
+\caption{Definition of exterior grade and footing wall depth relative to
+the wall surface (for a basement foundation context)\label{fig:2d-w}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-wall-slab.png}
+\caption{Definition of exterior grade and footing wall depth relative to
+the wall surface (for a slab foundation context)\label{fig:2d-w-slab}}
+\end{figure}
+
+\paragraph{Field: Wall Depth Below
+Slab}\label{field-wall-depth-below-slab}
+
+Distance from the slab bottom to the bottom of the foundation wall, in
+m. Default: 0.0 m
+
+Extending the wall below the slab provides a coarse approximation of the
+foundation footing. Alternatively, one may use the the fields ``Footing
+Material Name'' and ``Footing Depth'' to explicitly model the footing.
+Note, that explicit modeling of the footing requires a higher spatial
+discretization and, therefore, longer computation times.
+
+\paragraph{Field: Footing Wall Construction
+Name}\label{field-footing-wall-construction-name}
+
+Defines the construction of the foundation footing wall for slab foundations where the foundation wall is not exposed
+to the zone (and has no zone surface to explicitly assign a
+construction).
+
+By default, this is the same construction as any associated below-grade
+wall surfaces, or a 0.3 m wide poured concrete wall (conductivity = 1.95
+W/m-K, density = 2240 kg/m3, specific heat = 900 J/kg-K).
+
+\paragraph{Field: Footing Material
+Name}\label{field-footing-material-name}
+
+A reference to a material object associated with the foundation footing
+(typically some form of concrete). The thickness of this material is
+used to determine the width of the footing. If left blank, no footing
+will be used. Default: blank
+
+The following field defines the placement of this material within Kiva's
+two-dimensional context and are illustrated in Figure \ref{fig:foot}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-footing.png}
+\caption{Placement of footing\label{fig:foot}}
+\end{figure}
+
+\paragraph{Field: Footing Depth}\label{field-footing-depth}
+
+Top-to-bottom dimension of the footing (not to be confused with its
+depth in the ground). The width of the footing is defined by the
+material's thickness. Default: 0.3 m.
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{} Material
+Name}\label{field-custom-block-x-material-name}
+
+A reference to a material object associated with a custom block in the
+two-dimensional foundation context. The thickness of this material
+determines the width of the block.
+
+Custom blocks can be used to represent solid materials in the
+two-dimensional context that are not otherwise covered by the fields
+above. Examples of this might include interior finishings and insulation
+(Figure \ref{fig:cw}) or backfill soil with different thermal properties
+(Figure \ref{fig:cf}).
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-custom-ex-wall.png}
+\caption{Custom blocks representing interior batt insulation and dry
+wall\label{fig:cw}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-custom-ex-fill.png}
+\caption{Custom block representing exterior backfill\label{fig:cf}}
+\end{figure}
+
+If two or more custom blocks overlap, the final properties are
+determined by the higher block number (e.g., Custom Block 4 in the input
+object supersedes properties defined by Custom Block 2). All custom
+blocks properties are superseded by the elements shown in Figure
+\ref{fig:el}.
+
+The following fields defines the placement of this material within
+Kiva's two-dimensional context and are illustrated in Figure
+\ref{fig:custom}.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-custom.png}
+\caption{Placement of a custom block\label{fig:custom}}
+\end{figure}
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{}
+Depth}\label{field-custom-block-x-depth}
+
+Top-to-bottom dimension of the block downward. The default is the depth
+from the wall top to the top of the slab to facilitate interior
+constructions. Default: Slab depth
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{} X
+Position}\label{field-custom-block-x-x-position}
+
+Position outward (+) or inward (-) relative to the foundation wall.
+
+\paragraph{Field: Custom Block \textless{}x\textgreater{} Z
+Position}\label{field-custom-block-x-z-position}
+
+Position downward (+) relative to the foundation wall top. Default: Wall
+top
+
+\subsubsection{Output Description}\label{output-description}
+
+Output for surfaces with a Foundation boundary condition type will
+include all opaque surface output variables except:
+
+\begin{itemize}
+\tightlist
+\item
+  Surface Outside Face variables (since there is no ``Outside Face'')
+\item
+  Surface Heat Storage variables (since this definition depends on an
+  ``Outside Face'')
+\item
+  Surface Internal Source Location Temperature (Kiva doesn't handle
+  internal sources yet, but this is a possible future enhancement)
+\end{itemize}
+
+\subsection{Foundation:Kiva:Settings}\label{foundationkivasettings}
+
+This object defines settings applied across all Kiva foundation
+calculations. This object is not required. If it is not defined, all
+defaults will be applied.
+
+\subsubsection{Input Description}\label{input-description-1}
+
+\paragraph{Field: Soil Conductivity}\label{field-soil-conductivity}
+
+The thermal conductivity of the soil, in W/m-K. Default: 1.73 W/m-K.
+
+\paragraph{Field: Soil Density}\label{field-soil-density}
+
+The bulk density of the soil, in kg/m3. Default: 1842 kg/m3.
+
+\paragraph{Field: Soil Specific Heat}\label{field-soil-specific-heat}
+
+The specific heat of the soil, in J/kg-K. Default: 419 J/kg-K
+
+\paragraph{Field: Ground Solar
+Absorptivity}\label{field-ground-solar-absorptivity}
+
+Solar absorptivity of the exterior grade surface. Default: 0.9.
+
+\paragraph{Field: Ground Thermal
+Absorptivity}\label{field-ground-thermal-absorptivity}
+
+Long-wave absorptivity (emissivity) of the exterior grade surface.
+Default: 0.9.
+
+\paragraph{Field: Ground Surface
+Roughness}\label{field-ground-surface-roughness}
+
+The relief roughness of the exterior ground surface in m. Default: 0.03
+m.
+
+Estimates of surface roughnesses in m are shown below:
+
+\begin{longtable}[]{@{}lc@{}}
+\toprule
+Example Surface & Roughness {[}m{]}\tabularnewline
+\midrule
+\endhead
+Concrete & 0.002\tabularnewline
+Brick & 0.003\tabularnewline
+Soil & 0.005\tabularnewline
+Gravel & 0.012\tabularnewline
+Grass & 0.030\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: Far-Field Width}\label{field-far-field-width}
+
+The distance from the wall interior to the zero horizontal heat flux
+(i.e., adiabatic) far-field boundary, in m. This distance represents
+either the distance halfway between this foundation and a similar
+foundation of a neighboring building, or a distance adequately far from
+the foundation such that it is isolated from the effects of the boundary
+(typically \textgreater{}= 40 m). Default: 40 m.
+
+\paragraph{Field: Deep-Ground Boundary
+Condition}\label{field-deep-ground-boundary-condition}
+
+Defines the type of boundary condition to apply at the Deep-Ground
+Depth. Options are:
+
+\begin{itemize}
+\tightlist
+\item
+  ZeroFlux
+\item
+  GroundWater
+\item
+  Autoselect
+\end{itemize}
+
+ZeroFlux applies a zero vertical heat flux (i.e.~adiabatic) boundary
+condition. GroundWater applies a constant temperature boundary
+condition, with a temperature equal to the average outdoor air dry-bulb
+temperature from the environment(s). Autoselect applies either boundary
+condition depending on the elevation of the building site (Williams and
+Williamson, 1989):
+
+\[d_{wt}=0.1022\cdot d_{elev}\]
+
+If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied, otherwise
+a ZeroFlux boundary is applied at 40 m. If the calculated ground water depth is
+shallower than any element of the foundation construction, then the GroundWater
+is applied at 1 m below the lowest element.
+
+Default: Autoselect.
+
+\paragraph{Field: Deep-Ground Depth}\label{field-deep-ground-depth}
+
+The distance from the exterior grade to the deep ground boundary, in m.
+This distance represents either the distance to the ground water level,
+or a distance adequately far from the foundation such that it is
+isolated from the effects of the boundary (typically \textgreater{}= 40
+m). Default 40 m, or the distance determined by the ``Auto'' Deep-Ground
+Boundary Condition.
+
+\paragraph{Field: Minimum Cell
+Dimension}\label{field-minimum-cell-dimension}
+
+The minimum cell dimension, in m, used in the Kiva discretization.
+Default: 0.02 m.
+
+\paragraph{Field: Maximum Cell Growth
+Coefficient}\label{field-maximum-cell-growth-coefficient}
+
+The maximum ratio of growth between neighboring cells in the direction
+away from the near-field area of interest. Default: 1.50.
+
+\paragraph{Field: Simulation Timestep}\label{field-simulation-timestep}
+
+This field allows the user to choose whether to calculate foundation
+loads on the zone timestep or at hourly intervals. Hourly intervals will
+allow for less overall computation time, but with less accuracy. Choices
+are ``Hourly'' and ``Timestep''. Default: Hourly
+
+\subsection{ExposedFoundationPerimeter}\label{surfacepropertyexposedfoundationperimeter}
+
+This object (currently only used in conjunction with Foundation:Kiva
+boundary conditions) defines the perimeter of a foundation floor that is
+exposed to the exterior environment through the floor. The user may
+either define the total exposed perimeter, the fraction of the total
+perimeter that is exposed, or individually define which segments of the
+floor surface perimeter are exposed. This object is required for any floor surface with a Foundation:Kiva boundary condition.
+
+Figure \ref{fig:ex} illustrates how the exposed perimeter is determined
+from a floor plan of the foundation level.
+
+Some buildings may have neighboring zones with different foundation
+types. For example, a crawlspace next to a garage with a slab (Figure
+\ref{fig:ifw}). The foundation wall in this case is NOT considered part
+of either floor's exposed perimeter, and should not reference a
+Foundation boundary condition. Kiva does not calculate heat flow between
+two zones through ground. In this case, it is best to approximate
+interior foundation wall using an Adiabatic Outside Boundary Condition.
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-exposed-perim.png}
+\caption{Exposed foundation perimeter\label{fig:ex}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-interior-fnd-wall.png}
+\caption{Interior foundation wall\label{fig:ifw}}
+\end{figure}
+
+\subsubsection{Input Description}\label{input-description-2}
+
+\paragraph{Field: Surface Name}\label{field-surface-name}
+
+Name of foundation floor surface.
+
+\paragraph{Field: Exposed Perimeter Calculation Method}\label{field-exposed-perimeter-calculation-method}
+
+Required key/choice field that tells which method to use to calculate the exposed foundation perimeter. Choices are:
+
+\begin{itemize}
+\item TotalExposedPerimeter: Exposed perimeter is defined as an absolute distance in m. (The Total Exposed Perimeter field should be filled.)
+
+\item ExposedPerimeterFraction: Exposed perimeter is defined as a fraction of the total floor perimeter. (The Exposed Perimeter Fraction field should be filled.)
+
+\item BySegment: Each segment of the floor polygon (corresponding to distance between each set of vertices) is defined as exposed (``Yes'') or not exposed (``No'') in an extensible list corresponding to the number of vertices in the floor polygon. Exposed perimeter is defined as the sum of all exposed segement lengths. (The Surface Segment \textless{}x\textgreater{}
+Exposed fields should be filled.)
+\end{itemize}
+
+\paragraph{Field: Total Exposed
+Perimeter}\label{field-total-exposed-perimeter}
+
+Total perimeter that is is exposed in m.
+
+\paragraph{Field: Exposed Perimeter
+Fraction}\label{field-exposed-perimeter-fraction}
+
+Fraction of the total perimeter that is exposed. Default 1.0
+
+\paragraph{Field: Surface Segment \textless{}x\textgreater{}
+Exposed}\label{field-surface-segment-x-exposed}
+
+Surface Segment \textless{}x\textgreater{} is the perimeter between the
+\textless{}x\textgreater{}th and (\textless{}x\textgreater{}+1)th
+vertices.
 
 \subsection{SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections}\label{surfaceconvectionalgorithminsideadaptivemodelselections}
 
@@ -971,12 +1668,12 @@ This field contains the word ``Outside'' or ``Inside'' depending on which locati
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied. The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside, SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
 \begin{longtable}[c]{p{3.49in}p{2.5in}}
-\toprule 
+\toprule
 Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endhead
@@ -1136,12 +1833,12 @@ This field contains the word ``Outside'' or ``Inside'' depending on which locati
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.~ The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
 \begin{longtable}[c]{p{3.49in}p{2.5in}}
-\toprule 
+\toprule
 Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Key choice & Applies to Inside or Outside \tabularnewline
 \midrule
 \endhead
@@ -1245,13 +1942,13 @@ General to Specific, they are assigned in this order:
 % table 9
 \begin{longtable}[c]{p{2.96in}p{3.03in}}
 \caption{Convection Coefficient Assignment Hierarchy \label{table:convection-coefficient-assignment-hierarchy}} \tabularnewline
-\toprule 
+\toprule
 Objects/Description & Action \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Convection Coefficient Assignment Hierarchy} \tabularnewline
-\toprule 
+\toprule
 Objects/Description & Action \tabularnewline
 \midrule
 \endhead
@@ -1288,12 +1985,12 @@ When EnergyPlus is set to Display Advanced Variables (Output:Diagnostics, Displa
 This variable reports how the surface was classified as part of the adaptive convection algorithm for the inside face.~ The algorithm examines probable flow regimes, heat flow directions, orientations, HVAC equipment connections, and current operating status to assign each surface a category.~ The numbers in this report are integer codes that correspond to surface categories as described in the following table.
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
-\toprule 
+\toprule
 Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endhead
@@ -1351,12 +2048,12 @@ Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 This variable reports the specific model equation used to calculate the inside face convection coefficient.~ This can vary when using the adaptive convection algorithm and so the result of that selection algorithm is reported here.~ The following table lists the models associated with specific interger codes reported here.~ The models correspond to key words used in input objects.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endhead
@@ -1400,12 +2097,12 @@ Report Code & Related key and model \tabularnewline
 The inside face convection heat transfer calculations can be based on different reference air temperatures.~ This reference air temperature can vary during the simulation when the adaptive algorithm selects models that use different references.~ The following table lists the meaning of the integer codes.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Report Code & Reference Air Temperature Method \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Report Code & Reference Air Temperature Method \tabularnewline
 \midrule
 \endhead
@@ -1421,12 +2118,12 @@ Report Code & Reference Air Temperature Method \tabularnewline
 This variable reports how the surface was classified as part of the adaptive convection algorithm for the outside face.~ The algorithm examines the wind direction, heat flow directions and orientations to assign each surface a category.~ The numbers in this report are integer codes that correspond to surface categories as described in the following table.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Report Code & Surface Classification \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Report Code & Surface Classification \tabularnewline
 \midrule
 \endhead
@@ -1445,12 +2142,12 @@ Report Code & Surface Classification \tabularnewline
 These variables report the specific model equation used to calculate the outside face's convection coefficient.~ They can vary when using the adaptive convection algorithm and so the results of that selection algorithm are reported in these variables.~ The following table lists the models associated with specific integer codes that might be reported here.~ The models correspond to key words used in input objects.
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Report Code & Related key and model \tabularnewline
 \midrule
 \endhead

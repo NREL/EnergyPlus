@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,22 +43,12 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include <General.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -166,7 +153,7 @@ namespace EnergyPlus {
 			"	0.0, !- Zone Cooling Sizing Factor",
 			"	DesignDayWithLimit, !- Cooling Design Air Flow Method",
 			"	, !- Cooling Design Air Flow Rate { m3/s }",
-			"	, !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
+			"	0.0, !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
 			"	, !- Cooling Minimum Air Flow { m3/s }",
 			"	0.22, !- Cooling Minimum Air Flow Fraction",
 			"	DesignDay, !- Heating Design Air Flow Method",
@@ -262,12 +249,12 @@ namespace EnergyPlus {
 		GetSysInput();
 		ZoneSizingRunDone = true;
 		CurZoneEqNum = 1;
+		CurTermUnitSizingNum = 1;
 		Zone( 1 ).FloorArea = 96.48;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.21081;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
 		CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -277,12 +264,11 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_TRUE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
-		EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
+		EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.0 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.22 );
-		EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2, .07351776, 0.000001 );
-		EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin, .07351776, 0.000001 );
+		EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2, 0.0, 0.000001 );
+		EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin, 0.22*0.21081, 0.000001 );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -442,12 +428,12 @@ namespace EnergyPlus {
 		GetSysInput();
 		ZoneSizingRunDone = true;
 		CurZoneEqNum = 1;
+		CurTermUnitSizingNum = 1;
 		Zone( 1 ).FloorArea = 96.48;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.21081;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
 		CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -457,7 +443,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.2 );
@@ -622,12 +607,12 @@ namespace EnergyPlus {
 		GetSysInput();
 		ZoneSizingRunDone = true;
 		CurZoneEqNum = 1;
+		CurTermUnitSizingNum = 1;
 		Zone( 1 ).FloorArea = 96.48;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.21081;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
 		CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -637,7 +622,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_TRUE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.18 );
@@ -952,12 +936,12 @@ namespace EnergyPlus {
 		GetSysInput();
 		ZoneSizingRunDone = true;
 		CurZoneEqNum = 1;
+		CurTermUnitSizingNum = 1;
 		Zone( 1 ).FloorArea = 96.48;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.21081;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		CalcFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
 		CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
@@ -967,7 +951,6 @@ namespace EnergyPlus {
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_TRUE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		EXPECT_DOUBLE_EQ( ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea, 0.000762 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow, 0.0 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac, 0.2 );
@@ -987,7 +970,7 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax, 0.08 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
 		SizeSys( 1 );
-		EXPECT_DOUBLE_EQ( Sys( CurZoneEqNum ).ZoneMinAirFrac, 0.2 );
+		EXPECT_DOUBLE_EQ( Sys( CurZoneEqNum ).ZoneMinAirFrac, 0.07351776 / 0.21081 );
 		EXPECT_DOUBLE_EQ( Sys( CurZoneEqNum ).MaxAirVolFlowRateDuringReheat, 0.08 );
 
 		Node.deallocate();

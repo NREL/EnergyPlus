@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef EarthTube_hh_INCLUDED
 #define EarthTube_hh_INCLUDED
@@ -110,6 +98,8 @@ namespace EarthTube {
 		Real64 GroundTempz1z2t; // ground temp between z1 and z2 at time t
 		Real64 InsideAirTemp;
 		Real64 AirTemp;
+		Real64 HumRat; // Humidity ratio of air leaving EarthTube and entering zone
+		Real64 WetBulbTemp; // Humidity ratio of air leaving EarthTube and entering zone
 		Real64 r1; // Inner Pipe Radius (m)
 		Real64 r2; // Pipe Thickness (m)
 		Real64 r3; // Distance between Pipe Outer Surface and Undistubed Soil (m)
@@ -141,6 +131,8 @@ namespace EarthTube {
 			GroundTempz1z2t( 0.0 ),
 			InsideAirTemp( 0.0 ),
 			AirTemp( 0.0 ),
+			HumRat( 0.0 ),
+			WetBulbTemp( 0.0 ),
 			r1( 0.0 ),
 			r2( 0.0 ),
 			r3( 0.0 ),
@@ -170,9 +162,12 @@ namespace EarthTube {
 		Real64 EarthTubeVolFlowRateStd; // Volume flow rate of air (m3/s) due to EarthTube at standard air conditions
 		Real64 EarthTubeMass; // Mass of Air {kg} due to EarthTube
 		Real64 EarthTubeMassFlowRate; // Mass flow rate of air (kg/s) due to EarthTube
+		Real64 EarthTubeWaterMassFlowRate; // Mass flow rate of water vapor (kg/s) due to EarthTube
 		Real64 EarthTubeFanElec; // [J] Fan Electricity consumed by EarthTube
 		Real64 EarthTubeFanElecPower; // [W] Fan Electric power for EarthTube
 		Real64 EarthTubeAirTemp; // Air Temp {C} of EarthTube, air leaving tube and entering zone
+		Real64 EarthTubeWetBulbTemp; // Wet Bulb Temperature {C} of EarthTube, air leaving tube and entering zone
+		Real64 EarthTubeHumRat; // Humidity Ratio {kg/kg} of EarthTube, air leaving tube and entering zone
 
 		// Default Constructor
 		EarthTubeZoneReportVars() :
@@ -186,9 +181,12 @@ namespace EarthTube {
 			EarthTubeVolFlowRateStd( 0.0 ),
 			EarthTubeMass( 0.0 ),
 			EarthTubeMassFlowRate( 0.0 ),
+			EarthTubeWaterMassFlowRate( 0.0 ),
 			EarthTubeFanElec( 0.0 ),
 			EarthTubeFanElecPower( 0.0 ),
-			EarthTubeAirTemp( 0.0 )
+			EarthTubeAirTemp( 0.0 ),
+			EarthTubeWetBulbTemp( 0.0 ),
+			EarthTubeHumRat( 0.0 )
 		{}
 
 	};
@@ -198,16 +196,38 @@ namespace EarthTube {
 	extern Array1D< EarthTubeZoneReportVars > ZnRptET;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageEarthTube();
 
 	void
 	GetEarthTube( bool & ErrorsFound ); // If errors found in input
-
+	
+	void
+	CheckEarthTubesInZones
+		( std::string const ZoneName, // name of zone for error reporting
+	 	  std::string const FieldName, // name of earth tube in input
+		  bool & ErrorsFound // Found a problem
+		);
+	
+	void
+	CheckEarthTubesInZones
+		( std::string const ZoneName, // name of zone for error reporting
+	 	  std::string const FieldName, // name of earth tube in input
+		  bool & ErrorsFound // Found a problem
+		);
+	
 	void
 	CalcEarthTube();
 
+	void
+	CalcEarthTubeHumRat(
+			int const Loop, // EarthTube number (index)
+			int const NZ // Zone number (index)
+	);
+	
 	void
 	ReportEarthTube();
 

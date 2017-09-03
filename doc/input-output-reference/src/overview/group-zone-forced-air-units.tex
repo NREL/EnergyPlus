@@ -1,14 +1,17 @@
 \section{Group -- Zone Forced Air Units}\label{group-zone-forced-air-units}
 
+\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
+Regarding component schedules, the general rule is don't schedule any components except the supply fan and the corresponding availability manager(s). Beyond that, every component should always be available and let the controls determine what runs or doesn't run. If a component other than the supply fan is scheduled off, then it will remain off even if the night cycle manager turns on the system.
+
 \subsection{ZoneHVAC:IdealLoadsAirSystem}\label{zonehvacidealloadsairsystem}
 
-The simplest piece of zone equipment is the ZoneHVAC:IdealLoadsAirSystem component. ZoneHVAC:IdealLoadsAirSystem is used in situations where the user wishes to study the performance of a building without modeling a full HVAC system. In such a case, the Ideal Loads Air System is usually the sole conditioning component: the user does not need to specify air loops, water loops, etc. All that is needed for the ideal system are zone controls, zone equipment configurations, and the ideal loads system component.
+The simplest piece of zone equipment is the ZoneHVAC:IdealLoadsAirSystem component. ZoneHVAC:IdealLoadsAirSystem is used in situations where the user wishes to study the performance of a building without modeling a full HVAC system. In such a case, the Ideal Loads Air System is usually the sole conditioning component: the user does not need to specify air loops, water loops, etc. All that is needed for the ideal system are zone controls, zone equipment configurations, and the ideal loads system component. The use of a return plenum is optional and will require use of the AirloopHVAC:ReturnPlenum object.
 
 This component can be operated with infinite or finite heating and cooling capacity. For either mode -- infinite or limited capacity -- the user can also specify on/off schedules for heating and cooling and outdoor air controls. There are also optional controls for dehumidification, humidification, economizer, and heat recovery. This component may be used in combination with other HVAC equipment serving the same zone.
 
-This component can be thought of as an ideal unit that mixes air at the zone exhaust condition with the specified amount of outdoor air and then adds or removes heat and moisture at 100\% efficiency in order to produce a supply air stream at the specified conditions. The energy required to condition the supply air is metered and reported as DistrictHeating and DistrictCooling.
+This component can be thought of as an ideal unit that mixes air at the zone exhaust condition (or plenum outlet condition when a plenum is attached) with the specified amount of outdoor air and then adds or removes heat and moisture at 100\% efficiency in order to produce a supply air stream at the specified conditions. The energy required to condition the supply air is metered and reported as DistrictHeating and DistrictCooling.
 
-\textbf{Notes:} The ideal loads system uses the zone return node or an optional zone exhaust node to extract air from the zone. Every zone served by an HVAC component must have a return air node, even though this node may not be connected to anything.
+\textbf{Notes:} The ideal loads system uses the zone return node or an optional zone exhaust node to extract air from the zone. When the AirloopHVAC:ReturnPlenum is used the inlet of the ideal loads system is connected to the plenum outlet air node while the outlet of the ideal loads system is connected to a zone inlet node. The node name connected between the zone exhaust air node and plenum inlet air node must match in the ZoneHVAC:EquipmentConnections and AirloopHVAC:ReturnPlenum objects. Every zone served by an HVAC component must have a return air node, even though this node may not be connected to anything. If more than one ideals loads air systems are connected to the same AirloopHVAC:ReturnPlenum then one of the ideal loads air systems will connect to the ZoneHVAC:ReturnPlenum outlet air node and the remaining ideal loads air systems connected to the same return plenum will connect to the ZoneHVAC:ReturnPlenum induced air outlet nodes.
 
 The ideal loads system was significantly expanded in version 7.0 (October 2011). As part of this upgrade, any change in the moisture content of the supply air stream results in a latent cooling (dehumidification) or latent heating (humidification) load which is metered as DistrictCooling and DistrictHeating energy consumption. Prior to version 7.0, when the ideal loads system was in heating mode, only the energy for sensible heating was metered. This results in significant changes in reported energy use compared to earlier versions, especially when using the \textbf{\emph{ConstantSupplyHumidityRatio}} option for Humidification Control Type.
 
@@ -31,6 +34,10 @@ The name of the outlet air node of the ideal loads object. This should be the sa
 \paragraph{Field: Zone Exhaust Air Node Name}\label{field-zone-exhaust-air-node-name}
 
 The name of the zone exhaust air node of the ideal loads object. This should be the same as one of the zone air exhaust nodes for the zone this component is serving. This node name is required if ZoneHVAC:IdealLoadsAirSystem is used in a zone which also has other forced air HVAC equipment. Otherwise this node name is optional but recommended.
+
+\paragraph{Field: System Inlet Air Node Name}\label{system-inlet-air-node-name}
+
+The optional name of the return plenum outlet node (or induced air outlet node) connected to the ideal loads object. When a return plenum is used, the previous fields for Zone Supply Air Node Name and Zone Exhaust Air Node Name are also required. When an AirloopHVAC:ReturnPlenum is connected to the Ideal Loads Air System the Zone Supply Air Node Name must match a zone air inlet node name and the Zone Exhaust Air Node Name must match a zone air exhaust node (see ZoneHAVC:EquipmentConnections object). The Zone Exhaust Air Node Name must also match an AirloopHVAC:ReturnPlenum inlet node name. In the AirloopHVAC:ReturnPlenum object, when more than one ideal loads air systems are connected to the same return plenum, the System Inlet Air Node Name for one of the ideal loads air systems must match the return plenum Outlet Node Name while all remaining ideal loads air systems, if more than one are connected, would enter the System Inlet Air Node Name in the return plenum Induced Air Outlet Node or NodeList Name field (see Engineering Reference for schematic).
 
 \paragraph{Field: Maximum Heating Supply Air Temperature}\label{field-maximum-heating-supply-air-temperature-000}
 
@@ -577,6 +584,8 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
@@ -584,13 +593,15 @@ This field specifies the type of supply air fan object used by this fan coil. Th
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.6 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-000}
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for \emph{ConstantFanVariableFlow~} a \emph{Fan:OnOff} or \emph{Fan:ConstantVolume} should be used. For \emph{CyclingFan}, a \emph{Fan:OnOff} should be used. For \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow} a \emph{Fan:VariableVolume} should be chosen. For \emph{MultiSpeedFan} a \emph{Fan:OnOff} should be used. And for \emph{ASHRAE90VariableFan}, a \emph{Fan:OnOff} or \emph{Fan:VariableVolume} should be chosen.
+The name of a fan component that composes part of the fan coil unit. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for \emph{ConstantFanVariableFlow~} a \emph{Fan:SystemModel}, \emph{Fan:OnOff}, or \emph{Fan:ConstantVolume} should be used. For \emph{CyclingFan}, a \emph{Fan:OnOff} or \emph{Fan:SystemModel} should be used. For \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow} a \emph{Fan:SystemModel} or \emph{Fan:VariableVolume} should be chosen. For \emph{MultiSpeedFan} a \emph{Fan:SystemModel} or \emph{Fan:OnOff} should be used. And for \emph{ASHRAE90VariableFan}, a \emph{Fan:SystemModel}, \emph{Fan:OnOff}, or \emph{Fan:VariableVolume} should be chosen.
 
 \begin{lstlisting}
-The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
-The fan’s outlet node should be the same as the cooling coil’s air inlet node.
+The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
+The fan's outlet node should be the same as the cooling coil's air inlet node.
 \end{lstlisting}
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-003}
@@ -891,9 +902,9 @@ This output variable is the ratio of time in a system timestep that the fan coil
 
 \subsection{ZoneHVAC:UnitVentilator}\label{zonehvacunitventilator}
 
-Unit ventilators are zone equipment units which are assembled from other components. They contain a built-in outdoor air mixer, a fan, a heating coil, and a cooling coil. These components are described elsewhere in this document, except the built-in outdoor air mixer which is contained within the unit ventilator statement. The unit ventilator input simply requires the names of these other three components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor air control information (control type and schedules), an outdoor airflow rate, and maximum and minimum hot and cold water mass flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, outlet, outdoor air and exhaust (relief) air node names. Note that the unit air inlet node should be the same as a zone exhaust node and the unit outlet node should be the same as a zone inlet node. In general, the unit ventilator input is very similar to the fan coil unit input, and the unit is connected to a hot water loop (demand side) through its hot water coil and to a chilled water loop (demand side) through its cooling coil.
+Unit ventilators are zone equipment units which are assembled from other components. They contain a built-in outdoor air mixer, a fan, a heating coil, and a cooling coil. These components are described elsewhere in this document, except the built-in outdoor air mixer which is contained within the unit ventilator statement. The unit ventilator input simply requires the names of these other three components, which have to be described elsewhere in the input. The input also requires the name of an availability schedule, maximum airflow rate, outdoor air control information (control type and schedules), an outdoor airflow rate, and maximum and minimum hot and cold water mass flow rates. The unit is connected to the zone inlet and exhaust nodes and the outdoor air by specifying unit inlet, outlet, outdoor air and exhaust (relief) air node names. Note that if the Unit Ventilator is not connected to central dedicated outdoor air (DOA), then the unit air inlet node should be the same as a zone exhaust air node and the unit air outlet node should be the same as a zone air inlet node. The three node name input fields: \textit{Outdoor Air Node Name}, \textit{Exhaust Air Node Name}, and \textit{Mixed Air Node Name} are required fields only when the built-in outdoor air mixer is used to provide outdoor air. If the Unit Ventilator is connected to a central dedicated outdoor air (DOA) via \textit{AirTerminal:SingleDuct:Mixer}, then the above three node name input fields are not required and must be left blank. In the later case the Unit Ventilator node connection to the zone air exhaust node and the zone air inlet node are described in \textit{AirTerminal:SingleDuct:Mixer} object. In general, the unit ventilator input is very similar to the fan coil unit input, and the unit is connected to a hot water loop (demand side) through its hot water coil and to a chilled water loop (demand side) through its cooling coil.
 
-The main difference between the fan coil and unit ventilator input is that the unit ventilator has a built-in outdoor air mixer with its own specialized controls. The outdoor air control type can be selected from one of the following options: ``variable percent'', ``fixed temperature'' or ``fixed amount''. In fixed temperature control, the amount of outdoor air is varied between the minimum outdoor air fraction (specified by a schedule) and 100\% outdoor air to obtain a mixed air temperature as close as possible to the temperature schedule defined in the input. Variable percent control will also vary the amount of outdoor air between the minimum and maximum fractions (both specified in input by the user) to meet the load without the use of a coil if possible. In fixed amount control, the outdoor air flow rate is fixed to the specified value by the user. In this control strategy, the maximum outdoor air flow rate and schedule are automatically set to be equal to the minimum outdoor air flow rate and schedule. These control types are based on the 2004 ASHRAE Systems and Equipment Handbook (pp.~31.1-31.3) description of unit ventilator systems.
+The main difference between the fan coil and unit ventilator input is that the unit ventilator has a built-in outdoor air mixer with its own specialized controls. The outdoor air control type can be selected from one of the following options: ``variable percent'', ``fixed temperature'' or ``fixed amount''. In fixed temperature control, the amount of outdoor air is varied between the minimum outdoor air fraction (specified by a schedule) and 100\% outdoor air to obtain a mixed air temperature as close as possible to the temperature schedule defined in the input. Variable percent control will also vary the amount of outdoor air between the minimum and maximum fractions (both specified in input by the user) to meet the load without the use of a coil if possible. In fixed amount control, the outdoor air flow rate is fixed to the specified value by the user. In this control strategy, the maximum outdoor air flow rate and schedule are automatically set to be equal to the minimum outdoor air flow rate and schedule. These control types are based on the 2004 ASHRAE Systems and Equipment Handbook (pp.~31.1-31.3) description of unit ventilator systems. The three outdoor air control strategies are also valid and available when the Unit Ventilator is connected to central DOA.
 
 The unit is controlled to meet the zone (remaining) heating or cooling demand. If there is a heating demand, the cooling coil is off and the hot water flow through the heating coil is throttled to meet the demand. The hot water control node must be specified (same as the hot water coil inlet node). If there is a cooling demand from the zone, the hot water coil is off and the chilled water flow through the cooling coil is throttled to meet the load. The cooling coil control node must be specified (same as the cooling coil inlet node). Finally both heating and cooling require a convergence tolerance, which is the tolerance denoting how closely the fan coil unit will meet the heating or cooling load. The tolerance is always relative to the zone load.
 
@@ -961,29 +972,31 @@ This field can have one of two meanings depending the type of control selected i
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-1-007}
 
-This field is a node name used to identify the node that serves as the inlet (air side) to the unit ventilator. In EnergyPlus, nodes represent points between components or at various points in the loops. In a unit ventilator, the air inlet node to the system will typically be the same node as a zone outlet node. While a node name may be referenced more than once in an input data file, each node must have a unique name.
+This field is a node name used to identify the node that serves as the inlet (air side) to the unit ventilator. In a unit ventilator, the air inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the unit ventilator is connected to DOA, then the air inlet node name must be the DOA mixer outlet node name for InletSide mixer connection. In EnergyPlus, nodes represent points between components or at various points in the loops. While a node name may be referenced more than once in an input data file, each node must have a unique name.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-1-006}
 
-This field is a node name used to identify the node that serves as the outlet (air side) to the unit ventilator. In EnergyPlus, nodes represent points between components or at various points in the loops. In a unit ventilator, the air outlet node from the system will typically be the same node as a zone inlet node. While a node name may be referenced more than once in an input data file, each node must have a unique name.
+This field is a node name used to identify the node that serves as the outlet (air side) to the unit ventilator. In a unit ventilator, the air outlet node name must be zone inlet node name if there is no DOA Mixer, or if the unit ventilator is connected to DOA, then the air outlet node name must be the DOA mixer secondary air inlet node name for SupplySide mixer connection. In EnergyPlus, nodes represent points between components or at various points in the loops. While a node name may be referenced more than once in an input data file, each node must have a unique name.
 
 \paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name-001}
 
-This field is a node name used to identify the node associated with fresh air brought into the unit ventilator from the outdoor environment. You should also have defined an OutdoorAir:Node object with the same name and assign it an optional height (above ground).
+This field is a node name used to identify the node associated with fresh air brought into the unit ventilator from the outdoor environment. You should also have defined an OutdoorAir:Node object with the same name and assign it an optional height (above ground). This input field must be left blank if the Unit ventilator is connected to a central dedicated outdoor air (DOA) via \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Exhaust Air Node Name}\label{field-exhaust-air-node-name-000}
 
-This field is a node name used to identify the node associated with air exhausted out of the unit ventilator to the outdoor environment. While from a simulation standpoint this name is arbitrary and not a ``necessity'', assigning a name to this node allows the user to receive output on conditions at this node to verify the correct operation of the unit ventilator.
+This field is a node name used to identify the node associated with air exhausted out of the unit ventilator to the outdoor environment. While from a simulation standpoint this name is arbitrary and not a ``necessity'', assigning a name to this node allows the user to receive output on conditions at this node to verify the correct operation of the unit ventilator. This input field must be left blank if the Unit ventilator is connected to a central dedicated outdoor air (DOA) via \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Mixed Air Node Name}\label{field-mixed-air-node-name-001}
 
-This field is a node name used to identify the node associated with the ``mixed'' air of the unit ventilator. These conditions are post-``mixing box'' since they are the conditions of the fraction of return air combined with the outdoor air. Since this is a simple system, this can also be viewed as the conditions of the air being sent to the coils. While from a simulation standpoint this name is arbitrary and not a ``necessity'', assigning a name to this node allows the user to receive output on conditions at this node to verify the correct operation of the unit ventilator.
+This field is a node name used to identify the node associated with the ``mixed'' air of the unit ventilator. These conditions are post-``mixing box'' since they are the conditions of the fraction of return air combined with the outdoor air. Since this is a simple system, this can also be viewed as the conditions of the air being sent to the coils. While from a simulation standpoint this name is arbitrary and not a ``necessity'', assigning a name to this node allows the user to receive output on conditions at this node to verify the correct operation of the unit ventilator. This input field must be left blank if the Unit ventilator is connected to a central dedicated outdoor air (DOA) via \textit{AirTerminal:SingleDuct:Mixer} object.
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-1-000}
 
 This field specifies the type of supply air fan used by this unit ventilator. The supply air fan is part of the unit ventilator compound object. The only valid supply air fan types are:
 
 \begin{itemize}
+\item
+  Fan:SystemModel
 \item
   Fan:OnOff
 \item
@@ -992,9 +1005,11 @@ This field specifies the type of supply air fan used by this unit ventilator. Th
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-1-000}
 
-This field is the name of a fan (ref: Fan:OnOff, Fan:ConstantVolume, Fan: VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:OnOff, Fan:ConstantVolume, Fan: VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
 
 \paragraph{Field: Coil Option}\label{field-coil-option}
 
@@ -1250,6 +1265,8 @@ This field specifies the type of supply air fan used by this unit heater. The su
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
@@ -1257,9 +1274,11 @@ This field specifies the type of supply air fan used by this unit heater. The su
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-2-000}
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan:VariableVolume) that is part of the unit heater system. This name links the unit heater to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit heater system.
+This field is the name of a fan (ref: FanSystemModel, Fan:ConstantVolume, Fan:VariableVolume) that is part of the unit heater system. This name links the unit heater to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit heater system.
 
 \paragraph{Field: Maximum Supply Air Flow Rate}\label{field-maximum-supply-air-flow-rate-2}
 
@@ -1442,7 +1461,8 @@ This optional alpha input field defines the name of an HVAC system node which ca
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-3-000}
 
-This alpha input field defines the type of fan used by the zone evaporative cooler unit.~ There are four valid choices: Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, or Fan:ComponentModel.~ However the type of fan must be consistent with the control method defined below and a variable speed fan is needed with ZoneCoolingLoadVariableSpeedFan.
+This alpha input field defines the type of fan used by the zone evaporative cooler unit.  There are five valid choices: Fan:SystemModel, Fan:ComponentModel, Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume.  (Note that Fan:ConstantVolume, Fan:OnOff, and Fan:VariableVolume may be deprecated in a future version and as of version 8.7 these are being replaced by Fan:SystemModel.) 
+However the type of fan must be consistent with the control method defined below and a variable speed fan is needed with ZoneCoolingLoadVariableSpeedFan.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-3-000}
 
@@ -1502,23 +1522,23 @@ An example input object follows.
 \begin{lstlisting}
 
 ZoneHVAC:EvaporativeCoolerUnit,
-     Zone Evap Unit, !- Name
+     Zone Evap Unit,                !- Name
      System Availability Schedule , !- Availability Schedule Name
-     , !- Availability Manager List Name
-     Cooler Unit OA inlet , !- Outdoor Air Inlet Node Name
-     Main Zone Inlet Node, !- Cooler Outlet Node Name
-     Main Zone Relief Node , !- Zone Relief Air Node Name
-     Fan:ConstantVolume , !- Supply Air Fan Object Type
-     Supply Fan , !- Supply Air Fan Name
-     2.0, !- Design Supply Air Flow Rate
-     DrawThrough , !- Fan Placement
-     ZoneCoolingLoadOnOffCycling, !- Cooler Unit Control Method
-     1.1, !- Throttling Range Temperature Difference
-     100.0, !- Cooling Load Control Threshold Heat Transfer Rate
+     ,                              !- Availability Manager List Name
+     Cooler Unit OA inlet ,         !- Outdoor Air Inlet Node Name
+     Main Zone Inlet Node,          !- Cooler Outlet Node Name
+     Main Zone Relief Node ,        !- Zone Relief Air Node Name
+     Fan:SystemModel ,              !- Supply Air Fan Object Type
+     Supply Fan ,                   !- Supply Air Fan Name
+     2.0,                           !- Design Supply Air Flow Rate
+     DrawThrough ,                  !- Fan Placement
+     ZoneCoolingLoadOnOffCycling,   !- Cooler Unit Control Method
+     1.1,                           !- Throttling Range Temperature Difference
+     100.0,                         !- Cooling Load Control Threshold Heat Transfer Rate
      EvaporativeCooler:Direct:CelDekPad, !- First Evaporative Cooler Object Type
-     Evaporative Cooler, !- First Evaporative Cooler Object Name
-     , !- Second Evaporative Cooler Object Type
-     ; !- Second Evaporative Cooler Name
+     Evaporative Cooler,            !- First Evaporative Cooler Object Name
+     ,                              !- Second Evaporative Cooler Object Type
+     ;                              !- Second Evaporative Cooler Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-021}
@@ -1624,7 +1644,7 @@ This field contains a schedule name (ref: Schedule) that contains values for mod
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name-000}
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan: VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-1-001}
 
@@ -1641,7 +1661,7 @@ If the user does not select a fan placement type, \textbf{DrawThrough} is assume
 
 \paragraph{Field: Exhaust Fan Name}\label{field-exhaust-fan-name}
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan: VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
 
 \paragraph{Field: Exhaust Air Flow Rate}\label{field-exhaust-air-flow-rate}
 
@@ -1892,14 +1912,18 @@ This field specifies the type of supply air fan used by window air conditioner. 
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff and Fan:ConstantVolumemay be deprecated in a future version.
+
 \paragraph{Field:Supply Air Fan Name}\label{fieldsupply-air-fan-name}
 
-The name of a constant volume fan component that composes part of the window air conditioner. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the window air conditioner. A fan of type Fan:OnOff may be used with either cycling or continuous fan, and a fan of type Fan:ConstantVolume is used only with continuous fan (see Supply Air Fan Operating Mode Schedule field below). The fan's inlet node should be the same as the outdoor air mixer's mixed air node (for blow through) or the DX coil's outlet node (for draw through). The fan's outlet node should be the same as the DX coil's air inlet node (for blow through) or the window air conditioner's air outlet node (for draw through).
+The name of the fan component that composes part of the window air conditioner. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the window air conditioner. A fan of type Fan:SystemModel or Fan:OnOff may be used with either cycling or continuous fan, and a fan of type Fan:ConstantVolume is used only with continuous fan (see Supply Air Fan Operating Mode Schedule field below). The fan's inlet node should be the same as the outdoor air mixer's mixed air node (for blow through) or the DX coil's outlet node (for draw through). The fan's outlet node should be the same as the DX coil's air inlet node (for blow through) or the window air conditioner's air outlet node (for draw through).
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-2-001}
 
@@ -1908,6 +1932,8 @@ This field specifies the type of cooling coil to be modeled for this window air 
 \begin{itemize}
 \item
   Coil:Cooling:DX:SingleSpeed
+\item
+  Coil:Cooling:DX:VariableSpeed
 \item
   CoilSystem:Cooling:DX:HeatExchangerAssisted
 \end{itemize}
@@ -1948,7 +1974,7 @@ Following is an example input for the cycling window air conditioner, along with
 
 \begin{lstlisting}
 
-ZoneHVAC:WindowAirConditioner,
+  ZoneHVAC:WindowAirConditioner,
          Zone3WindAC,                  ! name of window AC unit
          FanAndCoilAvailSched,         ! Availability Schedule Name
          0.6,                          ! Maximum Supply Air Flow Rate {m3/s}
@@ -1957,14 +1983,13 @@ ZoneHVAC:WindowAirConditioner,
          Zone3WindACAirOutletNode,     ! Air Outlet Node Name
          OutdoorAir:Mixer,             ! Outdoor Air Mixer Object Type
          Zone3WindACOAMixer,           ! Outdoor Air Mixer Name
-         Fan:ConstantVolume,           ! Supply Air Fan Object Type
+         Fan:SystemModel,              ! Supply Air Fan Object Type
          Zone3WindACFan,               ! Fan Name
          Zone3WindACDXCoil,            ! DX Cooling Coil Name
          CyclingFanSch,                ! Supply Air Fan Operation Mode Schedule Name
          DrawThrough,                  ! Fan Placement
          0.001,                        ! Cooling Convergence Tolerance
          Coil:Cooling:DX:SingleSpeed;  ! Cooling Coil Object Type
-
 
   Schedule:Compact,
          CyclingFanSch,                !- Name
@@ -1974,7 +1999,6 @@ ZoneHVAC:WindowAirConditioner,
          Until: 24:00,                 !- Complex Field \#7
          0.0;                          !- Complex Field \#8
 
-
   OutdoorAir:Mixer,
          Zone3WindACOAMixer,           ! Name
          Zone3WindACOAMixerOutletNode, ! Mixed Air Node Name
@@ -1982,18 +2006,22 @@ ZoneHVAC:WindowAirConditioner,
          Zone3WindACExhNode,           ! Relief Air Stream Node Name
          Zone3WindACAirInletNode;      ! Return Air Stream Node Name
 
-
-  Fan:ConstantVolume,
-         Zone3WindACFan,               ! Name
-         FanAndCoilAvailSched,         ! Availability Schedule Name
-         0.5,                          ! Fan Total Efficiency
-         75.0,                         ! Pressure Rise {Pa}
-         0.6,                          ! Maximum Flow Rate {m3/s}
-         0.9,                          ! Motor Efficiency
-         1.0,                          ! Motor In Airstream Fraction
-         Zone3WindACDXOutletNode,      ! Air Inlet Node Name
-         Zone3WindACAirOutletNode;     ! Air Outlet Node Name
-
+  Fan:SystemModel,
+       Zone3WindACFan ,                !- Name
+       FanAndCoilAvailSched ,          !- Availability Schedule Name
+       Zone3WindACDXOutletNode,        !- Air Inlet Node Name
+       Zone3WindACAirOutletNode,       !- Air Outlet Node Name
+       0.6 ,                           !- Design Maximum Air Flow Rate
+       Discrete ,                      !- Speed Control Method
+       0.0,                            !- Electric Power Minimum Flow Rate Fraction
+       75.0,                           !- Design Pressure Rise
+       0.9 ,                           !- Motor Efficiency
+       1.0 ,                           !- Motor In Air Stream Fraction
+       AUTOSIZE,                       !- Design Electric Power Consumption
+       TotalEfficiencyAndPressure,     !- Design Power Sizing Method
+       ,                               !- Electric Power Per Unit Flow Rate
+       ,                               !- Electric Power Per Unit Flow Rate Per Unit Pressure
+       0.5;                            !- Fan Total Efficiency 
 
   Coil:Cooling:DX:SingleSpeed,
       Zone3WindACDXCoil,       !- Name
@@ -2154,7 +2182,7 @@ This numeric field defines the outdoor air flow rate through the air conditioner
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-5}
 
-This alpha field defines the type of fan used by this PTAC. The only valid choices are \textbf{Fan:OnOff} and \textbf{Fan:ConstantVolume}. A fan of type Fan:OnOff is used with cycling fan operating mode, and a fan of type Fan:ConstantVolume is used with continuous fan operating mode (see Supply Air Fan Operating Mode Schedule field below). The input requirements for these fan objects are described elsewhere in this document.
+This alpha field defines the type of fan used by this PTAC. The only valid choices are \textbf{Fan:SystemModel}, \textbf{Fan:OnOff}, and \textbf{Fan:ConstantVolume}. A fan of type Fan:SystemModel or Fan:OnOff is used with cycling fan operating mode, and a fan of type Fan:SystemModel or Fan:ConstantVolume is used with continuous fan operating mode (see Supply Air Fan Operating Mode Schedule field below). The input requirements for these fan objects are described elsewhere in this document. Note that Fan:SystemModel was added as of version 8.7 and is recommended for use in new models.  Fan:OnOff and Fan:ConstantVolume may be deprecated in a future version.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-4}
 
@@ -2513,10 +2541,6 @@ The heat pump is controlled by matching its sensible (temperature) heating outpu
 
 The maximum number of iterations is limited, with a warning message generated if the above equation is not satisfied within the maximum number of iterations.
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-001}
-
-This numeric field defines the minimum outdoor dry-bulb temperature in degrees Celsius for PTHP compressor operation. The compressor will not operate (for DX heating or DX cooling) when outdoor dry-bulb temperatures fall below this value. The minimum value must be greater than or equal to -20 °C. If this field is left blank, the default value is -8°C. This temperature should match the minimum compressor operating temperature specified for the heat pump's DX heating coil (if they don't match, the highest of the two temperatures will be the cut-off temperature for compressor operation).
-
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4-000}
 
 This alpha field defines the type of DX cooling coil used by this PTHP. The input requirements for these DX cooling coil objects are described elsewhere in this document. Only allowable coil types are:
@@ -2627,7 +2651,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
   Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
   Zone2PTHPDXHeatCoil,     !- Heating Coil Name
   0.001,                   !- Heating Convergence Tolerance {dimensionless}
-  2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
   Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
   0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -3187,6 +3210,7 @@ ZoneHVAC:WaterToAirHeatPump,
     Coil:Heating:Fuel,
       Heat Pump DX Supp Heating Coil 1,  !- Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency
       32000,                   !- Nominal Capacity {W}
       Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -3838,9 +3862,11 @@ This is the availability status of the Stand Alone ERV~ fan. This status flag is
 
 \subsection{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}\label{zonehvacterminalunitvariablerefrigerantflow}
 
-Zone terminal units with variable refrigerant flow DX coils are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. AirConditioner:VariableRefrigerantFlow object). The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a ZoneHVAC:EquipmentConnections object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the ZoneHVAC:EquipmentList). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
+Zone terminal units with variable refrigerant flow DX coils are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. AirConditioner:VariableRefrigerantFlow objects). The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a ZoneHVAC:EquipmentConnections object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the ZoneHVAC:EquipmentList). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
 
-The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. A supply air fan is also required and can be modeled as either draw through or blow through.
+The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. 
+
+A supply air fan is also required and can be modeled as either draw through or blow through. The Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume if AirConditioner:VariableRefrigerantFlow is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
 
 \subsubsection{Inputs}\label{inputs-14-018}
 
@@ -3902,7 +3928,9 @@ The second choice stands for ``draw through fan''. This means that the unit cons
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-8}
 
-This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff} or \textit{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff}, \textit{Fan:ConstantVolume}, \textit{Fan:SystemModel} or \textit{Fan:VariableVolume}. The Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume if AirConditioner:VariableRefrigerantFlow is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
+
+Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0). The Fan:SystemModel may be used to model either of these fan operating characteristics.
 
 \paragraph{Field: Supply Air Fan Object Name}\label{field-supply-air-fan-object-name}
 

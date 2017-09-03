@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -78,6 +66,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -126,6 +115,7 @@ namespace ChillerReformulatedEIR {
 	//    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
 	// Using/Aliasing
+	using namespace DataGlobals;
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::DisplayExtraWarnings;
@@ -642,6 +632,12 @@ namespace ChillerReformulatedEIR {
 				}
 			}
 
+			if ( NumAlphas > 14 ) {
+				ElecReformEIRChiller( EIRChillerNum ).EndUseSubcategory = cAlphaArgs( 15 );
+			} else {
+				ElecReformEIRChiller( EIRChillerNum ).EndUseSubcategory = "General";
+			}
+
 		}
 
 		if ( ErrorsFound ) {
@@ -652,7 +648,7 @@ namespace ChillerReformulatedEIR {
 			SetupOutputVariable( "Chiller Part Load Ratio []", ElecReformEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Cycling Ratio []", ElecReformEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Electric Power [W]", ElecReformEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Electric Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", ElecReformEIRChiller( EIRChillerNum ).EndUseSubcategory, "Plant" );
 
 			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElecReformEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
@@ -1016,7 +1012,10 @@ namespace ChillerReformulatedEIR {
 		tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
 		tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
 		tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
-		PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+
+		if ( ElecReformEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
+			PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
+		}
 
 		// find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).PlantSizNum;
@@ -1024,8 +1023,6 @@ namespace ChillerReformulatedEIR {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * ElecReformEIRChiller( EIRChillNum ).SizFac;
-				if ( ! ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
-
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = 0.0;
 
@@ -1087,13 +1084,9 @@ namespace ChillerReformulatedEIR {
 					SizingCondOutletTemp = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut;
 				}
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-
 				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-
 				RefCapFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, SizingEvapOutletTemp, SizingCondOutletTemp );
 				tmpNomCap = ( Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate ) / RefCapFT;
-				if ( ! ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized ) tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
-
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized ) tmpNomCap = 0.0;
 
@@ -1144,10 +1137,8 @@ namespace ChillerReformulatedEIR {
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElecReformEIRChiller( EIRChillNum ).RefCOP ) * ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-				if ( ! ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
 				//IF (PlantFirstSizesOkayToFinalize) ElecReformEIRChiller(EIRChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			} else {
 				if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = 0.0;
@@ -1398,7 +1389,7 @@ namespace ChillerReformulatedEIR {
 
 		// METHODOLOGY EMPLOYED:
 		// Use empirical curve fits to model performance at off-design conditions. This subroutine
-		// calls Subroutines CalcReformEIRChillerModel and SolveRegulaFalsi to obtain solution.
+		// calls Subroutines CalcReformEIRChillerModel and SolveRoot to obtain solution.
 		// The actual chiller performance calculations are in Subroutine CalcReformEIRChillerModel.
 
 		// REFERENCES:
@@ -1410,15 +1401,15 @@ namespace ChillerReformulatedEIR {
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
 		using CurveManager::GetCurveMinMaxValues;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // Iteration control for SolveRegulaFalsi
+		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRoot
+		int const MaxIter( 500 ); // Iteration control for SolveRoot
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na
@@ -1438,7 +1429,7 @@ namespace ChillerReformulatedEIR {
 		Real64 Tmax( -99 ); // Maximum condenser leaving temperature allowed by curve objects [C]
 		Array1D< Real64 > Par( 6 ); // Pass parameters for RegulaFalsi solver
 		Real64 FalsiCondOutTemp; // RegulaFalsi condenser outlet temperature result [C]
-		int SolFla; // Feedback flag from SolveRegulaFalsi
+		int SolFla; // Feedback flag from SolveRoot
 		Real64 CondTempMin; // Condenser outlet temperature when using Tmin as input to CalcReformEIRChillerModel [C]
 		Real64 CondTempMax; // Condenser outlet temperature when using Tmax as input to CalcReformEIRChillerModel [C]
 
@@ -1490,7 +1481,7 @@ namespace ChillerReformulatedEIR {
 				//Par(5) = FlowLock !DSU
 				Par( 6 ) = EquipFlowCtrl;
 
-				SolveRegulaFalsi( Acc, MaxIter, SolFla, FalsiCondOutTemp, CondOutTempResidual, Tmin, Tmax, Par );
+				SolveRoot( Acc, MaxIter, SolFla, FalsiCondOutTemp, CondOutTempResidual, Tmin, Tmax, Par );
 
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
@@ -1864,7 +1855,9 @@ namespace ChillerReformulatedEIR {
 		//       RE-ENGINEERED  na
 
 		//       MODIFIED
-		//			Aug.  2014, Rongpeng Zhang, added an additional part-load performance curve type
+		//			Aug. 2014, Rongpeng Zhang, added an additional part-load performance curve type
+		//			Jun. 2016, Rongpeng Zhang, applied the chiller supply water temperature sensor fault model
+		//			Nov. 2016, Rongpeng Zhang, added fouling chiller fault
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Simulate a vapor compression chiller using the reformulated model developed by Mark Hydeman
@@ -1877,6 +1870,8 @@ namespace ChillerReformulatedEIR {
 		//    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::SmallLoad;
 		using DataHVACGlobals::TimeStepSys;
@@ -1895,6 +1890,8 @@ namespace ChillerReformulatedEIR {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
+		using FaultsManager::FaultsChillerFouling;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1987,7 +1984,7 @@ namespace ChillerReformulatedEIR {
 		// This chiller is currenlty has only a water-cooled condenser
 		//! calculate end time of current time step
 		//  CurrentEndTime = CurrentTime + SysTimeElapsed
-		//! Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+		//! Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
 		//! Wait for next time step to print warnings. If simulation iterates, print out
 		//! the warning for the last iteration only. Must wait for next time step to accomplish this.
 		//! If a warning occurs and the simulation down shifts, the warning is not valid.
@@ -2037,6 +2034,21 @@ namespace ChillerReformulatedEIR {
 		TempLowLimitEout = ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElecReformEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
 		PartLoadCurveType = ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType; //zrp_Aug2014
+		
+		//If there is a fault of chiller fouling (zrp_Nov2016)
+		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
+			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
+			Real64 NomCap_ff = ChillerRefCap;
+			Real64 ReferenceCOP_ff = ReferenceCOP;
+		
+			//calculate the Faulty Chiller Fouling Factor using fault information
+			ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the Chiller nominal capacity and COP at faulty cases
+			ChillerRefCap = NomCap_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+			ReferenceCOP = ReferenceCOP_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
+			
+		}
 
 		// Set mass flow rates
 
@@ -2068,6 +2080,19 @@ namespace ChillerReformulatedEIR {
 		} else {
 			assert( false );
 		}}
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
+			
+			//calculate the sensor offset using fault information
+			ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the EvapOutletTempSetPoint
+			EvapOutletTempSetPoint = max( ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
+			ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
+			
+		}
 
 		// correct temperature if using heat recovery
 		// use report values for latest valid calculation, lagged somewhat
@@ -2140,7 +2165,7 @@ namespace ChillerReformulatedEIR {
 			} else {
 				ElecReformEIRChiller( EIRChillNum ).PossibleSubcooling = true;
 			}
-			// Either set the flow to the Constant value or caluclate the flow for the variable volume case
+			// Either set the flow to the Constant value or calculate the flow for the variable volume case
 			if ( ( ElecReformEIRChiller( EIRChillNum ).FlowMode == ConstantFlow ) || ( ElecReformEIRChiller( EIRChillNum ).FlowMode == NotModulated ) ) {
 				// Set the evaporator mass flow rate to design
 				// Start by assuming max (design) flow
@@ -2202,6 +2227,19 @@ namespace ChillerReformulatedEIR {
 				}
 			} //End of Constant Variable Flow If Block
 
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( ElecReformEIRChiller( EIRChillNum ).FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
 			SetComponentFlowRate( EvapMassFlowRate, EvapInletNode, EvapOutletNode, ElecReformEIRChiller( EIRChillNum ).CWLoopNum, ElecReformEIRChiller( EIRChillNum ).CWLoopSideNum, ElecReformEIRChiller( EIRChillNum ).CWBranchNum, ElecReformEIRChiller( EIRChillNum ).CWCompNum );
@@ -2252,6 +2290,16 @@ namespace ChillerReformulatedEIR {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset, Cp, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 			// Checks QEvaporator on the basis of the machine limits.

@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
 !*********** air source integrated heat pump ***********************
 
@@ -1141,6 +1141,7 @@
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
@@ -1263,6 +1264,7 @@
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
@@ -2663,23 +2665,23 @@
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Loop Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+  Output:Variable,*,Integrated Heat Pump Air Loop Mass Flow Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Condenser Water Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+  Output:Variable,*,Integrated Heat Pump Condenser Water Mass Flow Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Total Cooling Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Air Total Cooling Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Heating Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Air Heating Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Water Heating Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Water Heating Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Electric Power,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Electric Power,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Air Latent Cooling Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Air Latent Cooling Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump Source Heat Transfer Rate,timestep; !- HVAC Average [W]
+  Output:Variable,*,Integrated Heat Pump Source Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Integrated Heat Pump COP,timestep; !- HVAC Average []
+  Output:Variable,*,Integrated Heat Pump COP,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -2719,3 +2721,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+

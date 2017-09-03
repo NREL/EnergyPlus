@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef OutputReportTabular_hh_INCLUDED
 #define OutputReportTabular_hh_INCLUDED
@@ -120,6 +108,42 @@ namespace OutputReportTabular {
 	extern int const stepTypeZone;
 	extern int const stepTypeHVAC;
 
+	extern int const cSensInst;
+	extern int const cSensDelay;
+	extern int const cSensRA;
+	extern int const cLatent;
+	extern int const cTotal;
+	extern int const cPerc;
+	extern int const cArea;
+	extern int const cPerArea;
+
+	extern int const rPeople;
+	extern int const rLights;
+	extern int const rEquip;
+	extern int const rRefrig;
+	extern int const rWaterUse;
+	extern int const rHvacLoss;
+	extern int const rPowerGen;
+	extern int const rDOAS;
+	extern int const rInfil;
+	extern int const rZoneVent;
+	extern int const rIntZonMix;
+	extern int const rRoof;
+	extern int const rIntZonCeil;
+	extern int const rOtherRoof;
+	extern int const rExtWall;
+	extern int const rIntZonWall;
+	extern int const rGrdWall;
+	extern int const rOtherWall;
+	extern int const rExtFlr;
+	extern int const rIntZonFlr;
+	extern int const rGrdFlr;
+	extern int const rOtherFlr;
+	extern int const rFeneCond;
+	extern int const rFeneSolr;
+	extern int const rOpqDoor;
+	extern int const rGrdTot;
+
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
 	extern int const numResourceTypes;
@@ -182,9 +206,12 @@ namespace OutputReportTabular {
 	extern bool displayAdaptiveComfort;
 	extern bool displaySourceEnergyEndUseSummary;
 	extern bool displayZoneComponentLoadSummary;
+	extern bool displayAirLoopComponentLoadSummary;
+	extern bool displayFacilityComponentLoadSummary;
 	extern bool displayLifeCycleCostReport;
 	extern bool displayTariffReport;
 	extern bool displayEconomicResultSummary;
+	extern bool displayEioSummary;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -214,6 +241,7 @@ namespace OutputReportTabular {
 	extern Array1D< Real64 > gatherDemandTotal;
 	extern Array2D< Real64 > gatherDemandEndUse;
 	extern Array3D< Real64 > gatherDemandEndUseSub;
+	extern Array3D< Real64 > gatherDemandIndEndUseSub;
 	extern Array1D_int gatherDemandTimeStamp;
 	// to keep track of hours for the BEPS report gathering
 	extern Real64 gatherElapsedTimeBEPS;
@@ -590,6 +618,106 @@ namespace OutputReportTabular {
 
 	};
 
+	struct CompLoadTablesType
+	{
+		// members
+		int desDayNum; // design day number
+		int timeStepMax; // times step of the day that the maximum occurs
+		Array2D < Real64 > cells; // main component table results (column, row)
+		Array2D_bool cellUsed; // flag if the cell is used for the table of results (column, row)
+		std::string peakDateHrMin; // string containing peak timestamp
+		Real64 outsideDryBulb;   // outside dry bulb temperature at peak
+		Real64 outsideWebBulb;   // outside web bulb temperature at peak
+		Real64 outsideHumRatio;  // outside humidity ratio at peak
+		Real64 zoneDryBulb;   // zone dry bulb temperature at peak
+		Real64 zoneRelHum;   // zone relative humidity at peak
+		Real64 zoneHumRatio;  // zone humidity ratio at peak
+
+		Real64 supAirTemp;  // supply air temperature
+		Real64 mixAirTemp;  // mixed air temperature
+		Real64 mainFanAirFlow;  // main fan air flow
+		Real64 outsideAirFlow;  // outside air flow
+		Real64 designPeakLoad;  // design peak load
+		Real64 diffDesignPeak;  // difference between Design and Peak Load
+
+		Real64 peakDesSensLoad; // peak design sensible load
+		Real64 estInstDelSensLoad; // estimated instant plus delayed sensible load
+		Real64 diffPeakEst; // difference between the peak design sensible load and the estimated instant plus delayed sensible load
+		Array1D_int zoneIndices; // the zone numbers covered by the report
+
+		Real64 outsideAirRatio;  // outside Air
+		Real64 floorArea; // floor area
+		Real64 airflowPerFlrArea;  // airflow per floor area
+		Real64 airflowPerTotCap;  // airflow per total capacity
+		Real64 areaPerTotCap;  // area per total capacity
+		Real64 totCapPerArea;  // total capacity per area
+		Real64 chlPumpPerFlow;  // chiller pump power per flow
+		Real64 cndPumpPerFlow;  // condenser pump power per flow
+		Real64 numPeople;  // number of people
+
+		// default constructor
+		CompLoadTablesType() :
+			desDayNum( 0 ),
+			timeStepMax( 0 ),
+			outsideDryBulb( 0. ),
+			outsideWebBulb( 0. ),
+			outsideHumRatio( 0. ),
+			zoneDryBulb( 0. ),
+			zoneRelHum( 0. ),
+			supAirTemp( 0. ),
+			mixAirTemp( 0. ),
+			mainFanAirFlow( 0. ),
+			outsideAirFlow( 0. ),
+			designPeakLoad( 0. ),
+			diffDesignPeak( 0. ),
+			peakDesSensLoad( 0. ),
+			estInstDelSensLoad( 0. ),
+			diffPeakEst( 0. ),
+			outsideAirRatio( 0.),
+			floorArea( 0. ),
+			airflowPerFlrArea( 0. ),
+			airflowPerTotCap( 0. ),
+			areaPerTotCap( 0. ),
+			totCapPerArea( 0. ),
+			chlPumpPerFlow( 0. ),
+			cndPumpPerFlow( 0. ),
+			numPeople( 0. )
+
+		{}
+
+	};
+
+	struct ZompComponentAreasType
+	{
+		// members
+		Real64 floor;
+		Real64 roof;
+		Real64 ceiling;
+		Real64 extWall;
+		Real64 intZoneWall;
+		Real64 grndCntWall;
+		Real64 extFloor;
+		Real64 intZoneFloor;
+		Real64 grndCntFloor;
+		Real64 fenestration;
+		Real64 door;
+
+		// default constructor
+		ZompComponentAreasType() :
+			floor( 0. ),
+			roof( 0. ),
+			ceiling( 0. ),
+			extWall( 0. ),
+			intZoneWall( 0. ),
+			grndCntWall( 0. ),
+			extFloor( 0. ),
+			intZoneFloor( 0. ),
+			grndCntFloor( 0. ),
+			fenestration( 0. ),
+			door( 0. )
+		{}
+	};
+
 	// Object Data
 	extern Array1D< OutputTableBinnedType > OutputTableBinned;
 	extern Array2D< BinResultsType > BinResults; // table number, number of intervals
@@ -639,6 +767,9 @@ namespace OutputReportTabular {
 
 	void
 	InitializeTabularMonthly();
+
+	bool
+	isInvalidAggregationOrder();
 
 	void
 	GetInputTabularTimeBins();
@@ -774,8 +905,17 @@ namespace OutputReportTabular {
 	WriteSurfaceShadowing();
 
 	void
-	AddTOCZoneLoadComponentTable();
+	WriteEioTables();
 
+	int
+	unitsFromHeading( std::string & heading );
+
+	std::vector< std::string >
+	splitCommaString (std::string const & inputString );
+	
+	void
+	AddTOCLoadComponentTableSummaries();
+ 
 	void
 	AllocateLoadComponentArrays();
 
@@ -792,10 +932,117 @@ namespace OutputReportTabular {
 	GatherComponentLoadsHVAC();
 
 	void
-	ComputeDelayedComponents();
+	WriteLoadComponentSummaryTables();
 
 	void
-	WriteZoneLoadComponentTable();
+	GetDelaySequences(
+		int const & desDaySelected,
+		bool const & isCooling,
+		int const & zoneIndex,
+		Array1D< Real64 > & peopleDelaySeq,
+		Array1D< Real64 > & equipDelaySeq,
+		Array1D< Real64 > & hvacLossDelaySeq,
+		Array1D< Real64 > & powerGenDelaySeq,
+		Array1D< Real64 > & lightDelaySeq,
+		Array1D< Real64 > & feneSolarDelaySeq,
+		Array3D< Real64 > & feneCondInstantSeq,
+		Array2D< Real64 > & surfDelaySeq
+	);
+
+	Real64
+	MovingAvgAtMaxTime(
+		Array1S< Real64 > const & dataSeq,
+		int const & numTimeSteps,
+		int const & maxTimeStep
+	);
+
+	void
+	ComputeTableBodyUsingMovingAvg(
+		Array2D < Real64 > & resultCells,
+		Array2D_bool & resultCellsUsed,
+		int const & desDaySelected,
+		int const & timeOfMax,
+		int const & zoneIndex,
+		Array1D< Real64 > const & peopleDelaySeq,
+		Array1D< Real64 > const & equipDelaySeq,
+		Array1D< Real64 > const & hvacLossDelaySeq,
+		Array1D< Real64 > const & powerGenDelaySeq,
+		Array1D< Real64 > const & lightDelaySeq,
+		Array1D< Real64 > const & feneSolarDelaySeq,
+		Array3D< Real64 > const & feneCondInstantSeqLoc,
+		Array2D< Real64 > const & surfDelaySeq
+	);
+
+	void
+	CollectPeakZoneConditions(
+		CompLoadTablesType & compLoad,
+		int const & timeOfMax,
+		int const & zoneIndex,
+		bool const & isCooling
+	);
+
+	void
+	CollectPeakAirLoopConditions(
+		CompLoadTablesType & compLoad,
+		int const & airLoopIndex,
+		bool const & isCooling
+	);
+
+	void
+	ComputeEngineeringChecks(
+		CompLoadTablesType & compLoad
+	);
+
+
+	void
+	GetZoneComponentAreas(
+		Array1D< ZompComponentAreasType > & areas
+	);
+
+	void
+	AddAreaColumnForZone(
+		int const & zoneNum,
+		Array1D< ZompComponentAreasType > const & compAreas,
+		CompLoadTablesType & compLoadTotal
+	);
+
+	void
+	CombineLoadCompResults(
+		CompLoadTablesType & compLoadTotal,
+		CompLoadTablesType const & compLoadPartial,
+		Real64 const & multiplier
+	);
+
+	void
+	AddTotalRowsForLoadSummary(
+		CompLoadTablesType & compLoadTotal
+	);
+
+	void
+	ComputePeakDifference(
+		CompLoadTablesType & compLoad
+	);
+
+	void
+	LoadSummaryUnitConversion(
+		CompLoadTablesType & compLoadTotal
+    );
+
+	void
+	CreateListOfZonesForAirLoop(
+		CompLoadTablesType  & compLoad,
+		Array1D_int const & zoneToAirLoop,
+		int const & curAirLoop
+	);
+
+	void
+	OutputCompLoadSummary(
+		int const & kind, // zone=1, airloop=2, facility=3
+		CompLoadTablesType const & compLoadCool,
+		CompLoadTablesType const & compLoadHeat,
+		int const & zoneOrAirLoopIndex
+	);
+
 
 	void
 	WriteReportHeaders(
@@ -939,6 +1186,12 @@ namespace OutputReportTabular {
 
 	std::string
 	DateToString( int const codedDate ); // word containing encoded month, day, hour, minute
+
+	bool
+	isNumber( std::string const & s );
+
+	int
+	digitsAferDecimal( std::string s );
 
 	void
 	AddTOCEntry(

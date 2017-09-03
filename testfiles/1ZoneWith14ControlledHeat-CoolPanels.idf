@@ -409,7 +409,7 @@
     290,                     !- Density {kg/m3}
     590;                     !- Specific Heat {J/kg-K}
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,4;
 

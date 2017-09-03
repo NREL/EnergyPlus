@@ -1,8 +1,9 @@
 
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat/lib")
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/")
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 
-SET(SRC 
+SET(SRC
   main.h
   main.c
   fmiFunctions.h
@@ -38,4 +39,3 @@ set_target_properties(
   INSTALL_NAME_DIR "@executable_path"
 )
 endif()
-

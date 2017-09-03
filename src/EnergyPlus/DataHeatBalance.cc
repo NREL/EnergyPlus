@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -260,10 +248,10 @@ namespace DataHeatBalance {
 	int const MixingSourceZonesOnly( 1 );
 	int const AllZones( 2 );
 
-	int const NumZoneIntGainDeviceTypes( 52 );
-	Array1D_string const ZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "PEOPLE", "LIGHTS", "ELECTRICEQUIPMENT", "GASEQUIPMENT", "HOTWATEREQUIPMENT", "STEAMEQUIPMENT", "OTHEREQUIPMENT", "ZONEBASEBOARD:OUTDOORTEMPERATURECONTROLLED", "ZONECONTAMINANTSOURCEANDSINK:CARBONDIOXIDE", "WATERUSE:EQUIPMENT", "DAYLIGHTINGDEVICE:TUBULAR", "WATERHEATER:MIXED", "WATERHEATER:STRATIFIED", "THERMALSTORAGE:CHILLEDWATER:MIXED", "THERMALSTORAGE:CHILLEDWATER:STRATIFIED", "GENERATOR:FUELCELL", "GENERATOR:MICROCHP", "ELECTRICLOADCENTER:TRANSFORMER", "ELECTRICLOADCENTER:INVERTER:SIMPLE", "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER", "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE", "ELECTRICLOADCENTER:STORAGE:BATTERY", "ELECTRICLOADCENTER:STORAGE:SIMPLE", "PIPE:INDOOR", "REFRIGERATION:CASE", "REFRIGERATION:COMPRESSORRACK", "REFRIGERATION:SYSTEM:CONDENSER:AIRCOOLED", "REFRIGERATION:TRANSCRITICALSYSTEM:GASCOOLER:AIRCOOLED", "REFRIGERATION:SYSTEM:SUCTIONPIPE", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPEMT", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPELT", "REFRIGERATION:SECONDARYSYSTEM:RECEIVER", "REFRIGERATION:SECONDARYSYSTEM:PIPE", "REFRIGERATION:WALKIN", "PUMP:VARIABLESPEED", "PUMP:CONSTANTSPEED", "PUMP:VARIABLESPEED:CONDENSATE", "HEADEREDPUMPS:VARIABLESPEED", "HEADEREDPUMPS:CONSTANTSPEED", "ZONECONTAMINANTSOURCEANDSINK:GENERICCONTAMINANT", "PLANTCOMPONENT:USERDEFINED", "COIL:USERDEFINED", "ZONEHVAC:FORCEDAIR:USERDEFINED", "AIRTERMINAL:SINGLEDUCT:USERDEFINED", "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE", "ELECTRICEQUIPMENT:ITE:AIRCOOLED", "COIL:COOLING:DX:SINGLESPEED", "COIL:HEATING:DX:SINGLESPEED", "COIL:COOLING:DX:TWOSPEED", "COIL:COOLING:DX:MULTISPEED", "COIL:HEATING:DX:MULTISPEED","ELECTRICLOADCENTER:STORAGE:CONVERTER"} ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52
+	int const NumZoneIntGainDeviceTypes( 53 );
+	Array1D_string const ZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "PEOPLE", "LIGHTS", "ELECTRICEQUIPMENT", "GASEQUIPMENT", "HOTWATEREQUIPMENT", "STEAMEQUIPMENT", "OTHEREQUIPMENT", "ZONEBASEBOARD:OUTDOORTEMPERATURECONTROLLED", "ZONECONTAMINANTSOURCEANDSINK:CARBONDIOXIDE", "WATERUSE:EQUIPMENT", "DAYLIGHTINGDEVICE:TUBULAR", "WATERHEATER:MIXED", "WATERHEATER:STRATIFIED", "THERMALSTORAGE:CHILLEDWATER:MIXED", "THERMALSTORAGE:CHILLEDWATER:STRATIFIED", "GENERATOR:FUELCELL", "GENERATOR:MICROCHP", "ELECTRICLOADCENTER:TRANSFORMER", "ELECTRICLOADCENTER:INVERTER:SIMPLE", "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER", "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE", "ELECTRICLOADCENTER:STORAGE:BATTERY", "ELECTRICLOADCENTER:STORAGE:SIMPLE", "PIPE:INDOOR", "REFRIGERATION:CASE", "REFRIGERATION:COMPRESSORRACK", "REFRIGERATION:SYSTEM:CONDENSER:AIRCOOLED", "REFRIGERATION:TRANSCRITICALSYSTEM:GASCOOLER:AIRCOOLED", "REFRIGERATION:SYSTEM:SUCTIONPIPE", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPEMT", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPELT", "REFRIGERATION:SECONDARYSYSTEM:RECEIVER", "REFRIGERATION:SECONDARYSYSTEM:PIPE", "REFRIGERATION:WALKIN", "PUMP:VARIABLESPEED", "PUMP:CONSTANTSPEED", "PUMP:VARIABLESPEED:CONDENSATE", "HEADEREDPUMPS:VARIABLESPEED", "HEADEREDPUMPS:CONSTANTSPEED", "ZONECONTAMINANTSOURCEANDSINK:GENERICCONTAMINANT", "PLANTCOMPONENT:USERDEFINED", "COIL:USERDEFINED", "ZONEHVAC:FORCEDAIR:USERDEFINED", "AIRTERMINAL:SINGLEDUCT:USERDEFINED", "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE", "ELECTRICEQUIPMENT:ITE:AIRCOOLED", "COIL:COOLING:DX:SINGLESPEED", "COIL:HEATING:DX:SINGLESPEED", "COIL:COOLING:DX:TWOSPEED", "COIL:COOLING:DX:MULTISPEED", "COIL:HEATING:DX:MULTISPEED","ELECTRICLOADCENTER:STORAGE:CONVERTER","FAN:SYSTEMMODEL"} ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-	Array1D_string const ccZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "People", "Lights", "ElectricEquipment", "GasEquipment", "HotWaterEquipment", "SteamEquipment", "OtherEquipment", "ZoneBaseboard:OutdoorTemperatureControlled", "ZoneContaminantSourceAndSink:CarbonDioxide", "WaterUse:Equipment", "DaylightingDevice:Tubular", "WaterHeater:Mixed", "WaterHeater:Stratified", "ThermalStorage:ChilledWater:Mixed", "ThermalStorage:ChilledWater:Stratified", "Generator:FuelCell", "Generator:MicroCHP", "ElectricLoadCenter:Transformer", "ElectricLoadCenter:Inverter:Simple", "ElectricLoadCenter:Inverter:FunctionOfPower", "ElectricLoadCenter:Inverter:LookUpTable", "ElectricLoadCenter:Storage:Battery", "ElectricLoadCenter:Storage:Simple", "Pipe:Indoor", "Refrigeration:Case", "Refrigeration:CompressorRack", "Refrigeration:System:Condenser:AirCooled", "Refrigeration:TranscriticalSystem:GasCooler:AirCooled", "Refrigeration:System:SuctionPipe", "Refrigeration:TranscriticalSystem:SuctionPipeMT", "Refrigeration:TranscriticalSystem:SuctionPipeLT", "Refrigeration:SecondarySystem:Receiver", "Refrigeration:SecondarySystem:Pipe", "Refrigeration:WalkIn", "Pump:VariableSpeed", "Pump:ConstantSpeed", "Pump:VariableSpeed:Condensate", "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed", "ZoneContaminantSourceAndSink:GenericContaminant", "PlantComponent:UserDefined", "Coil:UserDefined", "ZoneHVAC:ForcedAir:UserDefined", "AirTerminal:SingleDuct:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "ElectricEquipment:ITE:AirCooled", "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed","ElectricLoadCenter:Storage:Converter"} ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52
+	Array1D_string const ccZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "People", "Lights", "ElectricEquipment", "GasEquipment", "HotWaterEquipment", "SteamEquipment", "OtherEquipment", "ZoneBaseboard:OutdoorTemperatureControlled", "ZoneContaminantSourceAndSink:CarbonDioxide", "WaterUse:Equipment", "DaylightingDevice:Tubular", "WaterHeater:Mixed", "WaterHeater:Stratified", "ThermalStorage:ChilledWater:Mixed", "ThermalStorage:ChilledWater:Stratified", "Generator:FuelCell", "Generator:MicroCHP", "ElectricLoadCenter:Transformer", "ElectricLoadCenter:Inverter:Simple", "ElectricLoadCenter:Inverter:FunctionOfPower", "ElectricLoadCenter:Inverter:LookUpTable", "ElectricLoadCenter:Storage:Battery", "ElectricLoadCenter:Storage:Simple", "Pipe:Indoor", "Refrigeration:Case", "Refrigeration:CompressorRack", "Refrigeration:System:Condenser:AirCooled", "Refrigeration:TranscriticalSystem:GasCooler:AirCooled", "Refrigeration:System:SuctionPipe", "Refrigeration:TranscriticalSystem:SuctionPipeMT", "Refrigeration:TranscriticalSystem:SuctionPipeLT", "Refrigeration:SecondarySystem:Receiver", "Refrigeration:SecondarySystem:Pipe", "Refrigeration:WalkIn", "Pump:VariableSpeed", "Pump:ConstantSpeed", "Pump:VariableSpeed:Condensate", "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed", "ZoneContaminantSourceAndSink:GenericContaminant", "PlantComponent:UserDefined", "Coil:UserDefined", "ZoneHVAC:ForcedAir:UserDefined", "AirTerminal:SingleDuct:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "ElectricEquipment:ITE:AirCooled", "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed","ElectricLoadCenter:Storage:Converter","Fan:SystemModel"} ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
 	int const IntGainTypeOf_People( 1 );
 	int const IntGainTypeOf_Lights( 2 );
@@ -317,6 +305,7 @@ namespace DataHeatBalance {
 	int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed( 50 );
 	int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed( 51 );
 	int const IntGainTypeOf_ElectricLoadCenterConverter( 52 );
+	int const IntGainTypeOf_FanSystemModel( 53 );
 
 	//Parameters for checking surface heat transfer models
 	Real64 const HighDiffusivityThreshold( 1.e-5 ); // used to check if Material properties are out of line.
@@ -667,6 +656,7 @@ namespace DataHeatBalance {
 	Array1D< HeatReclaimRefrigeratedRackData > HeatReclaimRefrigeratedRack;
 	Array1D< HeatReclaimRefrigCondenserData > HeatReclaimRefrigCondenser;
 	Array1D< HeatReclaimDXCoilData > HeatReclaimDXCoil;
+	Array1D< HeatReclaimDXCoilData > HeatReclaimVS_DXCoil;
 	Array1D< AirReportVars > ZnAirRpt;
 	Array1D< TCGlazingsType > TCGlazings;
 	Array1D< ZoneEquipData > ZoneCO2Gen;
@@ -682,6 +672,8 @@ namespace DataHeatBalance {
 	Array1D< ZoneReportVars > ZnRpt;
 	Array1D< ZoneMassConservationData > MassConservation;
 	ZoneAirMassFlowConservation ZoneAirMassFlow;
+
+	Array1D< ZoneLocalEnvironmentData > ZoneLocalEnvironment;
 
 	// Functions
 
@@ -923,6 +915,7 @@ namespace DataHeatBalance {
 		HeatReclaimRefrigeratedRack.deallocate();
 		HeatReclaimRefrigCondenser.deallocate();
 		HeatReclaimDXCoil.deallocate();
+		HeatReclaimVS_DXCoil.deallocate();
 		ZnAirRpt.deallocate();
 		TCGlazings.deallocate();
 		ZoneCO2Gen.deallocate();
@@ -937,6 +930,7 @@ namespace DataHeatBalance {
 		VentilationObjects.deallocate();
 		ZnRpt.deallocate();
 		MassConservation.deallocate();
+		ZoneLocalEnvironment.deallocate();
 		ZoneAirMassFlow = ZoneAirMassFlowConservation();
 	}
 
@@ -1007,6 +1001,12 @@ namespace DataHeatBalance {
 	}
 
 	void
+	ZoneData::SetWindDirAt( Real64 const fac )
+	{
+		WindDir = fac;
+	}
+
+	void
 	SetZoneOutBulbTempAt()
 	{
 		for ( auto & zone : Zone ) {
@@ -1015,7 +1015,7 @@ namespace DataHeatBalance {
 	}
 
 	void
-	CheckZoneOutBulbTempAt() 
+	CheckZoneOutBulbTempAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;
@@ -1038,6 +1038,17 @@ namespace DataHeatBalance {
 		Real64 const fac( DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
 		for ( auto & zone : Zone ) {
 			zone.SetWindSpeedAt( fac );
+		}
+	}
+
+
+	void
+	SetZoneWindDirAt()
+	{
+		// Using/Aliasing
+		Real64 const fac( DataEnvironment::WindDir );
+		for ( auto & zone : Zone ) {
+			zone.SetWindDirAt( fac );
 		}
 	}
 

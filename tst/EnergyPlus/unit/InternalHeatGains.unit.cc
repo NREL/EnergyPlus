@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #include <exception>
 
@@ -67,6 +55,9 @@
 #include <ScheduleManager.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
+#include <HVACManager.hh>
+#include <DataLoopNode.hh>
 #include <ExteriorEnergyUse.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -240,4 +231,213 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
 
 	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
+}
+
+TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortModel ) {
+	// Adaptive comfort model fatal for irrelevant blank fields  #5948
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.5;",
+
+		"ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
+
+		"  Schedule:Compact,",
+		"    HOUSE OCCUPANCY,    !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,           !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,1.0;        !- Field 3",
+
+		"  Schedule:Compact,",
+		"    Activity Sch,    !- Name",
+		"    Fraction,                !- Schedule Type Limits Name",
+		"    Through: 12/31,           !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,1.0;        !- Field 3",
+
+		"Zone,LIVING ZONE;",
+
+		"People,",
+		"LIVING ZONE People, !- Name",
+		"LIVING ZONE, !- Zone or ZoneList Name",
+		"HOUSE OCCUPANCY, !- Number of People Schedule Name",
+		"people, !- Number of People Calculation Method",
+		"3.000000, !- Number of People",
+		", !- People per Zone Floor Area{ person / m2 }",
+		", !- Zone Floor Area per Person{ m2 / person }",
+		"0.3000000, !- Fraction Radiant",
+		", !- Sensible Heat Fraction",
+		"Activity Sch, !- Activity Level Schedule Name",
+		"3.82E-8, !- Carbon Dioxide Generation Rate{ m3 / s - W }",
+		", !- Enable ASHRAE 55 Comfort Warnings",
+		"zoneaveraged, !- Mean Radiant Temperature Calculation Type",
+		", !- Surface Name / Angle Factor List Name",
+		", !- Work Efficiency Schedule Name",
+		", !- Clothing Insulation Calculation Method",
+		", !- Clothing Insulation Calculation Method Schedule Name",
+		", !- Clothing Insulation Schedule Name",
+		", !- Air Velocity Schedule Name",
+		"AdaptiveASH55;                  !- Thermal Comfort Model 1 Type",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	bool ErrorsFound1( false );
+
+	ScheduleManager::ProcessScheduleInput( ); // read schedules
+	HeatBalanceManager::GetZoneData( ErrorsFound1 );
+	ASSERT_FALSE( ErrorsFound1 );
+
+	ScheduleManager::ScheduleInputProcessed = true;
+	ScheduleManager::Schedule( 1 ).Used = true;;
+	ScheduleManager::Schedule( 1 ).CurrentValue = 1.0;
+	ScheduleManager::Schedule( 1 ).MinValue = 1.0;
+	ScheduleManager::Schedule( 1 ).MaxValue = 1.0;
+	ScheduleManager::Schedule( 1 ).MaxMinSet = true;
+	ScheduleManager::Schedule( 2 ).Used = true;;
+	ScheduleManager::Schedule( 2 ).CurrentValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MinValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MaxValue = 131.8;
+	ScheduleManager::Schedule( 2 ).MaxMinSet = true;
+	InternalHeatGains::GetInternalHeatGainsInput( );
+
+	EXPECT_FALSE( InternalHeatGains::ErrorsFound );
+
+}
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentReset) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+
+		"Zone,Zone1;",
+
+		"ElectricEquipment:ITE:AirCooled,",
+		"  Data Center Servers,     !- Name",
+		"  Zone1,                   !- Zone Name",
+		"  Watts/Unit,              !- Design Power Input Calculation Method",
+		"  500,                     !- Watts per Unit {W}",
+		"  100,                     !- Number of Units",
+		"  ,                        !- Watts per Zone Floor Area {W/m2}",
+		"  ,  !- Design Power Input Schedule Name",
+		"  ,  !- CPU Loading  Schedule Name",
+		"  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+		"  0.4,                     !- Design Fan Power Input Fraction",
+		"  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+		"  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+		"  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+		"  15,                      !- Design Entering Air Temperature {C}",
+		"  A3,                      !- Environmental Class",
+		"  AdjustedSupply,          !- Air Inlet Connection Type",
+		"  ,                        !- Air Inlet Room Air Model Node Name",
+		"  ,                        !- Air Outlet Room Air Model Node Name",
+		"  Main Zone Inlet Node,    !- Supply Air Node Name",
+		"  0.1,                     !- Design Recirculation Fraction",
+		"  Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
+		"  0.9,                     !- Design Electric Power Supply Efficiency",
+		"  UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+		"  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+		"  ITE-CPU,                 !- CPU End-Use Subcategory",
+		"  ITE-Fans,                !- Fan End-Use Subcategory",
+		"  ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
+		"",
+		"Curve:Quadratic,",
+		"  ECM FanPower fFlow,      !- Name",
+		"  0.0,                     !- Coefficient1 Constant",
+		"  1.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Minimum Value of x",
+		"  99.0;                    !- Maximum Value of x",
+		"",
+		"Curve:Quadratic,",
+		"  UPS Efficiency fPLR,     !- Name",
+		"  1.0,                     !- Coefficient1 Constant",
+		"  0.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Minimum Value of x",
+		"  99.0;                    !- Maximum Value of x",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Servers Power fLoadTemp,  !- Name",
+		"  -1.0,                    !- Coefficient1 Constant",
+		"  1.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.06667,                 !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Servers Airflow fLoadTemp,  !- Name",
+		"  -1.4,                    !- Coefficient1 Constant",
+		"  0.9,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.1,                     !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Recirculation fLoadTemp,  !- Name",
+		"  1.0,                     !- Coefficient1 Constant",
+		"  0.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+	
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
+
+	bool ErrorsFound( false );
+
+	HeatBalanceManager::GetZoneData( ErrorsFound );
+	ASSERT_FALSE( ErrorsFound );
+	DataHeatBalFanSys::MAT.allocate( 1 );
+	DataHeatBalFanSys::ZoneAirHumRat.allocate( 1 );
+
+	DataHeatBalFanSys::MAT( 1 ) = 24.0;
+	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.008;
+
+	InternalHeatGains::GetInternalHeatGainsInput();
+	InternalHeatGains::CalcZoneITEq();
+	Real64 InitialPower = DataHeatBalance::ZoneITEq( 1 ).CPUPower + DataHeatBalance::ZoneITEq( 1 ).FanPower + DataHeatBalance::ZoneITEq( 1 ).UPSPower;
+
+	DataLoopNode::Node( 1 ).Temp = 45.0;
+	InternalHeatGains::CalcZoneITEq();
+	Real64 NewPower = DataHeatBalance::ZoneITEq( 1 ).CPUPower + DataHeatBalance::ZoneITEq( 1 ).FanPower + DataHeatBalance::ZoneITEq( 1 ).UPSPower;
+	ASSERT_NE( InitialPower, NewPower );
+	HVACManager::ResetNodeData();
+
+	InternalHeatGains::CalcZoneITEq();
+	NewPower = DataHeatBalance::ZoneITEq( 1 ).CPUPower + DataHeatBalance::ZoneITEq( 1 ).FanPower + DataHeatBalance::ZoneITEq( 1 ).UPSPower;
+	ASSERT_EQ( InitialPower, NewPower );
 }

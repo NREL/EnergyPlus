@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::Heat Recovery Unit Tests
 
@@ -77,9 +65,6 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -164,7 +149,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	BalDesDehumPerfNumericFields( BalDesDehumPerfDataIndex ).NumericFieldNames.allocate( 2 );
 
 	// HXUnitOn is false so expect outlet = inlet
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ExchCond( ExchNum ).SupInTemp;
@@ -177,7 +162,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) );
@@ -186,7 +171,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) );
@@ -199,7 +184,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = SetPointTemp;
@@ -208,7 +193,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	Toutlet = Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint;
@@ -234,7 +219,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 	// HXUnitOn is false so expect outlet = inlet
 	HXUnitOn = false;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ExchCond( ExchNum ).SupInTemp, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -245,14 +230,14 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -263,14 +248,14 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	// HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
 	HXUnitOn = true;
 	ExchCond( ExchNum ).ExchConfigNum = Plate;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint, Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -280,7 +265,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	Node( ExchCond( ExchNum ).SupInletNode ).MassFlowRate = ExchCond( ExchNum ).SupInMassFlow / 4.0;
 	Node( ExchCond( ExchNum ).SecInletNode ).MassFlowRate = ExchCond( ExchNum ).SecInMassFlow / 4.0;
 	ExchCond( ExchNum ).ControlToTemperatureSetPoint = false;
-	InitHeatRecovery( ExchNum, CompanionCoilNum );
+	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio );
 	UpdateHeatRecovery( ExchNum );
 	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
@@ -289,9 +274,6 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		std::string const idf_objects = delimited_string( {
 			" Version,8.4;",
@@ -498,19 +480,13 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 		GetReturnAirPathInput();
 		GetAirPathData();
 		ASSERT_EQ( SimAirServingZones::HeatXchngr, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 4 ).CompType_Num );
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
-	int write_stat;
 	Real64 Qhr_HeatingRateTot( 0.0 );
 	int InletNode( 0 ); // Heat Recovery primary air inlet node number
 	int OutletNode( 0 ); // Heat Recovery primary air outlet node number
-
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 
 	std::string const idf_objects = delimited_string( {
@@ -3674,7 +3650,10 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    Hot Water Loop HW Demand Side Connectors,  !- Demand Side Connector List Name",
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    SingleSetpoint;          !- Plant Loop Demand Calculation Scheme",
+		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"PlantLoop,",
 		"    Chilled Water Loop Chilled Water Loop,  !- Name",
@@ -3698,7 +3677,9 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
 		"    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme",
-		"    None;                    !- Common Pipe Simulation",
+		"    None,                    !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"PlantEquipmentList,",
 		"    Hot Water Loop All Equipment,           !- Name",
@@ -3827,10 +3808,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	OutletNode = ExchCond( 1 ).SupOutletNode;
 	Qhr_HeatingRateTot = ExchCond( 1 ).SupInMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 );
-
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
 
 }
 

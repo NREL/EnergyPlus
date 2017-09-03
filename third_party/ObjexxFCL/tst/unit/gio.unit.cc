@@ -1,12 +1,12 @@
 // ObjexxFCL::gio Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -126,7 +126,9 @@ TEST( GioTest, BasicEOF )
 	int i( 0 );
 	while ( ! rflags.end() ) {
 		read( unit1, "(A)", rflags ) >> line;
-		if ( ! rflags.end() ) EXPECT_EQ( "Line " + std::to_string( ++i ), line );
+		if ( ! rflags.end() ) {
+			EXPECT_EQ( "Line " + std::to_string( ++i ), line );
+		}
 	}
 	EXPECT_EQ( 2, i );
 	flags.clear().del_on(); // Enable deletion

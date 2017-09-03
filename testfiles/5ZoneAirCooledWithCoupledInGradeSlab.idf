@@ -96,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
 !----------------------------------------------------------------
 
@@ -267,7 +267,9 @@
     Yes,                     !- Vertical Insulation
     Slab Insulation,         !- Vertical Insulation Material Name
     2,                       !- Vertical Insulation Depth {m}
-    Timestep;                !- Simulation Timestep
+    Timestep,                !- Simulation Timestep
+    ,                        !- Geometric Mesh Coefficient
+    ;                        !- Mesh Density Parameter
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     KATemps,                 !- Name

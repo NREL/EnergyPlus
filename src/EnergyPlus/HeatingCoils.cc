@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -80,6 +68,7 @@
 #include <DataSizing.hh>
 #include <DXCoils.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
@@ -92,6 +81,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -152,10 +142,11 @@ namespace HeatingCoils {
 
 	// reclaim heat object types
 	int const COMPRESSORRACK_REFRIGERATEDCASE( 1 );
-	int const COIL_DX_COOLING( 2 );
+	int const COIL_DX_COOLING( 2 ); // single speed DX
 	int const COIL_DX_MULTISPEED( 3 );
 	int const COIL_DX_MULTIMODE( 4 );
 	int const CONDENSER_REFRIGERATION( 5 );
+	int const COIL_DX_VARIABLE_COOLING( 6 );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -843,6 +834,10 @@ namespace HeatingCoils {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_COOLING;
 				GetDXCoilIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas( 5 ) );
 				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
+			} else if ( SameString( Alphas( 5 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
+				HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( Alphas( 5 ), Alphas( 6 ), DXCoilErrFlag );
+				if ( HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum > 0 ) ValidSourceType( CoilNum ) = true;
 			} else if ( SameString( Alphas( 5 ), "Coil:Cooling:DX:TwoSpeed" ) ) {
 				HeatingCoil( CoilNum ).ReclaimHeatingSource = COIL_DX_MULTISPEED;
 				GetDXCoilIndex( Alphas( 6 ), HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas( 5 ) );
@@ -932,6 +927,10 @@ namespace HeatingCoils {
 					if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 						SourceTypeString = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
 						SourceNameString = HeatReclaimDXCoil( SourceIndexNum ).Name;
+					}
+					if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+						SourceTypeString = "Coil:Cooling:DX:VariableSpeed";
+						SourceNameString = DataHeatBalance::HeatReclaimVS_DXCoil( SourceIndexNum ).Name;
 					}
 					ShowSevereError( "Coil:Heating:Desuperheater, \"" + HeatingCoil( CoilNum ).Name + "\" and \"" + HeatingCoil( RemainingCoils ).Name + "\" cannot use the same" );
 					ShowContinueError( " heat source object " + SourceTypeString + ", \"" + SourceNameString + "\"" );
@@ -1146,6 +1145,13 @@ namespace HeatingCoils {
 					if ( allocated( HeatReclaimDXCoil ) ) ValidSourceType( CoilNum ) = true;
 					break;
 				}
+			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				for ( DXCoilNum = 1; DXCoilNum <= VariableSpeedCoils::NumVarSpeedCoils; ++DXCoilNum ) {
+					if ( ! SameString( DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).Name, HeatingCoil( CoilNum ).ReclaimHeatingCoilName ) ) continue;
+					HeatingCoil( CoilNum ).ReclaimHeatingSourceIndexNum = DXCoilNum;
+					if ( allocated( DataHeatBalance::HeatReclaimVS_DXCoil ) ) ValidSourceType( CoilNum ) = true;
+					break;
+				}
 			}
 			if ( ( ValidSourceTypeCounter > NumDesuperheaterCoil * 2 ) && ShowSingleWarning( CoilNum ) && ! ValidSourceType( CoilNum ) ) {
 				ShowWarningError( "Coil:Heating:Desuperheater, \"" + HeatingCoil( CoilNum ).Name + "\" desuperheater heat source object name not found: " + HeatingCoil( CoilNum ).ReclaimHeatingCoilName );
@@ -1172,7 +1178,7 @@ namespace HeatingCoils {
 
 		// METHODOLOGY EMPLOYED:
 		// Obtains heating capacities from the zone or system sizing arrays or parent object as necessary.
-		// heating coil or other routine sets up any required data varaibles (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
+		// heating coil or other routine sets up any required data variables (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
 		// sizing variable (e.g., HeatingCoil( CoilNum ).NominalCapacity in this routine since it can be multi-staged and new routine
 		// currently only handles single values) and associated string representing that sizing variable.
 		// RequestSizing functions handles the actual sizing and reporting.
@@ -1362,7 +1368,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rich Liesen
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset 
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1373,9 +1379,13 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
 		using DataHVACGlobals::ElecHeatingCoilPower;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
+		using FaultsManager::FaultsCoilSATSensor;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1407,6 +1417,15 @@ namespace HeatingCoils {
 		Control = HeatingCoil( CoilNum ).Control;
 		TempSetPoint = HeatingCoil( CoilNum ).DesiredOutletTemp;
 
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
+		
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
@@ -1725,7 +1744,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rich Liesen
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1736,10 +1755,14 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
 		using DataAirLoop::LoopHeatingCoilMaxRTF;
+		using FaultsManager::FaultsCoilSATSensor;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1775,6 +1798,15 @@ namespace HeatingCoils {
 		AirMassFlow = HeatingCoil( CoilNum ).InletAirMassFlowRate;
 
 		CapacitanceAir = PsyCpAirFnWTdb( Win, TempAirIn ) * AirMassFlow;
+
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
 
 		// If the coil is operating there should be some heating capacitance
 		//  across the coil, so do the simulation. If not set outlet to inlet and no load.
@@ -2174,7 +2206,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   January 2005
-		//       MODIFIED       na
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -2193,7 +2225,11 @@ namespace HeatingCoils {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using FaultsManager::FaultsCoilSATSensor;
 		using namespace DXCoils;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2228,6 +2264,15 @@ namespace HeatingCoils {
 		CapacitanceAir = PsyCpAirFnWTdb( Win, TempAirIn ) * AirMassFlow;
 		TempSetPoint = HeatingCoil( CoilNum ).DesiredOutletTemp;
 
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( HeatingCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = HeatingCoil( CoilNum ).FaultyCoilSATIndex;
+			HeatingCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
+		}
+
 		// Access the appropriate structure to find the available heating capacity of the desuperheater heating coil
 		// The nominal capacity of the desuperheater heating coil varies based on the amount of heat rejected by the source
 		// Stovall 2011, add comparison to available temperature of heat reclaim source
@@ -2250,6 +2295,10 @@ namespace HeatingCoils {
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_COOLING || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTISPEED || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 				HeatingCoil( CoilNum ).RTF = DXCoil( SourceID ).CoolingCoilRuntimeFraction;
 				HeatingCoil( CoilNum ).NominalCapacity = HeatReclaimDXCoil( SourceID ).AvailCapacity * Effic;
+			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				//condenser heat rejection
+				HeatingCoil( CoilNum ).RTF = VariableSpeedCoils::VarSpeedCoil( SourceID ).RunFrac;
+				HeatingCoil( CoilNum ).NominalCapacity = VariableSpeedCoils::VarSpeedCoil( SourceID ).QSource * Effic;
 			}
 		} else {
 			HeatingCoil( CoilNum ).NominalCapacity = 0.0;
@@ -2329,6 +2378,8 @@ namespace HeatingCoils {
 				HeatReclaimRefrigCondenser( SourceID ).UsedHVACCoil = HeatingCoilLoad;
 			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_COOLING || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTISPEED || HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_MULTIMODE ) {
 				HeatReclaimDXCoil( SourceID ).AvailCapacity -= HeatingCoilLoad;
+			} else if ( HeatingCoil( CoilNum ).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING ) {
+				DataHeatBalance::HeatReclaimVS_DXCoil( SourceID ).AvailCapacity -= HeatingCoilLoad;
 			}
 		}
 
@@ -2987,6 +3038,13 @@ namespace HeatingCoils {
 			GetDXCoilIndex( CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning );
 			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
 				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTISPEED && HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
+				CoilFound = CoilNum;
+				break;
+			}
+		} else if ( SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) {
+			CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed( CoilType, CoilName, GetCoilErrFlag );
+			for ( NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil ) {
+				if ( HeatingCoil( NumCoil ).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil( NumCoil ).ReclaimHeatingCoilName != CoilName ) continue;
 				CoilFound = CoilNum;
 				break;
 			}

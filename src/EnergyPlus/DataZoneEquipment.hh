@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataZoneEquipment_hh_INCLUDED
 #define DataZoneEquipment_hh_INCLUDED
@@ -125,6 +113,10 @@ namespace DataZoneEquipment {
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
+
+	// Per Person Ventilation Rate Mode
+	extern int const PerPersonDCVByCurrentLevel;
+	extern int const PerPersonByDesignLevel;
 
 	extern int const NumValidSysAvailZoneComponents;
 	extern Array1D_string const cValidSysAvailManagerCompTypes;
@@ -303,6 +295,7 @@ namespace DataZoneEquipment {
 		int MainBranchIndex;
 		int SupplyBranchIndex;
 		int AirDistUnitIndex; // equipment number in EquipList
+		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 		int SupplyAirPathIndex;
 		Real64 NetBranchCoilDemand;
 		Array1D< SubSubEquipmentData > Coil;
@@ -315,6 +308,7 @@ namespace DataZoneEquipment {
 			MainBranchIndex( 0 ),
 			SupplyBranchIndex( 0 ),
 			AirDistUnitIndex( 0 ),
+			TermUnitSizingIndex( 0 ),
 			SupplyAirPathIndex( 0 ),
 			NetBranchCoilDemand( 0.0 )
 		{}
@@ -330,14 +324,18 @@ namespace DataZoneEquipment {
 		int EquipListIndex;
 		std::string ControlListName;
 		int ZoneNode;
-		int ReturnAirNode;
-		int NumInletNodes;
-		int NumExhaustNodes;
+		int ReturnAirNode; // first return node number
+		int NumInletNodes; // number of inlet nodes
+		int NumExhaustNodes; // number of exhaust nodes
+		int NumReturnNodes; // number of return air nodes
 		int NumReturnFlowBasisNodes; // number of return air flow basis nodes
 		int ReturnFlowSchedPtrNum; // return air flow fraction schedule pointer
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
+		Array1D_int InletNodeAirLoopNum; // air loop number connected to this inlet node (0 if not an airloop node)
 		Array1D_int ExhaustNode; // zone air exhaust nodes
+		Array1D_int ReturnNode; // zone return air nodes
+		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
 		int AirLoopNum; // the air loop index for this controlled zone
@@ -354,8 +352,7 @@ namespace DataZoneEquipment {
 		// AirDistUnitCool/AirDistUnitHeat, may represent a DIRECT AIR object,
 		// or the cold/hot side of AIR DISTRIBUTION
 		// UNIT object.  That is both AirDistUnitHeat and AirDistUnitCool are required to describe a dual
-		// duct AIR DISTRIBUTION object in the ZoneEquipList.  Although only one AIR DISTRIBUTION UNIT is
-		// allowed in ZoneEquipList, two instances of that object may exist in this data structure
+		// duct AIR DISTRIBUTION object in the ZoneEquipList.
 		Array1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
 		Array1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
 		bool SupLeakToRetPlen; // True if there is supply duct leak to the
@@ -366,6 +363,7 @@ namespace DataZoneEquipment {
 		// true when zone has in-ceiling HVAC
 		int ADUNum; // index of Air Distribution Unit
 		int SDUNum; // index of Single Duct Uncontrolled
+		bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
 
 		// Default Constructor
 		EquipConfiguration() :
@@ -376,6 +374,7 @@ namespace DataZoneEquipment {
 			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
 			NumExhaustNodes( 0 ),
+			NumReturnNodes( 0 ),
 			NumReturnFlowBasisNodes( 0 ),
 			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),
@@ -392,7 +391,8 @@ namespace DataZoneEquipment {
 			InWallActiveElement( false ),
 			InCeilingActiveElement( false ),
 			ADUNum( 0 ),
-			SDUNum( 0 )
+			SDUNum( 0 ),
+			ZoneHasAirFlowWindowReturn( false )
 		{}
 
 	};
@@ -579,7 +579,10 @@ namespace DataZoneEquipment {
 	GetSystemNodeNumberForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
 
 	int
-	GetReturnAirNodeForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
+	GetReturnAirNodeForZone( 
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	);
 
 	Real64
 	CalcDesignSpecificationOutdoorAir(

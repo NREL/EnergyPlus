@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     NONE,                    !- Name
@@ -1481,7 +1481,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name

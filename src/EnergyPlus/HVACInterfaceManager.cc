@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -64,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <HVACInterfaceManager.hh>
+#include <DataAirLoop.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
@@ -148,8 +137,6 @@ namespace HVACInterfaceManager {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   October 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages any generic HVAC loop interface.
@@ -159,34 +146,49 @@ namespace HVACInterfaceManager {
 		// from the outlet of one side of the loop get transfered directly
 		// to the inlet node of the corresponding other side of the loop.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
 		using DataLoopNode::Node;
 		using namespace DataConvergParams;
 		using DataContaminantBalance::Contaminant;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
-		// FLOW:
+
+		if ( ( CalledFrom == CalledFromAirSystemDemandSide ) && ( OutletNode == 0 ) ) {
+			// Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
+			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACTempNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnergyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACEnthalpyNotConverged( 1 ) = false;
+			AirLoopConvergence( AirLoopNum ).HVACPressureNotConverged( 1 ) = false;
+
+			Real64 totDemandSideMassFlow = 0.0;
+			Real64 totDemandSideMinAvail = 0.0;
+			Real64 totDemandSideMaxAvail = 0.0;
+			for ( int demIn = 1; demIn <= DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++demIn ) {
+				int demInNode =  DataAirLoop::AirToZoneNodeInfo( AirLoopNum ).ZoneEquipSupplyNodeNum( demIn );
+				totDemandSideMassFlow +=  Node( demInNode ).MassFlowRate;
+				totDemandSideMinAvail +=  Node( demInNode ).MassFlowRateMinAvail;
+				totDemandSideMaxAvail +=  Node( demInNode ).MassFlowRateMaxAvail;
+			}
+			TmpRealARR = AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue;
+			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) = std::abs( totDemandSideMassFlow - Node( InletNode ).MassFlowRate );
+			AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
+			if ( AirLoopConvergence( AirLoopNum ).HVACFlowDemandToSupplyTolValue( 1 ) > HVACFlowRateToler ) {
+				AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = true;
+				OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+			}
+
+			Node( InletNode ).MassFlowRate = totDemandSideMassFlow;
+			Node( InletNode ).MassFlowRateMinAvail = totDemandSideMinAvail;
+			Node( InletNode ).MassFlowRateMaxAvail = totDemandSideMaxAvail;
+			return;
+		}
 
 		//Calculate the approximate energy difference across interface for comparison
 		DeltaEnergy = HVACCpApprox * ( ( Node( OutletNode ).MassFlowRate * Node( OutletNode ).Temp ) - ( Node( InletNode ).MassFlowRate * Node( InletNode ).Temp ) );
 
-		if ( CalledFrom == CalledFromAirSystemDemandSide ) {
+		if ( ( CalledFrom == CalledFromAirSystemDemandSide ) && ( OutletNode > 0 ) ) {
 
 			AirLoopConvergence( AirLoopNum ).HVACMassFlowNotConverged( 1 ) = false;
 			AirLoopConvergence( AirLoopNum ).HVACHumRatNotConverged( 1 ) = false;

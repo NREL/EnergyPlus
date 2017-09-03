@@ -33,9 +33,9 @@ The following HVAC equipment types are allowed in the air loop. The component ma
 
 \subsection{AirLoopHVAC:UnitarySystem}\label{airloophvacunitarysystem}
 
-The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a ZoneHVAC:EquipmentList) or as an outside air system component (i.e., listed in a AirLoopHVAC:OutdoorAirSystem:EquipmentList).
+The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a ZoneHVAC:EquipmentList) or as an outside air system component (i.e., listed in a AirLoopHVAC:OutdoorAirSystem:EquipmentList). Water coil controllers are not required when these coil types are used with the AirloopHVAC:UnitarySystem object (i.e., leave the controller list name blank in the AirLoopHVAC object if water coils are used exclusively within the Unitary System).
 
-The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of a fan component (OnOff, ConstantVolume, VariableVolume, or ComponentModel), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure~\ref{fig:schematic-of-blow-through-heatcool-unitary}. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active. All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for fan-only, heating-only, cooling-only, or both heating and cooling. It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX.
+The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of a fan component (OnOff, ConstantVolume, VariableVolume, or ComponentModel), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure~\ref{fig:schematic-of-the-energyplus-unitary-system}. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active. All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for fan-only, heating-only, cooling-only, or both heating and cooling. It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX. 
 
 \begin{figure}[hbtp] % fig 1
 \centering
@@ -45,11 +45,13 @@ The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of
 
 Links to the fan, cooling coil, heating coil and reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.
 
-\subsubsection{Inputs}\label{inputs-049}
+\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
 
-\paragraph{Multi-Speed Fan and Water Coils In Unitary System}\label{multi-speed-fan-and-water-coils-in-unitary-system}
+For unitary systems, don't use the night cycle manager. Use a scheduled availability manager and let the system be always on. Then use the Supply Air Fan Operating Mode Schedule Name in the unitary system to switch between continuous fan (for ventilation) during occupied periods and switch to cycling fan for unoccupied. The system will cycle on as the thermostat requests, and this way it will run just enough to meet the load - no need for a minimum cycle time.
 
 Multi-speed fan chilled and hot water coils Air Handling Unit (AHU) can be modeled using Airloop Unitary System HVAC object (AirloopHVAC:UnitarySystem). AHU with chilled and hot water coils is setup by specifying Fan:OnOff and DesignSpecificationPerformance:MultiSpeed objects in Unitary System. The design specification performance object allows running the chilled and hot water coils capacity control using a multi-speed supply air fan. The multi-speed fan capacity control for chilled and hot water coil AHU is performed by modulating the supply air flow rate while maintaining a constant water flow rate. The chilled or hot water flow rates is set at maximum fixed flow rate when there is cooling or heating load and the water flow rate is set to zero when there is no load. Such control strategy is called two-position cooling or heating coil control. The fan speed selection depends on the current load, at lower load the fan is operated at minimum speed (Speed = 1) and the fan speed level increases progressively as the load increases until it reaches the maximum speed level specified. The multi-speed fan operation is modulated between the speeds to meet the current load. When the supply air fan is cycling between consecutive speeds levels, the speed ratio is calculated that indicates what fraction of the time step that the system run at the higher of the two speeds. At lower load, the fan may cycle on-off or run continuously depending the fan operating schedule specified. When the fan is cycling a part-load ratio is calculated to reflect the proportion of the system timestep the fan and coils were operating. In continuous fan operating mode only the coil cycles on-off and the part-load ratio applies to the coil only. Multi-speed fan capacity control is allowed with load based control type only.
+
+\subsubsection{Inputs}\label{inputs-049}
 
 \paragraph{Field: Name}\label{field-name-048}
 
@@ -57,17 +59,17 @@ This alpha field contains the identifying name for the unitary system.
 
 \paragraph{Field: Control Type}\label{field-control-type-004}
 
-This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are Load and SetPoint. Load control requires a Controlling Zone name and SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended.
+This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{SingleZoneVAV}. Load and SingleZoneVAV control requires a Controlling Zone name. SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. If setpoint control is used and the system represents a heat pump (i.e., cooling and heating coils are both DX coils) then only one of these coils may operate at a time. SingleZoneVAV requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the SingleZoneVAV control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and Coil:Heating:DX:SingleSpeed. If alternate coil types are used they are modeled using the load based control method. 
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{field-controlling-zone-or-thermostat-location}
 
-This alpha field contains the identifying zone name where the thermostat controlling the unitary system is located.
+This alpha field contains the identifying zone name where the thermostat controlling the unitary system is located. This field is required when Load or SingleZoneVAV control type is selected.
 
 \paragraph{Field: Dehumidification Control Type}\label{field-dehumidification-control-type-001}
 
 This alpha field contains the type of dehumidification control. The following options are valid for this field:
 
-\textbf{None} - meet sensible load only, no active dehumidification control
+\textbf{None} - meet sensible load only, no active dehumidification control. None is required when Control Type = SingleZoneVAV.
 
 \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
 
@@ -81,11 +83,11 @@ This alpha field contains the schedule name which contains information on the av
 
 \paragraph{Field: Unitary System Air Inlet Node Name}\label{field-unitary-system-air-inlet-node-name}
 
-This alpha field contains the unitary system inlet node name.
+This alpha field contains the unitary system air inlet node name.
 
 \paragraph{Field: Unitary System Air Outlet Node Name}\label{field-unitary-system-air-outlet-node-name}
 
-This alpha field contains the unitary system outlet node name.
+This alpha field contains the unitary system air outlet node name.
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type-000}
 
@@ -93,7 +95,7 @@ This alpha field contains the identifying type of supply air fan specified for t
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name}
 
-This alpha field contains the identifying name given to the unitary system fan.
+This alpha field contains the unique identifying name given to the unitary system fan.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement}
 
@@ -101,11 +103,11 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 \paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{supply-air-fan-operating-mode-schedule-name}
 
-This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
+This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load. The SingleZoneVAV control type is only active when the supply air fan runs continuously (i.e., during cycling fan operation the Control Type = Load model is used).
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-002}
 
-This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. Allowable coil types are:
+This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. Only specific coil types are allowed when Control Type = SingleZoneVAV as noted. Allowable coil types are:
 
 \begin{itemize}
 \item
@@ -189,19 +191,20 @@ This alpha field contains the identifying name given to the unitary system cooli
 
 \paragraph{Field: Use DOAS DX Cooling Coil}\label{field-use-doas-dx-cooling-coil}
 
-This input field eanbles DX Cooling coils to be used for 100\% outdoor air dedicated outdor air system applications. There are two choices Yes or No. If Yes, the DX coil is used as 100\% outdoor DX coil. If No, the DX coil is used as regular DX coil. This input file d is optional and the default is No.
+This input field enables DX Cooling coils to be used for 100\% outdoor air dedicated outdoor air system applications. There are two choices Yes or No. If Yes, the DX coil is used as 100\% outdoor DX coil. If No, the DX coil is used as regular DX coil. This input field is optional and the default is No. No should be specified when selecting the SingleZoneVAV control type.
 
-\paragraph{Field: DOAS DX Cooling Coil Leaving Minimum Air Temperature}\label{field-doas-dx-cooling-coil-leaving-minimum-air-temperature}
+\paragraph{Field: Minimum Supply Air Temperature}\label{field-minimum-supply-air-temperature}
 
-This input field is DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. This input field is optional and only used along with in the input field above. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.2\(^{o}\)C, and the default value is 2.0°C.
+When Use DOAS DX Cooling Coil is specified as Yes, this input field is the DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.5\(^{o}\)C, and the default value is 2.0\(^{o}\)C. This field is not autosizable when the input for Use DOAS DX Cooling Coil = Yes. When Control Type = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, the maximum limit for the minimum supply air temperature is 20.0\(^{o}\)C. Additionally, for the SingleZoneVAV model this input does not limit the minimum supply air temperature resulting from cooling coil operation at high fan speed.
+
 
 \paragraph{Field: Latent Load Control}\label{field-latent-load-control}
 
-This alpha field defines the latent load control method. Available choices are SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentWithSensibleLoadControl, or LatentOrSensibleLoadControl. The default choice is SensibleOnlyLoadControl. The SensibleOnlyLoadControl choice will operate to meet only a sensible load, and the LatentOnlyLoadConrol will operate to meet only a latent load. The LatentWithSensibleLoadControl will operate to meet the latent load only if there is a sensible load. The LatentOrSensibleLoadControl will operate to meet either a latent or sensible load.
+This alpha field defines the latent load control method. Available choices are SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentWithSensibleLoadControl, or LatentOrSensibleLoadControl. The default choice is SensibleOnlyLoadControl. The SensibleOnlyLoadControl choice will operate to meet only a sensible load and is also required when SingleZoneVAV control is selected. The LatentOnlyLoadConrol will operate to meet only a latent load. The LatentWithSensibleLoadControl will operate to meet the latent load only if there is a sensible load. The LatentOrSensibleLoadControl will operate to meet either a latent or sensible load.
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type}
 
-This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The Coil:UserDefined object must be configured as a heating coil. Supplemental heating type must be one of:
+This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plant loop. The Coil:UserDefined object must be configured as a heating coil. Supplemental heating type must be one of:
 
 \begin{itemize}
 \item
@@ -220,7 +223,7 @@ This alpha field contains the identifying type of supplemental heating coil spec
 
 \paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name}
 
-This alpha field contains the identifying name given to the unitary system reheat coil.
+This alpha field contains the identifying name given to the unitary system supplemental or reheat coil object. This coil provides supplemental heat during heating mode operation, or reheats the supply air during dehumidification mode operation. For set point based control, all coils will control to their respective outlet air temperature set point.
 
 \paragraph{Field: Cooling Supply Air Flow Rate Method}\label{field-cooling-supply-air-flow-rate-method-000}
 
@@ -264,7 +267,7 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: No Load Supply Air Flow Rate Method}\label{field-no-load-supply-air-flow-rate-method}
 
-This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate must be specified.
+This alpha field defines the supply air flow method when neither cooling or heating is required. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate must be specified. The following fields are also used to specify the lower air flow rate for the SingleZoneVAV control method with recommendations of greater than or equal to 67\% of the Cooling or Heating Supply Air Flow Rate when any DX coil is used and 50\% for other coil types.
 
 \paragraph{Field: No Load Supply Air Flow Rate}\label{field-no-load-supply-air-flow-rate-000}
 
@@ -292,7 +295,8 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature-000}
 
-This numeric field contains the design operating air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C.
+This numeric field contains the design operating air outlet temperature in degrees C when the unitary system is heating. If this input field is left blank, the default value is 80 C. When Control Type = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating model. For the SingleZoneVAV model this input does not limit the maximum supply air temperature resulting from heating or supplemental heating coil operation at high fan speed.  This field is autosizable.
+
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation}
 
@@ -304,32 +308,32 @@ This alpha field specifies the name of the outdoor node which controls the opera
 
 \paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-001}
 
-This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown below (Henderson et al. 1999):
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate}. (Henderson et al. 1999):
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image295.png}
-\caption{}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate}}
 \end{figure}
 
 \paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant-000}
 
-This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant}. (Henderson et al. 1999):
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image296.png}
-\caption{}
+\caption{Suggested values for heat pump time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant}}
 \end{figure}
 
 \paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use-000}
 
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
+This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are shown in Figure~\ref{fig:suggested-values-for-fraction-of-on-cycle-power-use}. (Henderson et al. 1999):
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image297.png}
-\caption{}
+\caption{Suggested values for fraction of on cycle power use \protect \label{fig:suggested-values-for-fraction-of-on-cycle-power-use}}
 \end{figure}
 
 \paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time-000}
@@ -383,79 +387,80 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 \item
   Reheat coil
 \item
-  Direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the unitary system
+  Direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the unitary system when used in an air loop
 \end{enumerate}
 
 \begin{lstlisting}
 
 AirLoopHVAC:UnitarySystem,
-  DXAC Heat Pump 1,        !- Name
-  Load,                    !- Control Type
-  East Zone,               !- Controlling Zone or Thermostat Location
-  ,                        !- Dehumidification Control Type
-  FanAndCoilAvailSched,    !- Availability Schedule Name
-  Mixed Air Node,          !- Air Inlet Node Name
-  Air Loop Outlet Node,    !- Air Outlet Node Name
-  Fan:OnOff,               !- Supply Air Fan Object Type
-  Supply Fan 1,            !- Supply Air Fan Name
-  BlowThrough,             !- Fan Placement
-  FanModeSchedule,         !- Supply Air Fan Operating Mode Schedule Name
+  DXAC Heat Pump 1,            !- Name
+  Load,                        !- Control Type
+  East Zone,                   !- Controlling Zone or Thermostat Location
+  ,                            !- Dehumidification Control Type
+  FanAndCoilAvailSched,        !- Availability Schedule Name
+  Mixed Air Node,              !- Air Inlet Node Name
+  Air Loop Outlet Node,        !- Air Outlet Node Name
+  Fan:OnOff,                   !- Supply Fan Object Type
+  Supply Fan 1,                !- Supply Fan Name
+  BlowThrough,                 !- Fan Placement
+  FanModeSchedule,             !- Supply Air Fan Operating Mode Schedule Name
   Coil:Heating:DX:MultiSpeed,  !- Heating Coil Object Type
   Heat Pump DX Heating Coil 1, !- Heating Coil Name
   ,                            !- DX Heating Coil Sizing Ratio
   Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
-  Heat Pump ACDXCoil 1,    !- Cooling Coil Name
-  ,                        !- Use DOAS DX Cooling Coil
-  ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature
-  ,                        !- Latent Load Control
-  Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
-  Supp Gas Heating Coil 1, !- Supplemental Heating Coil Name
-  SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
-  1.7,                     !- Cooling Supply Air Flow Rate {m3/s}
-  ,                        !- Cooling Supply Air Flow Rate Per Floor Area
-  ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-  ,                        !- Cooling Supply Air Flow Rate Per Unit of Cooling Capacity
-  SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
-  1.7,                     !- Heating Supply Air Flow Rate {m3/s}
-  ,                        !- Heating Supply Air Flow Rate Per Floor Area
-  ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-  ,                        !- Heating Supply Air Flow Rate Per Unit of Heating Capacity
-  SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
-  0.2,                     !- No Load Supply Air Flow Rate {m3/s}
-  ,                        !- No Load Supply Air Flow Rate Per Floor Area
-  ,                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
-  ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
-  ,                        !- No Load Supply Air Flow Rate Per Unit of Cooling Capacity
-  ,                        !- No Load Supply Air Flow Rate Per Unit of Heating Capacity
-  50,                      !- Maximum Supply Air Temperature {C}
-  21,  !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
-  ,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,  !- Maximum Cycling Rate
-  ,  !- Heat Pump Time Constant
-  ,  !- Fraction of On-Cycle Power Use
-  ,  !- Heat Pump Fan Delay Time
-  ,  !- Ancillary On-Cycle Electric Power
-  ,  !- Ancillary Off-Cycle Electric Power
-  ,  !- Design Heat Recovery Water Flow Rate
-  ,  !- Maximum Temperature for Heat Recovery (Maximum Heat Recovery Outlet Temperature?)
-  ,  !- Heat Recovery Water Inlet Node Name
-  ,  !- Heat Recovery Water Outlet Node Name
-  UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Heat Pump Object Type
-  MyMultispeedHPSpec;  !- Design Specification Multispeed Heat Pump Object Name
+  Heat Pump ACDXCoil 1,        !- Cooling Coil Name
+  ,                            !- Use DOAS DX Cooling Coil
+  ,                            !- Minimum Supply Air Temperature {C}
+  ,                            !- Latent Load Control
+  Coil:Heating:Fuel,           !- Supplemental Heating Coil Object Type
+  Supp Gas Heating Coil 1,     !- Supplemental Heating Coil Name
+  SupplyAirFlowRate,           !- Cooling Supply Air Flow Rate Method
+  1.7,                         !- Cooling Supply Air Flow Rate {m3/s}
+  ,                            !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+  ,                            !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+  ,                            !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  SupplyAirFlowRate,           !- Heating Supply Air Flow Rate Method
+  1.7,                         !- Heating Supply Air Flow Rate {m3/s}
+  ,                            !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+  ,                            !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+  ,                            !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+  SupplyAirFlowRate,           !- No Load Supply Air Flow Rate Method
+  0.2,                         !- No Load Supply Air Flow Rate {m3/s}
+  ,                            !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+  ,                            !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
+  ,                            !- No Load Fraction of Autosized Heating Supply Air Flow Rate
+  ,                            !- No Load Supply Air Flow Rate Per Unit of Capacity during Cooling Operation {m3/s-W}
+  ,                            !- No Load Supply Air Flow Rate Per Unit of Capacity during Heating Operation {m3/s-W}
+  50,                          !- Maximum Supply Air Temperature {C}
+  21,                          !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+  ,                            !- Outdoor Dry-Bulb Temperature Sensor Node Name
+  ,                            !- Maximum Cycling Rate {cycles/hr}
+  ,                            !- Heat Pump Time Constant {s}
+  ,                            !- Fraction of On-Cycle Power Use
+  ,                            !- Heat Pump Fan Delay Time {s}
+  ,                            !- Ancillary On-Cycle Electric Power {W}
+  ,                            !- Ancillary Off-Cycle Electric Power {W}
+  ,                            !- Design Heat Recovery Water Flow Rate {m3/s}
+  ,                            !- Maximum Temperature for Heat Recovery {C}
+  ,                            !- Heat Recovery Water Inlet Node Name
+  ,                            !- Heat Recovery Water Outlet Node Name
+  UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Object Type
+  MyMultispeedHPSpec;          !- Design Specification Multispeed Object Name
 
   UnitarySystemPerformance:Multispeed,
-  MyMultispeedHPSpec,      !- Name
-  4,                       !- Number of Speeds for Heating
-  4,                       !- Number of Speeds for Cooling
-  No,                      !- Single Mode Operation
-  0.235294118,             !- Heating Speed 1 Supply Air Flow Rate {m3/s}
-  0.235294118,             !- Cooling Speed 1 Supply Air Flow Rate {m3/s}
-  0.470588235,             !- Heating Speed 2 Supply Air Flow Rate {m3/s}
-  0.470588235,             !- Cooling Speed 2 Supply Air Flow Rate {m3/s}
-  0.705882353,             !- Heating Speed 3 Supply Air Flow Rate {m3/s}
-  0.705882353,             !- Cooling Speed 3 Supply Air Flow Rate {m3/s}
-  1.0,                     !- Heating Speed 4 Supply Air Flow Rate {m3/s}
-  1.0;                     !- Cooling Speed 4 Supply Air Flow Rate {m3/s}
+  MyMultispeedHPSpec,          !- Name
+  4,                           !- Number of Speeds for Heating
+  4,                           !- Number of Speeds for Cooling
+  No,                          !- Single Mode Operation
+  ,                            !- No Load Supply Air Flow Rate Ratio
+  0.235294118,                 !- Heating Speed 1 Supply Air Flow Ratio
+  0.235294118,                 !- Cooling Speed 1 Supply Air Flow Ratio
+  0.470588235,                 !- Heating Speed 2 Supply Air Flow Ratio
+  0.470588235,                 !- Cooling Speed 2 Supply Air Flow Ratio
+  0.705882353,                 !- Heating Speed 3 Supply Air Flow Ratio
+  0.705882353,                 !- Cooling Speed 3 Supply Air Flow Ratio
+  1.0,                         !- Heating Speed 4 Supply Air Flow Ratio
+  1.0;                         !- Cooling Speed 4 Supply Air Flow Ratio
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-038}
@@ -481,12 +486,23 @@ AirLoopHVAC:UnitarySystem,
   HVAC,Average,Unitary System Ancillary Electric Power{[}W{]}
 \end{itemize}
 
+Load based and SingleZoneVAV control outputs
+\begin{itemize}
+\tightlist
+\item
+HVAC,Average,Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate [W]
+\item
+HVAC,Average,Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate [W]
+\end{itemize}
+
 Two speed coil outputs
 
 \begin{itemize}
 \tightlist
 \item
   HVAC,Average,Unitary System Cycling Ratio {[]}
+\item
+  HVAC,Average,Unitary System Compressor Speed Ratio {[]}
 \end{itemize}
 
 Multi speed coil outputs
@@ -522,6 +538,16 @@ Multi speed coil outputs(If heat recovery is specified)
 \item
   HVAC,Sum, Unitary System Heat Recovery Energy {[}J{]}
 \end{itemize}
+
+Variable speed coils
+
+\begin{itemize}
+\item
+  HVAC,Average, Unitary System Requested Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Average, Unitary System Requested Latent Cooling Rate {[}W{]}
+\end{itemize}
+
 
 Water to air heat pump outputs
 
@@ -610,6 +636,15 @@ This is the auxiliary electricity consumption in Joules for the timestep being r
 
 This is the auxiliary electricity consumption in Joules for the timestep being reported. This is the auxiliary electricity consumption during periods when the unitary system is providing heating (DX heating coil is operating). This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
+\paragraph{Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}}\label{unitary-system-sensible-load-to-setpoint-heat-transfer-rate-w}
+
+This output variable is available only for load based and single zone VAV control and is the adjusted sensible load requested from the zone thermostat in watts. This value is calculated by adjusting the zone predicted sensible load to setpoint heat transfer rate based on the controlling zone air flow fraction and the impact of fan heat and outdoor air so that the thermostat setpoints are met. This value is used for control purposes within the Unitary System model. Positive values denote a heating load while negative valued denote a cooling load. Positive and negative values do not necessarily represent which coil type is active (e.g., a positive heating load does not necessarily mean the heating coil will turn on). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
+
+\paragraph{Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate {[}W{]}}\label{unitary-system-predicted-moisture-load-to-setpoint-heat-transfer-rate-w}
+
+This output variable is available only for load based control and is the adjusted moisture load requested from the zone humidistat in watts. This value is calculated by adjusting the zone predicted moisture load to setpoint heat transfer rate based on the heat of vaporization of water, controlling zone air flow fraction and the dehumidification control type (i.e., the moisture load is set to 0 for non-dehumidification systems). When this value is non-zero and dehumidification is requested, the Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate is compared to the result of sensible only control and if the coil does not provide sufficient dehumidification the coil capacity is increased to meet this moisture load. This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
+
+
 \paragraph{Unitary System Heat Recovery Inlet Temperature {[}C{]}}\label{unitary-system-heat-recovery-inlet-temperature-c}
 
 \paragraph{Unitary System Heat Recovery Outlet Temperature {[}C{]}}\label{unitary-system-heat-recovery-outlet-temperature-c}
@@ -672,37 +707,22 @@ The allowed cooling and heating coil types are restricted to the following combi
 
 Coil:Cooling:DX:MultiSpeed and Coil:Heating:DX:MultiSpeed or Coil:Cooling:DX:MultiSpeed and Coil:Heating:Fuel. 
 
-\paragraph{Field: Heating Speed 1 Supply Air Flow Ratio}\label{field-heating-speed-1-supply-air-flow-ratio}
+\paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 1 (lowest speed). Values must be greater than 0.
+This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
 
-\paragraph{Field: Cooling Speed 1 Supply Air Flow Ratio}\label{field-cooling-speed-1-supply-air-flow-ratio}
+\paragraph{Field Group: Heating and Cooling Speeds 1 to 10}\label{field-group-heating-and-cooling-speeds-1-to-10}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 1 (lowest speed). Values must be greater than 0.
+The air flow through a multispeed coil system is specified as a group of two air flow ratio inputs, one each for heating and cooling. If the number of speeds for heating and cooling are different, inputs for both heating and cooling are still required for a given speed yet one input may be blank. The maximum of the inputs for Number of Speeds for Cooling and Number of Speeds for Heating specified above determines how many groups of heating and cooling supply air flow ratio inputs are required. Both inputs for Speed 1 are required and specify the air flow ratio for the lowest speed, followed by the inputs for Speed 2, Speed 3, etc. up to a maximum of 10 speeds. These inputs are applicable only to multispeed or variable speed coils.
 
-\paragraph{Field: Heating Speed 2 Supply Air Flow Ratio}\label{field-heating-speed-2-supply-air-flow-ratio}
+\paragraph{Field: Heating Speed \textless{}x\textgreater{} Supply Air Flow Ratio}\label{field-heating-speed-x-supply-air-flow-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 1.
+This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil is operating at Speed \textless{}x\textgreater{}. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for the previous heating speed. If the `Number of Speeds for Heating' is less than \textless{}x\textgreater{}, then this field can be left blank.
 
-\paragraph{Field: Cooling Speed 2 Supply Air Flow Ratio}\label{field-cooling-speed-2-supply-air-flow-ratio}
+\paragraph{Field: Cooling Speed \textless{}x\textgreater{} Supply Air Flow Ratio}\label{field-cooling-speed-x-supply-
+air-flow-ratio}
 
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 2. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 1.
-
-\paragraph{Field: Heating Speed 3 Supply Air Flow Ratio}\label{field-heating-speed-3-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating speed 2.If the `Number of Speeds for Heating' is less than 3, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 3 Supply Air Flow Ratio}\label{field-cooling-speed-3-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling speed 2.If the `Number of Speeds for Cooling' is less than 3, then this field can be left blank.
-
-\paragraph{Field: Heating Speed 4 Supply Air Flow Ratio}\label{field-heating-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX heating coil and/or supplemental heater are operating at Speed 3. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for heating Speed 3.If the `Number of Speeds for Heating' is less than 4, then this field can be left blank.
-
-\paragraph{Field: Cooling Speed 4 Supply Air Flow Ratio}\label{field-cooling-speed-4-supply-air-flow-ratio}
-
-This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the DX cooling coil is operating at Speed 4. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for cooling Speed 3.If the `Number of Speeds for Cooling' is less than 4, then this field can be left blank.
+This numeric field defines the ratio of supply air flow rate leaving the unitary system to the maximum air flow rate specified in the coil object at maximum speed when the cooling coil is operating at Speed \textless{}x\textgreater{}. Values must be greater than 0. The entered value must be greater or equal to the flow rate ratio specified for the previous cooling speed. If the `Number of Speeds for Cooling' is less than \textless{}x\textgreater{}, then this field can be left blank.
 
 \subsection{AirLoopHVAC:Unitary:Furnace:HeatCool}\label{airloophvacunitaryfurnaceheatcool}
 
@@ -888,6 +908,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   Coil:Heating:Fuel,
       Furnace Heating Coil 1,         !- Coil Name
       FanAndCoilAvailSched,           !- Availability Schedule Name
+      NaturalGas,                     !- Fuel Type
       0.8,    !- Gas Burner Efficiency of the Coil
       25000,  !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
@@ -1130,6 +1151,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
     Coil:Heating:Fuel,
       Unitary System Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,           !- Availability Schedule Name
+      NaturalGas,                     !- Fuel Type
       0.8,    !- Gas Burner Efficiency of the Coil
       25000,  !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
@@ -1415,6 +1437,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
      Coil:Heating:Fuel,
         Heat Pump DX Supp Heating Coil 1, ! Name of heating coil
         FanAndCoilAvailSched,             ! Availability schedule
+        NaturalGas,                       ! Fuel Type
         0.8 ,                             ! Gas Burner Efficiency of the Coil
         32000,                            ! Nominal Capacity of the Coil [W]
         SuppHeating Coil Air Inlet Node,  ! Supplementary heating coil air side inlet node
@@ -1539,7 +1562,7 @@ This alpha field contains the identifying name given to the DX heating coil, and
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-000}
 
-This numeric field defines the outdoor air dry-bulb temperature below which the DX heating coil turns off.~ The temperature for this input field must be greater than or equal to --20 C.~ If this input field is left blank, the default value is -8 C. This temperature should match the minimum compressor operating temperature specified for the multispeed heat pump's DX heating coil. This field is only needed when Heating Coil Object Type above is \textbf{Coil:Heating:DX:MultiSpeed}.
+This numeric field defines the outdoor air dry-bulb temperature below which the DX heating coil turns off.~ If this input field is left blank, the default value is -8 C. This temperature should match the minimum compressor operating temperature specified for the multispeed heat pump's DX heating coil. This field is only needed when Heating Coil Object Type above is \textbf{Coil:Heating:DX:MultiSpeed}.
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4}
 
@@ -1838,6 +1861,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
   Coil:Heating:Fuel,
       Supp Gas Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency of the Coil
       45000,                   !- Nominal Capacity of the Coil {W}
       SuppHeating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node
@@ -2117,6 +2141,7 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
     Coil:Heating:Fuel,
       Furnace Coil,          !- Coil Name
       FanAndCoilAvailSched,  !- Availability Schedule Name
+      NaturalGas,            !- Fuel Type
       0.8,                   !- Gas Burner Efficiency of the Coil
       20000,                 !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
@@ -2292,6 +2317,7 @@ AirLoopHVAC:UnitaryHeatOnly,
     Coil:Heating:Fuel,
       Unitary System Heating Coil, !- Coil Name
       FanAndCoilAvailSched,        !- Availability Schedule Name
+      NaturalGas,                 !- Fuel Type
       0.8,                         !- Gas Burner Efficiency of the Coil
       20000,                       !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
@@ -2683,6 +2709,7 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
     Coil:Heating:Fuel,
       Heat Pump DX Supp Heating Coil 1,  !- Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency
       32000,                   !- Nominal Capacity {W}
       SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
@@ -2888,7 +2915,7 @@ This alpha field defines the name of an outdoor air mixer component that compose
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-3}
 
-This alpha field defines the type of fan used by this unitary system. The only valid choices are \textbf{Fan:OnOff} and \textbf{Fan:ConstantVolume}. The input requirements for these fan objects are described elsewhere in this document.
+This alpha field defines the type of fan used by this unitary system. The only valid choices are \textbf{Fan:SystemModel}, \textbf{Fan:OnOff}, and \textbf{Fan:ConstantVolume}. The input requirements for these fan objects are described elsewhere in this document.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-3}
 
@@ -2909,6 +2936,8 @@ This alpha field defines the type of cooling coil used by this unitary system. T
 \begin{itemize}
 \item
   Coil:Cooling:DX:SingleSpeed
+\item
+  Coil:Cooling:DX:VariableSpeed
 \item
   CoilSystem:Cooling:DX:HeatExchangerAssisted
 \item
@@ -2932,6 +2961,8 @@ This alpha field defines the type of heating coil used by this unitary system. T
   Coil:Heating:Fuel
 \item
   Coil:Heating:DX:SingleSpeed
+\item
+  Coil:Heating:DX:VariableSpeed
 \item
   Coil:Heating:Water
 \item
@@ -2994,7 +3025,7 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 1)~~~outdoor air mixer (OutdoorAir:Mixer)
 
-2)~~~fan (Fan:OnOff or Fan:ConstantVolume)
+2)~~~fan (Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume)
 
 3)~~~cooling coil (Coil:Cooling:DX:SingleSpeed, CoilSystem:Cooling:DX:HeatExchangerAssisted, or Coil:Cooling:DX:TwoStageWithHumidityControlMode)
 
@@ -3070,6 +3101,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
   Coil:Heating:Fuel,
       Furnace Heating Coil 1,  !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule Name
+      NaturalGas,              !- Fuel Type
       0.8,                     !- Gas Burner Efficiency of the Coil
       35000,                   !- Nominal Capacity of the Coil {W}
       Heating Coil Air Inlet Node,  !- Coil\_Air\_Inlet\_Node

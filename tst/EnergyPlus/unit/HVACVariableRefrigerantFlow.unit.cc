@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::HVACVariableRefrigerantFlow unit tests
 
@@ -68,7 +56,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -91,6 +78,7 @@
 #include <Fans.hh>
 #include <GlobalNames.hh>
 #include <HeatBalanceManager.hh>
+#include <HVACFan.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <OutputReportPredefined.hh>
 #include <PlantManager.hh>
@@ -118,6 +106,7 @@ using namespace EnergyPlus::FluidProperties;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::HVACFan;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::OutputReportPredefined;
@@ -138,9 +127,7 @@ namespace EnergyPlus {
 		int const FlagCondMode( 0 ); // Flag for running as condenser [-]
 		int const FlagEvapMode( 1 ); // Flag for running as evaporator [-]
 		bool ErrorsFound( false );        // function returns true on error
-		int NumTUList( 1 ); // number of TU List
 		int VRFCond( 1 ); // index to VRF condenser
-		int TUListNum ( 1 ); // index to VRF TU list
 
 		std::string const idf_objects = delimited_string( {
 		"Version,8.5;",
@@ -345,7 +332,109 @@ namespace EnergyPlus {
 		" Temperature,             !- Input Unit Type for X   ",
 		" Temperature,             !- Input Unit Type for Y   ",
 		" Dimensionless;           !- Output Unit Type        ",
-		"                                                     ",
+
+		"ZoneTerminalUnitList,",
+		"  VRF Heat Pump TU List,    !- Zone Terminal Unit List Name",
+		"  TU1;                      !- Zone Terminal Unit Name 1",
+
+		"ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+		"  TU1,                      !- Zone Terminal Unit Name",
+		"  ,                         !- Terminal Unit Availability Schedule",
+		"  TU1 Inlet Node,           !- Terminal Unit Air Inlet Node Name",
+		"  TU1 Outlet Node,          !- Terminal Unit Air Outlet Node Name",
+		"  autosize,                 !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+		"  0,                        !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+		"  autosize,                 !- Supply Air Flow Rate During Heating Operation {m3/s}",
+		"  0,                        !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+		"  autosize,                 !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+		"  autosize,                 !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+		"  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+		"  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
+		"  drawthrough,              !- Supply Air Fan Placement",
+		"  Fan:SystemModel,          !- Supply Air Fan Object Type",
+		"  TU1 VRF Supply Fan,       !- Supply Air Fan Object Name",
+		"  ,                         !- Outside Air Mixer Object Type",
+		"  ,                         !- Outside Air Mixer Object Name",
+		"  COIL:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  !- Cooling Coil Object Type",
+		"  TU1 VRF DX Cooling Coil,  !- Cooling Coil Object Name",
+		"  COIL:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,  !- Heating Coil Object Type",
+		"  TU1 VRF DX Heating Coil,  !- Heating Coil Object Name",
+		"  30,                       !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+		"  20;                       !- Zone Terminal Unit Off Parasitic Electric Energy Use{ W }",
+
+		"Schedule:Compact,",
+		"  VRFFanSchedule,          !- Name",
+		"  Any Number,              !- Schedule Type Limits Name",
+		"  Through: 12/31,          !- Field 1",
+		"  For: AllDays,            !- Field 2",
+		"  Until: 7:00,1.0,         !- Field 3",
+		"  Until: 18:00,1.0,        !- Field 5",
+		"  Until: 24:00,1.0;        !- Field 7",
+
+		"ScheduleTypeLimits,",
+		"  Any Number;              !- Name",
+
+		" Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl,  ",
+		" 	 TU1 VRF DX Cooling Coil, !- Name							   ",
+		" 	 ,                        !- Availability Schedule Name		   ",
+		" 	 TU1 Inlet Node,          !- Coil Air Inlet Node		   ",
+		" 	 TU1 VRF DX CCoil Outlet Node, !- Coil Air Outlet Node		   ",
+		" 	 2200,                    !- Rated Total Cooling Capacity {W}   ",
+		" 	 0.865,                   !- Rated Sensible Heat Ratio		   ",
+		" 	 3,                       !- Indoor Unit Reference Superheating ",
+		" 	 IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature",
+		" 	 ;                        !- Name of Water Storage Tank for Cond",
+
+		" Curve:Quadratic,												   ",
+		"     IUEvapTempCurve,         !- Name							   ",
+		"     0,                       !- Coefficient1 Const				   ",
+		"     0.80404,                 !- Coefficient2 x					   ",
+		"     0,                       !- Coefficient3 x**2				   ",
+		"     0,                       !- Minimum Value of x				   ",
+		"     15,                      !- Maximum Value of x				   ",
+		"     ,                        !- Minimum Curve Outp				   ",
+		"     ,                        !- Maximum Curve Outp				   ",
+		"     Dimensionless,           !- Input Unit Type fo				   ",
+		"     Dimensionless;           !- Output Unit Type				   ",
+
+		"  Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl,",
+		"    TU1 VRF DX Heating Coil, !- Name",
+		"    ,                        !- Availability Schedule",
+		"    TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node",
+		"    TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node",
+		"    6500.0,                  !- Rated Total Heating Capacity {W}",
+		"    5,                       !- Indoor Unit Reference Subcooling Degrees Setpoint {C}    ",
+		"    IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name",
+
+		"  Curve:Quadratic,",
+		"    IUCondTempCurve,         !- Name",
+		"    -1.85,                   !- Coefficient1 Constant",
+		"    0.411,                   !- Coefficient2 x",
+		"    0.0196,                  !- Coefficient3 x**2",
+		"    0,                       !- Minimum Value of x    ",
+		"    20,                      !- Maximum Value of x    ",
+		"    ,                        !- Minimum Curve Output",
+		"    ,                        !- Maximum Curve Output",
+		"    Temperature,             !- Input Unit Type for X",
+		"    Temperature;             !- Output Unit Type",
+
+		"  Fan:SystemModel,",
+		"    TU1 VRF Supply Fan,          !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
+		"    TU1 Outlet Node,             !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    100.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+
 		" !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:NAME ===========            ",
 		"                                                                                     ",
 		"   FluidProperties:Name,                                                             ",
@@ -1628,13 +1717,27 @@ namespace EnergyPlus {
 		ProcessScheduleInput(); // read schedules
 		CurveManager::GetCurveInput(); // read curves
 		FluidProperties::GetFluidPropertiesData(); // read refrigerant properties
+
+		// set up ZoneEquipConfig data
+		DataGlobals::NumOfZones = 1;
+		DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).IsControlled = true;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumInletNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 2;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 1;
+
 		GetVRFInputData( ErrorsFound ); // read VRF
-		// EXPECT_FALSE( ErrorsFound );
+		EXPECT_FALSE( ErrorsFound );
 		
-		// Allocate
-		TerminalUnitList.allocate( NumTUList );
-		VRF( VRFCond ).ZoneTUListPtr = TUListNum;
-		TerminalUnitList( TUListNum ).NumTUInList = NumTUList;
+		// Check expected result from GetInput
+
+		// #6218 Fan:SystemModel is used and DX coil RatedVolAirFlowRate was not set equal to system fan designAirVolFlowRate
+		EXPECT_EQ( DXCoil( 1 ).RatedAirVolFlowRate( 1 ), 1.0 );
+		EXPECT_EQ( DXCoil( 2 ).RatedAirVolFlowRate( 1 ), 1.0 );
+		EXPECT_EQ( HVACFan::fanObjs[ VRFTU( 1 ).FanIndex ]->designAirVolFlowRate, 1.0 );
 
 		// Run and Check: GetSupHeatTempRefrig
 		{
@@ -2456,12 +2559,12 @@ namespace EnergyPlus {
 			"  TU1 Inlet Node,           !- Terminal Unit Air Inlet Node Name",
 			"  TU1 Outlet Node,          !- Terminal Unit Air Outlet Node Name",
 			"  autosize,                 !- Supply Air Flow Rate During Cooling Operation {m3/s}",
-			"  autosize,                 !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
+			"  0,                        !- Supply Air Flow Rate When No Cooling is Needed {m3/s}",
 			"  autosize,                 !- Supply Air Flow Rate During Heating Operation {m3/s}",
-			"  autosize,                 !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
+			"  0,                        !- Supply Air Flow Rate When No Heating is Needed {m3/s}",
 			"  autosize,                 !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
 			"  autosize,                 !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
-			"  autosize,                 !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+			"  0,                        !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
 			"  VRFFanSchedule,           !- Supply Air Fan Operating Mode Schedule Name",
 			"  drawthrough,              !- Supply Air Fan Placement",
 			"  Fan:OnOff,                !- Supply Air Fan Object Type",
@@ -3008,20 +3111,48 @@ namespace EnergyPlus {
 		ZT.allocate( 1 );
 		ZT = 25.0;
 
-		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = -VRF( VRFCond ).CoolingCapacity; // set load equal to the VRF cooling capacity
-		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = -VRF( VRFCond ).CoolingCapacity;
-		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = -VRF( VRFCond ).CoolingCapacity - 1000.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = -VRF( VRFCond ).CoolingCapacity * 0.75; // set load equal to the VRF cooling capacity adjusted for SHR
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = -VRF( VRFCond ).CoolingCapacity * 0.75;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = -VRF( VRFCond ).CoolingCapacity * 0.75 - 1000.0;
 
 		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 35.0; // AHRI condition at 95 F db
-		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 25.0;
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = 27.0; // some zone return condition
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).HumRat = 0.011;
+		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Enthalpy = 55194.0; // VRF DX coil model uses node enthalpy
 		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 35.0; // AHRI condition at 95 F db
-		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).HumRat = 0.01; // don't care
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).HumRat = 0.008; // don't care
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Enthalpy = 55698.0;
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).OutAirWetBulb = 19.652;
 
 		VRF( VRFCond ).MasterZonePtr = 0;
 		VRF( VRFCond ).MasterZoneTUIndex = 0;
 		VRF( VRFCond ).ThermostatPriority = ThermostatOffsetPriority;
 		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
-		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system output should be less than 0
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system output should be less than 0 and approx = to VRF capacity * SHR
+
+		// ensure that TU turns off when fan heat exceeds the heating load
+		ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 19.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = 400.0; // set load equal to small value less than expected fan heat
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = 500.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = 400.0;
+		Schedule( VRFTU( VRFTUNum ).FanOpModeSchedPtr ).CurrentValue = 1.0; // set constant fan operating mode
+		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+		EXPECT_EQ( SysOutputProvided, 0.0 ); // for this system with 0 no load flow rate output should be = 0 when fan heat at very low TU PLR (1E-20) is greater than load
+		EXPECT_EQ(  VRF( VRFCond ).VRFCondPLR, 0.0 ); // system should be off
+
+		// ensure that TU operates when fan heat does not exceed the heating load
+		ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+		Node( VRF( VRFCond ).CondenserNodeNum ).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
+		Node( VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum ).Temp = 19.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired = 800.0; // set load equal to small value less than expected fan heat
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToCoolSP = 900.0;
+		ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputReqToHeatSP = 800.0;
+		Schedule( VRFTU( VRFTUNum ).FanOpModeSchedPtr ).CurrentValue = 1.0; // set constant fan operating mode
+		SimulateVRF( VRFTU( VRFTUNum ).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+		EXPECT_NEAR( SysOutputProvided, ZoneSysEnergyDemand( CurZoneNum ).RemainingOutputRequired, 5.0 ); // system should meet the heating load
+		EXPECT_GT(  VRF( VRFCond ).VRFCondPLR, 0.0 ); // system should be on
 
 	}
 
@@ -4239,7 +4370,12 @@ namespace EnergyPlus {
 			"Demand Outlet Node, !- Demand Side Outlet Node Name",
 			"Demand Branches, !- Demand Side Branch List Name",
 			"Demand Connectors, !- Demand Side Connector List Name",
-			"OPTIMAL;                 !- Load Distribution Scheme",
+			"Optimal, !- Load Distribution Scheme",
+			", !- Availability Manager List Name",
+			", !- Plant Loop Demand Calculation Scheme",
+			", !- Common Pipe Simulation",
+			", !- Pressure Simulation Type",
+			"2.0; !- Loop Circulation Time {minutes}",
 			" ",
 			"Sizing:Plant,",
 			"  Main Loop, !- Plant or Condenser Loop Name",

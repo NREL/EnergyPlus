@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 
@@ -357,6 +345,14 @@ void SQLite::sqliteCommit()
 	if ( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("COMMIT;");
 	}
+}
+
+bool SQLite::sqliteWithinTransaction()
+{
+	if ( m_writeOutputToSQLite ) {
+		return SQLiteProcedures::sqliteWithinTransaction();
+	}
+	return false;
 }
 
 void SQLite::sqliteWriteMessage(const std::string & message)
@@ -967,12 +963,13 @@ void SQLite::initializeZoneSizingTable()
 void SQLite::initializeSystemSizingTable()
 {
 	const std::string systemSizesTableSQL =
-		"CREATE TABLE SystemSizes (SystemSizesIndex INTEGER PRIMARY KEY, SystemName TEXT, Description TEXT, Value REAL, Units TEXT);";
+		"CREATE TABLE SystemSizes (SystemSizesIndex INTEGER PRIMARY KEY, SystemName TEXT, LoadType TEXT, PeakLoadType TEXT, "
+        "UserDesCap REAL, CalcDesVolFlow REAL, UserDesVolFlow REAL, DesDayName TEXT, PeakHrMin TEXT);";
 
 	sqliteExecuteCommand(systemSizesTableSQL);
 
 	const std::string systemSizingInsertSQL =
-		"INSERT INTO SystemSizes VALUES(?,?,?,?,?);";
+		"INSERT INTO SystemSizes VALUES(?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_systemSizingInsertStmt,systemSizingInsertSQL);
 }
@@ -1776,29 +1773,35 @@ void SQLite::addSQLiteZoneSizingRecord(
 	}
 }
 
-void SQLite::addSQLiteSystemSizingRecord(
-	std::string const & sysName, // the name of the system
-	std::string const & varDesc, // the description of the input variable
-	Real64 const varValue // the value from the sizing calculation
+void SQLite::addSQLiteSystemSizingRecord (
+	std::string const & SysName, // the name of the system
+	std::string const & LoadType, // either "Cooling" or "Heating"
+	std::string const & PeakLoadType, // either "Sensible" or "Total"
+	Real64 const & UserDesCap, // User  Design Capacity
+	Real64 const & CalcDesVolFlow, // Calculated Cooling Design Air Flow Rate
+	Real64 const & UserDesVolFlow, // User Cooling Design Air Flow Rate
+	std::string const & DesDayName, // the name of the design day that produced the peak
+	std::string const & PeakHrMin // time stamp of the peak
 )
 {
 	if ( m_writeOutputToSQLite ) {
 		++m_systemSizingIndex;
-		std::string description;
-		std::string units;
+		sqliteBindInteger( m_systemSizingInsertStmt, 1, m_systemSizingIndex );
+		sqliteBindText( m_systemSizingInsertStmt, 2, SysName );
+		sqliteBindText( m_systemSizingInsertStmt, 3, LoadType );
+		sqliteBindText( m_systemSizingInsertStmt, 4, PeakLoadType );
 
-		parseUnitsAndDescription(varDesc,units,description);
+		sqliteBindDouble( m_systemSizingInsertStmt, 5, UserDesCap );
+		sqliteBindDouble( m_systemSizingInsertStmt, 6, CalcDesVolFlow );
+		sqliteBindDouble( m_systemSizingInsertStmt, 7, UserDesVolFlow );
+		sqliteBindText( m_systemSizingInsertStmt, 8, DesDayName );
+		sqliteBindText( m_systemSizingInsertStmt, 9, PeakHrMin );
 
-		sqliteBindInteger(m_systemSizingInsertStmt, 1, m_systemSizingIndex);
-		sqliteBindText(m_systemSizingInsertStmt, 2, sysName);
-		sqliteBindText(m_systemSizingInsertStmt, 3, description);
-		sqliteBindDouble(m_systemSizingInsertStmt, 4, varValue);
-		sqliteBindText(m_systemSizingInsertStmt, 5, units);
-
-		sqliteStepCommand(m_systemSizingInsertStmt);
-		sqliteResetCommand(m_systemSizingInsertStmt);
+		sqliteStepCommand( m_systemSizingInsertStmt );
+		sqliteResetCommand( m_systemSizingInsertStmt );
 	}
 }
+
 
 void SQLite::addSQLiteComponentSizingRecord(
 	std::string const & compType, // the type of the component
@@ -2817,6 +2820,11 @@ int SQLiteProcedures::sqliteStepCommand(sqlite3_stmt * stmt)
 int SQLiteProcedures::sqliteResetCommand(sqlite3_stmt * stmt)
 {
 	return sqlite3_reset(stmt);
+}
+
+bool SQLiteProcedures::sqliteWithinTransaction()
+{
+	return ( sqlite3_get_autocommit(m_connection) == 0 );
 }
 
 // int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)

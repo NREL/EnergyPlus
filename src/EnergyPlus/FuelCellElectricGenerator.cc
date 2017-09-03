@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -1118,7 +1106,7 @@ namespace FuelCellElectricGenerator {
 					SetupOutputVariable( "Generator Ancillary AC Electric Energy [J]", FuelCell( GeneratorNum ).Report.ACancillariesEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
 
 					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count [ ]", FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Regula Falsi Iteration Count [ ]", FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Root Solver Iteration Count [ ]", FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
 				}
 			}
 
@@ -1161,7 +1149,7 @@ namespace FuelCellElectricGenerator {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataHeatBalFanSys::ZT;
 		using DataEnvironment::WaterMainsTemp;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -1204,10 +1192,10 @@ namespace FuelCellElectricGenerator {
 		int thisGas; // loop index
 		Real64 MagofImbalance; // error signal to control exiting loop and targeting product enthalpy
 		Real64 tmpTotProdGasEnthalphy;
-		Real64 Acc; // accuracy control for SolveRegulaFalsi
-		int MaxIter; // iteration control for SolveRegulaFalsi
-		int SolverFlag; // feed back flag from SolveRegulaFalsi
-		Array1D< Real64 > Par( 3 ); // parameters passed in to SolveRegulaFalsi
+		Real64 Acc; // accuracy control for SolveRoot
+		int MaxIter; // iteration control for SolveRoot
+		int SolverFlag; // feed back flag from SolveRoot
+		Array1D< Real64 > Par( 3 ); // parameters passed in to SolveRoot
 		// Par(1) = generator number index in structure
 		// Par(2) = targeted enthalpy (W)
 		// Par(3) = molar flow rate of product gases (kmol/s)
@@ -1650,20 +1638,20 @@ namespace FuelCellElectricGenerator {
 			Par( 2 ) = tmpTotProdGasEnthalphy;
 			Par( 3 ) = FuelCell( GeneratorNum ).FCPM.NdotProdGas;
 			tmpTprodGas = FuelCell( GeneratorNum ).FCPM.TprodGasLeavingFCPM;
-			SolveRegulaFalsi( Acc, MaxIter, SolverFlag, tmpTprodGas, FuelCellProductGasEnthResidual, MinProductGasTemp, MaxProductGasTemp, Par );
+			SolveRoot( Acc, MaxIter, SolverFlag, tmpTprodGas, FuelCellProductGasEnthResidual, MinProductGasTemp, MaxProductGasTemp, Par );
 
 			if ( SolverFlag == -2 ) {
 
-				ShowWarningError( "CalcFuelCellGeneratorModel: Regula falsi problem, flag = -2, check signs, all positive" );
+				ShowWarningError( "CalcFuelCellGeneratorModel: Root Solver problem, flag = -2, check signs, all positive" );
 
 			}
 			if ( SolverFlag == -1 ) {
-				ShowWarningError( "CalcFuelCellGeneratorModel: Regula falsi problem, flag = -1, check accuracy and iterations, did not converge" );
+				ShowWarningError( "CalcFuelCellGeneratorModel: Root Solver problem, flag = -1, check accuracy and iterations, did not converge" );
 
 			}
 			if ( SolverFlag > 0 ) {
 				FuelCell( GeneratorNum ).FCPM.TprodGasLeavingFCPM = tmpTprodGas;
-				//  write(*,*) 'Number of regula falsi iterations: ', solverFlag
+				//  write(*,*) 'Number of Root Solver iterations: ', solverFlag
 			}
 
 			//  moved call to HeatBalanceInternalGains.   Call FigureFuelCellZoneGains(GeneratorNum)
@@ -1962,7 +1950,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -1993,8 +1981,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID;
@@ -2014,8 +2000,16 @@ namespace FuelCellElectricGenerator {
 		// two different themodynamic curve fits might be used
 
 		tempCp = 0.0;
-		Tkel = ( FluidTemp + KelvinConv );
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
+
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 
 		for ( thisConstit = 1; thisConstit <= FuelCell( GeneratorNum ).AirSup.NumConstituents; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AirSup.GasLibID( thisConstit );
@@ -2028,7 +2022,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2039,7 +2033,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -2058,7 +2052,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2089,8 +2083,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHair;
 		Real64 HairI;
 		int thisConstit; // loop index
@@ -2109,11 +2101,19 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHair = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= FuelCell( GeneratorNum ).AirSup.NumConstituents; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AirSup.GasLibID( thisConstit );
@@ -2128,7 +2128,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HairI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
+					HairI = ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H );
 
 					tempHair += HairI * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
@@ -2141,7 +2141,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2159,7 +2159,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2190,8 +2190,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2206,11 +2204,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).NumConstituents; ++thisConstit ) {
 			gasID = FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).GasLibID( thisConstit );
@@ -2223,7 +2228,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2233,7 +2238,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -2252,7 +2257,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2283,8 +2288,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHfuel;
 		Real64 HfuelI;
 		int thisConstit; // loop index
@@ -2303,11 +2306,19 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHfuel = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).NumConstituents; ++thisConstit ) {
 			gasID = FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).GasLibID( thisConstit );
@@ -2321,7 +2332,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HfuelI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
+					HfuelI = ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H );
 
 					tempHfuel += HfuelI * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
@@ -2335,7 +2346,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2353,7 +2364,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2384,8 +2395,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHprodGases;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2403,11 +2412,19 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHprodGases = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= 5; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).FCPM.GasLibID( thisConstit );
@@ -2421,7 +2438,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					tempHprodGases += ( ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempHprodGases += ( ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
 					A1 = GasPhaseThermoChemistryData( gasID ).NASA_A1;
@@ -2431,7 +2448,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 				}
 			} // gasid > 0
 		}
@@ -2492,8 +2509,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2508,11 +2523,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).FCPM.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).FCPM.GasLibID( thisConstit );
@@ -2525,7 +2547,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2535,7 +2557,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2599,8 +2621,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2615,11 +2635,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).AuxilHeat.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AuxilHeat.GasLibID( thisConstit );
@@ -2632,7 +2659,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2642,7 +2669,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2706,8 +2733,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2722,11 +2747,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).ExhaustHX.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).ExhaustHX.GasLibID( thisConstit );
@@ -2739,7 +2771,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2749,7 +2781,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2769,7 +2801,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   December 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2799,23 +2831,15 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
-		Real64 F; // shomate coeff
+		Real64 const A = 29.0373; // shomate coeff
+		Real64 const B = 10.2573; // shomate coeff
+		Real64 const C = 2.81048; // shomate coeff
+		Real64 const D = -0.95914; // shomate coeff
+		Real64 const E = 0.11725; // shomate coeff
+		Real64 const F = -250.569; // shomate coeff
 		//  REAL(r64) :: H ! shomate coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = 29.0373;
-		B = 10.2573;
-		C = 2.81048;
-		D = -0.95914;
-		E = 0.11725;
-		F = -250.569;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
 		HGasWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
@@ -2829,7 +2853,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   December 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2859,24 +2883,15 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
-		Real64 F; // shomate coeff
-		Real64 H; // shomate coeff
+		Real64 const A = -203.606; // shomate coeff
+		Real64 const B = 1523.29; // shomate coeff
+		Real64 const C = -3196.413; // shomate coeff
+		Real64 const D = 2474.455; // shomate coeff
+		Real64 const E = 3.85533; // shomate coeff
+		Real64 const F = -256.5478; // shomate coeff
+		// Real64 const H = -285.8304; // shomate coeff (currently unused)
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = -203.606;
-		B = 1523.29;
-		C = -3196.413;
-		D = 2474.455;
-		E = 3.85533;
-		F = -256.5478;
-		H = -285.8304;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
 		HLiqWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
@@ -2933,20 +2948,13 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
+		Real64 const A = -203.606; // shomate coeff
+		Real64 const B = 1523.29; // shomate coeff
+		Real64 const C = -3196.413; // shomate coeff
+		Real64 const D = 2474.455; // shomate coeff
+		Real64 const E = 3.85533; // shomate coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = -203.606;
-		B = 1523.29;
-		C = -3196.413;
-		D = 2474.455;
-		E = 3.85533;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
 
 		Cp = A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho );
 

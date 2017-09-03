@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -526,28 +514,21 @@ namespace GroundHeatExchangers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the distance between any two points on any two loops
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 x;
-		Real64 y;
-		Real64 z;
-		Real64 xIn;
-		Real64 yIn;
-		Real64 zIn;
-		Real64 xOut;
-		Real64 yOut;
-		Real64 zOut;
-		Real64 pipeOuterRadius;
+		Real64 pipeOuterRadius = pipeOutDia / 2.0;
 
-		pipeOuterRadius = pipeOutDia / 2.0;
+		Real64 const cos_theta = std::cos( theta );
+		Real64 const sin_theta = std::sin( theta );
+		Real64 const cos_eta = std::cos( eta );
+		Real64 const sin_eta = std::sin( eta );
 
-		x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
-		y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
+		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
+		Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
 
-		xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-		yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 xIn = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
 
-		xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 xOut = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 		if ( ! verticalConfig ) {
 
@@ -556,10 +537,10 @@ namespace GroundHeatExchangers {
 
 		} else {
 
-			z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 );
+			Real64 z = Z0 + sin_theta * ( coilDiameter / 2.0 );
 
-			zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-			zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+			Real64 zIn = Z0 + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+			Real64 zOut = Z0 + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );
@@ -587,31 +568,24 @@ namespace GroundHeatExchangers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the distance between any two points between real and fictitious rings
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 x;
-		Real64 y;
-		Real64 z;
-		Real64 xIn;
-		Real64 yIn;
-		Real64 zIn;
-		Real64 xOut;
-		Real64 yOut;
-		Real64 zOut;
-		Real64 pipeOuterRadius;
+		Real64 pipeOuterRadius = pipeOutDia / 2.0;
 
-		pipeOuterRadius = pipeOutDia / 2.0;
+		Real64 const sin_theta = std::sin( theta );
+		Real64 const cos_theta = std::cos( theta );
+		Real64 const sin_eta = std::sin( eta );
+		Real64 const cos_eta = std::cos( eta );
 
-		x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
-		y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
-		z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 ) + 2 * coilDepth;
+		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
+		// Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
+		Real64 z = Z0 + sin_theta * ( coilDiameter / 2.0 ) + 2 * coilDepth;
 
-		xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-		yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-		zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 xIn = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+		//Real64 yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 zIn = Z0 + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
 
-		xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-		zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 xOut = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
+		//Real64 yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 zOut = Z0 + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 		return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );
@@ -1015,7 +989,7 @@ namespace GroundHeatExchangers {
 				// Find the total Sum of the Temperature difference due to all load blocks
 				sumTotal = sumQnSubHourly + sumQnHourly;
 
-				//Calulate the subhourly temperature due the Last Time steps Load
+				//Calculate the subhourly temperature due the Last Time steps Load
 				gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
 				RQSubHr = gFuncVal / ( kGroundFactor );
 
@@ -1090,7 +1064,7 @@ namespace GroundHeatExchangers {
 
 				sumTotal = sumQnMonthly + sumQnHourly + sumQnSubHourly;
 
-				// Calulate the subhourly temperature due the Last Time steps Load
+				// Calculate the subhourly temperature due the Last Time steps Load
 
 				gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
 				RQSubHr = gFuncVal / ( kGroundFactor );
@@ -1186,7 +1160,7 @@ namespace GroundHeatExchangers {
 
 		// METHODOLOGY EMPLOYED:
 		// The heat pulse histories need to be recorded over an extended period (months).
-		// To aid computational efficiency past pulses are continuously agregated into
+		// To aid computational efficiency past pulses are continuously aggregated into
 		// equivalent heat pulses of longer duration, as each pulse becomes less recent.
 		// Past sub-hourly loads are re-aggregated into equivalent hourly and monthly loads.
 

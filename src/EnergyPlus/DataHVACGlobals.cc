@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataHVACGlobals.hh>
@@ -96,6 +84,7 @@ namespace DataHVACGlobals {
 	Real64 const BlankNumeric( -99999.0 ); // indicates numeric input field was blank
 	Real64 const RetTempMax( 60.0 ); // maximum return air temperature [deg C]
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
+	Real64 const DesCoilHWInletTempMin( 46.0 ); // minimum heating water coil water inlet temp for UA sizing only. [deg C] 
 
 	// Number of Sizing types from list below
 	int const NumOfSizingTypes( 33 ); // number of sizing types
@@ -128,12 +117,14 @@ namespace DataHVACGlobals {
 	int const AutoCalculateSizing( 25 ); // identifies an autocalulate input
 	int const ZoneCoolingLoadSizing( 26 ); // zone cooling sensible load (zsz file)
 	int const ZoneHeatingLoadSizing( 27 ); // zome heating sensible load (zsz file)
-	int const MinSATempCoolingSizing( 28 ); // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-	int const MaxSATempHeatingSizing( 29 ); // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
-	int const HeatingCoilDesAirInletTempSizing( 30 ); // design inlet air temperature for heating coil
-	int const HeatingCoilDesAirOutletTempSizing( 31 ); // design outlet air temperature for heating coil
-	int const HeatingCoilDesAirInletHumRatSizing( 32 ); // design inlet air humidity ratio for heating coil
-	int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing( 33 ); // identifies desiccant performance data face velocity autosisizing input
+	int const MinSATempCoolingSizing( 28 ); // minimum SA temperature in cooling
+	int const MaxSATempHeatingSizing( 29 ); // maximum SA temperature in heating
+	int const ASHRAEMinSATCoolingSizing( 30 ); // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	int const ASHRAEMaxSATHeatingSizing( 31 ); // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	int const HeatingCoilDesAirInletTempSizing( 32 ); // design inlet air temperature for heating coil
+	int const HeatingCoilDesAirOutletTempSizing( 33 ); // design outlet air temperature for heating coil
+	int const HeatingCoilDesAirInletHumRatSizing( 34 ); // design inlet air humidity ratio for heating coil
+	int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing( 35 ); // identifies desiccant performance data face velocity autosisizing input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	int const AirCooled( 1 ); // Air-cooled condenser
@@ -158,14 +149,16 @@ namespace DataHVACGlobals {
 	int const Other( 4 );
 	int const RAB( 5 );
 	// parameters describing fan types
-	int const NumAllFanTypes( 5 ); // cpw22Aug2010 (was 4)
+	int const NumAllFanTypes( 6 ); // cpw22Aug2010 (was 4)
 
 	// fan types
 	int const FanType_SimpleConstVolume( 1 );
 	int const FanType_SimpleVAV( 2 );
 	int const FanType_SimpleOnOff( 3 );
 	int const FanType_ZoneExhaust( 4 );
-	int const FanType_ComponentModel( 5 ); // cpw22Aug2010 (new)
+	int const FanType_ComponentModel( 5 ); // cpw22Aug2010 
+	int const FanType_SystemModelObject( 6 ); // new for V8.7, simple versatile fan object
+
 	// Fan Minimum Flow Fraction Input Method
 	int const MinFrac( 1 );
 	int const FixedMin( 2 );
@@ -179,7 +172,7 @@ namespace DataHVACGlobals {
 	int const BypassWhenWithinEconomizerLimits( 0 ); // heat recovery controlled by economizer limits
 	int const BypassWhenOAFlowGreaterThanMinimum( 1 ); // heat recovery ON at minimum OA in economizer mode
 
-	Array1D_string const cFanTypes( NumAllFanTypes, { "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel" } ); // cpw22Aug2010 | cpw22Aug2010 (new)
+	Array1D_string const cFanTypes( NumAllFanTypes, { "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel" } ); 
 
 	// parameters describing unitary systems
 	int const NumUnitarySystemTypes( 7 );
@@ -316,6 +309,9 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	Real64 const OscillateMagnitude( 0.15 );
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	int const Bisection( 2 );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -338,7 +334,6 @@ namespace DataHVACGlobals {
 	int NumElecCircuits( 0 ); // Number of electric circuits specified in simulation
 	int NumGasMeters( 0 ); // Number of gas meters specified in simulation
 	int NumPrimaryAirSys( 0 ); // Number of primary HVAC air systems
-	Real64 FanElecPower( 0.0 ); // fan power from last fan simulation
 	Real64 OnOffFanPartLoadFraction( 1.0 ); // fan part-load fraction (Fan:OnOff)
 	Real64 DXCoilTotalCapacity( 0.0 ); // DX coil total cooling capacity (eio report var for HPWHs)
 	Real64 DXElecCoolingPower( 0.0 ); // Electric power consumed by DX cooling coil last DX simulation
@@ -364,6 +359,7 @@ namespace DataHVACGlobals {
 	Real64 HPWHCrankcaseDBTemp( 0.0 ); // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
 	bool AirLoopInit( false ); // flag for whether InitAirLoops has been called
 	bool AirLoopsSimOnce( false ); // True means that the air loops have been simulated once in this environment
+	bool GetAirPathDataDone( false ); // True means that air loops inputs have been processed
 
 	// Hybrid ventilation control part
 	int NumHybridVentSysAvailMgrs( 0 ); // Number of hybrid ventilation control
@@ -516,6 +512,7 @@ namespace DataHVACGlobals {
 	Array1D< ZoneCompTypeData > ZoneComp;
 	OptStartDataType OptStartData; // For optimum start
 	Array1D< ComponentSetPtData > CompSetPtEquip;
+	HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.
@@ -537,7 +534,6 @@ namespace DataHVACGlobals {
 		NumElecCircuits = 0;
 		NumGasMeters = 0;
 		NumPrimaryAirSys = 0;
-		FanElecPower = 0.0;
 		OnOffFanPartLoadFraction = 1.0;
 		DXCoilTotalCapacity = 0.0;
 		DXElecCoolingPower = 0.0;
@@ -561,6 +557,7 @@ namespace DataHVACGlobals {
 		HPWHCrankcaseDBTemp = 0.0;
 		AirLoopInit = false;
 		AirLoopsSimOnce = false;
+		GetAirPathDataDone = false;
 		NumHybridVentSysAvailMgrs = 0;
 		HybridVentSysAvailAirLoopNum.deallocate();
 		HybridVentSysAvailVentCtrl.deallocate();

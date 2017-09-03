@@ -1303,16 +1303,15 @@ Begin VB.Form eplUI
       Caption         =   "&Help"
       Begin VB.Menu mnuHelpEPDocs 
          Caption         =   "EnergyPlus Documentation Menu"
-         Shortcut        =   {F1}
-      End
-      Begin VB.Menu mnuHelpDiv1 
-         Caption         =   "-"
+         Enabled         =   0   'False
+         Visible         =   0   'False
       End
       Begin VB.Menu mnuHelpGettingStarted 
          Caption         =   "EnergyPlus Getting Started"
       End
       Begin VB.Menu mnuHelpIORef 
          Caption         =   "EnergyPlus Input/Output Reference"
+         Shortcut        =   {F1}
       End
       Begin VB.Menu mnuHelpOutDetails 
          Caption         =   "EnergyPlus Output Details and Examples"
@@ -2257,19 +2256,19 @@ Private Sub mnuHelpAuxProgs_Click()
 Call startAcrobat("AuxiliaryPrograms.pdf")
 End Sub
 Private Sub mnuHelpCompliance_Click()
-Call startAcrobat("Using_EnergyPlus_for_Compliance.pdf")
+Call startAcrobat("UsingEnergyPlusForCompliance.pdf")
 End Sub
 Private Sub mnuHelpPlantAppl_Click()
 Call startAcrobat("PlantApplicationGuide.pdf")
 End Sub
 Private Sub mnuHelpEMS_Click()
-Call startAcrobat("EMS_Application_Guide.pdf")
+Call startAcrobat("EMSApplicationGuide.pdf")
 End Sub
 Private Sub mnuHelpExtInterface_Click()
-Call startAcrobat("ExternalInterfaces_Application_Guide.pdf")
+Call startAcrobat("ExternalInterfacesApplicationGuide.pdf")
 End Sub
 Private Sub mnuHelpTips_Click()
-Call startAcrobat("Tips_and_Tricks_Using_EnergyPlus.pdf")
+Call startAcrobat("TipsAndTricksUsingEnergyPlus.pdf")
 End Sub
 Private Sub mnuHelpAcknowledge_Click()
 Call startAcrobat("Acknowledgements.pdf")

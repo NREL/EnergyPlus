@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -122,39 +110,7 @@ namespace PlantPressureSystem {
 	namespace{
 		bool InitPressureDropOneTimeInit( true );
 	}
-	// DERIVED TYPE DEFINITIONS:
-	//TYPE, PUBLIC:: PlantPressureCurveData
-	//  CHARACTER(len=MaxNameLength) :: Name                    = Blank
-	//  REAL(r64)                    :: EquivDiameter           = 0.0d0   !- An effective diameter for calculation of Re & e/D [m]
-	//  REAL(r64)                    :: MinorLossCoeff          = 0.0d0   !- K factor                                          [-]
-	//  REAL(r64)                    :: EquivLength             = 0.0d0   !- An effective length to apply friction calculation [m]
-	//  REAL(r64)                    :: EquivRoughness          = 0.0d0   !- An effective roughness (e) to calculate e/D       [m]
-	//  LOGICAL                      :: ConstantFPresent        = .FALSE. !- Signal for if a constant value of f was entered
-	//  REAL(r64)                    :: ConstantF               = 0.0d0   !- Constant value of f (if applicable)               [-]
-	//END TYPE PlantPressureCurveData
-	//          ! MODULE VARIABLE DECLARATIONS:
-	//TYPE(PlantPressureCurveData), ALLOCATABLE, DIMENSION(:),PUBLIC :: PressureCurve
-	//LOGICAL  :: GetInputFlag = .TRUE. !Module level, since GetInput could be called by SIMPRESSUREDROP or by BRANCHINPUTMANAGER
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-	// Driver/Manager Routines
-
-	// Initialization routines for module
-	//PRIVATE GetPressureSystemInput
-
-	// Algorithms/Calculation routines for the module
-	//PRIVATE PressureCurveValue
-	//PRIVATE CalculateMoodyFrictionFactor
-
-	// Update routines to check convergence and update nodes
-
-	// Utility routines for module
-
-	// Public Utility routines
-	//PUBLIC GetPressureCurveTypeAndIndex
-
-	// Functions
 	void
 	clear_state()
 	{
@@ -184,33 +140,12 @@ namespace PlantPressureSystem {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PressureCall_Init;
 		using DataPlant::PressureCall_Calc;
 		using DataPlant::PressureCall_Update;
 		using DataPlant::PlantLoop;
 		using DataPlant::Press_NoPressure;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		//Check if we need to get pressure curve input data
-		//  IF (GetInputFlag) CALL GetPressureSystemInput
 
 		//Exit out of any calculation routines if we don't do pressure simulation for this loop
 		if ( ( PlantLoop( LoopNum ).PressureSimType == Press_NoPressure ) && ( ( CallType == PressureCall_Calc ) || ( CallType == PressureCall_Update ) ) ) return;
@@ -229,12 +164,6 @@ namespace PlantPressureSystem {
 
 	}
 
-	//=================================================================================================!
-
-	//SUBROUTINE GetPressureSystemInput()
-	// Getinput for PressureSystem moved to CurveManager module
-	//=================================================================================================!
-
 	void
 	InitPressureDrop(
 		int const LoopNum,
@@ -252,12 +181,6 @@ namespace PlantPressureSystem {
 		// Initializes output variables and data structure
 		// On FirstHVAC, updates the demand inlet node pressure
 
-		// METHODOLOGY EMPLOYED:
-		// General EnergyPlus Methodology
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::DemandSide;
@@ -266,20 +189,6 @@ namespace PlantPressureSystem {
 		using DataPlant::CommonPipe_No;
 		using DataEnvironment::StdBaroPress;
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//Initialization Variables
 
 		static Array1D_bool LoopInit;
 
@@ -462,8 +371,6 @@ namespace PlantPressureSystem {
 
 	}
 
-	//=================================================================================================!
-
 	void
 	BranchPressureDrop(
 		int const LoopNum, // Plant Loop Index
@@ -481,12 +388,6 @@ namespace PlantPressureSystem {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This will choose an appropriate pressure drop calculation routine based on structure flags
 
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus Methodology
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using FluidProperties::GetDensityGlycol;
@@ -495,18 +396,9 @@ namespace PlantPressureSystem {
 		using CurveManager::CurveValue;
 		using CurveManager::PressureCurveValue;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcPlantPressureSystem" );
 		static std::string const DummyFluid;
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FluidIndex; // Plant loop level Fluid Index
@@ -577,173 +469,6 @@ namespace PlantPressureSystem {
 
 	}
 
-	//=================================================================================================!
-
-	//REAL(r64) FUNCTION PressureCurveValue(PressureCurveIndex, MassFlow, Density, Viscosity)
-
-	//          ! FUNCTION INFORMATION:
-	//          !       AUTHOR         Edwin Lee
-	//          !       DATE WRITTEN   August 2009
-	//          !       MODIFIED       na
-	//          !       RE-ENGINEERED  na
-
-	//          ! PURPOSE OF THIS FUNCTION:
-	//          ! This will evaluate the pressure drop for components which use pressure information
-
-	//          ! METHODOLOGY EMPLOYED:
-	//          ! Friction factor pressure drop equation:
-	//          ! DP = [f*(L/D) + K] * (rho * V^2) / 2
-
-	//          ! REFERENCES:
-	//          ! na
-
-	//          ! USE STATEMENTS:
-	//  USE DataPlant, ONLY : MassFlowTol
-	//  Use DataGlobals, ONLY : Pi
-
-	//  IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
-
-	//          ! FUNCTION ARGUMENT DEFINITIONS:
-	//  INTEGER, INTENT(IN)      ::  PressureCurveIndex
-	//  REAL(r64), INTENT(IN)    ::  MassFlow
-	//  REAL(r64), INTENT(IN)    ::  Density
-	//  REAL(r64), INTENT(IN)    ::  Viscosity
-
-	//          ! FUNCTION PARAMETER DEFINITIONS:
-	//          ! na
-
-	//          ! INTERFACE BLOCK SPECIFICATIONS:
-	//          ! na
-
-	//          ! DERIVED TYPE DEFINITIONS:
-	//          ! na
-
-	//          ! FUNCTION LOCAL VARIABLE DECLARATIONS:
-	//  REAL(r64)                ::  Diameter
-	//  REAL(r64)                ::  MinorLossCoeff
-	//  REAL(r64)                ::  Length
-	//  REAL(r64)                ::  Roughness
-	//  LOGICAL                  ::  IsConstFPresent
-	//  REAL(r64)                ::  ConstantF
-	//  REAL(r64)                ::  FrictionFactor
-	//  REAL(r64)                ::  CrossSectArea
-	//  REAL(r64)                ::  Velocity
-	//  REAL(r64)                ::  ReynoldsNumber
-	//  REAL(r64)                ::  RoughnessRatio
-
-	//  !Retrieve data from structure
-	//  Diameter        = PressureCurve(PressureCurveIndex)%EquivDiameter
-	//  MinorLossCoeff  = PressureCurve(PressureCurveIndex)%MinorLossCoeff
-	//  Length          = PressureCurve(PressureCurveIndex)%EquivLength
-	//  Roughness       = PressureCurve(PressureCurveIndex)%EquivRoughness
-	//  IsConstFPresent = PressureCurve(PressureCurveIndex)%ConstantFPresent
-	//  ConstantF       = PressureCurve(PressureCurveIndex)%ConstantF
-
-	//  !Intermediate calculations
-	//  CrossSectArea         =  (Pi / 4.0d0) * Diameter**2
-	//  Velocity              =  MassFlow / (Density * CrossSectArea)
-	//  ReynoldsNumber        =  Density * Diameter * Velocity / Viscosity !assuming mu here
-	//  RoughnessRatio        =  Roughness / Diameter
-
-	//  !If we don't have any flow then exit out
-	//  IF (MassFlow .LT. MassFlowTol) THEN
-	//    PressureCurveValue = 0.0d0
-	//    RETURN
-	//  END IF
-
-	//  !Calculate the friction factor
-	//  IF (IsConstFPresent) THEN   !use the constant value
-	//    FrictionFactor    =  ConstantF
-	//  ELSE ! must calculate f
-	//    FrictionFactor    =  CalculateMoodyFrictionFactor(ReynoldsNumber,RoughnessRatio)
-	//  END IF
-
-	//  !Pressure drop calculation
-	//  PressureCurveValue  =  (FrictionFactor * (Length / Diameter) + MinorLossCoeff) * (Density * Velocity**2) / 2.0d0
-
-	//END FUNCTION PressureCurveValue
-
-	//=================================================================================================!
-
-	//REAL(r64) FUNCTION CalculateMoodyFrictionFactor(ReynoldsNumber, RoughnessRatio)
-
-	//          ! FUNCTION INFORMATION:
-	//          !       AUTHOR         Edwin Lee
-	//          !       DATE WRITTEN   August 2009
-	//          !       MODIFIED       na
-	//          !       RE-ENGINEERED  na
-
-	//          ! PURPOSE OF THIS FUNCTION:
-	//          ! This will evaluate the moody friction factor based on Reynolds number and roughness ratio
-
-	//          ! METHODOLOGY EMPLOYED:
-	//          ! General empirical correlations for friction factor based on Moody Chart data
-
-	//          ! REFERENCES:
-	//          ! Haaland, SE (1983). "Simple and Explicit Formulas for the Friction Factor in Turbulent Flow".
-	//          !   Trans. ASIVIE, J. of Fluids Engineering 103: 89-90.
-
-	//          ! USE STATEMENTS:
-	//  USE General, ONLY: RoundSigDigits
-
-	//  IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
-
-	//          ! FUNCTION ARGUMENT DEFINITIONS:
-	//  REAL(r64), INTENT(IN)    ::  ReynoldsNumber
-	//  REAL(r64), INTENT(IN)    ::  RoughnessRatio
-
-	//          ! FUNCTION PARAMETER DEFINITIONS:
-	//          ! na
-
-	//          ! INTERFACE BLOCK SPECIFICATIONS:
-	//          ! na
-
-	//          ! DERIVED TYPE DEFINITIONS:
-	//          ! na
-
-	//          ! FUNCTION LOCAL VARIABLE DECLARATIONS:
-	//  REAL(r64)                    ::  Term1, Term2, Term3
-	//  CHARACTER(len=MaxNameLength) ::  RR, Re
-	//  LOGICAL, SAVE                ::  FrictionFactorErrorHasOccurred = .FALSE.
-
-	//  !Check for no flow before calculating values
-	//  IF (ReynoldsNumber .EQ. 0.0d0) THEN
-	//    CalculateMoodyFrictionFactor = 0.0d0
-	//    RETURN
-	//  END IF
-
-	//  !Check for no roughness also here
-	//  IF (RoughnessRatio .EQ. 0.0d0) THEN
-	//    CalculateMoodyFrictionFactor = 0.0d0
-	//    RETURN
-	//  END IF
-
-	//  !Calculate the friction factor
-	//  Term1 = (RoughnessRatio/3.7d0)**(1.11d0)
-	//  Term2 = 6.9d0/ReynoldsNumber
-	//  Term3 = -1.8d0 * LOG10(Term1 + Term2)
-	//  IF (Term3 .NE. 0.0d0) THEN
-	//    CalculateMoodyFrictionFactor = Term3 ** (-2.0d0)
-	//  ELSE
-	//    IF (.NOT. FrictionFactorErrorHasOccurred) THEN
-	//      RR=RoundSigDigits(RoughnessRatio,7)
-	//      Re=RoundSigDigits(ReynoldsNumber,1)
-	//      CALL ShowSevereError('Plant Pressure System: Error in moody friction factor calculation')
-	//      CALL ShowContinueError('Current Conditions: Roughness Ratio='//TRIM(RR)//'; Reynolds Number='//TRIM(Re))
-	//      CALL ShowContinueError('These conditions resulted in an unhandled numeric issue.')
-	//      CALL ShowContinueError('Please contact EnergyPlus support/development team to raise an alert about this issue')
-	//      CALL ShowContinueError('This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations')
-	//      FrictionFactorErrorHasOccurred = .TRUE.
-	//    END IF
-	//    CalculateMoodyFrictionFactor = 0.04d0
-	//  END IF
-
-	//  RETURN
-
-	//END FUNCTION CalculateMoodyFrictionFactor
-
-	//=================================================================================================!
-
 	void
 	UpdatePressureDrop( int const LoopNum )
 	{
@@ -763,26 +488,11 @@ namespace PlantPressureSystem {
 		// Then we move around the loop backward from this reference point and go until we hit a pump and stop.
 		// The pressure difference from reference to pump is the new required pump head.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::DemandSide;
 		using DataPlant::SupplySide;
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopSideNum;
@@ -949,8 +659,6 @@ namespace PlantPressureSystem {
 
 	}
 
-	//=================================================================================================!
-
 	void
 	DistributePressureOnBranch(
 		int const LoopNum,
@@ -975,27 +683,12 @@ namespace PlantPressureSystem {
 		// Account for branch pressure drop at branch inlet node
 		// Update PlantLoop(:)%LoopSide(:)%Branch(:)%PressureDrop Variable
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::GenEquipTypes_Pump;
 		using DataPlant::DemandSide;
 		using DataPlant::SupplySide;
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
@@ -1058,8 +751,6 @@ namespace PlantPressureSystem {
 
 	}
 
-	//=================================================================================================!
-
 	void
 	PassPressureAcrossMixer(
 		int const LoopNum,
@@ -1083,24 +774,9 @@ namespace PlantPressureSystem {
 		// Note that this is extremely simple, but is set to it's own routine to allow for clarity
 		//  when possible expansion occurs during further development
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BranchNum;
@@ -1110,8 +786,6 @@ namespace PlantPressureSystem {
 		}
 
 	}
-
-	//=================================================================================================!
 
 	void
 	PassPressureAcrossSplitter(
@@ -1135,27 +809,12 @@ namespace PlantPressureSystem {
 		// Note that this is extremely simple, but is set to it's own routine to allow for clarity
 		//  when possible expansion occurs during further development
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataLoopNode::Node;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const InletBranchNum( 1 );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		Node( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( InletBranchNum ).NodeNumOut ).Press = SplitterInletPressure;
 
@@ -1181,26 +840,11 @@ namespace PlantPressureSystem {
 		// Note that this is extremely simple, but is set to it's own routine to allow for clarity
 		//  when possible expansion occurs during further development
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::DemandSide;
 		using DataPlant::SupplySide;
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DemandInletNodeNum;
@@ -1212,118 +856,6 @@ namespace PlantPressureSystem {
 		Node( SupplyOutletNodeNum ).Press = Node( DemandInletNodeNum ).Press;
 
 	}
-
-	//=================================================================================================!
-
-	//SUBROUTINE GetPressureCurveTypeAndIndex(PressureCurveName, PressureCurveType, PressureCurveIndex)
-
-	//          ! SUBROUTINE INFORMATION:
-	//          !       AUTHOR         Edwin Lee
-	//          !       DATE WRITTEN   August 2009
-	//          !       MODIFIED       na
-	//          !       RE-ENGINEERED  na
-
-	//          ! PURPOSE OF THIS SUBROUTINE:
-	//          ! Given a curve name, returns the curve type and index
-
-	//          ! METHODOLOGY EMPLOYED:
-	//          ! Curve types are:
-	//          !  PressureCurve_Error       = pressure name was given, but curve is not available
-	//          !  PressureCurve_None        = no pressure curve for this branch
-	//          !  PressureCurve_Pressure    = pressure curve based on friction/minor loss
-	//          !  PressureCurve_Generic     = curvemanager held curve which is function of flow rate
-
-	//          ! REFERENCES:
-	//          ! na
-
-	//          ! USE STATEMENTS:
-	//  USE InputProcessor, ONLY : FindItemInList
-	//  USE CurveManager,   ONLY : GetCurveIndex, GetCurveType
-	//  USE GlobalDataConstants,  ONLY : PressureCurve_None, PressureCurve_Pressure, PressureCurve_Generic, PressureCurve_Error
-
-	//  IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
-
-	//          ! SUBROUTINE ARGUMENT DEFINITIONS:
-	//  CHARACTER(len=*), INTENT (IN)  :: PressureCurveName            ! name of the curve
-	//  INTEGER, INTENT(INOUT)         :: PressureCurveType
-	//  INTEGER, INTENT(INOUT)         :: PressureCurveIndex
-
-	//          ! SUBROUTINE PARAMETER DEFINITIONS:
-	//          ! na
-
-	//          ! INTERFACE BLOCK SPECIFICATIONS
-	//          ! na
-
-	//          ! DERIVED TYPE DEFINITIONS
-	//          ! na
-
-	//          ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	//  INTEGER           :: TempCurveIndex
-	//  LOGICAL           :: FoundCurve
-	//  CHARACTER(len=32) :: GenericCurveType
-
-	//  !If input is not gotten, go ahead and get it now
-	//  IF (GetInputFlag) CALL GetPressureSystemInput
-
-	//  !Initialize
-	//  FoundCurve = .FALSE.
-	//  PressureCurveType = PressureCurve_None
-	//  PressureCurveIndex = 0
-
-	//  !Try to retrieve a curve manager object
-	//  TempCurveIndex = GetCurveIndex(PressureCurveName)
-
-	//  !See if it is valid
-	//  IF (TempCurveIndex > 0) THEN
-	//    !We have to check the type of curve to make sure it is single independent variable type
-	//    GenericCurveType = GetCurveType(TempCurveIndex)
-	//    SELECT CASE (GenericCurveType)
-	//      CASE ('LINEAR', 'QUADRATIC', 'CUBIC', 'QUARTIC', 'EXPONENT')
-	//        PressureCurveType = PressureCurve_Generic
-	//        PressureCurveIndex = TempCurveIndex
-	//      CASE DEFAULT
-	//        CALL ShowSevereError('Plant Pressure Simulation: Found error for curve: '//PressureCurveName)
-	//        CALL ShowContinueError('Curve type detected: '//GenericCurveType)
-	//        CALL ShowContinueError('Generic curves should be single independent variable such that DeltaP = f(mdot)')
-	//        CALL ShowContinueError(' Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent')
-	//        CALL ShowFatalError('Errors in pressure simulation input cause program termination')
-	//    END SELECT
-	//    RETURN
-	//  END IF
-
-	//  !Then try to retrieve a pressure curve object
-	//  IF (ALLOCATED(PressureCurve)) THEN
-	//    IF (SIZE(PressureCurve) > 0) THEN
-	//      TempCurveIndex = FindItemInList(PressureCurveName,PressureCurve(1:SIZE(PressureCurve))%Name,SIZE(PressureCurve))
-	//    ELSE
-	//      TempCurveIndex = 0
-	//    END IF
-	//  END IF
-
-	//  !See if it is valid
-	//  IF (TempCurveIndex > 0) THEN
-	//    PressureCurveType = PressureCurve_Pressure
-	//    PressureCurveIndex = TempCurveIndex
-	//    RETURN
-	//  END IF
-
-	//  !If we made it here, we didn't find either type of match
-
-	//  !Last check, see if it is blank:
-	//  IF (TRIM(PressureCurveName)=='') THEN
-	//    PressureCurveType = PressureCurve_None
-	//    RETURN
-	//  END IF
-
-	//  !At this point, we had a non-blank user entry with no match
-	//  PressureCurveType = PressureCurve_Error
-	//  RETURN
-
-	//RETURN
-
-	//END SUBROUTINE
-
-	//=================================================================================================!
 
 	Real64
 	ResolveLoopFlowVsPressure(
@@ -1355,9 +887,6 @@ namespace PlantPressureSystem {
 		// This routine does not trap for errors if a pressure simulation is not to be performed.
 		// Calling routine should only call this if needed.
 
-		// REFERENCES:
-		//  -
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using DataPlant::PlantLoop;
@@ -1370,21 +899,12 @@ namespace PlantPressureSystem {
 		// Return value
 		Real64 ResolvedLoopMassFlowRate;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ResolvedLoopMassFlowRate: " );
 		int const MaxIters( 100 );
 		static std::string const DummyFluidName;
 		Real64 const PressureConvergeCriteria( 0.1 ); // Pa
 		Real64 const ZeroTolerance( 0.0001 );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 PumpPressureRise;

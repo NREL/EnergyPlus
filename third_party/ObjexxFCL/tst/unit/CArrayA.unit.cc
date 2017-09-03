@@ -1,14 +1,19 @@
 // ObjexxFCL::CArrayA Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
+#endif
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -16,6 +21,10 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArrayA.hh>
 #include "ObjexxFCL.unit.hh"
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 using namespace ObjexxFCL;
 
@@ -42,7 +51,7 @@ TEST( CArrayATest, Construction )
 
 	{ // Copy constructor and assignment template
 		CArrayA_int v( 10u, 22 );
-		CArrayA_float f( v );
+		CArrayA_float f( v ); // May cause conversion warning
 		EXPECT_EQ( CArrayA_float( 10u, 22.0f ), f );
 		v += 1;
 		EXPECT_EQ( CArrayA_int( 10u, 23 ), v );

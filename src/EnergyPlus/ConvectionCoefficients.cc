@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -87,6 +75,7 @@
 #include <InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 
@@ -420,6 +409,12 @@ namespace ConvectionCoefficients {
 					}
 				}
 
+				if ( Surface( SurfNum ).ExtBoundCond == DataSurfaces::KivaFoundation ) {
+					HConvIn( SurfNum ) = SurfaceGeometry::kivaManager.getConv( SurfNum );
+					Surface( SurfNum ).TAirRef = ZoneMeanAirTemp;					
+					continue;
+				}
+
 				{ auto const SELECT_CASE_var( Surface( SurfNum ).IntConvCoeff );
 
 				if ( ( SELECT_CASE_var <= -1 ) ) { // Set by user using one of the standard algorithms...
@@ -532,7 +527,7 @@ namespace ConvectionCoefficients {
 
 		// Using/Aliasing
 		using DataEnvironment::SkyTempKelvin;
-		using DataEnvironment::WindDir;
+		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -546,6 +541,9 @@ namespace ConvectionCoefficients {
 		//  REAL(r64) :: TSky           ! Absolute temperature of the sky (K)
 		Real64 TSurf; // Absolute temperature of the exterior surface (K)
 		Real64 SurfWindSpeed; // Local wind speed at height of the heat transfer surface (m/s)
+		Real64 SurfWindDir;
+		Real64 TSky;
+		Real64 TGround;
 		Real64 ConstantA; // = a, Constant, W/(m2K(m/s)^b)
 		Real64 ConstantB; // = b, Constant, W/(m2K^(4/3))
 		Real64 Hn; // Natural part of exterior convection
@@ -553,6 +551,7 @@ namespace ConvectionCoefficients {
 		Real64 HcGlass;
 		Real64 rCalcPerimeter; // approximation for Perimeter
 		int BaseSurf;
+		int SrdSurfsNum; // Srd surface counter
 		// REAL(r64) :: flag
 
 		// FLOW:
@@ -563,8 +562,25 @@ namespace ConvectionCoefficients {
 
 		TAir = Surface( SurfNum ).OutDryBulbTemp + KelvinConv;
 		TSurf = TempExt + KelvinConv;
+		TSky = SkyTempKelvin;
+		TGround = TAir;
+
+		
+
+		if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+			SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+			if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum != 0 ) {
+				TSky = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum );
+			}
+			if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum != 0 ) {
+				TGround = GetCurrentScheduleValue(SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum );
+			}
+		}
+
 
 		BaseSurf = Surface( SurfNum ).BaseSurf; // If this is a base surface, BaseSurf = SurfNum
+
+		SurfWindDir = Surface(SurfNum).WindDir;
 
 		if ( ! Surface( SurfNum ).ExtWind ) {
 			SurfWindSpeed = 0.0; // No wind exposure
@@ -605,7 +621,7 @@ namespace ConvectionCoefficients {
 
 				if ( Surface( BaseSurf ).GrossArea != 0.0 && Surface( BaseSurf ).Height != 0.0 ) {
 					rCalcPerimeter = 2.0 * ( Surface( BaseSurf ).GrossArea / Surface( BaseSurf ).Height + Surface( BaseSurf ).Height );
-					Hf = CalcHfExteriorSparrow( SurfWindSpeed, Surface( BaseSurf ).GrossArea, rCalcPerimeter, Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, Roughness, WindDir );
+					Hf = CalcHfExteriorSparrow( SurfWindSpeed, Surface( BaseSurf ).GrossArea, rCalcPerimeter, Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, Roughness, SurfWindDir );
 				} else {
 					Hf = 0.0;
 				}
@@ -622,7 +638,7 @@ namespace ConvectionCoefficients {
 				//   film coefficient for windows in low-rise buildings.
 				//   ASHRAE Transactions 100(1):  1087.
 
-				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, WindDir ) ) {
+				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, SurfWindDir ) ) {
 					ConstantA = 3.26;
 					ConstantB = 0.89;
 				} else { // leeward
@@ -640,7 +656,7 @@ namespace ConvectionCoefficients {
 				//   REFERENCES:
 				//   Lawrence Berkeley Laboratory.  1994.  DOE2.1E-053 source code.
 
-				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, WindDir ) ) {
+				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, SurfWindDir ) ) {
 					ConstantA = 3.26;
 					ConstantB = 0.89;
 				} else { // leeward
@@ -670,11 +686,11 @@ namespace ConvectionCoefficients {
 
 			if ( Surface( SurfNum ).EMSOverrideExtConvCoef ) HExt = Surface( SurfNum ).EMSValueForExtConvCoef;
 
-			if ( TSurf == SkyTempKelvin || std::abs( Surface( SurfNum ).ExtConvCoeff ) == ASHRAESimple ) {
+			if ( TSurf == TSky || std::abs( Surface( SurfNum ).ExtConvCoeff ) == ASHRAESimple ) {
 				HSky = 0.0;
 			} else {
 				// Compute sky radiation coefficient
-				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( pow_4( TSurf ) - pow_4( SkyTempKelvin ) ) / ( TSurf - SkyTempKelvin );
+				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( pow_4( TSurf ) - pow_4( TSky ) ) / ( TSurf - TSky );
 			}
 
 			if ( TSurf == TAir || std::abs( Surface( SurfNum ).ExtConvCoeff ) == ASHRAESimple ) {
@@ -682,7 +698,7 @@ namespace ConvectionCoefficients {
 				HAir = 0.0;
 			} else {
 				// Compute ground radiation coefficient
-				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( pow_4( TSurf ) - pow_4( TAir ) ) / ( TSurf - TAir );
+				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( pow_4( TSurf ) - pow_4( TGround ) ) / ( TSurf - TGround );
 
 				// Compute air radiation coefficient
 				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( pow_4( TSurf ) - pow_4( TAir ) ) / ( TSurf - TAir );
@@ -716,7 +732,7 @@ namespace ConvectionCoefficients {
 
 				if ( Surface( BaseSurf ).GrossArea != 0.0 && Surface( BaseSurf ).Height != 0.0 ) {
 					rCalcPerimeter = 2.0 * ( Surface( BaseSurf ).GrossArea / Surface( BaseSurf ).Height + Surface( BaseSurf ).Height );
-					Hf = CalcHfExteriorSparrow( SurfWindSpeed, Surface( BaseSurf ).GrossArea, rCalcPerimeter, Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, Roughness, WindDir );
+					Hf = CalcHfExteriorSparrow( SurfWindSpeed, Surface( BaseSurf ).GrossArea, rCalcPerimeter, Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, Roughness, SurfWindDir );
 				} else {
 					Hf = 0.0;
 				}
@@ -732,7 +748,7 @@ namespace ConvectionCoefficients {
 				//   Yazdanian, M. and J.H. Klems.  1994.  Measurement of the exterior convective
 				//   film coefficient for windows in low-rise buildings.
 				//   ASHRAE Transactions 100(1):  1087.
-				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, WindDir ) ) {
+				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, SurfWindDir ) ) {
 					ConstantA = 3.26;
 					ConstantB = 0.89;
 				} else { // leeward
@@ -750,7 +766,7 @@ namespace ConvectionCoefficients {
 				//   REFERENCES:
 				//   Lawrence Berkeley Laboratory.  1994.  DOE2.1E-053 source code.
 
-				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, WindDir ) ) {
+				if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, SurfWindDir ) ) {
 					ConstantA = 3.26;
 					ConstantB = 0.89;
 				} else { // leeward
@@ -780,11 +796,11 @@ namespace ConvectionCoefficients {
 
 			if ( Surface( SurfNum ).EMSOverrideExtConvCoef ) HExt = Surface( SurfNum ).EMSValueForExtConvCoef;
 
-			if ( TSurf == SkyTempKelvin || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
+			if ( TSurf == TSky || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
 				HSky = 0.0;
 			} else {
 				// Compute sky radiation coefficient
-				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( pow_4( TSurf ) - pow_4( SkyTempKelvin ) ) / ( TSurf - SkyTempKelvin );
+				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( pow_4( TSurf ) - pow_4( TSky ) ) / ( TSurf - TSky );
 			}
 
 			if ( TSurf == TAir || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
@@ -792,7 +808,7 @@ namespace ConvectionCoefficients {
 				HAir = 0.0;
 			} else {
 				// Compute ground radiation coefficient
-				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( pow_4( TSurf ) - pow_4( TAir ) ) / ( TSurf - TAir );
+				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( pow_4( TSurf ) - pow_4( TGround ) ) / ( TSurf - TGround );
 
 				// Compute air radiation coefficient
 				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( pow_4( TSurf ) - pow_4( TAir ) ) / ( TSurf - TAir );
@@ -804,11 +820,11 @@ namespace ConvectionCoefficients {
 
 			if ( Surface( SurfNum ).EMSOverrideExtConvCoef ) HExt = Surface( SurfNum ).EMSValueForExtConvCoef;
 
-			if ( TSurf == SkyTempKelvin || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
+			if ( TSurf == TSky || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
 				HSky = 0.0;
 			} else {
 				// Compute sky radiation coefficient
-				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( pow_4( TSurf ) - pow_4( SkyTempKelvin ) ) / ( TSurf - SkyTempKelvin );
+				HSky = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * AirSkyRadSplit( SurfNum ) * ( pow_4( TSurf ) - pow_4( TSky ) ) / ( TSurf - TSky );
 			}
 
 			if ( TSurf == TAir || Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple ) {
@@ -816,7 +832,7 @@ namespace ConvectionCoefficients {
 				HAir = 0.0;
 			} else {
 				// Compute ground radiation coefficient
-				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( pow_4( TSurf ) - pow_4( TAir ) ) / ( TSurf - TAir );
+				HGround = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorGroundIR * ( pow_4( TSurf ) - pow_4( TGround ) ) / ( TSurf - TGround );
 
 				// Compute air radiation coefficient
 				HAir = StefanBoltzmann * AbsExt * Surface( SurfNum ).ViewFactorSkyIR * ( 1.0 - AirSkyRadSplit( SurfNum ) ) * ( pow_4( TSurf ) - pow_4( TAir ) ) / ( TSurf - TAir );
@@ -6002,6 +6018,7 @@ namespace ConvectionCoefficients {
 		static Real64 Hn( 0.0 ); // the natural, or bouyancy driven portion of film coefficient
 		int ConstructNum;
 		Real64 SurfWindSpeed;
+		Real64 SurfWindDir;
 		Real64 HydraulicDiameter;
 
 		// first call Hn models
@@ -6144,13 +6161,13 @@ namespace ConvectionCoefficients {
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
 			}
-			Hf = CalcClearRoof( SurfNum, TH( 1, 1, SurfNum ), Surface( SurfNum ).OutDryBulbTemp, SurfWindSpeed, WindDir, Surface( SurfNum ).OutConvFaceArea, Surface( SurfNum ).OutConvFacePerimeter );
+			SurfWindDir = Surface(SurfNum).WindDir;
+			Hf = CalcClearRoof( SurfNum, TH( 1, 1, SurfNum ), Surface( SurfNum ).OutDryBulbTemp, SurfWindSpeed, SurfWindDir, Surface( SurfNum ).OutConvFaceArea, Surface( SurfNum ).OutConvFacePerimeter );
 		} else if ( SELECT_CASE_var == HcExt_BlockenWindward ) {
 			Hf = CalcBlockenWindward( WindSpeed, WindDir, Surface( SurfNum ).Azimuth );
 		} else if ( SELECT_CASE_var == HcExt_EmmelVertical ) {
 			Hf = CalcEmmelVertical( WindSpeed, WindDir, Surface( SurfNum ).Azimuth, SurfNum );
-		} else if ( SELECT_CASE_var == HcExt_EmmelRoof ) {
-
+		} else if ( SELECT_CASE_var == HcExt_EmmelRoof ) {			
 			Hf = CalcEmmelRoof( WindSpeed, WindDir, RoofLongAxisOutwardAzimuth, SurfNum );
 
 		}}
@@ -6181,7 +6198,6 @@ namespace ConvectionCoefficients {
 
 		// Using/Aliasing
 		using DataHeatBalSurface::TH;
-		using DataEnvironment::WindDir;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6197,6 +6213,9 @@ namespace ConvectionCoefficients {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 DeltaTemp( 0.0 );
+		Real64 surfWindDir;
+
+		surfWindDir = Surface( SurfNum ).WindDir;
 
 		if ( Surface( SurfNum ).Class == SurfaceClass_Roof ) {
 			DeltaTemp = TH( 1, 1, SurfNum ) - Surface( SurfNum ).OutDryBulbTemp;
@@ -6208,7 +6227,7 @@ namespace ConvectionCoefficients {
 
 		} else {
 
-			if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, WindDir ) ) {
+			if ( Windward( Surface( SurfNum ).CosTilt, Surface( SurfNum ).Azimuth, surfWindDir ) ) {
 				Surface( SurfNum ).OutConvClassification = OutConvClass_WindwardVertWall;
 			} else {
 				Surface( SurfNum ).OutConvClassification = OutConvClass_LeewardVertWall;
@@ -7462,8 +7481,8 @@ namespace ConvectionCoefficients {
 			ThetaRad = Theta * DegToRadians;
 			windVel = std::cos( ThetaRad ) * WindSpeed;
 		} else if ( SELECT_CASE_var == RefWindParallCompAtZ ) {
-			// Surface WindSpeed , WindDir, surface Azimuth
-			Theta = WindDir - Surface( SurfNum ).Azimuth - 90.0; //TODO double check theta
+			// Surface WindSpeed , Surface WindDir, surface Azimuth
+			Theta = Surface( SurfNum ).WindDir - Surface( SurfNum ).Azimuth - 90.0; //TODO double check theta
 			ThetaRad = Theta * DegToRadians;
 			windVel = std::cos( ThetaRad ) * Surface( SurfNum ).WindSpeed;
 		}}

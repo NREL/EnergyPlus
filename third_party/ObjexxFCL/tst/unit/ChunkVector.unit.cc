@@ -1,12 +1,12 @@
 // ObjexxFCL::ChunkVector Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -270,7 +270,7 @@ TEST( ChunkVectorTest, ResizeFill )
 TEST( ChunkVectorTest, NonpreservingResize )
 {
 	ChunkVector_int v( 10, 2u, 22 );
-	v.non_preserving_resize( 20U ); // Added element values are arbitrary
+	v.non_preserving_resize( 20u ); // Added element values are arbitrary
 	EXPECT_EQ( 20u, v.size() );
 }
 

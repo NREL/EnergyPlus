@@ -33,7 +33,7 @@
 !         The relief air that would have been dumped outside is fed into the secondary side of the
 !         indirect evaporative cooler.  Systems are set to Night Cycle during setup/setback.
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,6;
 
@@ -3897,6 +3897,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -4226,6 +4227,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -4555,6 +4557,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -4884,6 +4887,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -5213,6 +5217,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -5542,6 +5547,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -5871,6 +5877,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -6200,6 +6207,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -6529,6 +6537,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -6858,6 +6867,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,

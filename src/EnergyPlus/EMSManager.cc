@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -484,6 +472,7 @@ namespace EMSManager {
 			SetupSurfaceConvectionActuators();
 			SetupSurfaceConstructionActuators();
 			SetupSurfaceOutdoorBoundaryConditionActuators();
+			SetupZoneOutdoorBoundaryConditionActuators();
 			GetEMSInput();
 			GetEMSUserInput = false;
 		}
@@ -1587,6 +1576,8 @@ namespace EMSManager {
 				NodeNum = OutsideAirNodeList( OutsideAirNodeNum );
 				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Drybulb Temperature", "[C]", Node( NodeNum ).EMSOverrideOutAirDryBulb, Node( NodeNum ).EMSValueForOutAirDryBulb );
 				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wetbulb Temperature", "[C]", Node( NodeNum ).EMSOverrideOutAirWetBulb, Node( NodeNum ).EMSValueForOutAirWetBulb );
+				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wind Speed", "[m/s]", Node( NodeNum ).EMSOverrideOutAirWindSpeed, Node( NodeNum ).EMSValueForOutAirWindSpeed);
+				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wind Direction", "[degree]", Node( NodeNum ).EMSOverrideOutAirWindDir, Node( NodeNum ).EMSValueForOutAirWindDir );
 			}
 		}
 
@@ -2077,6 +2068,7 @@ namespace EMSManager {
 			SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wetbulb Temperature", "[C]", Surface( SurfNum ).OutWetBulbTempEMSOverrideOn, Surface( SurfNum ).OutWetBulbTempEMSOverrideValue );
 			if ( Surface( SurfNum ).ExtWind ) {
 				SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wind Speed", "[m/s]", Surface( SurfNum ).WindSpeedEMSOverrideOn, Surface( SurfNum ).WindSpeedEMSOverrideValue );
+				SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wind Direction", "[degree]", Surface( SurfNum ).WindDirEMSOverrideOn, Surface( SurfNum ).WindDirEMSOverrideValue );
 			}
 		}
 
@@ -2134,6 +2126,44 @@ namespace EMSManager {
 		}
 
 	}
+
+	void
+	SetupZoneOutdoorBoundaryConditionActuators()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X Luo
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// setup EMS actuators for outside boundary conditions by surface
+
+		// METHODOLOGY EMPLOYED:
+		// loop through all surfaces, cycle if not heat transfer or outdoors BC
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int ZoneNum; // local loop index.
+
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Drybulb Temperature", "[C]", Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn, Zone( ZoneNum ).OutDryBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wetbulb Temperature", "[C]", Zone( ZoneNum ).OutWetBulbTempEMSOverrideOn, Zone( ZoneNum ).OutWetBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wind Speed", "[m/s]", Zone( ZoneNum ).WindSpeedEMSOverrideOn, Zone( ZoneNum ).WindSpeedEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wind Direction", "[degree]", Zone( ZoneNum ).WindDirEMSOverrideOn, Zone( ZoneNum ).WindDirEMSOverrideValue );
+
+		}
+
+	}
+
 
 	void
 	checkForUnusedActuatorsAtEnd()

@@ -127,7 +127,7 @@
 !
 !
 
-  VERSION,8.6;
+  Version,8.8;
 
   Building,
     Exercise 2A,             !- Name
@@ -148,9 +148,11 @@
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
-    1,                       !- Temperature Capacity Multiplier
-    1,                       !- Humidity Capacity Multiplier
-    1,                       !- Carbon Dioxide Capacity Multiplier
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
+    1.0,                     !- Temperature Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    1.0,                     !- Carbon Dioxide Capacity Multiplier
     1.0;                     !- Generic Contaminant Capacity Multiplier
 
   SimulationControl,

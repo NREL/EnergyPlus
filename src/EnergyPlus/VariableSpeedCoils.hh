@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 
 #ifndef VariableSpeedCoils_hh_INCLUDED
@@ -120,7 +108,7 @@ namespace VariableSpeedCoils {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Identifier is VarSpeedCoil
-	extern int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
+	extern int NumVarSpeedCoils; // The Number of variable speed Water to Air Heat Pumps and variable dx coils found in the Input
 
 	extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
 	// LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag
@@ -240,6 +228,7 @@ namespace VariableSpeedCoils {
 		int CompanionHeatingCoilNum; // Cooling coil companion heating coil index
 		Real64 FanDelayTime; // Fan delay time, time delay for the HP's fan to
 		// beginning for multispeed coil type
+		int MSHPDesignSpecIndex; // index to UnitarySystemPerformance:Multispeed object
 		Array1D_int MSErrIndex; // index flag for num speeds/recurring messages
 		Array1D< Real64 > MSRatedPercentTotCap; // Percentage to the total cooling capacity for MS heat pump at the highest speed [dimensionless]
 		Array1D< Real64 > MSRatedTotCap; // Rated cooling capacity for MS heat pump [W]
@@ -342,6 +331,9 @@ namespace VariableSpeedCoils {
 		Real64 CondensateVdot; // rate of water condensation from air stream [m3/s]
 		Real64 CondensateVol; // amount of water condensed from air stream [m3]
 		Real64 CondInletTemp; // Evap condenser inlet temperature [C], report variable
+		int SupplyFanIndex; // index of this fan in fan array or vector
+		int SupplyFan_TypeNum; // type of fan, in DataHVACGlobals
+		std::string SupplyFanName; // name of fan associated with this dx coil
 		Real64 SourceAirMassFlowRate; // source air mass flow rate [kg/s]
 		Real64 InletSourceAirTemp; // source air temperature entering the outdoor coil [C]
 		Real64 InletSourceAirEnthalpy; // source air enthalpy entering the outdoor coil [J/kg]
@@ -495,6 +487,12 @@ namespace VariableSpeedCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	int
+	GetVSCoilCapFTCurveIndex(
+		int const & CoilIndex, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
 	Real64
 	GetVSCoilMinOATCompressor(
 		std::string const & CoilName, // must match coil names for the coil type
@@ -512,7 +510,8 @@ namespace VariableSpeedCoils {
 		int const WSHPNum, // Number of OA Controller
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
-		Optional_int CompanionHeatingCoilNum = _ // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int CompanionHeatingCoilNum = _, // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int MSHPDesignSpecIndex = _ // index to UnitarySystemPerformance:Multispeed object
 	);
 
 	void
@@ -584,6 +583,20 @@ namespace VariableSpeedCoils {
 		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 		int const SpeedNum, // Speed number, high bound capacity
 		int const CyclingScheme // Continuous fan OR cycling compressor
+	);
+
+	Real64 getVarSpeedPartLoadRatio( int const DXCoilNum ) ;// the number of the DX coil to mined for current PLR
+
+	void
+	setVarSpeedHPWHFanTypeNum(
+		int const dXCoilNum,
+		int const fanTypeNum
+	);
+
+	void
+	setVarSpeedHPWHFanIndex(
+		int const dXCoilNum,
+		int const fanIndex
 	);
 
 } // VariableSpeedCoils

@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,6;
 
@@ -1697,6 +1697,7 @@
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1

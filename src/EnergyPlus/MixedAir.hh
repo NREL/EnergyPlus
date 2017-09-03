@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef MixedAir_hh_INCLUDED
 #define MixedAir_hh_INCLUDED
@@ -97,6 +85,7 @@ namespace MixedAir {
 	extern int const OAMixer_Num;
 	extern int const Fan_Simple_CV;
 	extern int const Fan_Simple_VAV;
+	extern int const Fan_System_Object;
 	extern int const WaterCoil_SimpleCool;
 	extern int const WaterCoil_Cooling;
 	extern int const WaterCoil_SimpleHeat;
@@ -167,6 +156,7 @@ namespace MixedAir {
 
 	extern Array1D_bool MyOneTimeErrorFlag;
 	extern Array1D_bool MyOneTimeCheckUnitarySysFlag;
+	extern Array1D_bool initOASysFlag;
 	extern bool GetOASysInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAMixerInputFlag; // Flag set to make sure you get input once
 	extern bool GetOAControllerInputFlag; // Flag set to make sure you get input once
@@ -354,7 +344,8 @@ namespace MixedAir {
 
 		void
 		CalcOAController(
-			int const AirLoopNum
+			int const AirLoopNum,
+			bool const FirstHVACIteration
 		);
 
 		void
@@ -362,7 +353,8 @@ namespace MixedAir {
 			int const AirLoopNum,
 			Real64 const OutAirMinFrac,
 			Real64 & OASignal,
-			bool & HighHumidityOperationFlag
+			bool & HighHumidityOperationFlag,
+			bool const FirstHVACIteration
 		);
 
 		void
@@ -406,6 +398,8 @@ namespace MixedAir {
 		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message for SOAM_ProportionalControlSchOcc
 		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
 		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+		int OAMaxMinLimitErrorCount; // Counter when max OA < min OA for SOAM_ProportionalControlDesOARate
+		int OAMaxMinLimitErrorIndex; // Index for max OA < min OA recurring error message for SOAM_ProportionalControlDesOARate
 		Array1D< Real64 > ZoneADEffCooling; // Zone air distribution effectiveness in cooling mode for each zone
 		Array1D< Real64 > ZoneADEffHeating; // Zone air distribution effectiveness in heating mode for each zone
 		Array1D_int ZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule for each zone
@@ -414,6 +408,7 @@ namespace MixedAir {
 		Array1D< Real64 > ZoneSecondaryRecirculation; // zone air secondary recirculation ratio for each zone
 		Array1D_int ZoneOAFlowMethod; // OA flow method for each zone
 		Array1D_int ZoneOASchPtr; // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
+		Array1D< Real64 > OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
 
 		// Default Constructor
 		VentilationMechanicalProps() :
@@ -429,7 +424,9 @@ namespace MixedAir {
 			CO2MaxMinLimitErrorCount( 0 ),
 			CO2MaxMinLimitErrorIndex( 0 ),
 			CO2GainErrorCount( 0 ),
-			CO2GainErrorIndex( 0 )
+			CO2GainErrorIndex( 0 ),
+			OAMaxMinLimitErrorCount( 0 ),
+			OAMaxMinLimitErrorIndex( 0 )
 		{}
 
 		void
@@ -540,6 +537,13 @@ namespace MixedAir {
 	);
 
 	void
+	SimOASysComponents(
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum
+		);
+
+	void
 	SimOAComponent(
 		std::string const & CompType, // the component type
 		std::string const & CompName, // the component Name
@@ -549,9 +553,9 @@ namespace MixedAir {
 		int const AirLoopNum, // air loop index for economizer lockout coordination
 		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
 		int const OASysNum, // index to outside air system
-		Optional_bool OAHeatingCoil = _, // TRUE indicates a heating coil has been found
-		Optional_bool OACoolingCoil = _, // TRUE indicates a cooling coil has been found
-		Optional_bool OAHX = _ // TRUE indicates a heat exchanger has been found
+		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
+		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
+		bool & OAHX // TRUE indicates a heat exchanger has been found
 	);
 
 	void
@@ -607,8 +611,9 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const OASysNum, // unused1208
-		bool const FirstHVACIteration
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum
 	);
 
 	void
@@ -659,6 +664,12 @@ namespace MixedAir {
 
 	Real64
 	MixedAirControlTempResidual(
+		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
+		Array1< Real64 > const & Par // par(1) = mixed node number
+	);
+
+	Real64
+	MultiCompControlTempResidual(
 		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
 		Array1< Real64 > const & Par // par(1) = mixed node number
 	);

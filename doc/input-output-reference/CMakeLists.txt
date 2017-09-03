@@ -1,6 +1,6 @@
 
 # to get the list of input files, go to the root of the document folder, and:
-# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/|g' | sed 's/$/.tex/g' 
+# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/|g' | sed 's/$/.tex/g'
 SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/header.tex
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/input-output-reference.tex
@@ -107,10 +107,9 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/output-table-annual.tex
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/output-table-summaryreports.tex
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/outputcontrol-table-style.tex
-  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/../title.tex
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/src/weather-data/missing-weather-file-data.tex
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/src/weather-data/weather-data-hourly-interpolation.tex
-  ${CMAKE_SOURCE_DIR}/doc/title.tex
+  ${CMAKE_BINARY_DIR}/doc-build/title.tex
 )
 
 # to get the list of inluded images, go to the root of the document folder and:
@@ -305,7 +304,7 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image902.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image903.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image904.png
-) 
+)
 
 SET( SOURCE_FILENAME "input-output-reference" )
 SET( OUTPUT_FILENAME "InputOutputReference" )
@@ -316,7 +315,7 @@ add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
 	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
 		    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME}
 		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
-                 ) 
+                 )
 add_custom_target( zPDF_${OUTPUT_FILENAME} ALL
                    DEPENDS ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
                  )

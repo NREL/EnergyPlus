@@ -243,7 +243,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-1-000}
 
-This field is for the a radiant/convective steam baseboard unit heating capacity in watts. This field can be autosized by EnergyPlus. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified.
+This field is for the a radiant/convective steam baseboard unit heating capacity in watts. This field can be autosized by EnergyPlus. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-1-000}
 
@@ -414,7 +414,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-2}
 
-This field is for the radiant-convective electric baseboard unit nominal heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified.
+This field is for the radiant-convective electric baseboard unit nominal heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-2}
 
@@ -571,7 +571,7 @@ This field is the combined space temperature (air and surface) that the panel is
 
 \paragraph{Field: Rated Water Mass Flow Rate}\label{field-rated-water-mass-flow-rate}
 
-This field is the rated standard water flow rate in kg/s that was used to obtain the rated capacity under rated conditions.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  The default value is 0.063kg/s (1 gpm).  If it is blank or zero, the default value is assumed.
+This field is the rated standard water flow rate in kg/s that was used to obtain the design cooling capacity under rated temperature conditions.  This value along with the rated space and water inlet temperatures as well as the cooling capacity (whether autosized or entered by the user) is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the space.  Users should note that if this value is too low in comparison to the cooling design capacity that the program will produce an error message and the user must adjust one of these two parameters or the rated temperature values.  The default value is 0.063kg/s (1 gpm).  If it is blank or zero, the default value is assumed.
 
 \paragraph{Field: Cooling Design Capacity Method}\label{field-cooling-design-capacity-method-2}
 
@@ -579,7 +579,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Cooling Design Capacity}\label{field-cooling-design-capacity-2}
 
-This field is for the cooling panel unit nominal cooling capacity in watts. This field can be autosized by EnergyPlus. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified.
+This field is for the cooling panel unit nominal cooling capacity in watts at the rated flow rate of water through the unit (see Rated Water Mass Flow Rate field above). This field can be autosized by EnergyPlus. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
 
 \paragraph{Field: Cooling Design Capacity Per Floor Area}\label{field-cooling-design-capacity-per-floor-area-2}
 
@@ -789,7 +789,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-3}
 
-This field is for the hot water baseboard heater design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified id autosize is specified.
+This field is for the hot water baseboard heater design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified id autosize is specified.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-3}
 
@@ -828,17 +828,17 @@ An example IDF for the hot water convective baseboard is shown below.
 \begin{lstlisting}
 
 ZoneHVAC:Baseboard:Convective:Water,
-          Zone3Baseboard, ! name
-          FanAndCoilAvailSched, ! on/off schedule
-          Zone 3 Reheat Water Inlet Node, ! water inlet node
-          Zone 3 Reheat Water Outlet Node, ! water outlet node
-          HeatingDesignCapacity, !- Heating Design Capacity Method
-          autosize,!- Heating Design Capacity{ W }
-          ,        !- Heating Design Capacity Per Floor Area{ W / m2 }
-          ,        !- Fraction of Autosized Heating Design Capacity{ -}
-          500.,    ! UA
-          0.0013,  ! maximum water flow rate m3/s
-          0.001;   ! tolerance
+          Zone3Baseboard,                  !- name
+          FanAndCoilAvailSched,            !- on/off schedule
+          Zone 3 Reheat Water Inlet Node,  !- water inlet node
+          Zone 3 Reheat Water Outlet Node, !- water outlet node
+          HeatingDesignCapacity,           !- Heating Design Capacity Method
+          autosize,                        !- Heating Design Capacity{ W }
+          ,                                !- Heating Design Capacity Per Floor Area{ W / m2 }
+          ,                                !- Fraction of Autosized Heating Design Capacity{ -}
+          500.,                            !- UA
+          0.0013,                          !- maximum water flow rate m3/s
+          0.001;                           !- tolerance
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-015}
@@ -939,13 +939,13 @@ An example IDF for the electric convective baseboard is shown below.
 \begin{lstlisting}
 
 ZoneHVAC:Baseboard:Convective:Electric,
-      Zone1Baseboard,  !- Baseboard Name
-      FanAndCoilAvailSched,  !- Availability Schedule Name
+      Zone1Baseboard,          !- Baseboard Name
+      FanAndCoilAvailSched,    !- Availability Schedule Name
       HeatingDesignCapacity,   !- Heating Design Capacity Method
       5000,                    !- Heating Design Capacity{ W }
       ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
       ,                        !- Fraction of Autosized Heating Design Capacity{ -}
-      0.97;  !- Efficiency of the BaseBoard
+      0.97;                    !- Efficiency of the BaseBoard
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-012}
@@ -1011,7 +1011,7 @@ This field is the inside diameter of the tubes through which water is circulated
 
 \paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length}
 
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values.
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.  
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
 
@@ -1038,7 +1038,7 @@ Enter the method used to determine the heating design capacity for scalable sizi
 
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-5}
 
-This field is for the low temperature radiant variable flow unit design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
+This field is for the low temperature radiant variable flow unit design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
 
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-5}
 
@@ -1074,7 +1074,7 @@ Enter the method used to determine the cooling design capacity for scalable sizi
 
 \paragraph{Field: Cooling Design Capacity \{W\}}\label{field-cooling-design-capacity-w-000}
 
-This field is for the low temperature radiant variable flow unit design cooling capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity} and this input is is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
+This field is for the low temperature radiant variable flow unit design cooling capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity} and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
 
 \paragraph{Field: Cooling Design Capacity Per Floor Area \{W/m2\}}\label{field-cooling-design-capacity-per-floor-area-wm2-000}
 
@@ -1253,7 +1253,7 @@ This field is the inside diameter of the tubes through which water is circulated
 
 \paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-1}
 
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat being transferred to/from the radiant surface to the circulating fluid. This field is autosizable.
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat being transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
 
@@ -1368,34 +1368,34 @@ An example IDF with a constant flow low temperature radiant system is shown belo
 
 ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
       Resistive Zone Radiant Floor,  !- name of CONSTANT FLOW low temperature radiant system
-      RadiantSysAvailSched,  !- availability schedule
-      Resistive Zone,  !- Zone name
-      Zn001:Flr001,  !- Surface name or group
-      0.012,  !- Hydronic tubing inside diameter {m}
-      400.0,  !- Hydronic tubing length {m}
-      MeanAirTemperature,  !- temperature control type
-      0.0004,  !- maximum water volumetric flow rate {m3/s}
-      ,  !-schedule for flow rate (optional, non-existent means constant)
-      30000, !-Rated Pump Head in Pa
-      50,  !-Rated Power Consumption in W
-      0.87,  !-Motor Efficiency
-      0.1,  !-Fraction of Motor Inefficiencies to Fluid Stream
+      RadiantSysAvailSched,   !- availability schedule
+      Resistive Zone,         !- Zone name
+      Zn001:Flr001,           !- Surface name or group
+      0.012,                  !- Hydronic tubing inside diameter {m}
+      400.0,                  !- Hydronic tubing length {m}
+      MeanAirTemperature,     !- temperature control type
+      0.0004,                 !- maximum water volumetric flow rate {m3/s}
+      ,                       !-schedule for flow rate (optional, non-existent means constant)
+      30000,                  !-Rated Pump Head in Pa
+      50,                     !-Rated Power Consumption in W
+      0.87,                   !-Motor Efficiency
+      0.1,                    !-Fraction of Motor Inefficiencies to Fluid Stream
       Resistive Zone Radiant Water Inlet Node,  !- heating water inlet node
       Resistive Zone Radiant Water Outlet Node,  !- heating water outlet node
-      RadHeatHighWaterTemp,  !-high water temperature schedule
-      RadHeatLowWaterTemp,   !-low water temperature schedule
+      RadHeatHighWaterTemp,   !-high water temperature schedule
+      RadHeatLowWaterTemp,    !-low water temperature schedule
       RadHeatHighControlTemp, !-high control temperature schedule
       RadHeatLowControlTemp,  !-low control temperature schedule
       Zone 1 Cooling Water Inlet Node,  !- cooling water inlet node
       Zone 1 Cooling Water Outlet Node,  !- cooling water outlet node
-      RadCoolHighWaterTemp, !-cooling high water temperature schedule
-      RadCoolLowWaterTemp,  !-cooling low water temperature schedule
+      RadCoolHighWaterTemp,   !-cooling high water temperature schedule
+      RadCoolLowWaterTemp,    !-cooling low water temperature schedule
       RadCoolHighControlTemp, !- cooling high control temperature schedule
       RadCoolLowControlTemp,  !- cooling low control temperature schedule
       SimpleOff,              !- condensation control type
       0.5,                    !- condensation control dewpoint offset
       CalculateFromCircuitLength,   !- Number of Circuits
-      106.7;                   !- Circuit Length
+      106.7;                  !- Circuit Length
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-007}
@@ -1513,9 +1513,9 @@ The heat transfer energy for the heating fluid connection, in Joules.
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:Electric}\label{zonehvaclowtemperatureradiantelectric}
 
-This low temperature radiant system (electric) is a component of zone equipment that is intended to model any ``radiant system'' where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.~ If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
+This low temperature radiant system (electric) is a component of zone equipment that is intended to model any ``radiant system'' where electric resistance heating is used to supply energy (heat) to a building surface (wall, ceiling, or floor). The component is controlled by the radiant system controls that are defined in the syntax below and this control does not require the use of a zone thermostat unless the unit is being autosized. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first. If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: Low Temp Radiant System:Hydronic).
+The control is accomplished by varying the electrical power supplied to the unit. This model covers either a radiant panel system or wires embedded in entire walls, floors, or ceilings. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model (ref: ZoneHVAC:HighTemperatureRadiant) and different input syntax. Low temperature radiant systems that use water flowing through tubes to provide heat to the system should also be defined using separate input syntax (ref: ZoneHVAC:LowTemperatureRadiant:VariableFlow or ConstantFlow).
 
 \subsubsection{Inputs}\label{inputs-7-019}
 
@@ -1533,7 +1533,7 @@ This field is the name of the zone (Ref: Zone) in which the electric low tempera
 
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name-2}
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the heating element is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how energy flow is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed, Wall:Detailed, RoofCeiling:Detailed, etc.), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 \paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-6}
 
@@ -1572,7 +1572,7 @@ Operative temperature for radiant system controls is the average of Mean Air Tem
 
 \paragraph{Field: Heating Throttling Range}\label{field-heating-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature (see below) to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the power input to the system is at half of the maximum power input. For example, if the heating control temperature setpoint is currently 15°C and the heating throttling range is 2°C, the electrical power supplied to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or above 16°C and the maximum power input when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the power input to the radiant system is varied linearly.
+This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature (see below) to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the power input to the system is at half of the maximum power input. For example, if the heating control temperature setpoint is currently 15°C and the heating throttling range is 2°C, the electrical power supplied to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or above 16°C and the maximum power input when the controlling temperature is at or below 14°C. This represents a throttling range of 2°C around the setpoint of 15°C. In between 14°C and 16°C, the power input to the radiant system is varied linearly. The minimum throttling range is 0.5°C.
 
 \paragraph{Field: Heating Setpoint Temperature Schedule Name}\label{field-heating-setpoint-temperature-schedule-name}
 
@@ -1582,17 +1582,18 @@ An example IDF with an electric low temperature radiant system is shown below.
 
 \begin{lstlisting}
 
-ZoneHVAC:LowTemperatureRadiant:Electric, Zone 2 Radiant Floor,
-           RadiantPanelAvailSched ,    ! Availability schedule
-           EAST ZONE ,                 ! Zone name (name of zone system is serving)
-           Zn002:Flr001 ,              ! Surface name (name of surface system is embedded in)
+ZoneHVAC:LowTemperatureRadiant:Electric, 
+           Zone 2 Radiant Floor,       !- Name
+           RadiantPanelAvailSched ,    !- Availability Schedule Name
+           EAST ZONE ,                 !- Zone name (name of zone system is serving)
+           Zn002:Flr001 ,              !- Surface Name or Radiant Surface Group Name
            HeatingDesignCapacity,      !- Heating Design Capacity Method
            10000,                      !- Heating Design Capacity{ W }
-           ,                           !- Heating Design Capacity Per Floor Area{ W / m2 }
-           ,                           !- Fraction of Autosized Heating Design Capacity{ -}
-           MeanAirTemperature,         ! control type (control on mean air temperature)
-           2.0 ,                       ! heating throttling range (in C)
-           Radiant Heating Setpoints ; ! heating setpoint temperatures
+           ,                           !- Heating Design Capacity Per Floor Area{ W/m2 }
+           ,                           !- Fraction of Autosized Heating Design Capacity{ - }
+           MeanAirTemperature,         !- Temperature Control Type (control on mean air temperature)
+           2.0 ,                       !- Heating Throttling Range { deltaC }
+           Radiant Heating Setpoints ; !- Heating Setpoint Temperature Schedule Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-7-007}
@@ -1624,7 +1625,7 @@ These outputs are the heating provided by the low temperature radiant system to 
 
 \subsection{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}\label{zonehvaclowtemperatureradiantsurfacegroup}
 
-A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that are serving to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallet, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how flow rate is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list must be a part of the same zone and that the zone of these surfaces must also match the zone the radiant system is attempting to condition.
+A low temperature radiant system (hydronic or electric) may consist of multiple active surfaces that serve to condition the space. Surfaces that act serially can be specified as multiple radiant systems using the standard radiant system input described above. However, if the multiple surfaces act in parallel, the Radiant System Surface Group input line is used to specify which surfaces are acting in a coordinated fashion and how energy flow is split between the surfaces. This list of surfaces (the name it is assigned) replaces the name of a single surface in the radiant system input described above. Note that all of the surfaces within a single list must be a part of the same zone and that the zone of these surfaces must also match the zone the radiant system is attempting to condition.
 
 \subsubsection{Inputs}\label{inputs-8-017}
 
@@ -1762,25 +1763,25 @@ An example IDF with a high temperature radiant system is shown below.
 \begin{lstlisting}
 
 ZoneHVAC:HighTemperatureRadiant, Zone 2 Radiant Heater,
-           RadiantPanelAvailSched ,   ! Availability schedule
-           EAST ZONE ,                ! Zone name (name of zone system is serving)
+           RadiantPanelAvailSched ,   !- Availability schedule
+           EAST ZONE ,                !- Zone name (name of zone system is serving)
            10000,                     !- Heating Design Capacity{ W }
            ,                          !- Heating Design Capacity Per Floor Area{ W / m2 }
            ,                          !- Fraction of Autosized Heating Design Capacity{ -}
-           Gas,                       ! type of heater (either gas or electric)
-           0.8,                       ! combustion efficiency (ignored for electric radiant heaters)
-           0.80,                      ! fraction radiant
-           0.00,                      ! fraction latent
-           0.00,                      ! fraction lost
-           OperativeTemperature,      ! temperature control type (controls on operative temperature)
-           2.0 ,                      ! heating throttling range (in C)
-           Radiant Heating Setpoints, ! heating setpoint temperatures
-           0.04,                      ! fraction of radiant energy that is incident directly on people
-           Zn002:Flr001, 0.80,        ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall001, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall002, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall003, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-           Zn002:Wall004, 0.04;       ! fraction of radiant energy that is incident on the surface indicated
+           Gas,                       !- type of heater (either gas or electric)
+           0.8,                       !- combustion efficiency (ignored for electric radiant heaters)
+           0.80,                      !- fraction radiant
+           0.00,                      !- fraction latent
+           0.00,                      !- fraction lost
+           OperativeTemperature,      !- temperature control type (controls on operative temperature)
+           2.0 ,                      !- heating throttling range (in C)
+           Radiant Heating Setpoints, !- heating setpoint temperatures
+           0.04,                      !- fraction of radiant energy that is incident directly on people
+           Zn002:Flr001, 0.80,        !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall001, 0.04,       !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall002, 0.04,       !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall003, 0.04,       !- fraction of radiant energy that is incident on the surface indicated
+           Zn002:Wall004, 0.04;       !- fraction of radiant energy that is incident on the surface indicated
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-8-006}
@@ -1994,7 +1995,7 @@ This field is a node name used to identify the node that serves as the air outle
 
 \paragraph{Field: Fan Name}\label{field-fan-name-003}
 
-This field is the name of a fan (ref: Fan:ConstantVolume) that is part of the ventilated slab system.~ This name links the ventilated slab to particular fan data entered elsewhere in the input data file.~ A fan name is required since it is the prime mover of air in the ventilated slab system.
+This field is the name of a fan (ref: Fan:SystemModel or Fan:ConstantVolume) that is part of the ventilated slab system.  This name links the ventilated slab to particular fan data entered elsewhere in the input data file.  A fan name is required since it is the prime mover of air in the ventilated slab system.
 
 \paragraph{Field: Coil Option Type}\label{field-coil-option-type}
 

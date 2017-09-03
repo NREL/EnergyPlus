@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -2601,7 +2601,9 @@
     Main Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name
     Main Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name
     Mixed Air Node 1,        !- Air Inlet Node Name
-    Main Cooling Coil 1 Outlet Node;  !- Air Outlet Node Name
+    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    6.0;                     !- Design Water Temperature Difference {deltaC}
 
   Coil:Heating:Water,
     Main Heating Coil 1,     !- Name
@@ -2618,7 +2620,8 @@
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
+    ,                        !- Rated Ratio for Air and Water Convection
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name

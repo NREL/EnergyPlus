@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef ZoneTempPredictorCorrector_hh_INCLUDED
 #define ZoneTempPredictorCorrector_hh_INCLUDED
@@ -198,6 +186,25 @@ namespace ZoneTempPredictorCorrector {
 
 	};
 
+	struct AdaptiveComfortDailySetPointSchedule
+	{
+		// Members
+		bool initialized;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_90;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_80;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Central;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_I;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_II;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_III;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Central;
+
+		// Default Constructor
+		AdaptiveComfortDailySetPointSchedule() :
+			initialized( false )
+		{}
+	};
+
+
 	// Object Data
 	extern Array1D< ZoneTempControlType > SetPointSingleHeating;
 	extern Array1D< ZoneTempControlType > SetPointSingleCooling;
@@ -207,6 +214,8 @@ namespace ZoneTempPredictorCorrector {
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	extern AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
+	extern Array1D< Real64 > AdapComfortSetPointSummerDesDay;
 
 	// Functions
 	void
@@ -236,6 +245,12 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	CalcZoneAirTempSetPoints();
+
+	void
+	CalculateMonthlyRunningAverageDryBulb( Array1D< Real64 > & runningAverageASH, Array1D< Real64 > & runningAverageCEN );
+
+	void
+	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > const & runningAverageASH, Array1D< Real64 > const & runningAverageCEN );
 
 	void
 	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
@@ -329,6 +344,12 @@ namespace ZoneTempPredictorCorrector {
 	);
 
 	void
+	AdjustOperativeSetPointsforAdapComfort(
+		int const TempControlledZoneID,
+		Real64 & ZoneAirSetPoint
+	);
+
+	void
 	CalcZoneAirComfortSetPoints();
 
 	void
@@ -349,6 +370,20 @@ namespace ZoneTempPredictorCorrector {
 	AdjustCoolingSetPointforTempAndHumidityControl(
 		int const TempControlledZoneID,
 		int const ActualZoneNum // controlled zone actual zone number
+	);
+
+	void
+	OverrideAirSetPointsforEMSCntrl();
+
+	void
+	FillPredefinedTableOnThermostatSetpoints();
+
+	std::tuple< Real64, int, std::string >
+	temperatureAndCountInSch(
+		int const & scheduleIndex,
+		bool const & isSummer,
+		int const & dayOfWeek,
+		int const & hourOfDay
 	);
 
 } // ZoneTempPredictorCorrector

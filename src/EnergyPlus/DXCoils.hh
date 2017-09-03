@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DXCoils_hh_INCLUDED
 #define DXCoils_hh_INCLUDED
@@ -96,6 +84,7 @@ namespace DXCoils {
 	extern Real64 const RatedOutdoorAirTemp; // 35 C or 95F
 	extern Real64 const RatedInletAirTempHeat; // 21.11C or 70F
 	extern Real64 const RatedOutdoorAirTempHeat; // 8.33 C or 47F
+	extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
 	extern Real64 const RatedInletWetBulbTempHeat; // 15.55 or 60F
 
 	extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
@@ -266,8 +255,9 @@ namespace DXCoils {
 		Real64 RatedEIR2; // rated energy input ratio (low speed, inverse of COP2)
 		Real64 InternalStaticPressureDrop; // for rating VAV system
 		bool RateWithInternalStaticAndFanObject;
-		int SupplyFanIndex;
-		std::string SupplyFanName;
+		int SupplyFanIndex; // index of this fan in fan array or vector
+		int SupplyFan_TypeNum; // type of fan, in DataHVACGlobals
+		std::string SupplyFanName; // name of fan associated with this dx coil
 		std::string CoilSystemName;
 		// end of multi-speed compressor variables
 		Array1D< Real64 > RatedEIR; // rated energy input ratio (inverse of COP)
@@ -460,6 +450,7 @@ namespace DXCoils {
 		Real64 FuelUsed; // Energy used, in addition to electricity [W]
 		Real64 FuelConsumed; // Energy consumed, in addition to electricity [J]
 		bool MSHPHeatRecActive; // True when entered Heat Rec Vol Flow Rate > 0
+		int MSHPDesignSpecIndex; // index to MSHPDesignSpecification object used for variable speed coils
 		// End of multispeed DX coil input
 		// VRF system variables used for sizing
 		bool CoolingCoilPresent; // FALSE if coil not present
@@ -582,7 +573,8 @@ namespace DXCoils {
 			RatedEIR2( 0.0 ),
 			InternalStaticPressureDrop( 0.0 ),
 			RateWithInternalStaticAndFanObject( false ),
-			SupplyFanIndex( 0 ),
+			SupplyFanIndex( -1 ),
+			SupplyFan_TypeNum( 0 ),
 			RatedEIR( MaxModes, 0.0 ),
 			InletAirMassFlowRate( 0.0 ),
 			InletAirMassFlowRateMax( 0.0 ),
@@ -707,6 +699,7 @@ namespace DXCoils {
 			PLRImpact( false ),
 			LatentImpact( false ),
 			MSHPHeatRecActive( false ),
+			MSHPDesignSpecIndex( 0 ),
 			CoolingCoilPresent( true ),
 			HeatingCoilPresent( true ),
 			ISHundredPercentDOASDXCoil( false ),
@@ -908,10 +901,9 @@ namespace DXCoils {
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
+		Real64 const AirVolFlowRate, // the air volume flow rate at the given capacity [m3/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
-		bool const PrintFlag = true, // flag used to print warnings if desired
-		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
+		bool const PrintFlag = true // flag used to print warnings if desired
 	);
 
 	Real64
@@ -991,7 +983,8 @@ namespace DXCoils {
 	GetFanIndexForTwoSpeedCoil(
 		int const CoolingCoilIndex,
 		int & SupplyFanIndex,
-		std::string & SupplyFanName
+		std::string & SupplyFanName,
+		int & SupplyFan_TypeNum
 	);
 
 	Real64
@@ -1005,6 +998,14 @@ namespace DXCoils {
 	void
 	GetDXCoilIndex(
 		std::string const & DXCoilName,
+		int & DXCoilIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType = _,
+		Optional_bool_const SuppressWarning = _
+	);
+
+	std::string
+	GetDXCoilName(
 		int & DXCoilIndex,
 		bool & ErrorsFound,
 		Optional_string_const ThisObjectType = _,
@@ -1037,6 +1038,12 @@ namespace DXCoils {
 	GetMinOATCompressor(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
+	Real64
+	GetMinOATCompressorUsingIndex(
+		int const CoilIndex, // index to coil
 		bool & ErrorsFound // set to true if problem
 	);
 
@@ -1127,7 +1134,8 @@ namespace DXCoils {
 		Optional< Real64 > HeatSizeRatio = _,
 		Optional< Real64 > TotCap = _,
 		Optional_int SupplyFanIndex = _,
-		Optional_string SupplyFanName = _
+		Optional_string SupplyFanName = _,
+		Optional_int SupplyFan_TypeNum = _
 	);
 
 	void

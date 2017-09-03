@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef CondenserLoopTowers_hh_INCLUDED
 #define CondenserLoopTowers_hh_INCLUDED
@@ -132,7 +120,8 @@ namespace CondenserLoopTowers {
 	extern Real64 BasinHeaterPower; // Basin heater power use (W)
 	extern Real64 WaterUsage; // Tower water usage (m3/s)
 	extern Real64 FanCyclingRatio; // cycling ratio of tower fan when min fan speed provide to much capacity
-
+	
+	extern bool GetInput; // When TRUE, calls subroutine to read input file
 	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
@@ -273,6 +262,21 @@ namespace CondenserLoopTowers {
 		bool SetpointIsOnOutlet; // if true look to outlet node of tower, if flase look to overall loop setpoint
 		int VSMerkelAFRErrorIter; // error counter for regula falsi failed with max iterations, vs merkel model
 		int VSMerkelAFRErrorFail; // error counter for regula falsi failed with limits exceeded, vs merkel model
+		Real64 DesInletWaterTemp; // design tower inlet water temperature (C)
+		Real64 DesOutletWaterTemp; // design tower outlet water temperature (C)
+		Real64 DesInletAirDBTemp; // design tower inlet air dry-bulb temperature (C)
+		Real64 DesInletAirWBTemp; // design tower outlet air wet-bulb temperature (C)
+		Real64 DesApproach; // design tower approach temperature (deltaC)
+		Real64 DesRange; // design tower range temperature (deltaC)
+		bool TowerInletCondsAutoSize; // true if tower inlet condition is autosized or defaulted to autosize
+		//Operational fault parameters
+		bool FaultyCondenserSWTFlag; // True if the condenser has SWT sensor fault
+		int FaultyCondenserSWTIndex;  // Index of the fault object corresponding to the condenser
+		Real64 FaultyCondenserSWTOffset; // Condenser SWT sensor offset
+		bool FaultyTowerFoulingFlag; // True if the tower has fouling fault
+		int FaultyTowerFoulingIndex;  // Index of the fouling fault object corresponding to the condenser
+		Real64 FaultyTowerFoulingFactor; // Tower fouling factor
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		Towerspecs() :
@@ -375,7 +379,20 @@ namespace CondenserLoopTowers {
 			UAModFuncWaterFlowRatioCurvePtr( 0 ),
 			SetpointIsOnOutlet( false ),
 			VSMerkelAFRErrorIter( 0 ),
-			VSMerkelAFRErrorFail( 0 )
+			VSMerkelAFRErrorFail( 0 ),
+			DesInletWaterTemp( 0 ),
+			DesOutletWaterTemp( 0 ),
+			DesInletAirDBTemp( 0 ),
+			DesInletAirWBTemp( 0 ),
+			DesApproach( 0 ),
+			DesRange( 0 ),
+			TowerInletCondsAutoSize( false ),
+			FaultyCondenserSWTFlag( false ),
+			FaultyCondenserSWTIndex( 0 ),
+			FaultyCondenserSWTOffset( 0.0 ),
+			FaultyTowerFoulingFlag( false ),
+			FaultyTowerFoulingIndex( 0 ),
+			FaultyTowerFoulingFactor( 1.0 )
 		{}
 	};
 

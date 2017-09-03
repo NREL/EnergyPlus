@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2218,8 +2218,8 @@
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
-    ,                        !- Basin Heater Capacity {W/K}
-    ;                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ;                        !- Design Inlet Air Wet-Bulb Temperature {C}
 
 !-   ===========  ALL OBJECTS IN CLASS: PLANTLOOP ===========
 

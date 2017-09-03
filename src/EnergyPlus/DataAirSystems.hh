@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataAirSystems_hh_INCLUDED
 #define DataAirSystems_hh_INCLUDED
@@ -237,11 +225,18 @@ namespace DataAirSystems {
 
 	};
 
+	enum fanModelTypeEnum {
+		fanModelTypeNotYetSet,
+		structArrayLegacyFanModels,
+		objectVectorOOFanSystemModel
+		};
+
 	struct DefinePrimaryAirSystem // There is an array of these for each primary air system
 	{
 		// Members
 		std::string Name; // name of the system
 		Real64 DesignVolFlowRate; // the design total supply air flow rate (m3/s)
+		Real64 DesignReturnFlowFraction; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
 		int NumControllers; // number of controllers on this air path
 		Array1D_string ControllerName; // name of each controller on this system
 		Array1D_string ControllerType; // type of each controller on this system
@@ -273,13 +268,18 @@ namespace DataAirSystems {
 		int NumOAHeatCoils; // number of heating coils in the outside air system
 		int NumOAHXs; // number of heat exchangers in the outside air system
 		bool SizeAirloopCoil; // simulates air loop coils before calling controllers
-		int SupFanNum; // index of the supply fan in the Fan data structure
-		int RetFanNum; // index of the return fan in the Fan data structure
+		fanModelTypeEnum supFanModelTypeEnum; // indicates which type of fan model to call for supply fan, legacy or new OO
+		int SupFanNum; // index of the supply fan in the Fan data structure when model type is structArrayLegacyFanModels
+		int supFanVecIndex; // index in fan object vector for supply fan when model type is objectVectorOOFanSystemModel, zero-based index
+		fanModelTypeEnum retFanModelTypeEnum; // indicates which type of fan model to call for return fan, legacy or new OO
+		int RetFanNum; // index of the return fan in the Fan data structure when model type is structArrayLegacyFanModels
+		int retFanVecIndex; // index in fan object vector for return fan when model type is objectVectorOOFanSystemModel, zero-based index
 		Real64 FanDesCoolLoad; // design fan heat gain for the air loop [W]
 
 		// Default Constructor
 		DefinePrimaryAirSystem() :
 			DesignVolFlowRate( 0.0 ),
+			DesignReturnFlowFraction( 1.0 ),
 			NumControllers( 0 ),
 			NumBranches( 0 ),
 			NumOutletBranches( 0 ),
@@ -301,8 +301,12 @@ namespace DataAirSystems {
 			NumOAHeatCoils( 0 ),
 			NumOAHXs( 0 ),
 			SizeAirloopCoil( true ),
+			supFanModelTypeEnum( fanModelTypeNotYetSet ),
 			SupFanNum( 0 ),
+			supFanVecIndex( -1 ),
+			retFanModelTypeEnum( fanModelTypeNotYetSet ),
 			RetFanNum( 0 ),
+			retFanVecIndex( -1 ),
 			FanDesCoolLoad(0.0)
 		{}
 

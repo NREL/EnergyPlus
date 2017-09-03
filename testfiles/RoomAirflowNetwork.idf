@@ -136,7 +136,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -169,6 +169,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
+    Multiplier,              !- Name
+    ,                        !- Zone or ZoneList Name
     1.0,                     !- Temperature Capacity Multiplier
     1.0,                     !- Humidity Capacity Multiplier
     1.0,                     !- Carbon Dioxide Capacity Multiplier
@@ -1522,7 +1524,6 @@
     NaturalVentilation,      !- Name
     MultizoneWithoutDistribution,  !- AirflowNetwork Control
     INPUT,                   !- Wind Pressure Coefficient Type
-    Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
@@ -1847,22 +1848,22 @@
   AirflowNetwork:MultiZone:ExternalNode,
     NFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     EFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     SFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     WFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:Wind Pressure Coefficient Array ===========
 
@@ -2574,6 +2575,7 @@
     NORTH_ZONE PTAC Cooling Coil EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
     NORTH_ZONE PTAC Cooling Coil EIR-FF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     NORTH_ZONE PTAC Cooling Coil Coil PLF,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     0,                       !- Maximum Cycling Rate {cycles/hr}

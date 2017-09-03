@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataOutputs_hh_INCLUDED
 #define DataOutputs_hh_INCLUDED
@@ -65,6 +53,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <unordered_map>
+#include <vector>
+#include <cstddef>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -91,25 +83,19 @@ namespace DataOutputs {
 	extern int iTotalAutoCalculatableFields; // number of fields that can be autocalculated
 
 	// Types
+	struct OutputReportingVariables {
+		OutputReportingVariables(
+			std::string const & KeyValue,
+			std::string const & VariableName
+		);
 
-	struct OutputReportingVariables // Linked list of variables and keys
-	{
-		// Members
-		std::string Key; // could be a key or "*"  (upper case)
-		std::string VarName; // variable name (upper case)
-		int Previous; // Pointer to Previous of same variable name
-		int Next; // Pointer to Next of same variable name
-
-		// Default Constructor
-		OutputReportingVariables() :
-			Previous( 0 ),
-			Next( 0 )
-		{}
-
+		std::string const key;
+		std::string const variableName;
+		bool is_simple_string = true;
+		std::unique_ptr< RE2 > pattern;
+		std::unique_ptr< RE2 > case_insensitive_pattern;
 	};
-
-	// Object Data
-	extern Array1D< OutputReportingVariables > OutputVariablesForSimulation;
+	extern std::unordered_map < std::string, std::unordered_map< std::string, OutputReportingVariables > > OutputVariablesForSimulation;
 
 	// Functions
 

@@ -83,7 +83,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,4;
 
@@ -102,8 +102,6 @@
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
-
- Lead Input;
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
@@ -420,9 +418,6 @@
     CONTINUOUS;              !- Numeric Type
 
   Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
-
- End Lead Input;
- Simulation Data;
 
   Zone,
     ZONE 1,                  !- Name
@@ -1051,6 +1046,7 @@
     ,                        !- Availability Schedule Name
     ZONE 1 INLETS,           !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1110,6 +1106,7 @@
     ,                        !- Availability Schedule Name
     ZONE 2 INLETS,           !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1169,6 +1166,7 @@
     ,                        !- Availability Schedule Name
     ZONE 3 INLETS,           !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1228,6 +1226,7 @@
     ,                        !- Availability Schedule Name
     ZONE 4 INLETS,           !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1279,4 +1278,3 @@
 
   Output:Meter,DistrictCooling:Facility,hourly;
 
- End Simulation Data;

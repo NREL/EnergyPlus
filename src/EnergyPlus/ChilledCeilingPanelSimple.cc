@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -855,7 +843,7 @@ namespace CoolingPanelSimple {
 		using DataSizing::FractionOfAutosizedCoolingCapacity;
 		using DataSizing::DataConstantUsedForSizing;
 		using DataSizing::DataFractionUsedForSizing;
-		using DataSizing::CalcFinalZoneSizing;
+		using DataSizing::FinalZoneSizing;
 		using DataSizing::PlantSizData;
 		using DataSizing::AutoVsHardSizingThreshold;
 		using DataHVACGlobals::CoolingCapacitySizing;
@@ -937,8 +925,8 @@ namespace CoolingPanelSimple {
 						if ( ZoneSizingRunDone ) {
 							CheckZoneSizing( CompType, CompName );
 							SizingMethod = AutoCalculateSizing;
-							DataConstantUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad;
-							DataFractionUsedForSizing = CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							DataConstantUsedForSizing = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
+							DataFractionUsedForSizing = 1.0;
 						}
 						if ( CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity == AutoSize ) {
 							TempSize = AutoSize;
@@ -949,14 +937,14 @@ namespace CoolingPanelSimple {
 						if ( ZoneSizingRunDone ) {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 						}
 						TempSize = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity * Zone( CoolingPanel( CoolingPanelNum ).ZonePtr ).FloorArea;
 						DataScalableCapSizingON = true;
 					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 						CheckZoneSizing( CompType, CompName );
 						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor;
+						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
 						DataScalableCapSizingON = true;
 						
@@ -1027,34 +1015,81 @@ namespace CoolingPanelSimple {
 		
 		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
 
+		bool SizeCoolingPanelUASuccess;
+		SizeCoolingPanelUASuccess = SizeCoolingPanelUA( CoolingPanelNum );
+		if ( ! SizeCoolingPanelUASuccess ) ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
+
+	}
+
+	bool
+	SizeCoolingPanelUA(
+		int const CoolingPanelNum
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   June 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sizes UA value for the simple chilled ceiling panel.
+
+		// Return value
+		bool SizeCoolingPanelUA;
+		
 		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
+		Real64 Cp;
 		Real64 MDot;
 		Real64 MDotXCp;
 		Real64 Qrated;
 		Real64 Tinletr;
 		Real64 Tzoner;
+		Real64 RatCapToTheoMax; // Ratio of unit capacity to theoretical maximum output based on rated parameters
+
+		SizeCoolingPanelUA = true;
 		Cp = 4120.0; // Just an approximation, don't need to get an exact number
 		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
 		MDotXCp = Cp * MDot;
 		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
 		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
 		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+		if ( std::abs( Tinletr - Tzoner ) < 0.5 ) {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * 0.5 ); // Avoid a divide by zero error
+		} else {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) );
+		}
+		if ( ( RatCapToTheoMax < 1.1 ) && ( RatCapToTheoMax > 0.9999 ) ) {
+			// close to unity with some graciousness given in case the approximation of Cp causes a problem
+			RatCapToTheoMax = 0.9999;
+		} else if (RatCapToTheoMax >= 1.1 ) {
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a cooling capacity that is greater than the maximum possible value." );
+			ShowContinueError( "The result of this is that a UA value is impossible to calculate." );
+			ShowContinueError( "Check the rated input for temperatures, flow, and capacity for this unit." );
+			ShowContinueError( "The ratio of the capacity to the rated theoretical maximum must be less than unity." );
+			ShowContinueError( "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high, the rated flow being too low, rated temperatures being too close to each other, or all of those reasons." );
+			ShowContinueError( "Compare the rated capacity in your input to the product of the rated mass flow rate, Cp of water, and the difference between the rated temperatures." );
+			ShowContinueError( "If the rated capacity is higher than this product, then the cooling panel would violate the Second Law of Thermodynamics." );
+			SizeCoolingPanelUA = false;
+			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+		}
 		if ( Tinletr >= Tzoner ) {
-			ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
 			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-			ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			SizeCoolingPanelUA = false;
 			CoolingPanel( CoolingPanelNum ).UA = 1.0;
 		} else {
-			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
+			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - RatCapToTheoMax );
 			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-				ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+				ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
 				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-				ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+				SizeCoolingPanelUA = false;
 			}
 		}
-		
+
+		return SizeCoolingPanelUA;
+
 	}
-	
+
 	void
 	CalcCoolingPanel(
 		int & CoolingPanelNum

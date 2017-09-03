@@ -1,10 +1,7 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +32,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +43,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -75,6 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -150,6 +139,8 @@ namespace ChillerAbsorption {
 	Real64 EvaporatorEnergy( 0.0 ); // J - heat transfer to the evaporator coil
 	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
+	
+	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	static std::string const BlankString;
 	static std::string const fluidNameSteam( "STEAM" );
@@ -225,7 +216,6 @@ namespace ChillerAbsorption {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 		int ChillNum; // Chiller number pointer
 
 		//Get Absorber data from input file
@@ -1257,8 +1247,9 @@ namespace ChillerAbsorption {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       April 1999, May 2000- Taecheol Kim
-		//                      May   2008 - R. Raustad, added generator nodes
+		//       MODIFIED       Apr. 1999, May 2000- Taecheol Kim
+		//                      May. 2008, R. Raustad, Added generator nodes
+		//                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1272,7 +1263,11 @@ namespace ChillerAbsorption {
 		// 2.  Absorber User Manual
 
 		// Using/Aliasing
+		using namespace FluidProperties;
 		using DataGlobals::BeginEnvrnFlag;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using DataPlant::DeltaTempTol;
@@ -1282,7 +1277,7 @@ namespace ChillerAbsorption {
 		using DataPlant::DualSetPointDeadBand;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
-		using namespace FluidProperties;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
 
@@ -1385,6 +1380,19 @@ namespace ChillerAbsorption {
 		LoopSideNum = BLASTAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( BLASTAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset ));
+			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
 
 		// If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
 		// condenser side outlet temperature.
@@ -1437,6 +1445,20 @@ namespace ChillerAbsorption {
 					ShowRecurringWarningErrorAtEnd( "CalcBLASTAbsorberModel: Name=\"" + BLASTAbsorber( ChillNum ).Name + "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.", BLASTAbsorber( ChillNum ).ErrCount2 );
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( BLASTAbsorber( ChillNum ).FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				//PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				//PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				//ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -1488,6 +1510,7 @@ namespace ChillerAbsorption {
 					QEvaporator = EvapMassFlowRate * CpFluid * EvapDeltaTemp;
 				}
 			}
+
 			// Checks QEvaporator on the basis of the machine limits.
 			if ( QEvaporator > std::abs( MyLoad ) ) {
 				if ( EvapMassFlowRate > MassFlowTolerance ) {
@@ -1498,6 +1521,16 @@ namespace ChillerAbsorption {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 		} //This is the end of the FlowLock Block

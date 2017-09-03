@@ -3,13 +3,13 @@
 
 // MArray4: 4D Member Array Proxy
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -57,16 +57,19 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	// Using
-	using Super::in_range;
 	using Super::isize;
 	using Super::l;
 	using Super::u;
 	using Super::size;
+
+protected: // Types
+
+	using Super::in_range;
 	using Super::j1;
 	using Super::j2;
 	using Super::j3;
 	using Super::j4;
+
 	using Super::array_;
 	using Super::pmem_;
 

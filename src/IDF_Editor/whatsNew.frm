@@ -3,12 +3,12 @@ Begin VB.Form frmWhatsNew
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "New Features of IDF Editor"
    ClientHeight    =   8280
-   ClientLeft      =   45
-   ClientTop       =   435
-   ClientWidth     =   10905
+   ClientLeft      =   48
+   ClientTop       =   432
+   ClientWidth     =   10908
    BeginProperty Font 
       Name            =   "MS Sans Serif"
-      Size            =   9.75
+      Size            =   9.6
       Charset         =   0
       Weight          =   700
       Underline       =   0   'False
@@ -19,13 +19,13 @@ Begin VB.Form frmWhatsNew
    MaxButton       =   0   'False
    MinButton       =   0   'False
    ScaleHeight     =   8280
-   ScaleWidth      =   10905
+   ScaleWidth      =   10908
    ShowInTaskbar   =   0   'False
    StartUpPosition =   1  'CenterOwner
    Begin VB.TextBox txtWhatsNew 
       BeginProperty Font 
          Name            =   "MS Sans Serif"
-         Size            =   9.75
+         Size            =   9.6
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -45,7 +45,7 @@ Begin VB.Form frmWhatsNew
       Caption         =   "Close"
       BeginProperty Font 
          Name            =   "MS Sans Serif"
-         Size            =   8.25
+         Size            =   7.8
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -62,7 +62,7 @@ Begin VB.Form frmWhatsNew
       Caption         =   "This dialog box is shown at start up one time and then can be found under HELP .. WHATS NEW"
       BeginProperty Font 
          Name            =   "MS Sans Serif"
-         Size            =   8.25
+         Size            =   7.8
          Charset         =   0
          Weight          =   700
          Underline       =   0   'False
@@ -90,6 +90,17 @@ End Sub
 Private Sub Form_Load()
 Dim t As String
 t = ""
+t = t & "New Features of IDF Editor Version 1.49" & vbCrLf
+t = t & "-------------------------------------------------------------------------------" & vbCrLf
+t = t & "In EDIT .. VALIDITY CHECK now have an option to IGNORE MACROS which will not perform validity checking on fields that contain characters " _
+      & "typically used for macros:  # [ @ $ = " & vbCrLf & vbCrLf
+      
+t = t & "Allow multiple objects to be duplicated or deleted at the same time when multiple columns are selected." & vbCrLf & vbCrLf
+
+t = t & "New Features of IDF Editor Version 1.48" & vbCrLf
+t = t & "-------------------------------------------------------------------------------" & vbCrLf
+t = t & "Added warning when trying to open file with Unix file line endings." & vbCrLf & vbCrLf
+
 t = t & "New Features of IDF Editor Version 1.44" & vbCrLf
 t = t & "-------------------------------------------------------------------------------" & vbCrLf
 t = t & "The new JUMP menu allows you to easily navigate between fields in different objects that are using the same name. For example, it can be " _
@@ -151,15 +162,15 @@ End Sub
 
 '     NOTICE
 '
-'     The contents of this file are subject to the EnergyPlus Open Source License 
-'     Version 1.0 (the "License"); you may not use this file except in compliance 
-'     with the License. You may obtain a copy of the License at 
+'     The contents of this file are subject to the EnergyPlus Open Source License
+'     Version 1.0 (the "License"); you may not use this file except in compliance
+'     with the License. You may obtain a copy of the License at
 '
 '     http://apps1.eere.energy.gov/buildings/energyplus/energyplus_licensing.cfm
 '
-'     Software distributed under the License is distributed on an "AS IS" basis, 
-'     WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for 
-'     the specific language governing rights and limitations under the License. 
+'     Software distributed under the License is distributed on an "AS IS" basis,
+'     WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
+'     the specific language governing rights and limitations under the License.
 '
 '     Copyright © 1996-2014 GARD Analytics.  All rights reserved.
 '

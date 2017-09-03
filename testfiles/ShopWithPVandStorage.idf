@@ -53,7 +53,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                Yes, circa 2004, Reliant , TX
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,6;
 
@@ -3043,6 +3043,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -3320,6 +3321,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -3597,6 +3599,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -3874,6 +3877,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -4151,6 +4155,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
