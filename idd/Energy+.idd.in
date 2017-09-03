@@ -56940,19 +56940,19 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
-  N17, \field Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N17, \field Diameter of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the piping loss
        \type real
        \units m
        \minimum 0.0
        \default 0.0762
-  N18, \field Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N18, \field Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the heat loss of the main pipe
        \type real
        \units m
        \minimum 0.0
        \default 30.0
-  N19, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N19, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the refrigerant pressure drop of the main pipe
        \type real
        \units m
@@ -57364,13 +57364,13 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \units m
        \minimum 0.0
        \default 0.0762
-  N25, \field Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N25, \field Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the heat loss of the main pipe
        \type real
        \units m
        \minimum 0.0
        \default 30.0
-  N26, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N26, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the refrigerant pressure drop of the main pipe
        \type real
        \units m
