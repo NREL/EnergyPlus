@@ -114,25 +114,24 @@ TEST_F( EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero )
 	
 	// Test 1: Zone 1--PV has multiplier, Zone index already set
 	EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Report.DCPower = 1000.0;
+	EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Zone = Photovoltaics::GetPVZone( EnergyPlus::DataPhotovoltaics::PVarray( 1 ).SurfacePtr );
 	Photovoltaics::ReportPV( 1 );
+	EXPECT_EQ( EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Zone, 1 );
 	EXPECT_NEAR( EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Report.DCPower, 5000.0, 0.1 );
 	
 	// Test 2: Zone 2--PV has multiplier, Zone index not set yet
 	EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Report.DCPower = 1000.0;
+	EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Zone = Photovoltaics::GetPVZone( EnergyPlus::DataPhotovoltaics::PVarray( 2 ).SurfacePtr );
 	Photovoltaics::ReportPV( 2 );
+	EXPECT_EQ( EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Zone, 2 );
 	EXPECT_NEAR( EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Report.DCPower, 10000.0, 0.1 );
-	EXPECT_EQ( DataSurfaces::Surface( 2 ).Zone, 2 );
 	
-	// Test 3: Zone 2--PV has multiplier, Zone index set by previous pass through ReportPV
-	EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Report.DCPower = 500.0;
-	Photovoltaics::ReportPV( 2 );
-	EXPECT_NEAR( EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Report.DCPower, 5000.0, 0.1 );
-
-	// Test 4: Zone 3--PV not attached to any zone, Zone Index does not get reset
+	// Test 3: Zone 3--PV not attached to any zone, Zone Index does not get set
 	EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Report.DCPower = 1000.0;
+	EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Zone = Photovoltaics::GetPVZone( EnergyPlus::DataPhotovoltaics::PVarray( 3 ).SurfacePtr );
 	Photovoltaics::ReportPV( 3 );
+	EXPECT_EQ( EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Zone, 0 );
 	EXPECT_NEAR( EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Report.DCPower, 1000.0, 0.1 );
-	EXPECT_EQ( DataSurfaces::Surface( 3 ).Zone, 0 );
 
 }
 
