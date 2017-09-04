@@ -34,7 +34,7 @@ Attribute VB_Name = "IDFMain"
 ' command line argument /idd:iddfilename
 '
 
-Public Const ver = "1.49" 'current version of IDFEditor - less than 1 is a beta
+Public Const ver = "1.50" 'current version of IDFEditor - less than 1 is a beta
 Option Explicit
 Option Base 1
 
@@ -302,6 +302,7 @@ Public useWordWrap As Boolean
 Public previousVersion As String 'saved version of IDF Editor for displaying whats new dialog
 
 Public searchTerm As String
+Public replaceTerm As String
 
 Type recentFilesType
   nameOnly As String
