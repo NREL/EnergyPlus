@@ -360,7 +360,6 @@ namespace HVACManager {
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			ResetNodeData();
 			AirLoopsSimOnce = false;
 			MyEnvrnFlag = false;
 			InitVentReportFlag = true;
