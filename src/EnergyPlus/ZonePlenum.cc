@@ -766,6 +766,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			InitAirZoneReturnPlenumEnvrnFlag = false;
@@ -881,6 +891,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			MyEnvrnFlag = false;

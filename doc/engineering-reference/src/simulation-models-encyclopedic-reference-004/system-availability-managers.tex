@@ -53,7 +53,9 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 \end{itemize}
 
-If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) ~0 or if the program is in warmup, \emph{AvailStatus = NoAction}.
+If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) ~0 , \emph{AvailStatus = NoAction}.
+
+If the program is in warmup,the start time stop time are reset to the current time.
 
 Otherwise:
 
