@@ -6032,7 +6032,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 			if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 && MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 0.9e10 ) {
 				MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) = 1.0e10;
-				if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 && Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulbSchedNum != 0 ) {
+				if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 ) {
 					MV( i ) = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulb * 1.0e10;
 				} else {
 					MV( i ) = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight ) * 1.0e10;

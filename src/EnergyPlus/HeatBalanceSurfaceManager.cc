@@ -443,18 +443,10 @@ namespace HeatBalanceSurfaceManager {
 		if ( AnyLocalEnvironmentsInModel) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).HasLinkedOutAirNode ) {
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
-						Surface( SurfNum ).OutDryBulbTemp = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulb;
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
-						Surface( SurfNum ).OutWetBulbTemp = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulb;
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
-						Surface( SurfNum ).WindSpeed = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeed;
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
-						Surface( SurfNum ).WindDir = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDir;
-					}
+					Surface( SurfNum ).OutDryBulbTemp = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulb;
+					Surface( SurfNum ).OutWetBulbTemp = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulb;
+					Surface( SurfNum ).WindSpeed = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeed;
+					Surface( SurfNum ).WindDir = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDir;
 				}
 
 				if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {

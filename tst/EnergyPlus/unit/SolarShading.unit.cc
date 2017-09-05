@@ -691,7 +691,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 		"    1,                          !- Calculation Frequency                             ",
 		"    ,                           !- Maximum Figures in Shadow Overlap Calculations    ",
 		"    ,                           !- Polygon Clipping Algorithm                        ",
-		"    DetailedSkyDiffuseModeling ,!- Sky Diffuse Modeling Algorithm                    ",
+		"    ,                           !- Sky Diffuse Modeling Algorithm                    ",
 		"    ScheduledShading,           !- External Shading Calculation Method               ",
 		"    Yes;                        !- Output External Shading Calculation Results       ",
 		"  SurfaceConvectionAlgorithm:Inside,TARP;                                            ",
