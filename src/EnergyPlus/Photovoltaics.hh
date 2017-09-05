@@ -104,6 +104,11 @@ namespace Photovoltaics {
 
 	void
 	GetPVInput();
+	
+	int
+	GetPVZone(
+		int const SurfNum
+	);
 
 	// **************************************
 
