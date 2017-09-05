@@ -799,7 +799,8 @@ This output is the damper position required to meet the zone load. This is the a
 
 \subsection{AirTerminal:SingleDuct:SeriesPIU:Reheat}\label{airterminalsingleductseriespiureheat}
 
-The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan's availability schedule is on or it is activated by an availability manager). The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit's primary air supply inlet duct. This damper can move from fully open (100\% primary air. 0\% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum.
+The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan's availability schedule is on or it is activated by an availability manager). The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit's primary air supply inlet duct. This damper can move from fully open (100\% primary air. 0\% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum. During night cycle operation, if the availability manager status is CycleOnZoneFansOnly, then the fan will run only if there is a heating load.  If the status is CycleOn, then the fan will run according to the normal controls.
+
 
 The EnergyPlus model of the series PIU terminal unit is composed of three components: a zone mixer, a constant volume fan, and a heating coil (hot water, electric, or gas).
 
@@ -853,7 +854,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run according to the Availability Schedule specified in the fan object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run only when the Availability Schedule specified in the fan object is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-3}
 
@@ -984,9 +985,7 @@ The minimum volumetric air flow rate of primary air through the unit expressed a
 
 \paragraph{Field: Fan On Flow Fraction}\label{field-fan-on-flow-fraction}
 
-If Fan On Flow Fraction is > 0, then this is the fraction of the primary air flow at which the fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off. Otherwise the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below), unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). The fan will operate whenever the availability status is CycleOn or CycleOnZoneFansOnly.
-
-If Fan On Flow Fraction = 0, then the fan is controlled based on the zone load requirement rather than primary air flow fraction. The fan will operate if there is a heating load or if reheat is required to maintain the zone at the thermostat heating setpoint. When the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below) is off, it may be overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). If the availability manager status is CycleOnZoneFansOnly, then the fan will run regardless of zone load.  If the status is CycleOn, then the fan will run only if there is a heating load or reheat is required.
+This is the fraction of the primary air flow at or below which the secondary fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off unless reheat is required. The fan will only operate if the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below) is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). If the availability manager status is CycleOnZoneFansOnly, then the fan will run only if there is a heating load.  If the status is CycleOn, then the fan will run according to the normal controls (low flow or reheat required).
 
 \paragraph{Field: Supply Air Inlet Node Name}\label{field-supply-air-inlet-node-name-1}
 
@@ -1010,7 +1009,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-2}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. When the primary air flow is below the Fan On Flow Fraction (above), the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. The secondary fan will run only when the Availability Schedule specified in the Fan:ConstantVolume object is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). See description of fan controls under Fan On Flow Fraction above.
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-4}
 
