@@ -3096,7 +3096,11 @@
 
   EnergyManagementSystem:Program,
     CalculatePUE,            !- Name
-    set PUE_Value = Whole_Building_Power / IT_Equip_Power;  !- Program Line 1
+    IF IT_Equip_power > 0.0, !- Program Line 1
+    set PUE_Value = whole_building_power / IT_Equip_power,  !- Program Line 2
+    ELSE,                    !- Program Line 3
+    set PUE_Value = 0.0,     !- Program Line 4
+    ENDIF;                   !- Program Line 5
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
