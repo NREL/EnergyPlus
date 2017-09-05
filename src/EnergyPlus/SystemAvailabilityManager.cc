@@ -2167,6 +2167,12 @@ namespace SystemAvailabilityManager {
 		static Array1D_bool ZoneCompNCControlType;
 		int CyclingRunTimeControlType; 
 
+		// reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
+		if ( WarmupFlag && BeginDayFlag ) {
+			PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
+			PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps;
+		}
+
 		if ( present( ZoneEquipType ) ) {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
