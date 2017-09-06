@@ -2079,9 +2079,9 @@ namespace HVACUnitarySystem {
 		// not sure what to do if UnitarySystem has only 1 coil type and flow needs to occur when present coil is off
 		// how does constant fan operating mode pertain here?
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-			UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = EqSizing.HeatingAirVolFlow;
+			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = EqSizing.HeatingAirVolFlow;
 		} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-			UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
+			if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
@@ -2190,8 +2190,12 @@ namespace HVACUnitarySystem {
 
 		}
 
-		UnitarySystem( UnitarySysNum ).LowSpeedCoolFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-		UnitarySystem( UnitarySysNum ).LowSpeedHeatFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+		if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow > 0.0 ) {
+			UnitarySystem( UnitarySysNum ).LowSpeedCoolFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+		}
+		if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow > 0.0 ) {
+			UnitarySystem( UnitarySysNum ).LowSpeedHeatFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+		}
 
 		// initialize multi-speed coils
 		if ( ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ) || ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) ) {
@@ -5401,7 +5405,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iMaxCoolAirVolFlowNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Illegal " + cNumericFields( iMaxCoolAirVolFlowNumericNum ) + " = " + TrimSigDigits( Numbers( iMaxCoolAirVolFlowNumericNum ), 7 ) );
 						ErrorsFound = true;
@@ -5417,7 +5421,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FlowPerFloorArea;
 				if ( ! lNumericBlanks( iCoolFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFloorAreaNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFloorAreaNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerFloorAreaNumericNum ), 7 ) );
@@ -5443,7 +5447,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FractionOfAutoSizedCoolingValue;
 				if ( ! lNumericBlanks( iCoolFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFracCoolNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFracCoolNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerFracCoolNumericNum ), 7 ) );
@@ -5468,7 +5472,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FlowPerCoolingCapacity;
 				if ( ! lNumericBlanks( iCoolFlowPerCoolCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerCoolCapNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerCoolCapNumericNum ), 7 ) );
@@ -5515,7 +5519,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iMaxHeatAirVolFlowNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Illegal " + cNumericFields( iMaxHeatAirVolFlowNumericNum ) + " = " + TrimSigDigits( Numbers( iMaxHeatAirVolFlowNumericNum ), 7 ) );
 						ErrorsFound = true;
@@ -5530,7 +5534,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FlowPerFloorArea;
 				if ( ! lNumericBlanks( iHeatFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFloorAreaNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFloorAreaNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerFloorAreaNumericNum ), 7 ) );
@@ -5555,7 +5559,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FractionOfAutoSizedHeatingValue;
 				if ( ! lNumericBlanks( iHeatFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFracCoolNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFracCoolNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerFracCoolNumericNum ), 7 ) );
@@ -5579,7 +5583,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FlowPerHeatingCapacity;
 				if ( ! lNumericBlanks( iHeatFlowPerHeatCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerHeatCapNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerHeatCapNumericNum ), 7 ) );
@@ -5993,10 +5997,12 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).MaxOATSuppHeat = 999.0;
 			}
 
-			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize && ! UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
-				//           (UnitarySystem(UnitarySysNum)%CoolingSAFMethod .LE. SupplyAirFlowRate .OR. &
-				//            UnitarySystem(UnitarySysNum)%HeatingSAFMethod .LE. SupplyAirFlowRate))THEN
+			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= 0.0 && !UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
 				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+			} else if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= 0.0 && !UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
+				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+			} else if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= 0.0 && !UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
+				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
 			} else {
 				if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate == 0.0) {
 					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
