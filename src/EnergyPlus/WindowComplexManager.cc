@@ -2605,32 +2605,45 @@ namespace WindowComplexManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		UnitVect = Vector( 0.0, 0.0, 0.0 );
+
+		Real64 const sin_Phi = std::sin( Phi );
+		Real64 const cos_Phi = std::cos( Phi );
+
+		Real64 const sin_Gamma = std::sin( Gamma );
+		Real64 const cos_Gamma = std::cos( Gamma );
+
+		Real64 const sin_Alpha = std::sin( Alpha );
+		Real64 const cos_Alpha = std::cos( Alpha );
+
+		Real64 const sin_Theta = std::sin( Theta );
+		Real64 const cos_Theta = std::cos( Theta );
+
 		{ auto const SELECT_CASE_var( RadType );
 		if ( SELECT_CASE_var == Front_Incident ) { //W6 vector will point in direction of propagation, must reverse to get world vector
 			//  after the W6 vector has been rotated into the world CS
-			UnitVect.x = std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha );
-			UnitVect.z = -( std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma ) );
+			UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha;
+			UnitVect.z = -( sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma );
 		} else if ( SELECT_CASE_var == Front_Transmitted ) {
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = -( std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = -( sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha );
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Front_Reflected ) {
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) + std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Back_Incident ) {
-			UnitVect.x = std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha );
-			UnitVect.z = -std::cos( Theta ) * std::cos( Gamma ) - std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma );
+			UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * cos_Alpha;
+			UnitVect.z = -cos_Theta * cos_Gamma - sin_Theta * sin_Phi * sin_Gamma;
 		} else if ( SELECT_CASE_var == Back_Transmitted ) { //This is same as front reflected
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) + std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Back_Reflected ) { //This is same as front transmitted
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = -( std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = -( sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha );
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
 		}}
 
 		// Remove small numbers from evaluation (due to limited decimal points for pi)

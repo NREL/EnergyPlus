@@ -1387,6 +1387,9 @@ namespace PoweredInductionUnits {
 		Real64 MinSteamFlow;
 		Real64 MaxSteamFlow;
 		Real64 mdot; // local plant fluid flow rate kg/s
+		// Initialize local fan flags to global system flags
+		bool PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );  // If True, overrides fan schedule and cycles PIU fan on
+		bool PIUTurnFansOff = DataHVACGlobals::TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 
 		// FLOW
 
@@ -1429,7 +1432,13 @@ namespace PoweredInductionUnits {
 			if ( ! PriOn ) {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
-				SecAirMassFlow = PIU( PIUNum ).MaxTotAirMassFlow;
+				// PIU fan off if there is no heating load, also reset fan flag if fan should be off
+				if ( QZnReq <= SmallLoad ) {
+					SecAirMassFlow = 0.0;
+					PIUTurnFansOn = false;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxTotAirMassFlow;
+				}
 			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
 				// in deadband or very small load: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
@@ -1446,9 +1455,9 @@ namespace PoweredInductionUnits {
 				Node( SecNode ).MassFlowRate = PIU( PIUNum ).MaxTotAirMassFlow;
 				SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num ); // fire the mixer
 				if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, PIUTurnFansOn , PIUTurnFansOff ,_ );
 				} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-					Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+					Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff ); // fire the fan
 				}
 
 				FanDeltaTemp = Node( HCoilInAirNode ).Temp - Node( SecNode ).Temp;
@@ -1480,9 +1489,9 @@ namespace PoweredInductionUnits {
 		SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num );
 		// fire the fan
 		if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, PIUTurnFansOn, PIUTurnFansOff, _ );
 		} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-			Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+			Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff ); // fire the fan
 		}
 		// check if heating coil is off
 		QActualHeating = QToHeatSetPt - Node( HCoilInAirNode ).MassFlowRate * CpAirZn * ( Node( HCoilInAirNode ).Temp - Node( ZoneNode ).Temp );
@@ -1650,41 +1659,32 @@ namespace PoweredInductionUnits {
 		// Set the mass flow rates
 		if ( UnitOn ) {
 			// unit is on
-			// Special controls if FanOnFlowFrac = 0.0
+			// Calculate if reheat is needed
 			bool ReheatRequired = false;
-			if (PIU(PIUNum).FanOnFlowFrac <= 0.0) {
-				// Calculate if reheat is needed
-				Real64 qMinPrimary = PriAirMassFlowMin * ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
-				if (  qMinPrimary < QToHeatSetPt ) ReheatRequired = true;
-			}
+			Real64 qMinPrimary = PriAirMassFlowMin * ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
+			if (  qMinPrimary < QToHeatSetPt ) ReheatRequired = true;
 
 			if ( ! PriOn ) {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
-				// PIU fan off if FanOnFlowFrac is 0.0 and there is no heating load, also reset fan flag if fan should be off
-				if ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) {
-					if ( QZnReq <= SmallLoad ) {
-						SecAirMassFlow = 0.0;
-						PIUTurnFansOn = false;
-					} else {
-						SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-						PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
-					}
-				} else {
-					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-				}
-			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
-				// in deadband or very small load: set primary air flow to the minimum
-				PriAirMassFlow = PriAirMassFlowMin;
-				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
-				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
-					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-					PIUTurnFansOn = true;
-				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+				// PIU fan off if there is no heating load, also reset fan flag if fan should be off
+				if ( QZnReq <= SmallLoad ) {
 					SecAirMassFlow = 0.0;
 					PIUTurnFansOn = false;
 				} else {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+					PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
+				}
+			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
+				// in deadband or very small load: set primary air flow to the minimum
+				PriAirMassFlow = PriAirMassFlowMin;
+				// PIU fan off if reheat is not needed, also reset fan flag if fan should be off
+				if ( ReheatRequired ) {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+					PIUTurnFansOn = true;
+				} else {
+					SecAirMassFlow = 0.0;
+					PIUTurnFansOn = false;
 				}
 			} else if ( QZnReq > SmallLoad ) {
 				// heating: set primary air flow to the minimum
@@ -1709,12 +1709,8 @@ namespace PoweredInductionUnits {
 				PriAirMassFlow = QZnReq / ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
 				PriAirMassFlow = min( max( PriAirMassFlow, PriAirMassFlowMin ), PriAirMassFlowMax );
 				// check for fan on or off
-				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && ( PIU( PIUNum ).FanOnFlowFrac > 0.0 ) ) {
-					SecAirMassFlow = 0.0; // Fan is off; no secondary air
-					PIUTurnFansOn = false;
-				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
-					// if FanOnFlowFrac is 0, then fan does not run for cooling load unless reheat is required, also reset fan flag if fan should be off
-					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && !ReheatRequired ) {
+					SecAirMassFlow = 0.0; // Fan is off unless reheat is required; no secondary air; also reset fan flag
 					PIUTurnFansOn = false;
 				} else {
 					// fan is on; recalc primary air flow

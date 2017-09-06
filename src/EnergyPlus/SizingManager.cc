@@ -3716,7 +3716,12 @@ namespace SizingManager {
 			if( DataSizing::NumAirTerminalSizingSpec > 0 ) {
 				// Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
 				// Cooling
-				Real64 coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				Real64 coolFlowRatio = 1.0;
+				if ( thisTUSizing.SpecDesCoolSATRatio > 0.0 ) {
+					coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				} else {
+					coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac;
+				}
 				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
 				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * coolFlowRatio;
 				thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
@@ -3731,7 +3736,12 @@ namespace SizingManager {
 				thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
 				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
 				// Heating
-				Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				Real64 heatFlowRatio = 1.0;
+				if ( thisTUSizing.SpecDesHeatSATRatio > 0.0 ) {
+					heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				} else {
+					heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac;
+				}
 				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
 				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * heatFlowRatio;
 				thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
@@ -3746,9 +3756,17 @@ namespace SizingManager {
 				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
 				// Outdoor air
 				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
-				thisTUFZSizing.DesCoolOAFlowFrac = min(thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0);
+				if ( coolFlowRatio > 0.0 ) {
+					thisTUFZSizing.DesCoolOAFlowFrac = min( thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0 );
+				} else {
+					thisTUFZSizing.DesCoolOAFlowFrac = 0.0;
+				}
 				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
-				thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				if ( heatFlowRatio > 0.0 ) {
+					thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				} else {
+					thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
+				}
 				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
 			}
 		}

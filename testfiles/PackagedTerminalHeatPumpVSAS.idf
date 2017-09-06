@@ -122,7 +122,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:PACKAGEDTERMINALHEATPUMP ===========
 

@@ -1783,8 +1783,6 @@ namespace HVACUnitarySystem {
 		Real64 CoolCapAtPeak; // cooling capacity at peak [W]
 		Real64 HeatCapAtPeak; // heating capacity at peak [W]
 		std::string SystemType; // type of air loop equipment
-		Real64 OnOffAirFlowRatio; // used to pass to cooling coil for sizing
-		Real64 PartLoadRatio; // used to pass to cooling coil for sizing
 		bool TempCoolingLoad; // size cooling coils with a cooling load, save actual load
 		bool TempHeatingLoad; // save actual load
 		Real64 SysCoolingFlow; // individually sized cooling flow rate [m3/s]
@@ -2081,9 +2079,9 @@ namespace HVACUnitarySystem {
 		// not sure what to do if UnitarySystem has only 1 coil type and flow needs to occur when present coil is off
 		// how does constant fan operating mode pertain here?
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-			UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = EqSizing.HeatingAirVolFlow;
+			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = EqSizing.HeatingAirVolFlow;
 		} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-			UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
+			if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = EqSizing.CoolingAirVolFlow;
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
@@ -2192,8 +2190,12 @@ namespace HVACUnitarySystem {
 
 		}
 
-		UnitarySystem( UnitarySysNum ).LowSpeedCoolFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-		UnitarySystem( UnitarySysNum ).LowSpeedHeatFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+		if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow > 0.0 ) {
+			UnitarySystem( UnitarySysNum ).LowSpeedCoolFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+		}
+		if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow > 0.0 ) {
+			UnitarySystem( UnitarySysNum ).LowSpeedHeatFanRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+		}
 
 		// initialize multi-speed coils
 		if ( ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ) || ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) ) {
@@ -2242,9 +2244,8 @@ namespace HVACUnitarySystem {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
 			}
 
-			OnOffAirFlowRatio = 1.0;
-			PartLoadRatio = 1.0;
-			SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+			// set the multi-speed high flow rate variable in case a non-zero air flow rate resides on the coil inlet during sizing (e.g., upstream system ran prior to this one)
+			MSHPMassFlowRateHigh = EqSizing.CoolingAirVolFlow * StdRhoAir; // doesn't matter what this value is since only coil size is needed and CompOn = 0 here
 			SimDXCoilMultiSpeed( BlankString, 1.0, 1.0, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 0, 0, 0 );
 			DXCoolCap = GetCoilCapacityByIndexType( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).CoolingCoilType_Num, ErrFound );
 			EqSizing.DesCoolingLoad = DXCoolCap;
@@ -5404,7 +5405,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iMaxCoolAirVolFlowNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Illegal " + cNumericFields( iMaxCoolAirVolFlowNumericNum ) + " = " + TrimSigDigits( Numbers( iMaxCoolAirVolFlowNumericNum ), 7 ) );
 						ErrorsFound = true;
@@ -5420,7 +5421,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FlowPerFloorArea;
 				if ( ! lNumericBlanks( iCoolFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFloorAreaNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFloorAreaNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerFloorAreaNumericNum ), 7 ) );
@@ -5446,7 +5447,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FractionOfAutoSizedCoolingValue;
 				if ( ! lNumericBlanks( iCoolFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFracCoolNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerFracCoolNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerFracCoolNumericNum ), 7 ) );
@@ -5471,7 +5472,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSAFMethod = FlowPerCoolingCapacity;
 				if ( ! lNumericBlanks( iCoolFlowPerCoolCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerCoolCapNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).CoolCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) + " = " + TrimSigDigits( Numbers( iCoolFlowPerCoolCapNumericNum ), 7 ) );
@@ -5518,7 +5519,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iMaxHeatAirVolFlowNumericNum );
 					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Illegal " + cNumericFields( iMaxHeatAirVolFlowNumericNum ) + " = " + TrimSigDigits( Numbers( iMaxHeatAirVolFlowNumericNum ), 7 ) );
 						ErrorsFound = true;
@@ -5533,7 +5534,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FlowPerFloorArea;
 				if ( ! lNumericBlanks( iHeatFlowPerFloorAreaNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFloorAreaNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFloorAreaNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerFloorAreaNumericNum ), 7 ) );
@@ -5558,7 +5559,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FractionOfAutoSizedHeatingValue;
 				if ( ! lNumericBlanks( iHeatFlowPerFracCoolNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFracCoolNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerFracCoolNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerFracCoolNumericNum ), 7 ) );
@@ -5582,7 +5583,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).HeatingSAFMethod = FlowPerHeatingCapacity;
 				if ( ! lNumericBlanks( iHeatFlowPerHeatCapNumericNum ) ) {
 					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerHeatCapNumericNum );
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow <= 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) {
+					if ( ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) || ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == 0.0 && UnitarySystem( UnitarySysNum ).HeatCoilExists ) ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Input for " + cAlphaFields( iHeatSAFMAlphaNum ) + " = " + Alphas( iHeatSAFMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) + " = " + TrimSigDigits( Numbers( iHeatFlowPerHeatCapNumericNum ), 7 ) );
@@ -5996,10 +5997,12 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).MaxOATSuppHeat = 999.0;
 			}
 
-			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow != AutoSize && ! UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
-				//           (UnitarySystem(UnitarySysNum)%CoolingSAFMethod .LE. SupplyAirFlowRate .OR. &
-				//            UnitarySystem(UnitarySysNum)%HeatingSAFMethod .LE. SupplyAirFlowRate))THEN
+			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= 0.0 && !UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
 				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+			} else if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= 0.0 && !UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
+				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+			} else if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow > 0.0 && UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= 0.0 && !UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
+				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow, UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
 			} else {
 				if ( UnitarySystem( UnitarySysNum ).FanExists && UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate == 0.0) {
 					UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = AutoSize;
@@ -9092,7 +9095,7 @@ namespace HVACUnitarySystem {
 		Real64 OutletHumRatDXCoil; // Actual outlet humidity ratio of the DX cooling coil
 		int SolFla; // Flag of solver, num iterations if >0, else error index
 		int SolFlaLat; // Flag of solver for dehumid calculations
-		Array1D< Real64 > Par( 8 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 10 ); // Parameter array passed to solver
 		bool SensibleLoad; // True if there is a sensible cooling load on this system
 		bool LatentLoad; // True if there is a latent   cooling load on this system
 		int DehumidMode; // dehumidification mode (0=normal, 1=enhanced)
@@ -9383,6 +9386,10 @@ namespace HVACUnitarySystem {
 							PartLoadFrac = 0.0;
 					} else {
 
+						Par( 9 ) = double( AirLoopNum );
+						Par( 10 ) = 0.0;
+						if ( FirstHVACIteration ) Par( 10 ) = 1.0;
+
 						if ( CoilType_Num == CoilDX_CoolingSingleSpeed ) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
 
 							Par( 1 ) = double( UnitarySystem( UnitarySysNum ).CoolingCoilIndex );
@@ -9478,6 +9485,7 @@ namespace HVACUnitarySystem {
 							Par( 2 ) = DesOutTemp;
 							// Par(3) is only needed for variable speed coils (see DXCoilVarSpeedResidual and DXCoilCyclingResidual)
 							Par( 3 ) = UnitarySysNum;
+							UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = SpeedRatio;
 							if ( SpeedRatio == 1.0 ) {
 								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
 								PartLoadFrac = SpeedRatio;
@@ -9500,19 +9508,12 @@ namespace HVACUnitarySystem {
 							if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1.0 ) {
 								Par( 4 ) = CycRatio;
 								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
-								UnitarySystem( UnitarySysNum ).CoolingCycRatio = SpeedRatio;
-								UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = SpeedRatio;
-								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								PartLoadFrac = SpeedRatio;
 							} else {
 								SpeedRatio = 0.0;
 								UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = SpeedRatio;
 								Par( 4 ) = SpeedRatio;
-
 								SolveRoot( Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par );
-								UnitarySystem( UnitarySysNum ).CoolingCycRatio = CycRatio;
-								UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = CycRatio;
-								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								PartLoadFrac = CycRatio;
 							}
 
@@ -9532,7 +9533,6 @@ namespace HVACUnitarySystem {
 								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
 								UnitarySystem( UnitarySysNum ).CoolingCycRatio = CycRatio;
 								UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = SpeedRatio;
-								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = SpeedRatio;
 								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								PartLoadFrac = SpeedRatio;
@@ -9541,7 +9541,6 @@ namespace HVACUnitarySystem {
 								Par( 4 ) = SpeedRatio;
 								SolveRoot( Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par );
 								UnitarySystem( UnitarySysNum ).CoolingCycRatio = CycRatio;
-								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = CycRatio;
 								CalcPassiveSystem( UnitarySysNum, AirLoopNum, FirstHVACIteration );
 								PartLoadFrac = CycRatio;
@@ -12336,6 +12335,8 @@ namespace HVACUnitarySystem {
 		Real64 dummy;
 		Real64 SensLoad;
 		Real64 OnOffAirFlowRatio;
+		int AirloopNum;
+		bool FirstHVACIteration;
 
 		//            Par(1) = REAL(UnitarySystem(UnitarySysNum)%CoolingCoilIndex,r64)
 		//            Par(2) = DesOutTemp
@@ -12347,14 +12348,23 @@ namespace HVACUnitarySystem {
 
 		CoilIndex = int( Par( 1 ) );
 		UnitarySysNum = int( Par( 3 ) );
+		AirloopNum = int( Par( 9 ) );
+		FirstHVACIteration = ( Par( 10 ) > 0.0 );
 
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num );
 
 		if ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) {
 
-			CalcMultiSpeedDXCoil( CoilIndex, 0.0, CycRatio );
+			if ( UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+				UnitarySystem( UnitarySysNum ).CoolingCycRatio = CycRatio;
+				UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = CycRatio;
+				CalcPassiveSystem( UnitarySysNum, AirloopNum, FirstHVACIteration );
+			} else {
+				CalcMultiSpeedDXCoil( CoilIndex, 0.0, CycRatio );
+			}
 
 			OutletAirTemp = DXCoilOutletTemp( CoilIndex );
+
 		} else if ( SELECT_CASE_var == CoilDX_MultiSpeedCooling ) {
 
 			SpeedRatio = int( Par( 4 ) );
@@ -12364,7 +12374,13 @@ namespace HVACUnitarySystem {
 			OnOffAirFlowRatio = 1.0;
 
 			SetAverageAirFlow( UnitarySysNum, CycRatio, OnOffAirFlowRatio );
-			CalcMultiSpeedDXCoilCooling( CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0 );
+			if ( UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+				UnitarySystem( UnitarySysNum ).CoolingCycRatio = CycRatio;
+				UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = CycRatio;
+				CalcPassiveSystem( UnitarySysNum, AirloopNum, FirstHVACIteration );
+			} else {
+				CalcMultiSpeedDXCoilCooling( CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, 0 );
+			}
 			OutletAirTemp = DXCoilOutletTemp( CoilIndex );
 
 		} else if ( ( SELECT_CASE_var == Coil_CoolingAirToAirVariableSpeed ) || ( SELECT_CASE_var == Coil_CoolingWaterToAirHPVSEquationFit ) ) {
