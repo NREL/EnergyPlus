@@ -3050,7 +3050,6 @@ namespace ZoneEquipmentManager {
 		int SupplyAirPathNum;
 		int CompNum;
 		int EquipPtr;
-		int AirLoopNum;
 		int ZoneEquipTypeNum;
 		int ZoneCompNum;
 
@@ -3359,32 +3358,15 @@ namespace ZoneEquipmentManager {
 				CurTermUnitSizingNum = 0;
 			} // zone loop
 
-			AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-			if ( AirLoopInit ) {
-				if ( AirLoopNum > 0 ) {
-					if ( ! PrimaryAirSystem( AirLoopNum ).OASysExists ) {
-						if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
-							if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
-								ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
-								ShowContinueErrorTimeStamp( "" );
-								ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
-								ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
-								ZoneEquipConfig( ControlledZoneNum ).FlowError = true;
-							}
-						}
-						// ZoneEquipConfig(ControlledZoneNum)%ZoneExh = 0.0
+			if ( !ZoneEquipConfig( ControlledZoneNum ).ZoneHasAirLoopWithOASys ) {
+				if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
+					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
+						ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
+						ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
+						ZoneEquipConfig( ControlledZoneNum ).FlowError = true;
 					}
-				} else {
-					if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
-						if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
-							ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
-							ShowContinueErrorTimeStamp( "" );
-							ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
-							ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
-							ZoneEquipConfig( ControlledZoneNum ).FlowError = true;
-						}
-					}
-					// ZoneEquipConfig(ControlledZoneNum)%ZoneExh = 0.0
 				}
 			}
 		} // End of controlled zone loop
@@ -4116,7 +4098,7 @@ namespace ZoneEquipmentManager {
 					newReturnFlow = curReturnFlow * returnAdjFactor;
 					FinalTotalReturnMassFlow += newReturnFlow;
 					int airLoop = thisZoneEquip.ReturnNodeAirLoopNum( returnNum );
-					if ( airLoop > 0 ) {
+					if ( ( airLoop > 0 ) && ( numRetNodes > 1 ) ) {
 						DataAirLoop::AirLoopFlow( airLoop ).ZoneExhaust += ( curReturnFlow - newReturnFlow ) ;
 					}
 				}

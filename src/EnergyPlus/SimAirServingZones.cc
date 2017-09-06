@@ -1692,6 +1692,11 @@ namespace SimAirServingZones {
 										TermInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode;
 										TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
 										ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
+										if ( AirLoopNum > 0 ) {
+											if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) {
+												ZoneEquipConfig( CtrlZoneNum ).ZoneHasAirLoopWithOASys = true;
+											}
+										}
 										ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									}
 									FoundSupPathZoneConnect = true;

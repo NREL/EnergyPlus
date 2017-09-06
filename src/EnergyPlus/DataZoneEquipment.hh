@@ -365,6 +365,7 @@ namespace DataZoneEquipment {
 		int ADUNum; // index of Air Distribution Unit
 		int SDUNum; // index of Single Duct Uncontrolled
 		bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
+		bool ZoneHasAirLoopWithOASys; // true if zone is served by one or more airloops with an outdoor air system
 
 		// Default Constructor
 		EquipConfiguration() :
@@ -393,7 +394,8 @@ namespace DataZoneEquipment {
 			InCeilingActiveElement( false ),
 			ADUNum( 0 ),
 			SDUNum( 0 ),
-			ZoneHasAirFlowWindowReturn( false )
+			ZoneHasAirFlowWindowReturn( false ),
+			ZoneHasAirLoopWithOASys( false )
 		{}
 
 	};
