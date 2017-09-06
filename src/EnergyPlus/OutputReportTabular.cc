@@ -312,6 +312,7 @@ namespace OutputReportTabular {
 	// arrays the hold the demand values
 	Array1D< Real64 > gatherDemandTotal( numResourceTypes, 0.0 );
 	Array2D< Real64 > gatherDemandEndUse( numResourceTypes, NumEndUses, 0.0 );
+	Array2D< Real64 > gatherDemandIndEndUse( numResourceTypes, NumEndUses, 0.0 );
 	Array3D< Real64 > gatherDemandEndUseSub;
 	Array3D< Real64 > gatherDemandIndEndUseSub;
 	Array1D_int gatherDemandTimeStamp( numResourceTypes, 0 );
@@ -2070,6 +2071,7 @@ namespace OutputReportTabular {
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
 					displayEioSummary = true;
+					displayLEEDSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -2088,6 +2090,7 @@ namespace OutputReportTabular {
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
 					displayEioSummary = true;
+					displayLEEDSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -2116,6 +2119,7 @@ namespace OutputReportTabular {
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
 					displayEioSummary = true;
+					displayLEEDSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -2137,6 +2141,7 @@ namespace OutputReportTabular {
 					displayTariffReport = true;
 					displayEconomicResultSummary = true;
 					displayEioSummary = true;
+					displayLEEDSummary = true;
 					nameFound = true;
 					for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 						reportName( jReport ).show = true;
@@ -4683,13 +4688,18 @@ namespace OutputReportTabular {
 			// loop through all of the resources and end uses for the entire facility
 			for ( iResource = 1; iResource <= numResourceTypes; ++iResource ) {
 				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
-					for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-						curMeterNumber = meterNumEndUseSubBEPS( kEndUseSub, jEndUse, iResource );
-						if ( curMeterNumber > 0 ) {
-							curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
-							// check if current value is greater than existing peak demand value
-							if ( curDemandValue > gatherDemandIndEndUseSub( kEndUseSub, jEndUse, iResource ) ) {
-								gatherDemandIndEndUseSub( kEndUseSub, jEndUse, iResource ) = curDemandValue;
+					curMeterNumber = meterNumEndUseBEPS( iResource, jEndUse );
+					if ( curMeterNumber > 0 ) {
+						curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
+						gatherDemandIndEndUse( iResource, jEndUse ) = curDemandValue;
+						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
+							curMeterNumber = meterNumEndUseSubBEPS( kEndUseSub, jEndUse, iResource );
+							if ( curMeterNumber > 0 ) {
+								curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
+								// check if current value is greater than existing peak demand value
+								if ( curDemandValue > gatherDemandIndEndUseSub( kEndUseSub, jEndUse, iResource ) ) {
+									gatherDemandIndEndUseSub( kEndUseSub, jEndUse, iResource ) = curDemandValue;
+								}
 							}
 						}
 					}
@@ -8710,6 +8720,7 @@ namespace OutputReportTabular {
 		Array2D< Real64 > useVal( 6, 15 );
 		Array1D< Real64 > collapsedTotal( 6 );
 		Array2D< Real64 > collapsedEndUse( 6, NumEndUses );
+		Array2D< Real64 > collapsedIndEndUse( 6, NumEndUses );
 		Array1D_int collapsedTimeStep( 6 );
 		Array3D< Real64 > collapsedEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
 		Array3D< Real64 > collapsedIndEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
@@ -8847,14 +8858,24 @@ namespace OutputReportTabular {
 				}
 			}
 			// collapse the individual peaks for the end use subcategories for the LEED report
+			// collapse the gatherEndUseBEPS array to the resource groups displayed
+			collapsedIndEndUse = 0.0;
+			for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
+				collapsedIndEndUse( 1, jEndUse ) = gatherDemandIndEndUse( 1, jEndUse ) * powerConversion; //electricity
+				collapsedIndEndUse( 2, jEndUse ) = gatherDemandIndEndUse( 2, jEndUse ) * powerConversion; //natural gas
+				collapsedIndEndUse( 3, jEndUse ) = gatherDemandIndEndUse( additionalFuelSelected, jEndUse ) * powerConversion; //additional fuel
+				collapsedIndEndUse( 4, jEndUse ) = gatherDemandIndEndUse( 3, jEndUse ) * powerConversion; // purchased cooling
+				collapsedIndEndUse( 5, jEndUse ) = gatherDemandIndEndUse( distrHeatSelected, jEndUse ) * powerConversion; //district heating
+				collapsedIndEndUse( 6, jEndUse ) = gatherDemandIndEndUse( 7, jEndUse ) * flowConversion; //water
+			}
 			for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 				for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 1 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 1 ) * powerConversion; //electricity
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 2 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 2 ) * powerConversion; //natural gas
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 3 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, additionalFuelSelected ) * powerConversion; //additional fuel
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 4 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 3 ) * powerConversion; //purch cooling
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 5 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, distrHeatSelected ) * powerConversion; //district heating
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 6 ) = gatherDemandEndUseSub( kEndUseSub, jEndUse, 7 ) * flowConversion; //water
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 1 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 1 ) * powerConversion; //electricity
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 2 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 2 ) * powerConversion; //natural gas
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 3 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, additionalFuelSelected ) * powerConversion; //additional fuel
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 4 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 3 ) * powerConversion; //purch cooling
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 5 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, distrHeatSelected ) * powerConversion; //district heating
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 6 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 7 ) * flowConversion; //water
 				}
 			}
 
@@ -9122,11 +9143,11 @@ namespace OutputReportTabular {
 				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-							PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- " + EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub ), RealToStr( collapsedEndUseSub( kEndUseSub, jEndUse, iResource ), 2 ) );
+							PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- " + EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub ), RealToStr( collapsedIndEndUseSub( kEndUseSub, jEndUse, iResource ), 2 ) );
 							++i;
 						}
 					} else {
-						PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- Not Subdivided", RealToStr( collapsedEndUse( iResource, jEndUse ), 2 ) );
+						PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- Not Subdivided", RealToStr( collapsedIndEndUse( iResource, jEndUse ), 2 ) );
 						++i;
 					}
 				}
