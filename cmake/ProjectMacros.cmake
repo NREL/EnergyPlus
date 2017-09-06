@@ -74,6 +74,7 @@ endmacro()
 # ANNUAL_SIMULATION force annual simulation
 # EXPECT_FATAL Expect simulation to fail
 # PERFORMANCE Tag test as performance analysis
+# REVERSE_DESIGN_DAY Apply REVERSEDD environment to tests
 # COST <integer> Cost of this simulation relative to other simulations.
 #                Higher cost simulations run earlier in an attempt to enhance
 #                test parallelization and reduce overall test run time.
@@ -155,6 +156,10 @@ function( ADD_SIMULATION_TEST )
 
   if ( PROFILE_GENERATE AND ANNUAL_SIMULATION )
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
+  endif()
+
+  if (REVERSE_DESIGN_DAY)
+    set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES ENVIRONMENT "REVERSEDD=Yes")
   endif()
 
 

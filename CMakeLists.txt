@@ -139,6 +139,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source c
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
+  option( REVERSE_DESIGN_DAY "Use REVERSEDD during testing" OFF)
   enable_testing()
   include(CTest)
 endif()

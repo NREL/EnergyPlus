@@ -10,6 +10,25 @@ compilers:
     s3_upload: doc-build
     s3_upload_bucket: energyplus
 
+  - name: "gcc"
+    version: "4.8"
+    build_package_generator: "STGZ"
+    release_build_cmake_extra_flags: -DENABLE_REGRESSION_TESTING:BOOL=ON -DTEST_ANNUAL_SIMULATION:BOOL=ON
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
+    build_tag: AnnualSimulation
+    release_only: true
+    skip_packaging: true
+
+  - name: "gcc"
+    version: "4.8"
+    build_package_generator: "STGZ"
+    release_build_cmake_extra_flags: -DENABLE_REGRESSION_TESTING:BOOL=ON -DREVERSE_DESIGN_DAY:BOOL=ON
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
+    build_tag: ReverseDD
+    release_only: true
+    skip_packaging: true
+
+
   - name: cppcheck
     compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*"
 
