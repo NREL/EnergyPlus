@@ -2079,7 +2079,8 @@ namespace WindowComplexManager {
 		}
 
 		//Set the nominal diffuse transmittance so the surface isn't mistaken as opaque
-		Construct( IConst ).TransDiff = SurfaceWindow( ISurf ).ComplexFen.State( IState ).WinDiffTrans;
+		// Simon: Commented this out. We are not using TransDiff and it is already set to 0.1 in input routines.
+		// Construct( IConst ).TransDiff = SurfaceWindow( ISurf ).ComplexFen.State( IState ).WinDiffTrans;
 		//Calculate Window Sky Transmittance (transmitted radiation assumed diffuse)
 		//and Sky Absorptance (by layer)
 		Sum1 = 0.0;

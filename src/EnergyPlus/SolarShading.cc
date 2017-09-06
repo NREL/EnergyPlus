@@ -5810,7 +5810,10 @@ namespace SolarShading {
 
 						//Also update the nominal diffuse transmittance
 						NomDiffTrans = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDiffTrans;
-						Construct( Surface( SurfNum ).Construction ).TransDiff = NomDiffTrans;
+
+						// Do not store in TransDiff because it is not used by BSDF and rest of the code uses it as flag for opaque
+						// surface incorrectly assuming wall heat transfer routines for windows.
+						// Construct( Surface( SurfNum ).Construction ).TransDiff = NomDiffTrans;
 					} else {
 						DSZoneWin = 0.0;
 						DGZoneWin = 0.0;
