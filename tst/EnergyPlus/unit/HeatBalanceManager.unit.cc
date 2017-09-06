@@ -480,7 +480,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( Node( 4 ).MassFlowRate, 0.0 ); // Zone 1 return node (max(0.0, 1-2)
 		EXPECT_EQ( Infiltration( 1 ).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
 		EXPECT_EQ( Mixing( 1 ).MixingMassFlowRate, 0.1 ); // Zone 1 to Zone 2 mixing flow rate (unchanged)
-		EXPECT_EQ( Node( 8 ).MassFlowRate, 1.0 ); // Zone 2 return node (2 * (2+1-2)/2)
+		EXPECT_EQ( Node( 8 ).MassFlowRate, 2.0 ); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
 		ZoneReOrder.deallocate();
 		ZoneEquipConfig.deallocate();

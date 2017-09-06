@@ -3115,8 +3115,7 @@ namespace MixedAir {
 			// zone exhaust mass flow is saved in AirLoopFlow%ZoneExhaust
 			// the zone exhaust mass flow that is said to be balanced by simple air flows is saved in AirLoopFlow%ZoneExhaustBalanced
 			if ( AirLoopNum > 0 ) {
-				//OAController(OAControllerNum)%ExhMassFlow = AirLoopFlow(AirLoopNum)%ZoneExhaust
-				thisOAController.ExhMassFlow = AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment;
+				thisOAController.ExhMassFlow = AirLoopFlow( AirLoopNum ).SupFlow - AirLoopFlow( AirLoopNum ).RetFlow;
 				AirLoopControlInfo( AirLoopNum ).ZoneExhMassFlow = thisOAController.ExhMassFlow;
 				if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet && ! FirstHVACIteration ) {
 					// if flow rate has been specified by a manager, set it to the specified value

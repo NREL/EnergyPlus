@@ -114,36 +114,42 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 
 	} );
 
-	ASSERT_FALSE(process_idf(idf_objects));
-	EXPECT_FALSE(has_err_output());
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
-	GetZoneData(ErrorsFound);
+	GetZoneData( ErrorsFound );
 	AllocateHeatBalArrays();
 	GetZoneEquipmentData1();
 	ZoneEquipInputsFilled = true;
-	GetSimpleAirModelInputs(ErrorsFound);
-
+	GetSimpleAirModelInputs( ErrorsFound );
 	int ZoneNum = 1;
 	int NodeNum;
-	for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-		Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+	for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumInletNodes; ++NodeNum ) {
+		Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRate = 1.0;
 	}
+
+	ZoneEquipConfig( ZoneNum ).AirLoopNum = 0;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 ) = 0;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNodeNum( 1 ) = ZoneEquipConfig( ZoneNum ).InletNode( 1 );
+
 	// Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
-	Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
-	DataAirSystems::PrimaryAirSystem.allocate( 1 );
-	DataAirLoop::AirLoopFlow.allocate( 1 );
-	DataHVACGlobals::NumPrimaryAirSys = 1;
-
-	ZoneEquipConfig(ZoneNum).AirLoopNum = 1;
-	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 ) = 1;
-	DataHVACGlobals::AirLoopsSimOnce = true;
+	Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( 1 ) ).MassFlowRate = 1.000000001;
 	CalcZoneMassBalance( );
-	EXPECT_FALSE(has_err_output());
+	EXPECT_FALSE( has_err_output() );
 
-	// Add true zone exhuast from exhuast fan, now there should be warning
-	ZoneEquipConfig(ZoneNum).ZoneExh = 0.1;
+	// Add excess balanced zone exhaust from exhaust fan, still no warning
+	ZoneEquipConfig( ZoneNum ).ZoneExh = 0.5;
+	ZoneEquipConfig( ZoneNum ).ZoneExhBalanced = 0.5;
+	Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( 2 ) ).MassFlowRate = 0.5;
 	CalcZoneMassBalance();
-	EXPECT_TRUE(has_err_output());
+	EXPECT_FALSE( has_err_output() );
+
+	// Add excess unbalanced zone exhaust from exhaust fan, now there should be warning
+	ZoneEquipConfig( ZoneNum ).ZoneExh = 0.5;
+	ZoneEquipConfig( ZoneNum ).ZoneExhBalanced = 0.0;
+	Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( 2 ) ).MassFlowRate = 0.5;
+	CalcZoneMassBalance();
+	EXPECT_TRUE( has_err_output() );
 
 	// Deallocate everything - should all be taken care of in clear_states
 }
@@ -527,13 +533,10 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2 )
 
 	DataAirSystems::PrimaryAirSystem( 1 ).OASysExists = false;
 	DataAirLoop::AirLoopFlow( 1 ).DesReturnFrac = 1.0;
-	DataAirLoop::AirLoopFlow( 1 ).ZoneExhaust = 0.0;
 	DataAirSystems::PrimaryAirSystem( 2 ).OASysExists = false;
 	DataAirLoop::AirLoopFlow( 2 ).DesReturnFrac = 1.0;
-	DataAirLoop::AirLoopFlow( 2 ).ZoneExhaust = 0.0;
 	DataAirSystems::PrimaryAirSystem( 3 ).OASysExists = false;
 	DataAirLoop::AirLoopFlow( 3 ).DesReturnFrac = 1.0;
-	DataAirLoop::AirLoopFlow( 3 ).ZoneExhaust = 0.0;
 	DataGlobals::DoingSizing = false;
 	DataGlobals::isPulseZoneSizing = false;
 

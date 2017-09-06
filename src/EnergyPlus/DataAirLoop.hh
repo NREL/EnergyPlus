@@ -256,8 +256,6 @@ namespace DataAirLoop {
 	struct AirLoopFlowData // Derived type for air loop flow information
 	{
 		// Members
-		Real64 ZoneExhaust; // total of zone exhaust air mass flow rate for this loop [kg/s]
-		Real64 ZoneExhaustBalanced; // zone exhaust air that is balanced by simple air flow for loop [kg/s]
 		Real64 DesSupply; // design supply air mass flow rate for loop [kg/s]
 		Real64 DesReturnFrac; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
 		Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
@@ -267,20 +265,13 @@ namespace DataAirLoop {
 		Real64 OAMinFrac; // minimum outside air flow fraction this time step
 		Real64 Previous; // Previous mass air flow rate for this loop [kg/s]
 		Real64 SupFlow; // supply air flow rate [kg/s]
-		Real64 SupFlowMulti; // supply air flow rate for cases with multiple return nodes [kg/s]
 		Real64 RetFlow; // return air flow rate [kg/s]
-		Real64 RetFlow0; // sum of zone return flows before adjusting for total loop exhaust
-		Real64 RecircFlow; // sum of zone plenum recirculated flows
 		Real64 FanPLR; // Operating PLR of air loop fan
 		Real64 OAFrac; // fraction of outside air to mixed air mass flow rate
-		Real64 ZoneMixingFlow; // total zone mixing net flow used to cap the return flow
-		Real64 RetFlowAdjustment; // difference between user-specified return flow and default return flow
 		bool FlowError; // error flag for flow error message
 
 		// Default Constructor
 		AirLoopFlowData() :
-			ZoneExhaust( 0.0 ),
-			ZoneExhaustBalanced( 0.0 ),
 			DesSupply( 0.0 ),
 			DesReturnFrac( 1.0 ),
 			SysToZoneDesFlowRatio( 0.0 ),
@@ -290,14 +281,9 @@ namespace DataAirLoop {
 			OAMinFrac( 0.0 ),
 			Previous( 0.0 ),
 			SupFlow( 0.0 ),
-			SupFlowMulti( 0.0 ),
 			RetFlow( 0.0 ),
-			RetFlow0( 0.0 ),
-			RecircFlow( 0.0 ),
 			FanPLR( 0.0 ),
 			OAFrac( 0.0 ),
-			ZoneMixingFlow( 0.0 ),
-			RetFlowAdjustment( 0.0 ),
 			FlowError( false )
 		{}
 

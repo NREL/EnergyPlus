@@ -555,14 +555,8 @@ namespace ZoneEquipmentManager {
 		}
 		
 		for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
-			AirLoopFlow( airLoop ).ZoneExhaust = 0.0;
-			AirLoopFlow( airLoop ).ZoneExhaustBalanced = 0.0;
 			AirLoopFlow( airLoop ).SupFlow = 0.0;
 			AirLoopFlow( airLoop ).RetFlow = 0.0;
-			AirLoopFlow( airLoop ).RetFlow0 = 0.0;
-			AirLoopFlow( airLoop ).RecircFlow = 0.0;
-			AirLoopFlow( airLoop ).ZoneMixingFlow = 0.0;
-			AirLoopFlow( airLoop ).RetFlowAdjustment = 0.0;
 		}
 
 	}
@@ -3360,7 +3354,7 @@ namespace ZoneEquipmentManager {
 
 			if ( !ZoneEquipConfig( ControlledZoneNum ).ZoneHasAirLoopWithOASys ) {
 				if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
-					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
+					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag ) {
 						ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
 						ShowContinueErrorTimeStamp( "" );
 						ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
@@ -3762,7 +3756,6 @@ namespace ZoneEquipmentManager {
 		Real64 BuildingZoneMixingFlowOld;
 		Real64 BuildingZoneMixingFlow;
 		Real64 StdTotalReturnMassFlow; // Standard method (inlets - outlets) total return mass flow rate
-		Real64 UnbalancedExhaustDelta;
 		int Iteration;
 		int ZoneNum1;
 
@@ -3771,18 +3764,18 @@ namespace ZoneEquipmentManager {
 		BuildingZoneMixingFlow = 0.0;
 		BuildingZoneMixingFlowOld = 0.0;
 
-		// Total loop supply flows for multireturn node cases
+		// Total loop supply flows
 		for ( int airDistUnit = 1; airDistUnit <= DataDefineEquip::NumAirDistUnits; ++airDistUnit ) {
 			int airLoop = DataDefineEquip::AirDistUnit( airDistUnit ).AirLoopNum;
 			if  ( airLoop > 0 ) {
-				DataAirLoop::AirLoopFlow( airLoop ).SupFlowMulti += DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRateZSup;
+				DataAirLoop::AirLoopFlow( airLoop ).SupFlow += DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRateZSup;
 			}
 		}
 		// Accumulate air loop supply flow here for use in CalcZoneMassBalance
 		for ( int directAirUnit = 1; directAirUnit <= DirectAirManager::NumDirectAir; ++directAirUnit ) {
 			int airLoop = DirectAirManager::DirectAir( directAirUnit ).AirLoopNum;
 			if  ( airLoop > 0 ) {
-				DataAirLoop::AirLoopFlow( airLoop ).SupFlowMulti += Node( DirectAirManager::DirectAir( directAirUnit ).ZoneSupplyAirNode ).MassFlowRate ;
+				DataAirLoop::AirLoopFlow( airLoop ).SupFlow += Node( DirectAirManager::DirectAir( directAirUnit ).ZoneSupplyAirNode ).MassFlowRate ;
 			}
 		}	
 
@@ -3790,14 +3783,7 @@ namespace ZoneEquipmentManager {
 			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
 				// These are also reset in ZoneEquipmentManager::InitZoneEquipment, reset again here for each zone mass balance iteration
 				for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
-					AirLoopFlow( airLoop ).ZoneExhaust = 0.0;
-					AirLoopFlow( airLoop ).ZoneExhaustBalanced = 0.0;
-					AirLoopFlow( airLoop ).SupFlow = 0.0;
 					AirLoopFlow( airLoop ).RetFlow = 0.0;
-					AirLoopFlow( airLoop ).RetFlow0 = 0.0;
-					AirLoopFlow( airLoop ).RecircFlow = 0.0;
-					AirLoopFlow( airLoop ).ZoneMixingFlow = 0.0;
-					AirLoopFlow( airLoop ).RetFlowAdjustment = 0.0;
 				}
 				for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 					if ( !ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
@@ -3926,61 +3912,29 @@ namespace ZoneEquipmentManager {
 
 				TotSupplyAirMassFlowRate = TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow;
 
-				if ( ZoneEquipInputsFilled ) {
-					int airLoop1 = ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 );
-					if ( ( airLoop1 > 0 ) && ( ZoneEquipConfig( ZoneNum ).NumReturnNodes == 1 ) ) {
-						int RetNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
-						AirLoopFlow( airLoop1 ).ZoneExhaust += ZoneEquipConfig( ZoneNum ).ZoneExh;
-						AirLoopFlow( airLoop1 ).ZoneExhaustBalanced += ZoneEquipConfig( ZoneNum ).ZoneExhBalanced;
-						AirLoopFlow( airLoop1 ).SupFlow += TotSupplyAirMassFlowRate;
-						AirLoopFlow( airLoop1 ).RetFlow0 += Node( RetNode1 ).MassFlowRate;
-						AirLoopFlow( airLoop1 ).RecircFlow += ZoneEquipConfig( ZoneNum ).PlenumMassFlow;
-						AirLoopFlow( airLoop1 ).RetFlowAdjustment += ( FinalTotalReturnMassFlow - StdTotalReturnMassFlow );
-					}
-				}
 				BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
-			}
-			// Calculate an air loop return air flow rate
-			for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				UnbalancedExhaustDelta = (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).RetFlowAdjustment) - (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced);
-				UnbalancedExhaustDelta = max(UnbalancedExhaustDelta, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).RetFlowAdjustment) - (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) );
-				if ( (UnbalancedExhaustDelta > SmallMassFlow) && !AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
-					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
-						ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow." );
-						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
-						ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
-						AirLoopFlow(AirLoopNum).FlowError = true;
+
+				// Accumulate airloop total return flows
+				for ( int returnNum = 1; returnNum <= ZoneEquipConfig( ZoneNum ).NumReturnNodes; ++returnNum) {
+					int retNode = ZoneEquipConfig( ZoneNum ).ReturnNode( returnNum );
+					int airLoop = ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( returnNum );
+					if ( airLoop > 0 ) {
+						DataAirLoop::AirLoopFlow( airLoop ).RetFlow += DataLoopNode::Node( retNode ).MassFlowRate;
 					}
 				}
-				AirLoopFlow(AirLoopNum).ZoneExhaust = min(AirLoopFlow(AirLoopNum).ZoneExhaust, (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced + AirLoopFlow(AirLoopNum).ZoneMixingFlow));
-				AirLoopFlow(AirLoopNum).ZoneExhaust = min(AirLoopFlow(AirLoopNum).ZoneExhaust, (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced + AirLoopFlow(AirLoopNum).ZoneMixingFlow));
-
-				if ( AirLoopFlow(AirLoopNum).ZoneMixingFlow < 0.0 ) {
-					// the source zone and the recieving zone are in different air loops
-					AirLoopFlow(AirLoopNum).ZoneExhaust = max(0.0, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneMixingFlow));
-					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, ( AirLoopFlow( AirLoopNum ).SupFlow * AirLoopFlow(AirLoopNum).DesReturnFrac ) - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow );
-				} else {
-					AirLoopFlow( AirLoopNum ).RetFlow = max(0.0, ( AirLoopFlow( AirLoopNum ).SupFlow * AirLoopFlow(AirLoopNum).DesReturnFrac ) - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment) + AirLoopFlow( AirLoopNum ).RecircFlow + AirLoopFlow( AirLoopNum ).ZoneMixingFlow);
-				}
-			}
-
-			// adjust the zone return air flow rates to match the air loop return air flow rate
-			for ( ZoneNum1 = 1; ZoneNum1 <= NumOfZones; ++ZoneNum1 ) {
-				ZoneNum = ZoneNum1;
-				if ( !ZoneEquipConfig(ZoneNum).IsControlled ) continue;
-				int RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
-				int AirLoopNum = ZoneEquipConfig( ZoneNum ).AirLoopNum;
-				if ( AirLoopNum > 0 && RetNode > 0 ) {
-					if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) {
-						if ( AirLoopFlow( AirLoopNum ).RetFlow0 > 0.0 ) {
-							Node( RetNode ).MassFlowRate *= ( AirLoopFlow( AirLoopNum ).RetFlow / AirLoopFlow( AirLoopNum ).RetFlow0 );
-						} else {
-							Node( RetNode ).MassFlowRate = 0.0;
-						}
+				// Check zone flow balance
+				if ( !ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag ) {
+					Real64 unbalancedFlow = max( 0.0, ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ) + FinalTotalReturnMassFlow - TotInletAirMassFlowRate );
+					if ( ( unbalancedFlow > SmallMassFlow ) && !ZoneEquipConfig( ZoneNum ).FlowError ) {
+								ShowWarningError( "In zone " + ZoneEquipConfig( ZoneNum ).ZoneName + " there is unbalanced air flow." );
+								ShowContinueErrorTimeStamp( "" );
+								ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
+								ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
+								ZoneEquipConfig( ZoneNum ).FlowError = true;
 					}
 				}
 			}
+
 			// update the
 			if ( Iteration > 0 ) {
 				if ( abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) < ConvergenceTolerance ) {
@@ -3994,6 +3948,21 @@ namespace ZoneEquipmentManager {
 			Iteration += 1;
 
 		} while ( Iteration < IterMax );
+
+		// Check for unbalanced airloop
+		if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag && AirLoopsSimOnce ) {
+			for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				Real64 exhaustDelta = AirLoopFlow( AirLoopNum ).SupFlow - AirLoopFlow( AirLoopNum ).RetFlow;
+				Real64 unbalancedExhaustDelta = max( 0.0, ( exhaustDelta - AirLoopFlow( AirLoopNum ).MaxOutAir ) );
+				if ( ( unbalancedExhaustDelta > SmallMassFlow) && !AirLoopFlow( AirLoopNum ).FlowError ) {
+					ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem( AirLoopNum ).Name + " there is unbalanced exhaust air flow." );
+					ShowContinueErrorTimeStamp( "" );
+					ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
+					ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
+					AirLoopFlow( AirLoopNum ).FlowError = true;
+				}
+			}
+		}
 
 	}
 
@@ -4023,12 +3992,14 @@ namespace ZoneEquipmentManager {
 				auto & retNodeData( DataLoopNode::Node( retNode ) );
 
 				int airLoop = thisZoneEquip.ReturnNodeAirLoopNum( returnNum );
+				Real64 airLoopReturnFrac = 1.0;
 				if ( airLoop > 0 ) {
 					Real64 inletMassFlow = 0.0;
+					airLoopReturnFrac = DataAirLoop::AirLoopFlow( airLoop ).DesReturnFrac;
 					if ( inletNode > 0 ) inletMassFlow = DataLoopNode::Node( inletNode ).MassFlowRate;
 					if ( DataAirSystems::PrimaryAirSystem( airLoop ).OASysExists ) {
 						// Set return flow as fraction of matching inlet node flow if there is an OA system
-						returnNodeMassFlow = DataAirLoop::AirLoopFlow( airLoop ).DesReturnFrac * inletMassFlow;
+						returnNodeMassFlow = airLoopReturnFrac * inletMassFlow;
 					} else {
 						// Set return flow to matching inlet node flow
 						returnNodeMassFlow = inletMassFlow;
@@ -4060,7 +4031,7 @@ namespace ZoneEquipmentManager {
 						} else {
 							// If only 1 return node, use the standard return mass flow
 							if( numRetNodes == 1) {
-								returnNodeMassFlow = max( 0.0, ( ExpTotalReturnMassFlow * returnSchedFrac ) );
+								returnNodeMassFlow = max( 0.0, ( ExpTotalReturnMassFlow * returnSchedFrac * airLoopReturnFrac ) );
 							}
 						}
 					}
@@ -4084,7 +4055,7 @@ namespace ZoneEquipmentManager {
 		}
 
 		// Adjust return flows if greater than expected (i.e. there is exhaust or mixing flow reducing the total available for return)
-		if ( ( totReturnFlow > ExpTotalReturnMassFlow ) && ( numRetNodes > 1 ) ) {
+		if ( totReturnFlow > ExpTotalReturnMassFlow ) {
 			Real64 newReturnFlow = 0.0;
 			Real64 returnAdjFactor = 1.0;
 			if ( totVarReturnFlow > 0.0 ) {
@@ -4097,10 +4068,7 @@ namespace ZoneEquipmentManager {
 				if ( retNode > 0 ) {
 					newReturnFlow = curReturnFlow * returnAdjFactor;
 					FinalTotalReturnMassFlow += newReturnFlow;
-					int airLoop = thisZoneEquip.ReturnNodeAirLoopNum( returnNum );
-					if ( ( airLoop > 0 ) && ( numRetNodes > 1 ) ) {
-						DataAirLoop::AirLoopFlow( airLoop ).ZoneExhaust += ( curReturnFlow - newReturnFlow ) ;
-					}
+					DataLoopNode::Node( retNode ).MassFlowRate = newReturnFlow;
 				}
 			}
 		} else {

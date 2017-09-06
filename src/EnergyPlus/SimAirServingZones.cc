@@ -2171,7 +2171,7 @@ namespace SimAirServingZones {
 				for ( InNum = 1; InNum <= PrimaryAirSystem( AirLoopNum ).NumInletBranches; ++InNum ) {
 					InBranchNum = PrimaryAirSystem( AirLoopNum ).InletBranchNum( InNum );
 					NodeNumIn = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).NodeNumIn;
-					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply * AirLoopFlow( AirLoopNum ).ReqSupplyFrac - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment );
+					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply * AirLoopFlow( AirLoopNum ).ReqSupplyFrac - ( AirLoopFlow( AirLoopNum ).SupFlow - AirLoopFlow( AirLoopNum ).RetFlow );
 				}
 			}
 
