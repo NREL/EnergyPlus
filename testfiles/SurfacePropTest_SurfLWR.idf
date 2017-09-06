@@ -1,4 +1,4 @@
-! SurfaceTest_SurfLWR.idf
+! SurfacePropTest_SurfLWR.idf
 ! Basic file description:  2 story building divided into 9 zones, overhangs, reveal,
 !
 ! Highlights:              Test of the calculation of long wave radiation from surrounding surfaces for EnergyPlus.
@@ -2280,27 +2280,6 @@
     ,                           !- External Shading Fraction Schedule Name
 	SrdSurfs:Zn003:Roof001,     !- Surrounding Surfaces Object Name
 	;                           !- Outdoor Air Node Name
-	
-  ZoneInfiltration:DesignFlowRate,
-    Infiltration 1,   !- Name
-    OREGON WING,      !- Zone Name
-    Infiltration Sch, !- Schedule Name
-    Flow/Zone,      !- Design Flow Rate Calculation Method
-    2.831685,       !- Design Flow Rate {m3/s}
-    ,               !- Flow per Zone Floor Area {m3/s/m2}
-    ,               !- Flow per Exterior Surface Area {m3/s/m2}
-    ,               !- Air Changes per Hour
-    0.6060000    ,  !- Constant Term Coefficient
-    3.6359996E-02,  !- Temperature Term Coefficient
-    0.1177165    ,  !- Velocity Term Coefficient
-    0.0000000E+00;  !- Velocity Squared Term Coefficient
-	
-  Schedule:Compact,
-    Infiltration Sch,        !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
 
   Schedule:File,
     Surrounding Temp Sch 1,       !- Name
@@ -2314,10 +2293,10 @@
     Any Number,              !- Schedule Type Limits Name
 	Through: 06/30,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,100.0,      !- Field 3	
+    Until: 24:00,10.0,      !- Field 3	
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,-100.0;     !- Field 3	
+    Until: 24:00,-10.0;     !- Field 3	
 	
   Schedule:Compact,
     ShadingTransmittance:0001,  !- Name
@@ -2365,20 +2344,6 @@
   Output:Surfaces:Drawing,dxf,Triangulate3DFace;
 
   Output:Surfaces:List,detailswithvertices;
-
-  Output:Constructions,Constructions;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,monthly;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
