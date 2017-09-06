@@ -8859,23 +8859,24 @@ namespace OutputReportTabular {
 			}
 			// collapse the individual peaks for the end use subcategories for the LEED report
 			// collapse the gatherEndUseBEPS array to the resource groups displayed
+			// no unit conversion, it is done at the reporting stage if necessary
 			collapsedIndEndUse = 0.0;
 			for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
-				collapsedIndEndUse( 1, jEndUse ) = gatherDemandIndEndUse( 1, jEndUse ) * powerConversion; //electricity
-				collapsedIndEndUse( 2, jEndUse ) = gatherDemandIndEndUse( 2, jEndUse ) * powerConversion; //natural gas
-				collapsedIndEndUse( 3, jEndUse ) = gatherDemandIndEndUse( additionalFuelSelected, jEndUse ) * powerConversion; //additional fuel
-				collapsedIndEndUse( 4, jEndUse ) = gatherDemandIndEndUse( 3, jEndUse ) * powerConversion; // purchased cooling
-				collapsedIndEndUse( 5, jEndUse ) = gatherDemandIndEndUse( distrHeatSelected, jEndUse ) * powerConversion; //district heating
-				collapsedIndEndUse( 6, jEndUse ) = gatherDemandIndEndUse( 7, jEndUse ) * flowConversion; //water
+				collapsedIndEndUse( 1, jEndUse ) = gatherDemandIndEndUse( 1, jEndUse ); //electricity
+				collapsedIndEndUse( 2, jEndUse ) = gatherDemandIndEndUse( 2, jEndUse ); //natural gas
+				collapsedIndEndUse( 3, jEndUse ) = gatherDemandIndEndUse( additionalFuelSelected, jEndUse ); //additional fuel
+				collapsedIndEndUse( 4, jEndUse ) = gatherDemandIndEndUse( 3, jEndUse ); // purchased cooling
+				collapsedIndEndUse( 5, jEndUse ) = gatherDemandIndEndUse( distrHeatSelected, jEndUse ); //district heating
+				collapsedIndEndUse( 6, jEndUse ) = gatherDemandIndEndUse( 7, jEndUse ); //water
 			}
 			for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 				for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 1 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 1 ) * powerConversion; //electricity
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 2 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 2 ) * powerConversion; //natural gas
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 3 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, additionalFuelSelected ) * powerConversion; //additional fuel
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 4 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 3 ) * powerConversion; //purch cooling
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 5 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, distrHeatSelected ) * powerConversion; //district heating
-					collapsedIndEndUseSub( kEndUseSub, jEndUse, 6 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 7 ) * flowConversion; //water
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 1 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 1 ); //electricity
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 2 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 2 ); //natural gas
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 3 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, additionalFuelSelected ); //additional fuel
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 4 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 3 ); //purch cooling
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 5 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, distrHeatSelected ); //district heating
+					collapsedIndEndUseSub( kEndUseSub, jEndUse, 6 ) = gatherDemandIndEndUseSub( kEndUseSub, jEndUse, 7 ); //water
 				}
 			}
 
