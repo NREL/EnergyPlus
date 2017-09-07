@@ -5041,9 +5041,6 @@ namespace OutputProcessor {
 			case OutputProcessor::Unit::kg_s:
 				return "kg/s";
 				break;
-			case OutputProcessor::Unit::degree:
-				return "degree";
-				break;
 			case OutputProcessor::Unit::deg:
 				return "deg";
 				break;
@@ -5089,9 +5086,6 @@ namespace OutputProcessor {
 			case OutputProcessor::Unit::L:
 				return "L";
 				break;
-			case OutputProcessor::Unit::ACH:  //ou redundant
-				return "ACH";
-				break;
 			case OutputProcessor::Unit::ach:
 				return "ach";
 				break;
@@ -5124,9 +5118,6 @@ namespace OutputProcessor {
 				break;
 			case OutputProcessor::Unit::cd_m2:
 				return "cd/m2";
-				break;
-			case OutputProcessor::Unit::Kg_s:  //ou redundant
-				return "kg/s";
 				break;
 			case OutputProcessor::Unit::kmol_s:
 				return "kmol/s";
@@ -5204,7 +5195,7 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::m3;
 		} else if ( unitUpper == "KG" ) {
 			return OutputProcessor::Unit::kg;
-		} else if ( unitUpper == "ACH" ) {   //ou duplicate unit remove
+		} else if ( unitUpper == "ACH" ) {
 			return OutputProcessor::Unit::ach;
 		} else if ( unitUpper == "W/W" ) {
 			return OutputProcessor::Unit::W_W;
@@ -5233,11 +5224,7 @@ namespace OutputProcessor {
 		} else if ( unitUpper == "KMOL/S" ) {
 			return OutputProcessor::Unit::kmol_s;
 		} else if ( unitUpper == "KG/S" ) {
-			return OutputProcessor::Unit::Kg_s;  //ou duplicate remove
-		} else if ( unitUpper == "REV/MIN" ) {
 			return OutputProcessor::Unit::rev_min;
-		} else if ( unitUpper == "BTU/H/W" ) { //ou fix
-			return OutputProcessor::Unit::Btu_h_W;
 		} else if ( unitUpper == "W/M2-K" ) {
 			return OutputProcessor::Unit::W_m2K;
 		} else if ( unitUpper == "J/KG" ) {
@@ -5246,10 +5233,8 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::kg_kg;
 		} else if ( unitUpper == "%" ) {
 			return OutputProcessor::Unit::Perc;
-		} else if ( unitUpper == "DEG" ) { //ou remove later
+		} else if ( unitUpper == "DEG" ) { 
 			return OutputProcessor::Unit::deg;
-		} else if ( unitUpper == "DEGREE" ) {
-			return OutputProcessor::Unit::degree;
 		} else if ( unitUpper == "S" ) {
 			return OutputProcessor::Unit::s;
 		} else if ( unitUpper == "KG/M3" ) {
@@ -5268,8 +5253,6 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::W_m2C;
 		} else if ( unitUpper == "RAD" ) {
 			return OutputProcessor::Unit::rad;
-		} else if ( unitUpper == "ACH" ) {
-			return OutputProcessor::Unit::ACH;
 		} else if ( unitUpper == "J/M2" ) {
 			return OutputProcessor::Unit::J_m2;
 		} else if ( unitUpper == "CLO" ) {

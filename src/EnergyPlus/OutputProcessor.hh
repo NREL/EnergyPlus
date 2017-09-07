@@ -192,7 +192,6 @@ namespace OutputProcessor {
 	// Types
 	enum class Unit {
 		kg_s,
-		Kg_s, //ou remove duplicate
 		C,
 		kgWater_kgDryAir,
 		ppm,
@@ -225,8 +224,7 @@ namespace OutputProcessor {
 		J_kg,
 		kg_kg,
 		Perc,
-		deg, //ou remove duplicate
-		degree,
+		deg, 
 		s,
 		kg_m3,
 		kg_m2s,
@@ -236,7 +234,6 @@ namespace OutputProcessor {
 		m2,
 		W_m2C,
 		rad,
-		ACH,
 		J_m2,
 		clo,
 		W_K,
