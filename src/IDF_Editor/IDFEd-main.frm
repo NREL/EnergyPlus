@@ -4,16 +4,23 @@ Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
 Object = "{C0A63B80-4B21-11D3-BD95-D426EF2C7949}#1.0#0"; "Vsflex7L.ocx"
 Begin VB.Form IDFEdit 
    Caption         =   "IDF Edit"
-   ClientHeight    =   7272
-   ClientLeft      =   156
+   ClientHeight    =   7275
+   ClientLeft      =   150
    ClientTop       =   720
-   ClientWidth     =   10032
+   ClientWidth     =   10035
    Icon            =   "IDFEd-main.frx":0000
    LinkTopic       =   "Form1"
-   LockControls    =   -1  'True
    MDIChild        =   -1  'True
-   ScaleHeight     =   7272
-   ScaleWidth      =   10032
+   ScaleHeight     =   7275
+   ScaleWidth      =   10035
+   Begin VB.CommandButton cmdDuplicateObjectAndChange 
+      Caption         =   "Dup Obj + Chg"
+      Height          =   330
+      Left            =   3120
+      TabIndex        =   21
+      Top             =   60
+      Width           =   1260
+   End
    Begin VB.Timer timerJumpList 
       Interval        =   100
       Left            =   1680
@@ -53,8 +60,8 @@ Begin VB.Form IDFEdit
       Height          =   4215
       Left            =   9840
       MousePointer    =   7  'Size N S
-      ScaleHeight     =   4212
-      ScaleWidth      =   132
+      ScaleHeight     =   4215
+      ScaleWidth      =   135
       TabIndex        =   20
       Top             =   3000
       Visible         =   0   'False
@@ -69,8 +76,8 @@ Begin VB.Form IDFEdit
       Height          =   1455
       Left            =   5160
       MousePointer    =   7  'Size N S
-      ScaleHeight     =   1452
-      ScaleWidth      =   132
+      ScaleHeight     =   1455
+      ScaleWidth      =   135
       TabIndex        =   19
       Top             =   2880
       Visible         =   0   'False
@@ -85,8 +92,8 @@ Begin VB.Form IDFEdit
       Height          =   135
       Left            =   7320
       MousePointer    =   7  'Size N S
-      ScaleHeight     =   132
-      ScaleWidth      =   2532
+      ScaleHeight     =   135
+      ScaleWidth      =   2535
       TabIndex        =   18
       Top             =   4320
       Visible         =   0   'False
@@ -101,8 +108,8 @@ Begin VB.Form IDFEdit
       Height          =   135
       Left            =   7320
       MousePointer    =   7  'Size N S
-      ScaleHeight     =   132
-      ScaleWidth      =   2532
+      ScaleHeight     =   135
+      ScaleWidth      =   2535
       TabIndex        =   17
       Top             =   2400
       Visible         =   0   'False
@@ -111,7 +118,7 @@ Begin VB.Form IDFEdit
    Begin VB.CommandButton cmdCopyObject 
       Caption         =   "Copy Obj"
       Height          =   330
-      Left            =   4080
+      Left            =   5400
       TabIndex        =   7
       Top             =   60
       Width           =   900
@@ -120,7 +127,7 @@ Begin VB.Form IDFEdit
       Caption         =   "Paste Obj"
       Enabled         =   0   'False
       Height          =   330
-      Left            =   5040
+      Left            =   6360
       TabIndex        =   8
       Top             =   60
       Width           =   900
@@ -144,7 +151,7 @@ Begin VB.Form IDFEdit
    Begin VB.CommandButton cmdDeleteObject 
       Caption         =   "Del Obj"
       Height          =   330
-      Left            =   3120
+      Left            =   4440
       TabIndex        =   6
       Top             =   60
       Width           =   900
@@ -152,8 +159,8 @@ Begin VB.Form IDFEdit
    Begin MSComctlLib.ImageList ilToolBar 
       Left            =   7680
       Top             =   480
-      _ExtentX        =   995
-      _ExtentY        =   995
+      _ExtentX        =   1005
+      _ExtentY        =   1005
       BackColor       =   -2147483643
       ImageWidth      =   16
       ImageHeight     =   16
@@ -218,10 +225,10 @@ Begin VB.Form IDFEdit
       TabIndex        =   0
       Top             =   0
       Width           =   10032
-      _ExtentX        =   17695
-      _ExtentY        =   593
-      ButtonWidth     =   487
-      ButtonHeight    =   466
+      _ExtentX        =   17701
+      _ExtentY        =   582
+      ButtonWidth     =   609
+      ButtonHeight    =   582
       AllowCustomize  =   0   'False
       Appearance      =   1
       ImageList       =   "ilToolBar"
@@ -282,7 +289,7 @@ Begin VB.Form IDFEdit
       Enabled         =   -1  'True
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "MS Sans Serif"
-         Size            =   7.8
+         Size            =   8.25
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -389,7 +396,7 @@ Begin VB.Form IDFEdit
       Width           =   4575
    End
    Begin VB.ListBox lstObjectTypes 
-      Height          =   2352
+      Height          =   2205
       Left            =   120
       TabIndex        =   9
       Top             =   1725
@@ -573,6 +580,9 @@ Begin VB.Form IDFEdit
       End
       Begin VB.Menu mnuEditDuplicate 
          Caption         =   "Dup&licate Object"
+      End
+      Begin VB.Menu mnuEditDuplicateAndChange 
+         Caption         =   "Duplicate and Change Object"
       End
       Begin VB.Menu mnuEditDelete 
          Caption         =   "&Delete Object"
@@ -999,6 +1009,7 @@ End Sub
 
 
 
+
 '-----------------------------------------------------------------------------
 ' When the form is activated resize it.
 '-----------------------------------------------------------------------------
@@ -1129,11 +1140,13 @@ grdNew.ColWidth(-1) = defaultColumnWidth
 grdNew.ColWidth(0) = 4000
 grdNew.ColWidth(1) = 1000
 cmdDuplicateObject.Enabled = False
+cmdDuplicateObjectAndChange.Enabled = False
 cmdDeleteObject.Enabled = False
 cmdPasteObject.Enabled = doesClipContainObject()
 cmdCopyObject.Enabled = False
 mnuEditDelete.Enabled = False
 mnuEditDuplicate.Enabled = False
+mnuEditDuplicateAndChange.Enabled = False
 mnuEditPaste.Enabled = doesClipContainObject()
 currentFormLayoutOption = formLayoutOption
 saveOrderOption = saveOrderOptDefault
@@ -1967,10 +1980,12 @@ If IDDClassObjPt(actClass).objectCount > 0 Then
   grdNew.LeftCol = 2
   Call selectCell
   cmdDuplicateObject.Enabled = True
+  cmdDuplicateObjectAndChange.Enabled = True
   cmdDeleteObject.Enabled = True
   cmdCopyObject.Enabled = True
   mnuEditDelete.Enabled = True
   mnuEditDuplicate.Enabled = True
+  mnuEditDuplicateAndChange.Enabled = True
   mnuEditCopy.Enabled = True
 Else
   If IDDClassDat(actClass).memo <> "" Then
@@ -1979,10 +1994,12 @@ Else
     txtExplain.Text = ""
   End If
   cmdDuplicateObject.Enabled = False
+  cmdDuplicateObjectAndChange.Enabled = False
   cmdDeleteObject.Enabled = False
   cmdCopyObject.Enabled = False
   mnuEditDelete.Enabled = False
   mnuEditDuplicate.Enabled = False
+  mnuEditDuplicateAndChange.Enabled = False
   mnuEditCopy.Enabled = False
 End If
 End Sub
@@ -2037,6 +2054,7 @@ Private Sub mnuCreateRefObjListTxt_Click()
 Call dumpRefObjList
 MsgBox "RefObjList.txt file created in program directory.", vbInformation, "Create RefObjList.txt"
 End Sub
+
 
 Private Sub mnuEditFillRight_Click()
 Call fillGridToRight
@@ -2125,6 +2143,9 @@ Call IDFDeleteObject
 End Sub
 Private Sub mnuEditDuplicate_Click()
 Call IDFDuplicateObject
+End Sub
+Private Sub mnuEditDuplicateAndChange_Click()
+Call IDFDuplicateObjectAndChange
 End Sub
 Private Sub mnuEditNew_Click()
 Dim li As Long
@@ -2529,6 +2550,9 @@ Call IDFDeleteObject
 End Sub
 Private Sub cmdDuplicateObject_Click()
 Call IDFDuplicateObject
+End Sub
+Private Sub cmdDuplicateObjectAndChange_Click()
+Call IDFDuplicateObjectAndChange
 End Sub
 Private Sub cmdNewObject_Click()
 Dim li As Long
@@ -4173,6 +4197,72 @@ grdNew.Col = grdNew.Cols - 1
 grdNew.ShowCell grdNew.TopRow, grdNew.Cols - 1
 Call selectCell
 Call ShowFileAltered
+End Sub
+
+'-----------------------------------------------------------------------------
+' This routine creates a new object and duplicates the values from the currently
+' selected object into the new object and it allows the user to change text
+' that appears in one or more fields
+'-----------------------------------------------------------------------------
+Sub IDFDuplicateObjectAndChange()
+Dim rowSt As Long, rowEnd As Long, colSt As Long, colEnd As Long
+Dim curVal As Long, jField As Long, numFields As Long, iLength As Long
+Dim li As Long
+Dim curObj As Long
+Dim numChar As Long
+Dim found As Boolean
+Dim hintText As String
+li = lstObjectTypes.ListIndex
+grdNew.GetSelection rowSt, colSt, rowEnd, colEnd
+If actObject = 0 Then Exit Sub    'can't duplicate if not on a selected object
+If colEnd <> colEnd Then Exit Sub 'can't do changes across multiple objects
+' find the text suggestion for search box
+curObj = grdNew.ColData(colSt)
+curVal = IDFObject(curObj).valueStart
+numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+numChar = 2 'assume that this is the minimum number of characters that must match
+For iLength = 1 To Len(IDFValue(curVal).entry)
+  found = False
+  hintText = Left(IDFValue(curVal).entry, numChar)
+  For jField = 1 To numFields - 1
+    If InStr(IDFValue(curVal + jField).entry, hintText) > 0 Then
+      found = True
+      Exit For
+    End If
+  Next jField
+  If found Then
+    numChar = numChar + 1
+  Else
+    Exit For
+  End If
+Next iLength
+numChar = numChar - 1 'shorten since last find did not work
+If numChar > 1 Then
+  searchTerm = Left(IDFValue(curVal).entry, numChar)
+Else
+  searchTerm = Left(IDFValue(curVal).entry, 5)
+End If
+' show the dialog
+frmDuplicateAndChange.Show vbModal
+' do the replacement text if not changed
+If replaceTerm <> "" Then
+  Call IDFNewObject 'first make a new object
+  ' now copy values into new object
+  For jField = 0 To numFields - 1
+    IDFValue(maxUsedValue + jField - numFields).entry = Replace(IDFValue(curVal + jField).entry, searchTerm, replaceTerm)
+    Debug.Print "dup "; IDFValue(curVal + jField).entry
+  Next jField
+  Call FillList
+  Call FillGrid
+  If li > lstObjectTypes.ListCount - 1 Then
+    li = 0
+  End If
+  lstObjectTypes.ListIndex = li
+  grdNew.Col = grdNew.Cols - 1
+  grdNew.ShowCell grdNew.TopRow, grdNew.Cols - 1
+  Call selectCell
+  Call ShowFileAltered
+End If
 End Sub
 
 '-----------------------------------------------------------------------------
