@@ -3,12 +3,12 @@ Begin VB.Form frmWhatsNew
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "New Features of IDF Editor"
    ClientHeight    =   8280
-   ClientLeft      =   48
-   ClientTop       =   432
-   ClientWidth     =   10908
+   ClientLeft      =   45
+   ClientTop       =   435
+   ClientWidth     =   10905
    BeginProperty Font 
       Name            =   "MS Sans Serif"
-      Size            =   9.6
+      Size            =   9.75
       Charset         =   0
       Weight          =   700
       Underline       =   0   'False
@@ -19,13 +19,13 @@ Begin VB.Form frmWhatsNew
    MaxButton       =   0   'False
    MinButton       =   0   'False
    ScaleHeight     =   8280
-   ScaleWidth      =   10908
+   ScaleWidth      =   10905
    ShowInTaskbar   =   0   'False
    StartUpPosition =   1  'CenterOwner
    Begin VB.TextBox txtWhatsNew 
       BeginProperty Font 
          Name            =   "MS Sans Serif"
-         Size            =   9.6
+         Size            =   9.75
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -45,7 +45,7 @@ Begin VB.Form frmWhatsNew
       Caption         =   "Close"
       BeginProperty Font 
          Name            =   "MS Sans Serif"
-         Size            =   7.8
+         Size            =   8.25
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -62,7 +62,7 @@ Begin VB.Form frmWhatsNew
       Caption         =   "This dialog box is shown at start up one time and then can be found under HELP .. WHATS NEW"
       BeginProperty Font 
          Name            =   "MS Sans Serif"
-         Size            =   7.8
+         Size            =   8.25
          Charset         =   0
          Weight          =   700
          Underline       =   0   'False
@@ -90,6 +90,12 @@ End Sub
 Private Sub Form_Load()
 Dim t As String
 t = ""
+t = t & "New Features of IDF Editor Version 1.50" & vbCrLf
+t = t & "-------------------------------------------------------------------------------" & vbCrLf
+t = t & "New 'Duplicate Object and Change' menu item under Edit and 'Dup Obj + Chg' toolbar item. This will duplicate the currently selected object and for " _
+      & "each field in the object replace any text with new text. The original suggested text for change is based on the name of the object. This is " _
+      & "especially useful for HVAC related objects when the node names are based on some of the same text as the name of the object." & vbCrLf & vbCrLf
+
 t = t & "New Features of IDF Editor Version 1.49" & vbCrLf
 t = t & "-------------------------------------------------------------------------------" & vbCrLf
 t = t & "In EDIT .. VALIDITY CHECK now have an option to IGNORE MACROS which will not perform validity checking on fields that contain characters " _
