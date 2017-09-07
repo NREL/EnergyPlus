@@ -7,7 +7,7 @@
 ! Plant:    None.
 ! SolDis=MinimalShadowing, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,1;
 
@@ -379,7 +379,6 @@
     15.24,0,4.572,  !- X,Y,Z ==> Vertex 2 {m}
     15.24,15.24,4.572,  !- X,Y,Z ==> Vertex 3 {m}
     0,15.24,4.572;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 

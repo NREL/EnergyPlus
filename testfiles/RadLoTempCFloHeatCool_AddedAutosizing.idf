@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -1940,8 +1940,8 @@
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
     Cooling,                 !- Loop Type
-    0.5,                     !- Design Loop Exit Temperature
-    2.0;                     !- Loop Design Temperature Difference
+    0.5,                     !- Design Loop Exit Temperature {C}
+    2.0;                     !- Loop Design Temperature Difference {deltaC}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name

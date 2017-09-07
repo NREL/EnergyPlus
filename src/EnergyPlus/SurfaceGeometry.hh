@@ -281,6 +281,12 @@ namespace SurfaceGeometry {
 	GetShadingSurfReflectanceData( bool & ErrorsFound ); // If errors found in input
 
 	void
+	GetSurfaceSrdSurfsData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+
+	void
+	GetSurfaceLocalEnvData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+
+	void
 	GetHTSurfExtVentedCavityData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
 
 	void

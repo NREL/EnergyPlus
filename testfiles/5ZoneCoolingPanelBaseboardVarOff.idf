@@ -106,7 +106,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2259,7 +2259,7 @@
     5.0,                     !- Rated Inlet Water Temperature {C}
     24.0,                    !- Rated Inlet Space Temperature {C}
     0.63,                    !- Rated Water Mass Flow Rate {kg/s}
-    FractionOfAutosizedCoolingCapacity,   !- Cooling Design Capacity Method
+    FractionOfAutosizedCoolingCapacity,  !- Cooling Design Capacity Method
     0.0,                     !- Cooling Design Capacity {W}
     0.0,                     !- Cooling Design Capacity Per Floor Area {W/m2}
     1.1,                     !- Fraction of Autosized Cooling Design Capacity

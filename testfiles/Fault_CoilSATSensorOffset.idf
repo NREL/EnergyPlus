@@ -106,7 +106,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -3424,13 +3424,13 @@
 
   Output:Variable,*,Pump Outlet Temperature,timestep;
 
-  Output:Variable, Main Cooling Coil 1 Outlet Node, System Node Temperature, timestep;
-  
-  Output:Variable, Main Cooling Coil 1 Water Inlet Node, System Node Mass Flow Rate, timestep;
-  
-  Output:Variable, Main Heating Coil 1 Outlet Node, System Node Temperature, timestep;
-  
-  Output:Variable, Main Heating Coil 1 Water Inlet Node, System Node Mass Flow Rate, timestep;
+  Output:Variable,Main Cooling Coil 1 Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Main Heating Coil 1 Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Main Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,timestep;
 
   Output:VariableDictionary,Regular;
 
@@ -3529,5 +3529,6 @@
     ,                        !- Severity Schedule Name
     Coil:Cooling:Water,      !- Coil Object Type
     Main Cooling Coil 1,     !- Coil Object Name
-    Central Cooling Coil Controller 1, !- Water Coil Controller Name
+    Central Cooling Coil Controller 1,  !- Water Coil Controller Name
     2.0;                     !- Reference Sensor Offset {deltaC}
+

@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -2816,23 +2816,22 @@
     HX Process Outlet Node,  !- Air Inlet Node Name
     Desiccant Supply Fan Outlet Node;  !- Air Outlet Node Name
 
-
-Fan:SystemModel,
-  Desiccant Regen Fan , !- Name
-  FanAvailSched , !- Availability Schedule Name
-  HX Regen Outlet Node,  !- Air Inlet Node Name
-  Regen Fan Outlet Node,  !- Air Outlet Node Name
-  1.05 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  205.5, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.7;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Desiccant Regen Fan,     !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    HX Regen Outlet Node,    !- Air Inlet Node Name
+    Regen Fan Outlet Node,   !- Air Outlet Node Name
+    1.05,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    205.5,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7;                     !- Fan Total Efficiency
 
 ! Modeling Munters HCU (humidity control unit)
 
@@ -2842,7 +2841,7 @@ Fan:SystemModel,
     HeatExchanger:Desiccant:BalancedFlow,  !- Desiccant Heat Exchanger Object Type
     Desiccant Heat Exchanger 1,  !- Desiccant Heat Exchanger Name
     HX Process Outlet Node,  !- Sensor Node Name
-    Fan:SystemModel,      !- Regeneration Air Fan Object Type
+    Fan:SystemModel,         !- Regeneration Air Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
     Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type
@@ -2940,24 +2939,23 @@ Fan:SystemModel,
     Relief Air Outlet Node,  !- Secondary Air Inlet Node Name
     OA Heat Recovery Secondary Outlet Node;  !- Secondary Air Outlet Node Name
 
-  
-Fan:SystemModel,
-  OA Desiccant Regen Fan , !- Name
-  FanAvailSched , !- Availability Schedule Name
-  OA HX Regen Outlet Node,  !- Air Inlet Node Name
-  OA Regen Fan Outlet Node,  !- Air Outlet Node Name
-  2.5893 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  205.5, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
-  
+  Fan:SystemModel,
+    OA Desiccant Regen Fan,  !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    OA HX Regen Outlet Node, !- Air Inlet Node Name
+    OA Regen Fan Outlet Node,!- Air Outlet Node Name
+    2.5893,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    205.5,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
+
   Coil:Heating:Fuel,
     OA Desiccant Regen Coil, !- Name
     FanAvailSched,           !- Availability Schedule Name
@@ -2973,7 +2971,7 @@ Fan:SystemModel,
     HeatExchanger:Desiccant:BalancedFlow,  !- Desiccant Heat Exchanger Object Type
     OA Desiccant Heat Exchanger,  !- Desiccant Heat Exchanger Name
     OA Desiccant Process Outlet Node,  !- Sensor Node Name
-    Fan:SystemModel,               !- Regeneration Air Fan Object Type
+    Fan:SystemModel,         !- Regeneration Air Fan Object Type
     OA Desiccant Regen Fan,  !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
     Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type

@@ -227,43 +227,43 @@ This alpha field contains the identifying name given to the unitary system suppl
 
 \paragraph{Field: Cooling Supply Air Flow Rate Method}\label{field-cooling-supply-air-flow-rate-method-000}
 
-This alpha field defines the supply air flow method during cooling operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FlowPerCoolingCapacity. For each of the choices, a corresponding air flow rate for cooling must be specified.
+This alpha field defines the supply air flow method during cooling operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, FlowPerCoolingCapacity. For each of the choices, a corresponding air flow rate for cooling must be specified. If the system does not have a cooling coil a 0 may be entered for cooling air flow rate and/or no load supply air flow rate to turn the fan off when cooling is not required.
 
 \paragraph{Field: Cooling Supply Air Flow Rate}\label{field-cooling-supply-air-flow-rate-001}
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{SupplyAirFlowRate}.
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the cooling coil is operating. Values must be greater than 0 if the cooling coil is present or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{SupplyAirFlowRate}.
 
 \paragraph{Field: Cooling Supply Air Flow Rate Per Floor Area}\label{field-cooling-supply-air-flow-rate-per-floor-area}
 
-This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{FlowPerFloorArea}.
+This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the cooling coil is operating. Values must be greater than 0 if the cooling coil is present or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{FlowPerFloorArea}.
 
 \paragraph{Field: Cooling Fraction of Autosized Design Cooling Supply Air Flow Rate}\label{field-cooling-fraction-of-autosized-design-cooling-supply-air-flow-rate}
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{FractionOfAutosizedCoolingValue}.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the cooling coil is operating. Values must be greater than 0 if the cooling coil is present or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{FractionOfAutosizedCoolingValue}.
 
 \paragraph{Field: Cooling Supply Air Flow Rate Per Unit of Capacity}\label{field-cooling-supply-air-flow-rate-per-unit-of-capacity}
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the cooling coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{FlowPerCoolingCapacity}.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the cooling coil is operating. Values must be greater than 0 if the cooling coil is present or this field is autosizable. Required field when Cooling Supply Air Flow Rate Method is \textbf{FlowPerCoolingCapacity}.
 
 \paragraph{Field: Heating Supply Air Flow Rate Method}\label{field-heating-supply-air-flow-rate-method-000}
 
-This alpha field defines the supply air flow method during heating operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate for heating must be specified.
+This alpha field defines the supply air flow method during heating operation. Available choices are SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, FlowPerHeatingCapacity. For each of the choices, a corresponding air flow rate for heating must be specified. If the system does not have a heating coil a 0 may be entered for heating air flow rate and/or no load supply air flow rate to turn the fan off when heating is not required.
 
 \paragraph{Field: Heating Supply Air Flow Rate}\label{field-heating-supply-air-flow-rate-001}
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{SupplyAirFlowRate}.
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when the heating coil is operating. Values must be greater than 0 if the heating coil is present or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{SupplyAirFlowRate}.
 
 \paragraph{Field: Heating Supply Air Flow Rate Per Floor Area}\label{field-heating-supply-air-flow-rate-per-floor-area}
 
-This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{FlowPerFloorArea}.
+This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when the heating coil is operating. Values must be greater than 0 if the heating coil is present or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{FlowPerFloorArea}.
 
 \paragraph{Field: Heating Fraction of Autosized Design Heating Supply Air Flow Rate}\label{field-heating-fraction-of-autosized-design-heating-supply-air-flow-rate}
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{FractionOfAutosizedHeatingValue}.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the heating coil is operating. Values must be greater than 0 if the heating coil is present or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{FractionOfAutosizedHeatingValue}.
 
 \paragraph{Field: Heating Supply Air Flow Rate Per Unit of Capacity}\label{field-heating-supply-air-flow-rate-per-unit-of-capacity}
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{FlowPerHeatingCapacity}.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when the heating coil is operating. Values must be greater than 0 if the heating coil is present or this field is autosizable. Required field when Heating Supply Air Flow Rate Method is \textbf{FlowPerHeatingCapacity}.
 
 \paragraph{Field: No Load Supply Air Flow Rate Method}\label{field-no-load-supply-air-flow-rate-method}
 
@@ -271,27 +271,27 @@ This alpha field defines the supply air flow method when neither cooling or heat
 
 \paragraph{Field: No Load Supply Air Flow Rate}\label{field-no-load-supply-air-flow-rate-000}
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to 0, or this field is autosizable. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
 
 \paragraph{Field: No Load Supply Air Flow Rate Per Floor Area}\label{field-no-load-supply-air-flow-rate-per-floor-area}
 
-This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method During is \textbf{FlowPerFloorArea}.
+This numeric field defines the supply air flow rate per floor area leaving the unitary system in meters per second when neither cooling or heating coil is operating. Values must be greater than or equal to 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method During is \textbf{FlowPerFloorArea}.
 
 \paragraph{Field: No Load Fraction of Autosized Cooling Supply Air Flow Rate}\label{field-no-load-fraction-of-autosized-cooling-supply-air-flow-rate}
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FractionOfAutosizedCoolingValue}.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when neither cooling or heating coil is operating. Values must be greater than or equal to 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FractionOfAutosizedCoolingValue}.
 
 \paragraph{Field: No Load Fraction of Autosized Heating Supply Air Flow Rate}\label{field-no-load-fraction-of-autosized-heating-supply-air-flow-rate}
 
-This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the neither cooling or heating coil is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FractionOfAutosizedHeatingValue}.
+This numeric field defines the fraction of autosized supply air flow rate leaving the unitary system when the neither cooling or heating coil is operating. Values must be greater than or equal to 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FractionOfAutosizedHeatingValue}.
 
 \paragraph{Field: No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation}\label{field-no-load-supply-air-flow-rate-per-unit-of-capacity-during-cooling-operation}
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FlowPerCoolingCapacity}.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than or equal to 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FlowPerCoolingCapacity}.
 
 \paragraph{Field: No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation}\label{field-no-load-supply-air-flow-rate-per-unit-of-capacity-during-heating-operation}
 
-This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FlowPerHeatingCapacity}.
+This numeric field defines the supply air flow rate per unit of capacity leaving the unitary system when neither cooling or heating is operating. Values must be greater than or equal to 0 or this field is autosizable. Required field when No Load Supply Air Flow Rate Method is \textbf{FlowPerHeatingCapacity}.
 
 \paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature-000}
 
@@ -1562,7 +1562,7 @@ This alpha field contains the identifying name given to the DX heating coil, and
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-000}
 
-This numeric field defines the outdoor air dry-bulb temperature below which the DX heating coil turns off.~ The temperature for this input field must be greater than or equal to --20 C.~ If this input field is left blank, the default value is -8 C. This temperature should match the minimum compressor operating temperature specified for the multispeed heat pump's DX heating coil. This field is only needed when Heating Coil Object Type above is \textbf{Coil:Heating:DX:MultiSpeed}.
+This numeric field defines the outdoor air dry-bulb temperature below which the DX heating coil turns off.~ If this input field is left blank, the default value is -8 C. This temperature should match the minimum compressor operating temperature specified for the multispeed heat pump's DX heating coil. This field is only needed when Heating Coil Object Type above is \textbf{Coil:Heating:DX:MultiSpeed}.
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4}
 

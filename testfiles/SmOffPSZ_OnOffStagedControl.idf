@@ -70,7 +70,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -918,7 +918,6 @@
     0,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
     0,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   FenestrationSurface:Detailed,
     EWWndw,                  !- Name

@@ -57,6 +57,7 @@
 #include <SizingManager.hh>
 #include <CostEstimateManager.hh>
 #include <DataAirLoop.hh>
+#include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -231,6 +232,7 @@ namespace SizingManager {
 		GetOARequirements(); // get the OA requirements object
 		GetZoneAirDistribution(); // get zone air distribution objects
 		GetZoneHVACSizing(); // get zone HVAC sizing object
+		GetAirTerminalSizing(); // get air terminal sizing object
 		GetSizingParams(); // get the building level sizing paramets
 		GetZoneSizingInput(); // get the Zone Sizing input
 		GetSystemSizingInput(); // get the System Sizing input
@@ -948,10 +950,16 @@ namespace SizingManager {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowSum;
 			} else if ( SameString( Alphas( 2 ), "Maximum" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowMax;
+			} else if ( SameString( Alphas( 2 ), "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_IAQP;
+			} else if ( SameString( Alphas( 2 ), "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE" ) ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_ProportionalControlSchOcc;
+			} else if ( SameString( Alphas( 2 ), "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY" ) ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_ProportionalControlDesOcc;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
 				ShowContinueError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"," );
-				ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum." );
+				ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, ProportionalControlBasedOnDesignOccupancy, and ProportionalControlBasedonOccupancySchedule." );
 				ErrorsFound = true;
 			}
 		} else {
@@ -966,26 +974,30 @@ namespace SizingManager {
 		}
 		// if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it
 		// being counted later #4378
-		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax ) {
+		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax &&
+			OARequirements( OAIndex ).OAFlowMethod != ZOAM_ProportionalControlSchOcc && OARequirements( OAIndex ).OAFlowMethod != ZOAM_ProportionalControlDesOcc && OARequirements( OAIndex ).OAFlowMethod != ZOAM_IAQP ) {
 			OARequirements( OAIndex ).OAFlowPerPerson = 0.0;
 		}
 		// remaining fields default to 0
 		if ( NumNumbers > 1 ) {
 			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowPerArea || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
 				OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
+			} else if ( OARequirements( OAIndex ).OAFlowMethod == ZOAM_ProportionalControlSchOcc || OARequirements( OAIndex ).OAFlowMethod == ZOAM_ProportionalControlDesOcc || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
+				OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
 			} else {
 				OARequirements( OAIndex ).OAFlowPerArea = 0.0;
 			}
 		}
 		if ( NumNumbers > 2 ) {
-			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlow || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlow || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
 				OARequirements( OAIndex ).OAFlowPerZone = Numbers( 3 );
 			} else {
 				OARequirements( OAIndex ).OAFlowPerZone = 0.0;
 			}
 		}
+
 		if ( NumNumbers > 3 ) {
-			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowACH || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowACH || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
 				OARequirements( OAIndex ).OAFlowACH = Numbers( 4 );
 			} else {
 				OARequirements( OAIndex ).OAFlowACH = 0.0;
@@ -1705,17 +1717,6 @@ namespace SizingManager {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlow = rNumericArgs( 11 );
 					}
 					//  N12,\field Cooling Minimum Air Flow Fraction
-					//      \note fraction of the Cooling design Air Flow Rate
-					//      \type real
-					//      \minimum 0
-					//      \default 0
-					//      \note This input is currently used in sizing the Fan minimum Flow Rate.
-					//      \note It does not currently affect other component autosizing.
-					if ( lNumericFieldBlanks( 12 ) ) {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = false;
-					} else {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = true;
-					}
 					if ( rNumericArgs( 12 ) < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 						ShowContinueError( "... incorrect " + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "],  value should not be negative." );
@@ -2388,6 +2389,7 @@ namespace SizingManager {
 			// Determine SysSizInput electric Cooling design capacity sizing method
 			if ( SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "COOLINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).CoolingCapMethod = CoolingDesignCapacity;
+				// SysSizInput( SysSizIndex ).ScaledCoolingCapacity = AutoSize can be set to autosize cooling capacity
 				SysSizInput( SysSizIndex ).ScaledCoolingCapacity = rNumericArgs( iCoolDesignCapacityNumericNum );
 				if ( SysSizInput( SysSizIndex ).ScaledCoolingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledCoolingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
@@ -2443,7 +2445,7 @@ namespace SizingManager {
 			// Determine SysSizInput electric heating design capacity sizing method
 			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HEATINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).HeatingCapMethod = HeatingDesignCapacity;
-
+				// SysSizInput( SysSizIndex ).ScaledHeatingCapacity = AutoSize can be set to autosize heating capacity
 				SysSizInput( SysSizIndex ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
 				if ( SysSizInput( SysSizIndex ).ScaledHeatingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledHeatingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
@@ -3486,6 +3488,69 @@ namespace SizingManager {
 
 	}
 
+	void
+	GetAirTerminalSizing()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   February 2017
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Obtains input data for the AirTerminal sizing methods object and stores it in
+		// appropriate data structure.
+
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::VerifyName;
+		using InputProcessor::SameString;
+		using namespace DataIPShortCuts;
+		using General::RoundSigDigits;
+		using General::TrimSigDigits;
+
+		static std::string const RoutineName( "GetAirTerminalSizing: " ); // include trailing blank space
+
+		int NumAlphas; // Number of Alphas for each GetObjectItem call
+		int NumNumbers; // Number of Numbers for each GetObjectItem call
+		int TotalArgs; // Total number of alpha and numeric arguments (max) for a
+		int IOStatus; // Used in GetObjectItem
+		bool ErrorsFound( false ); // If errors detected in input
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+
+		cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
+		DataSizing::NumAirTerminalSizingSpec = GetNumObjectsFound( cCurrentModuleObject );
+		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		if ( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+			AirTerminalSizingSpec.allocate( DataSizing::NumAirTerminalSizingSpec );
+
+			//Start Loading the System Input
+			for ( int zSIndex = 1; zSIndex <= DataSizing::NumAirTerminalSizingSpec; ++zSIndex ) {
+
+				GetObjectItem( cCurrentModuleObject, zSIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+				VerifyName( cAlphaArgs( 1 ), AirTerminalSizingSpec, zSIndex - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+				}
+
+				auto & thisATSizing( DataSizing::AirTerminalSizingSpec( zSIndex ) );
+				thisATSizing.Name = cAlphaArgs( 1 );
+				thisATSizing.DesSensCoolingFrac = rNumericArgs( 1 );
+				thisATSizing.DesCoolSATRatio = rNumericArgs( 2 );
+				thisATSizing.DesSensHeatingFrac = rNumericArgs( 3 );
+				thisATSizing.DesHeatSATRatio = rNumericArgs( 4 );
+				thisATSizing.MinOAFrac = rNumericArgs( 5 );
+			}
+		}
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+		}
+
+	}
 
 
 	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
@@ -3632,7 +3697,80 @@ namespace SizingManager {
 		}
 	}
 
+	void
+	UpdateTermUnitFinalZoneSizing()
+	{
+		// Move data from FinalZoneSizing to TermUnitFinalZoneSizing and apply terminal unit sizing adjustments
+		// Called once to initialize before system sizing, then called again to update after system sizing
+		// M.J. Witte, July 2017
 
+		for ( int termUnitSizingIndex = 1; termUnitSizingIndex <= DataSizing::NumAirTerminalUnits; ++termUnitSizingIndex ) {
+			auto & thisTUFZSizing( TermUnitFinalZoneSizing( termUnitSizingIndex ) );
+			auto const & thisTUSizing( TermUnitSizing( termUnitSizingIndex ) );
+			int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
+			auto const & thisFZSizing( FinalZoneSizing( ctrlZoneNum ) );
+
+			// Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
+			thisTUFZSizing = thisFZSizing;
+
+			if( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+				// Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
+				// Cooling
+				Real64 coolFlowRatio = 1.0;
+				if ( thisTUSizing.SpecDesCoolSATRatio > 0.0 ) {
+					coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				} else {
+					coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac;
+				}
+				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
+				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlowMin = thisFZSizing.DesCoolVolFlowMin * coolFlowRatio;
+				thisTUFZSizing.DesCoolMassFlow = thisFZSizing.DesCoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolMinAirFlow2 = thisFZSizing.DesCoolMinAirFlow2 * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.CoolFlowSeq = thisFZSizing.CoolFlowSeq * coolFlowRatio;
+				thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
+				// Heating
+				Real64 heatFlowRatio = 1.0;
+				if ( thisTUSizing.SpecDesHeatSATRatio > 0.0 ) {
+					heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				} else {
+					heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac;
+				}
+				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
+				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.DesHeatVolFlow = thisFZSizing.DesHeatVolFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatVolFlowMax = thisFZSizing.DesHeatVolFlowMax * heatFlowRatio;
+				thisTUFZSizing.DesHeatMassFlow = thisFZSizing.DesHeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatMaxAirFlow2 = thisFZSizing.DesHeatMaxAirFlow2 * heatFlowRatio;
+				thisTUFZSizing.HeatFlowSeq = thisFZSizing.HeatFlowSeq * heatFlowRatio;
+				thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatLoad = thisFZSizing.NonAirSysDesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
+				// Outdoor air
+				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
+				if ( coolFlowRatio > 0.0 ) {
+					thisTUFZSizing.DesCoolOAFlowFrac = min( thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0 );
+				} else {
+					thisTUFZSizing.DesCoolOAFlowFrac = 0.0;
+				}
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+				if ( heatFlowRatio > 0.0 ) {
+					thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				} else {
+					thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
+				}
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+			}
+		}
+	}
 } // SizingManager
 
 } // EnergyPlus

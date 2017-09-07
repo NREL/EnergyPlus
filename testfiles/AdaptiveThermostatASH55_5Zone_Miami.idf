@@ -1,10 +1,9 @@
 ! AdaptiveThermostatASH55_5Zone_Miami.idf
-
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !                          (based on 5ZoneEndUses.idf)
 !
-! Highlights:              ASHRAE Standard 55-2010 adaptive comfort model is used in Space3-1 for setting zone thermostat 
-!                          setpoint temperature schedule                
+! Highlights:              ASHRAE Standard 55-2010 adaptive comfort model is used in Space3-1 for setting zone thermostat
+!                          setpoint temperature schedule
 !                          Variety of end uses by subcategory for reporting, including:
 !                              Interior Lighting:   General, Task Lights, Accent Lighting
 !                              Interior Equipment:  Computers, Copy Machines, Fax Machines, People Movers,
@@ -105,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -168,7 +167,7 @@
     ,                        !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
-    7,                      !- End Month
+    7,                       !- End Month
     31,                      !- End Day of Month
     Sunday,                  !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -254,7 +253,6 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
-
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
@@ -2576,10 +2574,10 @@
 
   ZoneControl:Thermostat:OperativeTemperature,
     AllControlledZones Thermostat,  !- Thermostat Name
-    CONSTANT,                                !- Radiative Fraction Input Mode
-    0.4,                                     !- Fixed Radiative Fraction
-    ,                                        !- Radiative Fraction Schedule Name
-    AdaptiveASH55CentralLine;               !- Adaptive Comfort Model Type
+    CONSTANT,                !- Radiative Fraction Input Mode
+    0.4,                     !- Fixed Radiative Fraction
+    ,                        !- Radiative Fraction Schedule Name
+    AdaptiveASH55CentralLine;!- Adaptive Comfort Model Type
 
   ThermostatSetpoint:SingleHeating,
     HeatingSetpoint,         !- Name
@@ -3075,7 +3073,7 @@
   Output:Variable,*,Fan Electric Power,Hourly;
 
   Output:Variable,*,Heating Coil Gas Rate,Hourly;
-  
+
   Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,Hourly;
 
   Output:Variable,*,Zone Adaptive Comfort Operative Temperature Set Point,Hourly;

@@ -411,6 +411,9 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 1 ).InletNode( 1 ) = 2;
 		ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 		ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+		ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 		ZoneEquipConfig( 1 ).IsControlled = true;
 		ZoneEquipConfig( 1 ).AirLoopNum = 1;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
@@ -425,6 +428,9 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 2 ).InletNode( 1 ) = 6;
 		ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 7;
 		ZoneEquipConfig( 2 ).ReturnAirNode = 8;
+		ZoneEquipConfig( 2 ).NumReturnNodes = 1;
+		ZoneEquipConfig( 2 ).ReturnNode.allocate( 1 );
+		ZoneEquipConfig( 2 ).ReturnNode( 1 ) = 8;
 		ZoneEquipConfig( 2 ).IsControlled = true;
 		ZoneEquipConfig( 2 ).AirLoopNum = 1;
 		ZoneEquipConfig( 2 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
@@ -615,4 +621,152 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
 
 	}
+	
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest )
+	{
+
+		WarmupFlag = false;
+		DayOfSim = 7;
+		MinNumberOfWarmupDays = 25;
+		NumOfZones = 1;
+		WarmupConvergenceValues.allocate( NumOfZones );
+		TempConvergTol = 0.01;
+		LoadsConvergTol = 0.01;
+		MaxTempPrevDay.allocate( NumOfZones );
+		MaxTempPrevDay( 1 ) = 23.0;
+		MaxTempZone.allocate( NumOfZones );
+		MaxTempZone( 1 ) = 23.0;
+		MinTempPrevDay.allocate( NumOfZones );
+		MinTempPrevDay( 1 ) = 23.0;
+		MinTempZone.allocate( NumOfZones );
+		MinTempZone( 1 ) = 23.0;
+		MaxHeatLoadZone.allocate( NumOfZones );
+		MaxHeatLoadPrevDay.allocate( NumOfZones );
+		WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue = 0.0;
+		MaxCoolLoadZone.allocate( NumOfZones );
+		MaxCoolLoadPrevDay.allocate( NumOfZones );
+		WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue = 0.0;
+		
+		// Test 1: All Maxs both less than MinLoad (100.0)
+		MaxHeatLoadZone( 1 ) = 50.0;
+		MaxHeatLoadPrevDay( 1 ) = 90.0;
+		MaxCoolLoadZone( 1 ) = 50.0;
+		MaxCoolLoadPrevDay( 1 ) = 90.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.0, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.0, 0.0001 );
+		
+		// Test 2: Max Previous Day both less than MinLoad
+		MaxHeatLoadZone( 1 ) = 100.5;
+		MaxHeatLoadPrevDay( 1 ) = 90.0;
+		MaxCoolLoadZone( 1 ) = 100.5;
+		MaxCoolLoadPrevDay( 1 ) = 90.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 3: Max Current Day both less than MinLoad
+		MaxHeatLoadZone( 1 ) = 90.0;
+		MaxHeatLoadPrevDay( 1 ) = 100.5;
+		MaxCoolLoadZone( 1 ) = 90.0;
+		MaxCoolLoadPrevDay( 1 ) = 100.5;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 4: Everything greater than MinLoad (pass convergence test)
+		MaxHeatLoadZone( 1 ) = 201.0;
+		MaxHeatLoadPrevDay( 1 ) = 200.0;
+		MaxCoolLoadZone( 1 ) = 201.0;
+		MaxCoolLoadPrevDay( 1 ) = 200.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 2 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
+		
+		// Test 5: Everything greater than MinLoad (fail convergence test)
+		MaxHeatLoadZone( 1 ) = 210.0;
+		MaxHeatLoadPrevDay( 1 ) = 200.0;
+		MaxCoolLoadZone( 1 ) = 210.0;
+		MaxCoolLoadPrevDay( 1 ) = 200.0;
+		CheckWarmupConvergence();
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 3 ), 1 );
+		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 1 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.05, 0.005 );
+		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.05, 0.005 );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInputTest )
+	{
+		// Test eio output for HVACSystemRootFindingAlgorithm
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.8;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"None, !- Infiltration Balancing Method",
+			"Ignored;                !- Infiltration Balancing Zones",
+			" HVACSystemRootFindingAlgorithm,",
+			" RegulaFalsiThenBisection,!- Algorithm",
+			" 5;                       !- Number of Iterations Before Algorithm Switch",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false
+		EXPECT_FALSE( ErrorsFound );
+		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION" );
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInputTest )
+	{
+		// Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.8;",
+			"Building,",
+			"My Building, !- Name",
+			"30., !- North Axis{ deg }",
+			"City, !- Terrain",
+			"0.04, !- Loads Convergence Tolerance Value",
+			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+			"FullExterior, !- Solar Distribution",
+			"25, !- Maximum Number of Warmup Days",
+			"6;                       !- Minimum Number of Warmup Days",
+			"ZoneAirMassFlowConservation,",
+			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+			"None, !- Infiltration Balancing Method",
+			"Ignored;                !- Infiltration Balancing Zones",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		bool ErrorsFound( false ); // If errors detected in input
+		ErrorsFound = false;
+		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false
+		EXPECT_FALSE( ErrorsFound );
+		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi" );
+	}
+
 }
