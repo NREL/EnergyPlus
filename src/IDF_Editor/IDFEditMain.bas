@@ -1145,7 +1145,7 @@ convUnits(121).multiUnitName = "Mode"
 convUnits(122).multiUnitName = "Control"
 convUnits(123).multiUnitName = "Availability"
 convUnits(129).multiUnitName = "VolumetricFlowPerPower"
-convUnits(144).multiUnitName = "WaveLength"
+convUnits(144).multiUnitName = "Wavelength"
 End Sub
 
 '-----------------------------------------------------------------------------
