@@ -985,8 +985,8 @@ namespace AirflowNetworkBalanceManager {
 			for ( k = 1; k <= NumOfNodes; ++k ) {
 				if ( Node( k ).IsLocalNode ) {
 					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + "=" + Alphas( 3 ) );
-					ShowContinueError( "A local air node is defined to input the wind pressure coefficient curve, while Wind Pressure Coefficient Type = SurfaceAverageCalculation. ");
-					ShowContinueError( "It requires tha Wind Pressure Coefficient Type = Input to use the local air node. ");
+					ShowContinueError( "A local air node is defined to INPUT the wind pressure coefficient curve, while Wind Pressure Coefficient Type is set to SurfaceAverageCalculation.");
+					ShowContinueError( "It requires  the Wind Pressure Coefficient Type be set to INPUT to use the local air node.");
 					ErrorsFound = true;
 					SimObjectError = true;
 					break;
