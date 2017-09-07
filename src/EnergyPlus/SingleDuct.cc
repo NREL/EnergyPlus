@@ -5031,6 +5031,7 @@ namespace SingleDuct {
 		// Keep trying until we find it, the airloopnum, that is
 		if ( this->OneTimeInitFlag2 ){
 			this->AirLoopNum = DataZoneEquipment::ZoneEquipConfig( DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqNum ).InletNodeAirLoopNum( this->CtrlZoneInNodeIndex );
+			DataDefineEquip::AirDistUnit( this->ADUNum ).AirLoopNum = this->AirLoopNum;
 			if ( this->AirLoopNum > 0 ) {
 				this->OneTimeInitFlag2 = false;
 			}

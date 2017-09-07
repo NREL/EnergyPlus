@@ -768,10 +768,12 @@ namespace DataZoneEquipment {
 
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum.allocate( NumNodes );
-				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNodeNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUCoolInNodeNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUHeatInNodeNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode = 0; // initialize to zero here
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
-				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNodeNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUCoolInNodeNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUHeatInNodeNum = 0; // initialize to zero here
 
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );

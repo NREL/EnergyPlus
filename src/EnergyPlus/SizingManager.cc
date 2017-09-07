@@ -2177,9 +2177,9 @@ namespace SizingManager {
 			}}
 			{ auto const coolOAOption( cAlphaArgs( i100PercentOACoolingAlphaNum ) );
 			if ( coolOAOption == "YES" ) {
-				SysSizInput( SysSizIndex ).CoolOAOption = 1;
+				SysSizInput( SysSizIndex ).CoolOAOption = AllOA;
 			} else if ( coolOAOption == "NO" ) {
-				SysSizInput( SysSizIndex ).CoolOAOption = 2;
+				SysSizInput( SysSizIndex ).CoolOAOption = MinOA;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
 				ShowContinueError("... incorrect " + cAlphaFieldNames( i100PercentOACoolingAlphaNum ) + "=\"" + cAlphaArgs( i100PercentOACoolingAlphaNum ) + "\".");

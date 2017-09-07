@@ -3986,7 +3986,10 @@ namespace ZoneEquipmentManager {
 		// Set initial flow rate for each return node
 		for ( int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
 			int retNode = thisZoneEquip.ReturnNode( returnNum );
-			int inletNode = thisZoneEquip.ReturnNodeInletNodeNum ( returnNum );
+			int inletNodeCool = thisZoneEquip.ReturnNodeADUCoolInNodeNum( returnNum ); // Primary air inlet node to matching AirDistUnitCool
+			int inletNodeHeat = thisZoneEquip.ReturnNodeADUHeatInNodeNum( returnNum ); // Primary air inlet node to matching AirDistUnitHeat
+			if ( inletNodeHeat == inletNodeCool ) inletNodeHeat = 0; // Don't double count airflow on the same inlet node
+
 			if ( retNode > 0 ) {
 				Real64 returnNodeMassFlow = 0.0;
 				auto & retNodeData( DataLoopNode::Node( retNode ) );
@@ -3994,9 +3997,34 @@ namespace ZoneEquipmentManager {
 				int airLoop = thisZoneEquip.ReturnNodeAirLoopNum( returnNum );
 				Real64 airLoopReturnFrac = 1.0;
 				if ( airLoop > 0 ) {
+					// Establish corresponding airloop inlet(s) mass flow rate and set return node max/min/maxavail
 					Real64 inletMassFlow = 0.0;
+					retNodeData.MassFlowRateMax = 0.0;
+					retNodeData.MassFlowRateMin = 0.0;
+					retNodeData.MassFlowRateMaxAvail = 0.0;
+					if ( inletNodeCool > 0 ) {
+						auto const & inletNodeData( DataLoopNode::Node( inletNodeCool ) );
+						inletMassFlow += inletNodeData.MassFlowRate;
+						retNodeData.MassFlowRateMax += inletNodeData.MassFlowRateMax;
+						retNodeData.MassFlowRateMin += inletNodeData.MassFlowRateMin;
+						retNodeData.MassFlowRateMaxAvail += inletNodeData.MassFlowRateMaxAvail;
+					}
+					if ( inletNodeHeat > 0 ) {
+						auto const & inletNodeData( DataLoopNode::Node( inletNodeHeat ) );
+						inletMassFlow += inletNodeData.MassFlowRate;
+						retNodeData.MassFlowRateMax += inletNodeData.MassFlowRateMax;
+						retNodeData.MassFlowRateMin += inletNodeData.MassFlowRateMin;
+						retNodeData.MassFlowRateMaxAvail += inletNodeData.MassFlowRateMaxAvail;
+					}
+
+					if ( ( inletNodeCool == 0 ) && ( inletNodeHeat == 0 ) ) {
+						auto const & zoneNodeData( DataLoopNode::Node( thisZoneEquip.ZoneNode ) );
+						retNodeData.MassFlowRateMax = zoneNodeData.MassFlowRateMax;
+						retNodeData.MassFlowRateMin = zoneNodeData.MassFlowRateMin;
+						retNodeData.MassFlowRateMaxAvail = zoneNodeData.MassFlowRateMaxAvail;
+					}
+
 					airLoopReturnFrac = DataAirLoop::AirLoopFlow( airLoop ).DesReturnFrac;
-					if ( inletNode > 0 ) inletMassFlow = DataLoopNode::Node( inletNode ).MassFlowRate;
 					if ( DataAirSystems::PrimaryAirSystem( airLoop ).OASysExists ) {
 						// Set return flow as fraction of matching inlet node flow if there is an OA system
 						returnNodeMassFlow = airLoopReturnFrac * inletMassFlow;
@@ -4040,17 +4068,6 @@ namespace ZoneEquipmentManager {
 				retNodeData.MassFlowRate = returnNodeMassFlow;
 				retNodeData.MassFlowRateMinAvail = 0.0;
 				if ( !fixedReturn( returnNum ) ) totVarReturnFlow += returnNodeMassFlow;
-				if ( inletNode > 0 ) {
-					auto const & inletNodeData( DataLoopNode::Node( inletNode ) );
-					retNodeData.MassFlowRateMax = inletNodeData.MassFlowRateMax;
-					retNodeData.MassFlowRateMin = inletNodeData.MassFlowRateMin;
-					retNodeData.MassFlowRateMaxAvail = inletNodeData.MassFlowRateMaxAvail;
-				} else {
-					auto const & zoneNodeData( DataLoopNode::Node( thisZoneEquip.ZoneNode ) );
-					retNodeData.MassFlowRateMax = zoneNodeData.MassFlowRateMax;
-					retNodeData.MassFlowRateMin = zoneNodeData.MassFlowRateMin;
-					retNodeData.MassFlowRateMaxAvail = zoneNodeData.MassFlowRateMaxAvail;
-				}
 			}
 		}
 

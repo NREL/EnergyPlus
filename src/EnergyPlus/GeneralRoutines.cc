@@ -1721,7 +1721,7 @@ TestReturnAirPathIntegrity(
 	// PURPOSE OF THIS SUBROUTINE:
 	// This subroutine tests return air path integrity and displays the loop for each branch.
 	// Also, input and output nodes.
-	// This also initializes ZoneEquipConfig.ReturnNodeInletNodeNum and ReturnNodeAirLoopNum
+	// This also initializes ZoneEquipConfig.ReturnNodeADUCoolInNodeNum, ReturnNodeADUHeatInNodeNum and ReturnNodeAirLoopNum
 
 	// METHODOLOGY EMPLOYED:
 	// na
@@ -2007,7 +2007,8 @@ TestReturnAirPathIntegrity(
 									// Find matching inlet node connected to the same air loop
 									for ( int inletNum = 1; inletNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++inletNum ) {
 										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( inletNum ) == WAirLoop ) {
-											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNodeNum( ZoneOutNum ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( inletNum );
+											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeADUCoolInNodeNum( ZoneOutNum ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( inletNum ).InNode;
+											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeADUHeatInNodeNum( ZoneOutNum ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( inletNum ).InNode;
 											break;
 										}
 									}
@@ -2043,7 +2044,8 @@ TestReturnAirPathIntegrity(
 							// Find matching inlet node connected to the same air loop
 							for ( int inletNum = 1; inletNum <= thisZoneEquip.NumInletNodes; ++inletNum ) {
 								if ( thisZoneEquip.InletNodeAirLoopNum( inletNum ) == airLoopNum ) {
-									thisZoneEquip.ReturnNodeInletNodeNum( znReturnNum ) = thisZoneEquip.InletNode( inletNum );
+									thisZoneEquip.ReturnNodeADUCoolInNodeNum( znReturnNum ) = thisZoneEquip.AirDistUnitCool( inletNum ).InNode;
+									thisZoneEquip.ReturnNodeADUHeatInNodeNum( znReturnNum ) = thisZoneEquip.AirDistUnitHeat( inletNum ).InNode;
 									break;
 								}
 							}

@@ -130,7 +130,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 
 	ZoneEquipConfig( ZoneNum ).AirLoopNum = 0;
 	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 ) = 0;
-	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNodeNum( 1 ) = ZoneEquipConfig( ZoneNum ).InletNode( 1 );
+	ZoneEquipConfig( ZoneNum ).ReturnNodeADUCoolInNodeNum ( 1 ) = ZoneEquipConfig( ZoneNum ).InletNode( 1 );
 
 	// Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
 	Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( 1 ) ).MassFlowRate = 1.000000001;
@@ -520,9 +520,9 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2 )
 	int inletNode1 = ZoneEquipConfig( ZoneNum ).InletNode( 1 );
 	int inletNode2 = ZoneEquipConfig( ZoneNum ).InletNode( 2 );
 	int inletNode3 = ZoneEquipConfig( ZoneNum ).InletNode( 3 );
-	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNodeNum( 1 ) = inletNode2; // Intentionally in a different order
-	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNodeNum( 2 ) = inletNode1;
-	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNodeNum( 3 ) = inletNode3;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeADUCoolInNodeNum( 1 ) = inletNode2; // Intentionally in a different order
+	ZoneEquipConfig( ZoneNum ).ReturnNodeADUCoolInNodeNum( 2 ) = inletNode1;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeADUCoolInNodeNum( 3 ) = inletNode3;
 	int returnNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
 	int returnNode2 = ZoneEquipConfig( ZoneNum ).ReturnNode( 2 );
 	int returnNode3 = ZoneEquipConfig( ZoneNum ).ReturnNode( 3 );

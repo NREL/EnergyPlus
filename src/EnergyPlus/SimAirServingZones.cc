@@ -98,6 +98,7 @@
 #include <InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
@@ -565,6 +566,7 @@ namespace SimAirServingZones {
 			OASysContListNum = 0;
 			PackagedUnit( AirSysNum ) = false;
 			PrimaryAirSystem( AirSysNum ).OASysExists = false; // init Outside Air system connection data to none
+			PrimaryAirSystem( AirSysNum ).isAllOA = false;
 			PrimaryAirSystem( AirSysNum ).OASysInletNodeNum = 0;
 			PrimaryAirSystem( AirSysNum ).OASysOutletNodeNum = 0;
 			PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = 0;
@@ -780,6 +782,18 @@ namespace SimAirServingZones {
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum.allocate( NumCompsOnBranch + 1 );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum( 1 ) = InletNodeNumbers( 1 );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).DuctType = Main;
+
+				// If first node is an outdoor air node, then consider this to have a simple OA system (many places check for this)
+				if ( OutAirNodeManager::CheckOutAirNodeNumber( InletNodeNumbers( 1 ) ) ) {
+					PrimaryAirSystem( AirSysNum ).OASysExists = true;
+					PrimaryAirSystem( AirSysNum ).isAllOA = true;
+					PrimaryAirSystem( AirSysNum ).OASysInletNodeNum = InletNodeNumbers( 1 );
+					PrimaryAirSystem( AirSysNum ).OASysOutletNodeNum = InletNodeNumbers( 1 );
+					PrimaryAirSystem( AirSysNum ).OAMixOAInNodeNum = InletNodeNumbers( 1 );
+					AirToOANodeInfo( AirSysNum ).OASysExists = true;
+					AirToOANodeInfo( AirSysNum ).OASysInletNodeNum = InletNodeNumbers( 1 );
+					AirToOANodeInfo( AirSysNum ).OASysOutletNodeNum = InletNodeNumbers( 1 );
+				}
 				for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 
 					PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf = CompTypes( CompNum );
@@ -1917,7 +1931,7 @@ namespace SimAirServingZones {
 							FoundOASys = true;
 						}
 						if ( CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel ) {
-							if ( PrimaryAirSystem(AirLoopNum).OASysExists ) {
+							if ( PrimaryAirSystem( AirLoopNum ).OASysExists && !PrimaryAirSystem( AirLoopNum ).isAllOA ) {
 								if ( FoundOASys ) {
 									if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3 ) {
 										GetFanIndex( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound );
@@ -1935,7 +1949,7 @@ namespace SimAirServingZones {
 							}
 						}
 						if ( CompTypeNum == Fan_System_Object ) {
-							if ( PrimaryAirSystem(AirLoopNum).OASysExists ) {
+							if ( PrimaryAirSystem( AirLoopNum ).OASysExists && !PrimaryAirSystem( AirLoopNum ).isAllOA ) {
 								if ( FoundOASys ) {
 									if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3 ) {
 										SupFanIndex = HVACFan::getFanObjectVectorIndex( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
@@ -3507,6 +3521,8 @@ namespace SimAirServingZones {
 						ScalableSM = "Design ";
 				}}
 				ReportSizingOutput("AirLoopHVAC", PrimaryAirSystem(AirLoopNum).Name, ScalableSM + "Supply Air Flow Rate [m3/s]", PrimaryAirSystem(AirLoopNum).DesignVolFlowRate);
+				// Initialize MaxOutAir for DOAS loops with no actual OASys, systems with an OA controller will overwrite this is CalcOAController
+				if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) AirLoopFlow( AirLoopNum ).MaxOutAir = PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate * DataEnvironment::StdRhoAir;
 			}
 
 			if ( PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate < SmallAirVolFlow ) {
@@ -3696,8 +3712,13 @@ namespace SimAirServingZones {
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolSupHumRat = SysSizInput( SysSizNum ).CoolSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatSupHumRat = SysSizInput( SysSizNum ).HeatSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).SizingOption = SysSizInput( SysSizNum ).SizingOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+					if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = AllOA;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = AllOA;
+					} else { 
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+					}
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolAirDesMethod = SysSizInput( SysSizNum ).CoolAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatAirDesMethod = SysSizInput( SysSizNum ).HeatAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( SysSizNum ).ScaleCoolSAFMethod;
@@ -3724,8 +3745,13 @@ namespace SimAirServingZones {
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolSupHumRat = SysSizInput( 1 ).CoolSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatSupHumRat = SysSizInput( 1 ).HeatSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).SizingOption = SysSizInput( 1 ).SizingOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+					if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = AllOA;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = AllOA;
+					} else { 
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+					}
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolAirDesMethod = SysSizInput( 1 ).CoolAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatAirDesMethod = SysSizInput( 1 ).HeatAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( 1 ).ScaleCoolSAFMethod;
@@ -3780,8 +3806,13 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( SysSizNum ).CoolSupHumRat;
 				FinalSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( SysSizNum ).HeatSupHumRat;
 				FinalSysSizing( AirLoopNum ).SizingOption = SysSizInput( SysSizNum ).SizingOption;
-				FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
-				FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					FinalSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else { 
+					FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				}
 				FinalSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( SysSizNum ).CoolAirDesMethod;
 				FinalSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( SysSizNum ).HeatAirDesMethod;
 				FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( SysSizNum ).ScaleCoolSAFMethod;
@@ -3819,8 +3850,13 @@ namespace SimAirServingZones {
 				CalcSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( SysSizNum ).CoolSupHumRat;
 				CalcSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( SysSizNum ).HeatSupHumRat;
 				CalcSysSizing( AirLoopNum ).SizingOption = SysSizInput( SysSizNum ).SizingOption;
-				CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
-				CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				}
 				CalcSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( SysSizNum ).CoolAirDesMethod;
 				CalcSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( SysSizNum ).HeatAirDesMethod;
 				CalcSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( SysSizNum ).ScaleCoolSAFMethod;
@@ -3859,8 +3895,13 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( 1 ).CoolSupHumRat;
 				FinalSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( 1 ).HeatSupHumRat;
 				FinalSysSizing( AirLoopNum ).SizingOption = SysSizInput( 1 ).SizingOption;
-				FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
-				FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					FinalSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else {
+					FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				}
 				FinalSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( 1 ).CoolAirDesMethod;
 				FinalSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( 1 ).HeatAirDesMethod;
 				FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( 1 ).ScaleCoolSAFMethod;
@@ -3897,8 +3938,13 @@ namespace SimAirServingZones {
 				CalcSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( 1 ).CoolSupHumRat;
 				CalcSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( 1 ).HeatSupHumRat;
 				CalcSysSizing( AirLoopNum ).SizingOption = SysSizInput( 1 ).SizingOption;
-				CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
-				CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				}
 				CalcSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( 1 ).CoolAirDesMethod;
 				CalcSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( 1 ).HeatAirDesMethod;
 				CalcSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( 1 ).ScaleCoolSAFMethod;
