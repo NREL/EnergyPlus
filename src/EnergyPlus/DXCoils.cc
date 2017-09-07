@@ -9486,7 +9486,7 @@ Label50: ;
 		if ( ADiff >= EXP_LowerLimit ) {
 			CBFAdj = std::exp( ADiff );
 		} else {
-			CBFAdj = 0.0;
+			CBFAdj = 1.0e-6;
 		}
 
 		return CBFAdj;
