@@ -421,6 +421,7 @@ namespace Photovoltaics {
 					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface is not exposed to solar, check surface bounday condition" );
 				}
+				PVarray( PVnum ).Zone = GetPVZone( PVarray( PVnum ).SurfacePtr );
 
 				// check surface orientation, warn if upside down
 				if ( ( Surface( SurfNum ).Tilt < -95.0 ) || ( Surface( SurfNum ).Tilt > 95.0 ) ) {
@@ -757,6 +758,34 @@ namespace Photovoltaics {
 
 	}
 
+	int
+	GetPVZone( int const SurfNum )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Sept 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// Get the zone number for this PV array for use when zone multipliers are applied
+
+		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
+		using DataSurfaces::Surface;
+		using InputProcessor::FindItemInList;
+		
+		int GetPVZone( 0 );
+		
+		if ( SurfNum > 0 ) {
+			GetPVZone = Surface( SurfNum ).Zone;
+				if ( GetPVZone == 0 ) { // might need to get the zone number from the name
+					GetPVZone = FindItemInList( Surface( SurfNum ).ZoneName, Zone, NumOfZones );
+				}
+		}
+		
+		return GetPVZone;
+		
+	}
+	
 	// **************************************
 
 	void
@@ -856,47 +885,28 @@ namespace Photovoltaics {
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Jan. 2004
 		//       MODIFIED       B. Griffith, Aug. 2008
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// collect statements that assign to variables tied to output variables
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
 		using DataSurfaces::Surface;
 		using DataHeatBalFanSys::QPVSysSource;
 		using TranspiredCollector::SetUTSCQdotSource;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		using InputProcessor::FindItemInList;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int thisZone; // working index for zones
 
 		PVarray( PVnum ).Report.DCEnergy = PVarray( PVnum ).Report.DCPower * ( TimeStepSys * SecInHour );
-
+		
 		// add check for multiplier.  if surface is attached to a zone that is on a multiplier
 		// then PV production should be multiplied out as well
 
-		if ( Surface( PVarray( PVnum ).SurfacePtr ).Zone != 0 ) { // might need to apply multiplier
-			thisZone = Surface( PVarray( PVnum ).SurfacePtr ).Zone;
+		thisZone = PVarray( PVnum ).Zone;
+		if ( thisZone != 0 ) { // might need to apply multiplier
 			PVarray( PVnum ).Report.DCEnergy *= ( Zone( thisZone ).Multiplier * Zone( thisZone ).ListMultiplier );
 			PVarray( PVnum ).Report.DCPower *= ( Zone( thisZone ).Multiplier * Zone( thisZone ).ListMultiplier );
 		}
