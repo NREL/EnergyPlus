@@ -1514,6 +1514,9 @@ namespace HeatingCoils {
 			LoopHeatingCoilMaxRTF = max( LoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil( CoilNum ).NominalCapacity );
 		}
 
+		// set outlet node temp so parent objects can call calc directly without have to simulate entire model
+		Node( HeatingCoil( CoilNum ).AirOutletNodeNum ).Temp = HeatingCoil( CoilNum ).OutletAirTemp;
+
 	}
 
 	void
@@ -1730,6 +1733,9 @@ namespace HeatingCoils {
 
 		} // end of on/off if - else
 
+		// set outlet node temp so parent objects can call calc directly without have to simulate entire model
+		Node( HeatingCoil( CoilNum ).AirOutletNodeNum ).Temp = HeatingCoil( CoilNum ).OutletAirTemp;
+
 	}
 
 	void
@@ -1929,6 +1935,9 @@ namespace HeatingCoils {
 		QCoilActual = HeatingCoilLoad;
 		LoopHeatingCoilMaxRTF = max( LoopHeatingCoilMaxRTF, HeatingCoil( CoilNum ).RTF );
 		ElecHeatingCoilPower = HeatingCoil( CoilNum ).ElecUseLoad;
+
+		// set outlet node temp so parent objects can call calc directly without have to simulate entire model
+		Node( HeatingCoil( CoilNum ).AirOutletNodeNum ).Temp = HeatingCoil( CoilNum ).OutletAirTemp;
 
 	}
 
@@ -2193,6 +2202,9 @@ namespace HeatingCoils {
 				}
 			}
 		}
+
+		// set outlet node temp so parent objects can call calc directly without have to simulate entire model
+		Node( HeatingCoil( CoilNum ).AirOutletNodeNum ).Temp = HeatingCoil( CoilNum ).OutletAirTemp;
 
 	}
 
