@@ -4691,7 +4691,9 @@ namespace OutputReportTabular {
 					curMeterNumber = meterNumEndUseBEPS( iResource, jEndUse );
 					if ( curMeterNumber > 0 ) {
 						curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
-						gatherDemandIndEndUse( iResource, jEndUse ) = curDemandValue;
+						if ( curDemandValue > gatherDemandIndEndUse( iResource, jEndUse ) ) {
+							gatherDemandIndEndUse( iResource, jEndUse ) = curDemandValue;
+						}
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 							curMeterNumber = meterNumEndUseSubBEPS( kEndUseSub, jEndUse, iResource );
 							if ( curMeterNumber > 0 ) {
