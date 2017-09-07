@@ -525,12 +525,12 @@ namespace EnergyPlus {
 			static Real64 flux_nonsolar( 0.0 );
 			static gio::Fmt fmtLD( "*" );
 
-			static Array1D< double > Atop_eff( maxlay, 0.0 );
-			static Array1D< double > Abot_eff( maxlay, 0.0 );
-			static Array1D< double > Al_eff( maxlay, 0.0 );
-			static Array1D< double > Ar_eff( maxlay, 0.0 );
-			static Array1D< double > Ah_eff( maxlay, 0.0 );
-			static Array1D< double > EffectiveOpenness( maxlay, 0.0 );
+			static Array1D< Real64 > Atop_eff( maxlay, 0.0 );
+			static Array1D< Real64 > Abot_eff( maxlay, 0.0 );
+			static Array1D< Real64 > Al_eff( maxlay, 0.0 );
+			static Array1D< Real64 > Ar_eff( maxlay, 0.0 );
+			static Array1D< Real64 > Ah_eff( maxlay, 0.0 );
+			static Array1D< Real64 > EffectiveOpenness( maxlay, 0.0 );
 
 			//Autodesk:Uninit Initialize variables used uninitialized
 			shgc_NOSD = 0.0; //Autodesk:Uninit Force default initialization
