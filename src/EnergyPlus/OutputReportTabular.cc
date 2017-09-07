@@ -90,6 +90,7 @@
 #include <General.hh>
 #include <HybridModel.hh>
 #include <InputProcessor.hh>
+#include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>
@@ -11433,6 +11434,7 @@ namespace OutputReportTabular {
 		static int iSurf( 0 );
 		static int ZoneNum( 0 );
 		static int TimeStepInDay( 0 );
+		static Array1D_int IntGainTypesTubular( 1, { IntGainTypeOf_DaylightingDeviceTubular } );
 
 		if ( CompLoadReportIsReq && ! isPulseZoneSizing ) {
 			TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
@@ -11447,6 +11449,11 @@ namespace OutputReportTabular {
 				// to how blinds and shades absorb solar radiation and
 				// convect that heat that timestep.
 				//feneSolarInstantSeq(ZoneNum,TimeStepInDay,CurOverallSimDay) = 0
+			}
+			for ( int izone = 1; izone <= NumOfZones; ++ izone ){
+				Real64 tubularGain = 0.0;
+				InternalHeatGains::SumInternalConvectionGainsByTypes( izone, IntGainTypesTubular, tubularGain );
+				feneCondInstantSeq( CurOverallSimDay, TimeStepInDay, izone ) += tubularGain;
 			}
 		}
 	}
