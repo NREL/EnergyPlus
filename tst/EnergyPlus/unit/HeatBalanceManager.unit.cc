@@ -418,16 +418,16 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 1 ).AirLoopNum = 1;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 		ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).InletNodeADUNum.allocate( 1 );
 		ZoneEquipConfig( 1 ).AirDistUnitCool.allocate( 1 );
 		ZoneEquipConfig( 1 ).AirDistUnitHeat.allocate( 1 );
 		ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 1 ).InletNodeADUNum( 1 ) = 0;
 		ZoneEquipConfig( 1 ).AirDistUnitCool( 1 ).InNode = 2;
 		ZoneEquipConfig( 1 ).ReturnNodeAirLoopNum.allocate( 1 );
-		ZoneEquipConfig( 1 ).ReturnNodeADUCoolInNodeNum.allocate( 1 );
-		ZoneEquipConfig( 1 ).ReturnNodeADUHeatInNodeNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).ReturnNodeInletNum.allocate( 1 );
 		ZoneEquipConfig( 1 ).ReturnNodeAirLoopNum( 1 ) = 1;
-		ZoneEquipConfig( 1 ).ReturnNodeADUCoolInNodeNum( 1 ) = 2;
-		ZoneEquipConfig( 1 ).ReturnNodeADUHeatInNodeNum( 1 ) = 0;
+		ZoneEquipConfig( 1 ).ReturnNodeInletNum( 1 ) = 1;
 
 		ZoneEquipConfig( 2 ).ZoneName = "Zone 2";
 		ZoneEquipConfig( 2 ).ActualZoneNum = 2;
@@ -446,16 +446,16 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 2 ).AirLoopNum = 1;
 		ZoneEquipConfig( 2 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 		ZoneEquipConfig( 2 ).InletNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 2 ).InletNodeADUNum.allocate( 1 );
 		ZoneEquipConfig( 2 ).AirDistUnitCool.allocate( 1 );
 		ZoneEquipConfig( 2 ).AirDistUnitHeat.allocate( 1 );
 		ZoneEquipConfig( 2 ).InletNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 2 ).InletNodeADUNum( 1 ) = 0;
 		ZoneEquipConfig( 2 ).AirDistUnitCool( 1 ).InNode = 6;
 		ZoneEquipConfig( 2 ).ReturnNodeAirLoopNum.allocate( 1 );
-		ZoneEquipConfig( 2 ).ReturnNodeADUCoolInNodeNum.allocate( 1 );
-		ZoneEquipConfig( 2 ).ReturnNodeADUHeatInNodeNum.allocate( 1 );
+		ZoneEquipConfig( 2 ).ReturnNodeInletNum.allocate( 1 );
 		ZoneEquipConfig( 2 ).ReturnNodeAirLoopNum( 1 ) = 1;
-		ZoneEquipConfig( 2 ).ReturnNodeADUCoolInNodeNum( 1 ) = 6;
-		ZoneEquipConfig( 2 ).ReturnNodeADUHeatInNodeNum( 1 ) = 0;
+		ZoneEquipConfig( 2 ).ReturnNodeInletNum( 1 ) = 1;
 
 		ZoneEquipInputsFilled = true;
 		NumPrimaryAirSys = 1;

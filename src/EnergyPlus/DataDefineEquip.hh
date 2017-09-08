@@ -115,9 +115,10 @@ namespace DataDefineEquip {
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
 		Real64 MassFlowRateUpStrLk; // current air mass flow rate of the upstream leak [kg/s]
 		Real64 MassFlowRateDnStrLk; // current air mass flow rate of the downstream leak [kg/s]
-		Real64 MassFlowRateTU; // current air mass flow rate tjrough the terminal unit [kg/s]
+		Real64 MassFlowRateTU; // current air mass flow rate through the terminal unit [kg/s]
 		Real64 MassFlowRateZSup; // current air mass flow rate of zone supply air [kg/s]
 		Real64 MassFlowRateSup; // current air mass flow rate of supply air upstream of upstream leak [kg/s]
+		Real64 MassFlowRatePlenInd; // current air mass flow rate of induced air from plenum [kg/s]
 		Real64 MaxAvailDelta; // change in max avail mass low rate due to leaks [kg/s]
 		Real64 MinAvailDelta; // change in min avail mass low rate due to leaks [kg/s]
 		int InletNodeNum; // index of inlet node
@@ -152,6 +153,7 @@ namespace DataDefineEquip {
 			MassFlowRateTU( 0.0 ),
 			MassFlowRateZSup( 0.0 ),
 			MassFlowRateSup( 0.0 ),
+			MassFlowRatePlenInd( 0.0 ),
 			MaxAvailDelta( 0.0 ),
 			MinAvailDelta( 0.0 ),
 			InletNodeNum( 0 ),

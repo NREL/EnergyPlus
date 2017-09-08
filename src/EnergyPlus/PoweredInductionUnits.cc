@@ -1544,6 +1544,7 @@ namespace PoweredInductionUnits {
 		} else {
 			PlenumInducedMassFlow = 0.0;
 		}
+		DataDefineEquip::AirDistUnit( PIU( PIUNum ).ADUNum ).MassFlowRatePlenInd = PlenumInducedMassFlow;
 		Node( OutletNode ).MassFlowRateMax = PIU( PIUNum ).MaxTotAirMassFlow;
 
 	}
@@ -1787,6 +1788,7 @@ namespace PoweredInductionUnits {
 		} else {
 			PlenumInducedMassFlow = 0.0;
 		}
+		DataDefineEquip::AirDistUnit( PIU( PIUNum ).ADUNum ).MassFlowRatePlenInd = PlenumInducedMassFlow;
 		Node( OutletNode ).MassFlowRateMax = PIU( PIUNum ).MaxPriAirMassFlow;
 
 	}

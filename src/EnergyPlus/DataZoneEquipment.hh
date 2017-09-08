@@ -333,11 +333,11 @@ namespace DataZoneEquipment {
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
 		Array1D_int InletNodeAirLoopNum; // air loop number connected to this inlet node (0 if not an airloop node)
+		Array1D_int InletNodeADUNum; // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
 		Array1D_int ExhaustNode; // zone air exhaust nodes
 		Array1D_int ReturnNode; // zone return air nodes (node numbers)
 		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
-		Array1D_int ReturnNodeADUCoolInNodeNum; // node number of the AirDistUnitCool primary inlet node for this zone that is attached to the same air loop (could be zero)
-		Array1D_int ReturnNodeADUHeatInNodeNum; // node number of the AirDistUnitHeat primary inlet node for this zone that is attached to the same air loop (could be zero)
+		Array1D_int ReturnNodeInletNum; // zone supply air inlet that matched this return node (same zone, same airloop)
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
 		int AirLoopNum; // the air loop index for this controlled zone

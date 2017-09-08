@@ -5210,6 +5210,13 @@ namespace SingleDuct {
 				Node( MixedAirOutNode ).GenContam = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).GenContam + Node( PriInNode ).MassFlowRate * Node( PriInNode ).GenContam ) / Node( MixedAirOutNode ).MassFlowRate;
 			}
 		}
+
+		// update ADU flow data - because SimATMixer is called from the various zone equipment so the updates in SimZoneAirLoopEquipment won't work
+		int aduNum = SysATMixer( SysNum ).ADUNum;
+		DataDefineEquip::AirDistUnit( aduNum ).MassFlowRateTU = Node( PriInNode ).MassFlowRate;
+		DataDefineEquip::AirDistUnit( aduNum ).MassFlowRateZSup = Node( PriInNode ).MassFlowRate;
+		DataDefineEquip::AirDistUnit( aduNum ).MassFlowRateSup = Node( PriInNode ).MassFlowRate;
+
 	}
 
 	void

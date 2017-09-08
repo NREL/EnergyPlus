@@ -714,6 +714,7 @@ namespace DataZoneEquipment {
 
 				ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
 
@@ -725,6 +726,7 @@ namespace DataZoneEquipment {
 						GetZoneEquipmentDataErrorsFound = true;
 					}
 					ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( NodeNum ) = 0;
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum( NodeNum ) = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
@@ -768,12 +770,10 @@ namespace DataZoneEquipment {
 
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum.allocate( NumNodes );
-				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUCoolInNodeNum.allocate( NumNodes );
-				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUHeatInNodeNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode = 0; // initialize to zero here
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
-				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUCoolInNodeNum = 0; // initialize to zero here
-				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeADUHeatInNodeNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum = 0; // initialize to zero here
 
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );

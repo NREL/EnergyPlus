@@ -556,7 +556,10 @@ namespace ZoneEquipmentManager {
 		
 		for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
 			AirLoopFlow( airLoop ).SupFlow = 0.0;
-			AirLoopFlow( airLoop ).RetFlow = 0.0;
+			AirLoopFlow( airLoop ).ZoneRetFlow = 0.0;
+			AirLoopFlow( airLoop ).SysRetFlow = 0.0;
+			AirLoopFlow( airLoop ).RecircFlow = 0.0;
+			AirLoopFlow( airLoop ).LeakFlow = 0.0;
 		}
 
 	}
@@ -3764,18 +3767,20 @@ namespace ZoneEquipmentManager {
 		BuildingZoneMixingFlow = 0.0;
 		BuildingZoneMixingFlowOld = 0.0;
 
-		// Total loop supply flows
+		// Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
 		for ( int airDistUnit = 1; airDistUnit <= DataDefineEquip::NumAirDistUnits; ++airDistUnit ) {
 			int airLoop = DataDefineEquip::AirDistUnit( airDistUnit ).AirLoopNum;
 			if  ( airLoop > 0 ) {
-				DataAirLoop::AirLoopFlow( airLoop ).SupFlow += DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRateZSup;
+				AirLoopFlow( airLoop ).SupFlow += DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRateSup;
+				AirLoopFlow( airLoop ).RecircFlow += DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRatePlenInd;
+				AirLoopFlow( airLoop ).LeakFlow += DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRateDnStrLk + DataDefineEquip::AirDistUnit( airDistUnit ).MassFlowRateUpStrLk;
 			}
 		}
 		// Accumulate air loop supply flow here for use in CalcZoneMassBalance
 		for ( int directAirUnit = 1; directAirUnit <= DirectAirManager::NumDirectAir; ++directAirUnit ) {
 			int airLoop = DirectAirManager::DirectAir( directAirUnit ).AirLoopNum;
 			if  ( airLoop > 0 ) {
-				DataAirLoop::AirLoopFlow( airLoop ).SupFlow += Node( DirectAirManager::DirectAir( directAirUnit ).ZoneSupplyAirNode ).MassFlowRate ;
+				AirLoopFlow( airLoop ).SupFlow += Node( DirectAirManager::DirectAir( directAirUnit ).ZoneSupplyAirNode ).MassFlowRate ;
 			}
 		}	
 
@@ -3783,7 +3788,8 @@ namespace ZoneEquipmentManager {
 			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
 				// These are also reset in ZoneEquipmentManager::InitZoneEquipment, reset again here for each zone mass balance iteration
 				for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
-					AirLoopFlow( airLoop ).RetFlow = 0.0;
+					AirLoopFlow( airLoop ).ZoneRetFlow = 0.0;
+					AirLoopFlow( airLoop ).SysRetFlow = 0.0;
 				}
 				for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 					if ( !ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
@@ -3919,7 +3925,7 @@ namespace ZoneEquipmentManager {
 					int retNode = ZoneEquipConfig( ZoneNum ).ReturnNode( returnNum );
 					int airLoop = ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( returnNum );
 					if ( airLoop > 0 ) {
-						DataAirLoop::AirLoopFlow( airLoop ).RetFlow += DataLoopNode::Node( retNode ).MassFlowRate;
+						AirLoopFlow( airLoop ).ZoneRetFlow += Node( retNode ).MassFlowRate;
 					}
 				}
 				// Check zone flow balance
@@ -3950,19 +3956,21 @@ namespace ZoneEquipmentManager {
 		} while ( Iteration < IterMax );
 
 		// Check for unbalanced airloop
-		if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag && AirLoopsSimOnce ) {
-			for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-				Real64 exhaustDelta = AirLoopFlow( AirLoopNum ).SupFlow - AirLoopFlow( AirLoopNum ).RetFlow;
-				Real64 unbalancedExhaustDelta = max( 0.0, ( exhaustDelta - AirLoopFlow( AirLoopNum ).MaxOutAir ) );
-				if ( ( unbalancedExhaustDelta > SmallMassFlow) && !AirLoopFlow( AirLoopNum ).FlowError ) {
+		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+			{ auto & thisAirLoopFlow ( AirLoopFlow( AirLoopNum ) );
+			thisAirLoopFlow.SysRetFlow = thisAirLoopFlow.ZoneRetFlow - thisAirLoopFlow.RecircFlow + thisAirLoopFlow.LeakFlow;
+			if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag && AirLoopsSimOnce ) {
+				Real64 exhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.SysRetFlow;
+				Real64 unbalancedExhaustDelta = max( 0.0, ( exhaustDelta - thisAirLoopFlow.MaxOutAir ) );
+				if ( ( unbalancedExhaustDelta > SmallMassFlow) && !thisAirLoopFlow.FlowError ) {
 					ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem( AirLoopNum ).Name + " there is unbalanced exhaust air flow." );
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
 					ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
-					AirLoopFlow( AirLoopNum ).FlowError = true;
+					thisAirLoopFlow.FlowError = true;
 				}
 			}
-		}
+		}}
 
 	}
 
@@ -3986,38 +3994,35 @@ namespace ZoneEquipmentManager {
 		// Set initial flow rate for each return node
 		for ( int returnNum = 1; returnNum <= numRetNodes; ++returnNum) {
 			int retNode = thisZoneEquip.ReturnNode( returnNum );
-			int inletNodeCool = thisZoneEquip.ReturnNodeADUCoolInNodeNum( returnNum ); // Primary air inlet node to matching AirDistUnitCool
-			int inletNodeHeat = thisZoneEquip.ReturnNodeADUHeatInNodeNum( returnNum ); // Primary air inlet node to matching AirDistUnitHeat
-			if ( inletNodeHeat == inletNodeCool ) inletNodeHeat = 0; // Don't double count airflow on the same inlet node
 
 			if ( retNode > 0 ) {
 				Real64 returnNodeMassFlow = 0.0;
 				auto & retNodeData( DataLoopNode::Node( retNode ) );
 
+				int inletNum = thisZoneEquip.ReturnNodeInletNum( returnNum ); // which inlet node matches this return node (same airloop)
 				int airLoop = thisZoneEquip.ReturnNodeAirLoopNum( returnNum );
 				Real64 airLoopReturnFrac = 1.0;
 				if ( airLoop > 0 ) {
 					// Establish corresponding airloop inlet(s) mass flow rate and set return node max/min/maxavail
 					Real64 inletMassFlow = 0.0;
-					retNodeData.MassFlowRateMax = 0.0;
-					retNodeData.MassFlowRateMin = 0.0;
-					retNodeData.MassFlowRateMaxAvail = 0.0;
-					if ( inletNodeCool > 0 ) {
-						auto const & inletNodeData( DataLoopNode::Node( inletNodeCool ) );
-						inletMassFlow += inletNodeData.MassFlowRate;
-						retNodeData.MassFlowRateMax += inletNodeData.MassFlowRateMax;
-						retNodeData.MassFlowRateMin += inletNodeData.MassFlowRateMin;
-						retNodeData.MassFlowRateMaxAvail += inletNodeData.MassFlowRateMaxAvail;
+					int ADUNum = 0;
+					int maxMinNodeNum = 0;
+					if ( inletNum > 0 ) ADUNum = thisZoneEquip.InletNodeADUNum( inletNum );
+					if ( ADUNum > 0 ){
+						// Zone return node could carry supply flow to zone without leaks plus any induced flow from plenum (but don't include other secondary flows from exhaust nodes)
+						inletMassFlow = DataDefineEquip::AirDistUnit( ADUNum ).MassFlowRateZSup + DataDefineEquip::AirDistUnit( ADUNum ).MassFlowRatePlenInd;
+						maxMinNodeNum = DataDefineEquip::AirDistUnit( ADUNum ).OutletNodeNum;
+					} else {
+						// If not connected to an ADU, then use the inlet node flow
+						inletMassFlow = DataLoopNode::Node( thisZoneEquip.InletNode( inletNum ) ).MassFlowRate ;
+						maxMinNodeNum = thisZoneEquip.InletNode( inletNum );
 					}
-					if ( inletNodeHeat > 0 ) {
-						auto const & inletNodeData( DataLoopNode::Node( inletNodeHeat ) );
-						inletMassFlow += inletNodeData.MassFlowRate;
-						retNodeData.MassFlowRateMax += inletNodeData.MassFlowRateMax;
-						retNodeData.MassFlowRateMin += inletNodeData.MassFlowRateMin;
-						retNodeData.MassFlowRateMaxAvail += inletNodeData.MassFlowRateMaxAvail;
-					}
-
-					if ( ( inletNodeCool == 0 ) && ( inletNodeHeat == 0 ) ) {
+					if( maxMinNodeNum > 0 ) {
+						auto const & maxMinNodeData( DataLoopNode::Node( maxMinNodeNum ) );
+						retNodeData.MassFlowRateMax = maxMinNodeData.MassFlowRateMax;
+						retNodeData.MassFlowRateMin = maxMinNodeData.MassFlowRateMin;
+						retNodeData.MassFlowRateMaxAvail = maxMinNodeData.MassFlowRateMaxAvail;
+					} else {
 						auto const & zoneNodeData( DataLoopNode::Node( thisZoneEquip.ZoneNode ) );
 						retNodeData.MassFlowRateMax = zoneNodeData.MassFlowRateMax;
 						retNodeData.MassFlowRateMin = zoneNodeData.MassFlowRateMin;

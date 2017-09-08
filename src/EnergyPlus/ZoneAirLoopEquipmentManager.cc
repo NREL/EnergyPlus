@@ -529,6 +529,9 @@ namespace ZoneAirLoopEquipmentManager {
 			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ) );
 			thisADU.ZoneNum = ActualZoneNum;
 			thisZoneEqConfig.ADUNum = AirDistUnitNum;
+			for ( int inletNum = 1; inletNum <= thisZoneEqConfig.NumInletNodes; ++inletNum ){
+				if ( thisZoneEqConfig.InletNode( inletNum ) == thisADU.OutletNodeNum ) thisZoneEqConfig.InletNodeADUNum( inletNum ) = AirDistUnitNum;
+			}
 
 			if ( thisADU.UpStreamLeak || thisADU.DownStreamLeak ) {
 				thisZoneEqConfig.SupLeakToRetPlen = true;
@@ -730,9 +733,18 @@ namespace ZoneAirLoopEquipmentManager {
 					AirDistUnit( AirDistUnitNum ).MaxAvailDelta = MassFlowRateMaxAvail - Node( OutNodeNum ).MassFlowRateMaxAvail;
 					AirDistUnit( AirDistUnitNum ).MinAvailDelta = MassFlowRateMinAvail - Node( OutNodeNum ).MassFlowRateMinAvail;
 				} else {
-					AirDistUnit( AirDistUnitNum ).MassFlowRateTU = Node( InNodeNum ).MassFlowRate;
-					AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = Node( InNodeNum ).MassFlowRate;
-					AirDistUnit( AirDistUnitNum ).MassFlowRateSup = Node( InNodeNum ).MassFlowRate;
+					// if no leaks, or a terminal unit type not supported for leaks
+					int termUnitType = AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompNum );
+					if ( ( termUnitType == DualDuctConstVolume ) || ( termUnitType == DualDuctVAV ) || ( termUnitType == DualDuctVAVOutdoorAir ) ) {
+						// Use ADU outlet node flow for dual duct terminal units (which don't support leaks)
+						AirDistUnit( AirDistUnitNum ).MassFlowRateTU = Node( OutNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = Node( OutNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateSup = Node( OutNodeNum ).MassFlowRate;
+					} else {
+						AirDistUnit( AirDistUnitNum ).MassFlowRateTU = Node( InNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = Node( InNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateSup = Node( InNodeNum ).MassFlowRate;
+					}
 				}
 			}
 		}
