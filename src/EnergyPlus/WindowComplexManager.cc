@@ -3213,13 +3213,6 @@ namespace WindowComplexManager {
 		//   (sum of solid layers and gap layers)
 		int Lay; // Layer number
 		int LayPtr; // Material number for a layer
-		int ShadingLayPtr; // Shading layer pointer for effective temperature calculations
-		int GlassLayPtr; // Glass layer pointer for effective temperature calculations
-		Real64 EpsGlassIR;
-		Real64 RhoGlassIR;
-		Real64 TauShadeIR;
-		Real64 EpsShadeIR;
-		Real64 RhoShadeIR;
 		int IGlass; // glass layer number (1,2,3,...)
 		int IGap; // Gap layer number (1,2,...)
 		int TotGlassLay; // Total number of glass layers in a construction
