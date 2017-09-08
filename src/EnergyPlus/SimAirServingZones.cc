@@ -97,6 +97,7 @@
 #include <HVACUnitarySystem.hh>
 #include <InputProcessor.hh>
 #include <MixedAir.hh>
+#include <MixerComponent.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -1675,8 +1676,6 @@ namespace SimAirServingZones {
 
 					// Now Loop over the Supply Air Path outlet nodes and find out which zone and which air terminal
 					// unit on that zone is connected to that supply air path.
-					// Need to be sure AirloopHVAC:UnitarySystem input has been gotten before this check executes
-					//HVACUnitarySystem::GetUnitarySystemInput();
 
 					for ( SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum ) {
 						FoundSupPathZoneConnect = false;
@@ -1898,6 +1897,9 @@ namespace SimAirServingZones {
 					}
 				}
 			}
+
+			// now connect return nodes with airloops and corresponding inlet nodes
+			ConnectReturnNodes();
 
 			InitAirLoopsOneTimeFlag = false;
 
@@ -2193,8 +2195,104 @@ namespace SimAirServingZones {
 
 	}
 
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
+	void
+	ConnectReturnNodes()
+	{
+		// This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
+		// Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone, same airloop)
+
+		if ( !ZoneEquipInputsFilled ) return;
+
+		bool returnPathFound = false;
+		// Loop over all controlled zones
+		for ( int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum ) {
+			auto & thisZoneEquip( DataZoneEquipment::ZoneEquipConfig( ctrlZoneNum ) );
+			if ( !thisZoneEquip.IsControlled ) continue;
+			// Loop over each return node for this zone
+			for ( int zoneOutNum = 1; zoneOutNum <= thisZoneEquip.NumReturnNodes; ++zoneOutNum ) {
+				returnPathFound = false;
+				int airLoopNum = 0;
+				int thisReturnNode = thisZoneEquip.ReturnNode( zoneOutNum );
+				// Loop over all return paths
+				for ( int retPathNum = 1; retPathNum <= NumReturnAirPaths; ++retPathNum ) {
+					auto const & thisRetPath( DataZoneEquipment::ReturnAirPath( retPathNum ) );
+					// Find which airloop this return path is on
+					for ( int sysNum = 1; sysNum <= NumPrimaryAirSys; ++sysNum ) {
+						if ( AirToZoneNodeInfo( sysNum ).NumReturnNodes > 0 ) {
+							if ( thisRetPath.OutletNodeNum == AirToZoneNodeInfo( sysNum ).ZoneEquipReturnNodeNum( 1 ) ) {
+								airLoopNum = sysNum;
+								break;
+							}
+						}
+					}
+					// Loop over components in return path and each component's inlet nodes
+					for ( int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum ) {
+						int compType = thisRetPath.ComponentType_Num( compNum );
+						if ( compType == ZoneMixer_Type ) {
+							auto const & thisMixer( MixerComponent::MixerCond( thisRetPath.ComponentIndex( compNum ) ) );
+							for( int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode ) {
+								if ( thisReturnNode == thisMixer.InletNode( inNode ) ) {
+									thisZoneEquip.ReturnNodeAirLoopNum( zoneOutNum ) = airLoopNum; // set the return node airloop num
+									returnPathFound = true;
+									break; // leave component inlet node loop
+								}
+							}
+						} else if ( compType == ZoneReturnPlenum_Type ) {
+							auto const & thisPlenum( ZonePlenum::ZoneRetPlenCond( thisRetPath.ComponentIndex( compNum ) ) );
+							for( int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode ) {
+								if ( thisReturnNode == thisPlenum.InletNode( inNode ) ) {
+									thisZoneEquip.ReturnNodeAirLoopNum( zoneOutNum ) = airLoopNum; // set the return node airloop num
+									returnPathFound = true;
+									break; // leave component inlet node loop
+								}
+							}
+						}
+						if ( returnPathFound ) break; // leave return path component loop
+					}
+					if ( returnPathFound ) break; // leave return path loop
+				}
+
+				if ( airLoopNum > 0 ) {
+					// Find matching inlet node connected to the same air loop
+					for ( int inletNum = 1; inletNum <= thisZoneEquip.NumInletNodes; ++inletNum ) {
+						if ( thisZoneEquip.InletNodeAirLoopNum( inletNum ) == airLoopNum ) {
+							thisZoneEquip.ReturnNodeInletNum( zoneOutNum ) = inletNum;
+							break;
+						}
+					}
+				}
+			} // return nodes loop
+		} // controlled zones loop
+
+		// Check for any air loops that may be connected directly to a zone return node
+		for ( int airLoopNum = 1; airLoopNum <= NumPrimaryAirSys; ++airLoopNum) {
+			bool returnFound = false;
+			if ( DataAirLoop::AirToZoneNodeInfo( airLoopNum ).NumReturnNodes > 0 ) {
+				int zeqReturnNodeNum = DataAirLoop::AirToZoneNodeInfo( airLoopNum ).ZoneEquipReturnNodeNum( 1 );
+				if ( zeqReturnNodeNum > 0 ) {
+					for ( int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum ) {
+						auto & thisZoneEquip( DataZoneEquipment::ZoneEquipConfig( ctrlZoneNum ) );
+						if ( !thisZoneEquip.IsControlled ) continue;
+						for ( int zoneOutNum = 1; zoneOutNum <= thisZoneEquip.NumReturnNodes; ++zoneOutNum ) {
+							if ( thisZoneEquip.ReturnNode( zoneOutNum ) == zeqReturnNodeNum ) {
+								thisZoneEquip.ReturnNodeAirLoopNum( zoneOutNum ) = airLoopNum;
+								returnFound = true;
+								// Find matching inlet node connected to the same air loop
+								for ( int inletNum = 1; inletNum <= thisZoneEquip.NumInletNodes; ++inletNum ) {
+									if ( thisZoneEquip.InletNodeAirLoopNum( inletNum ) == airLoopNum ) {
+										thisZoneEquip.ReturnNodeInletNum( zoneOutNum ) = inletNum;
+										break;
+									}
+								}
+								break; // leave zone return node loop
+							}
+							if ( returnFound ) break; // leave controlled zone loop
+						}
+					}
+				}
+			}
+		}
+	}
 
 	void
 	SimAirLoops(

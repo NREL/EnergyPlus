@@ -3016,7 +3016,6 @@ namespace ZoneEquipmentManager {
 		using DataAirflowNetwork::AirflowNetworkFanActivated;
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
 		using WaterThermalTanks::SimHeatPumpWaterHeater;
-		using DataAirSystems::PrimaryAirSystem;
 		using ElectricBaseboardRadiator::SimElecBaseboard;
 		using HVACVariableRefrigerantFlow::SimulateVRF;
 		using RefrigeratedCase::SimAirChillerSet;
@@ -3356,9 +3355,9 @@ namespace ZoneEquipmentManager {
 			} // zone loop
 
 			if ( !ZoneEquipConfig( ControlledZoneNum ).ZoneHasAirLoopWithOASys ) {
-				if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
+				if ( ( ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh -  ZoneEquipConfig( ControlledZoneNum ).ZoneExhBalanced ) > SmallMassFlow ) && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
 					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance && !DataGlobals::WarmupFlag ) {
-						ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
+						ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow with no airloop serving the zone with outdoor air." );
 						ShowContinueErrorTimeStamp( "" );
 						ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
 						ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
@@ -3934,6 +3933,8 @@ namespace ZoneEquipmentManager {
 					if ( ( unbalancedFlow > SmallMassFlow ) && !ZoneEquipConfig( ZoneNum ).FlowError ) {
 								ShowWarningError( "In zone " + ZoneEquipConfig( ZoneNum ).ZoneName + " there is unbalanced air flow." );
 								ShowContinueErrorTimeStamp( "" );
+								ShowContinueError( "  Flows [m3/s]: Inlets: " + General::RoundSigDigits( TotInletAirMassFlowRate * DataEnvironment::StdRhoAir, 6 ) + " Unbalanced exhausts: " + General::RoundSigDigits( ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ) * DataEnvironment::StdRhoAir, 6 ) );
+								ShowContinueError( "  Returns: " + General::RoundSigDigits( FinalTotalReturnMassFlow * DataEnvironment::StdRhoAir, 6 ) + " Excess outflow: " + General::RoundSigDigits( unbalancedFlow * DataEnvironment::StdRhoAir, 6 ) );
 								ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
 								ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
 								ZoneEquipConfig( ZoneNum ).FlowError = true;

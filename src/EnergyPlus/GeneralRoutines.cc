@@ -1721,7 +1721,6 @@ TestReturnAirPathIntegrity(
 	// PURPOSE OF THIS SUBROUTINE:
 	// This subroutine tests return air path integrity and displays the loop for each branch.
 	// Also, input and output nodes.
-	// This also initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
 
 	// METHODOLOGY EMPLOYED:
 	// na
@@ -1996,65 +1995,16 @@ TestReturnAirPathIntegrity(
 					WAirLoop = Count2;
 					ValRetAPaths( _, WAirLoop ) = 0;
 					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
-					for ( int RetPathNode = 1; RetPathNode <= CountNodes; ++RetPathNode ){
-						bool RetNodeFound = false;
-						for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
-							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-							for ( int ZoneOutNum = 1; ZoneOutNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++ZoneOutNum ) {
-								if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNode( ZoneOutNum ) == AllNodes( RetPathNode ) ) {
-									ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( ZoneOutNum ) = WAirLoop;
-									RetNodeFound = true;
-									// Find matching inlet node connected to the same air loop
-									for ( int inletNum = 1; inletNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++inletNum ) {
-										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( inletNum ) == WAirLoop ) {
-											ZoneEquipConfig( CtrlZoneNum ).ReturnNodeInletNum( ZoneOutNum ) = inletNum;
-											break;
-										}
-									}
-									break; // leave zone return node loop
-								}
-							if ( RetNodeFound ) break; // leave controlled zone loop
-							}
-						}
-
-					}
-					break; // leave air loops loop
+					break;
 				}
+			} else {
+				ShowWarningError( "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo( Count2 ).AirLoopName );
 			}
 		}
 
 	}
 
 	AllNodes.deallocate();
-
-	// Check for any air loops that may be connected directly to a zone return node
-	for ( int airLoopNum = 1; airLoopNum <= NumPrimaryAirSys; ++airLoopNum) {
-		bool returnFound = false;
-		if ( AirToZoneNodeInfo( airLoopNum ).NumReturnNodes > 0 ) {
-			int zeqReturnNodeNum = AirToZoneNodeInfo( airLoopNum ).ZoneEquipReturnNodeNum( 1 );
-			if ( zeqReturnNodeNum > 0 ) {
-				for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
-					{ auto & thisZoneEquip( ZoneEquipConfig( CtrlZoneNum ) );
-					if ( !thisZoneEquip.IsControlled ) continue;
-					for ( int znReturnNum = 1; znReturnNum <= thisZoneEquip.NumReturnNodes; ++znReturnNum ) {
-						if ( thisZoneEquip.ReturnNode( znReturnNum ) == zeqReturnNodeNum ) {
-							thisZoneEquip.ReturnNodeAirLoopNum( znReturnNum ) = airLoopNum;
-							returnFound = true;
-							// Find matching inlet node connected to the same air loop
-							for ( int inletNum = 1; inletNum <= thisZoneEquip.NumInletNodes; ++inletNum ) {
-								if ( thisZoneEquip.InletNodeAirLoopNum( inletNum ) == airLoopNum ) {
-									thisZoneEquip.ReturnNodeInletNum( znReturnNum ) = inletNum;
-									break;
-								}
-							}
-							break; // leave zone return node loop
-						}
-					if ( returnFound ) break; // leave controlled zone loop
-					}}
-				}
-			}
-		}
-	}
 
 	if ( NumMixers == 0 ) {
 		if ( GetNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
