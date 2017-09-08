@@ -2914,4 +2914,115 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeilingFloor_test )
 	EXPECT_FALSE( foundError );
 }
 
+TEST( SurfaceGeometryUnitTests, MakeRectangularVertices )
+{
+	int surfNum = 1;
+	int zoneNum = 1;
+	SurfaceTmp.allocate( surfNum );
+	SurfaceTmp( surfNum ).Class = SurfaceClass_Wall;
+	SurfaceTmp( surfNum ).Zone = zoneNum;
+	SurfaceTmp( surfNum ).Azimuth = 0.; 
+	SurfaceTmp( surfNum ).Tilt = 90.;
+	SurfaceTmp( surfNum ).Sides = 4;
+	SurfaceTmp( surfNum ).Vertex.allocate( 4 );
+
+	Zone.allocate( zoneNum );
+	Zone( zoneNum ).RelNorth = 0.;
+
+	CosZoneRelNorth.allocate( zoneNum );
+	SinZoneRelNorth.allocate( zoneNum );
+	CosZoneRelNorth( zoneNum ) = std::cos( -Zone( zoneNum ).RelNorth * DataGlobals::DegToRadians );
+	SinZoneRelNorth( zoneNum ) = std::sin( -Zone( zoneNum ).RelNorth * DataGlobals::DegToRadians );
+
+	CosBldgRelNorth = 1.0;
+	SinBldgRelNorth = 0.0;
+
+	// facing north
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3.,false);
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+	// facing east
+
+	SurfaceTmp( surfNum ).Azimuth = 90.;
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3., false );
+
+	EXPECT_NEAR( 0, SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+	// facing south
+
+	SurfaceTmp( surfNum ).Azimuth = 180.;
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3., false );
+
+	EXPECT_NEAR( 0, SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+	// facing west
+
+	SurfaceTmp( surfNum ).Azimuth = 270.;
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3., false );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+
+}
 
