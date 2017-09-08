@@ -9080,8 +9080,11 @@ namespace SurfaceGeometry {
 			}
 
 			if ( Zone( ZoneNum ).Volume <= 0.0 ) {
-				ShowSevereError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "Zone Volume calculated was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowWarningError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "The calculated Zone Volume was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowContinueError( "The simulation will continue with the Zone Volume set to 10.0 m3. ");
+				ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones." );
+				Zone( ZoneNum ).Volume =  10.;
 			}
 
 			if ( ShowZoneSurfaces ) {
@@ -9129,15 +9132,6 @@ namespace SurfaceGeometry {
 			} else if ( countNotFullyEnclosedZones > 1 ) {
 				ShowWarningError( "CalculateZoneVolume: " + RoundSigDigits( countNotFullyEnclosedZones ) + " zones are not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; " );
 			}
-		}
-
-		ErrorFlag = false;
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( Zone( ZoneNum ).Volume <= 0.0 ) ErrorFlag = true;
-		}
-		if ( ErrorFlag ) {
-			ShowSevereError( "All ZONE Volumes must be > 0.0" );
-			ErrorsFound = true;
 		}
 
 	}
