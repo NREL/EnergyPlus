@@ -698,7 +698,7 @@ namespace OutputProcessor {
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ReqRepVars( Loop ).Key.empty() ) continue;
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
+			if ( !RE2::FullMatch( KeyedValue, "(?i)" + ReqRepVars( Loop ).Key ) ) continue;
 
 			//   A match.  Make sure doesn't duplicate
 
