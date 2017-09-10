@@ -506,7 +506,7 @@ namespace SurfaceGeometry {
 
 		}
 
-		CalculateZoneVolume( ErrorsFound, ZoneCeilingHeightEntered ); // Calculate Zone Volumes
+		CalculateZoneVolume( ZoneCeilingHeightEntered ); // Calculate Zone Volumes
 
 		// Calculate zone centroid (and min/max x,y,z for zone)
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -8867,7 +8867,6 @@ namespace SurfaceGeometry {
 	// Calculates the volume (m3) of a zone using the surfaces as possible.
 	void
 	CalculateZoneVolume(
-		bool & ErrorsFound, // If errors found in input
 		Array1S_bool const CeilingHeightEntered
 	)
 	{
@@ -8911,7 +8910,6 @@ namespace SurfaceGeometry {
 		Real64 SurfCount; // Surface Count
 		int SurfNum; // Loop counter for surfaces
 		int ZoneNum; // Loop counter for Zones
-		bool ErrorFlag;
 		Array1D_int surfacenotused;
 		int notused;
 		int NFaces;
@@ -9080,8 +9078,11 @@ namespace SurfaceGeometry {
 			}
 
 			if ( Zone( ZoneNum ).Volume <= 0.0 ) {
-				ShowSevereError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "Zone Volume calculated was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowWarningError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "The calculated Zone Volume was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowContinueError( "The simulation will continue with the Zone Volume set to 10.0 m3. ");
+				ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones." );
+				Zone( ZoneNum ).Volume =  10.;
 			}
 
 			if ( ShowZoneSurfaces ) {
@@ -9129,15 +9130,6 @@ namespace SurfaceGeometry {
 			} else if ( countNotFullyEnclosedZones > 1 ) {
 				ShowWarningError( "CalculateZoneVolume: " + RoundSigDigits( countNotFullyEnclosedZones ) + " zones are not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; " );
 			}
-		}
-
-		ErrorFlag = false;
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( Zone( ZoneNum ).Volume <= 0.0 ) ErrorFlag = true;
-		}
-		if ( ErrorFlag ) {
-			ShowSevereError( "All ZONE Volumes must be > 0.0" );
-			ErrorsFound = true;
 		}
 
 	}
