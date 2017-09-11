@@ -639,12 +639,12 @@ namespace HVACDXSystem {
 		for ( DXSystemNum = 1; DXSystemNum <= NumDXSystem; ++DXSystemNum ) {
 			// Setup Report variables for the DXCoolingSystem that is not reported in the components themselves
 			if ( SameString( DXCoolingSystem( DXSystemNum ).CoolingCoilType, "Coil:Cooling:DX:Twospeed" ) ) {
-				SetupOutputVariable( "Coil System Cycling Ratio []", DXCoolingSystem( DXSystemNum ).CycRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
-				SetupOutputVariable( "Coil System Compressor Speed Ratio []", DXCoolingSystem( DXSystemNum ).SpeedRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+				SetupOutputVariable( "Coil System Cycling Ratio", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).CycRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+				SetupOutputVariable( "Coil System Compressor Speed Ratio", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).SpeedRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
 			} else {
-				SetupOutputVariable( "Coil System Part Load Ratio []", DXCoolingSystem( DXSystemNum ).PartLoadFrac, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+				SetupOutputVariable( "Coil System Part Load Ratio", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).PartLoadFrac, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
 			}
-			SetupOutputVariable( "Coil System Frost Control Status []", DXCoolingSystem( DXSystemNum ).FrostControlStatus, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+			SetupOutputVariable( "Coil System Frost Control Status", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).FrostControlStatus, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
 		}
 
 		Alphas.deallocate();

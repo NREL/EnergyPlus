@@ -1343,7 +1343,7 @@ namespace EMSManager {
 		int KeyNum;
 		int AvgOrSum;
 		int StepType;
-		std::string Units;
+		OutputProcessor::Unit Units( OutputProcessor::Unit::None );
 		Array1D_string KeyName;
 		Array1D_int KeyIndex;
 		bool Found;
