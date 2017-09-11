@@ -3755,7 +3755,7 @@ namespace VariableSpeedCoils {
 		//convert SHR to rated Bypass factor and effective air side surface area
 		if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
 			for ( Mode = 1; Mode <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds; ++Mode ) {
-				VarSpeedCoil( DXCoilNum ).MSRatedCBF( Mode ) = CalcCBF( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ), VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode ), VarSpeedCoil( DXCoilNum ).MSRatedSHR( Mode ) );
+				VarSpeedCoil( DXCoilNum ).MSRatedCBF( Mode ) = CalcCBF( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ), VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), VarSpeedCoil( DXCoilNum ).MSRatedSHR( Mode ), true );
 				if ( VarSpeedCoil( DXCoilNum ).MSRatedCBF( Mode ) > 0.0 ) {
 					VarSpeedCoil( DXCoilNum ).MSEffectiveAo( Mode ) = -std::log( VarSpeedCoil( DXCoilNum ).MSRatedCBF( Mode ) ) * VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode );
 				} else {
@@ -3792,7 +3792,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedCBF( Mode ) =
 					CalcCBF( VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).Name,
 							 HPWHInletDBTemp, HPInletAirHumRat, HPWHCoolCapacity,
-							 VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode ), VarSpeedCoil( DXCoilNum ).MSRatedSHR( Mode ) );
+							 VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), VarSpeedCoil( DXCoilNum ).MSRatedSHR( Mode ), true );
 				if ( VarSpeedCoil( DXCoilNum ).MSRatedCBF( Mode ) > 0.0 ) {
 					VarSpeedCoil( DXCoilNum ).MSEffectiveAo( Mode ) = -std::log( VarSpeedCoil( DXCoilNum ).MSRatedCBF( Mode ) ) *
 																	  VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode );
