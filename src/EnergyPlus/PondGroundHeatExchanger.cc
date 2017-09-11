@@ -369,12 +369,12 @@ namespace PondGroundHeatExchanger {
 
 		// Set up the output variables
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
-			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Rate [W]", PondGHE( Item ).HeatTransferRate, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Energy [J]", PondGHE( Item ).Energy, "Plant", "Sum", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Mass Flow Rate [kg/s]", PondGHE( Item ).MassFlowRate, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Inlet Temperature [C]", PondGHE( Item ).InletTemp, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Outlet Temperature [C]", PondGHE( Item ).OutletTemp, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Bulk Temperature [C]", PondGHE( Item ).PondTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, PondGHE( Item ).HeatTransferRate, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, PondGHE( Item ).Energy, "Plant", "Sum", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, PondGHE( Item ).MassFlowRate, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, PondGHE( Item ).InletTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, PondGHE( Item ).OutletTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, PondGHE( Item ).PondTemp, "Plant", "Average", PondGHE( Item ).Name );
 		}
 
 		if ( ! GroundTemp_DeepObjInput ) {
