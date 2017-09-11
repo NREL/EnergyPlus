@@ -1010,7 +1010,7 @@ namespace SolarShading {
 		DisplayString( "Initializing Surface (Shading) Report Variables" );
 		// CurrentModuleObject='Surfaces'
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
-			SetupOutputVariable( "Surface Outside Normal Azimuth Angle [rad]", Surface( SurfLoop ).Azimuth, "Zone", "Average", Surface( SurfLoop ).Name );
+			SetupOutputVariable( "Surface Outside Normal Azimuth Angle [deg]", Surface( SurfLoop ).Azimuth, "Zone", "Average", Surface( SurfLoop ).Name );
 			if ( Surface( SurfLoop ).ExtSolar ) {
 				SetupOutputVariable( "Surface Outside Face Sunlit Area [m2]", SurfSunlitArea( SurfLoop ), "Zone", "State", Surface( SurfLoop ).Name );
 				SetupOutputVariable( "Surface Outside Face Sunlit Fraction []", SurfSunlitFrac( SurfLoop ), "Zone", "State", Surface( SurfLoop ).Name );
