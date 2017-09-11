@@ -395,13 +395,13 @@ namespace HVACCooledBeam {
 
 			//Setup the Cooled Beam reporting variables
 			//CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam"
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Air Terminal Beam Chilled Water Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate [W]", CoolBeam( CBNum ).BeamCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Energy [J]", CoolBeam( CBNum ).SupAirCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Rate [W]", CoolBeam( CBNum ).SupAirCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Energy [J]", CoolBeam( CBNum ).SupAirHeatingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Rate [W]", CoolBeam( CBNum ).SupAirHeatingRate, "System", "Average", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Air Terminal Beam Chilled Water Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate", OutputProcessor::Unit::W, CoolBeam( CBNum ).BeamCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).SupAirCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Rate", OutputProcessor::Unit::W, CoolBeam( CBNum ).SupAirCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).SupAirHeatingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Rate", OutputProcessor::Unit::W, CoolBeam( CBNum ).SupAirHeatingRate, "System", "Average", CoolBeam( CBNum ).Name );
 
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( CoolBeam( CBNum ).AirOutNode == AirDistUnit( ADUNum ).OutletNodeNum ) {

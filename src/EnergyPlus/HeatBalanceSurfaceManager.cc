@@ -1475,115 +1475,115 @@ namespace HeatBalanceSurfaceManager {
 		// Setup surface report variables CurrentModuleObject='Opaque Surfaces'
 		for ( loop = 1; loop <= TotSurfaces; ++loop ) {
 			if ( ! Surface( loop ).HeatTransSurf ) continue;
-			SetupOutputVariable( "Surface Inside Face Temperature [C]", TempSurfInRep( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Temperature", OutputProcessor::Unit::C, TempSurfInRep( loop ), "Zone", "State", Surface( loop ).Name );
 
 			if ( Surface( loop ).ExtBoundCond != KivaFoundation ) {
-				SetupOutputVariable( "Surface Outside Face Temperature [C]", TempSurfOut( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Temperature", OutputProcessor::Unit::C, TempSurfOut( loop ), "Zone", "State", Surface( loop ).Name );
 			}
 
-			SetupOutputVariable( "Surface Inside Face Adjacent Air Temperature [C]", TempEffBulkAir( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]", HConvIn( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Convection Heat Gain Rate [W]", QdotConvInRep( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Convection Heat Gain Rate per Area [W/m2]", QdotConvInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Convection Heat Gain Energy [J]", QConvInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Adjacent Air Temperature", OutputProcessor::Unit::C, TempEffBulkAir( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HConvIn( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Convection Heat Gain Rate", OutputProcessor::Unit::W, QdotConvInRep( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Convection Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotConvInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Convection Heat Gain Energy", OutputProcessor::Unit::J, QConvInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-			SetupOutputVariable( "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate [W]", QdotRadNetSurfInRep( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area [W/m2]", QdotRadNetSurfInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy [J]", QRadNetSurfInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadNetSurfInRep( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotRadNetSurfInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadNetSurfInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 
 			if ( Surface( loop ).Class != SurfaceClass_Window ) {
-				SetupOutputVariable( "Surface Inside Face Solar Radiation Heat Gain Rate [W]", QdotRadSolarInRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Solar Radiation Heat Gain Rate per Area [W/m2]", QdotRadSolarInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Solar Radiation Heat Gain Energy [J]", QRadSolarInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Solar Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadSolarInRep( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Solar Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotRadSolarInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Solar Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadSolarInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-				SetupOutputVariable( "Surface Inside Face Lights Radiation Heat Gain Rate [W]", QdotRadLightsInRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]", QdotRadLightsInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Lights Radiation Heat Gain Energy [J]", QRadLightsInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Lights Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadLightsInRep( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Lights Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotRadLightsInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Lights Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadLightsInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 			}
 
-			SetupOutputVariable( "Surface Inside Face Internal Gains Radiation Heat Gain Rate [W]", QdotRadIntGainsInRep( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area [W/m2]", QdotRadIntGainsInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Internal Gains Radiation Heat Gain Energy [J]", QRadIntGainsInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Internal Gains Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadIntGainsInRep( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotRadIntGainsInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Internal Gains Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadIntGainsInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-			SetupOutputVariable( "Surface Inside Face System Radiation Heat Gain Rate [W]", QdotRadHVACInRep( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face System Radiation Heat Gain Rate per Area [W/m2]", QdotRadHVACInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face System Radiation Heat Gain Energy [J]", QRadHVACInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face System Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadHVACInRep( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face System Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotRadHVACInRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face System Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadHVACInReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 
 			if ( Surface( loop ).ExtBoundCond == ExternalEnvironment || DisplayAdvancedReportVariables ) {
-				SetupOutputVariable( "Surface Outside Face Outdoor Air Drybulb Temperature [C]", Surface( loop ).OutDryBulbTemp, "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Outdoor Air Wetbulb Temperature [C]", Surface( loop ).OutWetBulbTemp, "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Speed [m/s]", Surface( loop ).WindSpeed, "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Direction [degree]", Surface( loop ).WindDir, "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate [W]", QdotConvOutRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate per Area [W/m2]", QdotConvOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Energy [J]", QConvOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Convection Heat Transfer Coefficient [W/m2-K]", HcExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate [W]", QdotRadOutRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area [W/m2]", QdotRadOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]", QRadOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]", HAirExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]", HSkyExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]", HGrdExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Surface( loop ).OutDryBulbTemp, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Surface( loop ).OutWetBulbTemp, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Surface( loop ).WindSpeed, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Surface( loop ).WindDir, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate", OutputProcessor::Unit::W, QdotConvOutRep( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotConvOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Convection Heat Gain Energy", OutputProcessor::Unit::J, QConvOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HcExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate", OutputProcessor::Unit::W, QdotRadOutRep( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QdotRadOutRepPerArea( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Net Thermal Radiation Heat Gain Energy", OutputProcessor::Unit::J, QRadOutReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HAirExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HSkyExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, HGrdExtSurf( loop ), "Zone", "State", Surface( loop ).Name );
 				if ( Surface( loop ).Class != SurfaceClass_Window ) {
-					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Rate [W]", SWOutAbsTotalReport( loop ), "Zone", "Average", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Rate per Area [W/m2]", QRadSWOutAbs( loop ), "Zone", "Average", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Energy [J]", SWOutAbsEnergyReport( loop ), "Zone", "Sum", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Rate", OutputProcessor::Unit::W, SWOutAbsTotalReport( loop ), "Zone", "Average", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Rate per Area", OutputProcessor::Unit::W_m2, QRadSWOutAbs( loop ), "Zone", "Average", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Solar Radiation Heat Gain Energy", OutputProcessor::Unit::J, SWOutAbsEnergyReport( loop ), "Zone", "Sum", Surface( loop ).Name );
 				}
 			}
 			if ( Surface( loop ).Class == SurfaceClass_Floor || Surface( loop ).Class == SurfaceClass_Wall || Surface( loop ).Class == SurfaceClass_IntMass || Surface( loop ).Class == SurfaceClass_Roof || Surface( loop ).Class == SurfaceClass_Door ) {
 				//      IF (DisplayAdvancedReportVariables) THEN  !CurrentModuleObject='Opaque Surfaces(Advanced)'
-				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Rate [W]", OpaqSurfInsFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Conduction Heat Gain Rate [W]", OpaqSurfInsFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Conduction Heat Loss Rate [W]", OpaqSurfInsFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfInsFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Energy [J]", OpaqSurfInsFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Rate", OutputProcessor::Unit::W, OpaqSurfInsFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Conduction Heat Gain Rate", OutputProcessor::Unit::W, OpaqSurfInsFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Conduction Heat Loss Rate", OutputProcessor::Unit::W, OpaqSurfInsFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, OpaqSurfInsFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, OpaqSurfInsFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
 
 				if ( Surface( loop ).ExtBoundCond != KivaFoundation ) {
-					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate [W]", OpaqSurfOutsideFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Outside Face Conduction Heat Gain Rate [W]", OpaqSurfExtFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Outside Face Conduction Heat Loss Rate [W]", OpaqSurfExtFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfOutsideFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Energy [J]", OpaqSurfOutsideFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate", OutputProcessor::Unit::W, OpaqSurfOutsideFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Gain Rate", OutputProcessor::Unit::W, OpaqSurfExtFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Loss Rate", OutputProcessor::Unit::W, OpaqSurfExtFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, OpaqSurfOutsideFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Outside Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, OpaqSurfOutsideFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate [W]", OpaqSurfAvgFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Average Face Conduction Heat Gain Rate [W]", OpaqSurfAvgFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Average Face Conduction Heat Loss Rate [W]", OpaqSurfAvgFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate per Area [W/m2]", OpaqSurfAvgFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Energy [J]", OpaqSurfAvgFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate", OutputProcessor::Unit::W, OpaqSurfAvgFaceConduction( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Gain Rate", OutputProcessor::Unit::W, OpaqSurfAvgFaceCondGainRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Loss Rate", OutputProcessor::Unit::W, OpaqSurfAvgFaceCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, OpaqSurfAvgFaceConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Average Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, OpaqSurfAvgFaceConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
 
-					SetupOutputVariable( "Surface Heat Storage Rate [W]", OpaqSurfStorageConduction( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Heat Storage Gain Rate [W]", OpaqSurfStorageGainRep( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Heat Storage Loss Rate [W]", OpaqSurfStorageCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Heat Storage Rate per Area [W/m2]", OpaqSurfStorageConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
-					SetupOutputVariable( "Surface Heat Storage Energy [J]", OpaqSurfStorageConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Rate", OutputProcessor::Unit::W, OpaqSurfStorageConduction( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Gain Rate", OutputProcessor::Unit::W, OpaqSurfStorageGainRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Loss Rate", OutputProcessor::Unit::W, OpaqSurfStorageCondLossRep( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Rate per Area", OutputProcessor::Unit::W_m2, OpaqSurfStorageConductionFlux( loop ), "Zone", "State", Surface( loop ).Name );
+					SetupOutputVariable( "Surface Heat Storage Energy", OutputProcessor::Unit::J, OpaqSurfStorageConductionEnergy( loop ), "Zone", "Sum", Surface( loop ).Name );
 				}
 
 				//      ENDIF
 				//CurrentModuleObject='Opaque Surfaces'
 
-				SetupOutputVariable( "Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]", OpaqSurfInsFaceBeamSolAbsorbed( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Inside Face Beam Solar Radiation Heat Gain Rate", OutputProcessor::Unit::W, OpaqSurfInsFaceBeamSolAbsorbed( loop ), "Zone", "State", Surface( loop ).Name );
 			}
 			if ( Construct( Surface( loop ).Construction ).SourceSinkPresent ) {
-				SetupOutputVariable( "Surface Internal Source Location Temperature [C]", TempSource( loop ), "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Internal User Specified Location Temperature [C]", TempUserLoc( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Internal Source Location Temperature", OutputProcessor::Unit::C, TempSource( loop ), "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Internal User Specified Location Temperature", OutputProcessor::Unit::C, TempUserLoc( loop ), "Zone", "State", Surface( loop ).Name );
 			}
 			if ( Surface( loop ).Class == SurfaceClass_Window ) { // CurrentModuleObject='Windows'
-				SetupOutputVariable( "Surface Shading Device Is On Time Fraction []", SurfaceWindow( loop ).FracTimeShadingDeviceOn, "Zone", "Average", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Storm Window On Off Status []", SurfaceWindow( loop ).StormWinFlag, "Zone", "State", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Window Blind Slat Angle [deg]", SurfaceWindow( loop ).SlatAngThisTSDeg, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Shading Device Is On Time Fraction", OutputProcessor::Unit::None, SurfaceWindow( loop ).FracTimeShadingDeviceOn, "Zone", "Average", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Storm Window On Off Status", OutputProcessor::Unit::None, SurfaceWindow( loop ).StormWinFlag, "Zone", "State", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Window Blind Slat Angle", OutputProcessor::Unit::deg, SurfaceWindow( loop ).SlatAngThisTSDeg, "Zone", "State", Surface( loop ).Name );
 			}
 			//    IF (DisplayAdvancedReportVariables) THEN  !CurrentModuleObject='Opaque Surfaces(Advanced)'
-			SetupOutputVariable( "Surface Inside Face Convection Classification Index [ ]", Surface( loop ).IntConvClassification, "Zone", "Average", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Convection Model Equation Index [ ]", Surface( loop ).IntConvHcModelEq, "Zone", "Average", Surface( loop ).Name );
-			SetupOutputVariable( "Surface Inside Face Convection Reference Air Index [ ]", Surface( loop ).TAirRef, "Zone", "Average", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Convection Classification Index", OutputProcessor::Unit::None, Surface( loop ).IntConvClassification, "Zone", "Average", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Convection Model Equation Index", OutputProcessor::Unit::None, Surface( loop ).IntConvHcModelEq, "Zone", "Average", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Inside Face Convection Reference Air Index", OutputProcessor::Unit::None, Surface( loop ).TAirRef, "Zone", "Average", Surface( loop ).Name );
 			if ( Surface( loop ).ExtBoundCond == ExternalEnvironment ) {
-				SetupOutputVariable( "Surface Outside Face Convection Classification Index [ ]", Surface( loop ).OutConvClassification, "Zone", "Average", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Forced Convection Model Equation Index [ ]", Surface( loop ).OutConvHfModelEq, "Zone", "Average", Surface( loop ).Name );
-				SetupOutputVariable( "Surface Outside Face Natural Convection Model Equation Index [ ]", Surface( loop ).OutConvHnModelEq, "Zone", "Average", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Convection Classification Index", OutputProcessor::Unit::None, Surface( loop ).OutConvClassification, "Zone", "Average", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Forced Convection Model Equation Index", OutputProcessor::Unit::None, Surface( loop ).OutConvHfModelEq, "Zone", "Average", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Outside Face Natural Convection Model Equation Index", OutputProcessor::Unit::None, Surface( loop ).OutConvHnModelEq, "Zone", "Average", Surface( loop ).Name );
 			}
 			//     ENDIF
 			if ( DisplayAdvancedReportVariables ) {
-				SetupOutputVariable( "Surface Construction Index []", Surface( loop ).Construction, "Zone", "Average", Surface( loop ).Name );
+				SetupOutputVariable( "Surface Construction Index", OutputProcessor::Unit::None, Surface( loop ).Construction, "Zone", "Average", Surface( loop ).Name );
 			}
 
 		}
@@ -1604,7 +1604,7 @@ namespace HeatBalanceSurfaceManager {
 
 		for ( loop = 1; loop <= NumOfZones; ++loop ) {
 			//CurrentModuleObject='Zone'
-			SetupOutputVariable( "Zone Mean Radiant Temperature [C]", ZoneMRT( loop ), "Zone", "State", Zone( loop ).Name );
+			SetupOutputVariable( "Zone Mean Radiant Temperature", OutputProcessor::Unit::C, ZoneMRT( loop ), "Zone", "State", Zone( loop ).Name );
 		}
 
 	}
@@ -5269,7 +5269,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			MinIterations = 1;
 		}
 		if ( DisplayAdvancedReportVariables ) {
-			SetupOutputVariable( "Surface Inside Face Heat Balance Calculation Iteration Count []", InsideSurfIterations, "ZONE", "Sum", "Simulation" );
+			SetupOutputVariable( "Surface Inside Face Heat Balance Calculation Iteration Count", OutputProcessor::Unit::None, InsideSurfIterations, "ZONE", "Sum", "Simulation" );
 		}
 	}
 	if ( BeginEnvrnFlag && MyEnvrnFlag ) {
