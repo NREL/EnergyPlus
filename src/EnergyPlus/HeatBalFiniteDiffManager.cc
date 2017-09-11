@@ -908,18 +908,18 @@ namespace HeatBalFiniteDiffManager {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CondFD ) continue;
 
-			SetupOutputVariable( "CondFD Inner Solver Loop Iteration Count [ ]", SurfaceFD( SurfNum ).GSloopCounter, "Zone", "Sum", Surface( SurfNum ).Name );
+			SetupOutputVariable( "CondFD Inner Solver Loop Iteration Count", OutputProcessor::Unit::None, SurfaceFD( SurfNum ).GSloopCounter, "Zone", "Sum", Surface( SurfNum ).Name );
 
 			TotNodes = ConstructFD( Surface( SurfNum ).Construction ).TotNodes; // Full size nodes, start with outside face.
 			for ( Lay = 1; Lay <= TotNodes + 1; ++Lay ) { // include inside face node
-				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + " [W/m2]", SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Phase Change State " + TrimSigDigits( Lay ) + " []", SurfaceFD( SurfNum ).PhaseChangeState( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Phase Change Previous State " + TrimSigDigits( Lay ) + " []", SurfaceFD( SurfNum ).PhaseChangeStateOld( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Phase Change Node Temperature " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDT( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::C, SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::W_m2, SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Phase Change State " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::None, SurfaceFD( SurfNum ).PhaseChangeState( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Phase Change Previous State " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::None, SurfaceFD( SurfNum ).PhaseChangeStateOld( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Phase Change Node Temperature " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::C, SurfaceFD( SurfNum ).TDT( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				if ( DisplayAdvancedReportVariables ) {
-					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::W_m2K, SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::W_m2K, SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				}
 			}
 

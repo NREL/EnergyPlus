@@ -291,18 +291,18 @@ namespace FourPipeBeam {
 
 		//Setup the Cooled Beam reporting variables
 		if ( thisBeam->beamCoolingPresent ) {
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy [J]", thisBeam->beamCoolingEnergy, "System", "Sum", thisBeam->name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate [W]", thisBeam->beamCoolingRate, "System", "Average", thisBeam->name );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy", OutputProcessor::Unit::J, thisBeam->beamCoolingEnergy, "System", "Sum", thisBeam->name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate", OutputProcessor::Unit::W, thisBeam->beamCoolingRate, "System", "Average", thisBeam->name );
 		}
 		if ( thisBeam->beamHeatingPresent ) {
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Heating Energy [J]", thisBeam->beamHeatingEnergy, "System", "Sum", thisBeam->name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Heating Rate [W]", thisBeam->beamHeatingRate, "System", "Average", thisBeam->name );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Heating Energy", OutputProcessor::Unit::J, thisBeam->beamHeatingEnergy, "System", "Sum", thisBeam->name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Heating Rate", OutputProcessor::Unit::W, thisBeam->beamHeatingRate, "System", "Average", thisBeam->name );
 		}
-		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Cooling Energy [J]", thisBeam->supAirCoolingEnergy, "System", "Sum", thisBeam->name );
-		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Cooling Rate [W]", thisBeam->supAirCoolingRate, "System", "Average", thisBeam->name );
-		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Heating Energy [J]", thisBeam->supAirHeatingEnergy, "System", "Sum", thisBeam->name );
-		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Heating Rate [W]", thisBeam->supAirHeatingRate, "System", "Average", thisBeam->name );
-		SetupOutputVariable( "Zone Air Terminal Primary Air Flow Rate [m3/s]", thisBeam->primAirFlow, "System", "Average", thisBeam->name );
+		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Cooling Energy", OutputProcessor::Unit::J, thisBeam->supAirCoolingEnergy, "System", "Sum", thisBeam->name );
+		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Cooling Rate", OutputProcessor::Unit::W, thisBeam->supAirCoolingRate, "System", "Average", thisBeam->name );
+		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Heating Energy", OutputProcessor::Unit::J, thisBeam->supAirHeatingEnergy, "System", "Sum", thisBeam->name );
+		SetupOutputVariable( "Zone Air Terminal Primary Air Sensible Heating Rate", OutputProcessor::Unit::W, thisBeam->supAirHeatingRate, "System", "Average", thisBeam->name );
+		SetupOutputVariable( "Zone Air Terminal Primary Air Flow Rate", OutputProcessor::Unit::m3_s, thisBeam->primAirFlow, "System", "Average", thisBeam->name );
 
 		airNodeFound = false;
 		for ( aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex ) {

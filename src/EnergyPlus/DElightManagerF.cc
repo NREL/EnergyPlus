@@ -570,7 +570,7 @@ namespace DElightManagerF {
 								if ( refPt.indexToFracAndIllum != 0 ){
 									gio::write( unit, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << znDayl.FracZoneDaylit( refPt.indexToFracAndIllum ) << znDayl.IllumSetPoint( refPt.indexToFracAndIllum ) * LUX2FC << znDayl.LightControlType;
 									// RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
-									SetupOutputVariable( "Daylighting Reference Point Illuminance [lux]", znDayl.DaylIllumAtRefPt( refPt.indexToFracAndIllum ), "Zone", "Average", refPt.Name );
+									SetupOutputVariable( "Daylighting Reference Point Illuminance", OutputProcessor::Unit::lux, znDayl.DaylIllumAtRefPt( refPt.indexToFracAndIllum ), "Zone", "Average", refPt.Name );
 								} else {
 									gio::write( unit, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << 0.0 << 0.0 * LUX2FC << znDayl.LightControlType; // should never happen but just in case send zero fraction and illuminance
 								}
