@@ -3939,7 +3939,9 @@ namespace ZoneEquipmentManager {
 					int airLoop = ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( returnNum );
 					if ( airLoop > 0 ) {
 						AirLoopFlow( airLoop ).ZoneRetFlow += Node( retNode ).MassFlowRate;
-						AirLoopFlow( airLoop ).ExcessZoneExhFlow += ZoneEquipConfig( ZoneNum ).ExcessZoneExh * AirLoopFlow( airLoop ).MaxOutAir / ZoneEquipConfig( ZoneNum ).TotAvailAirLoopOA;
+						if ( ZoneEquipConfig( ZoneNum ).TotAvailAirLoopOA > 0.0 ) {
+							AirLoopFlow( airLoop ).ExcessZoneExhFlow += ZoneEquipConfig( ZoneNum ).ExcessZoneExh * AirLoopFlow( airLoop ).MaxOutAir / ZoneEquipConfig( ZoneNum ).TotAvailAirLoopOA;
+						}
 					}
 				}
 
