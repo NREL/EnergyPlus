@@ -121,7 +121,8 @@ namespace DataDefineEquip {
 		Real64 MassFlowRatePlenInd; // current air mass flow rate of induced air from plenum [kg/s]
 		Real64 MaxAvailDelta; // change in max avail mass low rate due to leaks [kg/s]
 		Real64 MinAvailDelta; // change in min avail mass low rate due to leaks [kg/s]
-		int InletNodeNum; // index of inlet node
+		int InletNodeNum; // index of inlet node 1
+		int InletNodeNum2; // index of inlet node 2 (used for dual duct airterminals)
 		int ZoneEqNum; // index of zone equipment object for this terminal unit
 		int AirLoopNum; // index to airloop that this terminal unit is connected to
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
@@ -157,6 +158,7 @@ namespace DataDefineEquip {
 			MaxAvailDelta( 0.0 ),
 			MinAvailDelta( 0.0 ),
 			InletNodeNum( 0 ),
+			InletNodeNum2( 0 ),
 			ZoneEqNum( 0 ),
 			AirLoopNum( 0 ),
 			LeakLoadMult( 0.0 ),

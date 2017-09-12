@@ -3928,15 +3928,18 @@ namespace ZoneEquipmentManager {
 					}
 				}
 				// Check zone flow balance
-				if ( !ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag ) {
-					Real64 unbalancedFlow = max( 0.0, ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ) + FinalTotalReturnMassFlow - TotInletAirMassFlowRate );
-					if ( ( unbalancedFlow > SmallMassFlow ) && !ZoneEquipConfig( ZoneNum ).FlowError ) {
-								ShowWarningError( "In zone " + ZoneEquipConfig( ZoneNum ).ZoneName + " there is unbalanced air flow." );
+				if ( !ZoneAirMassFlow.EnforceZoneMassBalance && !isPulseZoneSizing && !DataGlobals::ZoneSizingCalc && !DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag  && !ZoneEquipConfig( ZoneNum ).FlowError ) {
+					// Net system flows first (sum leaving flows, less entering flows)
+					Real64 unbalancedFlow = ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ) + FinalTotalReturnMassFlow - TotInletAirMassFlowRate;
+					int actualZone = ZoneEquipConfig( ZoneNum ).ActualZoneNum;
+					// Now include infiltration, ventilation, and mixing flows (these are all entering the zone, so subtract them)
+					unbalancedFlow = max( 0.0, unbalancedFlow - DataHeatBalFanSys::OAMFL( actualZone ) - DataHeatBalFanSys::VAMFL( actualZone ) - DataHeatBalFanSys::MixingMassFlowZone( actualZone ) );
+					if ( unbalancedFlow > SmallMassFlow ) {
+								ShowWarningError( "In zone " + ZoneEquipConfig( ZoneNum ).ZoneName + " there is unbalanced air flow. Load due to induced outdoor air is neglected." );
 								ShowContinueErrorTimeStamp( "" );
-								ShowContinueError( "  Flows [m3/s]: Inlets: " + General::RoundSigDigits( TotInletAirMassFlowRate * DataEnvironment::StdRhoAir, 6 ) + " Unbalanced exhausts: " + General::RoundSigDigits( ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ) * DataEnvironment::StdRhoAir, 6 ) );
-								ShowContinueError( "  Returns: " + General::RoundSigDigits( FinalTotalReturnMassFlow * DataEnvironment::StdRhoAir, 6 ) + " Excess outflow: " + General::RoundSigDigits( unbalancedFlow * DataEnvironment::StdRhoAir, 6 ) );
-								ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
-								ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
+								ShowContinueError( "  Flows [kg/s]: Inlets: " + General::RoundSigDigits( TotInletAirMassFlowRate, 6 ) + "  Unbalanced exhausts: " + General::RoundSigDigits( ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ), 6 ) + "  Returns: " + General::RoundSigDigits( FinalTotalReturnMassFlow, 6 ) );
+								ShowContinueError( "  Infiltration: " + General::RoundSigDigits( DataHeatBalFanSys::OAMFL( actualZone ), 6 ) + "  Ventilation: " + General::RoundSigDigits( DataHeatBalFanSys::VAMFL( actualZone ), 6 ) + "  Mixing(incoming): " + General::RoundSigDigits( DataHeatBalFanSys::MixingMassFlowZone( actualZone ), 6 ) );
+								ShowContinueError( "  Imbalance (excess outflow): " + General::RoundSigDigits( unbalancedFlow, 6 ) + "  This error will only be reported once per zone." );
 								ZoneEquipConfig( ZoneNum ).FlowError = true;
 					}
 				}

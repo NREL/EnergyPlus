@@ -385,7 +385,8 @@ namespace DualDuct {
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperIndex ).ColdAirInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperIndex ).HotAirInletNodeNum;
 						Damper( DamperIndex ).ADUNum = ADUNum;
 					}
 				}
@@ -480,7 +481,8 @@ namespace DualDuct {
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperIndex ).ColdAirInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperIndex ).HotAirInletNodeNum;
 						Damper( DamperIndex ).ADUNum = ADUNum;
 					}
 				}
@@ -596,7 +598,8 @@ namespace DualDuct {
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperIndex ).OAInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperIndex ).RecircAirInletNodeNum;
 						Damper( DamperIndex ).ADUNum = ADUNum;
 					}
 				}
@@ -865,16 +868,13 @@ namespace DualDuct {
 			MyEnvrnFlag( DamperNum ) = true;
 		}
 
-		// Find air loop associated with VAV dual duct or VAV:OutdoorAir terminal units
+		// Find air loop associated with this terminal unit
 		if ( MyAirLoopFlag( DamperNum ) ) {
-			if ( Damper( DamperNum ).DamperType == DualDuct_VariableVolume || Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
-				if ( Damper( DamperNum ).AirLoopNum == 0 ) {
-					if ( ( Damper( DamperNum ).CtrlZoneNum > 0 ) && ( Damper( DamperNum ).CtrlZoneInNodeIndex > 0 ) ){
-						Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).InletNodeAirLoopNum( Damper( DamperNum ).CtrlZoneInNodeIndex );
-						AirDistUnit( Damper( DamperNum ).ADUNum ).AirLoopNum = Damper( DamperNum ).AirLoopNum;
-					}
-				} else {
-					MyAirLoopFlag( DamperNum ) = false;
+			if ( Damper( DamperNum ).AirLoopNum == 0 ) {
+				if ( ( Damper( DamperNum ).CtrlZoneNum > 0 ) && ( Damper( DamperNum ).CtrlZoneInNodeIndex > 0 ) ){
+					Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).InletNodeAirLoopNum( Damper( DamperNum ).CtrlZoneInNodeIndex );
+					AirDistUnit( Damper( DamperNum ).ADUNum ).AirLoopNum = Damper( DamperNum ).AirLoopNum;
+					// Don't set MyAirLoopFlag to false yet because airloopnums might not be populated yet
 				}
 			} else {
 				MyAirLoopFlag( DamperNum ) = false;

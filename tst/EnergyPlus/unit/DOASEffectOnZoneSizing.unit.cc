@@ -60,6 +60,7 @@
 #include <DataZoneEquipment.hh>
 #include <DataEnvironment.hh>
 #include <DataZoneEnergyDemands.hh>
+#include <HeatBalanceManager.hh>
 #include <Psychrometrics.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
@@ -165,7 +166,7 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	ZoneMassBalanceFlag.allocate( 2 );
 	NumOfZones = 2;
 	MassConservation.allocate( NumOfZones );
-
+	HeatBalanceManager::AllocateHeatBalArrays();
 	AirflowNetworkNumOfExhFan = 0;
 	TempControlType( 1 ) = 4;
 	TempControlType( 2 ) = 4;
