@@ -2558,7 +2558,6 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test )
 	 ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test" );
 	 using DataGlobals::NumOfZones;
 
-	 bool foundError;
 	 Array1D_bool enteredCeilingHeight;
 	 NumOfZones = 1;
 	 enteredCeilingHeight.dimension( NumOfZones, false );
@@ -2623,10 +2622,8 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_SimpleBox_test )
 	 Surface( 6 ).Vertex( 3 ) = Vector( 10., 0., 3. );
 	 Surface( 6 ).Vertex( 4 ) = Vector( 10., 8., 3. );
 
-	 foundError = false;
-	 CalculateZoneVolume( foundError, enteredCeilingHeight );
+	 CalculateZoneVolume( enteredCeilingHeight );
 	 EXPECT_EQ( 240., Zone(1).Volume );
-	 EXPECT_FALSE( foundError );
 
 
  }
@@ -2636,7 +2633,6 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test )
 	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test" );
 	using DataGlobals::NumOfZones;
 
-	bool foundError;
 	Array1D_bool enteredCeilingHeight;
 	NumOfZones = 1;
 	enteredCeilingHeight.dimension( NumOfZones, false );
@@ -2692,14 +2688,11 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxOneWallMissing_test )
 	Surface( 5 ).Vertex( 3 ) = Vector( 10., 0., 3. );
 	Surface( 5 ).Vertex( 4 ) = Vector( 10., 8., 3. );
 
-	foundError = false;
-
 	Zone( 1 ).FloorArea = 80.;
 	Zone( 1 ).CeilingHeight = 3.;
 
-	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	CalculateZoneVolume( enteredCeilingHeight );
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
-	EXPECT_FALSE( foundError );
 
 }
 
@@ -2709,7 +2702,6 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test )
 	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test" );
 	using DataGlobals::NumOfZones;
 
-	bool foundError;
 	Array1D_bool enteredCeilingHeight;
 	NumOfZones = 1;
 	enteredCeilingHeight.dimension( NumOfZones, false );
@@ -2765,15 +2757,11 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeiling_test )
 	Surface( 5 ).Vertex( 3 ) = Vector( 10., 8, 0. );
 	Surface( 5 ).Vertex( 4 ) = Vector( 10., 0, 0. );
 
-	foundError = false;
-
 	Zone( 1 ).FloorArea = 80.;
 	Zone( 1 ).CeilingHeight =  3.;
 
-	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	CalculateZoneVolume( enteredCeilingHeight );
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
-	EXPECT_FALSE( foundError );
-
 
 }
 
@@ -2782,7 +2770,6 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test )
 	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test" );
 	using DataGlobals::NumOfZones;
 
-	bool foundError;
 	Array1D_bool enteredCeilingHeight;
 	NumOfZones = 1;
 	enteredCeilingHeight.dimension( NumOfZones, false );
@@ -2838,14 +2825,12 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test )
 	Surface( 5 ).Vertex( 3 ) = Vector( 10., 0., 3. );
 	Surface( 5 ).Vertex( 4 ) = Vector( 10., 8., 3. );
 
-	foundError = false;
 
 	Zone( 1 ).CeilingArea = 80.;
 	Zone( 1 ).CeilingHeight = 3.;
 
-	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	CalculateZoneVolume( enteredCeilingHeight );
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
-	EXPECT_FALSE( foundError );
 }
 
 TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeilingFloor_test )
@@ -2853,7 +2838,6 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeilingFloor_test )
 	ShowMessage( "Begin Test: SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoFloor_test" );
 	using DataGlobals::NumOfZones;
 
-	bool foundError;
 	Array1D_bool enteredCeilingHeight;
 	NumOfZones = 1;
 	enteredCeilingHeight.dimension( NumOfZones, false );
@@ -2907,11 +2891,120 @@ TEST( SurfaceGeometryUnitTests, CalculateZoneVolume_BoxNoCeilingFloor_test )
 	Surface( 4 ).Vertex( 3 ) = Vector( 10., 8., 0. );
 	Surface( 4 ).Vertex( 4 ) = Vector( 10., 8., 3. );
 
-	foundError = false;
 
-	CalculateZoneVolume( foundError, enteredCeilingHeight );
+	CalculateZoneVolume( enteredCeilingHeight );
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
-	EXPECT_FALSE( foundError );
 }
 
+TEST( SurfaceGeometryUnitTests, MakeRectangularVertices )
+{
+	int surfNum = 1;
+	int zoneNum = 1;
+	SurfaceTmp.allocate( surfNum );
+	SurfaceTmp( surfNum ).Class = SurfaceClass_Wall;
+	SurfaceTmp( surfNum ).Zone = zoneNum;
+	SurfaceTmp( surfNum ).Azimuth = 0.; 
+	SurfaceTmp( surfNum ).Tilt = 90.;
+	SurfaceTmp( surfNum ).Sides = 4;
+	SurfaceTmp( surfNum ).Vertex.allocate( 4 );
+
+	Zone.allocate( zoneNum );
+	Zone( zoneNum ).RelNorth = 0.;
+
+	CosZoneRelNorth.allocate( zoneNum );
+	SinZoneRelNorth.allocate( zoneNum );
+	CosZoneRelNorth( zoneNum ) = std::cos( -Zone( zoneNum ).RelNorth * DataGlobals::DegToRadians );
+	SinZoneRelNorth( zoneNum ) = std::sin( -Zone( zoneNum ).RelNorth * DataGlobals::DegToRadians );
+
+	CosBldgRelNorth = 1.0;
+	SinBldgRelNorth = 0.0;
+
+	// facing north
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3.,false);
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+	// facing east
+
+	SurfaceTmp( surfNum ).Azimuth = 90.;
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3., false );
+
+	EXPECT_NEAR( 0, SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+	// facing south
+
+	SurfaceTmp( surfNum ).Azimuth = 180.;
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3., false );
+
+	EXPECT_NEAR( 0, SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( 5., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+	// facing west
+
+	SurfaceTmp( surfNum ).Azimuth = 270.;
+
+	MakeRectangularVertices( 1, 0., 0., 0., 5., 3., false );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 1 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 1 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).x, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 2 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).x, 0.001 );
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 3 ).y, 0.001 );
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 3 ).z, 0.001 );
+
+	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
+	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
+	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
+
+
+}
 

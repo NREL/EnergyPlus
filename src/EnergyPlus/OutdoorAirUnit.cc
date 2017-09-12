@@ -830,22 +830,22 @@ namespace OutdoorAirUnit {
 
 		// Setup Report variables for the zone outdoor air unit CurrentModuleObject='ZoneHVAC:OutdoorAirUnit'
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Rate [W]", OutAirUnit( OAUnitNum ).TotHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Energy [J]", OutAirUnit( OAUnitNum ).TotHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Rate [W]", OutAirUnit( OAUnitNum ).SensHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Energy [J]", OutAirUnit( OAUnitNum ).SensHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Rate [W]", OutAirUnit( OAUnitNum ).LatHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Energy [J]", OutAirUnit( OAUnitNum ).LatHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Rate [W]", OutAirUnit( OAUnitNum ).TotCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Energy [J]", OutAirUnit( OAUnitNum ).TotCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Rate [W]", OutAirUnit( OAUnitNum ).SensCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Energy [J]", OutAirUnit( OAUnitNum ).SensCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Rate [W]", OutAirUnit( OAUnitNum ).LatCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Energy [J]", OutAirUnit( OAUnitNum ).LatCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Air Mass Flow Rate [kg/s]", OutAirUnit( OAUnitNum ).AirMassFlow, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Power [W]", OutAirUnit( OAUnitNum ).ElecFanRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Energy [J]", OutAirUnit( OAUnitNum ).ElecFanEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Availability Status []", OutAirUnit( OAUnitNum ).AvailStatus, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).TotHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).TotHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).SensHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).SensHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).LatHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).LatHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).TotCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).TotCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).SensCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).SensCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).LatCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).LatCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Air Mass Flow Rate", OutputProcessor::Unit::kg_s, OutAirUnit( OAUnitNum ).AirMassFlow, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Power", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).ElecFanRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).ElecFanEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Availability Status", OutputProcessor::Unit::None, OutAirUnit( OAUnitNum ).AvailStatus, "System", "Average", OutAirUnit( OAUnitNum ).Name );
 			//! Note that the outdoor air unit fan electric is NOT metered because this value is already metered through the fan component
 
 		}
