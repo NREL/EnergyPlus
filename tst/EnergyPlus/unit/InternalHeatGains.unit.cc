@@ -501,7 +501,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals) {
 	// Legitimate gain types excluded from this total
 	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide ); // this is only used for CO2
 	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam ); // this is only used for generic contaminants
-	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular ); // this should be included in the component loads as Fenestration Solar or Fenestration Conduction - Instant?
+	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular ); // this is included in Fenestration Conduction - Sensible Instant
 
 	// ** NOTE: If this unit test fails, the likely cause is that a new internal gain type was added, but it was not added to one of the subtotal types in InternalHeatGains::GatherComponentLoadsIntGain()
 	// this also means that the new type may be missing from other places that collect internal gains by subgroups, such as the room air models and output reporting for zone-level gains
