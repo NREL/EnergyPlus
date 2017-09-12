@@ -137,7 +137,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1957,22 +1957,22 @@
   AirflowNetwork:MultiZone:ExternalNode,
     NFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    NFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    NFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     EFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    EFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    EFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     SFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    SFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    SFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   AirflowNetwork:MultiZone:ExternalNode,
     WFacade,                 !- Name
     1.524,                   !- External Node Height {m}
-    WFacade_WPCValue;        !- Wind Pressure Coefficient Values Object Name
+    WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:Wind Pressure Coefficient Array ===========
 

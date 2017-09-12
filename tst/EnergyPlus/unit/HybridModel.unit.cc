@@ -197,6 +197,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	OAMFL.allocate( 1 );
 	VAMFL.allocate( 1 );
 	EAMFL.allocate( 1 );
+	EAMFLxHumRat.allocate( 1 );
 	CTMFL.allocate( 1 );
 
 	// Parameter setup
@@ -334,6 +335,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	OAMFL.deallocate();
 	VAMFL.deallocate();
 	EAMFL.deallocate();
+	EAMFLxHumRat.deallocate();
 	CTMFL.deallocate();
 
 }

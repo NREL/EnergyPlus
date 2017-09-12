@@ -58,7 +58,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.7;
+  Version,8.8;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -542,8 +542,8 @@
   Site:GroundDomain:Basement,
     CoupledBasement,         !- Name
     5,                       !- Ground Domain Depth {m}
-    1,                       !- Aspect ratio {m}
-    5,                       !- Perimeter offset {m}
+    1,                       !- Aspect Ratio
+    5,                       !- Perimeter Offset {m}
     1.8,                     !- Soil Thermal Conductivity {W/m-K}
     3200,                    !- Soil Density {kg/m3}
     836,                     !- Soil Specific Heat {J/kg-K}

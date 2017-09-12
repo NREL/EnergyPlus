@@ -87,7 +87,7 @@ namespace HeatBalFiniteDiffManager {
 	//                      and included enthalpy formulations for phase change materials
 	// PURPOSE OF THIS MODULE:
 	// To encapsulate the data and algorithms required to
-	// manage the fiite difference heat balance simulation on the building.
+	// manage the finite difference heat balance simulation on the building.
 
 	// REFERENCES:
 	// The MFD moisture balance method
@@ -764,7 +764,7 @@ namespace HeatBalFiniteDiffManager {
 					mAlpha = 0.0;
 
 					//check for Material layers that are too thin and highly conductivity (not appropriate for surface models)
-					if ( Alpha > HighDiffusivityThreshold && ! Material( CurrentLayer ).WarnedForHighDiffusivity ) {
+					if ( Alpha > HighDiffusivityThreshold ) {
 						DeltaTimestep = TimeStepZoneSec;
 						ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 						if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
@@ -776,7 +776,7 @@ namespace HeatBalFiniteDiffManager {
 								ShowContinueError( "Material may be too thin to be modeled well, thickness = " + RoundSigDigits( Material( CurrentLayer ).Thickness, 5 ) + " [m]" );
 								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThinMaterialLayerThreshold, 5 ) + " [m]" );
 							}
-							Material( CurrentLayer ).WarnedForHighDiffusivity = true;
+							ShowFatalError( "Preceding conditions cause termination." );
 						}
 					}
 
@@ -908,18 +908,18 @@ namespace HeatBalFiniteDiffManager {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CondFD ) continue;
 
-			SetupOutputVariable( "CondFD Inner Solver Loop Iteration Count [ ]", SurfaceFD( SurfNum ).GSloopCounter, "Zone", "Sum", Surface( SurfNum ).Name );
+			SetupOutputVariable( "CondFD Inner Solver Loop Iteration Count", OutputProcessor::Unit::None, SurfaceFD( SurfNum ).GSloopCounter, "Zone", "Sum", Surface( SurfNum ).Name );
 
 			TotNodes = ConstructFD( Surface( SurfNum ).Construction ).TotNodes; // Full size nodes, start with outside face.
 			for ( Lay = 1; Lay <= TotNodes + 1; ++Lay ) { // include inside face node
-				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + " [W/m2]", SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Phase Change State " + TrimSigDigits( Lay ) + " []", SurfaceFD( SurfNum ).PhaseChangeState( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Phase Change Previous State " + TrimSigDigits( Lay ) + " []", SurfaceFD( SurfNum ).PhaseChangeStateOld( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-				SetupOutputVariable( "CondFD Phase Change Node Temperature " + TrimSigDigits( Lay ) + " [C]", SurfaceFD( SurfNum ).TDT( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Surface Temperature Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::C, SurfaceFD( SurfNum ).TDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Surface Heat Flux Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::W_m2, SurfaceFD( SurfNum ).QDreport( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Phase Change State " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::None, SurfaceFD( SurfNum ).PhaseChangeState( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Phase Change Previous State " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::None, SurfaceFD( SurfNum ).PhaseChangeStateOld( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+				SetupOutputVariable( "CondFD Phase Change Node Temperature " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::C, SurfaceFD( SurfNum ).TDT( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				if ( DisplayAdvancedReportVariables ) {
-					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
-					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + " [W/m2-K]", SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::W_m2K, SurfaceFD( SurfNum ).CpDelXRhoS1( Lay ), "Zone", "State", Surface( SurfNum ).Name );
+					SetupOutputVariable( "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits( Lay ) + "", OutputProcessor::Unit::W_m2K, SurfaceFD( SurfNum ).CpDelXRhoS2( Lay ), "Zone", "State", Surface( SurfNum ).Name );
 				}
 			}
 
@@ -1045,7 +1045,7 @@ namespace HeatBalFiniteDiffManager {
 						}
 					}
 
-					if ( ( Lay < TotLayers ) && ( TotNodes != 1 ) ) { // Interface equations for 2 capactive materials
+					if ( ( Lay < TotLayers ) && ( TotNodes != 1 ) ) { // Interface equations for 2 capacitive materials
 						++i;
 						IntInterfaceNodeEqns( Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, GSiter );
 					} else if ( Lay == TotLayers ) { // For the Interior surface node with a convective boundary condition
@@ -1136,7 +1136,7 @@ namespace HeatBalFiniteDiffManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine gives a detailed report to the user about
-		// the initializations for the Fintie Difference calculations
+		// the initializations for the Finite Difference calculations
 		// of each construction.
 
 		// Using/Aliasing
@@ -1438,8 +1438,11 @@ namespace HeatBalFiniteDiffManager {
 					auto const & matFD_TempEnth( matFD.TempEnth );
 					assert( matFD_TempEnth.u2() >= 3 );
 					auto const lTE( matFD_TempEnth.index( 2, 1 ) );
+					Real64 RhoS( mat.Density );
 					if ( mat.phaseChange ) {
 						Cp = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
+						RhoS = mat.phaseChange->getDensity( TD_i );
+						kt = mat.phaseChange->getConductivity( TD_i );
 						SurfaceFD( Surf ).EnthalpyF = mat.phaseChange->enthalpyF;
 						SurfaceFD( Surf ).EnthalpyM = mat.phaseChange->enthalpyM;
 					} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data to generate Cp
@@ -1452,7 +1455,6 @@ namespace HeatBalFiniteDiffManager {
 					} // Phase Change Material option
 
 					// Choose Regular or Transparent Insulation Case
-					Real64 const RhoS( mat.Density );
 					Real64 const DelX( ConstructFD( ConstrNum ).DelX( Lay ) );
 					Real64 const Delt_DelX( Delt * DelX );
 					SurfaceFD( Surf ).CpDelXRhoS1( i ) = 0.0; // Outside face  does not have an outer half node
@@ -1473,11 +1475,11 @@ namespace HeatBalFiniteDiffManager {
 						}
 
 					} else { // HMovInsul > 0.0: Transparent insulation on outside
-						// Transparent insulaton additions
+						// Transparent insulation additions
 
 						// Movable Insulation Layer Outside surface temp
 
-						Real64 const TInsulOut( ( QRadSWOutMvInsulFD + hgnd * Tgnd + HMovInsul * TDT_i + ( hconvo + hrad ) * Toa + hsky * Tsky ) / ( hconvo + hgnd + HMovInsul + hrad + hsky ) ); // Temperature of outisde face of Outside Insulation
+						Real64 const TInsulOut( ( QRadSWOutMvInsulFD + hgnd * Tgnd + HMovInsul * TDT_i + ( hconvo + hrad ) * Toa + hsky * Tsky ) / ( hconvo + hgnd + HMovInsul + hrad + hsky ) ); // Temperature of outside face of Outside Insulation
 						Real64 const Two_Delt_DelX( 2.0 * Delt_DelX );
 						Real64 const Cp_DelX2_RhoS( Cp * pow_2( DelX ) * RhoS );
 						Real64 const Two_Delt_kt( 2.0 * Delt * kt );
@@ -1507,13 +1509,13 @@ namespace HeatBalFiniteDiffManager {
 
 			} // regular detailed FD part or SigmaR SigmaC part
 
-			// Determine net heat flux to ooutside face
+			// Determine net heat flux to outside face
 			// One formulation that works for Fully Implicit and CrankNicholson and massless wall
 
 			Real64 const Toa_TDT_i( Toa - TDT_i );
 			Real64 const QNetSurfFromOutside( QRadSWOutFD + ( hgnd * ( -TDT_i + Tgnd ) + ( hconvo + hrad ) * Toa_TDT_i + hsky * ( -TDT_i + Tsky ) ) );
 
-			//S ame sign convention as CTFs
+			// Same sign convention as CTFs
 			OpaqSurfOutsideFaceConductionFlux( Surf ) = -QNetSurfFromOutside;
 			OpaqSurfOutsideFaceConduction( Surf ) = surface.Area * OpaqSurfOutsideFaceConductionFlux( Surf );
 
@@ -1587,8 +1589,12 @@ namespace HeatBalFiniteDiffManager {
 		auto const & matFD_TempEnth( matFD.TempEnth );
 		assert( matFD_TempEnth.u2() >= 3 );
 		auto const lTE( matFD_TempEnth.index( 2, 1 ) );
+		Real64 RhoS( mat.Density );
 		if ( mat.phaseChange ) {
 			Cp = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
+			RhoS = mat.phaseChange->getDensity( TD_i );
+			ktA1 = mat.phaseChange->getConductivity( TDT_ip );
+			ktA2 = mat.phaseChange->getConductivity( TDT_mi );
 		} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 			EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 			EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
@@ -1597,7 +1603,6 @@ namespace HeatBalFiniteDiffManager {
 			}
 		} // Phase Change case
 
-		Real64 const RhoS( mat.Density );
 		Real64 const DelX( ConstructFD( ConstrNum ).DelX( Lay ) );
 		Real64 const Cp_DelX_RhoS_Delt( Cp * DelX * RhoS / Delt );
 		if ( CondFDSchemeType == CrankNicholsonSecondOrder ) { // Adams-Moulton second order
@@ -1636,7 +1641,7 @@ namespace HeatBalFiniteDiffManager {
 		Array1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
 		Array1< Real64 > const & EP_UNUSED( EnthOld ), // Old Nodal enthalpy
 		Array1< Real64 > & EnthNew, // New Nodal enthalpy
-		int const EP_UNUSED( GSiter ) // Iteration number of Gauss Seidell iteration
+		int const EP_UNUSED( GSiter ) // Iteration number of Gauss Seidel iteration
 	)
 	{
 
@@ -1644,7 +1649,7 @@ namespace HeatBalFiniteDiffManager {
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   November, 2003
 		//       MODIFIED       May 2011, B. Griffith, P. Tabares,  add first order fully implicit, bug fixes, cleanup
-		//       RE-ENGINEERED  Curtis Pedersen, Changed to Implit mode and included enthalpy.  FY2006
+		//       RE-ENGINEERED  Curtis Pedersen, Changed to Implicit mode and included enthalpy.  FY2006
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// calculate finite difference heat transfer for nodes that interface two different material layers inside construction
@@ -1711,12 +1716,12 @@ namespace HeatBalFiniteDiffManager {
 					}
 				}
 
-				Real64 const RhoS1( mat.Density );
+				Real64 RhoS1( mat.Density );
 				Real64 const Cpo1( mat.SpecHeat ); // constant Cp from input file
 				Real64 Cp1( Cpo1 ); // Will be reset if PCM
 				Real64 const Delx1( ConstructFD( ConstrNum ).DelX( Lay ) );
 
-				Real64 const RhoS2( mat2.Density );
+				Real64 RhoS2( mat2.Density );
 				Real64 const Cpo2( mat2.SpecHeat );
 				Real64 Cp2( Cpo2 ); // will be reset if PCM
 				Real64 const Delx2( ConstructFD( ConstrNum ).DelX( Lay + 1 ) );
@@ -1746,6 +1751,8 @@ namespace HeatBalFiniteDiffManager {
 					// Check for PCM second layer
 					if ( mat2.phaseChange ) {
 						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
+						RhoS2 = mat.phaseChange->getDensity( TD_i );
+						kt2 = mat.phaseChange->getConductivity( TDT_i );
 					} else if ( ( matFD_sum < 0.0 ) && ( matFD2_sum > 0.0 ) ) { // Phase change material Layer2, Use TempEnth Data
 						Real64 const Enth2Old( terpld( matFD2_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth2New( terpld( matFD2_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
@@ -1781,6 +1788,8 @@ namespace HeatBalFiniteDiffManager {
 					// Check for PCM layer before R layer
 					if ( mat.phaseChange ) {
 						Cp1 = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
+						RhoS1 = mat.phaseChange->getDensity( TD_i );
+						kt1 = mat.phaseChange->getConductivity( TDT_i );
 					} else if ( ( matFD_sum > 0.0 ) && ( matFD2_sum < 0.0 ) ) { // Phase change material Layer1, Use TempEnth Data
 						Real64 const Enth1Old( terpld( matFD_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth1New( terpld( matFD_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
@@ -1856,9 +1865,13 @@ namespace HeatBalFiniteDiffManager {
 
 					if ( mat.phaseChange ) {
 						Cp1 = mat.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
+						RhoS1 = mat.phaseChange->getDensity( TD_i );
+						kt1 = mat.phaseChange->getConductivity( TDT_i );
 					}
 					if ( mat2.phaseChange ) {
 						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
+						RhoS2 = mat.phaseChange->getDensity( TD_i );
+						kt2 = mat.phaseChange->getConductivity( TDT_i );
 					}
 
 					Real64 const Delt_Delx1( Delt * Delx1 );
@@ -1921,7 +1934,7 @@ namespace HeatBalFiniteDiffManager {
 		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
 		Array1< Real64 > & EnthNew, // New Nodal enthalpy
-		Array1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
+		Array1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager iteration's value
 	)
 	{
 		// SUBROUTINE INFORMATION:

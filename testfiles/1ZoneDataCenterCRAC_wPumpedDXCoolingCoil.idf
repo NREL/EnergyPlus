@@ -26,7 +26,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -1265,7 +1265,11 @@
 
   EnergyManagementSystem:Program,
     CalcPUE,                 !- Name
-    set PUE = whole_building_power / IT_Equip_power;  !- Program Line 1
+    IF IT_Equip_power > 0.0, !- Program Line 1
+    set PUE = whole_building_power / IT_Equip_power,  !- Program Line 2
+    ELSE,                    !- Program Line 3
+    set PUE = 0.0,           !- Program Line 4
+    ENDIF;                   !- Program Line 5
 
   Output:Variable,*,PUE,Hourly;
 

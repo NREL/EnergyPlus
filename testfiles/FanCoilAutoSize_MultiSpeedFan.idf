@@ -95,7 +95,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -1768,7 +1768,7 @@
     Zone1FanCoilAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone1FanCoilOAMixer,     !- Outdoor Air Mixer Name
-    Fan:SystemModel,               !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone1FanCoilFan,         !- Supply Air Fan Name
     Coil:Cooling:Water,      !- Cooling Coil Object Type
     Zone1FanCoilCoolingCoil, !- Cooling Coil Name
@@ -1791,35 +1791,35 @@
     Zone1FanCoilExhNode,     !- Relief Air Stream Node Name
     Zone1FanCoilAirInletNode;!- Return Air Stream Node Name
 
-Fan:SystemModel,
-  Zone1FanCoilFan , !- Name
-  FanAndCoilAvailSched , !- Availability Schedule Name
-  Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50,  !- Fan Total Efficiency 
-  , !- Electric Power Function of Flow Fraction Curve Name
-  , !- Night Ventilation Mode Pressure Rise
-  , !- Night Ventilation Mode Flow Fraction
-  , !- Motor Loss Zone Name
-  , !- Motor Loss Radiative Fraction 
-  General, !- End-Use Subcategory
-  3, !- Number of Speeds
-  0.33, !- Speed 1 Flow Fraction
-  0.12, !- Speed 1 Electric Power Fraction
-  0.66, !- Speed 2 Flow Fraction
-  0.51, !- Speed 2 Electric Power Fraction
-  1.0,  !- Speed 3 Flow Fraction
-  1.0;  !- Speed 3 Electric Power Fraction
+  Fan:SystemModel,
+    Zone1FanCoilFan,         !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone1FanCoilOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone1FanCoilFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50,                    !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    3,                       !- Number of Speeds
+    0.33,                    !- Speed 1 Flow Fraction
+    0.12,                    !- Speed 1 Electric Power Fraction
+    0.66,                    !- Speed 2 Flow Fraction
+    0.51,                    !- Speed 2 Electric Power Fraction
+    1.0,                     !- Speed 3 Flow Fraction
+    1.0;                     !- Speed 3 Electric Power Fraction
 
   Coil:Cooling:Water,
     Zone1FanCoilCoolingCoil, !- Name
@@ -1891,7 +1891,7 @@ Fan:SystemModel,
     Zone2FanCoilAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone2FanCoilOAMixer,     !- Outdoor Air Mixer Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone2FanCoilFan,         !- Supply Air Fan Name
     Coil:Cooling:Water,      !- Cooling Coil Object Type
     Zone2FanCoilCoolingCoil, !- Cooling Coil Name
@@ -1914,35 +1914,35 @@ Fan:SystemModel,
     Zone2FanCoilExhNode,     !- Relief Air Stream Node Name
     Zone2FanCoilAirInletNode;!- Return Air Stream Node Name
 
-Fan:SystemModel,
-  Zone2FanCoilFan , !- Name
-  FanAndCoilAvailSched , !- Availability Schedule Name
-  Zone2FanCoilOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone2FanCoilFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50,  !- Fan Total Efficiency 
-  , !- Electric Power Function of Flow Fraction Curve Name
-  , !- Night Ventilation Mode Pressure Rise
-  , !- Night Ventilation Mode Flow Fraction
-  , !- Motor Loss Zone Name
-  , !- Motor Loss Radiative Fraction 
-  General, !- End-Use Subcategory
-  3, !- Number of Speeds
-  0.33, !- Speed 1 Flow Fraction
-  0.33, !- Speed 1 Electric Power Fraction
-  0.66, !- Speed 2 Flow Fraction
-  0.66, !- Speed 2 Electric Power Fraction
-  1.0,  !- Speed 3 Flow Fraction
-  1.0;  !- Speed 3 Electric Power Fraction
+  Fan:SystemModel,
+    Zone2FanCoilFan,         !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone2FanCoilOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone2FanCoilFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50,                    !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    3,                       !- Number of Speeds
+    0.33,                    !- Speed 1 Flow Fraction
+    0.33,                    !- Speed 1 Electric Power Fraction
+    0.66,                    !- Speed 2 Flow Fraction
+    0.66,                    !- Speed 2 Electric Power Fraction
+    1.0,                     !- Speed 3 Flow Fraction
+    1.0;                     !- Speed 3 Electric Power Fraction
 
   Coil:Cooling:Water,
     Zone2FanCoilCoolingCoil, !- Name
@@ -2014,7 +2014,7 @@ Fan:SystemModel,
     Zone3FanCoilAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone3FanCoilOAMixer,     !- Outdoor Air Mixer Name
-    Fan:SystemModel,               !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone3FanCoilFan,         !- Supply Air Fan Name
     Coil:Cooling:Water,      !- Cooling Coil Object Type
     Zone3FanCoilCoolingCoil, !- Cooling Coil Name
@@ -2037,36 +2037,36 @@ Fan:SystemModel,
     Zone3FanCoilExhNode,     !- Relief Air Stream Node Name
     Zone3FanCoilAirInletNode;!- Return Air Stream Node Name
 
-Fan:SystemModel,
-  Zone3FanCoilFan , !- Name
-  FanAndCoilAvailSched , !- Availability Schedule Name
-  Zone3FanCoilOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone3FanCoilFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50,  !- Fan Total Efficiency 
-  , !- Electric Power Function of Flow Fraction Curve Name
-  , !- Night Ventilation Mode Pressure Rise
-  , !- Night Ventilation Mode Flow Fraction
-  , !- Motor Loss Zone Name
-  , !- Motor Loss Radiative Fraction 
-  General, !- End-Use Subcategory
-  3, !- Number of Speeds
-  0.33, !- Speed 1 Flow Fraction
-  0.33, !- Speed 1 Electric Power Fraction
-  0.66, !- Speed 2 Flow Fraction
-  0.66, !- Speed 2 Electric Power Fraction
-  1.0,  !- Speed 3 Flow Fraction
-  1.0;  !- Speed 3 Electric Power Fraction
-  
+  Fan:SystemModel,
+    Zone3FanCoilFan,         !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone3FanCoilOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone3FanCoilFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50,                    !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    3,                       !- Number of Speeds
+    0.33,                    !- Speed 1 Flow Fraction
+    0.33,                    !- Speed 1 Electric Power Fraction
+    0.66,                    !- Speed 2 Flow Fraction
+    0.66,                    !- Speed 2 Electric Power Fraction
+    1.0,                     !- Speed 3 Flow Fraction
+    1.0;                     !- Speed 3 Electric Power Fraction
+
   Coil:Cooling:Water,
     Zone3FanCoilCoolingCoil, !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
@@ -2155,9 +2155,9 @@ Fan:SystemModel,
 
   Output:Variable,*,Fan Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,Fan Coil Fan Electric Power, timestep;
+  Output:Variable,*,Fan Coil Fan Electric Power,timestep;
 
-  Output:Variable,*,Fan Coil Speed Ratio, timestep;
+  Output:Variable,*,Fan Coil Speed Ratio,timestep;
 
   Output:Variable,*,Fan Coil Speed Ratio,timestep;
 

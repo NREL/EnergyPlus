@@ -739,7 +739,7 @@ namespace FanCoilUnits {
 			}
 
 			//check for inlet side air mixer
-			GetATMixer( FanCoil( FanCoilNum ).Name, ATMixerName, ATMixerNum, ATMixerType, ATMixerPriNode, ATMixerSecNode, ATMixerOutNode );
+			GetATMixer( FanCoil( FanCoilNum ).Name, ATMixerName, ATMixerNum, ATMixerType, ATMixerPriNode, ATMixerSecNode, ATMixerOutNode, FanCoil( FanCoilNum ).AirOutNode );
 			if ( ATMixerType == ATMixer_InletSide ) {
 				// save the air terminal mixer data in the fan coil data array
 				FanCoil( FanCoilNum ).ATMixerExists = true;
@@ -904,26 +904,26 @@ namespace FanCoilUnits {
 		for ( FanCoilNum = 1; FanCoilNum <= NumFanCoils; ++FanCoilNum ) {
 			// Setup Report variables for the Fan Coils
 			// CurrentModuleObject='ZoneHVAC:FourPipeFanCoil'
-			SetupOutputVariable( "Fan Coil Heating Rate [W]", FanCoil( FanCoilNum ).HeatPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Heating Energy [J]", FanCoil( FanCoilNum ).HeatEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Total Cooling Rate [W]", FanCoil( FanCoilNum ).TotCoolPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Total Cooling Energy [J]", FanCoil( FanCoilNum ).TotCoolEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Sensible Cooling Rate [W]", FanCoil( FanCoilNum ).SensCoolPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Sensible Cooling Energy [J]", FanCoil( FanCoilNum ).SensCoolEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Fan Electric Power [W]", FanCoil( FanCoilNum ).ElecPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Fan Electric Energy [J]", FanCoil( FanCoilNum ).ElecEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Heating Rate", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).HeatPower, "System", "Average", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Heating Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).HeatEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Total Cooling Rate", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).TotCoolPower, "System", "Average", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Total Cooling Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).TotCoolEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Sensible Cooling Rate", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).SensCoolPower, "System", "Average", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Sensible Cooling Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).SensCoolEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Fan Electric Power", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).ElecPower, "System", "Average", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Fan Electric Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).ElecEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_MultiSpeedFan ) {
-				SetupOutputVariable( "Fan Coil Runtime Fraction []", FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
-				SetupOutputVariable( "Fan Coil Fan Speed Level []", FanCoil( FanCoilNum ).SpeedFanSel, "System", "Average", FanCoil( FanCoilNum ).Name );
+				SetupOutputVariable( "Fan Coil Runtime Fraction", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
+				SetupOutputVariable( "Fan Coil Fan Speed Level", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).SpeedFanSel, "System", "Average", FanCoil( FanCoilNum ).Name );
 				if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_MultiSpeedFan ) {
-					SetupOutputVariable( "Fan Coil Speed Ratio []", FanCoil( FanCoilNum ).SpeedRatio, "System", "Average", FanCoil( FanCoilNum ).Name );
-					SetupOutputVariable( "Fan Coil Part Load Ratio []", FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
+					SetupOutputVariable( "Fan Coil Speed Ratio", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).SpeedRatio, "System", "Average", FanCoil( FanCoilNum ).Name );
+					SetupOutputVariable( "Fan Coil Part Load Ratio", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
 				}
 			}
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanVarFlow || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanConsFlow ) {
-				SetupOutputVariable( "Fan Coil Part Load Ratio []", FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
+				SetupOutputVariable( "Fan Coil Part Load Ratio", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
 			}
-			SetupOutputVariable( "Fan Coil Availability Status []", FanCoil( FanCoilNum ).AvailStatus, "System", "Average", FanCoil( FanCoilNum ).Name );
+			SetupOutputVariable( "Fan Coil Availability Status", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).AvailStatus, "System", "Average", FanCoil( FanCoilNum ).Name );
 		}
 
 	}

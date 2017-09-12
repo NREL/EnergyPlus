@@ -73,7 +73,7 @@ namespace EnergyPlus {
 			Array1D_int VarIndexes( NumVariables ); // Variable Numbers
 			Array1D_int VarTypes( NumVariables ); // Variable Types (1=integer, 2=real, 3=meter)
 			Array1D_int IndexTypes( NumVariables ); // Variable Index Types (1=Zone,2=HVAC)
-			Array1D_string UnitsStrings( NumVariables ); // UnitsStrings for each variable
+			Array1D < OutputProcessor::Unit> unitsForVar( NumVariables ); // units from enum for each variable
 			Array1D_int ResourceTypes( NumVariables ); // ResourceTypes for each variable
 			Array1D_string EndUses( NumVariables ); // EndUses for each variable
 			Array1D_string Groups( NumVariables ); // Groups for each variable
@@ -85,7 +85,7 @@ namespace EnergyPlus {
 
 			int NumFound;
 
-			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 			EXPECT_EQ( 0, NumFound );
 
@@ -105,7 +105,7 @@ namespace EnergyPlus {
 			EnergyMeters.allocate( 10 );
 			EnergyMeters( 1 ).ResourceType = NameOfComp;
 
-			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 			EXPECT_EQ( 1 , NumFound );
 
 		}
@@ -1122,31 +1122,31 @@ namespace EnergyPlus {
 			int ipUnits = -999999;
 			bool errorFound = false;
 
-			DetermineMeterIPUnits( ipUnits, "ELEC", "J", errorFound );
+			DetermineMeterIPUnits( ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound );
 			EXPECT_EQ( RT_IPUnits_Electricity, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			DetermineMeterIPUnits( ipUnits, "GAS", "J", errorFound );
+			DetermineMeterIPUnits( ipUnits, "GAS", OutputProcessor::Unit::J, errorFound );
 			EXPECT_EQ( RT_IPUnits_Gas, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			DetermineMeterIPUnits( ipUnits, "COOL", "J", errorFound );
+			DetermineMeterIPUnits( ipUnits, "COOL", OutputProcessor::Unit::J, errorFound );
 			EXPECT_EQ( RT_IPUnits_Cooling, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			DetermineMeterIPUnits( ipUnits, "WATER", "m3", errorFound );
+			DetermineMeterIPUnits( ipUnits, "WATER", OutputProcessor::Unit::m3, errorFound );
 			EXPECT_EQ( RT_IPUnits_Water, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			DetermineMeterIPUnits( ipUnits, "OTHER", "m3", errorFound );
+			DetermineMeterIPUnits( ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound );
 			EXPECT_EQ( RT_IPUnits_OtherM3, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			DetermineMeterIPUnits( ipUnits, "OTHER", "kg", errorFound );
+			DetermineMeterIPUnits( ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound );
 			EXPECT_EQ( RT_IPUnits_OtherKG, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			DetermineMeterIPUnits( ipUnits, "OTHER", "L", errorFound );
+			DetermineMeterIPUnits( ipUnits, "OTHER", OutputProcessor::Unit::L, errorFound );
 			EXPECT_EQ( RT_IPUnits_OtherL, ipUnits );
 			EXPECT_FALSE( errorFound );
 
@@ -1155,12 +1155,12 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 
 			ipUnits = -999999;
-			DetermineMeterIPUnits( ipUnits, "UNKONWN", "badUnits", errorFound );
+			DetermineMeterIPUnits( ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound );  //was "badunits"
 			EXPECT_EQ( RT_IPUnits_OtherJ, ipUnits );
 			EXPECT_TRUE( errorFound );
 
 			ipUnits = -999999;
-			DetermineMeterIPUnits( ipUnits, "ELEC", "kWh", errorFound );
+			DetermineMeterIPUnits( ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound ); // was "kWh"
 			EXPECT_EQ( RT_IPUnits_Electricity, ipUnits );
 			EXPECT_TRUE( errorFound );
 
@@ -1169,8 +1169,8 @@ namespace EnergyPlus {
 			auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
 			ASSERT_EQ(2ul, errorData.size());
-			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[badUnits].", "1"};
-			std::vector<std::string> errorData1 {"2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[kWh].", "1"};
+			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
+			std::vector<std::string> errorData1 {"2", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].", "1"};
 			EXPECT_EQ(errorData0, errorData[0]);
 			EXPECT_EQ(errorData1, errorData[1]);
 
@@ -1213,148 +1213,148 @@ namespace EnergyPlus {
 
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [meterUnits] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,meterName [meterUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 2, 2, -999, "indexGroup", "2", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "2,1,meterName [meterUnits] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,meterName [meterUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 2, 2, -999, "indexGroup", "2", "meterName", OutputProcessor::Unit::W, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 3, -999, "indexGroup", "3", "meterName", "meterUnits", true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 3, -999, "indexGroup", "3", "meterName", OutputProcessor::Unit::J, true, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 4, -999, "indexGroup", "4", "meterName", "meterUnits", false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "4,1,meterName [meterUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 4, -999, "indexGroup", "4", "meterName", OutputProcessor::Unit::W, false, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "4,1,meterName [W] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 5, -999, "indexGroup", "5", "meterName", "meterUnits", true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "5,1,Cumulative meterName [meterUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 5, -999, "indexGroup", "5", "meterName", OutputProcessor::Unit::W, true, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "5,1,Cumulative meterName [W] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 6, -999, "indexGroup", "6", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "6,1,meterName [meterUnits] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,meterName [meterUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 6, -999, "indexGroup", "6", "meterName", OutputProcessor::Unit::J, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 2, 7, -999, "indexGroup", "7", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "7,1,meterName [meterUnits] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,meterName [meterUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 2, 7, -999, "indexGroup", "7", "meterName", OutputProcessor::Unit::J, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 8, -999, "indexGroup", "8", "meterName", "meterUnits", true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 8, -999, "indexGroup", "8", "meterName", OutputProcessor::Unit::J, true, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 9, -999, "indexGroup", "9", "meterName", "meterUnits", false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "9,1,meterName [meterUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 9, -999, "indexGroup", "9", "meterName", OutputProcessor::Unit::J, false, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "9,1,meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 10, -999, "indexGroup", "10", "meterName", "meterUnits", true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "10,1,Cumulative meterName [meterUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportEach, 1, 10, -999, "indexGroup", "10", "meterName", OutputProcessor::Unit::J, true, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "10,1,Cumulative meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 11, -999, "indexGroup", "11", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "11,1,meterName [meterUnits] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,meterName [meterUnits] !Hourly" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 11, -999, "indexGroup", "11", "meterName", OutputProcessor::Unit::J, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 2, 12, -999, "indexGroup", "12", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "12,1,meterName [meterUnits] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,meterName [meterUnits] !Hourly" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 2, 12, -999, "indexGroup", "12", "meterName", OutputProcessor::Unit::None, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 13, -999, "indexGroup", "13", "meterName", "meterUnits", true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 13, -999, "indexGroup", "13", "meterName", OutputProcessor::Unit::None, true, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 14, -999, "indexGroup", "14", "meterName", "meterUnits", false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "14,1,meterName [meterUnits] !Hourly" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 14, -999, "indexGroup", "14", "meterName", OutputProcessor::Unit::None, false, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "14,1,meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 15, -999, "indexGroup", "15", "meterName", "meterUnits", true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "15,1,Cumulative meterName [meterUnits] !Hourly" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportHourly, 1, 15, -999, "indexGroup", "15", "meterName", OutputProcessor::Unit::None, true, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "15,1,Cumulative meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 16, -999, "indexGroup", "16", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 16, -999, "indexGroup", "16", "meterName", OutputProcessor::Unit::None, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 2, 17, -999, "indexGroup", "17", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 2, 17, -999, "indexGroup", "17", "meterName", OutputProcessor::Unit::None, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "17,7,meterName [] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,meterName [] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 18, -999, "indexGroup", "18", "meterName", "meterUnits", true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "18,1,Cumulative meterName [meterUnits] !Daily " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,1,Cumulative meterName [meterUnits] !Daily " } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 18, -999, "indexGroup", "18", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 19, -999, "indexGroup", "19", "meterName", "meterUnits", false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "19,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 19, -999, "indexGroup", "19", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "19,7,meterName [deltaC] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 20, -999, "indexGroup", "20", "meterName", "meterUnits", true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "20,1,Cumulative meterName [meterUnits] !Daily " } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportDaily, 1, 20, -999, "indexGroup", "20", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "20,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 21, -999, "indexGroup", "21", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 21, -999, "indexGroup", "21", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 2, 22, -999, "indexGroup", "22", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 2, 22, -999, "indexGroup", "22", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 23, -999, "indexGroup", "23", "meterName", "meterUnits", true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 23, -999, "indexGroup", "23", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 24, -999, "indexGroup", "24", "meterName", "meterUnits", false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "24,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 24, -999, "indexGroup", "24", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "24,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 25, -999, "indexGroup", "25", "meterName", "meterUnits", true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "25,1,Cumulative meterName [meterUnits] !Monthly " } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportMonthly, 1, 25, -999, "indexGroup", "25", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "25,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 26, -999, "indexGroup", "26", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 26, -999, "indexGroup", "26", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 2, 27, -999, "indexGroup", "27", "meterName", "meterUnits", false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 2, 27, -999, "indexGroup", "27", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 28, -999, "indexGroup", "28", "meterName", "meterUnits", true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 28, -999, "indexGroup", "28", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 29, -999, "indexGroup", "29", "meterName", "meterUnits", false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "29,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 29, -999, "indexGroup", "29", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", "meterUnits", true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "30,1,Cumulative meterName [meterUnits] !RunPeriod " } ) ) );
+			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "30,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
 			std::vector< std::vector<std::string> > reportDataDictionary(
 			{
-				{"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "meterUnits"},
-				{"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "meterUnits"},
-				{"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
-				{"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
-				{"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"},
-				{"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "meterUnits"},
-				{"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", "meterUnits"},
-				{"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
-				{"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
-				{"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"},
-				{"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "meterUnits"},
-				{"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "meterUnits"},
-				{"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
-				{"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
-				{"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"},
-				{"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "meterUnits"},
-				{"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "meterUnits"},
-				{"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
-				{"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
-				{"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"},
-				{"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "meterUnits"},
-				{"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "meterUnits"}
+				{"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "J"},
+				{"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "W"},
+				{"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "J"},
+				{"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "W"},
+				{"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "W"},
+				{"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
+				{"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
+				{"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
+				{"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
+				{"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
+				{"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "J"},
+				{"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", ""},
+				{"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", ""},
+				{"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", ""},
+				{"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", ""},
+				{"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", ""},
+				{"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", ""},
+				{"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "deltaC"},
+				{"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "deltaC"},
+				{"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "deltaC"},
+				{"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
+				{"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
+				{"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "deltaC"},
+				{"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
+				{"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "deltaC"},
+				{"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
+				{"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
+				{"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "deltaC"},
+				{"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
+				{"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "deltaC"}
 			});
 			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
 
@@ -1366,170 +1366,170 @@ namespace EnergyPlus {
 
 			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 2, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 2, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,keyedValue,variableName [variableUnits] !TimeStep,scheduleName" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "4,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "4,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "5,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "5,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 2, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 2, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,keyedValue,variableName [variableUnits] !Each Call,scheduleName" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "9,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "9,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, "variableUnits", _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "10,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportEach, 1, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "10,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,keyedValue,variableName [variableUnits] !Hourly" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,keyedValue,variableName [variableUnits] !Hourly" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,keyedValue,variableName [variableUnits] !Hourly,scheduleName" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "14,1,keyedValue,variableName [variableUnits] !Hourly" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "14,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "15,1,keyedValue,variableName [variableUnits] !Hourly" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "15,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,keyedValue,variableName [variableUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,keyedValue,variableName [m3/s] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "19,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "20,7,keyedValue,variableName [variableUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,keyedValue,variableName [variableUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,keyedValue,variableName [m3/s] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "24,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "25,9,keyedValue,variableName [variableUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "29,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, "variableUnits", _ ) );
+			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "30,11,keyedValue,variableName [variableUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
+			EXPECT_TRUE( compare_eso_stream( delimited_string( { "30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
 			std::vector< std::vector<std::string> > reportDataDictionary(
 			{
-				{"1", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"2", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"3", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "scheduleName", "variableUnits"},
-				{"4", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"5", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Zone Timestep", "", "variableUnits"},
-				{"6", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"7", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"8", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "variableUnits"},
-				{"9", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"10", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "HVAC System Timestep", "", "variableUnits"},
-				{"11", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"12", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"13", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "scheduleName", "variableUnits"},
-				{"14", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"15", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Hourly", "", "variableUnits"},
-				{"16", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"17", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"18", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "scheduleName", "variableUnits"},
-				{"19", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"20", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Daily", "", "variableUnits"},
-				{"21", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"22", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"23", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "scheduleName", "variableUnits"},
-				{"24", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"25", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Monthly", "", "variableUnits"},
-				{"26", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
-				{"27", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
-				{"28", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "scheduleName", "variableUnits"},
-				{"29", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Run Period", "", "variableUnits"},
-				{"30", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Run Period", "", "variableUnits"}
+				{"1", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"2", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"3", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Zone Timestep", "scheduleName", "m3/s"},
+				{"4", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"5", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
+				{"6", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"7", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"8", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "m3/s"},
+				{"9", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"10", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
+				{"11", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"12", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"13", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Hourly", "scheduleName", "m3/s"},
+				{"14", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"15", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Hourly", "", "m3/s"},
+				{"16", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"17", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"18", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Daily", "scheduleName", "m3/s"},
+				{"19", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"20", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Daily", "", "m3/s"},
+				{"21", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"22", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"23", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Monthly", "scheduleName", "m3/s"},
+				{"24", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"25", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Monthly", "", "m3/s"},
+				{"26", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "m3/s"},
+				{"27", "0", "Sum", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "", "m3/s"},
+				{"28", "0", "Avg", "indexGroup", "HVAC System", "keyedValue", "variableName", "Run Period", "scheduleName", "m3/s"},
+				{"29", "0", "Avg", "indexGroup", "Zone", "keyedValue", "variableName", "Run Period", "", "m3/s"},
+				{"30", "0", "Avg", "indexGroup", "Unknown!!!", "keyedValue", "variableName", "Run Period", "", "m3/s"}
 			});
 			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
 
@@ -1841,7 +1841,7 @@ namespace EnergyPlus {
 		TEST_F( SQLiteFixture, OutputProcessor_addMeter )
 		{
 			auto const name( "testMeter" );
-			auto const units( "J" );
+			OutputProcessor::Unit const units( OutputProcessor::Unit::J );
 			auto const resourceType( "ELEC" );
 			auto const endUse( "testEndUse" );
 			auto const endUseSub( "testEndUseSub" );
@@ -1878,7 +1878,7 @@ namespace EnergyPlus {
 			sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 			auto const name2( "testMeter2" );
-			auto const units2( "kWh" );
+			OutputProcessor::Unit const units2( OutputProcessor::Unit::unknown ); // was "kwh"
 			auto const resourceType2( "OTHER" );
 			auto const endUse2( "testEndUse2" );
 			auto const endUseSub2( "testEndUseSub2" );
@@ -1888,7 +1888,7 @@ namespace EnergyPlus {
 			auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
 			ASSERT_EQ(1ul, errorData.size());
-			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[kWh].  ..on Meter=\"testMeter2\".  ..requests for IP units from this meter will be ignored.", "1"};
+			std::vector<std::string> errorData0 {"1", "1", "0", "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[unknown].  ..on Meter=\"testMeter2\".  ..requests for IP units from this meter will be ignored.", "1"};
 			EXPECT_EQ(errorData0, errorData[0]);
 
 			ASSERT_EQ( 2, NumEnergyMeters );
@@ -2106,9 +2106,9 @@ namespace EnergyPlus {
 			for ( auto & meter : input_map ) {
 				errorFound = false;
 				if ( meter.size() == 5 ) {
-					ValidateNStandardizeMeterTitles( meter[ 0 ], meter[ 1 ], meter[ 2 ], meter[ 3 ], meter[ 4 ], errorFound );
+					ValidateNStandardizeMeterTitles( OutputProcessor::Unit::J, meter[ 1 ], meter[ 2 ], meter[ 3 ], meter[ 4 ], errorFound ); // the first argument was  meter[ 0 ]
 				} else if ( meter.size() == 6 ) {
-					ValidateNStandardizeMeterTitles( meter[ 0 ], meter[ 1 ], meter[ 2 ], meter[ 3 ], meter[ 4 ], errorFound, meter[ 5 ] );
+					ValidateNStandardizeMeterTitles( OutputProcessor::Unit::J, meter[ 1 ], meter[ 2 ], meter[ 3 ], meter[ 4 ], errorFound, meter[ 5 ] ); // the first argument was  meter[ 0 ]
 				}
 				EXPECT_FALSE( errorFound );
 			}
@@ -2125,7 +2125,7 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 
-			std::string units = "J";
+			OutputProcessor::Unit units = OutputProcessor::Unit::J;
 			std::string resourceType = "ELEC";
 			std::string endUse = "INTERIOR LIGHTS";
 			std::string endUseSub = "endUseSub";
@@ -2135,7 +2135,7 @@ namespace EnergyPlus {
 			ValidateNStandardizeMeterTitles( units, resourceType, endUse, endUseSub, group, errorFound );
 			EXPECT_TRUE( errorFound );
 
-			units = "J";
+			units = OutputProcessor::Unit::J;
 			resourceType = "ELEC";
 			endUse = "BAD INPUT";
 			endUseSub = "endUseSub";
@@ -2174,25 +2174,6 @@ namespace EnergyPlus {
 
 			EXPECT_DOUBLE_EQ( timeStep, TimeValue( 2 ).TimeStep );
 			EXPECT_DOUBLE_EQ( 0.0, TimeValue( 2 ).CurMinute );
-
-		}
-
-		TEST_F( SQLiteFixture, OutputProcessor_getVariableUnitsString )
-		{
-			EXPECT_EQ( "C", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C]" ) );
-			EXPECT_EQ( "%", GetVariableUnitsString( "Site Outdoor Air Relative Humidity [%]" ) );
-			EXPECT_EQ( "kgWater/kgDryAir", GetVariableUnitsString( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]" ) );
-			EXPECT_EQ( "", GetVariableUnitsString( "Site Daylighting Model Sky Clearness []" ) );
-			EXPECT_EQ( "", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature" ) );
-			EXPECT_EQ( "0123456789012345", GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [0123456789012345]" ) );
-
-		}
-
-		TEST_F( SQLiteFixture, OutputProcessor_DeathTest_getVariableUnitsString )
-		{
-			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [C" ) );
-			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature ]C[" ) );
-			EXPECT_ANY_THROW( GetVariableUnitsString( "Site Outdoor Air Drybulb Temperature [01234567890123456]" ) );
 
 		}
 
@@ -2414,10 +2395,10 @@ namespace EnergyPlus {
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
 
-			AddToOutputVariableList( "Site Outdoor Air Drybulb Temperature", 1, 1, 2, "C" );
-			AddToOutputVariableList( "Site Outdoor Air Wetbulb Temperature", 1, 1, 2, "C" );
-			AddToOutputVariableList( "Site Outdoor Air Humidity Ratio", 1, 1, 2, "kgWater/kgDryAir" );
-			AddToOutputVariableList( "Site Outdoor Air Relative Humidity", 1, 1, 2, "%" );
+			AddToOutputVariableList( "Site Outdoor Air Drybulb Temperature", 1, 1, 2, OutputProcessor::Unit::C );
+			AddToOutputVariableList( "Site Outdoor Air Wetbulb Temperature", 1, 1, 2, OutputProcessor::Unit::C );
+			AddToOutputVariableList( "Site Outdoor Air Humidity Ratio", 1, 1, 2, OutputProcessor::Unit::kgWater_kgDryAir );
+			AddToOutputVariableList( "Site Outdoor Air Relative Humidity", 1, 1, 2, OutputProcessor::Unit::Perc );
 
 			EXPECT_EQ( 1, DDVariableTypes( 1 ).IndexType );
 			EXPECT_EQ( 1, DDVariableTypes( 1 ).StoreType );
@@ -2425,7 +2406,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 1 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 1 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Drybulb Temperature", DDVariableTypes( 1 ).VarNameOnly );
-			EXPECT_EQ( "C", DDVariableTypes( 1 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::C, DDVariableTypes( 1 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 2 ).IndexType );
 			EXPECT_EQ( 1, DDVariableTypes( 2 ).StoreType );
@@ -2433,7 +2414,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 2 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 2 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Wetbulb Temperature", DDVariableTypes( 2 ).VarNameOnly );
-			EXPECT_EQ( "C", DDVariableTypes( 2 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::C, DDVariableTypes( 2 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 3 ).IndexType );
 			EXPECT_EQ( 1, DDVariableTypes( 3 ).StoreType );
@@ -2441,7 +2422,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 3 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 3 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Humidity Ratio", DDVariableTypes( 3 ).VarNameOnly );
-			EXPECT_EQ( "kgWater/kgDryAir", DDVariableTypes( 3 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::kgWater_kgDryAir, DDVariableTypes( 3 ).units );
 
 			EXPECT_EQ( 1, DDVariableTypes( 4 ).IndexType );
 			EXPECT_EQ( 1, DDVariableTypes( 4 ).StoreType );
@@ -2449,7 +2430,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( 0, DDVariableTypes( 4 ).Next );
 			EXPECT_FALSE( DDVariableTypes( 4 ).ReportedOnDDFile );
 			EXPECT_EQ( "Site Outdoor Air Relative Humidity", DDVariableTypes( 4 ).VarNameOnly );
-			EXPECT_EQ( "%", DDVariableTypes( 4 ).UnitsString );
+			EXPECT_EQ( OutputProcessor::Unit::Perc, DDVariableTypes( 4 ).units );
 
 		}
 
@@ -2463,7 +2444,7 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2503,9 +2484,9 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2542,9 +2523,9 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2579,9 +2560,9 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -2617,10 +2598,10 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall002" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall003" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall003" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
@@ -2658,10 +2639,10 @@ namespace EnergyPlus {
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL002" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL003" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
+			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL003" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
@@ -2784,17 +2765,17 @@ namespace EnergyPlus {
 			ASSERT_FALSE( process_idf( idf_objects ) );
 
 			Real64 light_consumption = 0;
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 0;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 
 			bool errors_found = false;
 
@@ -2831,7 +2812,7 @@ namespace EnergyPlus {
 				EXPECT_EQ( std::get<3>( result.second ), EnergyMeters( result.first ).EndUse );
 				EXPECT_EQ( std::get<4>( result.second ), EnergyMeters( result.first ).EndUseSub );
 				EXPECT_EQ( std::get<5>( result.second ), EnergyMeters( result.first ).Group );
-				EXPECT_EQ( std::get<6>( result.second ), EnergyMeters( result.first ).Units );
+				EXPECT_EQ( std::get<6>( result.second ), unitEnumToString( EnergyMeters( result.first ).Units) );
 			}
 		}
 
@@ -2858,7 +2839,7 @@ namespace EnergyPlus {
 			std::string group( "Building" );
 			std::string const zoneName( "SPACE1-1" );
 
-			AttachMeters( "J", resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found );
+			AttachMeters( OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found );
 
 			EXPECT_FALSE( errors_found );
 			EXPECT_EQ( 1, meter_array_ptr );
@@ -2881,7 +2862,7 @@ namespace EnergyPlus {
 				EXPECT_EQ( std::get<3>( result.second ), EnergyMeters( result.first ).EndUse );
 				EXPECT_EQ( std::get<4>( result.second ), EnergyMeters( result.first ).EndUseSub );
 				EXPECT_EQ( std::get<5>( result.second ), EnergyMeters( result.first ).Group );
-				EXPECT_EQ( std::get<6>( result.second ), EnergyMeters( result.first ).Units );
+				EXPECT_EQ( std::get<6>( result.second ), unitEnumToString( EnergyMeters( result.first ).Units ) );
 			}
 		}
 
@@ -2939,19 +2920,19 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 999;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 
 			UpdateMeterReporting();
 
@@ -3121,23 +3102,23 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 999;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 			Real64 fuel_used = 999;
 			Real64 boiler_load = 999;
-			SetupOutputVariable( "Boiler Heating Rate [W]", boiler_load, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 
 			UpdateMeterReporting();
 
@@ -3316,23 +3297,23 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
-			SetupOutputVariable( "Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE2-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE2-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE3-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE3-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE4-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE4-1", 1, 1 );
+			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE5-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE5-1", 1, 1 );
 			Real64 zone_infil_total_loss = 999;
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
-			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE1-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE2-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE3-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1" );
+			SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1" );
 			Real64 fuel_used = 999;
 			Real64 boiler_load = 999;
-			SetupOutputVariable( "Boiler Heating Rate [W]", boiler_load, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1" );
+			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 
 			UpdateMeterReporting();
 
@@ -3462,7 +3443,7 @@ namespace EnergyPlus {
 			GetReportVariableInput();
 			Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
 			PurchAir.allocate( 1 );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy [J]", PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy", OutputProcessor::Unit::J, PurchAir( 1 ).TotHeatEnergy, "System", "Sum", PurchAir( 1 ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
 
 			PurchAir( 1 ).TotHeatEnergy = 1.1;
 			UpdateMeterReporting();
@@ -3586,17 +3567,18 @@ namespace EnergyPlus {
 			TimeValue (2).CurMinute = 50;
 
 			GetReportVariableInput ();
-			SetupOutputVariable ("Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+			SetupOutputVariable ("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
 			Real64 light_consumption = 999;
-			SetupOutputVariable ("Lights Electric Energy [J]", light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
+			SetupOutputVariable ("Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
 			UpdateMeterReporting ();
 			UpdateDataandReport (DataGlobals::ZoneTSReporting);
 
 			GenOutputVariablesAuditReport();
 
 			std::string errMsg = delimited_string ({
-				"   ** Warning ** The following Report Variables were requested but not generated",
-				"   **   ~~~   ** because IDF did not contain these elements or misspelled variable name -- check .rdd file",
+				"   ** Warning ** The following Report Variables were requested but not generated -- check.rdd file",
+				"   **   ~~~   ** Either the IDF did not contain these elements, the variable name is misspelled,",
+				"   **   ~~~   ** or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;",
 				"   ************* Key=*, VarName=BOILER GAS RATE, Frequency=Detailed",
 				"   ************* Key=*, VarName=BOILER HEATING RATE, Frequency=Detailed",
 			});
@@ -3641,6 +3623,73 @@ namespace EnergyPlus {
 
 			compare_err_stream(errMsg);
 		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitStringToEnum )
+		{
+
+			EXPECT_EQ( OutputProcessor::Unit::J, unitStringToEnum( "J" ) );
+			EXPECT_EQ( OutputProcessor::Unit::J, unitStringToEnum( "j" ) );
+
+			EXPECT_EQ( OutputProcessor::Unit::kgWater_kgDryAir, unitStringToEnum( "kgWater/kgDryAir" ) );
+			EXPECT_EQ( OutputProcessor::Unit::kgWater_s, unitStringToEnum( "kgWater/s" ) );
+
+			EXPECT_EQ( OutputProcessor::Unit::unknown, unitStringToEnum( "junk" ) );
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitEnumToString )
+		{
+
+			EXPECT_EQ( "J", unitEnumToString( OutputProcessor::Unit::J ) );
+
+			EXPECT_EQ( "kgWater/kgDryAir", unitEnumToString( OutputProcessor::Unit::kgWater_kgDryAir ) );
+			EXPECT_EQ( "kgWater/s",  unitEnumToString( OutputProcessor::Unit::kgWater_s ) );
+
+			EXPECT_EQ( "unknown", unitEnumToString( OutputProcessor::Unit::unknown ) );
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitEnumToStringBrackets )
+		{
+
+			EXPECT_EQ( " [J]", unitEnumToStringBrackets( OutputProcessor::Unit::J ) );
+
+			EXPECT_EQ( " [kgWater/kgDryAir]", unitEnumToStringBrackets( OutputProcessor::Unit::kgWater_kgDryAir ) );
+			EXPECT_EQ( " [kgWater/s]", unitEnumToStringBrackets( OutputProcessor::Unit::kgWater_s ) );
+
+			EXPECT_EQ( " [unknown]", unitEnumToStringBrackets( OutputProcessor::Unit::unknown ) );
+
+		}
+
+		TEST_F( EnergyPlusFixture, OutputProcessor_unitStringFromDDitem )
+		{
+
+			AddToOutputVariableList( "energy variable 1", 1, 1, 1, OutputProcessor::Unit::J );
+			AddToOutputVariableList( "energy variable 2", 1, 1, 1, OutputProcessor::Unit::J );
+			AddToOutputVariableList( "energy variable 3", 1, 1, 1, OutputProcessor::Unit::J );
+
+			AddToOutputVariableList( "humidity ratio variable 1", 1, 1, 1, OutputProcessor::Unit::kgWater_kgDryAir );
+			AddToOutputVariableList( "humidity ratio variable 2", 1, 1, 1, OutputProcessor::Unit::kgWater_kgDryAir );
+
+			AddToOutputVariableList( "flow variable 1", 1, 1, 1, OutputProcessor::Unit::kgWater_s );
+			AddToOutputVariableList( "flow variable 2", 1, 1, 1, OutputProcessor::Unit::kgWater_s );
+
+			AddToOutputVariableList( "user defined EMS variable 1", 1, 1, 1, OutputProcessor::Unit::customEMS, "ergs/century" );
+			AddToOutputVariableList( "user defined EMS variable 2", 1, 1, 1, OutputProcessor::Unit::customEMS, "swamps/county" );
+
+			EXPECT_EQ( " [J]", unitStringFromDDitem( 3 ) );
+
+			EXPECT_EQ( " [kgWater/kgDryAir]", unitStringFromDDitem( 4 ) );
+
+			EXPECT_EQ( " [kgWater/s]", unitStringFromDDitem( 6 ) );
+
+			EXPECT_EQ( " [ergs/century]", unitStringFromDDitem( 8 ) );
+
+			EXPECT_EQ( " [swamps/county]", unitStringFromDDitem( 9 ) );
+
+
+		}
+
 
 	}
 

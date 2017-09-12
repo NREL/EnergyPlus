@@ -1072,7 +1072,7 @@ namespace PackagedTerminalHeatPump {
 			}
 
 			// Get AirTerminal mixer data
-			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
+			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode, PTUnit( PTUnitNum ).AirOutNode );
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				PTUnit( PTUnitNum ).ATMixerExists = true;
 			}
@@ -1708,7 +1708,7 @@ namespace PackagedTerminalHeatPump {
 			SetMinOATCompressor( PTUnitNum, PTUnit( PTUnitNum ).Name, CurrentModuleObject, PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).DXHeatCoilName, ErrorsFound );
 
 			// Get AirTerminal mixer data
-			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
+			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode, PTUnit( PTUnitNum ).AirOutNode );
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				PTUnit( PTUnitNum ).ATMixerExists = true;
 			}
@@ -2409,7 +2409,7 @@ namespace PackagedTerminalHeatPump {
 			}
 
 			// Get AirTerminal mixer data
-			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
+			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode, PTUnit( PTUnitNum ).AirOutNode );
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				PTUnit( PTUnitNum ).ATMixerExists = true;
 			}
@@ -2859,66 +2859,66 @@ namespace PackagedTerminalHeatPump {
 
 		for ( PTUnitNum = 1; PTUnitNum <= NumPTHP; ++PTUnitNum ) {
 			// Setup Report variables for the Packaged Terminal Heat Psmps,   CurrentModuleObject = 'ZoneHVAC:PackagedTerminalHeatPump'
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Rate [W]", PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Energy [J]", PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Rate [W]", PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Energy [J]", PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Rate [W]", PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Energy [J]", PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Rate [W]", PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Energy [J]", PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Rate [W]", PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Energy [J]", PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Rate [W]", PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Energy [J]", PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Power [W]", PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Energy [J]", PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Part Load Ratio []", PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Compressor Part Load Ratio []", PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Availability Status []", PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Total Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Sensible Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Power", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Electric Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Compressor Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Heat Pump Fan Availability Status", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
 		}
 
 		for ( PTUnitNum = 1 + NumPTHP; PTUnitNum <= NumPTHP + NumPTAC; ++PTUnitNum ) {
 			// Setup Report variables for the Packaged Terminal Air Conditioners,
 			// CurrentModuleObject = 'ZoneHVAC:PackagedTerminalAirConditioner'
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Rate [W]", PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Energy [J]", PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Rate [W]", PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Energy [J]", PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Rate [W]", PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Energy [J]", PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Rate [W]", PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Energy [J]", PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Rate [W]", PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Energy [J]", PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Rate [W]", PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Energy [J]", PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Power [W]", PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Energy [J]", PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Part Load Ratio []", PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio []", PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Availability Status []", PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Total Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Sensible Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Power", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Electric Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Packaged Terminal Air Conditioner Fan Availability Status", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
 		}
 
 		for ( PTUnitNum = 1 + NumPTHP + NumPTAC; PTUnitNum <= NumPTUs; ++PTUnitNum ) {
 			// Setup Report variables for the Zone Water Source Heat Pumps, CurrentModuleObject='ZoneHVAC:WaterToAirHeatPump'
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Rate [W]", PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Energy [J]", PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Rate [W]", PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Energy [J]", PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Rate [W]", PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Energy [J]", PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Rate [W]", PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Energy [J]", PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Rate [W]", PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Energy [J]", PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Rate [W]", PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Energy [J]", PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Power [W]", PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Energy [J]", PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Part Load Ratio []", PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Compressor Part Load Ratio []", PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
-			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Availability Status []", PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).TotCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Total Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).TotCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).SensCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Sensible Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).SensCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatHeatEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Heating Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatHeatEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).LatCoolEnergyRate, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).LatCoolEnergy, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Power", OutputProcessor::Unit::W, PTUnit( PTUnitNum ).ElecPower, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Electric Energy", OutputProcessor::Unit::J, PTUnit( PTUnitNum ).ElecConsumption, "System", "Sum", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Compressor Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
+			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Availability Status", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
 		}
 	}
 
@@ -3012,7 +3012,6 @@ namespace PackagedTerminalHeatPump {
 		int i; // Loop index
 		int Iter; // speed iteration count
 		int PTObjectIndex;
-		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		int CtrlZoneNum; // the controlled zone index (index of ZoneEquipConfig)
 
 		InNode = PTUnit( PTUnitNum ).AirInNode;
@@ -3141,49 +3140,51 @@ namespace PackagedTerminalHeatPump {
 		if ( ! SysSizingCalc && MySizeFlag( PTUnitNum ) ) {
 			SizePTUnit( PTUnitNum );
 			MySizeFlag( PTUnitNum ) = false;
-		}
 
-		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 && ! MySizeFlag( PTUnitNum ) ) {
+			RhoAir = StdRhoAir;
+			PTUnit( PTUnitNum ).MaxCoolAirMassFlow = RhoAir * PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+			PTUnit( PTUnitNum ).MaxHeatAirMassFlow = RhoAir * PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
 
-			SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
-			PTUnit( PTUnitNum ).NumOfSpeedCooling = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NumOfSpeeds;
+			if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling == 0 ) {
 
-			MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NormSpedLevel );
-			for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedCooling; ++Iter ) {
-				PTUnit( PTUnitNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
-				PTUnit( PTUnitNum ).CoolMassFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirMassFlowRate( Iter ) * MulSpeedFlowScale;
-				PTUnit( PTUnitNum ).MSCoolingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedCooling );
-			}
+				SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
+				PTUnit( PTUnitNum ).NumOfSpeedCooling = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).NumOfSpeeds;
 
-			if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
-
-				SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
-
-				PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NumOfSpeeds;
-
-				MulSpeedFlowScale = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).RatedAirVolFlowRate / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NormSpedLevel );
-				for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedHeating; ++Iter ) {
-					PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
-					PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirMassFlowRate( Iter ) * MulSpeedFlowScale;
-					PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
+				for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedCooling; ++Iter ) {
+					PTUnit( PTUnitNum ).MSCoolingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXCoolCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedCooling );
+					PTUnit( PTUnitNum ).CoolVolumeFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxCoolAirVolFlow * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( Iter );
+					PTUnit( PTUnitNum ).CoolMassFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxCoolAirMassFlow * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( Iter );
 				}
-			}
-			// intialize idle flow
 
-			if ( PTUnit( PTUnitNum ).NumOfSpeedHeating > 0 ) {
-				PTUnit( PTUnitNum ).IdleMassFlowRate = min( PTUnit( PTUnitNum ).HeatMassFlowRate( 1 ), PTUnit( PTUnitNum ).CoolMassFlowRate( 1 ) );
-				PTUnit( PTUnitNum ).IdleSpeedRatio = min( PTUnit( PTUnitNum ).MSHeatingSpeedRatio( 1 ), PTUnit( PTUnitNum ).MSCoolingSpeedRatio( 1 ) );
-				PTUnit( PTUnitNum ).IdleVolumeAirRate = min( PTUnit( PTUnitNum ).HeatVolumeFlowRate( 1 ), PTUnit( PTUnitNum ).CoolVolumeFlowRate( 1 ) );
-			} else {
-				PTUnit( PTUnitNum ).IdleMassFlowRate = PTUnit( PTUnitNum ).CoolMassFlowRate( 1 );
-				PTUnit( PTUnitNum ).IdleSpeedRatio = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( 1 );
-				PTUnit( PTUnitNum ).IdleVolumeAirRate = PTUnit( PTUnitNum ).CoolVolumeFlowRate( 1 );
-			}
+				if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || PTUnit( PTUnitNum ).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed ) {
 
-			if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) {
-				PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = PTUnit( PTUnitNum ).IdleVolumeAirRate;
-				PTUnit( PTUnitNum ).MaxNoCoolHeatAirMassFlow = PTUnit( PTUnitNum ).IdleMassFlowRate;
-				PTUnit( PTUnitNum ).NoHeatCoolSpeedRatio = PTUnit( PTUnitNum ).IdleSpeedRatio;
+					SimVariableSpeedCoils( "", PTUnit( PTUnitNum ).DXHeatCoilIndexNum, 0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
+
+					PTUnit( PTUnitNum ).NumOfSpeedHeating = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).NumOfSpeeds;
+
+					for ( Iter = 1; Iter <= PTUnit( PTUnitNum ).NumOfSpeedHeating; ++Iter ) {
+						PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter ) = VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( Iter ) / VarSpeedCoil( PTUnit( PTUnitNum ).DXHeatCoilIndexNum ).MSRatedAirVolFlowRate( PTUnit( PTUnitNum ).NumOfSpeedHeating );
+						PTUnit( PTUnitNum ).HeatVolumeFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxHeatAirVolFlow * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter );
+						PTUnit( PTUnitNum ).HeatMassFlowRate( Iter ) = PTUnit( PTUnitNum ).MaxHeatAirMassFlow * PTUnit( PTUnitNum ).MSHeatingSpeedRatio( Iter );
+					}
+				}
+				// intialize idle flow
+
+				if ( PTUnit( PTUnitNum ).NumOfSpeedHeating > 0 ) {
+					PTUnit( PTUnitNum ).IdleMassFlowRate = min( PTUnit( PTUnitNum ).HeatMassFlowRate( 1 ), PTUnit( PTUnitNum ).CoolMassFlowRate( 1 ) );
+					PTUnit( PTUnitNum ).IdleSpeedRatio = min( PTUnit( PTUnitNum ).MSHeatingSpeedRatio( 1 ), PTUnit( PTUnitNum ).MSCoolingSpeedRatio( 1 ) );
+					PTUnit( PTUnitNum ).IdleVolumeAirRate = min( PTUnit( PTUnitNum ).HeatVolumeFlowRate( 1 ), PTUnit( PTUnitNum ).CoolVolumeFlowRate( 1 ) );
+				} else {
+					PTUnit( PTUnitNum ).IdleMassFlowRate = PTUnit( PTUnitNum ).CoolMassFlowRate( 1 );
+					PTUnit( PTUnitNum ).IdleSpeedRatio = PTUnit( PTUnitNum ).MSCoolingSpeedRatio( 1 );
+					PTUnit( PTUnitNum ).IdleVolumeAirRate = PTUnit( PTUnitNum ).CoolVolumeFlowRate( 1 );
+				}
+
+				if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) {
+					PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = PTUnit( PTUnitNum ).IdleVolumeAirRate;
+					PTUnit( PTUnitNum ).MaxNoCoolHeatAirMassFlow = PTUnit( PTUnitNum ).IdleMassFlowRate;
+					PTUnit( PTUnitNum ).NoHeatCoolSpeedRatio = PTUnit( PTUnitNum ).IdleSpeedRatio;
+				}
 			}
 		}
 
@@ -3294,7 +3295,6 @@ namespace PackagedTerminalHeatPump {
 						ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 						PTUnit( PTUnitNum ).IdleVolumeAirRate = PTUnit( PTUnitNum ).FanVolFlow;
 					}
-					RhoAir = StdRhoAir;
 					// set the mass flow rates from the reset volume flow rates
 					for ( i = 1; i <= NumOfSpeedCooling; ++i ) {
 						PTUnit( PTUnitNum ).CoolMassFlowRate( i ) = RhoAir * PTUnit( PTUnitNum ).CoolVolumeFlowRate( i );
@@ -4188,6 +4188,15 @@ namespace PackagedTerminalHeatPump {
 		if ( CurZoneEqNum > 0 ) {
 			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
+			// save air flow rates for child object sizing
+			if( PTUnit( PTUnitNum ).MaxCoolAirVolFlow > 0.0 ) {
+				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+				ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+			}
+			if( PTUnit( PTUnitNum ).MaxHeatAirVolFlow > 0.0 ) {
+				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
+				ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -6728,8 +6737,7 @@ namespace PackagedTerminalHeatPump {
 						CompOnMassFlow = SpeedRatio * PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum ) + ( 1.0 - SpeedRatio ) * PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum - 1 );
 						CompOnFlowRatio = SpeedRatio * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum ) + ( 1.0 - SpeedRatio ) * PTUnit( PTUnitNum ).MSCoolingSpeedRatio( SpeedNum - 1 );
 						MSHPMassFlowRateLow = PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum - 1 );
-						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum );
-					}
+						MSHPMassFlowRateHigh = PTUnit( PTUnitNum ).CoolMassFlowRate( SpeedNum );					}
 				}
 			}
 

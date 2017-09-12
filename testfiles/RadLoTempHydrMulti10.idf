@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,4;
 
@@ -864,7 +864,6 @@
     6,21,10,  !- X,Y,Z ==> Vertex 2 {m}
     6,11,10,  !- X,Y,Z ==> Vertex 3 {m}
     11,11,10;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   Sizing:Zone,
     ZONE 1,                  !- Zone or ZoneList Name

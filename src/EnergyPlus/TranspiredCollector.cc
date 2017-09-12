@@ -620,21 +620,21 @@ namespace TranspiredCollector {
 			tempHdeltaNPL = std::sin( TiltRads ) * UTSC( Item ).Height / 4.0;
 			UTSC( Item ).HdeltaNPL = max( tempHdeltaNPL, UTSC( Item ).PlenGapThick );
 
-			SetupOutputVariable( "Solar Collector Heat Exchanger Effectiveness []", UTSC( Item ).HXeff, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Leaving Air Temperature [C]", UTSC( Item ).TairHX, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Outside Face Suction Velocity [m/s]", UTSC( Item ).Vsuction, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Surface Temperature [C]", UTSC( Item ).Tcoll, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Plenum Air Temperature [C]", UTSC( Item ).Tplen, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Sensible Heating Rate [W]", UTSC( Item ).SensHeatingRate, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Sensible Heating Energy [J]", UTSC( Item ).SensHeatingEnergy, "System", "Sum", UTSC( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
+			SetupOutputVariable( "Solar Collector Heat Exchanger Effectiveness", OutputProcessor::Unit::None, UTSC( Item ).HXeff, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Leaving Air Temperature", OutputProcessor::Unit::C, UTSC( Item ).TairHX, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Outside Face Suction Velocity", OutputProcessor::Unit::m_s, UTSC( Item ).Vsuction, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Surface Temperature", OutputProcessor::Unit::C, UTSC( Item ).Tcoll, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Plenum Air Temperature", OutputProcessor::Unit::C, UTSC( Item ).Tplen, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Sensible Heating Rate", OutputProcessor::Unit::W, UTSC( Item ).SensHeatingRate, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Sensible Heating Energy", OutputProcessor::Unit::J, UTSC( Item ).SensHeatingEnergy, "System", "Sum", UTSC( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
 
-			SetupOutputVariable( "Solar Collector Natural Ventilation Air Change Rate [ACH]", UTSC( Item ).PassiveACH, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotVent, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Wind Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotWind, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotTherm, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Incident Solar Radiation [W/m2]", UTSC( Item ).Isc, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector System Efficiency []", UTSC( Item ).UTSCEfficiency, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Surface Efficiency []", UTSC( Item ).UTSCCollEff, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Natural Ventilation Air Change Rate", OutputProcessor::Unit::ach, UTSC( Item ).PassiveACH, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotVent, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Wind Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotWind, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotTherm, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Incident Solar Radiation", OutputProcessor::Unit::W_m2, UTSC( Item ).Isc, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector System Efficiency", OutputProcessor::Unit::None, UTSC( Item ).UTSCEfficiency, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Surface Efficiency", OutputProcessor::Unit::None, UTSC( Item ).UTSCCollEff, "System", "Average", UTSC( Item ).Name );
 
 		}
 
