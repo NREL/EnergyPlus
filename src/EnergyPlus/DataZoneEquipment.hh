@@ -349,6 +349,8 @@ namespace DataZoneEquipment {
 		Real64 ZoneExh; // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
 		Real64 ZoneExhBalanced; // balanced zone exhaust mass flow rate [kg/s]
 		Real64 PlenumMassFlow; // zone air mass flow rate induced from plenum [kg/s]
+		Real64 ExcessZoneExh; // excess zone exhaust to be balanced by other zones (only used when !ZoneAirMassFlow.EnforceZoneMassBalance) [kg/s]
+		Real64 TotAvailAirLoopOA; // total airloop OA available for systems serving this zone (used to apportion excess exhaust) [kg/s}
 		// AirDistUnitCool and AirDistUnitHeat
 		// do not correspond with the AIR DISTRIBUTION UNIT object in the zone equipment list.
 		// AirDistUnitCool/AirDistUnitHeat, may represent a DIRECT AIR object,
@@ -389,6 +391,8 @@ namespace DataZoneEquipment {
 			ZoneExh( 0.0 ),
 			ZoneExhBalanced( 0.0 ),
 			PlenumMassFlow( 0.0 ),
+			ExcessZoneExh( 0.0 ),
+			TotAvailAirLoopOA( 0.0 ),
 			SupLeakToRetPlen( false ),
 			InFloorActiveElement( false ),
 			InWallActiveElement( false ),

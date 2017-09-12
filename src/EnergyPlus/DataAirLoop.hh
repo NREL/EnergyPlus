@@ -266,9 +266,11 @@ namespace DataAirLoop {
 		Real64 Previous; // Previous mass air flow rate for this loop [kg/s]
 		Real64 SupFlow; // supply air flow rate (includes LeakFlow) [kg/s]
 		Real64 ZoneRetFlow; // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
+		Real64 ZoneRetFlowRatio; // ratio for adjusting zone return flows for excess zone exhaust
 		Real64 SysRetFlow; // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
 		Real64 RecircFlow; // sum of zone plenum recirculated flows [kg/s]
 		Real64 LeakFlow; // sum of air distribution leak flows to return plenum [kg/s]
+		Real64 ExcessZoneExhFlow; // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
 		Real64 FanPLR; // Operating PLR of air loop fan
 		Real64 OAFrac; // fraction of outside air to mixed air mass flow rate
 		bool FlowError; // error flag for flow error message
@@ -285,9 +287,11 @@ namespace DataAirLoop {
 			Previous( 0.0 ),
 			SupFlow( 0.0 ),
 			ZoneRetFlow( 0.0 ),
+			ZoneRetFlowRatio( 1.0 ),
 			SysRetFlow( 0.0 ),
 			RecircFlow( 0.0 ),
 			LeakFlow( 0.0 ),
+			ExcessZoneExhFlow( 0.0 ),
 			FanPLR( 0.0 ),
 			OAFrac( 0.0 ),
 			FlowError( false )
