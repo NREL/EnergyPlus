@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -145,7 +146,7 @@ namespace DataZoneEquipment {
 	{
 		// Members
 		std::string ReportVarName;
-		std::string ReportVarUnits;
+		OutputProcessor::Unit ReportVarUnits;
 		int ResourceType;
 		std::string EndUse;
 		int EndUse_CompMode;
@@ -157,6 +158,7 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		EquipMeterData() :
+			ReportVarUnits( OutputProcessor::Unit::None ),
 			ResourceType( 0 ),
 			EndUse_CompMode( 0 ),
 			ReportVarIndex( 0 ),

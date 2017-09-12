@@ -624,7 +624,7 @@ namespace RoomAirModelUserTempPattern {
 		}
 
 		if ( SetupOutputFlag( ZoneNum ) ) {
-			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient [K/m]", AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
+			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient", OutputProcessor::Unit::K_m, AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
 
 			SetupOutputFlag( ZoneNum ) = false;
 		}

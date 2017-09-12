@@ -1354,7 +1354,7 @@ namespace SimAirServingZones {
 		}
 
 		for ( AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum ) {
-			SetupOutputVariable( "Air System Simulation Cycle On Off Status []", PriAirSysAvailMgr( AirSysNum ).AvailStatus, "HVAC", "Average", PrimaryAirSystem( AirSysNum ).Name );
+			SetupOutputVariable( "Air System Simulation Cycle On Off Status", OutputProcessor::Unit::None, PriAirSysAvailMgr( AirSysNum ).AvailStatus, "HVAC", "Average", PrimaryAirSystem( AirSysNum ).Name );
 		}
 
 	}
@@ -2379,9 +2379,9 @@ namespace SimAirServingZones {
 
 		// Set up output variables
 		if ( ! OutputSetupFlag ) {
-			SetupOutputVariable( "Air System Simulation Maximum Iteration Count []", IterMax, "HVAC", "Sum", "SimAir" );
-			SetupOutputVariable( "Air System Simulation Iteration Count []", IterTot, "HVAC", "Sum", "SimAir" );
-			SetupOutputVariable( "Air System Component Model Simulation Calls []", NumCallsTot, "HVAC", "Sum", "SimAir" );
+			SetupOutputVariable( "Air System Simulation Maximum Iteration Count", OutputProcessor::Unit::None, IterMax, "HVAC", "Sum", "SimAir" );
+			SetupOutputVariable( "Air System Simulation Iteration Count", OutputProcessor::Unit::None, IterTot, "HVAC", "Sum", "SimAir" );
+			SetupOutputVariable( "Air System Component Model Simulation Calls", OutputProcessor::Unit::None, NumCallsTot, "HVAC", "Sum", "SimAir" );
 			OutputSetupFlag = true;
 		}
 

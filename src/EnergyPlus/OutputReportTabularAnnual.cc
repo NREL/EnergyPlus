@@ -180,7 +180,7 @@ namespace EnergyPlus {
 			int typeVar = 0;
 			int avgSumVar = 0;
 			int stepTypeVar = 0;
-			std::string unitsVar = "";
+			OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
 			Array1D_string namesOfKeys; // keyNames
 			Array1D_int indexesForKeyVar; // keyVarIndexes
 			std::list<std::string> allKeys;
@@ -727,19 +727,19 @@ namespace EnergyPlus {
 				}
 				//do the unit conversions
 				if ( unitsStyle == OutputReportTabular::unitsStyleInchPound ) {
-					varNameWithUnits =  fldStIt->m_variMeter + '[' + fldStIt->m_varUnits + ']';
+					varNameWithUnits =  fldStIt->m_variMeter + unitEnumToStringBrackets( fldStIt->m_varUnits );
 					OutputReportTabular::LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 					OutputReportTabular::GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 				}
 				else { //just do the Joule conversion
 					//if units is in Joules, convert if specified
-					if ( fldStIt->m_varUnits == "J" ) {
+					if ( fldStIt->m_varUnits == OutputProcessor::Unit::J ) {
 						curUnits = energyUnitsString;
 						curConversionFactor = energyUnitsConversionFactor;
 						curConversionOffset = 0.0;
 					}
 					else { //if not joules don't perform conversion
-						curUnits = fldStIt->m_varUnits;
+						curUnits = unitEnumToString( fldStIt->m_varUnits );
 						curConversionFactor = 1.0;
 						curConversionOffset = 0.0;
 					}
@@ -1337,19 +1337,19 @@ namespace EnergyPlus {
 			Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor( unitsStyle, energyUnitsString );
 			//do the unit conversions
 			if ( unitsStyle == OutputReportTabular::unitsStyleInchPound ) {
-				varNameWithUnits = fldStIt->m_variMeter + '[' + fldStIt->m_varUnits + ']';
+				varNameWithUnits = fldStIt->m_variMeter + '[' + unitEnumToString( fldStIt->m_varUnits ) + ']';
 				OutputReportTabular::LookupSItoIP( varNameWithUnits, indexUnitConv, curUnits );
 				OutputReportTabular::GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 			}
 			else { //just do the Joule conversion
 				//if units is in Joules, convert if specified
-				if ( fldStIt->m_varUnits == "J" ) {
+				if ( fldStIt->m_varUnits == OutputProcessor::Unit::J ) {
 					curUnits = energyUnitsString;
 					curConversionFactor = energyUnitsConversionFactor;
 					curConversionOffset = 0.0;
 				}
 				else { //if not joules don't perform conversion
-					curUnits = fldStIt->m_varUnits;
+					curUnits = unitEnumToString( fldStIt->m_varUnits );
 					curConversionFactor = 1.0;
 					curConversionOffset = 0.0;
 				}
@@ -1461,7 +1461,7 @@ namespace EnergyPlus {
 			fldSt = m_annualFields[fldIndex];
 			ret.push_back( fldSt.m_colHead );
 			ret.push_back( fldSt.m_variMeter );
-			ret.push_back( fldSt.m_varUnits );
+			ret.push_back( unitEnumToString( fldSt.m_varUnits ) );
 			std::string outStr = std::to_string( fldSt.m_showDigits );
 			//ints
 			ret.push_back( outStr );
