@@ -517,22 +517,22 @@ namespace FluidCoolers {
 
 		// Set up output variables, CurrentModuleObject='FluidCooler:SingleSpeed'
 		for ( FluidCoolerNum = 1; FluidCoolerNum <= NumSingleSpeedFluidCoolers; ++FluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 		}
 
 		// CurrentModuleObject='FluidCooler:TwoSpeed'
 		for ( FluidCoolerNum = NumSingleSpeedFluidCoolers + 1; FluidCoolerNum <= NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers; ++FluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 		}
 
 	}
