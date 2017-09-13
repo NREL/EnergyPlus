@@ -66,8 +66,6 @@ TEST( WindowRoutines, EffectiveOpennessVenetianBlind_0_deg )
 		int const nlayer = 1;
 		Real64 const width = 1;
 		Real64 const height = 1;
-		int nperr = 0;
-		std::string ErrorMessage;
 		Array1A_int LayerType( nlayer );
 
 		Array1D< Real64 > Atop_eff( nlayer, 0.0 );
@@ -83,12 +81,10 @@ TEST( WindowRoutines, EffectiveOpennessVenetianBlind_0_deg )
 		Array1D< Real64 > const Ah( nlayer, 0.2 );
 		LayerType( 1 ) = VENETBLIND;
 		Array1D< Real64 > const SlatAngle( nlayer, 0 );
-		Array1D< Real64 > gap = {};
 
 		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff,
-			                            Ar_eff, Ah_eff, LayerType, SlatAngle, gap, nperr, ErrorMessage );
+			                            Ar_eff, Ah_eff, LayerType, SlatAngle );
 
-		EXPECT_EQ( nperr, 0 );
 		EXPECT_NEAR( Al_eff( 1 ), 0, 1e-6 );
 		EXPECT_NEAR( Ar_eff( 1 ), 0, 1e-6 );
 		EXPECT_NEAR( Atop_eff( 1 ), 0.1, 1e-6 );
@@ -105,8 +101,6 @@ TEST( WindowRoutines, EffectiveOpennessVenetianBlind_45_deg )
 		int const nlayer = 1;
 		Real64 const width = 1;
 		Real64 const height = 1;
-		int nperr = 0;
-		std::string ErrorMessage;
 		Array1A_int LayerType( nlayer );
 
 		Array1D< Real64 > Atop_eff( nlayer, 0.0 );
@@ -122,12 +116,10 @@ TEST( WindowRoutines, EffectiveOpennessVenetianBlind_45_deg )
 		Array1D< Real64 > const Ah( nlayer, 0.2 );
 		LayerType( 1 ) = VENETBLIND;
 		Array1D< Real64 > const SlatAngle( nlayer, 45 );
-		Array1D< Real64 > gap = {};
 
 		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff,
-			                            Ar_eff, Ah_eff, LayerType, SlatAngle, gap, nperr, ErrorMessage );
+			                            Ar_eff, Ah_eff, LayerType, SlatAngle );
 
-		EXPECT_EQ( nperr, 0 );
 		EXPECT_NEAR( Al_eff( 1 ), 0, 1e-6 );
 		EXPECT_NEAR( Ar_eff( 1 ), 0, 1e-6 );
 		EXPECT_NEAR( Atop_eff( 1 ), 0.1, 1e-6 );
@@ -144,8 +136,6 @@ TEST( WindowRoutines, EffectiveOpennessOtherShades )
 		int const nlayer = 1;
 		Real64 const width = 1;
 		Real64 const height = 1;
-		int nperr = 0;
-		std::string ErrorMessage;
 		Array1A_int LayerType( nlayer );
 
 		Array1D< Real64 > Atop_eff( nlayer, 0.0 );
@@ -161,12 +151,10 @@ TEST( WindowRoutines, EffectiveOpennessOtherShades )
 		Array1D< Real64 > const Ah( nlayer, 0.2 );
 		LayerType( 1 ) = DIFFSHADE;
 		Array1A< Real64 > const SlatAngle( nlayer, 0 );
-		Array1A< Real64 > gap = {};
 
 		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff,
-			                            Ar_eff, Ah_eff, LayerType, SlatAngle, gap, nperr, ErrorMessage );
+			                            Ar_eff, Ah_eff, LayerType, SlatAngle );
 
-		EXPECT_EQ( nperr, 0 );
 		EXPECT_NEAR( Al_eff( 1 ), 0, 1e-6 );
 		EXPECT_NEAR( Ar_eff( 1 ), 0, 1e-6 );
 		EXPECT_NEAR( Atop_eff( 1 ), 0.05, 1e-6 );
