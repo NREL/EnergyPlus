@@ -5990,123 +5990,123 @@ namespace SolarShading {
 						if ( ConstrNumSh != 0 ) {
 							if ( ShadeFlag != IntBlindOn && ShadeFlag != ExtBlindOn && ShadeFlag != BGBlindOn && ShadeFlag != ExtScreenOn ) {
 
-							// Shade on or switchable glazing
+								// Shade on or switchable glazing
 
-							if ( SunLitFract > 0.0 ) TBmAllShBlSc = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef );
+								if ( SunLitFract > 0.0 ) TBmAllShBlSc = POLYF( CosInc, Construct( ConstrNumSh ).TransSolBeamCoef );
 
 						} else {
 
-							// Blind or Screen on
+								// Blind or Screen on
 
-							SurfaceWindow( SurfNum ).BlGlSysTsolDifDif = DiffTrans;
-							SurfaceWindow( SurfNum ).ScGlSysTsolDifDif = DiffTrans;
-							if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-								SurfaceWindow( SurfNum ).BlTsolDifDif = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolFrontDiffDiffTrans );
-							} else if ( ShadeFlag == ExtScreenOn ) {
-								SurfaceWindow( SurfNum ).ScTsolDifDif = SurfaceScreens( ScNum ).DifDifTrans;
-							}
-
-							if ( SunLitFract > 0.0 ) {
-								if ( ShadeFlag == ExtScreenOn ) {
-									//           beam transmittance (written in subroutine CalcScreenTransmittance each time step)
-									TScBmBm = SurfaceScreens( ScNum ).BmBmTrans;
-									SurfaceWindow( SurfNum ).ScTsolBmBm = TScBmBm;
-								} else {
-									TBlBmBm = BlindBeamBeamTrans( ProfAng, SlatAng, Blind( BlNum ).SlatWidth, Blind( BlNum ).SlatSeparation, Blind( BlNum ).SlatThickness );
-									SurfaceWindow( SurfNum ).BlTsolBmBm = TBlBmBm;
-								}
-								if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ) {
-									// Interior or exterior blind
-									TBmBmBl = TBmBm * TBlBmBm;
+								SurfaceWindow( SurfNum ).BlGlSysTsolDifDif = DiffTrans;
+								SurfaceWindow( SurfNum ).ScGlSysTsolDifDif = DiffTrans;
+								if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
+									SurfaceWindow( SurfNum ).BlTsolDifDif = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolFrontDiffDiffTrans );
 								} else if ( ShadeFlag == ExtScreenOn ) {
-									// Exterior screen
-									TBmBmSc = TBmBm * TScBmBm;
-								} else {
-									// Between-glass blind
-									if ( NGlass == 2 ) {
-										TBmBmBl = t1 * tfshBB * t2;
-									} else { // NGlass = 3
-										TBmBmBl = t1 * t2 * tfshBB * t3;
+									SurfaceWindow( SurfNum ).ScTsolDifDif = SurfaceScreens( ScNum ).DifDifTrans;
+								}
+
+								if ( SunLitFract > 0.0 ) {
+									if ( ShadeFlag == ExtScreenOn ) {
+										//           beam transmittance (written in subroutine CalcScreenTransmittance each time step)
+										TScBmBm = SurfaceScreens( ScNum ).BmBmTrans;
+										SurfaceWindow( SurfNum ).ScTsolBmBm = TScBmBm;
+									} else {
+										TBlBmBm = BlindBeamBeamTrans( ProfAng, SlatAng, Blind( BlNum ).SlatWidth, Blind( BlNum ).SlatSeparation, Blind( BlNum ).SlatThickness );
+										SurfaceWindow( SurfNum ).BlTsolBmBm = TBlBmBm;
 									}
-								}
-								if ( ShadeFlag == ExtScreenOn ) {
-									//           Report variable for Beam-to-Beam transmittance
-									SurfaceWindow( SurfNum ).ScGlSysTsolBmBm = TBmBmSc;
-								} else {
-									SurfaceWindow( SurfNum ).BlGlSysTsolBmBm = TBmBmBl;
-								}
+									if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ) {
+										// Interior or exterior blind
+										TBmBmBl = TBmBm * TBlBmBm;
+									} else if ( ShadeFlag == ExtScreenOn ) {
+										// Exterior screen
+										TBmBmSc = TBmBm * TScBmBm;
+									} else {
+										// Between-glass blind
+										if ( NGlass == 2 ) {
+											TBmBmBl = t1 * tfshBB * t2;
+										} else { // NGlass = 3
+											TBmBmBl = t1 * t2 * tfshBB * t3;
+										}
+									}
+									if ( ShadeFlag == ExtScreenOn ) {
+										//           Report variable for Beam-to-Beam transmittance
+										SurfaceWindow( SurfNum ).ScGlSysTsolBmBm = TBmBmSc;
+									} else {
+										SurfaceWindow( SurfNum ).BlGlSysTsolBmBm = TBmBmBl;
+									}
 
-								if ( ShadeFlag == ExtScreenOn ) {
-									TScBmDif = SurfaceScreens( ScNum ).BmDifTrans;
-									//           Report variable for Beam-to-Diffuse transmittance (scattered transmittance)
-									SurfaceWindow( SurfNum ).ScTsolBmDif = TScBmDif;
-								} else {
-									TBlBmDif = InterpProfSlatAng( ProfAng, SlatAng, VarSlats, Blind( BlNum ).SolFrontBeamDiffTrans );
-									SurfaceWindow( SurfNum ).BlTsolBmDif = TBlBmDif;
-									//CR6913     SurfaceWindow(SurfNum)%BlTsolDifDif = InterpSlatAng(SlatAng,VarSlats,Blind(BlNum)%SolFrontDiffDiffTrans)
-								}
-
-								//added TH 12/9/2009
-								TBmBmShBlSc = 0.0;
-								TBmDifShBlSc = 0.0;
-
-								if ( ShadeFlag == IntBlindOn ) {
-
-									// Interior blind on: beam-beam and diffuse transmittance of exterior beam
-
-									TBlDifDif = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolFrontDiffDiffTrans );
-									RhoBlBmDifFr = InterpProfSlatAng( ProfAng, SlatAng, VarSlats, Blind( BlNum ).SolFrontBeamDiffRefl );
-									RGlDifBk = Construct( ConstrNum ).ReflectSolDiffBack;
-									RhoBlDifDifFr = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolFrontDiffDiffRefl );
-									TBmAllShBlSc = TBmBm * ( TBlBmBm + TBlBmDif + TBlDifDif * RhoBlBmDifFr * RGlDifBk / ( 1 - RhoBlDifDifFr * RGlDifBk ) );
-
-									//added TH 12/9/2009
-									TBmBmShBlSc = TBmBmBl; //TBmBm * TBlBmBm
-									TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
-									if ( TBmDifShBlSc < 0.0 ) TBmDifShBlSc = 0.0;
-
-								} else if ( ShadeFlag == ExtBlindOn ) {
-
-									// Exterior blind on: beam-beam and diffuse transmittance of exterior beam
-
-									RhoBlBmDifBk = InterpProfSlatAng( ProfAng, SlatAng, VarSlats, Blind( BlNum ).SolBackBeamDiffRefl );
-									RGlBmFr = POLYF( CosInc, Construct( ConstrNum ).ReflSolBeamFrontCoef );
-									TBmAllShBlSc = TBlBmBm * ( TBmBm + TDifBare * RGlBmFr * RhoBlBmDifBk / ( 1 - RGlDifFr * RhoBlDifDifBk ) ) + TBlBmDif * TDifBare / ( 1 - RGlDifFr * RhoBlDifDifBk );
-
-									//added TH 12/9/2009
-									TBmBmShBlSc = TBmBmBl; //TBmBm * TBlBmBm
-									TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
-
-								} else if ( ShadeFlag == ExtScreenOn ) {
-
-									// Exterior screen on: beam-beam and diffuse transmittance of exterior beam
-
-									RScBack = SurfaceScreens( ScNum ).ReflectSolBeamFront;
-									RScDifDifBk = SurfaceScreens( ScNum ).DifReflect;
-									RGlBmFr = POLYF( CosInc, Construct( ConstrNum ).ReflSolBeamFrontCoef );
-									TBmAllShBlSc = TScBmBm * ( TBmBm + RGlBmFr * RScBack * TDifBare / ( 1 - RGlDifFr * RScDifDifBk ) ) + TScBmDif * TDifBare / ( 1 - RGlDifFr * RScDifDifBk );
-
-									//added TH 12/9/2009
-									TBmBmShBlSc = TBmBmSc;
-									TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
-
-								} else {
-									// Between-glass blind on: beam-beam and diffuse transmittance of exterior beam
-
-									if ( NGlass == 2 ) {
-										TBmAllShBlSc = t1 * tfshBB * t2 + t1 * ( tfshBB * rf2 * rbshB + tfshBd * ( 1.0 + rfd2 * rbshd ) + rfshB * rbd1 * rfshd ) * td2;
-									} else { // NGlass = 3
-										TBmAllShBlSc = t1t2 * tfshBB * t3 + t1t2 * ( tfshBB * rf3 * rbshB + tfshBd * ( 1.0 + rfd3 * rbshd ) + rbshB * ( rbd2 * tfshd + td2 * rbd1 * td2 * tfshd ) ) * td3;
+									if ( ShadeFlag == ExtScreenOn ) {
+										TScBmDif = SurfaceScreens( ScNum ).BmDifTrans;
+										//           Report variable for Beam-to-Diffuse transmittance (scattered transmittance)
+										SurfaceWindow( SurfNum ).ScTsolBmDif = TScBmDif;
+									} else {
+										TBlBmDif = InterpProfSlatAng( ProfAng, SlatAng, VarSlats, Blind( BlNum ).SolFrontBeamDiffTrans );
+										SurfaceWindow( SurfNum ).BlTsolBmDif = TBlBmDif;
+										//CR6913     SurfaceWindow(SurfNum)%BlTsolDifDif = InterpSlatAng(SlatAng,VarSlats,Blind(BlNum)%SolFrontDiffDiffTrans)
 									}
 
 									//added TH 12/9/2009
-									TBmBmShBlSc = TBmBmBl;
-									TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
+									TBmBmShBlSc = 0.0;
+									TBmDifShBlSc = 0.0;
 
+									if ( ShadeFlag == IntBlindOn ) {
+
+										// Interior blind on: beam-beam and diffuse transmittance of exterior beam
+
+										TBlDifDif = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolFrontDiffDiffTrans );
+										RhoBlBmDifFr = InterpProfSlatAng( ProfAng, SlatAng, VarSlats, Blind( BlNum ).SolFrontBeamDiffRefl );
+										RGlDifBk = Construct( ConstrNum ).ReflectSolDiffBack;
+										RhoBlDifDifFr = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolFrontDiffDiffRefl );
+										TBmAllShBlSc = TBmBm * ( TBlBmBm + TBlBmDif + TBlDifDif * RhoBlBmDifFr * RGlDifBk / ( 1 - RhoBlDifDifFr * RGlDifBk ) );
+
+										//added TH 12/9/2009
+										TBmBmShBlSc = TBmBmBl; //TBmBm * TBlBmBm
+										TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
+										if ( TBmDifShBlSc < 0.0 ) TBmDifShBlSc = 0.0;
+
+									} else if ( ShadeFlag == ExtBlindOn ) {
+
+										// Exterior blind on: beam-beam and diffuse transmittance of exterior beam
+
+										RhoBlBmDifBk = InterpProfSlatAng( ProfAng, SlatAng, VarSlats, Blind( BlNum ).SolBackBeamDiffRefl );
+										RGlBmFr = POLYF( CosInc, Construct( ConstrNum ).ReflSolBeamFrontCoef );
+										TBmAllShBlSc = TBlBmBm * ( TBmBm + TDifBare * RGlBmFr * RhoBlBmDifBk / ( 1 - RGlDifFr * RhoBlDifDifBk ) ) + TBlBmDif * TDifBare / ( 1 - RGlDifFr * RhoBlDifDifBk );
+
+										//added TH 12/9/2009
+										TBmBmShBlSc = TBmBmBl; //TBmBm * TBlBmBm
+										TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
+
+								} else if ( ShadeFlag == ExtScreenOn ) {
+
+										// Exterior screen on: beam-beam and diffuse transmittance of exterior beam
+
+										RScBack = SurfaceScreens( ScNum ).ReflectSolBeamFront;
+										RScDifDifBk = SurfaceScreens( ScNum ).DifReflect;
+										RGlBmFr = POLYF( CosInc, Construct( ConstrNum ).ReflSolBeamFrontCoef );
+										TBmAllShBlSc = TScBmBm * ( TBmBm + RGlBmFr * RScBack * TDifBare / ( 1 - RGlDifFr * RScDifDifBk ) ) + TScBmDif * TDifBare / ( 1 - RGlDifFr * RScDifDifBk );
+
+										//added TH 12/9/2009
+										TBmBmShBlSc = TBmBmSc;
+										TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
+
+									} else {
+										// Between-glass blind on: beam-beam and diffuse transmittance of exterior beam
+
+										if ( NGlass == 2 ) {
+											TBmAllShBlSc = t1 * tfshBB * t2 + t1 * ( tfshBB * rf2 * rbshB + tfshBd * ( 1.0 + rfd2 * rbshd ) + rfshB * rbd1 * rfshd ) * td2;
+										} else { // NGlass = 3
+											TBmAllShBlSc = t1t2 * tfshBB * t3 + t1t2 * ( tfshBB * rf3 * rbshB + tfshBd * ( 1.0 + rfd3 * rbshd ) + rbshB * ( rbd2 * tfshd + td2 * rbd1 * td2 * tfshd ) ) * td3;
+										}
+
+										//added TH 12/9/2009
+										TBmBmShBlSc = TBmBmBl;
+										TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
+
+									}
 								}
-							}
 
-						}
+							}
 
 						}
 					} // End of check if ShadeFlag > 0 and ShadeFlag < 10

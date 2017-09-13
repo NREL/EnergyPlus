@@ -3920,12 +3920,12 @@ namespace WindowComplexManager {
 				// TauShadeIR = ComplexShade( ShadingLayPtr ).IRTransmittance;
 				// EpsShadeIR = ComplexShade( ShadingLayPtr ).FrontEmissivity;
 				// RhoShadeIR = max( 0.0, 1.0 - TauShadeIR - EpsShadeIR );
-        // 
+				// 
 				// // Get properties of glass next to inside shading layer
 				// GlassLayPtr = Construct( ConstrNum ).LayerPoint( TotLay - 2 );
 				// EpsGlassIR = Material( GlassLayPtr ).AbsorpThermalBack;
 				// RhoGlassIR = 1 - EpsGlassIR;
-        // 
+				// 
 				// EffShBlEmiss = EpsShadeIR * ( 1.0 + RhoGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR ) );
 				// SurfaceWindow( SurfNum ).EffShBlindEmiss = EffShBlEmiss;
 				// EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR );
@@ -3937,8 +3937,8 @@ namespace WindowComplexManager {
 				Real64 EffShBlEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss[ 0 ];
 				Real64 EffGlEmiss = SurfaceWindow( SurfNum ).EffGlassEmiss[ 0 ];
 				SurfaceWindow( SurfNum ).EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( theta( 2 * ngllayer ) - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
-        // SurfInsideTemp = SurfaceWindow( SurfNum ).EffInsSurfTemp;
-			  //ELSE
+				// SurfInsideTemp = SurfaceWindow( SurfNum ).EffInsSurfTemp;
+				//ELSE
 				//  SurfInsideTemp = theta(2*ngllayer) - TKelvin
 				//END IF
 				//IF(ShadeFlag == ExtShadeOn .OR. ShadeFlag == ExtBlindOn .OR. ShadeFlag == ExtScreenOn) THEN

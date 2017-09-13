@@ -1733,7 +1733,7 @@ namespace HeatBalanceSurfaceManager {
 		}
 		CondFDRelaxFactor = CondFDRelaxFactorInput;
 
-    // This is already initialized in SurfaceWindow structure constructor. Do not do it again here (Simon)
+		// This is already initialized in SurfaceWindow structure constructor. Do not do it again here (Simon)
 		// for ( auto & e : SurfaceWindow ) {
 		// 	// Initialize window frame and divider temperatures
 		// 	e.FrameTempSurfIn = 23.0;
@@ -1742,7 +1742,7 @@ namespace HeatBalanceSurfaceManager {
 		// 	e.DividerTempSurfIn = 23.0;
 		// 	e.DividerTempSurfInOld = 23.0;
 		// 	e.DividerTempSurfOut = 23.0;
-    // 
+		// 
 		// 	// Initialize previous-timestep shading indicators
 		// 	e.ExtIntShadePrevTS = 0;
 		// 	e.ShadingFlag = ShadeOff;
