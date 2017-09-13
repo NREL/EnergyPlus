@@ -452,16 +452,6 @@
 
   Output:Variable,*,CondFD Surface Temperature Node 5;
 
-  Output:Variable,*,CondFD Surface Temperature Node 6;
-
-  Output:Variable,*,CondFD Surface Temperature Node 7;
-
-  Output:Variable,*,CondFD Surface Temperature Node 8;
-
-  Output:Variable,*,CondFD Surface Temperature Node 9;
-
-  Output:Variable,*,CondFD Surface Temperature Node 10;
-
   Output:Diagnostics,
     DisplayAdvancedReportVariables;  !- Key 1
 

@@ -6,7 +6,7 @@
   Version,8.8;
 
   Building,
-    anyplace           Load Calc,  !- Name
+    anyplace Load Calc,      !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
     0.03,                    !- Loads Convergence Tolerance Value
@@ -15,7 +15,7 @@
     ,                        !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
-  Timestep,2;
+  Timestep,4;
 
   SurfaceConvectionAlgorithm:Inside,TARP;
 
@@ -38,8 +38,8 @@
 
   Site:Location,
     anyplace,                !- Name
-    40,                      !- Latitude {deg}
-    -88,                     !- Longitude {deg}
+    41.98,                   !- Latitude {deg}
+    -87.92,                  !- Longitude {deg}
     -6,                      !- Time Zone {hr}
     0.3048;                  !- Elevation {m}
 
