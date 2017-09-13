@@ -715,15 +715,15 @@ namespace Photovoltaics {
 			}}
 
 			//set up report variables CurrentModuleObject='Photovoltaics'
-			SetupOutputVariable( "Generator Produced DC Electric Power [W]", PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
-			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
-			SetupOutputVariable( "Generator PV Array Efficiency []", PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Power", OutputProcessor::Unit::W, PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
+			SetupOutputVariable( "Generator PV Array Efficiency", OutputProcessor::Unit::None, PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
 
 			// CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
 			if ( ( PVarray( PVnum ).PVModelType == iTRNSYSPVModel ) || ( PVarray( PVnum ).PVModelType == iSandiaPVModel ) ) {
-				SetupOutputVariable( "Generator PV Cell Temperature [C]", PVarray( PVnum ).Report.CellTemp, "System", "Average", PVarray( PVnum ).Name );
-				SetupOutputVariable( "Generator PV Short Circuit Current [A]", PVarray( PVnum ).Report.ArrayIsc, "System", "Average", PVarray( PVnum ).Name );
-				SetupOutputVariable( "Generator PV Open Circuit Voltage [V]", PVarray( PVnum ).Report.ArrayVoc, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Cell Temperature", OutputProcessor::Unit::C, PVarray( PVnum ).Report.CellTemp, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Short Circuit Current", OutputProcessor::Unit::A, PVarray( PVnum ).Report.ArrayIsc, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Open Circuit Voltage", OutputProcessor::Unit::V, PVarray( PVnum ).Report.ArrayVoc, "System", "Average", PVarray( PVnum ).Name );
 			}
 
 			// do some checks and setup
