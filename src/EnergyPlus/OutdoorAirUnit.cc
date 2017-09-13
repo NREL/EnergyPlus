@@ -523,8 +523,10 @@ namespace OutdoorAirUnit {
 
 			if ( lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFan = false;
-				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\": No input of " + cAlphaFields( 7 ) + "." );
-				ShowContinueError( "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced. Please reconsider your input." );
+				if ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFields( 7 ) + " is blank." );
+					ShowContinueError( "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced." );
+				}
 			} else if ( ! lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFanName = cAlphaArgs( 7 );
 				VerifyName( cAlphaArgs( 7 ), OutAirUnit, &OAUnitData::ExtFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
@@ -555,10 +557,10 @@ namespace OutdoorAirUnit {
 
 			//N2
 			OutAirUnit( OAUnitNum ).ExtAirVolFlow = NumArray( 2 );
-			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+			if ( ( OutAirUnit( OAUnitNum ).ExtFan ) && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ){
 				if ( NumArray( 2 ) != NumArray( 1 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" unbalanbce inputs between " + cNumericFields( 1 ) + " and " + cNumericFields( 2 ) + " may cause unbalance mass flow rate between supply and exhaust." );
-					ShowContinueError( "The entered value of " + cNumericFields( 1 ) + " is " + General::RoundSigDigits( NumArray( 1 ), 3 ) + " and the entered value of " + cNumericFields( 2 ) + " is " + General::RoundSigDigits( NumArray( 2 ), 3 ) );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFields( 1 ) + " and " + cNumericFields( 2 ) + " are not equal. This may cause unbalanced flow." );
+					ShowContinueError( cNumericFields( 1 ) + "=" + General::RoundSigDigits( NumArray( 1 ), 3 ) + " and " + cNumericFields( 2 ) + "=" + General::RoundSigDigits( NumArray( 2 ), 3 ) );
 				}
 			}
 			//A8
@@ -567,12 +569,12 @@ namespace OutdoorAirUnit {
 			OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr = GetScheduleIndex( OutAirUnit( OAUnitNum ).ExtAirSchedName );
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 				if ( ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr == 0 ) || ( lNumericBlanks( 2 ) ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 					ErrorsFound = true;
 				} else {
-					if ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr != OutAirUnit( OAUnitNum ).OutAirSchedPtr ) {
-						ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" different schedule inputs between " + cAlphaFields( 4 ) + " and " + cAlphaFields( 9 ) + " may cause unbalance mass flow rate between supply and exhaust." );
-						ShowContinueError( "The entered name of " + cAlphaFields( 4 ) + " is " + cAlphaArgs( 4 ) + " and the entered name of " + cAlphaFields( 9 ) + " is " + cAlphaArgs( 9 ) );
+					if ( ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr != OutAirUnit( OAUnitNum ).OutAirSchedPtr ) && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
+						ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", different schedule inputs for outdoor air and exhaust air schedules may cause unbalanced mass flow." );
+						ShowContinueError( cAlphaFields( 4 ) + "=" + cAlphaArgs( 4 ) + " and " + cAlphaFields( 8 ) + "=" + cAlphaArgs( 8 ) );
 					}
 				}
 			}
@@ -1522,7 +1524,7 @@ namespace OutdoorAirUnit {
 			}
 
 			// Air mass balance check
-			if ( std::abs( OutAirUnit( OAUnitNum ).ExtAirMassFlow - OutAirUnit( OAUnitNum ).OutAirMassFlow ) > 0.001 ) {
+			if ( ( std::abs( OutAirUnit( OAUnitNum ).ExtAirMassFlow - OutAirUnit( OAUnitNum ).OutAirMassFlow ) > 0.001 )  && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
 				OutAirUnit( OAUnitNum ).UnBalancedErrCount = OutAirUnit( OAUnitNum ).UnBalancedErrCount + 1;
 				if ( OutAirUnit( OAUnitNum ).UnBalancedErrCount == 1 ) {
 					ShowWarningError( "Air mass flow between zone supply and exhaust is not balanced" );
