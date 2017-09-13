@@ -4037,8 +4037,8 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "CalcMultiSpeedVarSpeedCoilCooling" );
-		static std::string const RoutineNameSourceSideInletTemp( "CalcVSHPCoolingSimple:SourceSideInletTemp" );
+		static std::string const RoutineName( "CalcVarSpeedCoilCooling" );
+		static std::string const RoutineNameSourceSideInletTemp( "CalcVarSpeedCoilCooling:SourceSideInletTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
