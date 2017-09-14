@@ -1309,19 +1309,19 @@ namespace TARCOGOutput {
 			gio::write( WINCogFile, Format_2020 ) << xwght( i );
 			gio::write( WINCogFile, Format_2031 );
 			gio::write( Format_2020 ) << xgcon( 1, 1 );
-			for ( j = 2; i <= 3; ++j ) {
+			for ( j = 2; j <= 3; ++j ) {
 				gio::write( WINCogFile, Format_2030 ) << xgcon( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2032 );
 			gio::write( Format_2020 ) << xgvis( 1, 1 );
-			for ( j = 2; i <= 3; ++j ) {
+			for ( j = 2; j <= 3; ++j ) {
 				gio::write( WINCogFile, Format_2030 ) << xgvis( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2033 );
 			gio::write( Format_2020 ) << xgcp( 1, 1 );
-			for ( j = 2; i <= 3; ++j ) {
+			for ( j = 2; j <= 3; ++j ) {
 				gio::write( WINCogFile, Format_2030 ) << xgcp( j, i );
 			}
 			gio::write( WINCogFile );
