@@ -2351,6 +2351,61 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F( SQLiteFixture, OutputProcessor_buildKeyVarListWithRegexKey )
+		{
+			std::string const idf_objects = delimited_string( {
+				"  Output:Table:Monthly,",
+				"    Test Report,  !- Name",
+				"    2,                       !- Digits After Decimal",
+				"    Zone Total Internal Latent Gain Rate,  !- Variable or Meter 1 Name",
+				"    SumOrAverage;            !- Aggregation Type for Variable or Meter 1",
+				"",
+				"Output:Variable,Liv.*,Zone Total Internal Latent Gain Rate,Hourly;",
+				"",
+				"Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
+			} );
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			InputProcessor::PreScanReportingVariables();
+			InitializeOutput();
+
+			Real64 ilgrGarage;
+			Real64 ilgrLiving1;
+			Real64 ilgrLiving2;
+
+			SetupOutputVariable( "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, "Zone", "Sum", "Garage" );
+			SetupOutputVariable( "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving1, "Zone", "Sum", "Living1" );
+			SetupOutputVariable( "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving2, "Zone", "Sum", "Living2" );
+
+			Real64 isgrGarage;
+			Real64 isgrLiving;
+			Real64 isgrAttic;
+
+			SetupOutputVariable( "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, "Zone", "Sum", "Garage" );
+			SetupOutputVariable( "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, "Zone", "Sum", "Living1" );
+			SetupOutputVariable( "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, "Zone", "Sum", "Living2" );
+
+			DataGlobals::DoWeathSim = true;
+			DataGlobals::TimeStepZone = 0.25;
+
+			OutputReportTabular::GetInputTabularMonthly();
+			EXPECT_EQ( OutputReportTabular::MonthlyInputCount, 1 );
+			OutputReportTabular::InitializeTabularMonthly();
+
+			GetReportVariableInput();
+
+			NumExtraVars = 0;
+			BuildKeyVarList( "LIVING1", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 2 );
+			EXPECT_EQ( 1, NumExtraVars );
+
+			NumExtraVars = 0;
+			BuildKeyVarList( "GARAGE", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 2 );
+			EXPECT_EQ( 0, NumExtraVars );
+
+
+		}
+
 
 
 		TEST_F( SQLiteFixture, OutputProcessor_addBlankKeys )
