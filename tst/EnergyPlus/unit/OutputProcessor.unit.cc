@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 
 #include <map>
 
@@ -2290,6 +2291,67 @@ namespace EnergyPlus {
 			EXPECT_EQ( "", ReqRepVars( 5 ).SchedName );
 			EXPECT_FALSE( ReqRepVars( 5 ).Used );
 		}
+
+		TEST_F( SQLiteFixture, OutputProcessor_buildKeyVarListWithKey )
+		{
+			std::string const idf_objects = delimited_string( {
+				"  Output:Table:Monthly,",
+				"    Test Report,  !- Name",
+				"    2,                       !- Digits After Decimal",
+				"    Zone Total Internal Latent Gain Rate,  !- Variable or Meter 1 Name",
+				"    SumOrAverage;            !- Aggregation Type for Variable or Meter 1",
+				"",
+				"Output:Variable,Living,Zone Total Internal Latent Gain Rate,Hourly;",
+				"Output:Variable,Attic,Zone Total Internal Latent Gain Rate,Hourly;",
+				"",
+				"Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
+			} );
+
+			ASSERT_FALSE( process_idf( idf_objects ) );
+
+			InputProcessor::PreScanReportingVariables();
+			InitializeOutput();
+
+			Real64 ilgrGarage;
+			Real64 ilgrLiving;
+			Real64 ilgrAttic;
+
+			SetupOutputVariable( "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, "Zone", "Sum", "Garage" );
+			SetupOutputVariable( "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving, "Zone", "Sum", "Living" );
+			SetupOutputVariable( "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrAttic, "Zone", "Sum", "Attic" );
+
+			Real64 isgrGarage;
+			Real64 isgrLiving;
+			Real64 isgrAttic;
+
+			SetupOutputVariable( "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, "Zone", "Sum", "Garage" );
+			SetupOutputVariable( "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, "Zone", "Sum", "Living" );
+			SetupOutputVariable( "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, "Zone", "Sum", "Attic" );
+
+			DataGlobals::DoWeathSim = true;
+			DataGlobals::TimeStepZone = 0.25;
+
+			OutputReportTabular::GetInputTabularMonthly();
+			EXPECT_EQ( OutputReportTabular::MonthlyInputCount, 1 );
+			OutputReportTabular::InitializeTabularMonthly();
+
+			GetReportVariableInput();
+
+			NumExtraVars = 0;
+			BuildKeyVarList( "LIVING", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 3 );
+			EXPECT_EQ( 1, NumExtraVars );
+
+			NumExtraVars = 0;
+			BuildKeyVarList( "GARAGE", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 3 );
+			EXPECT_EQ( 0, NumExtraVars );
+
+			NumExtraVars = 0;
+			BuildKeyVarList( "ATTIC", "ZONE TOTAL INTERNAL SENSIBLE GAIN RATE", 1, 3 );
+			EXPECT_EQ( 0, NumExtraVars );
+
+		}
+
+
 
 		TEST_F( SQLiteFixture, OutputProcessor_addBlankKeys )
 		{
