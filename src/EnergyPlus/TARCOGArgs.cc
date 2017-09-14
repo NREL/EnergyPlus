@@ -498,7 +498,7 @@ namespace TARCOGArgs {
 		Real64 & Gin,
 		Array1A< Real64 > rir,
 		Array1A< Real64 > vfreevent,
-		Array1A< Real64 > Ah,
+		Array1A< Real64 > Ah,    // Front openness area for airflow calculations [m2]
 		int & nperr,
 		std::string & ErrorMessage
 	)

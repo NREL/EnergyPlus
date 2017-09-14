@@ -77,12 +77,12 @@ namespace TARCOGCommon {
 
 	void
 	modifyHcGap(
-		Array1< Real64 > const & hcgap,
-		Array1< Real64 > const & qv,
-		Array1< Real64 > const & hcv,
-		Array1< Real64 > & hcgapMod,
-		int const nlayer,
-		Real64 const edgeGlCorrFac
+		Array1< Real64 > const & hcgap,  // Convective coefficient for gap
+		Array1< Real64 > const & qv,     // Heat flow from ventilation [W/m2]
+		Array1< Real64 > const & hcv,    // Convective heat flow coefficient due to ventilation
+		Array1< Real64 > & hcgapMod,     // Modified heat flow coefficient for gap
+		int const nlayer,                // Number of layers
+		Real64 const edgeGlCorrFac       // Edge of glass correction factor
 	);
 
 	void

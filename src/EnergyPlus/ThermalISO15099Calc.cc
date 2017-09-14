@@ -533,18 +533,13 @@ namespace ThermalISO15099Calc {
 		AchievedErrorToleranceSolar = 0.0;
 		AchievedErrorTolerance_NOSD = 0.0;
 
-		PrepVariablesISO15099( nlayer, tout, tind, trmin, isky, outir, tsky, esky, fclr, gap, thick, scon, tir,
-		                       emis, tilt, hin, hout, ibc, SlatThick, SlatWidth, SlatAngle, SlatCond, LayerType, ThermalMod, SDScalar,
-		                       ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, Keff, ShadeGapKeffConv, sc, shgc,
-		                       ufactor, flux, LaminateAU, sumsolU, sol0, hint, houtt, trmout, ebsky, ebroom, Gout, Gin, rir, vfreevent,
-		                       Ah, nperr, ErrorMessage );
+		PrepVariablesISO15099( nlayer, tout, tind, trmin, isky, outir, tsky, esky, fclr, gap, thick, scon, tir, emis, tilt, hin, hout, ibc, SlatThick, SlatWidth, SlatAngle, SlatCond, LayerType, ThermalMod, SDScalar, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, Keff, ShadeGapKeffConv, sc, shgc, ufactor, flux, LaminateAU, sumsolU, sol0, hint, houtt, trmout, ebsky, ebroom, Gout, Gin, rir, vfreevent, Ah, nperr, ErrorMessage );
 
 		for ( int i = 1; i <= nlayer; ++i ) {
 			EffectiveOpenness( i ) = Ah( i ) / ( width * height );
 		}
 
-		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff,
-		                            Ar_eff, Ah_eff, LayerType, SlatAngle );
+		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle );
 
 		//No option to take hardcoded variables.  All gas coefficients are now passed from outside.
 		//if (GoAhead(nperr)) call propcon90(ISO15099,mgas,xgcon,xgvis,xgcp,xgrho,xwght,nperr)
@@ -565,14 +560,7 @@ namespace ThermalISO15099Calc {
 		if ( ( dir > 0.0 ) || ( SHGCCalc == 0 ) ) {
 			// call therm1d to calculate heat flux with solar radiation
 
-			therm1d( nlayer, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, dir, ebsky, Gout,
-			         trmout, trmin, ebroom, Gin, tir, rir, emis, gap, thick, scon, tilt, asol, height, heightt, width,
-			         iprop, frct, presure, nmix, xwght, xgcon, xgvis, xgcp, gama, SupportPillar, PillarSpacing,
-			         PillarRadius, theta, q, qv, flux, hcin, hrin, hcout, hrout, hin, hout, hcgas, hrgas, ufactor,
-			         nperr, ErrorMessage, tamb, troom, ibc, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, EffectiveOpenness, vvent, tvent,
-			         LayerType, Ra, Nu, vfreevent, qcgas, qrgas, Ebf, Ebb, Rf, Rb, ShadeEmisRatioOut, ShadeEmisRatioIn,
-			         ShadeHcModifiedOut, ShadeHcModifiedIn, ThermalMod, Debug_mode, AchievedErrorToleranceSolar,
-			         NumOfIterSolar, edgeGlCorrFac );
+			therm1d( nlayer, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, dir, ebsky, Gout, trmout, trmin, ebroom, Gin, tir, rir, emis, gap, thick, scon, tilt, asol, height, heightt, width, iprop, frct, presure, nmix, xwght, xgcon, xgvis, xgcp, gama, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, flux, hcin, hrin, hcout, hrout, hin, hout, hcgas, hrgas, ufactor, nperr, ErrorMessage, tamb, troom, ibc, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, EffectiveOpenness, vvent, tvent, LayerType, Ra, Nu, vfreevent, qcgas, qrgas, Ebf, Ebb, Rf, Rb, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcModifiedOut, ShadeHcModifiedIn, ThermalMod, Debug_mode, AchievedErrorToleranceSolar, NumOfIterSolar, edgeGlCorrFac );
 
 			NumOfIterations = NumOfIterSolar;
 			//exit on error:
@@ -640,14 +628,7 @@ namespace ThermalISO15099Calc {
 			hout = houtt;
 
 			// call therm1d to calculate heat flux without solar radiation
-			therm1d( nlayer, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, 0.0, ebsky, Gout,
-			         trmout, trmin, ebroom, Gin, tir, rir, emis, gap, thick, scon, tilt, sol0, height, heightt, width,
-			         iprop, frct, presure, nmix, xwght, xgcon, xgvis, xgcp, gama, SupportPillar, PillarSpacing,
-			         PillarRadius, theta, q, qv, flux, hcin, hrin, hcout, hrout, hin, hout, hcgas, hrgas, ufactor, nperr,
-			         ErrorMessage, tamb, troom, ibc, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, EffectiveOpenness, vvent, tvent, LayerType,
-			         Ra, Nu, vfreevent, qcgas, qrgas, Ebf, Ebb, Rf, Rb, ShadeEmisRatioOut, ShadeEmisRatioIn,
-			         ShadeHcModifiedOut, ShadeHcModifiedIn, ThermalMod, Debug_mode, AchievedErrorTolerance, NumOfIter,
-			         edgeGlCorrFac );
+			therm1d( nlayer, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, 0.0, ebsky, Gout, trmout, trmin, ebroom, Gin, tir, rir, emis, gap, thick, scon, tilt, sol0, height, heightt, width, iprop, frct, presure, nmix, xwght, xgcon, xgvis, xgcp, gama, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, flux, hcin, hrin, hcout, hrout, hin, hout, hcgas, hrgas, ufactor, nperr, ErrorMessage, tamb, troom, ibc, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, EffectiveOpenness, vvent, tvent, LayerType, Ra, Nu, vfreevent, qcgas, qrgas, Ebf, Ebb, Rf, Rb, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcModifiedOut, ShadeHcModifiedIn, ThermalMod, Debug_mode, AchievedErrorTolerance, NumOfIter, edgeGlCorrFac );
 
 			NumOfIterations = NumOfIter;
 
@@ -769,16 +750,7 @@ namespace ThermalISO15099Calc {
 				//      This is "Unshaded, No solar radiation" pass
 				//cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 				// call therm1d to calculate heat flux with solar radiation
-				therm1d( nlayer_NOSD, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, 0.0, ebsky,
-				         Gout, trmout, trmin, ebroom, Gin, tir_NOSD, rir_NOSD, emis_NOSD, gap_NOSD, thick_NOSD, scon_NOSD,
-				         tilt, sol0, height, heightt, width, iprop_NOSD, frct_NOSD, presure_NOSD, nmix_NOSD, xwght, xgcon,
-				         xgvis, xgcp, gama, SupportPillar, PillarSpacing, PillarRadius, theta_NOSD, q_NOSD, qv_NOSD,
-				         flux_NOSD, hcin_NOSD, hrin_NOSD, hcout_NOSD, hrout_NOSD, hin_NOSD, hout_NOSD, hcgas_NOSD, hrgas_NOSD,
-				         ufactor_NOSD, nperr, ErrorMessage, tamb_NOSD, troom_NOSD, ibc, Atop_NOSD, Abot_NOSD, Al_NOSD,
-				         Ar_NOSD, Ah_NOSD, EffectiveOpenness_NOSD, vvent_NOSD, tvent_NOSD, LayerType_NOSD, Ra_NOSD, Nu_NOSD, vfreevent_NOSD,
-				         qcgas_NOSD, qrgas_NOSD, Ebf_NOSD, Ebb_NOSD, Rf_NOSD, Rb_NOSD, ShadeEmisRatioOut_NOSD,
-				         ShadeEmisRatioIn_NOSD, ShadeHcModifiedOut_NOSD, ShadeHcModifiedIn_NOSD, ThermalMod, Debug_mode,
-				         AchievedErrorTolerance_NOSD, NumOfIter_NOSD, edgeGlCorrFac );
+				therm1d( nlayer_NOSD, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, 0.0, ebsky, Gout, trmout, trmin, ebroom, Gin, tir_NOSD, rir_NOSD, emis_NOSD, gap_NOSD, thick_NOSD, scon_NOSD, tilt, sol0, height, heightt, width, iprop_NOSD, frct_NOSD, presure_NOSD, nmix_NOSD, xwght, xgcon, xgvis, xgcp, gama, SupportPillar, PillarSpacing, PillarRadius, theta_NOSD, q_NOSD, qv_NOSD, flux_NOSD, hcin_NOSD, hrin_NOSD, hcout_NOSD, hrout_NOSD, hin_NOSD, hout_NOSD, hcgas_NOSD, hrgas_NOSD, ufactor_NOSD, nperr, ErrorMessage, tamb_NOSD, troom_NOSD, ibc, Atop_NOSD, Abot_NOSD, Al_NOSD, Ar_NOSD, Ah_NOSD, EffectiveOpenness_NOSD, vvent_NOSD, tvent_NOSD, LayerType_NOSD, Ra_NOSD, Nu_NOSD, vfreevent_NOSD, qcgas_NOSD, qrgas_NOSD, Ebf_NOSD, Ebb_NOSD, Rf_NOSD, Rb_NOSD, ShadeEmisRatioOut_NOSD, ShadeEmisRatioIn_NOSD, ShadeHcModifiedOut_NOSD, ShadeHcModifiedIn_NOSD, ThermalMod, Debug_mode, AchievedErrorTolerance_NOSD, NumOfIter_NOSD, edgeGlCorrFac );
 
 				NumOfIterations = NumOfIter_NOSD;
 				// exit on error
@@ -933,7 +905,7 @@ namespace ThermalISO15099Calc {
 		Array1< Real64 > const & Al,
 		Array1< Real64 > const & Ar,
 		Array1< Real64 > const & Ah,
-		Array1A< Real64 > const & EffectiveOpenness,
+		Array1A< Real64 > const & EffectiveOpenness,  // Effective opennes for airflow calculations [m2]
 		Array1< Real64 > const & vvent,
 		Array1< Real64 > const & tvent,
 		Array1_int const & LayerType,
@@ -1206,8 +1178,7 @@ namespace ThermalISO15099Calc {
 			// evaluate convective/conductive components of gap
 			hatter( nlayer, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, ebsky, tamb, ebroom, troom, gap, height, heightt, scon, tilt, theta, Tgap, Radiation, trmout, trmin, iprop, frct, presure, nmix, wght, gcon, gvis, gcp, gama, SupportPillar, PillarSpacing, PillarRadius, hgas, hcgas, hrgas, hcin, hcout, hin, hout, index, ibc, nperr, ErrorMessage, hrin, hrout, Ra, Nu );
 
-			effectiveLayerCond( nlayer, LayerType, scon, thick, iprop, frct, nmix, presure, wght, gcon, gvis, gcp,
-			                    EffectiveOpenness, theta, sconScaled, nperr, ErrorMessage );
+			effectiveLayerCond( nlayer, LayerType, scon, thick, iprop, frct, nmix, presure, wght, gcon, gvis, gcp, EffectiveOpenness, theta, sconScaled, nperr, ErrorMessage );
 
 			// exit on error
 			if ( ! ( GoAhead( nperr ) ) ) return;
@@ -1224,19 +1195,15 @@ namespace ThermalISO15099Calc {
 				//qv(i)    = 0.0d0
 				//hcv(i)   = 0.0d0
 				//end do
-				matrixQBalance( nlayer, a, b, sconScaled, hcgas, hcgapMod, asol, qv, hcv, tind, tout,
-				                Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac );
+				matrixQBalance( nlayer, a, b, sconScaled, hcgas, hcgapMod, asol, qv, hcv, tind, tout, Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac );
 			} else {
 				//bi...There are no Venetian layers, or ThermalMod is not CSM, so carry on as usual:
-				shading( theta, gap, hgas, hcgas, hrgas, frct, iprop, presure, nmix, wght, gcon, gvis, gcp, nlayer,
-				         width, height, tilt, tout, tind, Atop, Abot, Al, Ar, Ah, vvent, tvent, LayerType, Tgap, qv,
-				         hcv, nperr, ErrorMessage, vfreevent );
+				shading( theta, gap, hgas, hcgas, hrgas, frct, iprop, presure, nmix, wght, gcon, gvis, gcp, nlayer, width, height, tilt, tout, tind, Atop, Abot, Al, Ar, Ah, vvent, tvent, LayerType, Tgap, qv, hcv, nperr, ErrorMessage, vfreevent );
 
 				// exit on error
 				if ( ! ( GoAhead( nperr ) ) ) return;
 
-				matrixQBalance( nlayer, a, b, sconScaled, hcgas, hcgapMod, asol, qv, hcv, tind, tout,
-				                Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac );
+				matrixQBalance( nlayer, a, b, sconScaled, hcgas, hcgapMod, asol, qv, hcv, tind, tout, Gin, Gout, theta, tir, rir, emis, edgeGlCorrFac );
 
 			} //  end if
 
@@ -1438,9 +1405,7 @@ namespace ThermalISO15099Calc {
 			// Simon: It is important to recalculate coefficients from most accurate run
 			hatter( nlayer, iwd, tout, tind, wso, wsi, VacuumPressure, VacuumMaxGapThickness, ebsky, tamb, ebroom, troom, gap, height, heightt, scon, tilt, theta, Tgap, Radiation, trmout, trmin, iprop, frct, presure, nmix, wght, gcon, gvis, gcp, gama, SupportPillar, PillarSpacing, PillarRadius, hgas, hcgas, hrgas, hcin, hcout, hin, hout, index, ibc, nperr, ErrorMessage, hrin, hrout, Ra, Nu );
 
-			shading( theta, gap, hgas, hcgas, hrgas, frct, iprop, presure, nmix, wght, gcon, gvis, gcp, nlayer,
-			         width, height, tilt, tout, tind, Atop, Abot, Al, Ar, Ah, vvent, tvent, LayerType, Tgap, qv,
-			         hcv, nperr, ErrorMessage, vfreevent );
+			shading( theta, gap, hgas, hcgas, hrgas, frct, iprop, presure, nmix, wght, gcon, gvis, gcp, nlayer, width, height, tilt, tout, tind, Atop, Abot, Al, Ar, Ah, vvent, tvent, LayerType, Tgap, qv, hcv, nperr, ErrorMessage, vfreevent );
 		}
 
 		if ( CalcOutcome == CALC_UNKNOWN ) {
@@ -2000,11 +1965,25 @@ namespace ThermalISO15099Calc {
 	}
 
 	void
-	effectiveLayerCond( int const nlayer, Array1A_int const LayerType, Array1A< Real64 > const scon,
-	                    Array1A< Real64 > const thick, Array2A_int const iprop, Array2A< Real64 > const frct, Array1A_int const nmix,
-	                    Array1A< Real64 > const pressure, Array1A< Real64 > const wght, Array2A< Real64 > const gcon,
-	                    Array2A< Real64 > const gvis, Array2A< Real64 > const gcp, Array1A< Real64 > const EffectiveOpenness,
-	                    Array1< Real64 > & theta, Array1D< Real64 > & sconScaled, int & nperr, std::string & ErrorMessage )
+	effectiveLayerCond( 
+		int const nlayer, 
+		Array1A_int const LayerType,                // Layer type
+		Array1A< Real64 > const scon,               // Layer thermal conductivity
+		Array1A< Real64 > const thick,              // Layer thickness
+		Array2A_int const iprop,                    // Gas type in gaps
+		Array2A< Real64 > const frct,               // Fraction of gas
+		Array1A_int const nmix,                     // Gas mixture
+		Array1A< Real64 > const pressure,           // Gas pressure [Pa]
+		Array1A< Real64 > const wght,               // Molecular weight
+		Array2A< Real64 > const gcon,               // Gas specific conductivity
+		Array2A< Real64 > const gvis,               // Gas specific viscosity
+		Array2A< Real64 > const gcp,                // Gas specific heat
+		Array1A< Real64 > const EffectiveOpenness,  // Layer effective openneess [m2]
+		Array1< Real64 > & theta,                   // Layer surface tempeartures [K]
+		Array1D< Real64 > & sconScaled,             // Layer conductivity divided by thickness
+		int & nperr,                                // Error message flag
+		std::string & ErrorMessage                  // Error message
+	)
 	{
 		static Array1D_int iprop1( maxgas );
 		static Array1D< Real64 > frct1( maxgas );

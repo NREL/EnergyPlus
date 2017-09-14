@@ -233,7 +233,7 @@ namespace ThermalISO15099Calc {
 		Array1< Real64 > const & Al,
 		Array1< Real64 > const & Ar,
 		Array1< Real64 > const & Ah,
-		Array1A< Real64 > const & EffectiveOpenness,
+		Array1A< Real64 > const & EffectiveOpenness,  // Effective layer openness [m2]
 		Array1< Real64 > const & vvent,
 		Array1< Real64 > const & tvent,
 		Array1_int const & LayerType,
@@ -368,23 +368,24 @@ namespace ThermalISO15099Calc {
 
 	void
 	effectiveLayerCond(
-		int const nlayer,
-		Array1A_int const LayerType,
-		Array1A< Real64 > const scon,
-		Array1A< Real64 > const thick,
-		Array2A_int const iprop,
-		Array2A< Real64 > const frct,
-		Array1A_int const nmix,
-		Array1A< Real64 > const pressure,
-		Array1A< Real64 > const wght,
-		Array2A< Real64 > const gcon,
-		Array2A< Real64 > const gvis,
-		Array2A< Real64 > const gcp,
-		Array1A< Real64 > const EffectiveOpenness,
-		Array1< Real64 > & theta,
-		Array1D< Real64 > & sconScaled,
-		int & nperr,
-		std::string & ErrorMessage );
+		int const nlayer, 
+		Array1A_int const LayerType,                // Layer type
+		Array1A< Real64 > const scon,               // Layer thermal conductivity
+		Array1A< Real64 > const thick,              // Layer thickness
+		Array2A_int const iprop,                    // Gas type in gaps
+		Array2A< Real64 > const frct,               // Fraction of gas
+		Array1A_int const nmix,                     // Gas mixture
+		Array1A< Real64 > const pressure,           // Gas pressure [Pa]
+		Array1A< Real64 > const wght,               // Molecular weight
+		Array2A< Real64 > const gcon,               // Gas specific conductivity
+		Array2A< Real64 > const gvis,               // Gas specific viscosity
+		Array2A< Real64 > const gcp,                // Gas specific heat
+		Array1A< Real64 > const EffectiveOpenness,  // Layer effective openneess [m2]
+		Array1< Real64 > & theta,                   // Layer surface tempeartures [K]
+		Array1D< Real64 > & sconScaled,             // Layer conductivity divided by thickness
+		int & nperr,                                // Error message flag
+		std::string & ErrorMessage                  // Error message
+	);
 
 	void
 	filmi(

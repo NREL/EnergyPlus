@@ -1733,20 +1733,19 @@ namespace HeatBalanceSurfaceManager {
 		}
 		CondFDRelaxFactor = CondFDRelaxFactorInput;
 
-		// This is already initialized in SurfaceWindow structure constructor. Do not do it again here (Simon)
-		// for ( auto & e : SurfaceWindow ) {
-		// 	// Initialize window frame and divider temperatures
-		// 	e.FrameTempSurfIn = 23.0;
-		// 	e.FrameTempSurfInOld = 23.0;
-		// 	e.FrameTempSurfOut = 23.0;
-		// 	e.DividerTempSurfIn = 23.0;
-		// 	e.DividerTempSurfInOld = 23.0;
-		// 	e.DividerTempSurfOut = 23.0;
-		// 
-		// 	// Initialize previous-timestep shading indicators
-		// 	e.ExtIntShadePrevTS = 0;
-		// 	e.ShadingFlag = ShadeOff;
-		// }
+		for ( auto & e : SurfaceWindow ) {
+			// Initialize window frame and divider temperatures
+			e.FrameTempSurfIn = 23.0;
+			e.FrameTempSurfInOld = 23.0;
+			e.FrameTempSurfOut = 23.0;
+			e.DividerTempSurfIn = 23.0;
+			e.DividerTempSurfInOld = 23.0;
+			e.DividerTempSurfOut = 23.0;
+		
+			// Initialize previous-timestep shading indicators
+			e.ExtIntShadePrevTS = 0;
+			e.ShadingFlag = NoShade;
+		}
 
 		// Perform other initializations that depend on the surface characteristics
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -2869,7 +2868,7 @@ namespace HeatBalanceSurfaceManager {
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( IGlass, SurfNum ) += QS( ZoneNum ) * Construct( ConstrNum ).AbsDiffBack( IGlass );
 						}
-					} else if ( ConstrNumSh && ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) ) {
+					} else if ( ConstrNumSh != 0 && ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) ) {
 						// Interior, exterior or between-glass shade, screen or blind in place
 						for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
 							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) QRadSWwinAbs( IGlass, SurfNum ) += QS( ZoneNum ) * Construct( ConstrNumSh ).AbsDiffBack( IGlass );

@@ -6188,10 +6188,7 @@ namespace SolarShading {
 
 				if ( SunLitFract > 0.0 && Surface( SurfNum ).Class != SurfaceClass_TDD_Dome ) {
 
-					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
-						( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn ||
-							ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn ||
-							ShadeFlag == ExtScreenOn ) ) {
+					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn ) ) {
 						TBmAll = TBmAllShBlSc;
 					} else {
 						TBmAll = TBmBm + TBmDif;
@@ -6248,13 +6245,9 @@ namespace SolarShading {
 					// from this exterior window since the beam-beam transmittance of shades and diffusing glass
 					// is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
 					// assumed to be zero.
-
+					
 					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel )
-						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn ||
-							SurfaceWindow( SurfNum ).SolarDiffusing ||
-							SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ||
-							Surface( SurfNum ).Class == SurfaceClass_TDD_Dome )
-							continue;
+						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || SurfaceWindow( SurfNum ).SolarDiffusing || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser || Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) continue;
 
 					// Find interior beam radiation that is:
 					// (1) absorbed by opaque back surfaces;
@@ -7986,7 +7979,11 @@ namespace SolarShading {
 
 		for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 			SurfaceWindow( ISurf ).ExtIntShadePrevTS = SurfaceWindow( ISurf ).ShadingFlag;
-			// SurfaceWindow( ISurf ).ShadingFlag = NoShade;
+
+			// Avoid update of NoShade flag to BSDF window type. That flag is set only once in case of
+			// BSDF window type (during reading input file) (Simon)
+			if ( SurfaceWindow( ISurf ).WindowModelType != WindowBSDFModel )
+				SurfaceWindow( ISurf ).ShadingFlag = NoShade;
 			SurfaceWindow( ISurf ).FracTimeShadingDeviceOn = 0.0;
 			if ( SurfaceWindow( ISurf ).WindowModelType == WindowEQLModel ) {
 				int EQLNum = Construct( Surface( ISurf ).Construction ).EQLConsPtr;
