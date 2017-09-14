@@ -414,12 +414,12 @@ namespace DataZoneEquipment {
 		if ( NumOfZoneEquipLists != NumOfControlledZones ) {
 			ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );
 			ShowContinueError( "..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList" );
-			ShowFatalError( "GetZoneEquipment: Incorrect number of zone equipment lists" );
+			ShowFatalError( "GetZoneEquipment: Incorrect number of zone equipment lists" );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumOfControlledZones > NumOfZones ) {
 			ShowSevereError( RoutineName + "Number of Controlled Zone objects [" + TrimSigDigits( NumOfControlledZones ) + "] greater than Number of Zones [" + TrimSigDigits( NumOfZones ) + ']' );
-			ShowFatalError( RoutineName + "Too many ZoneHVAC:EquipmentConnections objects." );
+			ShowFatalError( RoutineName + "Too many ZoneHVAC:EquipmentConnections objects." );  // LCOV_EXCL_LINE
 		}
 
 		InitUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
@@ -621,7 +621,7 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" ) { // Simple Cooling Panel
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = CoolingPanel_Num;
-					
+
 					} else if ( SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT" ) { // High Temperature Radiators
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HiTempRadiant_Num;
 
@@ -972,7 +972,7 @@ namespace DataZoneEquipment {
 		SetupZoneEquipmentForConvectionFlowRegime();
 
 		if ( GetZoneEquipmentDataErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting Zone Equipment input." );
+			ShowFatalError( RoutineName + "Errors found in getting Zone Equipment input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1269,7 +1269,7 @@ namespace DataZoneEquipment {
 	GetReturnAirNodeForZone(
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
 		std::string const & NodeName  // Return air node name to match (may be blank)
-	) 
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -1280,7 +1280,7 @@ namespace DataZoneEquipment {
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the return air node number for the indicated
 		// zone and node name.  If NodeName is blank, return the first return node number,
-		// otherwise return the node number of the matching return node name.  
+		// otherwise return the node number of the matching return node name.
 		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
 
 		// Using/Aliasing
@@ -1435,7 +1435,7 @@ namespace DataZoneEquipment {
 			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
 				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" IndoorAirQualityProcedure\" requires CO2 simulation." );
 				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
-				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 			MyEnvrnFlag( DSOAPtr ) = false;
 		}
@@ -1443,7 +1443,7 @@ namespace DataZoneEquipment {
 			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
 				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" ProportionalControlBasedOnDesignOccupancy\" requires CO2 simulation." );
 				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
-				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 			MyEnvrnFlag( DSOAPtr ) = false;
 		}
@@ -1451,7 +1451,7 @@ namespace DataZoneEquipment {
 			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
 				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" ProportionalControlBasedonOccupancySchedule\" requires CO2 simulation." );
 				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
-				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 			MyEnvrnFlag( DSOAPtr ) = false;
 		}

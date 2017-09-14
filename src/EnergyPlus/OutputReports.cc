@@ -279,7 +279,7 @@ LinesOut( std::string const & option )
 	unit = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputSlnFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "LinesOut: Could not open file "+ DataStringGlobals::outputSlnFileName +" for output (write)." );
+		ShowFatalError( "LinesOut: Could not open file "+ DataStringGlobals::outputSlnFileName +" for output (write)." );  // LCOV_EXCL_LINE
 	}
 
 	if ( option != "IDF" ) {
@@ -468,7 +468,7 @@ DXFOut(
 	unit = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOut: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
+		ShowFatalError( "DXFOut: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );  // LCOV_EXCL_LINE
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -960,7 +960,7 @@ DXFOutLines( std::string const & ColorScheme )
 	unit = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutLines: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
+		ShowFatalError( "DXFOutLines: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );  // LCOV_EXCL_LINE
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -1386,7 +1386,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	unit = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutWireFrame: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
+		ShowFatalError( "DXFOutWireFrame: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );  // LCOV_EXCL_LINE
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -2148,7 +2148,7 @@ CostInfoOut()
 	// .sci = surface cost info
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputSciFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "CostInfoOut: Could not open file "+DataStringGlobals::outputSciFileName+" for output (write)." );
+		ShowFatalError( "CostInfoOut: Could not open file "+DataStringGlobals::outputSciFileName+" for output (write)." );  // LCOV_EXCL_LINE
 	}
 	gio::write( unit, fmtLD ) << TotSurfaces << int( count( uniqueSurf ) );
 	gio::write( unit, fmtLD ) << "data for surfaces useful for cost information";
@@ -2276,7 +2276,7 @@ VRMLOut(
 	unit = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputWrlFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "VRMLOut: Could not open file "+ DataStringGlobals::outputWrlFileName +" for output (write)." );
+		ShowFatalError( "VRMLOut: Could not open file "+ DataStringGlobals::outputWrlFileName +" for output (write)." );  // LCOV_EXCL_LINE
 	}
 
 	gio::write( unit, Format_702 ); // Beginning

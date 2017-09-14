@@ -282,17 +282,17 @@ namespace ChillerElectricEIR {
 		if ( CompIndex == 0 ) {
 			EIRChillNum = FindItemInList( EIRChillerName, ElectricEIRChiller );
 			if ( EIRChillNum == 0 ) {
-				ShowFatalError( "SimElectricEIRChiller: Specified Chiller not one of Valid EIR Electric Chillers=" + EIRChillerName );
+				ShowFatalError( "SimElectricEIRChiller: Specified Chiller not one of Valid EIR Electric Chillers=" + EIRChillerName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = EIRChillNum;
 		} else {
 			EIRChillNum = CompIndex;
 			if ( EIRChillNum > NumElectricEIRChillers || EIRChillNum < 1 ) {
-				ShowFatalError( "SimElectricEIRChiller:  Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Number of Units=" + TrimSigDigits( NumElectricEIRChillers ) + ", Entered Unit name=" + EIRChillerName );
+				ShowFatalError( "SimElectricEIRChiller:  Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Number of Units=" + TrimSigDigits( NumElectricEIRChillers ) + ", Entered Unit name=" + EIRChillerName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( EIRChillNum ) ) {
 				if ( EIRChillerName != ElectricEIRChiller( EIRChillNum ).Name ) {
-					ShowFatalError( "SimElectricEIRChiller: Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Unit name=" + EIRChillerName + ", stored Unit Name for that index=" + ElectricEIRChiller( EIRChillNum ).Name );
+					ShowFatalError( "SimElectricEIRChiller: Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Unit name=" + EIRChillerName + ", stored Unit Name for that index=" + ElectricEIRChiller( EIRChillNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( EIRChillNum ) = false;
 			}
@@ -784,7 +784,7 @@ namespace ChillerElectricEIR {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum ) {
@@ -945,7 +945,7 @@ namespace ChillerElectricEIR {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "InitElectricEIRChiller: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitElectricEIRChiller: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ElectricEIRChiller( EIRChillNum ).FlowMode == ConstantFlow ) {
@@ -1413,7 +1413,7 @@ namespace ChillerElectricEIR {
 					}
 					tempHeatRecVolFlowRate = nomHeatRecVolFlowRateUser;
 				}
-			
+
 			}
 			if ( ! ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tempHeatRecVolFlowRate = ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 			PlantUtilities::RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).HeatRecInletNodeNum, tempHeatRecVolFlowRate );
@@ -1433,7 +1433,7 @@ namespace ChillerElectricEIR {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1652,22 +1652,22 @@ namespace ChillerElectricEIR {
 		EvapOutletTemp = Node( ElectricEIRChiller( EIRChillNum ).EvapOutletNodeNum ).Temp;
 		TempLowLimitEout = ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElectricEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerRefCap;
 			Real64 ReferenceCOP_ff = ReferenceCOP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerRefCap = NomCap_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 			ReferenceCOP = ReferenceCOP_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 
 		}
-		
+
 		// Set mass flow rates
 		if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
 			CondMassFlowRate = ElectricEIRChiller( EIRChillNum ).CondMassFlowRateMax;
@@ -1702,18 +1702,18 @@ namespace ChillerElectricEIR {
 		} else {
 			assert( false );
 		}}
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the EvapOutletTempSetPoint
 			EvapOutletTempSetPoint = max( ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
-			
+
 		}
 
 		// correct temperature if using heat recovery
@@ -1871,7 +1871,7 @@ namespace ChillerElectricEIR {
 			QEvaporator = max( 0.0, ( EvapMassFlowRate * Cp * EvapDeltaTemp ) );
 			EvapOutletTemp = EvapOutletTempSetPoint;
 		}
-		
+
 		//Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
 		if ( EvapOutletTemp < TempLowLimitEout ) {
 			if ( ( Node( EvapInletNode ).Temp - TempLowLimitEout ) > DeltaTempTol ) {
@@ -2012,7 +2012,7 @@ namespace ChillerElectricEIR {
 				//DSU? maybe this could be handled earlier, check if this component has a load and an evap flow rate
 				// then if cond flow is zero, just make a request to the condenser,
 				// then just say it couldn't run until condenser loop wakes up.
-				//CALL ShowFatalError('Program Terminates due to previous error condition.')
+				//CALL ShowFatalError('Program Terminates due to previous error condition.')  // LCOV_EXCL_LINE
 			}
 		} else { //Air Cooled or Evap Cooled
 

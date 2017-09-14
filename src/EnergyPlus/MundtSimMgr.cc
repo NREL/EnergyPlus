@@ -208,7 +208,7 @@ namespace MundtSimMgr {
 			// setup Mundt model
 			ErrorsFound = false;
 			SetupMundtModel( ZoneNum, ErrorsFound );
-			if ( ErrorsFound ) ShowFatalError( "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination." );
+			if ( ErrorsFound ) ShowFatalError( "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 
 			// perform Mundt model calculations
 			CalcMundtModel( ZoneNum );
@@ -366,7 +366,7 @@ namespace MundtSimMgr {
 
 						// error check for debugging
 						if ( AirNodeBeginNum > TotNumOfAirNodes ) {
-							ShowFatalError( "An array bound exceeded. Error in InitMundtModel subroutine of MundtSimMgr." );
+							ShowFatalError( "An array bound exceeded. Error in InitMundtModel subroutine of MundtSimMgr." );  // LCOV_EXCL_LINE
 						}
 
 						AirNodeFoundFlag = false;
@@ -415,7 +415,7 @@ namespace MundtSimMgr {
 
 		}
 
-		if ( ErrorsFound ) ShowFatalError( "InitMundtModel: Preceding condition(s) cause termination." );
+		if ( ErrorsFound ) ShowFatalError( "InitMundtModel: Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 
 		// allocate arrays
 		RoomNodeIDs.allocate( MaxNumOfRoomNodes );
@@ -501,7 +501,7 @@ namespace MundtSimMgr {
 		ZoneEquipConfigNum = ZoneNum;
 		// check whether this zone is a controlled zone or not
 		if ( ! Zone( ZoneNum ).IsControlled ) {
-			ShowFatalError( "Zones must be controlled for Mundt air model. No system serves zone " + Zone( ZoneNum ).Name );
+			ShowFatalError( "Zones must be controlled for Mundt air model. No system serves zone " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 			return;
 		}
 

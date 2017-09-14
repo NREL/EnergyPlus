@@ -280,7 +280,7 @@ namespace PackagedTerminalHeatPump {
 		if ( CompIndex == 0 ) {
 			PTUnitNum = FindItemInList( CompName, PTUnit );
 			if ( PTUnitNum == 0 ) {
-				ShowFatalError( "SimPackagedTerminalUnit: Unit not found=" + CompName );
+				ShowFatalError( "SimPackagedTerminalUnit: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = PTUnit( PTUnitNum ).PTObjectIndex;
 		} else {
@@ -295,11 +295,11 @@ namespace PackagedTerminalHeatPump {
 				assert( false );
 			}}
 			if ( PTUnitNum > NumPTUs || PTUnitNum < 1 ) {
-				ShowFatalError( "SimPackagedTerminalUnit:  Invalid CompIndex passed=" + TrimSigDigits( PTUnitNum ) + ", Number of Units=" + TrimSigDigits( NumPTUs ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimPackagedTerminalUnit:  Invalid CompIndex passed=" + TrimSigDigits( PTUnitNum ) + ", Number of Units=" + TrimSigDigits( NumPTUs ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( PTUnitNum ) ) {
 				if ( CompName != PTUnit( PTUnitNum ).Name ) {
-					ShowFatalError( "SimPackagedTerminalUnit: Invalid CompIndex passed=" + TrimSigDigits( PTUnitNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + PTUnit( PTUnitNum ).Name );
+					ShowFatalError( "SimPackagedTerminalUnit: Invalid CompIndex passed=" + TrimSigDigits( PTUnitNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + PTUnit( PTUnitNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( PTUnitNum ) = false;
 			}
@@ -2853,7 +2853,7 @@ namespace PackagedTerminalHeatPump {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input." );
+			ShowFatalError( RoutineName + "Errors found in getting input." );  // LCOV_EXCL_LINE
 			ShowContinueError( "... Preceding condition causes termination." );
 		}
 
@@ -3053,7 +3053,7 @@ namespace PackagedTerminalHeatPump {
 					ScanPlantLoopsForObject( PTUnit( PTUnitNum ).ACHeatCoilName, TypeOf_CoilWaterSimpleHeating, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "Reference Unit=\"" + PTUnit( PTUnitNum ).Name + "\", type=" + PTUnit( PTUnitNum ).UnitType );
-						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );
+						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 
 					PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
@@ -3070,7 +3070,7 @@ namespace PackagedTerminalHeatPump {
 					ScanPlantLoopsForObject( PTUnit( PTUnitNum ).ACHeatCoilName, TypeOf_CoilSteamAirHeating, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "Reference Unit=\"" + PTUnit( PTUnitNum ).Name + "\", type=" + PTUnit( PTUnitNum ).UnitType );
-						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );
+						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 
 					PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).ACHeatCoilIndex, ErrorsFound );
@@ -3092,7 +3092,7 @@ namespace PackagedTerminalHeatPump {
 					errFlag = false;
 					ScanPlantLoopsForObject( PTUnit( PTUnitNum ).SuppHeatCoilName, TypeOf_CoilWaterSimpleHeating, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );
+						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 					PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", PTUnit( PTUnitNum ).SuppHeatCoilName, ErrorsFound );
 
@@ -3104,7 +3104,7 @@ namespace PackagedTerminalHeatPump {
 					errFlag = false;
 					ScanPlantLoopsForObject( PTUnit( PTUnitNum ).SuppHeatCoilName, TypeOf_CoilSteamAirHeating, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );
+						ShowFatalError( "InitPTUnit: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 					PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).SuppHeatCoilIndex, ErrorsFound );
 					if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow > 0.0 ) {
@@ -3203,7 +3203,7 @@ namespace PackagedTerminalHeatPump {
 					GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, PTUnit( PTUnitNum ).ActualFanVolFlowRate );
 				}
 
-				
+
 			}
 		}
 
@@ -3255,7 +3255,7 @@ namespace PackagedTerminalHeatPump {
 				} else {
 					GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, PTUnit( PTUnitNum ).FanVolFlow );
 				}
-				
+
 				if ( PTUnit( PTUnitNum ).FanVolFlow != AutoSize ) {
 					//     Check fan versus system supply air flow rates
 					if ( PTUnit( PTUnitNum ).FanVolFlow + 1e-10 < PTUnit( PTUnitNum ).CoolVolumeFlowRate( NumOfSpeedCooling ) ) {
@@ -4200,9 +4200,9 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
-		
+
 		DataScalableCapSizingON = false;
 
 	}
@@ -4592,7 +4592,7 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				Fans::SimulateFanComponents( PTUnit( PTUnitNum ).FanName, FirstHVACIteration, PTUnit( PTUnitNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
-			
+
 		}
 
 		if ( CoolingLoad && OutsideDryBulbTemp > PTUnit( PTUnitNum ).MinOATCompressorCooling ) {
@@ -6013,7 +6013,7 @@ namespace PackagedTerminalHeatPump {
 						}
 					}
 				} else if ( SolFla == -2 ) {
-					ShowFatalError( "VS WSHP unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + PTUnit( PTUnitNum ).Name );
+					ShowFatalError( "VS WSHP unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + PTUnit( PTUnitNum ).Name );  // LCOV_EXCL_LINE
 				}
 			} else {
 				// Check to see which speed to meet the load
@@ -6064,7 +6064,7 @@ namespace PackagedTerminalHeatPump {
 						}
 					}
 				} else if ( SolFla == -2 ) {
-					ShowFatalError( "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" + PTUnit( PTUnitNum ).Name );
+					ShowFatalError( "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" + PTUnit( PTUnitNum ).Name );  // LCOV_EXCL_LINE
 				}
 			}
 		}

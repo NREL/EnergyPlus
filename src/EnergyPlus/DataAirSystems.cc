@@ -105,7 +105,7 @@ namespace DataAirSystems {
 	// Functions
 	void
 	clear_state(){
-	
+
 		PrimaryAirSystem.deallocate();
 		DemandSideConnect.deallocate(); // Connections between loops
 		ZoneCompToPlant.deallocate(); // Connections between loops
@@ -113,7 +113,7 @@ namespace DataAirSystems {
 		ZoneSubSubCompToPlant.deallocate(); // Connections between loops
 		AirSysCompToPlant.deallocate(); // Connections between loops
 		AirSysSubCompToPlant.deallocate(); // Connections between loops
-		AirSysSubSubCompToPlant.deallocate(); // Connections 
+		AirSysSubSubCompToPlant.deallocate(); // Connections
 	}
 
 } // DataAirSystems

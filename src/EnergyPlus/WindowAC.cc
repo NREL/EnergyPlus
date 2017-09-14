@@ -254,17 +254,17 @@ namespace WindowAC {
 		if ( CompIndex == 0 ) {
 			WindACNum = FindItemInList( CompName, WindAC );
 			if ( WindACNum == 0 ) {
-				ShowFatalError( "SimWindowAC: Unit not found=" + CompName );
+				ShowFatalError( "SimWindowAC: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = WindACNum;
 		} else {
 			WindACNum = CompIndex;
 			if ( WindACNum > NumWindAC || WindACNum < 1 ) {
-				ShowFatalError( "SimWindowAC:  Invalid CompIndex passed=" + TrimSigDigits( WindACNum ) + ", Number of Units=" + TrimSigDigits( NumWindAC ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimWindowAC:  Invalid CompIndex passed=" + TrimSigDigits( WindACNum ) + ", Number of Units=" + TrimSigDigits( NumWindAC ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( WindACNum ) ) {
 				if ( CompName != WindAC( WindACNum ).Name ) {
-					ShowFatalError( "SimWindowAC: Invalid CompIndex passed=" + TrimSigDigits( WindACNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WindAC( WindACNum ).Name );
+					ShowFatalError( "SimWindowAC: Invalid CompIndex passed=" + TrimSigDigits( WindACNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WindAC( WindACNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( WindACNum ) = false;
 			}
@@ -685,7 +685,7 @@ namespace WindowAC {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		for ( WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum ) {
@@ -1079,7 +1079,7 @@ namespace WindowAC {
 		}
 
 		DataScalableCapSizingON = false;
-		
+
 	}
 
 	void
@@ -1371,7 +1371,7 @@ namespace WindowAC {
 			Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
 
 			VariableSpeedCoils::SimVariableSpeedCoils( WindAC( WindACNum ).DXCoilName, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadFrac, WindAC( WindACNum ).DXCoilNumOfSpeeds, 1.0, QZnReq, QLatReq, OnOffAirFlowRatio );
-		
+
 		} else {
 			SimDXCoil( WindAC( WindACNum ).DXCoilName, On, FirstHVACIteration, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, PartLoadFrac );
 		}

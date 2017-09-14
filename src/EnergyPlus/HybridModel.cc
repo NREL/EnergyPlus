@@ -64,7 +64,7 @@ namespace EnergyPlus {
 namespace HybridModel {
 
 	// MODULE INFORMATION:
-	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL 
+	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL
 	//       DATE WRITTEN   Oct 2015
 
 	// PURPOSE OF THIS MODULE:
@@ -83,7 +83,7 @@ namespace HybridModel {
 	using namespace InputProcessor;
 	using DataGlobals::ScheduleAlwaysOn;
 	using General::CheckCreatedZoneItemName;
-	
+
 	bool FlagHybridModel( false ); // True if hybrid model is activated
 	int NumOfHybridModelZones( 0 ); // Number of hybrid model zones in the model
 	std::string CurrentModuleObject; // to assist in getting input
@@ -114,10 +114,10 @@ namespace HybridModel {
 		Array1D_string cAlphaFieldNames( 10 );
 		Array1D_string cNumericFieldNames( 10 );
 		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
-		int HybridModelStartMonth( 0 ); // Hybrid model start month 
-		int HybridModelStartDate( 0 ); // Hybrid model start date of month 
-		int HybridModelEndMonth( 0 ); // Hybrid model end month 
-		int HybridModelEndDate( 0 ); // Hybrid model end date of month 
+		int HybridModelStartMonth( 0 ); // Hybrid model start month
+		int HybridModelStartDate( 0 ); // Hybrid model start date of month
+		int HybridModelEndMonth( 0 ); // Hybrid model end month
+		int HybridModelEndDate( 0 ); // Hybrid model end date of month
 		int HMStartDay( 0 );
 		int HMEndDay( 0 );
 
@@ -131,7 +131,7 @@ namespace HybridModel {
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
 				GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				
+
 				ZoneListPtr = 0;
 				ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
 				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = FindItemInList( cAlphaArgs( 2 ), ZoneList );
@@ -210,7 +210,7 @@ namespace HybridModel {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors getting Hybrid Model input data. Preceding condition(s) cause termination." );
+				ShowFatalError( "Errors getting Hybrid Model input data. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 		}
 	}

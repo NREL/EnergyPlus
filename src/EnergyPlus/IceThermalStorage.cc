@@ -292,17 +292,17 @@ namespace IceThermalStorage {
 		if ( CompIndex == 0 ) {
 			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
-				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
+				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = IceStorageNum;
 		} else {
 			IceStorageNum = CompIndex;
 			if ( IceStorageNum > TotalIceStorages || IceStorageNum < 1 ) {
-				ShowFatalError( "SimIceStorage:  Invalid CompIndex passed=" + TrimSigDigits( IceStorageNum ) + ", Number of Units=" + TrimSigDigits( TotalIceStorages ) + ", Entered Unit name=" + IceStorageName );
+				ShowFatalError( "SimIceStorage:  Invalid CompIndex passed=" + TrimSigDigits( IceStorageNum ) + ", Number of Units=" + TrimSigDigits( TotalIceStorages ) + ", Entered Unit name=" + IceStorageName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( IceStorageNum ) ) {
 				if ( IceStorageName != IceStorageTypeMap( IceStorageNum ).Name ) {
-					ShowFatalError( "SimIceStorage: Invalid CompIndex passed=" + TrimSigDigits( IceStorageNum ) + ", Unit name=" + IceStorageName + ", stored Unit Name for that index=" + IceStorageTypeMap( IceStorageNum ).Name );
+					ShowFatalError( "SimIceStorage: Invalid CompIndex passed=" + TrimSigDigits( IceStorageNum ) + ", Unit name=" + IceStorageName + ", stored Unit Name for that index=" + IceStorageTypeMap( IceStorageNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( IceStorageNum ) = false;
 			}
@@ -420,7 +420,7 @@ namespace IceThermalStorage {
 			ReportDetailedIceStorage(); // Report detailed ice storage
 
 		} else {
-			ShowFatalError( "Specified IceStorage not found in SimIceStorage" + IceStorageType );
+			ShowFatalError( "Specified IceStorage not found in SimIceStorage" + IceStorageType );  // LCOV_EXCL_LINE
 		}}
 
 	}
@@ -824,7 +824,7 @@ namespace IceThermalStorage {
 
 		} else { // Shouldn't get here ever (print error if we do)
 
-			ShowFatalError( "Detailed Ice Storage systemic code error--contact EnergyPlus support" );
+			ShowFatalError( "Detailed Ice Storage systemic code error--contact EnergyPlus support" );  // LCOV_EXCL_LINE
 
 		}
 
@@ -962,7 +962,7 @@ namespace IceThermalStorage {
 		} // IceNum
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		// Setup Output Variables to Report  CurrentModuleObject='ThermalStorage:Ice:Simple'
@@ -1169,7 +1169,7 @@ namespace IceThermalStorage {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		// Setup Output Variables to Report CurrentModuleObject='ThermalStorage:Ice:Detailed'
@@ -1372,7 +1372,7 @@ namespace IceThermalStorage {
 			errFlag = false;
 			ScanPlantLoopsForObject( IceStorage( IceNum ).Name, TypeOf_TS_IceSimple, IceStorage( IceNum ).LoopNum, IceStorage( IceNum ).LoopSideNum, IceStorage( IceNum ).BranchNum, IceStorage( IceNum ).CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitSimpleIceStorage: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitSimpleIceStorage: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			MyPlantScanFlag( IceNum ) = false;
 		}

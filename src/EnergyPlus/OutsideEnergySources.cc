@@ -197,17 +197,17 @@ namespace OutsideEnergySources {
 		if ( CompIndex == 0 ) {
 			EqNum = FindItemInList( EquipName, EnergySource );
 			if ( EqNum == 0 ) {
-				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
+				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = EqNum;
 		} else {
 			EqNum = CompIndex;
 			if ( EnergySource( EqNum ).CheckEquipName ) {
 				if ( EqNum > NumDistrictUnits || EqNum < 1 ) {
-					ShowFatalError( "SimOutsideEnergy:  Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Number of Units=" + TrimSigDigits( NumDistrictUnits ) + ", Entered Unit name=" + EquipName );
+					ShowFatalError( "SimOutsideEnergy:  Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Number of Units=" + TrimSigDigits( NumDistrictUnits ) + ", Entered Unit name=" + EquipName );  // LCOV_EXCL_LINE
 				}
 				if ( EquipName != EnergySource( EqNum ).Name ) {
-					ShowFatalError( "SimOutsideEnergy: Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + EnergySource( EqNum ).Name );
+					ShowFatalError( "SimOutsideEnergy: Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + EnergySource( EqNum ).Name );  // LCOV_EXCL_LINE
 				}
 				EnergySource( EqNum ).CheckEquipName = false;
 			}
@@ -349,7 +349,7 @@ namespace OutsideEnergySources {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );  // LCOV_EXCL_LINE
 		}
 
 		EnergySourceNum = 0;
@@ -413,7 +413,7 @@ namespace OutsideEnergySources {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );  // LCOV_EXCL_LINE
 		}
 
 		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
@@ -493,13 +493,13 @@ namespace OutsideEnergySources {
 			} else if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {
 				TempTypeFlag = TypeOf_PurchChilledWater;
 			} else {
-				ShowFatalError( "InitSimVars: Invalid EnergyType for District Heating/Cooling=" + EnergySource( EnergySourceNum ).Name );
+				ShowFatalError( "InitSimVars: Invalid EnergyType for District Heating/Cooling=" + EnergySource( EnergySourceNum ).Name );  // LCOV_EXCL_LINE
 			}
 			// Locate the unit on the plant loops for later usage
 			errFlag = false;
 			ScanPlantLoopsForObject( EnergySource( EnergySourceNum ).Name, TempTypeFlag, EnergySource( EnergySourceNum ).LoopNum, EnergySource( EnergySourceNum ).LoopSideNum, EnergySource( EnergySourceNum ).BranchNum, EnergySource( EnergySourceNum ).CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitSimVars: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitSimVars: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			// set limits on outlet node temps to plant loop limits
 			PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).LoopSide( EnergySource( EnergySourceNum ).LoopSideNum ).Branch( EnergySource( EnergySourceNum ).BranchNum ).Comp( EnergySource( EnergySourceNum ).CompNum ).MinOutletTemp = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MinTemp;
@@ -636,7 +636,7 @@ namespace OutsideEnergySources {
 			}
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 	}
 

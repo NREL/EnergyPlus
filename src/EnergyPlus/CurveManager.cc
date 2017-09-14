@@ -339,7 +339,7 @@ namespace CurveManager {
 		}
 
 		if ( ( CurveIndex <= 0 ) || ( CurveIndex > NumCurves ) ) {
-			ShowFatalError( "CurveValue: Invalid curve passed." );
+			ShowFatalError( "CurveValue: Invalid curve passed." );  // LCOV_EXCL_LINE
 		}
 
 		{ auto const SELECT_CASE_var( PerfCurve( CurveIndex ).InterpolationType );
@@ -350,7 +350,7 @@ namespace CurveManager {
 		} else if ( SELECT_CASE_var == LagrangeInterpolationLinearExtrapolation ) {
 			CurveValue = TableLookupObject( CurveIndex, Var1, Var2, Var3, Var4, Var5 );
 		} else {
-			ShowFatalError( "CurveValue: Invalid Interpolation Type" );
+			ShowFatalError( "CurveValue: Invalid Interpolation Type" );  // LCOV_EXCL_LINE
 		}}
 
 		if ( PerfCurve( CurveIndex ).EMSOverrideOn ) CurveValue = PerfCurve( CurveIndex ).EMSOverrideCurveValue;
@@ -375,7 +375,7 @@ namespace CurveManager {
 		GetCurveInputData( GetInputErrorsFound );
 
 		if ( GetInputErrorsFound ) {
-			ShowFatalError( "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination." );
+			ShowFatalError( "GetCurveInput: Errors found in getting Curve Objects.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2000,7 +2000,7 @@ namespace CurveManager {
 				if ( !PerfCurve( CurveNum ).Var1MaxPresent ) {
 					PerfCurve( CurveNum ).Var1Max = maxval( TableData( TableNum ).X1 );
 				}
-			} 
+			}
 
 			// if user enters limits that exceed data range, warn that limits are based on table data
 			if ( PerfCurve( CurveNum ).InterpolationType == LinearInterpolationOfTable ) {
@@ -3385,17 +3385,17 @@ namespace CurveManager {
 				if ( endcol == 0 ) {
 					ShowWarningError( "ReadTableData: Data not found on second line in external file = " + FileName );
 					ShowContinueError( "...Check that file is ASCII text and that file is not locked by other applications." );
-					ShowFatalError( "External table data not found. Simulation will terminate." );
+					ShowFatalError( "External table data not found. Simulation will terminate." );  // LCOV_EXCL_LINE
 				} else {
 					ShowWarningError( "Second read attempt found data in external file = " + FileName );
-					ShowFatalError( "...Blank lines are not allowed. Simulation will terminate." );
+					ShowFatalError( "...Blank lines are not allowed. Simulation will terminate." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( endcol > 0 ) {
 				if ( int( NextLine[ endcol - 1 ] ) == iUnicode_end ) {
 					ShowSevereError( "ReadTableData: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" external file, appears to be a Unicode or binary file." );
 					ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-					ShowFatalError( "Program terminates due to previous condition." );
+					ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -3405,7 +3405,7 @@ namespace CurveManager {
 			if ( NumIVars > 5 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables found in external file = " + FileName );
-				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
+				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );  // LCOV_EXCL_LINE
 			}
 
 			gio::rewind( FileNum );
@@ -3441,7 +3441,7 @@ namespace CurveManager {
 			if ( NumIVars > 5 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables." );
-				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
+				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );  // LCOV_EXCL_LINE
 			}
 
 			BaseOffset = 15;
@@ -4054,7 +4054,7 @@ Label999: ;
 		ShowSevereError( "CurveManager: SearchTableDataFile: Could not open Table Data File, expecting it as file name = " + FileName );
 		ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 		ShowContinueError( "Try again with putting full path and file name in the field." );
-		ShowFatalError( "Program terminates due to these conditions." );
+		ShowFatalError( "Program terminates due to these conditions." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -4540,7 +4540,7 @@ Label999: ;
 			TableValue = 0.0;
 			ShowSevereError( "Errors found in table output calculation for " + PerfCurve( CurveIndex ).Name );
 			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number of Independent Variables or Points." );
-			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );
+			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );  // LCOV_EXCL_LINE
 		}}
 
 		if ( PerfCurve( CurveIndex ).CurveMinPresent ) TableValue = max( TableValue, PerfCurve( CurveIndex ).CurveMin );
@@ -4836,7 +4836,7 @@ Label999: ;
 			TableValue = 0.0;
 			ShowSevereError( "Errors found in table output calculation for " + PerfCurve( CurveIndex ).Name );
 			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number of Independent Variables or Points." );
-			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );
+			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );  // LCOV_EXCL_LINE
 		}}
 
 		if ( PerfCurve( CurveIndex ).CurveMinPresent ) TableValue = max( TableValue, PerfCurve( CurveIndex ).CurveMin );
@@ -6081,7 +6081,7 @@ Label999: ;
 		NumPressureCurves = NumPressure;
 
 		if ( ErrsFound ) {
-			ShowFatalError( "GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination." );
+			ShowFatalError( "GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -6167,7 +6167,7 @@ Label999: ;
 				ShowContinueError( "Curve type detected: " + GenericCurveType );
 				ShowContinueError( "Generic curves should be single independent variable such that DeltaP = f(mdot)" );
 				ShowContinueError( " Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent" );
-				ShowFatalError( "Errors in pressure simulation input cause program termination" );
+				ShowFatalError( "Errors in pressure simulation input cause program termination" );  // LCOV_EXCL_LINE
 			}}
 			return;
 		}
@@ -6436,7 +6436,7 @@ Label999: ;
 	}
 
 	void
-	checkCurveIsNormalizedToOne( 
+	checkCurveIsNormalizedToOne(
 		std::string const callingRoutineObj, // calling routine with object type
 		std::string const objectName,        // parent object where curve is used
 		int const curveIndex,                // index to curve object
@@ -6518,7 +6518,7 @@ Label999: ;
 			ShowSevereError( "CurveManager::ReadTwoVarTableDataFromFile: Could not open Table Data File, expecting it as file name = " + FileName );
 			ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 			ShowContinueError( "Try again with putting full path and file name in the field." );
-			ShowFatalError( "Program terminates due to these conditions." );
+			ShowFatalError( "Program terminates due to these conditions." );  // LCOV_EXCL_LINE
 		}
 
 		TableNum = PerfCurve( CurveNum ).TableIndex;
@@ -6538,7 +6538,7 @@ Label999: ;
 		}
 		if ( lineNum == 0 ) {
 			ShowSevereError( "CurveManager::ReadTwoVarTableDataFromFile: The data file is empty as file name = " + FileName );
-			ShowFatalError( "Program terminates due to these conditions." );
+			ShowFatalError( "Program terminates due to these conditions." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -6552,7 +6552,7 @@ Label999: ;
 	{
 
 		// PURPOSE OF THIS FUNCTION:
-		// Set up indenpendent varilable values the same in 3 table data 
+		// Set up indenpendent varilable values the same in 3 table data
 
 		// Using/Aliasing
 		int X1TableNum;

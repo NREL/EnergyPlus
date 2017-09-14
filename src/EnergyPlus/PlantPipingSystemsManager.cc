@@ -194,18 +194,18 @@ namespace PlantPipingSystemsManager {
 			CircuitNum = FindItemInList( EquipName, PipingSystemCircuits );
 			if ( CircuitNum == 0 ) {
 				// Catch any bad names before crashing
-				ShowFatalError( RoutineName + ": Piping circuit requested not found=" + EquipName );
+				ShowFatalError( RoutineName + ": Piping circuit requested not found=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			EqNum = CircuitNum;
 		} else {
 			CircuitNum = EqNum;
 			int const NumOfPipeCircuits = isize( PipingSystemCircuits );
 			if ( CircuitNum > NumOfPipeCircuits || CircuitNum < 1 ) {
-				ShowFatalError( RoutineName + ":  Invalid component index passed=" + TrimSigDigits( CircuitNum ) + ", Number of Units=" + TrimSigDigits( NumOfPipeCircuits ) + ", Entered Unit name=" + EquipName ); //Autodesk:Uninit DomainNum was uninitialized
+				ShowFatalError( RoutineName + ":  Invalid component index passed=" + TrimSigDigits( CircuitNum ) + ", Number of Units=" + TrimSigDigits( NumOfPipeCircuits ) + ", Entered Unit name=" + EquipName ); //Autodesk:Uninit DomainNum was uninitialized  // LCOV_EXCL_LINE
 			}
 			if ( PipingSystemCircuits( CircuitNum ).CheckEquipName ) {
 				if ( EquipName != PipingSystemCircuits( CircuitNum ).Name ) {
-					ShowFatalError( RoutineName + ": Invalid component name passed=" + TrimSigDigits( CircuitNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + PipingSystemCircuits( CircuitNum ).Name );
+					ShowFatalError( RoutineName + ": Invalid component name passed=" + TrimSigDigits( CircuitNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + PipingSystemCircuits( CircuitNum ).Name );  // LCOV_EXCL_LINE
 				}
 				PipingSystemCircuits( CircuitNum ).CheckEquipName = false;
 			}
@@ -520,7 +520,7 @@ namespace PlantPipingSystemsManager {
 		ReadBasementInputs( NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements, ErrorsFound );
 
 		// Report errors that are purely input problems
-		if ( ErrorsFound ) ShowFatalError( RoutineName + ": Preceding input errors cause program termination." );
+		if ( ErrorsFound ) ShowFatalError( RoutineName + ": Preceding input errors cause program termination." );  // LCOV_EXCL_LINE
 
 		// Setup output variables
 		SetupPipingSystemOutputVariables( TotalNumSegments, TotalNumCircuits );
@@ -602,7 +602,7 @@ namespace PlantPipingSystemsManager {
 
 		// If we encountered any other errors that we couldn't handle separately than stop now
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + ':' + ObjName_ug_GeneralDomain + ": Errors found in input." );
+			ShowFatalError( RoutineName + ':' + ObjName_ug_GeneralDomain + ": Errors found in input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2148,7 +2148,7 @@ namespace PlantPipingSystemsManager {
 			bool errFlag = false;
 			DataPlant::ScanPlantLoopsForObject( thisCircuit.Name, TypeToLookFor, thisCircuit.LoopNum, thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s)." );
+				ShowFatalError( "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			// Once we find ourselves on the plant loop, we can do other things
@@ -2170,7 +2170,7 @@ namespace PlantPipingSystemsManager {
 						ShowSevereError( "PipingSystems:" + RoutineName + ":Pipe segment index not set." );
 						ShowContinueError( "...Possibly because pipe segment was placed outside of the domain." );
 						ShowContinueError( "...Verify piping system domain inputs, circuits, and segments." );
-						ShowFatalError( "Preceding error causes program termination" );
+						ShowFatalError( "Preceding error causes program termination" );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -3317,7 +3317,7 @@ namespace PlantPipingSystemsManager {
 				ShowSevereError( "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain." );
 				ShowContinueError( "Occurs during mesh development for domain=" + this->Name );
 				ShowContinueError( "A pipe or basement is located outside of the domain extents." );
-				ShowFatalError( "Preceding error causes program termination." );
+				ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 			}
 
 			// Scan all grid regions to make sure this range doesn't fall within an already entered range
@@ -3331,7 +3331,7 @@ namespace PlantPipingSystemsManager {
 						ShowContinueError( "A mesh conflict was encountered where partitions were overlapping." );
 						ShowContinueError( "Ensure that all pipes exactly line up or are separated to allow meshing in between them" );
 						ShowContinueError( "Also verify the pipe and basement dimensions to avoid conflicts there." );
-						ShowFatalError( "Preceding error causes program termination" );
+						ShowFatalError( "Preceding error causes program termination" );  // LCOV_EXCL_LINE
 
 					}
 
@@ -3344,7 +3344,7 @@ namespace PlantPipingSystemsManager {
 						ShowContinueError( "A mesh conflict was encountered where partitions were overlapping." );
 						ShowContinueError( "Ensure that all pipes exactly line up or are separated to allow meshing in between them" );
 						ShowContinueError( "Also verify the pipe and basement dimensions to avoid conflicts there." );
-						ShowFatalError( "Preceding error causes program termination" );
+						ShowFatalError( "Preceding error causes program termination" );  // LCOV_EXCL_LINE
 
 					}
 				}
@@ -4290,7 +4290,7 @@ namespace PlantPipingSystemsManager {
 			ThisMesh.thisMeshDistribution = MeshDistribution::Uniform;
 			//ShowSevereError( "Invalid RegionType passed to PlantPipingSystems::FullDomainStructureInfo::getCellWidths; should be x, y, or z direction only." );
 			//ShowContinueError( "This is a developer problem, as the code should never reach this point." );
-			//ShowFatalError( "EnergyPlus aborts due to the previous severe error" );
+			//ShowFatalError( "EnergyPlus aborts due to the previous severe error" );  // LCOV_EXCL_LINE
 		}
 
 		// just one cell for extremely tight regions
@@ -5254,7 +5254,7 @@ namespace PlantPipingSystemsManager {
 		}
 
 		if ( RunningVolume <= 0.0 ) {
-			ShowFatalError( "FullDomainStructureInfo::GetAverageTempByType calculated zero volume, program aborts" );
+			ShowFatalError( "FullDomainStructureInfo::GetAverageTempByType calculated zero volume, program aborts" );  // LCOV_EXCL_LINE
 		}
 
 		return RunningSummation / RunningVolume;
@@ -5422,7 +5422,7 @@ namespace PlantPipingSystemsManager {
 				Increment = -1;
 				break;
 			default:
-				ShowFatalError( "Debug error: invalid flow direction on piping system segment" );
+				ShowFatalError( "Debug error: invalid flow direction on piping system segment" );  // LCOV_EXCL_LINE
 			}
 
 			//'find the cell we are working on in order to retrieve cell and neighbor information
@@ -6293,17 +6293,17 @@ namespace PlantPipingSystemsManager {
 				ShowSevereError( "Site:GroundDomain:Slab" + RoutineName + ": Out of range temperatures detected in the ground domain." );
 				ShowContinueError( "This could be due to the size of the loads on the domain." );
 				ShowContinueError( "Verify inputs are correct. If problem persists, notify EnergyPlus support." );
-				ShowFatalError( "Preceding error(s) cause program termination" );
+				ShowFatalError( "Preceding error(s) cause program termination" );  // LCOV_EXCL_LINE
 			} else if ( thisDomain.HasZoneCoupledBasement ) {
 				ShowSevereError( "Site:GroundDomain:Basement" + RoutineName + ": Out of range temperatures detected in the ground domain." );
 				ShowContinueError( "This could be due to the size of the loads on the domain." );
 				ShowContinueError( "Verify inputs are correct. If problem persists, notify EnergyPlus support." );
-				ShowFatalError( "Preceding error(s) cause program termination" );
+				ShowFatalError( "Preceding error(s) cause program termination" );  // LCOV_EXCL_LINE
 			} else {
 				ShowSevereError( "PipingSystems:" + RoutineName + ": Out of range temperatures detected in piping system simulation." );
 				ShowContinueError( "This could be due to the size of the pipe circuit in relation to the loads being imposed." );
 				ShowContinueError( "Try increasing the size of the pipe circuit and investigate sizing effects." );
-				ShowFatalError( "Preceding error(s) cause program termination" );
+				ShowFatalError( "Preceding error(s) cause program termination" );  // LCOV_EXCL_LINE
 			}
 		}
 

@@ -293,7 +293,7 @@ namespace GeneratorFuelSupply {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Problem found processing input for " + cCurrentModuleObject );
+				ShowFatalError( "Problem found processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 			}
 
 			MyOneTimeFlag = false;

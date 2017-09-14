@@ -249,16 +249,16 @@ namespace DesiccantDehumidifiers {
 		if ( CompIndex == 0 ) {
 			DesicDehumNum = FindItemInList( CompName, DesicDehum );
 			if ( DesicDehumNum == 0 ) {
-				ShowFatalError( "SimDesiccantDehumidifier: Unit not found=" + CompName );
+				ShowFatalError( "SimDesiccantDehumidifier: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DesicDehumNum;
 		} else {
 			DesicDehumNum = CompIndex;
 			if ( DesicDehumNum > NumDesicDehums || DesicDehumNum < 1 ) {
-				ShowFatalError( "SimDesiccantDehumidifier:  Invalid CompIndex passed=" + TrimSigDigits( DesicDehumNum ) + ", Number of Units=" + TrimSigDigits( NumDesicDehums ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimDesiccantDehumidifier:  Invalid CompIndex passed=" + TrimSigDigits( DesicDehumNum ) + ", Number of Units=" + TrimSigDigits( NumDesicDehums ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CompName != DesicDehum( DesicDehumNum ).Name ) {
-				ShowFatalError( "SimDesiccantDehumidifier: Invalid CompIndex passed=" + TrimSigDigits( DesicDehumNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + DesicDehum( DesicDehumNum ).Name );
+				ShowFatalError( "SimDesiccantDehumidifier: Invalid CompIndex passed=" + TrimSigDigits( DesicDehumNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + DesicDehum( DesicDehumNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -278,7 +278,7 @@ namespace DesiccantDehumidifiers {
 			CalcGenericDesiccantDehumidifier( DesicDehumNum, HumRatNeeded, FirstHVACIteration );
 
 		} else {
-			ShowFatalError( "Invalid type, Desiccant Dehumidifer=" + DesicDehum( DesicDehumNum ).DehumType );
+			ShowFatalError( "Invalid type, Desiccant Dehumidifer=" + DesicDehum( DesicDehumNum ).DehumType );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -1355,7 +1355,7 @@ namespace DesiccantDehumidifiers {
 					ShowContinueError( "The outlet node name in cooling coil = " + NodeID( DesicDehum( DesicDehumNum ).CoolingCoilOutletNode ) );
 					ShowContinueError( "For desiccant heat exchanger = " + DesicDehum( DesicDehumNum ).HXType + " \"" + DesicDehum( DesicDehumNum ).HXName + "\"" );
 					ShowContinueError( "The process air inlet node name = " + NodeID( DesicDehum( DesicDehumNum ).ProcAirInNode ) );
-					ShowFatalError( "...previous error causes program termination." );
+					ShowFatalError( "...previous error causes program termination." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -1427,9 +1427,9 @@ namespace DesiccantDehumidifiers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting Dehumidifier:Desiccant:NoFans input" );
+			ShowFatalError( "Errors found in getting Dehumidifier:Desiccant:NoFans input" );  // LCOV_EXCL_LINE
 		} else if ( ErrorsFoundGeneric ) {
-			ShowFatalError( "Errors found in getting DESICCANT DEHUMIDIFIER input" );
+			ShowFatalError( "Errors found in getting DESICCANT DEHUMIDIFIER input" );  // LCOV_EXCL_LINE
 		}
 
 		Alphas.deallocate();
@@ -1529,7 +1529,7 @@ namespace DesiccantDehumidifiers {
 					ErrorFlag = false;
 					ScanPlantLoopsForObject( DesicDehum( DesicDehumNum ).RegenCoilName, TypeOf_CoilWaterSimpleHeating, DesicDehum( DesicDehumNum ).LoopNum, DesicDehum( DesicDehumNum ).LoopSide, DesicDehum( DesicDehumNum ).BranchNum, DesicDehum( DesicDehumNum ).CompNum, _, _, _, _, _, ErrorFlag );
 					if ( ErrorFlag ) {
-						ShowFatalError( "InitDesiccantDehumidifier: Program terminated for previous conditions." );
+						ShowFatalError( "InitDesiccantDehumidifier: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 
 					ErrorFlag = false;
@@ -1545,7 +1545,7 @@ namespace DesiccantDehumidifiers {
 					ScanPlantLoopsForObject( DesicDehum( DesicDehumNum ).RegenCoilName, TypeOf_CoilSteamAirHeating, DesicDehum( DesicDehumNum ).LoopNum, DesicDehum( DesicDehumNum ).LoopSide, DesicDehum( DesicDehumNum ).BranchNum, DesicDehum( DesicDehumNum ).CompNum, _, _, _, _, _, ErrorFlag );
 
 					if ( ErrorFlag ) {
-						ShowFatalError( "InitDesiccantDehumidifier: Program terminated for previous conditions." );
+						ShowFatalError( "InitDesiccantDehumidifier: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 					ErrorFlag = false;
 					DesicDehum( DesicDehumNum ).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate( DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorFlag );
@@ -1786,7 +1786,7 @@ namespace DesiccantDehumidifiers {
 					if ( HumRatNeeded <= 0.0 ) {
 						ShowSevereError( "Dehumidifier:Desiccant:NoFans: " + DesicDehum( DesicDehumNum ).Name );
 						ShowContinueError( "Invalid Leaving Max Humidity Ratio Setpoint=" + TrimSigDigits( HumRatNeeded, 8 ) );
-						ShowFatalError( "must be > 0.0" );
+						ShowFatalError( "must be > 0.0" );  // LCOV_EXCL_LINE
 					}
 
 				} else if ( SELECT_CASE_var1 == NodeHumratBypass ) {
@@ -1795,7 +1795,7 @@ namespace DesiccantDehumidifiers {
 
 				} else {
 
-					ShowFatalError( "Invalid control type in desiccant dehumidifier = " + DesicDehum( DesicDehumNum ).Name );
+					ShowFatalError( "Invalid control type in desiccant dehumidifier = " + DesicDehum( DesicDehumNum ).Name );  // LCOV_EXCL_LINE
 
 				}}
 
@@ -2035,7 +2035,7 @@ namespace DesiccantDehumidifiers {
 
 			} else {
 
-				ShowFatalError( "Invalid performance model in desiccant dehumidifier = " + TrimSigDigits( DesicDehum( DesicDehumNum ).PerformanceModel_Num ) );
+				ShowFatalError( "Invalid performance model in desiccant dehumidifier = " + TrimSigDigits( DesicDehum( DesicDehumNum ).PerformanceModel_Num ) );  // LCOV_EXCL_LINE
 
 			}} // Performance Model Part A
 
@@ -2127,7 +2127,7 @@ namespace DesiccantDehumidifiers {
 
 			} else {
 
-				ShowFatalError( "Invalid performance model in desiccant dehumidifier = " + TrimSigDigits( DesicDehum( DesicDehumNum ).PerformanceModel_Num ) );
+				ShowFatalError( "Invalid performance model in desiccant dehumidifier = " + TrimSigDigits( DesicDehum( DesicDehumNum ).PerformanceModel_Num ) );  // LCOV_EXCL_LINE
 
 				// Suppress uninitialized warnings
 				ProcAirOutTemp = 0.0;
@@ -2348,7 +2348,7 @@ namespace DesiccantDehumidifiers {
 				//     condenser waste heat is proportional to DX coil PLR
 				if ( ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) || ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) ) {
 					CondenserWasteHeat = HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity;
-					HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;				
+					HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;
 				} else if ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 					CondenserWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity;
 					DataHeatBalance::HeatReclaimVS_DXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;
@@ -2488,7 +2488,7 @@ namespace DesiccantDehumidifiers {
 						} else {
 							HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->simulate( _,_,_,_ );
 						}
-						
+
 						FanDeltaT = Node( DesicDehum( DesicDehumNum ).RegenFanOutNode ).Temp - Node( DesicDehum( DesicDehumNum ).RegenFanInNode ).Temp;
 						RegenSetPointTemp -= FanDeltaT;
 					}
@@ -3010,7 +3010,7 @@ namespace DesiccantDehumidifiers {
 		NumSolidDesicDehums = 0;
 		NumGenericDesicDehums = 0;
 		GetInputDesiccantDehumidifier = true;
-		InitDesiccantDehumidifierOneTimeFlag = true;	
+		InitDesiccantDehumidifierOneTimeFlag = true;
 		DesicDehum.deallocate();
 	}
 

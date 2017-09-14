@@ -573,7 +573,7 @@ namespace CrossVentMgr {
 				ShowContinueError( "Surface " + AirflowNetworkLinkageData( Ctd ).Name + " in zone " + Zone( ZoneNum ).Name + " uses leakage component " + AirflowNetworkLinkageData( Ctd ).CompName );
 				ShowContinueError( "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and " );
 				ShowContinueError( "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model" );
-				ShowFatalError( "Previous severe error causes program termination" );
+				ShowFatalError( "Previous severe error causes program termination" );  // LCOV_EXCL_LINE
 			}
 		}
 

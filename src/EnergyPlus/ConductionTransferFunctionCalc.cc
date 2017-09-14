@@ -510,7 +510,7 @@ namespace ConductionTransferFunctionCalc {
 							--Construct( ConstrNum ).TempAfterLayer;
 						}
 					} else { // These are not adjacent layers and there is a logic flaw here (should not happen)
-						ShowFatalError( "Combining resistance layers failed for " + Construct( ConstrNum ).Name );
+						ShowFatalError( "Combining resistance layers failed for " + Construct( ConstrNum ).Name );  // LCOV_EXCL_LINE
 						ShowContinueError( "This should never happen.  Contact EnergyPlus Support for further assistance." );
 					}
 				}
@@ -1086,7 +1086,7 @@ namespace ConductionTransferFunctionCalc {
 									CTFConvrg = false;
 								}
 							} else { // Something terribly wrong--the surface has no CTFs, not even an R-value
-								ShowFatalError( "Illegal construction definition, no CTFs calculated for " + Construct( ConstrNum ).Name );
+								ShowFatalError( "Illegal construction definition, no CTFs calculated for " + Construct( ConstrNum ).Name );  // LCOV_EXCL_LINE
 							}
 						}
 
@@ -1122,7 +1122,7 @@ namespace ConductionTransferFunctionCalc {
 							DoCTFErrorReport = true;
 							ErrorsFound = true;
 							break;
-							//            CALL ShowFatalError('Program terminated for reasons listed (InitConductionTransferFunctions) ')
+							//            CALL ShowFatalError('Program terminated for reasons listed (InitConductionTransferFunctions) ')  // LCOV_EXCL_LINE
 						}
 
 					} // ... end of CTF calculation loop.
@@ -1235,7 +1235,7 @@ namespace ConductionTransferFunctionCalc {
 		ReportCTFs( DoCTFErrorReport );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Program terminated for reasons listed (InitConductionTransferFunctions)" );
+			ShowFatalError( "Program terminated for reasons listed (InitConductionTransferFunctions)" );  // LCOV_EXCL_LINE
 		}
 
 	}

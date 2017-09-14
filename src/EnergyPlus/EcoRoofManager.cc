@@ -605,7 +605,7 @@ namespace EcoRoofManager {
 			//   Prior experience suggests that no more than 3 iterations are likely needed
 			LeafTK = Tf + KelvinConv;
 			SoilTK = Tg + KelvinConv;
-			
+
 			for ( EcoLoop = 1; EcoLoop <= 3; ++EcoLoop ) {
 				P1 = sigmaf * ( RS * ( 1.0 - Alphaf ) + epsilonf * Latm ) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * pow_4( SoilTK ) / EpsilonOne - 3.0 * ( -sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_4( LeafTK ) + sheatf * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * ( qsf - LeafTK * dqf ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 0.1 * sigmaf * Mg ) / dOne ) * ( qsg - SoilTK * dqg );
 				P2 = 4.0 * ( sigmaf * epsilonf * epsilong * Sigma ) * pow_3( SoilTK ) / EpsilonOne + 0.1 * sigmaf * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( 0.1 * sigmaf * Mg ) / dOne * dqg;

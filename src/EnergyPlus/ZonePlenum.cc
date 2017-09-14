@@ -211,17 +211,17 @@ namespace ZonePlenum {
 			if ( CompIndex == 0 ) {
 				ZonePlenumNum = FindItemInList( CompName, ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName );
 				if ( ZonePlenumNum == 0 ) {
-					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName );
+					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = ZonePlenumNum;
 			} else {
 				ZonePlenumNum = CompIndex;
 				if ( ZonePlenumNum > NumZoneReturnPlenums || ZonePlenumNum < 1 ) {
-					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", Number of AirLoopHVAC:ReturnPlenum=" + TrimSigDigits( NumZoneReturnPlenums ) + ", AirLoopHVAC:ReturnPlenum name=" + CompName );
+					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", Number of AirLoopHVAC:ReturnPlenum=" + TrimSigDigits( NumZoneReturnPlenums ) + ", AirLoopHVAC:ReturnPlenum name=" + CompName );  // LCOV_EXCL_LINE
 				}
 				if ( CheckRetEquipName( ZonePlenumNum ) ) {
 					if ( CompName != ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName ) {
-						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", AirLoopHVAC:ReturnPlenum name=" + CompName + ", stored AirLoopHVAC:ReturnPlenum Name for that index=" + ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName );
+						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", AirLoopHVAC:ReturnPlenum name=" + CompName + ", stored AirLoopHVAC:ReturnPlenum Name for that index=" + ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName );  // LCOV_EXCL_LINE
 					}
 					CheckRetEquipName( ZonePlenumNum ) = false;
 				}
@@ -240,17 +240,17 @@ namespace ZonePlenum {
 			if ( CompIndex == 0 ) {
 				ZonePlenumNum = FindItemInList( CompName, ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName );
 				if ( ZonePlenumNum == 0 ) {
-					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName );
+					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = ZonePlenumNum;
 			} else {
 				ZonePlenumNum = CompIndex;
 				if ( ZonePlenumNum > NumZoneSupplyPlenums || ZonePlenumNum < 1 ) {
-					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", Number of AirLoopHVAC:SupplyPlenum=" + TrimSigDigits( NumZoneReturnPlenums ) + ", AirLoopHVAC:SupplyPlenum name=" + CompName );
+					ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", Number of AirLoopHVAC:SupplyPlenum=" + TrimSigDigits( NumZoneReturnPlenums ) + ", AirLoopHVAC:SupplyPlenum name=" + CompName );  // LCOV_EXCL_LINE
 				}
 				if ( CheckSupEquipName( ZonePlenumNum ) ) {
 					if ( CompName != ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName ) {
-						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", AirLoopHVAC:SupplyPlenum name=" + CompName + ", stored AirLoopHVAC:SupplyPlenum Name for that index=" + ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName );
+						ShowFatalError( "SimAirZonePlenum: Invalid CompIndex passed=" + TrimSigDigits( ZonePlenumNum ) + ", AirLoopHVAC:SupplyPlenum name=" + CompName + ", stored AirLoopHVAC:SupplyPlenum Name for that index=" + ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName );  // LCOV_EXCL_LINE
 					}
 					CheckSupEquipName( ZonePlenumNum ) = false;
 				}
@@ -267,7 +267,7 @@ namespace ZonePlenum {
 		} else {
 			ShowSevereError( "SimAirZonePlenum: Errors in Plenum=" + CompName );
 			ShowContinueError( "ZonePlenum: Unhandled plenum type found:" + TrimSigDigits( iCompType ) );
-			ShowFatalError( "Preceding conditions cause termination." );
+			ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 
 		}
 
@@ -637,7 +637,7 @@ namespace ZonePlenum {
 		NodeNums.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}

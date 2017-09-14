@@ -367,7 +367,7 @@ namespace InputProcessor {
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Could not open (write) "+ outputAuditFileName + " ." );
-			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );  // LCOV_EXCL_LINE
 		}
 		echo_stream = gio::out_stream( EchoInputFile );
 
@@ -376,7 +376,7 @@ namespace InputProcessor {
 			CacheIPErrorFile = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); read_stat = flags.ios(); }
 			if ( read_stat != 0 ) {
-				ShowFatalError( "EnergyPlus: Could not open file "+outputIperrFileName+" for input (read)." );
+				ShowFatalError( "EnergyPlus: Could not open file "+outputIperrFileName+" for input (read)." );  // LCOV_EXCL_LINE
 			}
 			{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
 		}
@@ -384,16 +384,16 @@ namespace InputProcessor {
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Could not open (write) "+outputIperrFileName );
-			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );  // LCOV_EXCL_LINE
 		}
 
 		std::ifstream idd_stream( inputIddFileName, std::ios_base::in | std::ios_base::binary );
 		if ( ! idd_stream ) {
 			if ( idd_stream.is_open() ) idd_stream.close();
 			if ( ! gio::file_exists( inputIddFileName ) ) { // No such file
-				ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + inputIddFileName );
+				ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + inputIddFileName );  // LCOV_EXCL_LINE
 			} else {
-				ShowFatalError( "ProcessInput: Could not open file \"" + inputIddFileName + "\" for input (read)." );
+				ShowFatalError( "ProcessInput: Could not open file \"" + inputIddFileName + "\" for input (read)." );  // LCOV_EXCL_LINE
 			}
 		}
 		NumLines = 0;
@@ -415,7 +415,7 @@ namespace InputProcessor {
 		ObjectGotCount.dimension( NumObjectDefs, 0 );
 
 		if ( NumObjectDefs == 0 ) {
-			ShowFatalError( "ProcessInput: No objects found in IDD.  Program will terminate." );
+			ShowFatalError( "ProcessInput: No objects found in IDD.  Program will terminate." );  // LCOV_EXCL_LINE
 			ErrorsInIDD = true;
 		}
 		//  If no fatal to here, rewind EchoInputFile -- only keep processing data...
@@ -442,7 +442,7 @@ namespace InputProcessor {
 		std::ifstream idf_stream( inputIdfFileName, std::ios_base::in | std::ios_base::binary );
 		if ( ! idf_stream ) {
 			if ( idf_stream.is_open() ) idf_stream.close();
-			ShowFatalError( "ProcessInput: Could not open file \"" + inputIdfFileName + "\" for input (read)." );
+			ShowFatalError( "ProcessInput: Could not open file \"" + inputIdfFileName + "\" for input (read)." );  // LCOV_EXCL_LINE
 		}
 		NumLines = 0;
 		EchoInputLine = true;
@@ -615,7 +615,7 @@ namespace InputProcessor {
 			if ( int( InputLine[ len_line - 1 ] ) == iUnicode_end ) {
 				ShowSevereError( "ProcessInput: \"Energy+.idd\" appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
+				ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 			}
 			if ( has( InputLine, "!IDD_Version" ) ) {
 				IDDVerString = InputLine.substr( 1, len( InputLine ) - 1 );
@@ -1266,7 +1266,7 @@ namespace InputProcessor {
 			if ( int( InputLine[ len_line - 1 ] ) == iUnicode_end ) {
 				ShowSevereError( "ProcessInput: \"in.idf\" appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
+				ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 			}
 		}
 		if ( idf_stream ) idf_stream.seekg( 0, std::ios::beg );
@@ -2024,7 +2024,7 @@ namespace InputProcessor {
 
 		int Found = FindItemInList( MakeUPPERCase( SectionWord ), ListOfSections, NumSectionDefs );
 		if ( Found == 0 ) {
-			//    CALL ShowFatalError('Requested Section not found in Definitions: '//TRIM(SectionWord))
+			//    CALL ShowFatalError('Requested Section not found in Definitions: '//TRIM(SectionWord))  // LCOV_EXCL_LINE
 			GetNumSectionsFound = 0;
 		} else {
 			GetNumSectionsFound = SectionDef( Found ).NumFound;
@@ -2335,14 +2335,14 @@ namespace InputProcessor {
 			Found = FindItemInList( UCObject, ListOfObjects, NumObjectDefs );
 		}
 		if ( Found == 0 ) { //  This is more of a developer problem
-			ShowFatalError( "IP: GetObjectItem: Requested object=" + UCObject + ", not found in Object Definitions -- incorrect IDD attached." );
+			ShowFatalError( "IP: GetObjectItem: Requested object=" + UCObject + ", not found in Object Definitions -- incorrect IDD attached." );  // LCOV_EXCL_LINE
 		}
 
 		if ( ObjectDef( Found ).NumAlpha > 0 ) {
 			if ( ObjectDef( Found ).NumAlpha > MaxAlphas ) {
 				cfld1 = IPTrimSigDigits( ObjectDef( Found ).NumAlpha );
 				cfld2 = IPTrimSigDigits( MaxAlphas );
-				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Alpha Args [" + cfld1 + "] > Size of AlphaArg array [" + cfld2 + "]." );
+				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Alpha Args [" + cfld1 + "] > Size of AlphaArg array [" + cfld2 + "]." );  // LCOV_EXCL_LINE
 			}
 			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = BlankString;
 		}
@@ -2350,7 +2350,7 @@ namespace InputProcessor {
 			if ( ObjectDef( Found ).NumNumeric > MaxNumbers ) {
 				cfld1 = IPTrimSigDigits( ObjectDef( Found ).NumNumeric );
 				cfld2 = IPTrimSigDigits( MaxNumbers );
-				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Numeric Args [" + cfld1 + "] > Size of NumericArg array [" + cfld2 + "]." );
+				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Numeric Args [" + cfld1 + "] > Size of NumericArg array [" + cfld2 + "]." );  // LCOV_EXCL_LINE
 			}
 			Numbers( {1,ObjectDef( Found ).NumNumeric} ) = 0.0;
 		}
@@ -2375,7 +2375,7 @@ namespace InputProcessor {
 					// Read this one
 					GetObjectItemfromFile( LoopIndex, ObjectWord, NumAlphas, NumNumbers, AlphaArgs, NumberArgs, AlphaArgsBlank, NumberArgsBlank );
 					if ( NumAlphas > MaxAlphas || NumNumbers > MaxNumbers ) {
-						ShowFatalError( "IP: GetObjectItem: Too many actual arguments for those expected on Object: " + ObjectWord, EchoInputFile );
+						ShowFatalError( "IP: GetObjectItem: Too many actual arguments for those expected on Object: " + ObjectWord, EchoInputFile );  // LCOV_EXCL_LINE
 					}
 					NumAlphas = min( MaxAlphas, NumAlphas );
 					NumNumbers = min( MaxNumbers, NumNumbers );
@@ -2787,7 +2787,7 @@ namespace InputProcessor {
 						if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
 							ExtensibleObject = true;
 							if ( UCInputLine[ 11 ] != ':' ) {
-								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
+								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );  // LCOV_EXCL_LINE
 							} else { // process number
 								std::string const number_str( UCInputLine.substr( 12 ) );
 								NSpace = scan( number_str, " !" );
@@ -3001,7 +3001,7 @@ namespace InputProcessor {
 						if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
 							ExtensibleObject = true;
 							if ( UCInputLine[ 11 ] != ':' ) {
-								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
+								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );  // LCOV_EXCL_LINE
 							} else { // process number
 								std::string const number_str( UCInputLine.substr( 12 ) );
 								NSpace = scan( number_str, " !" );
@@ -4027,7 +4027,7 @@ namespace InputProcessor {
 			} else if ( ( errorCheck == 'F' ) || ( errorCheck == 'f' ) ) {
 				ShowSevereError( Message1 );
 				ShowContinueError( Message2 );
-				ShowFatalError( "Program terminates due to preceding condition(s)." );
+				ShowFatalError( "Program terminates due to preceding condition(s)." );  // LCOV_EXCL_LINE
 
 			} else {
 				ShowSevereError( Message1 );
@@ -4805,8 +4805,8 @@ namespace InputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		if ( ! equali( LineItem.Name, "OUTPUT:REPORTS" ) ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
-		if ( LineItem.NumAlphas < 1 ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
+		if ( ! equali( LineItem.Name, "OUTPUT:REPORTS" ) ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );  // LCOV_EXCL_LINE
+		if ( LineItem.NumAlphas < 1 ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );  // LCOV_EXCL_LINE
 
 		{ auto const makeTransition( uppercased( LineItem.Alphas( 1 ) ) );
 
@@ -4881,7 +4881,7 @@ namespace InputProcessor {
 		ObjPtr = FindItemInList( LineItem.Name, ListOfObjects, NumObjectDefs );
 		ObjPtr = iListOfObjects( ObjPtr );
 
-		if ( ObjPtr == 0 ) ShowFatalError( "No Object Def for " + LineItem.Name );
+		if ( ObjPtr == 0 ) ShowFatalError( "No Object Def for " + LineItem.Name );  // LCOV_EXCL_LINE
 		++ObjectDef( ObjPtr ).NumFound;
 
 	}
@@ -5201,7 +5201,7 @@ namespace InputProcessor {
 		}
 
 		if ( CompactObjectsFound ) {
-			ShowFatalError( "Program Terminates: The ExpandObjects program has not been run or is not in your EnergyPlus.exe folder." );
+			ShowFatalError( "Program Terminates: The ExpandObjects program has not been run or is not in your EnergyPlus.exe folder." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -5246,7 +5246,7 @@ namespace InputProcessor {
 			auto const & Name( IDFRecords( i ).Name );
 			if ( has_prefixi( Name, "Parametric:" ) ) {
 				ShowSevereError( "Parametric objects are found in the IDF File." );
-				ShowFatalError( "Program Terminates: The ParametricPreprocessor program has not been run." );
+				ShowFatalError( "Program Terminates: The ParametricPreprocessor program has not been run." );  // LCOV_EXCL_LINE
 				break;
 			}
 		}

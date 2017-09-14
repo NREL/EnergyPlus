@@ -899,7 +899,7 @@ namespace ZoneContaminantPredictorCorrector {
 		AlphaName.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors getting Zone Contaminant Sources and Sinks input data.  Preceding condition(s) cause termination." );
+			ShowFatalError( "Errors getting Zone Contaminant Sources and Sinks input data.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1111,7 +1111,7 @@ namespace ZoneContaminantPredictorCorrector {
 		} // ContControlledZoneNum
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors getting Zone Contaminant Control input data.  Preceding condition(s) cause termination." );
+			ShowFatalError( "Errors getting Zone Contaminant Control input data.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1370,7 +1370,7 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 			MyConfigOneTimeFlag = false;
 			if ( ErrorsFound ) {
-				ShowFatalError( "ZoneControl:ContaminantController: Program terminates for preceding reason(s)." );
+				ShowFatalError( "ZoneControl:ContaminantController: Program terminates for preceding reason(s)." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -1667,7 +1667,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of CO2 Load means that
@@ -1749,7 +1749,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
 						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of GC Load means that
@@ -2242,7 +2242,7 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
 						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 				}
 			} else if ( ZoneMassFlowRate <= 0.0 ) {
 				if ( Contaminant.CO2Simulation ) {

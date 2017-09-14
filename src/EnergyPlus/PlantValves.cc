@@ -173,17 +173,17 @@ namespace PlantValves {
 		if ( CompNum == 0 ) {
 			EqNum = FindItemInList( CompName, TemperValve );
 			if ( EqNum == 0 ) {
-				ShowFatalError( "SimPlantValves: Unit not found=" + CompName );
+				ShowFatalError( "SimPlantValves: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompNum = EqNum;
 		} else {
 			EqNum = CompNum;
 			if ( EqNum > NumTemperingValves || EqNum < 1 ) {
-				ShowFatalError( "SimPlantValves:  Invalid CompNum passed=" + TrimSigDigits( EqNum ) + ", Number of Units=" + TrimSigDigits( NumTemperingValves ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimPlantValves:  Invalid CompNum passed=" + TrimSigDigits( EqNum ) + ", Number of Units=" + TrimSigDigits( NumTemperingValves ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( EqNum ) ) {
 				if ( CompName != TemperValve( EqNum ).Name ) {
-					ShowFatalError( "SimPlantValves: Invalid CompNum passed=" + TrimSigDigits( EqNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + TemperValve( EqNum ).Name );
+					ShowFatalError( "SimPlantValves: Invalid CompNum passed=" + TrimSigDigits( EqNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + TemperValve( EqNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( EqNum ) = false;
 			}
@@ -291,7 +291,7 @@ namespace PlantValves {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input" );
+			ShowFatalError( "GetPlantValvesInput: " + CurrentModuleObject + " Errors found in input" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -378,7 +378,7 @@ namespace PlantValves {
 					ScanPlantLoopsForObject( TemperValve( CompNum ).Name, TypeOf_ValveTempering, TemperValve( CompNum ).LoopNum, TemperValve( CompNum ).LoopSideNum, TemperValve( CompNum ).BranchNum, TemperValve( CompNum ).CompNum, _, _, _, _, _, errFlag );
 
 					if ( errFlag ) {
-						ShowFatalError( "InitPlantValves: Program terminated due to previous condition(s)." );
+						ShowFatalError( "InitPlantValves: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					}
 					// init logical flags
 					ErrorsFound = false;
@@ -500,7 +500,7 @@ namespace PlantValves {
 						ErrorsFound = true;
 					}
 					if ( ErrorsFound ) {
-						ShowFatalError( "Errors found in input, TemperingValve object " + TemperValve( CompNum ).Name );
+						ShowFatalError( "Errors found in input, TemperingValve object " + TemperValve( CompNum ).Name );  // LCOV_EXCL_LINE
 					}
 					MyTwoTimeFlag( CompNum ) = false;
 				} // my two time flag for input checking

@@ -316,7 +316,7 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Pipe Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_Pump ) {
@@ -449,13 +449,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Chiller Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Chiller=" + sim_component.TypeOf );
 				ShowContinueError( "..Chiller Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			//HEAT PUMPS
@@ -515,13 +515,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Heat Pump Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for HeatPump=" + sim_component.TypeOf );
 				ShowContinueError( "..HeatPump Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			//TOWERS
@@ -582,13 +582,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Tower Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Cooling Tower=" + sim_component.TypeOf );
 				ShowContinueError( "..Tower Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			//FLUID COOLERS
@@ -617,13 +617,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid FluidCooler Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Fluid Cooler=" + sim_component.TypeOf );
 				ShowContinueError( "..Fluid Cooler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_EvapFluidCooler ) {
@@ -651,13 +651,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid EvapFluidCooler Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Fluid Cooler=" + sim_component.TypeOf );
 				ShowContinueError( "..Fluid Cooler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			//BOILERS
@@ -689,13 +689,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Boiler Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Boiler=" + sim_component.TypeOf );
 				ShowContinueError( "..Boiler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			//WATER HEATER
@@ -723,13 +723,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Water Heater Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Water Heater=" + sim_component.TypeOf );
 				ShowContinueError( "..Water Thermal Tank Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			//PURCHASED
@@ -755,13 +755,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid District Energy Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for District Energy=" + sim_component.TypeOf );
 				ShowContinueError( "..District Cooling/Heating Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_HeatExchanger ) {
@@ -778,7 +778,7 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Heat Exchanger Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			}
 
@@ -852,13 +852,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Chilled/Ice Thermal Storage Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Thermal Storage=" + sim_component.TypeOf );
 				ShowContinueError( "..Chilled/Ice Thermal Storage Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_Valve ) {
@@ -873,13 +873,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Valve Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Valves=" + sim_component.TypeOf );
 				ShowContinueError( "..Valve Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_Generator ) {
@@ -942,14 +942,14 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Generator Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			}
 
 			if ( InitLoopEquip && EquipNum == 0 ) {
 				ShowSevereError( "InitLoop did not set Equipment Index for Generator=" + sim_component.TypeOf );
 				ShowContinueError( "..Generator Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_LoadProfile ) { // DSU2 draft out InitLoopEquip on a demand side component
@@ -964,7 +964,7 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Load Profile Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_DemandCoil ) { //DSU3
@@ -1010,7 +1010,7 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Load Coil Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			} //DSU3
 
@@ -1026,7 +1026,7 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Load Coil Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_SolarCollector ) {
@@ -1050,7 +1050,7 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Solar Collector Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_ZoneHVACDemand ) { //ZoneHVAC and air terminal models with direct plant connections
@@ -1083,7 +1083,7 @@ namespace PlantLoopEquip {
 
 				ShowSevereError( "SimPlantEquip: Invalid ZoneHVAC Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			}
 
@@ -1106,7 +1106,7 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Refrigeration Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( GeneralEquipType == GenEquipTypes_PlantComponent ) {
@@ -1134,7 +1134,7 @@ namespace PlantLoopEquip {
 			} else {
 				//        CALL ShowSevereError('SimPlantEquip: Invalid Component Equipment Type='//TRIM(EquipType))
 				//        CALL ShowContinueError('Occurs in Plant Loop='//TRIM(PlantLoop(LoopNum)%Name))
-				//        CALL ShowFatalError('Preceding condition causes termination.')
+				//        CALL ShowFatalError('Preceding condition causes termination.')  // LCOV_EXCL_LINE
 
 			}
 
@@ -1157,13 +1157,13 @@ namespace PlantLoopEquip {
 			} else {
 				ShowSevereError( "SimPlantEquip: Invalid Central Heat Pump System Type=" + sim_component.TypeOf );
 				ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} else {
 			ShowSevereError( "SimPlantEquip: Invalid Equipment Type=" + sim_component.TypeOf );
 			ShowContinueError( "Occurs in Plant Loop=" + PlantLoop( LoopNum ).Name );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		} // TypeOfEquip
 
 	}

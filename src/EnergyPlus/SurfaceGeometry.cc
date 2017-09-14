@@ -1933,7 +1933,7 @@ namespace SurfaceGeometry {
 
 		if ( SurfError || ErrorsFound ) {
 			ErrorsFound = true;
-			ShowFatalError( RoutineName + "Errors discovered, program terminates." );
+			ShowFatalError( RoutineName + "Errors discovered, program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection;
@@ -6005,7 +6005,7 @@ namespace SurfaceGeometry {
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
-		
+
 		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfLocalEnv;
@@ -6116,7 +6116,7 @@ namespace SurfaceGeometry {
 		}
 		// Link surface properties to surface object
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
-			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {			
+			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {
 				if ( SurfLocalEnvironment( Loop ).SurfPtr == SurfLoop ) {
 					if ( SurfLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
 						Surface( SurfLoop ).HasLinkedOutAirNode = true;
@@ -7022,7 +7022,7 @@ namespace SurfaceGeometry {
 			TransformVertsByAspect( SurfNum, SurfaceTmp( SurfNum ).Sides );
 
 		} else {
-			ShowFatalError( RoutineName + "Called with less than 2 sides, Surface=" + SurfaceTmp( SurfNum ).Name );
+			ShowFatalError( RoutineName + "Called with less than 2 sides, Surface=" + SurfaceTmp( SurfNum ).Name );  // LCOV_EXCL_LINE
 		}
 
 		// Preliminary Height/Width
@@ -10341,7 +10341,7 @@ namespace SurfaceGeometry {
 				gio::write( ErrLineOut, ErrFmt ) << point.x << point.y << point.z;
 				ShowContinueError( ErrLineOut );
 			}
-			ShowFatalError( "CalcCoordinateTransformation: Program terminates due to preceding condition.", OutputFileStandard );
+			ShowFatalError( "CalcCoordinateTransformation: Program terminates due to preceding condition.", OutputFileStandard );  // LCOV_EXCL_LINE
 			return;
 		}
 
@@ -10562,7 +10562,7 @@ namespace SurfaceGeometry {
 			ConstrNum = Surface( SurfNum ).Construction;
 			// Fatal error if base construction has more than three glass layers
 			if ( Construct( ConstrNum ).TotGlassLayers > 3 ) {
-				ShowFatalError( "Window=" + Surface( SurfNum ).Name + " has more than 3 glass layers; a storm window cannot be applied." );
+				ShowFatalError( "Window=" + Surface( SurfNum ).Name + " has more than 3 glass layers; a storm window cannot be applied." );  // LCOV_EXCL_LINE
 			}
 			ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
 			ConstrName = Construct( ConstrNum ).Name;
@@ -10590,7 +10590,7 @@ namespace SurfaceGeometry {
 					ShowContinueError( "Storm windows can only be applied to shaded constructions that:" );
 					ShowContinueError( "have an interior shade or blind and up to three glass layers, or" );
 					ShowContinueError( "have a between-glass shade or blind and two glass layers." );
-					ShowFatalError( "EnergyPlus is exiting due to reason stated above." );
+					ShowFatalError( "EnergyPlus is exiting due to reason stated above." );  // LCOV_EXCL_LINE
 				}
 			}
 

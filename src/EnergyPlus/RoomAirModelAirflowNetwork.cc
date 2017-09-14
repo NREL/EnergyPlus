@@ -190,7 +190,7 @@ namespace RoomAirModelAirflowNetwork {
 		RAFNNum = RoomAirflowNetworkZoneInfo( ZoneNum ).RAFNNum;
 
 		if ( RAFNNum == 0 ) {
-			ShowFatalError( "SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" + Zone(ZoneNum).Name );
+			ShowFatalError( "SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" + Zone(ZoneNum).Name );  // LCOV_EXCL_LINE
 		}
 
 		auto & thisRAFN( RAFN( RAFNNum ) );
@@ -250,7 +250,7 @@ namespace RoomAirModelAirflowNetwork {
 		RAFNNum = RoomAirflowNetworkZoneInfo( ZoneNum ).RAFNNum;
 
 		if ( RAFNNum == 0 ) {
-			ShowFatalError( "LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" + Zone( ZoneNum ).Name );
+			ShowFatalError( "LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model =" + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 		}
 		auto & thisRAFN( RAFN( RAFNNum ) );
 		thisRAFN.ZoneNum = ZoneNum;
@@ -485,7 +485,7 @@ namespace RoomAirModelAirflowNetwork {
 				InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
 				if ( allocated( NodeFound ) ) NodeFound.deallocate( );
 				if ( ErrorsFound ) {
-					ShowFatalError( "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates." );
+					ShowFatalError( "GetRoomAirflowNetworkData: Errors found getting air model input.  Program terminates." );  // LCOV_EXCL_LINE
 				}
 			}
 		} //End of InitRoomAirModelAirflowNetworkOneTimeFlagConf
@@ -1085,7 +1085,7 @@ namespace RoomAirModelAirflowNetwork {
 			} else if ( Surface( SurfNum ).TAirRef == ZoneSupplyAirTemp ) {
 				// check whether this zone is a controlled zone or not
 				if ( !ControlledZoneAirFlag ) {
-					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
+					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 					return;
 				}
 				// determine supply air temperature as a weighted average of the inlet temperatures.

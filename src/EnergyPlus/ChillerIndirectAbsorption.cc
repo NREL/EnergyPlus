@@ -143,7 +143,7 @@ namespace ChillerIndirectAbsorption {
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
 	Real64 EnergyLossToEnvironment( 0.0 ); // J - piping energy loss from generator outlet to pump inlet
 	Real64 ChillerONOFFCyclingFrac( 0.0 ); // fraction of time chiller is on
-	
+
 	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
@@ -228,16 +228,16 @@ namespace ChillerIndirectAbsorption {
 		if ( CompIndex == 0 ) {
 			ChillNum = FindItemInList( AbsorberName, IndirectAbsorber );
 			if ( ChillNum == 0 ) {
-				ShowFatalError( "SimIndirectAbsorber: Specified chiller not one of Valid Absorption Chillers=" + AbsorberName );
+				ShowFatalError( "SimIndirectAbsorber: Specified chiller not one of Valid Absorption Chillers=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = ChillNum;
 		} else {
 			ChillNum = CompIndex;
 			if ( ChillNum > NumIndirectAbsorbers || ChillNum < 1 ) {
-				ShowFatalError( "SimIndirectAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumIndirectAbsorbers ) + ", Entered Unit name=" + AbsorberName );
+				ShowFatalError( "SimIndirectAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumIndirectAbsorbers ) + ", Entered Unit name=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			if ( AbsorberName != IndirectAbsorber( ChillNum ).Name ) {
-				ShowFatalError( "SimIndirectAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + IndirectAbsorber( ChillNum ).Name );
+				ShowFatalError( "SimIndirectAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + IndirectAbsorber( ChillNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -279,7 +279,7 @@ namespace ChillerIndirectAbsorption {
 			UpdateAbsorberChillerComponentGeneratorSide( LoopNum, LoopSide, TypeOf_Chiller_Indirect_Absorption, IndirectAbsorber( ChillNum ).GeneratorInletNodeNum, IndirectAbsorber( ChillNum ).GeneratorOutletNodeNum, IndirectAbsorber( ChillNum ).GenHeatSourceType, IndirectAbsorberReport( ChillNum ).QGenerator, IndirectAbsorberReport( ChillNum ).SteamMdot, FirstIteration );
 
 		} else {
-			ShowFatalError( "SimIndirectAbsorber: Invalid LoopNum passed=" + TrimSigDigits( LoopNum ) + ", Unit name=" + AbsorberName + ", stored chilled water loop=" + TrimSigDigits( IndirectAbsorber( ChillNum ).CWLoopNum ) + ", stored condenser water loop=" + TrimSigDigits( IndirectAbsorber( ChillNum ).CDLoopNum ) + ", stored generator loop=" + TrimSigDigits( IndirectAbsorber( ChillNum ).GenLoopNum ) );
+			ShowFatalError( "SimIndirectAbsorber: Invalid LoopNum passed=" + TrimSigDigits( LoopNum ) + ", Unit name=" + AbsorberName + ", stored chilled water loop=" + TrimSigDigits( IndirectAbsorber( ChillNum ).CWLoopNum ) + ", stored condenser water loop=" + TrimSigDigits( IndirectAbsorber( ChillNum ).CDLoopNum ) + ", stored generator loop=" + TrimSigDigits( IndirectAbsorber( ChillNum ).GenLoopNum ) );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -609,7 +609,7 @@ namespace ChillerIndirectAbsorption {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting Chiller:Absorption:Indirect" );
+			ShowFatalError( "Errors found in getting Chiller:Absorption:Indirect" );  // LCOV_EXCL_LINE
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum ) {
@@ -740,7 +740,7 @@ namespace ChillerIndirectAbsorption {
 
 			}
 			if ( errFlag ) {
-				ShowFatalError( "InitIndirectAbsorpChiller: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitIndirectAbsorpChiller: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( IndirectAbsorber( ChillNum ).FlowMode == ConstantFlow ) {
@@ -1342,7 +1342,7 @@ namespace ChillerIndirectAbsorption {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 		if ( PlantFinalSizesOkayToReport ) {
@@ -1552,18 +1552,18 @@ namespace ChillerIndirectAbsorption {
 		LoopSideNum = IndirectAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( IndirectAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset ));
 			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		if ( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr > 0 ) {
@@ -1716,7 +1716,7 @@ namespace ChillerIndirectAbsorption {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

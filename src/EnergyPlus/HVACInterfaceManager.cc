@@ -706,7 +706,7 @@ namespace HVACInterfaceManager {
 		//update heat trasport and heat storage rates
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT = ( TankInletTemp - TankFinalTemp ) * Cp * MassFlowRate;
 		PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt = ( ThisTankMass * Cp * ( TankFinalTemp - LastTankOutletTemp ))/ TimeStepSeconds;
-		
+
 		//Determine excessive storage
 		if (PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_MdotCpDeltaT < PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_McpDTdt) {
 			PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LoopSideInlet_CapExcessStorageTimeReport = TimeStepSys;
@@ -1287,7 +1287,7 @@ namespace HVACInterfaceManager {
 			}
 
 		} else {
-			//???      CALL ShowFatalError('ManageTwoWayCommonPipe: Calling Case Fall Through')
+			//???      CALL ShowFatalError('ManageTwoWayCommonPipe: Calling Case Fall Through')  // LCOV_EXCL_LINE
 
 		}}
 

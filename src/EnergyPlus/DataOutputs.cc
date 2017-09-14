@@ -122,7 +122,7 @@ namespace DataOutputs {
 		if ( ! pattern->ok() ) {
 			ShowSevereError( "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect" );
 			ShowContinueError( pattern->error() );
-			ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );
+			ShowFatalError( "Error found in regular expression. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 	}
 

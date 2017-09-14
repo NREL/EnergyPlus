@@ -329,7 +329,7 @@ namespace LowTempRadiantSystem {
 		//      IF (RadSysNum > 0) THEN  ! Found it and it is an electric system
 		//        SystemType = ConstantFlowSystem
 		//      ELSE  ! RadSysNum is still <= 0 so this CompName was not found among either radiant system type-->error
-		//        CALL ShowFatalError('SimLowTempRadiantSystem: Radiant System not found = '//TRIM(CompName))
+		//        CALL ShowFatalError('SimLowTempRadiantSystem: Radiant System not found = '//TRIM(CompName))  // LCOV_EXCL_LINE
 		//      END IF
 		//    END IF
 		//  END IF
@@ -338,7 +338,7 @@ namespace LowTempRadiantSystem {
 		if ( CompIndex == 0 ) {
 			RadSysNum = FindItemInList( CompName, RadSysTypes );
 			if ( RadSysNum == 0 ) {
-				ShowFatalError( "SimLowTempRadiantSystem: Unit not found=" + CompName );
+				ShowFatalError( "SimLowTempRadiantSystem: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = RadSysNum;
 			SystemType = RadSysTypes( RadSysNum ).SystemType;
@@ -354,11 +354,11 @@ namespace LowTempRadiantSystem {
 			RadSysNum = CompIndex;
 			SystemType = RadSysTypes( RadSysNum ).SystemType;
 			if ( RadSysNum > TotalNumOfRadSystems || RadSysNum < 1 ) {
-				ShowFatalError( "SimLowTempRadiantSystem:  Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Number of Units=" + TrimSigDigits( TotalNumOfRadSystems ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimLowTempRadiantSystem:  Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Number of Units=" + TrimSigDigits( TotalNumOfRadSystems ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( RadSysNum ) ) {
 				if ( CompName != RadSysTypes( RadSysNum ).Name ) {
-					ShowFatalError( "SimLowTempRadiantSystem: Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + RadSysTypes( RadSysNum ).Name );
+					ShowFatalError( "SimLowTempRadiantSystem: Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + RadSysTypes( RadSysNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( RadSysNum ) = false;
 			}
@@ -366,7 +366,7 @@ namespace LowTempRadiantSystem {
 
 		InitLowTempRadiantSystem( FirstHVACIteration, RadSysTypes( RadSysNum ).CompIndex, SystemType, InitErrorFound );
 		if ( InitErrorFound ) {
-			ShowFatalError( "InitLowTempRadiantSystem: Preceding error is not allowed to proceed with the simulation.  Correct this input problem." );
+			ShowFatalError( "InitLowTempRadiantSystem: Preceding error is not allowed to proceed with the simulation.  Correct this input problem." );  // LCOV_EXCL_LINE
 		}
 
 		{ auto const SELECT_CASE_var( SystemType );
@@ -377,7 +377,7 @@ namespace LowTempRadiantSystem {
 		} else if ( SELECT_CASE_var == ElectricSystem ) {
 			CalcLowTempElecRadiantSystem( RadSysTypes( RadSysNum ).CompIndex, LoadMet );
 		} else {
-			ShowFatalError( "SimLowTempRadiantSystem: Illegal system type for system " + CompName );
+			ShowFatalError( "SimLowTempRadiantSystem: Illegal system type for system " + CompName );  // LCOV_EXCL_LINE
 		}}
 
 		UpdateLowTempRadiantSystem( FirstHVACIteration, RadSysTypes( RadSysNum ).CompIndex, SystemType );
@@ -1436,7 +1436,7 @@ namespace LowTempRadiantSystem {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input. Preceding conditions cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Set up the output variables for low temperature radiant systems
@@ -1565,7 +1565,7 @@ namespace LowTempRadiantSystem {
 		// FLOW:
 
 		InitErrorsFound = false;
-		
+
 		if ( MyOneTimeFlag ) {
 			MyEnvrnFlagHydr.allocate( NumOfHydrLowTempRadSys );
 			MyEnvrnFlagCFlo.allocate( NumOfCFloLowTempRadSys );
@@ -1650,13 +1650,13 @@ namespace LowTempRadiantSystem {
 				if ( HydrRadSys( RadSysNum ).HotWaterInNode > 0 ) {
 					ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).HWLoopNum, HydrRadSys( RadSysNum ).HWLoopSide, HydrRadSys( RadSysNum ).HWBranchNum, HydrRadSys( RadSysNum ).HWCompNum, _, _, _, HydrRadSys( RadSysNum ).HotWaterInNode, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );
+						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					}
 				}
 				if ( HydrRadSys( RadSysNum ).ColdWaterInNode > 0 ) {
 					ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).CWLoopNum, HydrRadSys( RadSysNum ).CWLoopSide, HydrRadSys( RadSysNum ).CWBranchNum, HydrRadSys( RadSysNum ).CWCompNum, _, _, _, HydrRadSys( RadSysNum ).ColdWaterInNode, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );
+						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					}
 				}
 				MyPlantScanFlagHydr( RadSysNum ) = false;
@@ -1671,13 +1671,13 @@ namespace LowTempRadiantSystem {
 				if ( CFloRadSys( RadSysNum ).HotWaterInNode > 0 ) {
 					ScanPlantLoopsForObject( CFloRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_ConstFlow, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum, _, _, _, CFloRadSys( RadSysNum ).HotWaterInNode, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );
+						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					}
 				}
 				if ( CFloRadSys( RadSysNum ).ColdWaterInNode > 0 ) {
 					ScanPlantLoopsForObject( CFloRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_ConstFlow, CFloRadSys( RadSysNum ).CWLoopNum, CFloRadSys( RadSysNum ).CWLoopSide, CFloRadSys( RadSysNum ).CWBranchNum, CFloRadSys( RadSysNum ).CWCompNum, _, _, _, CFloRadSys( RadSysNum ).ColdWaterInNode, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );
+						ShowFatalError( "InitLowTempRadiantSystem: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					}
 				}
 				MyPlantScanFlagCFlo( RadSysNum ) = false;
@@ -1895,7 +1895,7 @@ namespace LowTempRadiantSystem {
 
 				ShowSevereError( "Radiant system entered without specification of type: electric, constant flow, or hydronic?" );
 				ShowContinueError( "Occurs in Radiant System=" + HydrRadSys( RadSysNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			}}
 
@@ -2586,7 +2586,7 @@ namespace LowTempRadiantSystem {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2601,7 +2601,7 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   August 2017
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine figures out the tube length based on the spacing of tubes.
 		// For single surface systems, this is fairly easy as there is only one spacing
@@ -2610,10 +2610,10 @@ namespace LowTempRadiantSystem {
 
 		// Return value
 		Real64 SizeRadSysTubeLength;
-		
+
 		int SurfNum; // index for counting through the surfaces that are part of this radiant system
 		Real64 TubeLength; // temporary holding place for the function calculation
-		
+
 		// HydrRadSys( RadNum ).TotalSurfaceArea = 0.0;
 		// for ( SurfNum = 1; SurfNum <= HydrRadSys( RadNum ).NumOfSurfaces; ++SurfNum ) {
 		// 	HydrRadSys( RadNum ).TotalSurfaceArea += Surface( HydrRadSys( RadNum ).SurfacePtr( SurfNum ) ).Area;
@@ -2647,12 +2647,12 @@ namespace LowTempRadiantSystem {
 			ShowWarningError( "SizeRadSysTubeLength: Illegal system type passed into this routine.  This should never happen." );
 			TubeLength = 60.0; // Assign a length to avoid any divide by zero errors. This length is a 3m by 3m room with 0.15m spacing.
 		}
-			
+
 		SizeRadSysTubeLength = TubeLength;
 		return SizeRadSysTubeLength;
-		
+
 	}
-	
+
 	void
 	CalcLowTempHydrRadiantSystem(
 		int const RadSysNum, // name of the low temperature radiant system
@@ -2767,7 +2767,7 @@ namespace LowTempRadiantSystem {
 			} else { // Should never get here
 				ControlTemp = MAT( ZoneNum );
 				ShowSevereError( "Illegal control type in low temperature radiant system: " + HydrRadSys( RadSysNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}}
 
 			if ( HydrRadSys( RadSysNum ).HotSetptSchedPtr > 0 ) {
@@ -2788,7 +2788,7 @@ namespace LowTempRadiantSystem {
 			if ( OffTempHeat > OffTempCool ) {
 				MassFlowFrac = 0.0;
 				ShowSevereError( "Overlapping heating and cooling control temps in radiant system: " + HydrRadSys( RadSysNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			} else { // Temperatures for heating and cooling do not overlap--calculate the mass flow fraction
 
@@ -2947,7 +2947,7 @@ namespace LowTempRadiantSystem {
 			WaterNodeIn = 0; // Suppress uninitialized warning
 			ShowSevereError( "Illegal low temperature radiant system operating mode" );
 			ShowContinueError( "Occurs in Radiant System=" + HydrRadSys( RadSysNum ).Name );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}}
 		ZoneNum = HydrRadSys( RadSysNum ).ZonePtr;
 		SysWaterMassFlow = Node( WaterNodeIn ).MassFlowRate;
@@ -3390,7 +3390,7 @@ namespace LowTempRadiantSystem {
 			} else { // Should never get here
 				SetPointTemp = 0.0; // Suppress uninitialized warning
 				ShowSevereError( "Illegal control type in low temperature radiant system: " + CFloRadSys( RadSysNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}}
 
 			// Avoid problems when there is no heating or cooling control because the system only cools or heats
@@ -3409,7 +3409,7 @@ namespace LowTempRadiantSystem {
 			if ( SetPointTemp < OffTempHeat && CFloRadSys( RadSysNum ).HeatingSystem ) { // HEATING MODE
 
 				OperatingMode = HeatingMode;
-				
+
 				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).HotWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).HeatingSystem ) {
@@ -3423,7 +3423,7 @@ namespace LowTempRadiantSystem {
 					if ( SetPointTempHi < SetPointTempLo ) {
 						ShowSevereError( "Heating setpoint temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
-						ShowFatalError( "Preceding condition causes termination." );
+						ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 					}
 
 					WaterTempHi = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).HotWaterHiTempSchedPtr );
@@ -3431,7 +3431,7 @@ namespace LowTempRadiantSystem {
 					if ( WaterTempHi < WaterTempLo ) {
 						ShowSevereError( "Heating water temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High water temperature is less than low water temperature--check your schedule input" );
-						ShowFatalError( "Preceding condition causes termination." );
+						ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 					}
 
 					if ( SetPointTemp >= SetPointTempHi ) {
@@ -3451,7 +3451,7 @@ namespace LowTempRadiantSystem {
 			} else if ( SetPointTemp > OffTempCool && CFloRadSys( RadSysNum ).CoolingSystem ) { // COOLING MODE
 
 				OperatingMode = CoolingMode;
-				
+
 				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).ChWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).CoolingSystem ) {
@@ -3465,7 +3465,7 @@ namespace LowTempRadiantSystem {
 					if ( SetPointTempHi < SetPointTempLo ) {
 						ShowSevereError( "Cooling setpoint temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
-						ShowFatalError( "Preceding condition causes termination." );
+						ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 					}
 
 					WaterTempHi = GetCurrentScheduleValue( CFloRadSys( RadSysNum ).ColdWaterHiTempSchedPtr );
@@ -3473,7 +3473,7 @@ namespace LowTempRadiantSystem {
 					if ( WaterTempHi < WaterTempLo ) {
 						ShowSevereError( "Cooling water temperature mismatch in" + CFloRadSys( RadSysNum ).Name );
 						ShowContinueError( "High water temperature is less than low water temperature--check your schedule input" );
-						ShowFatalError( "Preceding condition causes termination." );
+						ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 					}
 
 					if ( SetPointTemp <= SetPointTempLo ) {
@@ -3926,7 +3926,7 @@ namespace LowTempRadiantSystem {
 		} else {
 			ShowSevereError( "Illegal low temperature radiant system operating mode" );
 			ShowContinueError( "Occurs in Radiant System=" + CFloRadSys( RadSysNum ).Name );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}}
 		ZoneNum = CFloRadSys( RadSysNum ).ZonePtr;
 		ZoneMult = double( Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier );
@@ -4368,7 +4368,7 @@ namespace LowTempRadiantSystem {
 			} else { // Should never get here
 				ControlTemp = MAT( ZoneNum );
 				ShowSevereError( "Illegal control type in low temperature radiant system: " + ElecRadSys( RadSysNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}}
 
 			if ( ControlTemp < OffTemp ) { // HEATING MODE

@@ -298,17 +298,17 @@ namespace CondenserLoopTowers {
 		if ( CompIndex == 0 ) {
 			TowerNum = FindItemInList( TowerName, SimpleTower );
 			if ( TowerNum == 0 ) {
-				ShowFatalError( "SimTowers: Unit not found=" + TowerName );
+				ShowFatalError( "SimTowers: Unit not found=" + TowerName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = TowerNum;
 		} else {
 			TowerNum = CompIndex;
 			if ( TowerNum > NumSimpleTowers || TowerNum < 1 ) {
-				ShowFatalError( "SimTowers:  Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Number of Units=" + TrimSigDigits( NumSimpleTowers ) + ", Entered Unit name=" + TowerName );
+				ShowFatalError( "SimTowers:  Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Number of Units=" + TrimSigDigits( NumSimpleTowers ) + ", Entered Unit name=" + TowerName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( TowerNum ) ) {
 				if ( TowerName != SimpleTower( TowerNum ).Name ) {
-					ShowFatalError( "SimTowers: Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Unit name=" + TowerName + ", stored Unit Name for that index=" + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "SimTowers: Invalid CompIndex passed=" + TrimSigDigits( TowerNum ) + ", Unit name=" + TowerName + ", stored Unit Name for that index=" + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( TowerNum ) = false;
 			}
@@ -397,7 +397,7 @@ namespace CondenserLoopTowers {
 			ReportTowers( RunFlag, TowerNum );
 
 		} else {
-			ShowFatalError( "SimTowers: Invalid Tower Type Requested=" + TowerType );
+			ShowFatalError( "SimTowers: Invalid Tower Type Requested=" + TowerType );  // LCOV_EXCL_LINE
 
 		}} // TypeOfEquip
 
@@ -498,7 +498,7 @@ namespace CondenserLoopTowers {
 		NumVSMerkelTowers = GetNumObjectsFound( cCoolingTower_VariableSpeedMerkel );
 		NumSimpleTowers = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
 
-		if ( NumSimpleTowers <= 0 ) ShowFatalError( "No Cooling Tower objects found in input, however, a branch object has specified a cooling tower. Search the input for CoolingTower to determine the cause for this error." );
+		if ( NumSimpleTowers <= 0 ) ShowFatalError( "No Cooling Tower objects found in input, however, a branch object has specified a cooling tower. Search the input for CoolingTower to determine the cause for this error." );  // LCOV_EXCL_LINE
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleTower ) ) return;
@@ -606,7 +606,7 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).DesRange = 5.5;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
-			// set tower design water outlet and inlet temperatures 
+			// set tower design water outlet and inlet temperatures
 			SimpleTower( TowerNum ).DesOutletWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
 			SimpleTower( TowerNum ).DesInletWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp + SimpleTower( TowerNum ).DesRange;
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
@@ -939,7 +939,7 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).DesRange = 5.5;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
-			// set tower design water outlet and inlet temperatures 
+			// set tower design water outlet and inlet temperatures
 			SimpleTower( TowerNum ).DesOutletWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
 			SimpleTower( TowerNum ).DesInletWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp + SimpleTower( TowerNum ).DesRange;
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
@@ -1905,7 +1905,7 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).DesRange = 5.5;
 				SimpleTower( TowerNum ).TowerInletCondsAutoSize = true;
 			}
-			// set tower design water outlet and inlet temperatures 
+			// set tower design water outlet and inlet temperatures
 			SimpleTower( TowerNum ).DesOutletWaterTemp = SimpleTower( TowerNum ).DesInletAirWBTemp + SimpleTower( TowerNum ).DesApproach;
 			SimpleTower( TowerNum ).DesInletWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp + SimpleTower( TowerNum ).DesRange;
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
@@ -2048,7 +2048,7 @@ namespace CondenserLoopTowers {
 		} // end merkel vs tower loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting cooling tower input." );
+			ShowFatalError( "Errors found in getting cooling tower input." );  // LCOV_EXCL_LINE
 		}
 
 		// Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
@@ -2307,7 +2307,7 @@ namespace CondenserLoopTowers {
 			// Locate the tower on the plant loops for later usage
 			ScanPlantLoopsForObject( SimpleTower( TowerNum ).Name, TypeOf_Num, SimpleTower( TowerNum ).LoopNum, SimpleTower( TowerNum ).LoopSideNum, SimpleTower( TowerNum ).BranchNum, SimpleTower( TowerNum ).CompNum, _, _, _, _, _, ErrorsFound );
 			if ( ErrorsFound ) {
-				ShowFatalError( "InitTower: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitTower: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			// check if setpoint on outlet node
@@ -2494,7 +2494,7 @@ namespace CondenserLoopTowers {
 				DesTowerInletWaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp;
 				DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
 				if ( PltSizCondNum > 0 ) {
-					// check the tower range against the plant sizing data 
+					// check the tower range against the plant sizing data
 					if ( abs( DesTowerWaterDeltaT - PlantSizData( PltSizCondNum ).DeltaT ) > TolTemp ) {
 						ShowWarningError( "Error when autosizing the load for cooling tower = " + SimpleTower( TowerNum ).Name + ". Tower Design Range Temperature is different from the Design Loop Delta Temperature." );
 						ShowContinueError( "Tower Design Range Temperature specified in tower = " + SimpleTower( TowerNum ).Name );
@@ -2568,7 +2568,7 @@ namespace CondenserLoopTowers {
 			} else {
 				if ( PlantFinalSizesOkayToReport ) {
 					ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-					ShowFatalError( "Autosizing of cooling tower condenser flow rate requires a loop Sizing:Plant object." );
+					ShowFatalError( "Autosizing of cooling tower condenser flow rate requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 				}
 
 			}
@@ -2621,7 +2621,7 @@ namespace CondenserLoopTowers {
 				} else {
 					if ( PlantFinalSizesOkayToReport ) {
 							ShowSevereError( "Autosizing of cooling tower fan power requires a loop Sizing:Plant object." );
-							ShowFatalError( " Occurs in cooling tower object= " + SimpleTower( TowerNum ).Name );
+							ShowFatalError( " Occurs in cooling tower object= " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 						}
 					}
 			}
@@ -2686,7 +2686,7 @@ namespace CondenserLoopTowers {
 						ShowContinueError( "is less than or equal to the design inlet air wet-bulb temperature of " + TrimSigDigits( SimpleTowerInlet( TowerNum ).AirWetBulb, 2 ) + " C." );
 						ShowContinueError( "It is recommended that the Design Loop Exit Temperature = " + TrimSigDigits( SimpleTower( TowerNum ).DesInletAirWBTemp, 2 ) + " C plus the cooling tower design approach temperature = " + TrimSigDigits( SimpleTower( TowerNum ).DesApproach, 2 ) + "C." );
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > " + TrimSigDigits( SimpleTower( TowerNum ).DesInletAirWBTemp, 2 ) + " C if autosizing the cooling tower." );
-						ShowFatalError( "Autosizing of cooling tower fails for tower = " + SimpleTower( TowerNum ).Name + '.' );
+						ShowFatalError( "Autosizing of cooling tower fails for tower = " + SimpleTower( TowerNum ).Name + '.' );  // LCOV_EXCL_LINE
 					}
 
 					Par( 1 ) = DesTowerLoad;
@@ -2705,10 +2705,10 @@ namespace CondenserLoopTowers {
 					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					} else if ( SolFla == -2 ) {
 						ShowSevereError( "Bad starting values for UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					}
 
 					if ( PlantFirstSizesOkayToFinalize ) {
@@ -2753,7 +2753,7 @@ namespace CondenserLoopTowers {
 						ShowContinueError( "is less than or equal to the design inlet air wet-bulb temperature of " + TrimSigDigits( SimpleTowerInlet( TowerNum ).AirWetBulb, 2 ) + " C." );
 						ShowContinueError( "It is recommended that the Design Loop Exit Temperature = " + TrimSigDigits( SimpleTower( TowerNum ).DesInletAirWBTemp, 2 ) + " C plus the cooling tower design approach temperature = " + TrimSigDigits( SimpleTower( TowerNum ).DesApproach, 2 ) + "C." );
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > " + TrimSigDigits( SimpleTower( TowerNum ).DesInletAirWBTemp, 2 ) + " C if autosizing the cooling tower." );
-						ShowFatalError( "Autosizing of cooling tower fails for tower = " + SimpleTower( TowerNum ).Name + '.' );
+						ShowFatalError( "Autosizing of cooling tower fails for tower = " + SimpleTower( TowerNum ).Name + '.' );  // LCOV_EXCL_LINE
 					}
 
 					Par( 1 ) = DesTowerLoad;
@@ -2772,10 +2772,10 @@ namespace CondenserLoopTowers {
 					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					} else if ( SolFla == -2 ) {
 						ShowSevereError( "Bad starting values for UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					}
 
 					if ( PlantFirstSizesOkayToFinalize ) {
@@ -2806,7 +2806,7 @@ namespace CondenserLoopTowers {
 							"Initial U-Factor Times Area Value at High Fan Speed [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
 					}
 				}
-			} 		
+			}
 		}
 
 		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
@@ -2832,10 +2832,10 @@ namespace CondenserLoopTowers {
 				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				if ( PlantFirstSizesOkayToFinalize ) {
 					SimpleTower( TowerNum ).HighSpeedTowerUA = UA;
@@ -2963,10 +2963,10 @@ namespace CondenserLoopTowers {
 				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				if ( PlantFirstSizesOkayToFinalize ) {
 					SimpleTower( TowerNum ).LowSpeedTowerUA = UA;
@@ -3034,7 +3034,7 @@ namespace CondenserLoopTowers {
 				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA calculations" );
 					ShowContinueError( "Tower inlet design water temperature assumed to be 35.0 C." );
@@ -3045,7 +3045,7 @@ namespace CondenserLoopTowers {
 					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA0, OutWaterTemp );
 					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
 					ShowContinueError( "Tower capacity at lower UA guess (" + TrimSigDigits( UA0, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );
-					
+
 					SimSimpleTower( TowerNum, Par( 3 ), Par( 4 ), UA1, OutWaterTemp );
 					CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerNum ).WaterTemp - OutWaterTemp );
 					ShowContinueError( "Tower capacity at upper UA guess (" + TrimSigDigits( UA1, 4) + ") = " + TrimSigDigits( CoolingOutput, 0 ) + " W." );
@@ -3053,7 +3053,7 @@ namespace CondenserLoopTowers {
 					if ( CoolingOutput < DesTowerLoad ) {
 						ShowContinueError( "Free convection capacity should be less than tower capacity at upper UA guess." );
 					}
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 
 				}
 				if ( PlantFirstSizesOkayToFinalize ) {
@@ -3113,11 +3113,11 @@ namespace CondenserLoopTowers {
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower water flow ratio during calibration" );
 					ShowContinueError( "Inlet air wet-bulb, range, and/or approach temperature does not allow calibration of water flow rate ratio for this variable-speed cooling tower." );
-					ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for cooling tower water flow rate ratio calibration." );
 					ShowContinueError( "Inlet air wet-bulb, range, and/or approach temperature does not allow calibration of water flow rate ratio for this variable-speed cooling tower." );
-					ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name + '.' );
+					ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name + '.' );  // LCOV_EXCL_LINE
 				}
 			} else {
 				gio::write( OutputChar2, OutputFormat2 ) << WaterFlowRateRatio;
@@ -3125,7 +3125,7 @@ namespace CondenserLoopTowers {
 				ShowSevereError( "Bad starting values for cooling tower water flow rate ratio calibration." );
 				ShowContinueError( "Design inlet air wet-bulb or range temperature must be modified to achieve the design approach" );
 				ShowContinueError( "A water flow rate ratio of " + OutputChar2 + " was calculated to yield an approach temperature of " + OutputChar + '.' );
-				ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name + '.' );
+				ShowFatalError( "Cooling tower calibration failed for tower " + SimpleTower( TowerNum ).Name + '.' );  // LCOV_EXCL_LINE
 			}
 
 			SimpleTower( TowerNum ).CalibratedWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate / WaterFlowRatio;
@@ -3214,7 +3214,7 @@ namespace CondenserLoopTowers {
 				}
 			}
 			if ( ErrorsFound ) {
-				ShowFatalError( "InitTower: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitTower: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -3310,7 +3310,7 @@ namespace CondenserLoopTowers {
 				DesTowerInletWaterTemp = DesTowerExitWaterTemp + PlantSizData( PltSizCondNum ).DeltaT;
 				DesTowerWaterDeltaT = PlantSizData( PltSizCondNum ).DeltaT;
 			} else {
-				// set default values to replace hard wired input assumptions 
+				// set default values to replace hard wired input assumptions
 				DesTowerExitWaterTemp = SimpleTower( TowerNum ).DesOutletWaterTemp;
 				DesTowerInletWaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp;
 				DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
@@ -3321,7 +3321,7 @@ namespace CondenserLoopTowers {
 			DesTowerInletWaterTemp = SimpleTower( TowerNum ).DesInletWaterTemp;
 			DesTowerWaterDeltaT = SimpleTower( TowerNum ).DesRange;
 			if ( PltSizCondNum > 0 ) {
-				// check the tower range against the plant sizing data 
+				// check the tower range against the plant sizing data
 				if ( abs( DesTowerWaterDeltaT - PlantSizData( PltSizCondNum ).DeltaT ) > TolTemp ) {
 					ShowWarningError( "Error when autosizing the load for cooling tower = " + SimpleTower( TowerNum ).Name + ". Tower Design Range Temperature is different from the Design Loop Delta Temperature." );
 					ShowContinueError( "Tower Design Range Temperature specified in tower = " + SimpleTower( TowerNum ).Name );
@@ -3384,7 +3384,7 @@ namespace CondenserLoopTowers {
 					} else {
 						if ( PlantFirstSizesOkayToFinalize ) {
 							ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 						}
 					}
 				}
@@ -3485,10 +3485,10 @@ namespace CondenserLoopTowers {
 				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				SimpleTower( TowerNum ).HighSpeedTowerUA = UA;
 				if ( PlantFinalSizesOkayToReport ) {
@@ -3516,10 +3516,10 @@ namespace CondenserLoopTowers {
 				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
-					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Bad starting values for UA" );
-					ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				SimpleTower( TowerNum ).FreeConvTowerUA = UA;
 				if ( PlantFinalSizesOkayToReport ) {
@@ -3577,7 +3577,7 @@ namespace CondenserLoopTowers {
 					} else {
 						if ( PlantFirstSizesOkayToFinalize ) {
 							ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 						}
 					}
 				}
@@ -3652,7 +3652,7 @@ namespace CondenserLoopTowers {
 					} else {
 						if (PlantFirstSizesOkayToFinalize) {
 							ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 						}
 					}
 				}
@@ -3722,10 +3722,10 @@ namespace CondenserLoopTowers {
 					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower UA" );
-						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					} else if ( SolFla == -2 ) {
 						ShowSevereError( "Bad starting values for UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "Autosizing of cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					}
 					SimpleTower( TowerNum ).HighSpeedTowerUA = UA;
 					if ( PlantFinalSizesOkayToReport ) {
@@ -3752,10 +3752,10 @@ namespace CondenserLoopTowers {
 					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleTowerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowSevereError( "Iteration limit exceeded in calculating tower free convection UA" );
-						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "calculating cooling tower UA failed for tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					} else if ( SolFla == -2 ) {
 						ShowSevereError( "Bad starting values for UA" );
-						ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + SimpleTower( TowerNum ).Name );
+						ShowFatalError( "Autosizing of cooling tower UA failed for free convection tower " + SimpleTower( TowerNum ).Name );  // LCOV_EXCL_LINE
 					}
 					SimpleTower( TowerNum ).LowSpeedTowerUA = UA;
 					if ( PlantFinalSizesOkayToReport ) {
@@ -3823,7 +3823,7 @@ namespace CondenserLoopTowers {
 						tmpNomTowerCap = 0.0; // Suppress uninitialized warnings
 						if ( PlantFirstSizesOkayToFinalize ) {
 							ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
+							ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 						}
 					}
 
@@ -4061,7 +4061,7 @@ namespace CondenserLoopTowers {
 		OutletWaterTemp = Node( WaterInletNode ).Temp;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
-		
+
 		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
 		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
 
@@ -4085,12 +4085,12 @@ namespace CondenserLoopTowers {
 		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempSetPoint
 			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
-			
+
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
@@ -4098,14 +4098,14 @@ namespace CondenserLoopTowers {
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
-			
+
 			//calculate the Faulty Tower Fouling Factor using fault information
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
-			
+
 			//update the tower UA values at faulty cases
 			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			
+
 		}
 
 		// Added for fluid bypass. First assume no fluid bypass
@@ -4413,10 +4413,10 @@ namespace CondenserLoopTowers {
 		OutletWaterTemp = Node( WaterInletNode ).Temp;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
-		
+
 		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
 		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
-		
+
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -4437,12 +4437,12 @@ namespace CondenserLoopTowers {
 		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempSetPoint
 			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
-			
+
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
@@ -4450,14 +4450,14 @@ namespace CondenserLoopTowers {
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
-			
+
 			//calculate the Faulty Tower Fouling Factor using fault information
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
-			
+
 			//update the tower UA values at faulty cases
 			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			
+
 		}
 
 		// Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
@@ -4658,10 +4658,10 @@ namespace CondenserLoopTowers {
 		OutletWaterTemp = Node( WaterInletNode ).Temp;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
-		
+
 		Real64 FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUA;
 		Real64 HighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
-		
+
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -4682,12 +4682,12 @@ namespace CondenserLoopTowers {
 		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempSetPoint
 			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
-			
+
 		}
 
 		//If there is a fault of cooling tower fouling (zrp_Jul2016)
@@ -4695,14 +4695,14 @@ namespace CondenserLoopTowers {
 			int FaultIndex = SimpleTower( TowerNum ).FaultyTowerFoulingIndex;
 			Real64 FreeConvTowerUA_ff = SimpleTower( TowerNum ).FreeConvTowerUA;
 			Real64 HighSpeedTowerUA_ff = SimpleTower( TowerNum ).HighSpeedTowerUA;
-			
+
 			//calculate the Faulty Tower Fouling Factor using fault information
 			SimpleTower( TowerNum ).FaultyTowerFoulingFactor = FaultsTowerFouling( FaultIndex ).CalFaultyTowerFoulingFactor();
-			
+
 			//update the tower UA values at faulty cases
 			FreeConvTowerUA = FreeConvTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
 			HighSpeedTowerUA = HighSpeedTowerUA_ff * SimpleTower( TowerNum ).FaultyTowerFoulingFactor;
-			
+
 		}
 
 		// Added for multi-cell. Determine the number of cells operating
@@ -5127,7 +5127,7 @@ namespace CondenserLoopTowers {
 		TwbCapped = SimpleTowerInlet( TowerNum ).AirWetBulb;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
-		
+
 		//water temperature setpoint
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 		if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -5142,12 +5142,12 @@ namespace CondenserLoopTowers {
 		if( SimpleTower( TowerNum ).FaultyCondenserSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = SimpleTower( TowerNum ).FaultyCondenserSWTIndex;
 			Real64 TowerOutletTemp_ff = TempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			SimpleTower( TowerNum ).FaultyCondenserSWTOffset = FaultsCondenserSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempSetPoint
 			TempSetPoint = TowerOutletTemp_ff - SimpleTower( TowerNum ).FaultyCondenserSWTOffset;
-			
+
 		}
 
 		Tr = Node( WaterInletNode ).Temp - TempSetPoint;

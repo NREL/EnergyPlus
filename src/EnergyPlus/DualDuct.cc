@@ -207,17 +207,17 @@ namespace DualDuct {
 		if ( CompIndex == 0 ) {
 			DamperNum = FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
 			if ( DamperNum == 0 ) {
-				ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );
+				ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DamperNum;
 		} else {
 			DamperNum = CompIndex;
 			if ( DamperNum > NumDampers || DamperNum < 1 ) {
-				ShowFatalError( "SimulateDualDuct: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Dampers=" + TrimSigDigits( NumDampers ) + ", Damper name=" + CompName );
+				ShowFatalError( "SimulateDualDuct: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Dampers=" + TrimSigDigits( NumDampers ) + ", Damper name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DamperNum ) ) {
 				if ( CompName != Damper( DamperNum ).DamperName ) {
-					ShowFatalError( "SimulateDualDuct: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Damper name=" + CompName + ", stored Damper Name for that index=" + Damper( DamperNum ).DamperName );
+					ShowFatalError( "SimulateDualDuct: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Damper name=" + CompName + ", stored Damper Name for that index=" + Damper( DamperNum ).DamperName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DamperNum ) = false;
 			}
@@ -251,7 +251,7 @@ namespace DualDuct {
 			// Report the current Damper
 			ReportDualDuct( DamperNum );
 		} else {
-			ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );
+			ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -696,7 +696,7 @@ namespace DualDuct {
 
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}

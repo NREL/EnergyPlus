@@ -220,17 +220,17 @@ namespace WaterToAirHeatPump {
 		if ( CompIndex == 0 ) {
 			HPNum = FindItemInList( CompName, WatertoAirHP );
 			if ( HPNum == 0 ) {
-				ShowFatalError( "WaterToAir HP not found=" + CompName );
+				ShowFatalError( "WaterToAir HP not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = HPNum;
 		} else {
 			HPNum = CompIndex;
 			if ( HPNum > NumWatertoAirHPs || HPNum < 1 ) {
-				ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
+				ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( HPNum ) ) {
 				if ( ! CompName.empty() && CompName != WatertoAirHP( HPNum ).Name ) {
-					ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + WatertoAirHP( HPNum ).Name );
+					ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + WatertoAirHP( HPNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( HPNum ) = false;
 			}
@@ -250,7 +250,7 @@ namespace WaterToAirHeatPump {
 			UpdateWatertoAirHP( HPNum );
 
 		} else {
-			ShowFatalError( "SimWatertoAirHP: AirtoAir heatpump not in either HEATING or COOLING" );
+			ShowFatalError( "SimWatertoAirHP: AirtoAir heatpump not in either HEATING or COOLING" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -566,7 +566,7 @@ namespace WaterToAirHeatPump {
 		NumArray.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found getting input. Program terminates." );
+			ShowFatalError( RoutineName + "Errors found getting input. Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		for ( HPNum = 1; HPNum <= NumWatertoAirHPs; ++HPNum ) {
@@ -726,7 +726,7 @@ namespace WaterToAirHeatPump {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "InitWatertoAirHP: Program terminated for previous conditions." );
+				ShowFatalError( "InitWatertoAirHP: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 			}
 
 			MyPlantScanFlag( HPNum ) = false;

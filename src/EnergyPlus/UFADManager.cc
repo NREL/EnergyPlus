@@ -435,7 +435,7 @@ namespace UFADManager {
 				ZoneUCSDUI( UINum ).E_Kc = 0.0;
 			} else {
 				if ( ZoneUCSDUI( UINum ).A_Kc == AutoCalculate || ZoneUCSDUI( UINum ).B_Kc == AutoCalculate || ZoneUCSDUI( UINum ).C_Kc == AutoCalculate || ZoneUCSDUI( UINum ).D_Kc == AutoCalculate || ZoneUCSDUI( UINum ).E_Kc == AutoCalculate ) {
-					ShowFatalError( "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI( UINum ).ZoneName + ", input for Coefficients A - E must be specified when Floor Diffuser Type = Custom." );
+					ShowFatalError( "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI( UINum ).ZoneName + ", input for Coefficients A - E must be specified when Floor Diffuser Type = Custom." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ZoneUCSDUI( UINum ).PowerPerPlume == AutoCalculate ) {
@@ -587,7 +587,7 @@ namespace UFADManager {
 				ZoneUCSDUE( UINum ).E_Kc = 0.0014;
 			} else {
 				if ( ZoneUCSDUE( UINum ).A_Kc == AutoCalculate || ZoneUCSDUE( UINum ).B_Kc == AutoCalculate || ZoneUCSDUE( UINum ).C_Kc == AutoCalculate || ZoneUCSDUE( UINum ).D_Kc == AutoCalculate || ZoneUCSDUE( UINum ).E_Kc == AutoCalculate ) {
-					ShowFatalError( "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE( UINum ).ZoneName + ", input for Coefficients A - E must be specified when Floor Diffuser Type = Custom." );
+					ShowFatalError( "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE( UINum ).ZoneName + ", input for Coefficients A - E must be specified when Floor Diffuser Type = Custom." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ZoneUCSDUE( UINum ).PowerPerPlume == AutoCalculate ) {
@@ -753,7 +753,7 @@ namespace UFADManager {
 					ShowContinueError( "Zone=\"" + Zone( Surface( SurfNum ).Zone ).Name + "\", Surface=\"" + Surface( SurfNum ).Name + "\"." );
 					ShowContinueError( "ZInfSurf=[" + RoundSigDigits( ZInfSurf, 4 ) + "], LayH=[" + RoundSigDigits( LayH, 4 ) + "]." );
 					ShowContinueError( "ZSupSurf=[" + RoundSigDigits( ZSupSurf, 4 ) + "], LayH=[" + RoundSigDigits( LayH, 4 ) + "]." );
-					ShowFatalError( "...Previous condition causes termination." );
+					ShowFatalError( "...Previous condition causes termination." );  // LCOV_EXCL_LINE
 				}
 
 				// The Wall surface is partially in upper and partially in lower subzone
@@ -1325,7 +1325,7 @@ namespace UFADManager {
 			} else if ( HeightComfort >= HeightUpSubzoneAve && HeightComfort <= CeilingHeight ) {
 				TCMF( ZoneNum ) = ZTMX( ZoneNum );
 			} else {
-				ShowFatalError( "UFAD comfort height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );
+				ShowFatalError( "UFAD comfort height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -1341,7 +1341,7 @@ namespace UFADManager {
 			} else if ( HeightThermostat >= HeightUpSubzoneAve && HeightThermostat <= CeilingHeight ) {
 				TempTstatAir( ZoneNum ) = ZTMX( ZoneNum );
 			} else {
-				ShowFatalError( "Underfloor air distribution thermostat height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );
+				ShowFatalError( "Underfloor air distribution thermostat height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -1644,8 +1644,8 @@ namespace UFADManager {
 				if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 					GainsFrac -= 0.2;
 				}
-				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
-				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
+				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 
 				if ( UseZoneTimeStepHistory ) {
 					ZTM3OC( ZoneNum ) = XM3TOC( ZoneNum );
@@ -1783,7 +1783,7 @@ namespace UFADManager {
 			} else if ( HeightComfort >= HeightUpSubzoneAve && HeightComfort <= CeilingHeight ) {
 				TCMF( ZoneNum ) = ZTMX( ZoneNum );
 			} else {
-				ShowFatalError( "UFAD comfort height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );
+				ShowFatalError( "UFAD comfort height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -1799,7 +1799,7 @@ namespace UFADManager {
 			} else if ( HeightThermostat >= HeightUpSubzoneAve && HeightThermostat <= CeilingHeight ) {
 				TempTstatAir( ZoneNum ) = ZTMX( ZoneNum );
 			} else {
-				ShowFatalError( "Underfloor air distribution thermostat height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );
+				ShowFatalError( "Underfloor air distribution thermostat height is above ceiling or below floor in Zone: " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 

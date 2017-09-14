@@ -256,7 +256,7 @@ namespace EMSManager {
 				OutputEMSFileUnitNum = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputEMSFileUnitNum, DataStringGlobals::outputEddFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( "CheckIFAnyEMS: Could not open file "+ DataStringGlobals::outputEddFileName +" for output (write)." );
+					ShowFatalError( "CheckIFAnyEMS: Could not open file "+ DataStringGlobals::outputEddFileName +" for output (write)." );  // LCOV_EXCL_LINE
 				}
 			}
 		} else {
@@ -756,7 +756,7 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						Sensor( SensorNum ).VariableNum = VariableNum;
-						ErlVariable( VariableNum ).Value.initialized = true; 
+						ErlVariable( VariableNum ).Value.initialized = true;
 					}
 				}
 
@@ -1056,7 +1056,7 @@ namespace EMSManager {
 		lNumericFieldBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting Energy Management System input. Preceding condition causes termination." );
+			ShowFatalError( "Errors found in getting Energy Management System input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1299,7 +1299,7 @@ namespace EMSManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing Energy Management System input. Preceding condition causes termination." );
+			ShowFatalError( "Errors found in processing Energy Management System input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( reportErrors ) {
@@ -2168,7 +2168,7 @@ namespace EMSManager {
 	void
 	checkForUnusedActuatorsAtEnd()
 	{
-		// call at end of simulation to check if any of the user's actuators were never initialized.  
+		// call at end of simulation to check if any of the user's actuators were never initialized.
 		// Could be a mistake we want to help users catch // Issue #4404.
 		for ( int actuatorUsedLoop = 1; actuatorUsedLoop <= numActuatorsUsed; ++actuatorUsedLoop ) {
 			if ( ! ErlVariable( EMSActuatorUsed( actuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
@@ -2179,9 +2179,9 @@ namespace EMSManager {
 				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( actuatorUsedLoop ).ControlTypeName );
 			}
 		}
-	
+
 	}
-	
+
 } // EMSManager
 
 //Moved these setup EMS actuator routines out of module to solve circular use problems between

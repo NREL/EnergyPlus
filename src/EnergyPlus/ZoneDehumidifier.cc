@@ -224,17 +224,17 @@ namespace ZoneDehumidifier {
 		if ( CompIndex == 0 ) {
 			ZoneDehumidNum = FindItemInList( CompName, ZoneDehumid );
 			if ( ZoneDehumidNum == 0 ) {
-				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + CompName );
+				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = ZoneDehumidNum;
 		} else {
 			ZoneDehumidNum = CompIndex;
 			if ( ZoneDehumidNum > NumDehumidifiers || ZoneDehumidNum < 1 ) {
-				ShowFatalError( "SimZoneDehumidifier:  Invalid CompIndex passed= " + TrimSigDigits( ZoneDehumidNum ) + ", Number of Units= " + TrimSigDigits( NumDehumidifiers ) + ", Entered Unit name= " + CompName );
+				ShowFatalError( "SimZoneDehumidifier:  Invalid CompIndex passed= " + TrimSigDigits( ZoneDehumidNum ) + ", Number of Units= " + TrimSigDigits( NumDehumidifiers ) + ", Entered Unit name= " + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( ZoneDehumidNum ) ) {
 				if ( CompName != ZoneDehumid( ZoneDehumidNum ).Name ) {
-					ShowFatalError( "SimZoneDehumidifier: Invalid CompIndex passed=" + TrimSigDigits( ZoneDehumidNum ) + ", Unit name= " + CompName + ", stored Unit Name for that index= " + ZoneDehumid( ZoneDehumidNum ).Name );
+					ShowFatalError( "SimZoneDehumidifier: Invalid CompIndex passed=" + TrimSigDigits( ZoneDehumidNum ) + ", Unit name= " + CompName + ", stored Unit Name for that index= " + ZoneDehumid( ZoneDehumidNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( ZoneDehumidNum ) = false;
 			}
@@ -521,7 +521,7 @@ namespace ZoneDehumidifier {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + ':' + CurrentModuleObject + ": Errors found in input." );
+			ShowFatalError( RoutineName + ':' + CurrentModuleObject + ": Errors found in input." );  // LCOV_EXCL_LINE
 		}
 
 		for ( ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex ) {

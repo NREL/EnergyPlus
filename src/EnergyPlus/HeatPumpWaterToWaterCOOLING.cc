@@ -188,17 +188,17 @@ namespace HeatPumpWaterToWaterCOOLING {
 		if ( CompIndex == 0 ) {
 			GSHPNum = FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
-				ShowFatalError( "SimHPWatertoWaterCOOLING: Unit not found=" + GSHPName );
+				ShowFatalError( "SimHPWatertoWaterCOOLING: Unit not found=" + GSHPName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = GSHPNum;
 		} else {
 			GSHPNum = CompIndex;
 			if ( GSHPNum > NumGSHPs || GSHPNum < 1 ) {
-				ShowFatalError( "SimHPWatertoWaterCOOLING:  Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Number of Units=" + TrimSigDigits( NumGSHPs ) + ", Entered Unit name=" + GSHPName );
+				ShowFatalError( "SimHPWatertoWaterCOOLING:  Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Number of Units=" + TrimSigDigits( NumGSHPs ) + ", Entered Unit name=" + GSHPName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( GSHPNum ) ) {
 				if ( GSHPName != GSHP( GSHPNum ).Name ) {
-					ShowFatalError( "SimHPWatertoWaterCOOLING: Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Unit name=" + GSHPName + ", stored Unit Name for that index=" + GSHP( GSHPNum ).Name );
+					ShowFatalError( "SimHPWatertoWaterCOOLING: Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Unit name=" + GSHPName + ", stored Unit Name for that index=" + GSHP( GSHPNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( GSHPNum ) = false;
 			}
@@ -220,7 +220,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		} else if ( LoopNum == GSHP( GSHPNum ).SourceLoopNum ) { // condenser loop
 			UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, TypeOf_HPWaterEFCooling, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideWaterInletTemp, GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, GSHPReport( GSHPNum ).SourceSidemdot, FirstHVACIteration );
 		} else {
-			ShowFatalError( "SimHPWatertoWaterCOOLING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + GSHPName );
+			ShowFatalError( "SimHPWatertoWaterCOOLING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + GSHPName );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -424,13 +424,13 @@ namespace HeatPumpWaterToWaterCOOLING {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors Found in getting Gshp input" );
+			ShowFatalError( "Errors Found in getting Gshp input" );  // LCOV_EXCL_LINE
 		}
 
 		GSHPRefrigIndex = FindRefrigerant( GSHPRefrigerant );
 		if ( GSHPRefrigIndex == 0 ) {
-			ShowFatalError( "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant );
-			ShowFatalError( "FluidProperties:* objects for " + GSHPRefrigerant + " must be included in the idf file.");
+			ShowFatalError( "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant );  // LCOV_EXCL_LINE
+			ShowFatalError( "FluidProperties:* objects for " + GSHPRefrigerant + " must be included in the idf file.");  // LCOV_EXCL_LINE
 		}
 
 		//CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Cooling'
@@ -461,7 +461,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "GetWatertoWaterHPInput: Program terminated on scan for loop data" );
+				ShowFatalError( "GetWatertoWaterHPInput: Program terminated on scan for loop data" );  // LCOV_EXCL_LINE
 			}
 
 		}
@@ -509,7 +509,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 			ScanPlantLoopsForObject( GSHP( GSHPNum ).Name, TypeOf_HPWaterPECooling, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).SourceBranchNum, GSHP( GSHPNum ).SourceCompNum, _, _, _, GSHP( GSHPNum ).SourceSideInletNodeNum, _, errFlag );
 			ScanPlantLoopsForObject( GSHP( GSHPNum ).Name, TypeOf_HPWaterPECooling, GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum, _, _, _, GSHP( GSHPNum ).LoadSideInletNodeNum, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitGshp: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitGshp: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			MyPlanScanFlag( GSHPNum ) = false;
 		}
@@ -788,14 +788,14 @@ namespace HeatPumpWaterToWaterCOOLING {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Source Side Pressure Less than the Design Minimum" );
 				ShowContinueError( "Cooling Source Side Pressure=" + TrimSigDigits( SourceSidePressure, 2 ) + " and user specified Design Minimum Pressure=" + TrimSigDigits( LowPressCutoff, 2 ) );
 				ShowContinueErrorTimeStamp( "" );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( LoadSidePressure > HighPressCutoff ) {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Load Side Pressure greater than the Design Maximum" );
 				ShowContinueError( "Cooling Load Side Pressure=" + TrimSigDigits( LoadSidePressure, 2 ) + " and user specified Design Maximum Pressure=" + TrimSigDigits( HighPressCutoff, 2 ) );
 				ShowContinueErrorTimeStamp( "" );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 			// Determine Suction Pressure at compressor inlet
 			SuctionPr = LoadSidePressure - PressureDrop;
@@ -806,14 +806,14 @@ namespace HeatPumpWaterToWaterCOOLING {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Suction Pressure Less than the Design Minimum" );
 				ShowContinueError( "Cooling Suction Pressure=" + TrimSigDigits( SuctionPr, 2 ) + " and user specified Design Minimum Pressure=" + TrimSigDigits( LowPressCutoff, 2 ) );
 				ShowContinueErrorTimeStamp( "" );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( DischargePr > HighPressCutoff ) {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Discharge Pressure greater than the Design Maximum" );
 				ShowContinueError( "Cooling Discharge Pressure=" + TrimSigDigits( DischargePr, 2 ) + " and user specified Design Maximum Pressure=" + TrimSigDigits( HighPressCutoff, 2 ) );
 				ShowContinueErrorTimeStamp( "" );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 
 			// Determine the Source Side Outlet Enthalpy

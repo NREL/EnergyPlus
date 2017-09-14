@@ -216,17 +216,17 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( CompIndex == 0 ) {
 			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil );
 			if ( HXAssistedCoilNum == 0 ) {
-				ShowFatalError( "HX Assisted Coil not found=" + HXAssistedCoilName );
+				ShowFatalError( "HX Assisted Coil not found=" + HXAssistedCoilName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = HXAssistedCoilNum;
 		} else {
 			HXAssistedCoilNum = CompIndex;
 			if ( HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1 ) {
-				ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Number of HX Assisted Cooling Coils=" + TrimSigDigits( TotalNumHXAssistedCoils ) + ", Coil name=" + HXAssistedCoilName );
+				ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Number of HX Assisted Cooling Coils=" + TrimSigDigits( TotalNumHXAssistedCoils ) + ", Coil name=" + HXAssistedCoilName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( HXAssistedCoilNum ) ) {
 				if ( ! HXAssistedCoilName.empty() && HXAssistedCoilName != HXAssistedCoil( HXAssistedCoilNum ).Name ) {
-					ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Coil name=" + HXAssistedCoilName + ", stored Coil Name for that index=" + HXAssistedCoil( HXAssistedCoilNum ).Name );
+					ShowFatalError( "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Coil name=" + HXAssistedCoilName + ", stored Coil Name for that index=" + HXAssistedCoil( HXAssistedCoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( HXAssistedCoilNum ) = false;
 			}
@@ -664,7 +664,7 @@ namespace HVACHXAssistedCoolingCoil {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Previous error condition causes termination." );
+			ShowFatalError( RoutineName + "Previous error condition causes termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -719,8 +719,8 @@ namespace HVACHXAssistedCoolingCoil {
 			DXCoilFullLoadOutAirTemp( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 			DXCoilFullLoadOutAirHumRat( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 		} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
-			// 
-		
+			//
+
 		}
 
 	}
@@ -982,17 +982,17 @@ namespace HVACHXAssistedCoolingCoil {
 			}
 
 			if ( HXAssistedCoilNum == 0 ) {
-				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + CompName );
+				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = HXAssistedCoilNum;
 			Value = 1.0; // not scheduled?
 		} else {
 			HXAssistedCoilNum = CompIndex;
 			if ( HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1 ) {
-				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( TotalNumHXAssistedCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( TotalNumHXAssistedCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CompName != HXAssistedCoil( HXAssistedCoilNum ).Name ) {
-				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HXAssistedCoil( HXAssistedCoilNum ).Name );
+				ShowFatalError( "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( HXAssistedCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HXAssistedCoil( HXAssistedCoilNum ).Name );  // LCOV_EXCL_LINE
 			}
 
 			Value = 1.0; // not scheduled?

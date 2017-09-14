@@ -247,17 +247,17 @@ namespace Fans {
 		if ( CompIndex == 0 ) {
 			FanNum = FindItemInList( CompName, Fan, &FanEquipConditions::FanName );
 			if ( FanNum == 0 ) {
-				ShowFatalError( "SimulateFanComponents: Fan not found=" + CompName );
+				ShowFatalError( "SimulateFanComponents: Fan not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = FanNum;
 		} else {
 			FanNum = CompIndex;
 			if ( FanNum > NumFans || FanNum < 1 ) {
-				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Number of Fans=" + TrimSigDigits( NumFans ) + ", Fan name=" + CompName );
+				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Number of Fans=" + TrimSigDigits( NumFans ) + ", Fan name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( FanNum ) ) {
 				if ( ! CompName.empty() && CompName != Fan( FanNum ).FanName ) {
-					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Fan name=" + CompName + ", stored Fan Name for that index=" + Fan( FanNum ).FanName );
+					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Fan name=" + CompName + ", stored Fan Name for that index=" + Fan( FanNum ).FanName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( FanNum ) = false;
 			}
@@ -912,7 +912,7 @@ namespace Fans {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		for ( FanNum = 1; FanNum <= NumFans; ++FanNum ) {

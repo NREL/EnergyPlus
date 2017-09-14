@@ -2792,7 +2792,7 @@ namespace InternalHeatGains {
 		AlphaName.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in Getting Internal Gains Input, Program Stopped" );
+			ShowFatalError( RoutineName + "Errors found in Getting Internal Gains Input, Program Stopped" );  // LCOV_EXCL_LINE
 		}
 
 		gio::write( OutputFileInits, Format_721 );
@@ -3906,7 +3906,7 @@ namespace InternalHeatGains {
 					TSupply = Node( SupplyNodeNum ).Temp;
 					WSupply = Node( SupplyNodeNum ).HumRat;
 				} else {
-					ShowFatalError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
+					ShowFatalError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );  // LCOV_EXCL_LINE
 					ShowContinueError( "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified." );
 				}
 				if ( ZoneITEq( Loop ).RecircFLTCurve != 0 ) {
@@ -4377,7 +4377,7 @@ namespace InternalHeatGains {
 		int Loop;
 
 		if ( GetInternalHeatGainsInputFlag ) {
-			ShowFatalError( "GetDesignLightingLevelForZone: Function called prior to Getting Lights Input." );
+			ShowFatalError( "GetDesignLightingLevelForZone: Function called prior to Getting Lights Input." );  // LCOV_EXCL_LINE
 		}
 
 		DesignLightingLevelSum = 0.0;
@@ -4437,7 +4437,7 @@ namespace InternalHeatGains {
 		int NumLights; // Number of Lights statement for that zone.
 
 		if ( GetInternalHeatGainsInputFlag ) {
-			ShowFatalError( "CheckLightsReplaceableMinMaxForZone: Function called prior to Getting Lights Input." );
+			ShowFatalError( "CheckLightsReplaceableMinMaxForZone: Function called prior to Getting Lights Input." );  // LCOV_EXCL_LINE
 		}
 
 		LightsRepMin = 99999.0;

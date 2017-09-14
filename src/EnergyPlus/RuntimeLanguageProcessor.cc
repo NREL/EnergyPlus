@@ -1024,7 +1024,7 @@ namespace RuntimeLanguageProcessor {
 					}
 				}
 			} else {
-				ShowFatalError( "Fatal error in RunStack:  Unknown keyword." );
+				ShowFatalError( "Fatal error in RunStack:  Unknown keyword." );  // LCOV_EXCL_LINE
 
 			}}
 
@@ -1126,7 +1126,7 @@ namespace RuntimeLanguageProcessor {
 			ShowContinueError( "Erl program line text: " + LineString );
 			ShowContinueError( "Error message: " + cValueString );
 			ShowContinueErrorTimeStamp( "" );
-			ShowFatalError( "Previous EMS error caused program termination.");
+			ShowFatalError( "Previous EMS error caused program termination.");  // LCOV_EXCL_LINE
 		}
 
 
@@ -1220,7 +1220,7 @@ namespace RuntimeLanguageProcessor {
 				ShowSevereError( "EMS ParseExpression: Entity=" + ErlStack( StackNum ).Name );
 				ShowContinueError( "...Line=" + Line );
 				ShowContinueError( "...Failed to process String=\"" + String + "\"." );
-				ShowFatalError( "...program terminates due to preceding condition." );
+				ShowFatalError( "...program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 			}
 			NextChar = String[ Pos ];
 			if ( NextChar == ' ' ) {
@@ -1692,7 +1692,7 @@ namespace RuntimeLanguageProcessor {
 						Pos += 10;
 					} else { // throw error
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + String + "\"";
-						ShowFatalError( "EMS Runtime Language: did not find valid input for built-in function =" + String );
+						ShowFatalError( "EMS Runtime Language: did not find valid input for built-in function =" + String );  // LCOV_EXCL_LINE
 					}
 				} else {
 					// Check for remaining single character operators
@@ -1742,7 +1742,7 @@ namespace RuntimeLanguageProcessor {
 					} else {
 						// Uh OH, this should never happen! throw error
 						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + StringToken + "\"";
-						ShowFatalError( "EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String );
+						ShowFatalError( "EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String );  // LCOV_EXCL_LINE
 
 					}
 				}
@@ -1775,7 +1775,7 @@ namespace RuntimeLanguageProcessor {
 
 		if ( NumErrors > 0 ) {
 			if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR OUT";
-			ShowFatalError( "EMS, previous errors cause termination." );
+			ShowFatalError( "EMS, previous errors cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		ExpressionNum = ProcessTokens( Token, NumTokens, StackNum, String );
@@ -1903,7 +1903,7 @@ namespace RuntimeLanguageProcessor {
 		if ( ParenthWhileCounter == 50 ) { // symptom of mismatched parenthesis
 			ShowSevereError( "EMS error parsing parentheses, check that parentheses are balanced" );
 			ShowContinueError( "String being parsed=\"" + ParsingString + "\"." );
-			ShowFatalError( "Program terminates due to preceding error." );
+			ShowFatalError( "Program terminates due to preceding error." );  // LCOV_EXCL_LINE
 		}
 
 		SetupPossibleOperators(); // includes built-in functions
@@ -1952,7 +1952,7 @@ namespace RuntimeLanguageProcessor {
 							ErlExpression( ExpressionNum ).Operand( 3 ).Expression = Token( Pos + 3 ).Expression;
 							ErlExpression( ExpressionNum ).Operand( 3 ).Variable = Token( Pos + 3 ).Variable;
 							if ( ( NumOperands == 3 ) && ( NumTokens - 4 > 0 ) ) { // too many tokens for this non-binary operator
-								ShowFatalError( "EMS error parsing tokens, too many for built-in function" );
+								ShowFatalError( "EMS error parsing tokens, too many for built-in function" );  // LCOV_EXCL_LINE
 							}
 						}
 
@@ -1962,7 +1962,7 @@ namespace RuntimeLanguageProcessor {
 							ErlExpression( ExpressionNum ).Operand( 4 ).Expression = Token( Pos + 4 ).Expression;
 							ErlExpression( ExpressionNum ).Operand( 4 ).Variable = Token( Pos + 4 ).Variable;
 							if ( ( NumOperands == 4 ) && ( NumTokens - 5 > 0 ) ) { // too many tokens for this non-binary operator
-								ShowFatalError( "EMS error parsing tokens, too many for built-in function" );
+								ShowFatalError( "EMS error parsing tokens, too many for built-in function" );  // LCOV_EXCL_LINE
 							}
 						}
 
@@ -1972,7 +1972,7 @@ namespace RuntimeLanguageProcessor {
 							ErlExpression( ExpressionNum ).Operand( 5 ).Expression = Token( Pos + 5 ).Expression;
 							ErlExpression( ExpressionNum ).Operand( 5 ).Variable = Token( Pos + 5 ).Variable;
 							if ( ( NumOperands == 5 ) && ( NumTokens - 6 > 0 ) ) { // too many tokens for this non-binary operator
-								ShowFatalError( "EMS error parsing tokens, too many for  built-in function" );
+								ShowFatalError( "EMS error parsing tokens, too many for  built-in function" );  // LCOV_EXCL_LINE
 							}
 						}
 						break;
@@ -2454,7 +2454,7 @@ namespace RuntimeLanguageProcessor {
 
 				ShowSevereError( "EMS user program found serious problem and is halting simulation" );
 				ShowContinueErrorTimeStamp( "" );
-				ShowFatalError( "EMS user program halted simulation with error code = " + TrimSigDigits( Operand( 1 ).Number, 2 ) );
+				ShowFatalError( "EMS user program halted simulation with error code = " + TrimSigDigits( Operand( 1 ).Number, 2 ) );  // LCOV_EXCL_LINE
 				ReturnValue = SetErlValueNumber( Operand( 1 ).Number ); // returns back the error code
 			} else if ( SELECT_CASE_var == FuncSevereWarnEp ) {
 
@@ -2623,7 +2623,7 @@ namespace RuntimeLanguageProcessor {
 
 			} else {
 				// throw Error!
-				ShowFatalError( "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression" );
+				ShowFatalError( "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression" );  // LCOV_EXCL_LINE
 			}}
 			}
 			Operand.deallocate();
@@ -3095,7 +3095,7 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in getting EMS Runtime Language input. Preceding condition causes termination." );
+				ShowFatalError( "Errors found in getting EMS Runtime Language input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			// Parse the runtime language code
@@ -3112,7 +3112,7 @@ namespace RuntimeLanguageProcessor {
 			} // StackNum
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in parsing EMS Runtime Language input. Preceding condition causes termination." );
+				ShowFatalError( "Errors found in parsing EMS Runtime Language input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ( NumEMSOutputVariables > 0 ) || ( NumEMSMeteredOutputVariables > 0 ) ) {
@@ -3534,7 +3534,7 @@ namespace RuntimeLanguageProcessor {
 			lNumericFieldBlanks.deallocate();
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in getting EMS Runtime Language input. Preceding condition causes termination." );
+				ShowFatalError( "Errors found in getting EMS Runtime Language input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 
 		} // GetInput

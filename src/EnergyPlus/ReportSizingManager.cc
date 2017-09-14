@@ -180,7 +180,7 @@ namespace ReportSizingManager {
 			gio::write( OutputFileInits, Format_991 ) << CompType << CompName << UsrDesc << RoundSigDigits( UsrValue, 5 );
 			AddCompSizeTableEntry( CompType, CompName, UsrDesc, UsrValue );
 		} else if ( present( UsrDesc ) || present( UsrValue ) ) {
-			ShowFatalError( "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both." );
+			ShowFatalError( "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both." );  // LCOV_EXCL_LINE
 		}
 
 		// add to SQL output
@@ -472,7 +472,7 @@ namespace ReportSizingManager {
 			} else {
 				ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName );
 				ShowContinueError( "... DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + SizingString + " must both be greater than 0." );
-				ShowFatalError( "Preceding conditions cause termination." );
+				ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 			bCheckForZero = false;
 		} else if ( CurZoneEqNum > 0 ) {
@@ -1557,7 +1557,7 @@ namespace ReportSizingManager {
 					}
 				} else if ( SizingType == CoolingWaterflowSizing ) {
 					if ( CurOASysNum > 0 ) {
-						CoilDesWaterDeltaT = 0.5 * DataWaterCoilSizCoolDeltaT;						 
+						CoilDesWaterDeltaT = 0.5 * DataWaterCoilSizCoolDeltaT;
 					} else {
 						CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
 					}
@@ -1770,7 +1770,7 @@ namespace ReportSizingManager {
 					} else {
 						ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName );
 						ShowContinueError( "... DataFlowUsedForSizing and DataCapacityUsedForSizing " + SizingString + " must both be greater than 0." );
-						ShowFatalError( "Preceding conditions cause termination." );
+						ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 					}
 				} else if ( SizingType == CoolingCapacitySizing ) {
 					DataFracOfAutosizedCoolingCapacity = 1.0;
@@ -2268,7 +2268,7 @@ namespace ReportSizingManager {
 				} else {
 					ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
 					ShowContinueError( "SizingString = " + SizingString + ", SizingResult = " + TrimSigDigits( SizingResult, 1 ) );
-					// ShowFatalError( " Previous errors cause program termination" );
+					// ShowFatalError( " Previous errors cause program termination" );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -2330,11 +2330,11 @@ namespace ReportSizingManager {
 			if ( !HardSizeNoDesRun || DataScalableSizingON || DataScalableCapSizingON ) {
 				if ( IsAutoSize ) { // Design Size values are available for both autosized and hard - sized
 					// check capacity to make sure design volume flow per total capacity is within range
-					
+
 					// Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and determines capacity using physical calculations instead of emperical curves
 					bool FlagCheckVolFlowPerRatedTotCap = true;
 					if ( SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) || SameString( CompType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ) FlagCheckVolFlowPerRatedTotCap = false;
-						
+
 					if ( DataIsDXCoil && FlagCheckVolFlowPerRatedTotCap && ( SizingType == CoolingCapacitySizing || SizingType == HeatingCapacitySizing ) ) {
 						if ( SizingResult > 0.0 ) {
 							RatedVolFlowPerRatedTotCap = DesVolFlow / SizingResult;

@@ -344,7 +344,7 @@ namespace EconomicTariff {
 				CreateDefaultComputation();
 			}
 			Update_GetInput = false;
-			if ( ErrorsFound ) ShowFatalError( "UpdateUtilityBills: Preceding errors cause termination." );
+			if ( ErrorsFound ) ShowFatalError( "UpdateUtilityBills: Preceding errors cause termination." );  // LCOV_EXCL_LINE
 		}
 		if ( DoOutputReporting && ( KindOfSim == ksRunPeriodWeather ) ) {
 			GatherForEconomics();

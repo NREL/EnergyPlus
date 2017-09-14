@@ -3846,7 +3846,7 @@ namespace RefrigeratedCase {
 					//^^^^^^^Now look at input and once-only calculations required only for liquid/brine secondary loops^^^^^^^^^^^^^^^^^^^^^^
 					//   Ensure that required input data is not missing prior to performing the following once-only calculations
 					if ( ErrorsFound ) {
-						ShowFatalError( RoutineName + CurrentModuleObject + "=\"" + Secondary( SecondaryNum ).Name + "\", Program terminated due to previous condition(s)." );
+						ShowFatalError( RoutineName + CurrentModuleObject + "=\"" + Secondary( SecondaryNum ).Name + "\", Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					} // ErrorsFound
 
 					if ( Secondary( SecondaryNum ).FluidType == SecFluidTypeAlwaysLiquid ) {
@@ -5801,7 +5801,7 @@ namespace RefrigeratedCase {
 		ReportRefrigerationComponents();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + " Previous errors cause program termination" );
+			ShowFatalError( RoutineName + " Previous errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -6922,7 +6922,7 @@ namespace RefrigeratedCase {
 				errFlag = false;
 				ScanPlantLoopsForObject( Condenser( RefCondLoop ).Name, TypeOf_RefrigSystemWaterCondenser, Condenser( RefCondLoop ).PlantLoopNum, Condenser( RefCondLoop ).PlantLoopSideNum, Condenser( RefCondLoop ).PlantBranchNum, Condenser( RefCondLoop ).PlantCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitRefrigerationPlantConnections: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitRefrigerationPlantConnections: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 				rho = GetDensityGlycol( PlantLoop( Condenser( RefCondLoop ).PlantLoopNum ).FluidName, 20.0, PlantLoop( Condenser( RefCondLoop ).PlantLoopNum ).FluidIndex, RoutineName );
@@ -6941,7 +6941,7 @@ namespace RefrigeratedCase {
 				errFlag = false;
 				ScanPlantLoopsForObject( RefrigRack( RefCompRackLoop ).Name, TypeOf_RefrigerationWaterCoolRack, RefrigRack( RefCompRackLoop ).PlantLoopNum, RefrigRack( RefCompRackLoop ).PlantLoopSideNum, RefrigRack( RefCompRackLoop ).PlantBranchNum, RefrigRack( RefCompRackLoop ).PlantCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitRefrigerationPlantConnections: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitRefrigerationPlantConnections: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 				rho = GetDensityGlycol( PlantLoop( RefrigRack( RefCompRackLoop ).PlantLoopNum ).FluidName, 20.0, PlantLoop( RefrigRack( RefCompRackLoop ).PlantLoopNum ).FluidIndex, RoutineName );
@@ -7958,11 +7958,11 @@ namespace RefrigeratedCase {
 			} else if ( SELECT_CASE_var == TypeOf_RefrigSystemWaterCondenser ) {
 				Num = FindItemInList( CompName, Condenser );
 			} else {
-				ShowFatalError( "SimRefrigCondenser: invalid system type passed" );
+				ShowFatalError( "SimRefrigCondenser: invalid system type passed" );  // LCOV_EXCL_LINE
 			}}
 
 			if ( Num == 0 ) {
-				ShowFatalError( "SimRefrigCondenser: Specified refrigeration condenser not Valid =" + CompName );
+				ShowFatalError( "SimRefrigCondenser: Specified refrigeration condenser not Valid =" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = Num;
 		} else {
@@ -7971,22 +7971,22 @@ namespace RefrigeratedCase {
 			{ auto const SELECT_CASE_var( SysType );
 			if ( SELECT_CASE_var == TypeOf_RefrigerationWaterCoolRack ) {
 				if ( Num > NumRefrigeratedRacks || Num < 1 ) {
-					ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Number of Units=" + TrimSigDigits( NumRefrigeratedRacks ) + ", Entered Unit name=" + CompName );
+					ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Number of Units=" + TrimSigDigits( NumRefrigeratedRacks ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 				}
 				if ( CheckEquipNameRackWaterCondenser( Num ) ) {
 					if ( CompName != RefrigRack( Num ).Name ) {
-						ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Entered Unit name=" + CompName + ", stored Unit name for that index=" + RefrigRack( Num ).Name );
+						ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Entered Unit name=" + CompName + ", stored Unit name for that index=" + RefrigRack( Num ).Name );  // LCOV_EXCL_LINE
 					}
 					CheckEquipNameRackWaterCondenser( Num ) = false;
 				}
 
 			} else if ( SELECT_CASE_var == TypeOf_RefrigSystemWaterCondenser ) {
 				if ( Num > NumRefrigCondensers || Num < 1 ) {
-					ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Number of Units=" + TrimSigDigits( NumRefrigCondensers ) + ", Entered Unit name=" + CompName );
+					ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Number of Units=" + TrimSigDigits( NumRefrigCondensers ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 				}
 				if ( CheckEquipNameWaterCondenser( Num ) ) {
 					if ( CompName != Condenser( Num ).Name ) {
-						ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Entered Unit name=" + CompName + ", stored Unit name for that index=" + Condenser( Num ).Name );
+						ShowFatalError( "SimRefrigCondenser: Invalid CompIndex passed=" + TrimSigDigits( Num ) + ", Entered Unit name=" + CompName + ", stored Unit name for that index=" + Condenser( Num ).Name );  // LCOV_EXCL_LINE
 					}
 					CheckEquipNameWaterCondenser( Num ) = false;
 				}
@@ -12056,17 +12056,17 @@ namespace RefrigeratedCase {
 		if ( AirChillerSetPtr == 0 ) {
 			ChillerSetID = FindItemInList( AirChillerSetName, AirChillerSet );
 			if ( ChillerSetID == 0 ) {
-				ShowFatalError( "SimAirChillerSet: Unit not found=" + AirChillerSetName );
+				ShowFatalError( "SimAirChillerSet: Unit not found=" + AirChillerSetName );  // LCOV_EXCL_LINE
 			} // chillersetid ==0 because not in list
 			AirChillerSetPtr = ChillerSetID;
 		} else { //airchllersetpointer passed in call to subroutine not ==0
 			ChillerSetID = AirChillerSetPtr;
 			if ( ChillerSetID > NumRefrigChillerSets || ChillerSetID < 1 ) {
-				ShowFatalError( "SimAirChillerSet:  Invalid AirChillerSetPtr passed=" + TrimSigDigits( ChillerSetID ) + ", Number of Units=" + TrimSigDigits( NumRefrigChillerSets ) + ", Entered Unit name=" + AirChillerSetName );
+				ShowFatalError( "SimAirChillerSet:  Invalid AirChillerSetPtr passed=" + TrimSigDigits( ChillerSetID ) + ", Number of Units=" + TrimSigDigits( NumRefrigChillerSets ) + ", Entered Unit name=" + AirChillerSetName );  // LCOV_EXCL_LINE
 			} //ChillerSetID makes no sense
 			if ( CheckChillerSetName( ChillerSetID ) ) {
 				if ( AirChillerSetName != AirChillerSet( ChillerSetID ).Name ) {
-					ShowFatalError( "SimAirChillerSet:  Invalid AirChillerSetPtr passed=" + TrimSigDigits( ChillerSetID ) + ", Unit name=" + AirChillerSetName + ", stored Unit Name for that index=" + AirChillerSet( ChillerSetID ).Name );
+					ShowFatalError( "SimAirChillerSet:  Invalid AirChillerSetPtr passed=" + TrimSigDigits( ChillerSetID ) + ", Unit name=" + AirChillerSetName + ", stored Unit Name for that index=" + AirChillerSet( ChillerSetID ).Name );  // LCOV_EXCL_LINE
 				} //name not equal correct name
 				CheckChillerSetName( ChillerSetID ) = false;
 			} //CheckChillerSetName logical test

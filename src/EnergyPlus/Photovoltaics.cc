@@ -202,17 +202,17 @@ namespace Photovoltaics {
 		if ( GeneratorIndex == 0 ) {
 			PVnum = FindItemInList( GeneratorName, PVarray );
 			if ( PVnum == 0 ) {
-				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName );
+				ShowFatalError( "SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators " + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			GeneratorIndex = PVnum;
 		} else {
 			PVnum = GeneratorIndex;
 			if ( PVnum > NumPVs || PVnum < 1 ) {
-				ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( PVnum ) + ", Number of PVs=" + TrimSigDigits( NumPVs ) + ", Generator name=" + GeneratorName );
+				ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( PVnum ) + ", Number of PVs=" + TrimSigDigits( NumPVs ) + ", Generator name=" + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( PVnum ) ) {
 				if ( GeneratorName != PVarray( PVnum ).Name ) {
-					ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( PVnum ) + ", Generator name=" + GeneratorName + ", stored PV Name for that index=" + PVarray( PVnum ).Name );
+					ShowFatalError( "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( PVnum ) + ", Generator name=" + GeneratorName + ", stored PV Name for that index=" + PVarray( PVnum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( PVnum ) = false;
 			}
@@ -238,7 +238,7 @@ namespace Photovoltaics {
 
 		} else {
 
-			ShowFatalError( "Specified generator model type not found for PV generator = " + GeneratorName );
+			ShowFatalError( "Specified generator model type not found for PV generator = " + GeneratorName );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -753,7 +753,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting photovoltaic input" );
+			ShowFatalError( "Errors found in getting photovoltaic input" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -764,7 +764,7 @@ namespace Photovoltaics {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   Sept 2017
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// Get the zone number for this PV array for use when zone multipliers are applied
 
@@ -772,20 +772,20 @@ namespace Photovoltaics {
 		using DataGlobals::NumOfZones;
 		using DataSurfaces::Surface;
 		using InputProcessor::FindItemInList;
-		
+
 		int GetPVZone( 0 );
-		
+
 		if ( SurfNum > 0 ) {
 			GetPVZone = Surface( SurfNum ).Zone;
 				if ( GetPVZone == 0 ) { // might need to get the zone number from the name
 					GetPVZone = FindItemInList( Surface( SurfNum ).ZoneName, Zone, NumOfZones );
 				}
 		}
-		
+
 		return GetPVZone;
-		
+
 	}
-	
+
 	// **************************************
 
 	void
@@ -901,7 +901,7 @@ namespace Photovoltaics {
 		int thisZone; // working index for zones
 
 		PVarray( PVnum ).Report.DCEnergy = PVarray( PVnum ).Report.DCPower * ( TimeStepSys * SecInHour );
-		
+
 		// add check for multiplier.  if surface is attached to a zone that is on a multiplier
 		// then PV production should be multiplied out as well
 
@@ -1725,7 +1725,7 @@ namespace Photovoltaics {
 			ShowContinueError( "Check input data in " + cPVEquiv1DiodePerfObjectName );
 			ShowContinueError( "VV (voltage) = " + RoundSigDigits( VV, 5 ) );
 			ShowContinueError( "II (current) = " + RoundSigDigits( II, 5 ) );
-			ShowFatalError( "FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );
+			ShowFatalError( "FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );  // LCOV_EXCL_LINE
 		}
 
 		return FUN;
@@ -1785,7 +1785,7 @@ namespace Photovoltaics {
 			ShowContinueError( "Check input data in " + cPVEquiv1DiodePerfObjectName );
 			ShowContinueError( "VV (voltage) = " + RoundSigDigits( VV, 5 ) );
 			ShowContinueError( "II (current) = " + RoundSigDigits( II, 5 ) );
-			ShowFatalError( "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );
+			ShowFatalError( "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );  // LCOV_EXCL_LINE
 		}
 
 		return FI;
@@ -1846,7 +1846,7 @@ namespace Photovoltaics {
 			ShowContinueError( "Check input data in " + cPVEquiv1DiodePerfObjectName );
 			ShowContinueError( "VV (voltage) = " + RoundSigDigits( VV, 5 ) );
 			ShowContinueError( "II (current) = " + RoundSigDigits( II, 5 ) );
-			ShowFatalError( "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );
+			ShowFatalError( "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model" );  // LCOV_EXCL_LINE
 		}
 
 		return FV;
@@ -2719,7 +2719,7 @@ namespace Photovoltaics {
 
 		if ( SurfacePtr == 0 ) {
 			// should be trapped already
-			ShowFatalError( "Invalid surface passed to GetExtVentedCavityIndex" );
+			ShowFatalError( "Invalid surface passed to GetExtVentedCavityIndex" );  // LCOV_EXCL_LINE
 		}
 
 		CavNum = 0;
@@ -2734,7 +2734,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );  // LCOV_EXCL_LINE
 		} else {
 
 			VentCavIndex = CavNum;

@@ -535,7 +535,7 @@ namespace FluidProperties {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + " Previous errors in input cause program termination." );
+			ShowFatalError( RoutineName + " Previous errors in input cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumOfRefrigerants + 1 > 0 ) {
@@ -1066,7 +1066,7 @@ namespace FluidProperties {
 			// Check: TEMPERATURES for saturated density (must all be the same)
 			//    IF (RefrigData(Loop)%NumCpPoints /= RefrigData(Loop)%NumCpPoints) THEN
 			//!!!  Error -- can never happen, does this mean NumCp vs. NumRho?
-			//      CALL ShowFatalError('GetFluidPropertiesData: Number of specific heat fluid and gas/fluid points are not the same')
+			//      CALL ShowFatalError('GetFluidPropertiesData: Number of specific heat fluid and gas/fluid points are not the same')  // LCOV_EXCL_LINE
 			//    ELSE
 			//      DO TempLoop = 1, RefrigData(Loop)%NumCpPoints
 			//!!! Error -- something else that can never happen
@@ -1923,7 +1923,7 @@ namespace FluidProperties {
 		lNumericFieldBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Previous errors in input cause program termination." );
+			ShowFatalError( RoutineName + "Previous errors in input cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( GetNumSectionsFound( "REPORTGLYCOLS" ) > 0 ) DebugReportGlycols = true;
@@ -2445,7 +2445,7 @@ namespace FluidProperties {
 					}
 				}
 			} else { // user has input data for concentrations that are too close or repeated, this must be fixed
-				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );
+				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -2548,7 +2548,7 @@ namespace FluidProperties {
 					}
 				}
 			} else { // user has input data for concentrations that are too close or repeated, this must be fixed
-				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );
+				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -3710,7 +3710,7 @@ namespace FluidProperties {
 		if ( ( Quality < 0.0 ) || ( Quality > 1.0 ) ) {
 			ShowSevereError( RoutineName + ": Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom );
 			ShowContinueError( "Saturated refrigerant quality must be between 0 and 1, entered value=[" + RoundSigDigits( Quality, 4 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition." );
+			ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 		}
 
 		if ( RefrigIndex > 0 ) {
@@ -3804,7 +3804,7 @@ namespace FluidProperties {
 		if ( ( Quality < 0.0 ) || ( Quality > 1.0 ) ) {
 			ShowSevereError( RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom );
 			ShowContinueError( "Saturated density quality must be between 0 and 1, entered value=[" + RoundSigDigits( Quality, 4 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition." );
+			ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 		}
 
 		// Find which refrigerant (index) is being requested and then determine
@@ -3938,7 +3938,7 @@ namespace FluidProperties {
 		if ( ( Quality < 0.0 ) || ( Quality > 1.0 ) ) {
 			ShowSevereError( RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom );
 			ShowContinueError( "Saturated density quality must be between 0 and 1, entered value=[" + RoundSigDigits( Quality, 4 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition." );
+			ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 		}
 
 		// Find which refrigerant (index) is being requested and then determine
@@ -4491,7 +4491,7 @@ namespace FluidProperties {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Performs iterations to calculate the refrigerant temperature corresponding to the given 
+		// Performs iterations to calculate the refrigerant temperature corresponding to the given
 		// enthalpy and pressure.  Works only in superheated region.
 
 		// METHODOLOGY EMPLOYED:
@@ -4515,7 +4515,7 @@ namespace FluidProperties {
 		Real64 RefTHigh; // High Temperature Value for Ps (max in tables)
 		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
 		Real64 Temp; // Temperature of the superheated refrigerant at the given enthalpy and pressure
-		
+
 		if ( GetInput ) {
 			GetFluidPropertiesData();
 			GetInput = false;
@@ -4543,7 +4543,7 @@ namespace FluidProperties {
 		// check temperature data range and attempt to cap if necessary
 		RefTHigh = refrig.PsHighTempValue;
 		RefTSat = GetSatTemperatureRefrig( Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
-		
+
 		if ( TempLow < RefTSat ) {
 			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
 			ShowContinueError( " Called From:" + CalledFrom );
@@ -4563,7 +4563,7 @@ namespace FluidProperties {
 			TempLow = RefTSat;
 			TempUp = RefTHigh;
 		}
-		
+
 		// check enthalpy data range and attempt to cap if necessary
 		EnthalpyLow = GetSupHeatEnthalpyRefrig( Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
 		EnthalpyHigh = GetSupHeatEnthalpyRefrig( Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
@@ -4575,18 +4575,18 @@ namespace FluidProperties {
 			ReturnValue = TempUp;
 			return ReturnValue;
 		}
-		
+
 		//Perform iterations to obtain the temperature level
 		{
 			Array1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
 			Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
 			int const MaxIte( 500 ); // maximum number of iterations
 			int SolFla; // Flag of RegulaFalsi solver
-			
+
 			Par( 1 ) = RefrigNum;
 			Par( 2 ) = Enthalpy;
 			Par( 3 ) = Pressure;
-			
+
 			SolveRoot( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
 			ReturnValue = Temp;
 		}
@@ -4594,11 +4594,11 @@ namespace FluidProperties {
 		return ReturnValue;
 
 	}
-	
+
 	Real64
 	GetSupHeatTempRefrigResidual(
 		Real64 const Temp, // temperature of the refrigerant
-		Array1< Real64 > const & Par 
+		Array1< Real64 > const & Par
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -4609,7 +4609,7 @@ namespace FluidProperties {
 
 		// PURPOSE OF THIS FUNCTION:
 		//  Calculates residual function (( Enthalpy_Actual - Enthalpy_Req ) / Enthalpy_Req )
-		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given 
+		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given
 		//  enthalpy and pressure in superheated region.
 
 		// REFERENCES:
@@ -4642,23 +4642,23 @@ namespace FluidProperties {
 		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrigResidual" );
 		std::string Refrigerant; // carries in substance name
 		int RefrigNum; // index for refrigerant under consideration
-		Real64 Pressure; // pressure of the refrigerant 
+		Real64 Pressure; // pressure of the refrigerant
 		Real64 Enthalpy_Req; // enthalpy of the refrigerant to meet
 		Real64 Enthalpy_Act; // enthalpy of the refrigerant calculated
-		
+
 		RefrigNum = int( Par( 1 ) );
 		Enthalpy_Req = Par( 2 );
 		Pressure = Par( 3 );
 		Refrigerant = RefrigErrorTracking( RefrigNum ).Name;
 		if ( std::abs( Enthalpy_Req ) < 100.0 ) Enthalpy_Req = sign( 100.0, Enthalpy_Req );
-		
+
 		Enthalpy_Act = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
-		
+
 		TempResidual = ( Enthalpy_Act - Enthalpy_Req ) / Enthalpy_Req;
 
 		return TempResidual;
 	}
-	
+
 	//*****************************************************************************
 
 	Real64
@@ -5446,7 +5446,7 @@ namespace FluidProperties {
 	void
 	GetInterpValue_error()
 	{
-		ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );
+		ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );  // LCOV_EXCL_LINE
 	}
 
 	//*****************************************************************************
@@ -6185,7 +6185,7 @@ namespace FluidProperties {
 		}
 		if ( RefrigNo > 0 ) ShowContinueError( "Note: that fluid is listed as a Refrigerant from input." );
 
-		ShowFatalError( "Program terminates due to preceding condition." );
+		ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -6246,7 +6246,7 @@ namespace FluidProperties {
 		}
 		if ( GlycolNo > 0 ) ShowContinueError( "Note: that fluid is listed as a Glycol from input." );
 
-		ShowFatalError( "Program terminates due to preceding condition." );
+		ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 
 	}
 

@@ -411,7 +411,7 @@ namespace ConvectionCoefficients {
 
 				if ( Surface( SurfNum ).ExtBoundCond == DataSurfaces::KivaFoundation ) {
 					HConvIn( SurfNum ) = SurfaceGeometry::kivaManager.getConv( SurfNum );
-					Surface( SurfNum ).TAirRef = ZoneMeanAirTemp;					
+					Surface( SurfNum ).TAirRef = ZoneMeanAirTemp;
 					continue;
 				}
 
@@ -441,7 +441,7 @@ namespace ConvectionCoefficients {
 						ManageInsideAdaptiveConvectionAlgo( SurfNum );
 
 					} else {
-						ShowFatalError( "Unhandled convection coefficient algorithm." );
+						ShowFatalError( "Unhandled convection coefficient algorithm." );  // LCOV_EXCL_LINE
 					}}
 
 				} else if ( SELECT_CASE_var == 0 ) { // Not set by user, uses Zone Setting
@@ -470,7 +470,7 @@ namespace ConvectionCoefficients {
 						// Already done above and can't be at individual surface
 
 					} else {
-						ShowFatalError( "Unhandled convection coefficient algorithm." );
+						ShowFatalError( "Unhandled convection coefficient algorithm." );  // LCOV_EXCL_LINE
 
 					}}
 
@@ -565,7 +565,7 @@ namespace ConvectionCoefficients {
 		TSky = SkyTempKelvin;
 		TGround = TAir;
 
-		
+
 
 		if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 			SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
@@ -680,7 +680,7 @@ namespace ConvectionCoefficients {
 				ManageOutsideAdaptiveConvectionAlgo( SurfNum, HExt );
 
 			} else {
-				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface( SurfNum ).Name );
+				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface( SurfNum ).Name );  // LCOV_EXCL_LINE
 
 			}} // choice of algorithm type
 
@@ -790,7 +790,7 @@ namespace ConvectionCoefficients {
 				ManageOutsideAdaptiveConvectionAlgo( SurfNum, HExt );
 
 			} else {
-				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface( SurfNum ).Name );
+				ShowFatalError( "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface( SurfNum ).Name );  // LCOV_EXCL_LINE
 
 			}} // choice of algorithm type
 
@@ -3121,7 +3121,7 @@ namespace ConvectionCoefficients {
 		} // end of 'SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections'
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found getting input.  Program termination." );
+			ShowFatalError( RoutineName + "Errors found getting input.  Program termination." );  // LCOV_EXCL_LINE
 		}
 
 		SetupAdaptiveConvectionStaticMetaData();
@@ -5492,7 +5492,7 @@ namespace ConvectionCoefficients {
 		//if ( std::isnan( HConvIn( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
 			//// throw Error
 			//ShowSevereError( "Inside convection coefficient is out of bound = " + Surface( SurfNum ).Name );
-			//ShowFatalError( "Inside convection coefficient model number = " + TrimSigDigits( Surface( SurfNum ).IntConvHcModelEq ) );
+			//ShowFatalError( "Inside convection coefficient model number = " + TrimSigDigits( Surface( SurfNum ).IntConvHcModelEq ) );  // LCOV_EXCL_LINE
 		//}
 	}
 
@@ -6167,7 +6167,7 @@ namespace ConvectionCoefficients {
 			Hf = CalcBlockenWindward( WindSpeed, WindDir, Surface( SurfNum ).Azimuth );
 		} else if ( SELECT_CASE_var == HcExt_EmmelVertical ) {
 			Hf = CalcEmmelVertical( WindSpeed, WindDir, Surface( SurfNum ).Azimuth, SurfNum );
-		} else if ( SELECT_CASE_var == HcExt_EmmelRoof ) {			
+		} else if ( SELECT_CASE_var == HcExt_EmmelRoof ) {
 			Hf = CalcEmmelRoof( WindSpeed, WindDir, RoofLongAxisOutwardAzimuth, SurfNum );
 
 		}}

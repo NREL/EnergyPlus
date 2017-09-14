@@ -295,7 +295,7 @@ namespace RoomAirModelManager {
 		GetUFADZoneData( ErrorsFound );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetAirModelData: Errors found getting air model input.  Program terminates." );
+			ShowFatalError( "GetAirModelData: Errors found getting air model input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -842,7 +842,7 @@ namespace RoomAirModelManager {
 
 					// terminate the program due to a severe error in the specified input
 					if ( ( NumSurfsInvolved ) > NumOfSurfs ) {
-						ShowFatalError( "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to " + AirNode( AirNodeNum ).Name + " is greater than number of surfaces in " + Zone( ZoneNum ).Name );
+						ShowFatalError( "GetAirNodeData: Mundt Room Air Model: Number of surfaces connected to " + AirNode( AirNodeNum ).Name + " is greater than number of surfaces in " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 						return;
 					}
 

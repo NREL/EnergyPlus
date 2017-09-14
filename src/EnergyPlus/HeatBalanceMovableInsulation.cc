@@ -119,7 +119,7 @@ namespace HeatBalanceMovableInsulation {
 				if ( ( Material( MaterialIndex ).Conductivity ) > 0.0 ) {
 					Material( MaterialIndex ).Resistance = Material( Surface( SurfNum ).MaterialMovInsulExt ).Thickness / Material( Surface( SurfNum ).MaterialMovInsulExt ).Conductivity;
 				} else {
-					ShowFatalError( "EvalOutsideMovableInsulation: No resistance or conductivity found for material " + Material( Surface( SurfNum ).MaterialMovInsulExt ).Name );
+					ShowFatalError( "EvalOutsideMovableInsulation: No resistance or conductivity found for material " + Material( Surface( SurfNum ).MaterialMovInsulExt ).Name );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -163,7 +163,7 @@ namespace HeatBalanceMovableInsulation {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
-		
+
 		// FLOW:
 		MovInsulSchedVal = GetCurrentScheduleValue( Surface( SurfNum ).SchedMovInsulInt );
 
@@ -182,7 +182,7 @@ namespace HeatBalanceMovableInsulation {
 				if ( Material( thisMovableInt ).Conductivity > 0.0 && Material( thisMovableInt ).Thickness > 0.0 ) {
 					Material( thisMovableInt ).Resistance = Material( thisMovableInt ).Thickness / Material( thisMovableInt ).Conductivity;
 				} else {
-					ShowFatalError( "EvalInsideMovableInsulation: No resistance found for material " + Material( MaterialIndex ).Name );
+					ShowFatalError( "EvalInsideMovableInsulation: No resistance found for material " + Material( MaterialIndex ).Name );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -194,7 +194,7 @@ namespace HeatBalanceMovableInsulation {
 			} else {
 				AbsInt = Material( MaterialIndex ).AbsorpSolar;
 			} }
-			
+
 		} }
 
 	}

@@ -419,7 +419,7 @@ namespace MixedAir {
 		if ( OASysNum == 0 ) {
 			OASysNum = FindItemInList( OASysName, OutsideAirSys );
 			if ( OASysNum == 0 ) {
-				ShowFatalError( "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName );
+				ShowFatalError( "ManageOutsideAirSystem: AirLoopHVAC:OutdoorAirSystem not found=" + OASysName );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -562,7 +562,7 @@ namespace MixedAir {
 				}
 			}
 			MyOneTimeErrorFlag( OASysNum ) = false;
-			if ( FatalErrorFlag ) ShowFatalError( "Previous severe error(s) cause program termination" );
+			if ( FatalErrorFlag ) ShowFatalError( "Previous severe error(s) cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 		CurOASysNum = 0;
@@ -661,7 +661,7 @@ namespace MixedAir {
 				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
 			}
 			if ( Sim ) {
-				HVACFan::fanObjs[ CompIndex - 1 ]->simulate(_,_,_,_); // vector is 0 based, but CompIndex is 1 based so shift 
+				HVACFan::fanObjs[ CompIndex - 1 ]->simulate(_,_,_,_); // vector is 0 based, but CompIndex is 1 based so shift
 			}
 			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
@@ -789,7 +789,7 @@ namespace MixedAir {
 			}
 
 		} else {
-			ShowFatalError( "Invalid Outside Air Component=" + CompType );
+			ShowFatalError( "Invalid Outside Air Component=" + CompType );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -842,7 +842,7 @@ namespace MixedAir {
 			OAMixerNum = FindItemInList( CompName, OAMixer );
 			CompIndex = OAMixerNum;
 			if ( OAMixerNum == 0 ) {
-				ShowFatalError( "SimOAMixer: OutdoorAir:Mixer not found=" + CompName );
+				ShowFatalError( "SimOAMixer: OutdoorAir:Mixer not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 		} else {
 			OAMixerNum = CompIndex;
@@ -910,7 +910,7 @@ namespace MixedAir {
 			}
 			CtrlIndex = OAControllerNum;
 			if ( OAControllerNum == 0 ) {
-				ShowFatalError( "SimOAController: Outside Air Controller not found=" + CtrlName );
+				ShowFatalError( "SimOAController: Outside Air Controller not found=" + CtrlName );  // LCOV_EXCL_LINE
 			}
 		} else {
 			OAControllerNum = CtrlIndex;
@@ -1259,7 +1259,7 @@ namespace MixedAir {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + '.' );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + '.' );  // LCOV_EXCL_LINE
 		}
 
 		AlphArray.deallocate();
@@ -1430,7 +1430,7 @@ namespace MixedAir {
 				lAlphaBlanks.deallocate();
 				cAlphaFields.deallocate();
 				cNumericFields.deallocate();
-				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " inputs." );
+				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " inputs." );  // LCOV_EXCL_LINE
 			}
 
 		}
@@ -1958,7 +1958,7 @@ namespace MixedAir {
 		cNumericFields.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found when getting " + CurrentModuleObject + " inputs." );
+			ShowFatalError( RoutineName + "Errors found when getting " + CurrentModuleObject + " inputs." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2101,7 +2101,7 @@ namespace MixedAir {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		GetOAMixerInputFlag = false;
@@ -2905,7 +2905,7 @@ namespace MixedAir {
 					PreDefTableEntry( pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate( jZone ), 6 );
 					PreDefTableEntry( pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate( jZone ), 6 );
 					PreDefTableEntry( pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate( jZone ), 6 );
-					PreDefTableEntry( pdchDCVMethod, zoneName, cOAFlowMethodTypes( vent_mech.ZoneOAFlowMethod( jZone ) ) ); 
+					PreDefTableEntry( pdchDCVMethod, zoneName, cOAFlowMethodTypes( vent_mech.ZoneOAFlowMethod( jZone ) ) );
 					if ( vent_mech.ZoneOASchPtr( jZone ) > 0 ) {
 						PreDefTableEntry( pdchDCVOASchName, zoneName, GetScheduleName( vent_mech.ZoneOASchPtr( jZone ) ) );
 					} else {
@@ -3232,7 +3232,7 @@ namespace MixedAir {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Error in " + CurrentModuleObjects( CMO_OAController ) + "; program terminated" );
+			ShowFatalError( "Error in " + CurrentModuleObjects( CMO_OAController ) + "; program terminated" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -4166,7 +4166,7 @@ namespace MixedAir {
 					} else {
 						AirLoopControlInfo( AirLoopNum ).EconomizerFlowLocked = false;
 						this->HRHeatingCoilActive = 0;
-					} 
+					}
 					AirLoopControlInfo( AirLoopNum ).CheckHeatRecoveryBypassStatus = false;
 				}
 			}
@@ -4704,7 +4704,7 @@ namespace MixedAir {
 			} // End of component loop
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -5257,7 +5257,7 @@ namespace MixedAir {
 		}
 
 		if ( OAMixerNum > NumOAMixers ) {
-			ShowFatalError( "GetOAMixerReliefNodeNumber: Requested Mixer #=" + TrimSigDigits( OAMixerNum ) + ", which is > number of OA Mixers=" + TrimSigDigits( NumOAMixers ) );
+			ShowFatalError( "GetOAMixerReliefNodeNumber: Requested Mixer #=" + TrimSigDigits( OAMixerNum ) + ", which is > number of OA Mixers=" + TrimSigDigits( NumOAMixers ) );  // LCOV_EXCL_LINE
 		}
 
 		ReliefNodeNumber = OAMixer( OAMixerNum ).RelNode;

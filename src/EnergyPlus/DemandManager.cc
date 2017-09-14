@@ -255,7 +255,7 @@ namespace DemandManager {
 
 					if ( DemandManagerExtIterations + DemandManagerHBIterations + DemandManagerHVACIterations > 500 ) {
 						// This error can only happen if there is a bug in the code
-						ShowFatalError( "Too many DemandManager iterations. (>500)" );
+						ShowFatalError( "Too many DemandManager iterations. (>500)" );  // LCOV_EXCL_LINE
 						break;
 					}
 				}
@@ -578,7 +578,7 @@ namespace DemandManager {
 				SetupOutputVariable( "Demand Manager Over Limit Time", OutputProcessor::Unit::hr, DemandManagerList( ListNum ).OverLimitDuration, "Zone", "Sum", DemandManagerList( ListNum ).Name );
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in processing input for " + CurrentModuleObject );
+					ShowFatalError( "Errors found in processing input for " + CurrentModuleObject );  // LCOV_EXCL_LINE
 				}
 
 			} // ListNum
@@ -1325,7 +1325,7 @@ namespace DemandManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for demand managers. Preceding condition causes termination." );
+			ShowFatalError( "Errors found in processing input for demand managers. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}
 
 	}

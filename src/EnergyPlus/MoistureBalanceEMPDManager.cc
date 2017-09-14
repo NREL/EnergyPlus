@@ -347,7 +347,7 @@ namespace MoistureBalanceEMPDManager {
 		ReportMoistureBalanceEMPD();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated." );
+			ShowFatalError( "GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated." );  // LCOV_EXCL_LINE
 		}
 
 	}

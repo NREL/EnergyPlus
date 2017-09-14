@@ -210,17 +210,17 @@ namespace BoilerSteam {
 		if ( CompIndex == 0 ) {
 			BoilerNum = FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
-				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
+				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BoilerNum;
 		} else {
 			BoilerNum = CompIndex;
 			if ( BoilerNum > NumBoilers || BoilerNum < 1 ) {
-				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Number of Units=" + TrimSigDigits( NumBoilers ) + ", Entered Unit name=" + BoilerName );
+				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Number of Units=" + TrimSigDigits( NumBoilers ) + ", Entered Unit name=" + BoilerName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( BoilerNum ) ) {
 				if ( BoilerName != Boiler( BoilerNum ).Name ) {
-					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Unit name=" + BoilerName + ", stored Unit Name for that index=" + Boiler( BoilerNum ).Name );
+					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Unit name=" + BoilerName + ", stored Unit Name for that index=" + Boiler( BoilerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( BoilerNum ) = false;
 			}
@@ -437,12 +437,12 @@ namespace BoilerSteam {
 			if ( NumAlphas > 4 ) {
 				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 5 );
 			} else {
-				Boiler( BoilerNum ).EndUseSubcategory = "General"; 
+				Boiler( BoilerNum ).EndUseSubcategory = "General";
 			}
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );
+			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
@@ -540,7 +540,7 @@ namespace BoilerSteam {
 			errFlag = false;
 			ScanPlantLoopsForObject( Boiler( BoilerNum ).Name, TypeOf_Boiler_Steam, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitBoiler: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitBoiler: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			MyFlag( BoilerNum ) = false;
@@ -755,7 +755,7 @@ namespace BoilerSteam {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}

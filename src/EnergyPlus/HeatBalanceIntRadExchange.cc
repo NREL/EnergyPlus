@@ -454,12 +454,12 @@ namespace HeatBalanceIntRadExchange {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   July 2016
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// To determine if any changes in interior movable insulation have happened.
 		// If there have been changes due to a schedule change AND a change in properties,
 		// then the matrices which are used to calculate interior radiation must be recalculated.
-				
+
 		MovableInsulationChange = false;
 		if ( Surface( SurfNum ).MaterialMovInsulInt > 0 ) {
 			Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
@@ -476,7 +476,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 	}
-	
+
 	void
 	InitInteriorRadExchange()
 	{
@@ -569,7 +569,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 			ZoneInfo( ZoneNum ).NumOfSurfaces = NumOfZoneSurfaces;
 			MaxNumOfZoneSurfaces = max( MaxNumOfZoneSurfaces, NumOfZoneSurfaces );
-			if ( NumOfZoneSurfaces < 1 ) ShowFatalError( "No surfaces in a zone in InitInteriorRadExchange" );
+			if ( NumOfZoneSurfaces < 1 ) ShowFatalError( "No surfaces in a zone in InitInteriorRadExchange" );  // LCOV_EXCL_LINE
 
 			// Allocate the parts of the derived type
 			ZoneInfo( ZoneNum ).F.dimension( NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0 );
@@ -775,7 +775,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated." );
+			ShowFatalError( "InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1234,7 +1234,7 @@ namespace HeatBalanceIntRadExchange {
 				}
 				sumFixedF.deallocate();
 				if ( MaxFixedFRowSum < 1.0 ) {
-					ShowFatalError( " FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
+					ShowFatalError( " FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");  // LCOV_EXCL_LINE
 				} else {
 					FixedF *= ( 1.0 / MaxFixedFRowSum );
 				}

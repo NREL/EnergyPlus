@@ -250,17 +250,17 @@ namespace HeatingCoils {
 			if ( CompIndex == 0 ) {
 				CoilNum = FindItemInList( CompName, HeatingCoil );
 				if ( CoilNum == 0 ) {
-					ShowFatalError( "SimulateHeatingCoilComponents: Coil not found=" + CompName );
+					ShowFatalError( "SimulateHeatingCoilComponents: Coil not found=" + CompName );  // LCOV_EXCL_LINE
 				}
 				//    CompIndex=CoilNum
 			} else {
 				CoilNum = CompIndex;
 				if ( CoilNum > NumHeatingCoils || CoilNum < 1 ) {
-					ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );
+					ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 				}
 				if ( CheckEquipName( CoilNum ) ) {
 					if ( ! CompName.empty() && CompName != HeatingCoil( CoilNum ).Name ) {
-						ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil( CoilNum ).Name );
+						ShowFatalError( "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil( CoilNum ).Name );  // LCOV_EXCL_LINE
 					}
 					CheckEquipName( CoilNum ) = false;
 				}
@@ -268,7 +268,7 @@ namespace HeatingCoils {
 		} else {
 			ShowSevereError( "SimulateHeatingCoilComponents: CompIndex argument not used." );
 			ShowContinueError( "..CompName = " + CompName );
-			ShowFatalError( "Preceding conditions cause termination." );
+			ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( present( SuppHeat ) ) {
@@ -661,7 +661,7 @@ namespace HeatingCoils {
 			SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name );
 			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Rate", OutputProcessor::Unit::W, coil.ParasiticFuelRate, "System", "Average", coil.Name );
 			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Energy", OutputProcessor::Unit::J, coil.ParasiticFuelLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
-			
+
 		}
 
 		// Get the data for for gas multistage heating coils
@@ -940,7 +940,7 @@ namespace HeatingCoils {
 		}
 
 		if ( InputErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		Alphas.deallocate();
@@ -1116,7 +1116,7 @@ namespace HeatingCoils {
 
 		// delay fatal error until all coils are called
 		if ( ! FirstHVACIteration && HeatingCoilFatalError ) {
-			ShowFatalError( "... errors found in heating coil input." );
+			ShowFatalError( "... errors found in heating coil input." );  // LCOV_EXCL_LINE
 		}
 
 		// Find the heating source index for the desuperheater heating coil if not already found. This occurs when zone heating
@@ -1262,7 +1262,7 @@ namespace HeatingCoils {
 		RequestSizing( CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName );
 		DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
 		DataDesicRegCoil = false; // reset global to false so other heating coils are not affected
-		DataDesInletAirTemp = 0.0; // reset global data to zero so other heating coils are not 
+		DataDesInletAirTemp = 0.0; // reset global data to zero so other heating coils are not
 		DataDesOutletAirTemp = 0.0; // reset global data to zero so other heating coils are not affected
 
 		if ( HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingElectric_MultiStage || HeatingCoil( CoilNum ).HCoilType_Num == Coil_HeatingGas_MultiStage ) {
@@ -1315,7 +1315,7 @@ namespace HeatingCoils {
 			for ( StageNum = 1; StageNum <= HeatingCoil( CoilNum ).NumOfStages - 1; ++StageNum ) {
 				if ( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) > HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ) ) {
 					ShowSevereError( "SizeHeatingCoil: " + HeatingCoil( CoilNum ).HeatingCoilType + ' ' + HeatingCoil( CoilNum ).Name + ", Stage " + TrimSigDigits( StageNum ) + " Nominal Capacity (" + RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ), 2 ) + " W) must be less than or equal to Stage " + TrimSigDigits( StageNum + 1 ) + " Nominal Capacity (" + RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ), 2 ) + " W)." );
-					ShowFatalError( "Preceding conditions cause termination." );
+					ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 				}
 			}
 		} else { // not a multi-speed coil
@@ -1368,7 +1368,7 @@ namespace HeatingCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rich Liesen
 		//       DATE WRITTEN   May 2000
-		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset 
+		//       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1425,7 +1425,7 @@ namespace HeatingCoils {
 			//update the TempSetPoint
 			TempSetPoint -= HeatingCoil( CoilNum ).FaultyCoilSATOffset;
 		}
-		
+
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
@@ -2636,24 +2636,24 @@ namespace HeatingCoils {
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItem( CompName, HeatingCoil );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "CheckHeatingCoilSchedule: Coil not found=\"" + CompName + "\"." );
+				ShowFatalError( "CheckHeatingCoilSchedule: Coil not found=\"" + CompName + "\"." );  // LCOV_EXCL_LINE
 			}
 			if ( ! SameString( CompType, cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) ) ) {
 				ShowSevereError( "CheckHeatingCoilSchedule: Coil=\"" + CompName + "\"" );
 				ShowContinueError( "...expected type=\"" + CompType + "\", actual type=\"" + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "\"." );
-				ShowFatalError( "Program terminates due to preceding conditions." );
+				ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CoilNum;
 			Value = GetCurrentScheduleValue( HeatingCoil( CoilNum ).SchedPtr ); // not scheduled?
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumHeatingCoils || CoilNum < 1 ) {
-				ShowFatalError( "CheckHeatingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "CheckHeatingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumHeatingCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CompName != HeatingCoil( CoilNum ).Name ) {
 				ShowSevereError( "CheckHeatingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil( CoilNum ).Name );
 				ShowContinueError( "...expected type=\"" + CompType + "\", actual type=\"" + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "\"." );
-				ShowFatalError( "Program terminates due to preceding conditions." );
+				ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 			}
 			Value = GetCurrentScheduleValue( HeatingCoil( CoilNum ).SchedPtr ); // not scheduled?
 		}
@@ -3424,7 +3424,7 @@ namespace HeatingCoils {
 		return NumberOfStages;
 
 	}
- 
+
 	// Clears the global data in HeatingCoils.
 	// Needed for unit tests, should not be normally called.
 	void
@@ -3450,7 +3450,7 @@ namespace HeatingCoils {
 		int const CoilNum, // Number of electric or gas heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this coil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this coil is used
 		) {
 
 		// FUNCTION INFORMATION:
@@ -3465,7 +3465,7 @@ namespace HeatingCoils {
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		if ( GetCoilsInputFlag ) { 
+		if ( GetCoilsInputFlag ) {
 			GetHeatingCoilInput();
 			GetCoilsInputFlag = false;
 		}

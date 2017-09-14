@@ -466,7 +466,7 @@ namespace HeatBalFiniteDiffManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetCondFDInput: Errors found getting ConductionFiniteDifference properties. Program terminates." );
+			ShowFatalError( "GetCondFDInput: Errors found getting ConductionFiniteDifference properties. Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		InitialInitHeatBalFiniteDiff();
@@ -776,7 +776,7 @@ namespace HeatBalFiniteDiffManager {
 								ShowContinueError( "Material may be too thin to be modeled well, thickness = " + RoundSigDigits( Material( CurrentLayer ).Thickness, 5 ) + " [m]" );
 								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThinMaterialLayerThreshold, 5 ) + " [m]" );
 							}
-							ShowFatalError( "Preceding conditions cause termination." );
+							ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 						}
 					}
 

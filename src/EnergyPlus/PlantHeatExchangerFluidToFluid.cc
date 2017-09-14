@@ -206,17 +206,17 @@ namespace PlantHeatExchangerFluidToFluid {
 		if ( CompIndex == 0 ) {
 			CompNum = FindItemInList( EquipName, FluidHX );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimFluidHeatExchanger: HeatExchanger:FluidToFluid not found" );
+				ShowFatalError( "SimFluidHeatExchanger: HeatExchanger:FluidToFluid not found" );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumberOfPlantFluidHXs ) {
-				ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of heat exchangers =" + TrimSigDigits( NumberOfPlantFluidHXs ) + ", Entered heat exchanger name = " + EquipName );
+				ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of heat exchangers =" + TrimSigDigits( NumberOfPlantFluidHXs ) + ", Entered heat exchanger name = " + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckFluidHXs( CompNum ) ) {
 				if ( EquipName != FluidHX( CompNum ).Name ) {
-					ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", heat exchanger name=" + EquipName + ", stored name for that index=" + FluidHX( CompNum ).Name );
+					ShowFatalError( "SimFluidHeatExchanger: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", heat exchanger name=" + EquipName + ", stored name for that index=" + FluidHX( CompNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckFluidHXs( CompNum ) = false;
 			}
@@ -568,7 +568,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );
+			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 		for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
@@ -706,7 +706,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( RoutineName + "Program terminated due to previous condition(s)." );
+				ShowFatalError( RoutineName + "Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			MyFlag( CompNum ) = false;
 		} // plant setup

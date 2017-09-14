@@ -2570,7 +2570,7 @@ namespace General {
 
 	}
 
-	// returns the Julian date for the first, second, etc. day of week for a given month 
+	// returns the Julian date for the first, second, etc. day of week for a given month
 	int
 	nthDayOfWeekOfMonth(
 		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
@@ -2734,7 +2734,7 @@ namespace General {
 		Determinant = A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) + A( 2, 1 ) * A( 3, 2 ) * A( 1, 3 ) + A( 3, 1 ) * A( 1, 2 ) * A( 2, 3 ) - A( 1, 1 ) * A( 2, 3 ) * A( 3, 2 ) - A( 1, 2 ) * A( 2, 1 ) * A( 3, 3 ) - A( 1, 3 ) * A( 2, 2 ) * A( 3, 1 );
 
 		if ( std::abs( Determinant ) < .1E-12 ) {
-			ShowFatalError( "Determinant = [Zero] in Invert3By3Matrix", OutputFileStandard );
+			ShowFatalError( "Determinant = [Zero] in Invert3By3Matrix", OutputFileStandard );  // LCOV_EXCL_LINE
 		}
 
 		// Compute Inverse

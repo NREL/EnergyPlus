@@ -177,7 +177,7 @@ namespace PondGroundHeatExchanger {
 			}
 		}
 		// If we didn't find it, fatal
-		ShowFatalError( "Pond Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
+		ShowFatalError( "Pond Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );  // LCOV_EXCL_LINE
 		// Shut up the compiler
 		return nullptr;
 	}
@@ -364,7 +364,7 @@ namespace PondGroundHeatExchanger {
 
 		// final error check
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		// Set up the output variables
@@ -469,7 +469,7 @@ namespace PondGroundHeatExchanger {
 			errFlag = false;
 			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgPond, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitPondGroundHeatExchanger: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitPondGroundHeatExchanger: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			rho = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, constant_zero, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 			Cp = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, constant_zero, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
@@ -1004,7 +1004,7 @@ namespace PondGroundHeatExchanger {
 			}
 			ShowRecurringWarningErrorAtEnd( "GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen", this->FrozenErrIndex, PondTemperature, PondTemperature, _, "[C]", "[C]" );
 			if ( this->ConsecutiveFrozen >= NumOfTimeStepInHour * 30 ) {
-				ShowFatalError( "GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates." );
+				ShowFatalError( "GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates." );  // LCOV_EXCL_LINE
 			}
 		} else {
 			this->ConsecutiveFrozen = 0;

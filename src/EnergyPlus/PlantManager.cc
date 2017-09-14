@@ -703,7 +703,7 @@ namespace PlantManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in processing input. Preceding conditions cause termination." );
+			ShowFatalError( RoutineName + "Errors found in processing input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		// set up loop status (set by system availability managers) report variables
@@ -1421,7 +1421,7 @@ namespace PlantManager {
 				}
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "GetPlantInput: Previous Severe errors cause termination." );
+					ShowFatalError( "GetPlantInput: Previous Severe errors cause termination." );  // LCOV_EXCL_LINE
 				}
 
 				NumConnectorsInLoop = NumofSplitters + NumofMixers;
@@ -1571,7 +1571,7 @@ namespace PlantManager {
 							if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_Pipe || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeSteam || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
 
 								++PipeNum;
-								if ( PipeNum > NumOfPipesInLoop ) ShowFatalError( "Pipe counting problem in GetPlantSideLoops" );
+								if ( PipeNum > NumOfPipesInLoop ) ShowFatalError( "Pipe counting problem in GetPlantSideLoops" );  // LCOV_EXCL_LINE
 
 								LoopPipe( HalfLoopNum ).NumPipes = NumOfPipesInLoop;
 								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name = TempLoop.Branch( BranchNum ).Comp( CompNum ).Name;
@@ -1745,7 +1745,7 @@ namespace PlantManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetPlantInput: Errors in getting PlantLoop Input" );
+			ShowFatalError( "GetPlantInput: Errors in getting PlantLoop Input" );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumPlantLoops > 0 ) VentRepPlantSupplySide.allocate( NumPlantLoops );
@@ -2409,7 +2409,7 @@ namespace PlantManager {
 		} //
 		if ( ! BeginEnvrnFlag ) SupplyEnvrnFlag = true;
 
-		if ( ErrorsFound ) ShowFatalError( "Preceding errors caused termination" );
+		if ( ErrorsFound ) ShowFatalError( "Preceding errors caused termination" );  // LCOV_EXCL_LINE
 
 	}
 
@@ -3274,7 +3274,7 @@ namespace PlantManager {
 
 			} else {
 				if (PlantFirstSizesOkayToFinalize) {
-					ShowFatalError( "Autosizing of plant loop requires a loop Sizing:Plant object" );
+					ShowFatalError( "Autosizing of plant loop requires a loop Sizing:Plant object" );  // LCOV_EXCL_LINE
 					ShowContinueError( "Occurs in PlantLoop object=" + PlantLoop( LoopNum ).Name );
 					ErrorsFound = true;
 				}
@@ -3324,7 +3324,7 @@ namespace PlantManager {
 		PlantLoop( LoopNum ).MinMassFlowRate = PlantLoop( LoopNum ).MinVolFlowRate * FluidDensity;
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 
@@ -3475,7 +3475,7 @@ namespace PlantManager {
 		PlantLoop( LoopNum ).MinMassFlowRate = PlantLoop( LoopNum ).MinVolFlowRate * FluidDensity;
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 
@@ -4464,7 +4464,7 @@ namespace PlantManager {
 								ShowSevereError( "A pipe used as a bypass should not be in series with another component" );
 								ShowContinueError( "Occurs in Branch = " + PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).Branch( BranchCtr ).Name );
 								ShowContinueError( "Occurs in PlantLoop = " + PlantLoop( LoopCtr ).Name );
-								ShowFatalError( "SetupBranchControlTypes: preceding condition causes termination." );
+								ShowFatalError( "SetupBranchControlTypes: preceding condition causes termination." );  // LCOV_EXCL_LINE
 							}
 
 						} else if ( SELECT_CASE_var == ControlType_Passive ) {

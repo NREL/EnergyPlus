@@ -377,7 +377,7 @@ namespace DataSurfaceLists {
 
 		}
 
-		if ( ErrorsFound ) ShowFatalError( "GetSurfaceListsInputs: Program terminates due to preceding conditions." );
+		if ( ErrorsFound ) ShowFatalError( "GetSurfaceListsInputs: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 
 	}
 

@@ -540,7 +540,7 @@ namespace SwimmingPool {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in swimming pool input. Preceding conditions cause termination." );
+			ShowFatalError( RoutineName + "Errors found in swimming pool input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Set up the output variables for swimming pools
@@ -655,7 +655,7 @@ namespace SwimmingPool {
 		}
 
 		InitSwimmingPoolPlantLoopIndex( PoolNum, MyPlantScanFlagPool( PoolNum ) );
-		
+
 		if ( BeginEnvrnFlag && MyEnvrnFlagGeneral ) {
 			ZeroSourceSumHATsurf = 0.0;
 			QPoolSrcAvg = 0.0;
@@ -809,13 +809,13 @@ namespace SwimmingPool {
 
 		bool errFlag;
 		static std::string const RoutineName( "InitSwimmingPoolPlantLoopIndex" );
-		
+
 		if ( MyPlantScanFlagPool && allocated( PlantLoop ) ) {
 			errFlag = false;
 			if ( Pool( PoolNum ).WaterInletNode > 0 ) {
 				ScanPlantLoopsForObject( Pool( PoolNum ).Name, TypeOf_SwimmingPool_Indoor, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum, _, _, _, Pool( PoolNum ).WaterInletNode, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
+					ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 			}
 			MyPlantScanFlagPool = false;
@@ -824,8 +824,8 @@ namespace SwimmingPool {
 		}
 
 	}
-	
-	
+
+
 	void
 	CalcSwimmingPool(
 		int const PoolNum // number of the swimming pool
@@ -1007,18 +1007,18 @@ namespace SwimmingPool {
 		using DataEnvironment::OutBaroPress;
 		using DataConversions::CFA;
 		using DataConversions::CFMF;
-		
+
 		static std::string const RoutineName( "CalcSwimmingPoolEvap" );
 		static Real64 const CFinHg( 0.00029613 ); // Multiple pressure in Pa by this constant to get inches of Hg
 
 		Real64 PSatPool;
 		Real64 PParAir;
-		
+
 		// Evaporation calculation:
 		// Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
 		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
 		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
-		
+
 		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
 		PParAir = PsyPsatFnTemp( MAT, RoutineName ) * PsyRhFnTdbWPb( MAT, HumRat, OutBaroPress );
 		if ( PSatPool < PParAir ) PSatPool = PParAir;
@@ -1027,7 +1027,7 @@ namespace SwimmingPool {
 		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
 
 	}
-	
+
 	void
 	UpdateSwimmingPool(
 		int const PoolNum // number of the swimming pool

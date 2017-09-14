@@ -336,17 +336,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + ChillerName );
+					ShowFatalError( "SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumElectricChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimElectricChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumElectricChillers ) + ", Entered Unit name=" + ChillerName );
+					ShowFatalError( "SimElectricChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumElectricChillers ) + ", Entered Unit name=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				if ( ElectricChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != ElectricChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimElectricChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + ElectricChiller( ChillNum ).Base.Name );
+						ShowFatalError( "SimElectricChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + ElectricChiller( ChillNum ).Base.Name );  // LCOV_EXCL_LINE
 					}
 					ElectricChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -398,17 +398,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + ChillerName );
+					ShowFatalError( "SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumEngineDrivenChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimEngineDrivenChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumEngineDrivenChillers ) + ", Entered Unit name=" + ChillerName );
+					ShowFatalError( "SimEngineDrivenChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumEngineDrivenChillers ) + ", Entered Unit name=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				if ( EngineDrivenChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != EngineDrivenChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimEngineDrivenChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + EngineDrivenChiller( ChillNum ).Base.Name );
+						ShowFatalError( "SimEngineDrivenChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + EngineDrivenChiller( ChillNum ).Base.Name );  // LCOV_EXCL_LINE
 					}
 					EngineDrivenChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -457,17 +457,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, GTChiller.ma( &GTChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + ChillerName );
+					ShowFatalError( "SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumGTChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimGTChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumGTChillers ) + ", Entered Unit name=" + ChillerName );
+					ShowFatalError( "SimGTChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumGTChillers ) + ", Entered Unit name=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				if ( GTChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != GTChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimGTChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + GTChiller( ChillNum ).Base.Name );
+						ShowFatalError( "SimGTChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + GTChiller( ChillNum ).Base.Name );  // LCOV_EXCL_LINE
 					}
 					GTChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -520,17 +520,17 @@ namespace PlantChillers {
 			if ( CompIndex == 0 ) {
 				ChillNum = FindItemInList( ChillerName, ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
-					ShowFatalError( "SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + ChillerName );
+					ShowFatalError( "SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = ChillNum;
 			} else {
 				ChillNum = CompIndex;
 				if ( ChillNum > NumConstCOPChillers || ChillNum < 1 ) {
-					ShowFatalError( "SimConstCOPChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumConstCOPChillers ) + ", Entered Unit name=" + ChillerName );
+					ShowFatalError( "SimConstCOPChiller:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumConstCOPChillers ) + ", Entered Unit name=" + ChillerName );  // LCOV_EXCL_LINE
 				}
 				if ( ConstCOPChiller( ChillNum ).Base.CheckEquipName ) {
 					if ( ChillerName != ConstCOPChiller( ChillNum ).Base.Name ) {
-						ShowFatalError( "SimConstCOPChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + ConstCOPChiller( ChillNum ).Base.Name );
+						ShowFatalError( "SimConstCOPChiller: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + ConstCOPChiller( ChillNum ).Base.Name );  // LCOV_EXCL_LINE
 					}
 					ConstCOPChiller( ChillNum ).Base.CheckEquipName = false;
 				}
@@ -912,7 +912,7 @@ namespace PlantChillers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum ) {
@@ -1240,7 +1240,7 @@ namespace PlantChillers {
 
 			EngineDrivenChiller( ChillerNum ).FuelHeatingValue = rNumericArgs( 25 );
 
-			// add support of autosize to this. 
+			// add support of autosize to this.
 
 			EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate = rNumericArgs( 26 );
 			if ( EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 || EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate ==  DataSizing::AutoSize ) {
@@ -1353,7 +1353,7 @@ namespace PlantChillers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumEngineDrivenChillers; ++ChillerNum ) {
@@ -1795,7 +1795,7 @@ namespace PlantChillers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumGTChillers; ++ChillerNum ) {
@@ -2092,7 +2092,7 @@ namespace PlantChillers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( ChillerNum = 1; ChillerNum <= NumConstCOPChillers; ++ChillerNum ) {
@@ -2235,7 +2235,7 @@ namespace PlantChillers {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "InitElectricChiller: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitElectricChiller: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ElectricChiller( ChillNum ).Base.FlowMode == ConstantFlow ) {
@@ -2517,7 +2517,7 @@ namespace PlantChillers {
 				InterConnectTwoPlantLoopSides( EngineDrivenChiller( ChillNum ).Base.CDLoopNum, EngineDrivenChiller( ChillNum ).Base.CDLoopSideNum, EngineDrivenChiller( ChillNum ).HRLoopNum, EngineDrivenChiller( ChillNum ).HRLoopSideNum, TypeOf_Chiller_EngineDriven, false );
 			}
 			if ( errFlag ) {
-				ShowFatalError( "InitEngineDrivenChiller: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitEngineDrivenChiller: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( EngineDrivenChiller( ChillNum ).Base.FlowMode == ConstantFlow ) {
@@ -2757,7 +2757,7 @@ namespace PlantChillers {
 				InterConnectTwoPlantLoopSides( GTChiller( ChillNum ).Base.CDLoopNum, GTChiller( ChillNum ).Base.CDLoopSideNum, GTChiller( ChillNum ).HRLoopNum, GTChiller( ChillNum ).HRLoopSideNum, TypeOf_Chiller_CombTurbine, false );
 			}
 			if ( errFlag ) {
-				ShowFatalError( "InitGTChiller: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitGTChiller: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( GTChiller( ChillNum ).Base.FlowMode == ConstantFlow ) {
@@ -2975,7 +2975,7 @@ namespace PlantChillers {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "CalcConstCOPChillerModel: Program terminated due to previous condition(s)." );
+				ShowFatalError( "CalcConstCOPChillerModel: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			if ( ConstCOPChiller( ChillNum ).Base.FlowMode == ConstantFlow ) {
 				// reset flow priority
@@ -3305,7 +3305,7 @@ namespace PlantChillers {
 			RegisterPlantCompDesignFlow( ElectricChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ElectricChiller( ChillNum ).HeatRecActive ) {
@@ -3592,7 +3592,7 @@ namespace PlantChillers {
 			RegisterPlantCompDesignFlow( EngineDrivenChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 		}
 
-		// autosize support for heat recovery flow rate. 
+		// autosize support for heat recovery flow rate.
 		if ( EngineDrivenChiller( ChillNum ).HeatRecActive ) {
 			Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * EngineDrivenChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( PlantFirstSizesOkayToFinalize ) {
@@ -3644,7 +3644,7 @@ namespace PlantChillers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -3878,7 +3878,7 @@ namespace PlantChillers {
 		// save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
 		if ( GTChiller( ChillNum ).Base.CondenserType == WaterCooled ) RegisterPlantCompDesignFlow( GTChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 
-		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap / ( GTChiller( ChillNum ).engineCapacityScalar * GTChiller( ChillNum ).Base.COP ); 
+		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap / ( GTChiller( ChillNum ).engineCapacityScalar * GTChiller( ChillNum ).Base.COP );
 		if ( PlantFirstSizesOkayToFinalize ) {
 			if ( GTChiller( ChillNum ).GTEngineCapacityWasAutoSized ) {
 				GTChiller( ChillNum ).GTEngineCapacity = GTEngineCapacityDes;
@@ -3909,7 +3909,7 @@ namespace PlantChillers {
 			}
 		}
 
-		// autosize support for heat recovery flow rate. 
+		// autosize support for heat recovery flow rate.
 		if ( GTChiller( ChillNum ).HeatRecActive ) {
 			Real64 tmpHeatRecVolFlowRate = GTChiller( ChillNum ).Base.CondVolFlowRate * GTChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( PlantFirstSizesOkayToFinalize ) {
@@ -3960,7 +3960,7 @@ namespace PlantChillers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -4193,7 +4193,7 @@ namespace PlantChillers {
 		if ( ConstCOPChiller( ChillNum ).Base.CondenserType == WaterCooled ) RegisterPlantCompDesignFlow( ConstCOPChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 		//create predefined report
@@ -4425,16 +4425,16 @@ namespace PlantChillers {
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 RatedCOP_ff = RatedCOP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
 			RatedCOP = RatedCOP_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
-		
+
 		// initialize outlet air humidity ratio of air or evap cooled chillers
 		CondOutletHumRat = Node( CondInletNode ).HumRat;
 
@@ -4483,15 +4483,15 @@ namespace PlantChillers {
 		if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( ElectricChiller( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset ));
 			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
-		
+
 		//Calculate chiller performance from this set of performance equations.
 		//  from BLAST...Z=(TECONDW-ADJTC(1))/ADJTC(2)-(TLCHLRW-ADJTC(3))
 
@@ -4695,7 +4695,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -4791,7 +4791,7 @@ namespace PlantChillers {
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
 					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
-					ShowFatalError( "Program Terminates due to previous error condition" );
+					ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ! WarmupFlag ) {
@@ -4801,7 +4801,7 @@ namespace PlantChillers {
 					ShowContinueError( "Check input for Capacity Ratio Curve" );
 					ShowContinueError( "Condenser inlet temperature: " + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
-					ShowFatalError( "Program Terminates due to previous error condition" );
+					ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 				}
 			}
 			// If makes it here, set limits, chiller can't have negative energy/power
@@ -5084,20 +5084,20 @@ namespace PlantChillers {
 		LoopNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopSideNum;
 		EvapMassFlowRateMax = EngineDrivenChiller( ChillerNum ).Base.EvapMassFlowRateMax;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			COP = COP_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
 
 		//*********************************
@@ -5106,13 +5106,13 @@ namespace PlantChillers {
 		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( EngineDrivenChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		//Calculate chiller performance from this set of performance equations.
@@ -5220,7 +5220,7 @@ namespace PlantChillers {
 				// ChillerPartLoadRatio = PartLoadRat;
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
-			
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5298,7 +5298,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -5451,7 +5451,7 @@ namespace PlantChillers {
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
 					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
-					ShowFatalError( "Program Terminates due to previous error condition" );
+					ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ! WarmupFlag ) {
@@ -5461,7 +5461,7 @@ namespace PlantChillers {
 					ShowContinueError( "Check input for Capacity Ratio Curve" );
 					ShowContinueError( "Condenser inlet temperature: " + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
-					ShowFatalError( "Program Terminates due to previous error condition" );
+					ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 				}
 			}
 			// If makes it here, set limits, chiller can't have negative energy/power
@@ -5736,20 +5736,20 @@ namespace PlantChillers {
 		EvapMassFlowRateMax = GTChiller( ChillerNum ).Base.EvapMassFlowRateMax;
 		LoopNum = GTChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = GTChiller( ChillerNum ).Base.CWLoopSideNum;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
-			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;			
+			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			COP = COP_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
 
 		//*********************************
@@ -5758,13 +5758,13 @@ namespace PlantChillers {
 		if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( GTChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
 			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		//Calculate chiller performance from this set of performance equations.
@@ -5870,7 +5870,7 @@ namespace PlantChillers {
 				// ChillerPartLoadRatio = PartLoadRat;
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
-			
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5942,7 +5942,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -6188,7 +6188,7 @@ namespace PlantChillers {
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
 					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
-					ShowFatalError( "Program Terminates due to previous error condition" );
+					ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ! WarmupFlag ) {
@@ -6198,7 +6198,7 @@ namespace PlantChillers {
 					ShowContinueError( "Check input for Capacity Ratio Curve" );
 					ShowContinueError( "Condenser inlet temperature: " + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
-					ShowFatalError( "Program Terminates due to previous error condition" );
+					ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 				}
 			}
 			// If makes it here, set limits, chiller can't have negative energy/power
@@ -6219,7 +6219,7 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen 
+		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen
 		//                      Feb. 2010, Chandan Sharma, FSEC. Added basin heater
 		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
 		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
@@ -6300,16 +6300,16 @@ namespace PlantChillers {
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
-			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor; 
-			
+			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+
 		}
-		
+
 		//set module level chiller inlet and temperature variables
 		LoopNum = ConstCOPChiller( ChillNum ).Base.CWLoopNum;
 		LoopSideNum = ConstCOPChiller( ChillNum ).Base.CWLoopSideNum;
@@ -6332,15 +6332,15 @@ namespace PlantChillers {
 		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOutSetPoint
 			TempEvapOutSetPoint = min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset );
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOutSetPoint;
-			
+
 		}
-		
+
 		EvapDeltaTemp = std::abs( Node( EvapInletNode ).Temp - TempEvapOutSetPoint );
 		EvapInletTemp = Node( EvapInletNode ).Temp;
 
@@ -6575,7 +6575,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -6647,7 +6647,7 @@ namespace PlantChillers {
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
 					ShowContinueError( "Evaporator inlet temperature: " + RoundSigDigits( Node( EvapInletNode ).Temp, 2 ) );
 
-					ShowFatalError( "Program Terminates due to previous error condition" );
+					ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 				}
 			}
 			// If makes it here, set limits, chiller can't have negative energy/power

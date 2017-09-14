@@ -203,23 +203,23 @@ namespace Humidifiers {
 		if ( CompIndex == 0 ) {
 			HumNum = FindItemInList( CompName, Humidifier );
 			if ( HumNum == 0 ) {
-				ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
+				ShowFatalError( "SimHumidifier: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = HumNum;
 		} else {
 			HumNum = CompIndex;
 			if ( HumNum > NumHumidifiers || HumNum < 1 ) {
-				ShowFatalError( "SimHumidifier: Invalid CompIndex passed=" + TrimSigDigits( HumNum ) + ", Number of Units=" + TrimSigDigits( NumHumidifiers ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimHumidifier: Invalid CompIndex passed=" + TrimSigDigits( HumNum ) + ", Number of Units=" + TrimSigDigits( NumHumidifiers ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( HumNum ) ) {
 				if ( CompName != Humidifier( HumNum ).Name ) {
-					ShowFatalError( "SimHumidifier: Invalid CompIndex passed=" + TrimSigDigits( HumNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + Humidifier( HumNum ).Name );
+					ShowFatalError( "SimHumidifier: Invalid CompIndex passed=" + TrimSigDigits( HumNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + Humidifier( HumNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( HumNum ) = false;
 			}
 		}
 		if ( HumNum <= 0 ) {
-			ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
+			ShowFatalError( "SimHumidifier: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 		}
 
 		auto & thisHum( Humidifier( HumNum ) );
@@ -242,7 +242,7 @@ namespace Humidifiers {
 		} else {
 			ShowSevereError( "SimHumidifier: Invalid Humidifier Type Code=" + TrimSigDigits( thisHum.HumType_Code ) );
 			ShowContinueError( "...Component Name=[" + CompName + "]." );
-			ShowFatalError( "Preceding Condition causes termination." );
+			ShowFatalError( "Preceding Condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -504,7 +504,7 @@ namespace Humidifiers {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input." );
+			ShowFatalError( RoutineName + "Errors found in input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -859,7 +859,7 @@ namespace Humidifiers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( CalledFrom + ": Mismatch was found in the Rated Gas Use Rate and Thermal Efficiency for gas fired steam humidifier = " + Name + ". " );
+			ShowFatalError( CalledFrom + ": Mismatch was found in the Rated Gas Use Rate and Thermal Efficiency for gas fired steam humidifier = " + Name + ". " );  // LCOV_EXCL_LINE
 		}
 	}
 

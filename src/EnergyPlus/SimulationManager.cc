@@ -373,7 +373,7 @@ namespace SimulationManager {
 		Available = true;
 
 		if ( InvalidBranchDefinitions ) {
-			ShowFatalError( "Preceding error(s) in Branch Input cause termination." );
+			ShowFatalError( "Preceding error(s) in Branch Input cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		DisplayString( "Initializing Simulation" );
@@ -436,7 +436,7 @@ namespace SimulationManager {
 			ProduceRDDMDD();
 
 			if ( TerminalError ) {
-				ShowFatalError( "Previous Conditions cause program termination." );
+				ShowFatalError( "Previous Conditions cause program termination." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -447,10 +447,10 @@ namespace SimulationManager {
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
-		
+
 		// check for variable latitude/location/etc
 		WeatherManager::ReadVariableLocationOrientation();
-		
+
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
@@ -586,7 +586,7 @@ namespace SimulationManager {
 						//  After the first iteration of HeatBalance, all the 'input' has been gotten
 						if ( BeginFullSimFlag ) {
 							if ( GetNumRangeCheckErrorsFound() > 0 ) {
-								ShowFatalError( "Out of \"range\" values found in input" );
+								ShowFatalError( "Out of \"range\" values found in input" );  // LCOV_EXCL_LINE
 							}
 						}
 
@@ -671,7 +671,7 @@ namespace SimulationManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Error condition occurred.  Previous Severe Errors cause termination." );
+			ShowFatalError( "Error condition occurred.  Previous Severe Errors cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1043,7 +1043,7 @@ namespace SimulationManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found getting Project Input" );
+			ShowFatalError( "Errors found getting Project Input" );  // LCOV_EXCL_LINE
 		}
 
 		gio::write( OutputFileInits, fmtA ) << "! <Version>, Version ID";
@@ -1233,7 +1233,7 @@ namespace SimulationManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Program terminates due to preceding conditions." );
+			ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1338,7 +1338,7 @@ namespace SimulationManager {
 		StdOutputRecordCount = 0;
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileStandard, DataStringGlobals::outputEsoFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEsoFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEsoFileName+" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		eso_stream = gio::out_stream( OutputFileStandard );
 		gio::write( OutputFileStandard, fmtA ) << "Program Version," + VerString;
@@ -1347,7 +1347,7 @@ namespace SimulationManager {
 		OutputFileInits = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, DataStringGlobals::outputEioFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEioFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEioFileName+" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		eio_stream = gio::out_stream( OutputFileInits );
 		gio::write( OutputFileInits, fmtA ) << "Program Version," + VerString;
@@ -1357,7 +1357,7 @@ namespace SimulationManager {
 		StdMeterRecordCount = 0;
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileMeters, DataStringGlobals::outputMtrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputMtrFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputMtrFileName+" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		mtr_stream = gio::out_stream( OutputFileMeters );
 		gio::write( OutputFileMeters, fmtA ) << "Program Version," + VerString;
@@ -1366,7 +1366,7 @@ namespace SimulationManager {
 		OutputFileBNDetails = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileBNDetails, DataStringGlobals::outputBndFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputBndFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputBndFileName+" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
@@ -1665,7 +1665,7 @@ namespace SimulationManager {
 			//  After the first iteration of HeatBalance, all the 'input' has been gotten
 			if ( BeginFullSimFlag ) {
 				if ( GetNumRangeCheckErrorsFound() > 0 ) {
-					ShowFatalError( "Out of \"range\" values found in input" );
+					ShowFatalError( "Out of \"range\" values found in input" );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -1704,7 +1704,7 @@ namespace SimulationManager {
 		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
-		if ( ErrorsFound ) ShowFatalError( "Previous conditions cause program termination." );
+		if ( ErrorsFound ) ShowFatalError( "Previous conditions cause program termination." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -2492,11 +2492,11 @@ namespace SimulationManager {
 		CheckCachedIPErrors();
 
 		if ( PreP_Fatal ) {
-			ShowFatalError( "Preprocessor condition(s) cause termination." );
+			ShowFatalError( "Preprocessor condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( OverallErrorFlag ) {
-			ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );
+			ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		CompactObjectsCheck(); // Check to see if Compact Objects (CompactHVAC, etc) are in input file.
@@ -2506,7 +2506,7 @@ namespace SimulationManager {
 
 		if ( NumOutOfRangeErrorsFound + NumBlankReqFieldFound + NumMiscErrorsFound > 0 ) {
 			ShowSevereError( "IP: Out of \"range\" values and/or blank required fields found in input" );
-			ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );
+			ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( GetNumSectionsFound( "DISPLAYALLWARNINGS" ) > 0 ) {

@@ -262,7 +262,7 @@ namespace HeatBalanceAirManager {
 		GetRoomAirModelParameters( ErrorsFound );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetAirHeatBalanceInput: Errors found in getting Air inputs" );
+			ShowFatalError( "GetAirHeatBalanceInput: Errors found in getting Air inputs" );  // LCOV_EXCL_LINE
 		}
 
 	}

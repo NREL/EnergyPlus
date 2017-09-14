@@ -380,17 +380,17 @@ namespace Furnaces {
 		if ( CompIndex == 0 ) {
 			FurnaceNum = FindItemInList( FurnaceName, Furnace );
 			if ( FurnaceNum == 0 ) {
-				ShowFatalError( "SimFurnace: Unit not found=" + FurnaceName );
+				ShowFatalError( "SimFurnace: Unit not found=" + FurnaceName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = FurnaceNum;
 		} else {
 			FurnaceNum = CompIndex;
 			if ( FurnaceNum > NumFurnaces || FurnaceNum < 1 ) {
-				ShowFatalError( "SimFurnace:  Invalid CompIndex passed=" + TrimSigDigits( FurnaceNum ) + ", Number of Units=" + TrimSigDigits( NumFurnaces ) + ", Entered Unit name=" + FurnaceName );
+				ShowFatalError( "SimFurnace:  Invalid CompIndex passed=" + TrimSigDigits( FurnaceNum ) + ", Number of Units=" + TrimSigDigits( NumFurnaces ) + ", Entered Unit name=" + FurnaceName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( FurnaceNum ) ) {
 				if ( FurnaceName != Furnace( FurnaceNum ).Name ) {
-					ShowFatalError( "SimFurnace: Invalid CompIndex passed=" + TrimSigDigits( FurnaceNum ) + ", Unit name=" + FurnaceName + ", stored Unit Name for that index=" + Furnace( FurnaceNum ).Name );
+					ShowFatalError( "SimFurnace: Invalid CompIndex passed=" + TrimSigDigits( FurnaceNum ) + ", Unit name=" + FurnaceName + ", stored Unit Name for that index=" + Furnace( FurnaceNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( FurnaceNum ) = false;
 			}
@@ -4269,7 +4269,7 @@ namespace Furnaces {
 		Numbers.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting Furnace or Unitary System input." );
+			ShowFatalError( "Errors found in getting Furnace or Unitary System input." );  // LCOV_EXCL_LINE
 		}
 
 		for ( HeatOnlyNum = 1; HeatOnlyNum <= NumHeatOnly; ++HeatOnlyNum ) {
@@ -4592,7 +4592,7 @@ namespace Furnaces {
 					errFlag = false;
 					ScanPlantLoopsForObject( Furnace( FurnaceNum ).HeatingCoilName, TypeOf_CoilWaterSimpleHeating, Furnace( FurnaceNum ).LoopNum, Furnace( FurnaceNum ).LoopSide, Furnace( FurnaceNum ).BranchNum, Furnace( FurnaceNum ).CompNum, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );
+						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 					Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).HeatingCoilName, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxHeatCoilFluidFlow > 0.0 ) {
@@ -4604,7 +4604,7 @@ namespace Furnaces {
 					errFlag = false;
 					ScanPlantLoopsForObject( Furnace( FurnaceNum ).HeatingCoilName, TypeOf_CoilSteamAirHeating, Furnace( FurnaceNum ).LoopNum, Furnace( FurnaceNum ).LoopSide, Furnace( FurnaceNum ).BranchNum, Furnace( FurnaceNum ).CompNum, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );
+						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 					Furnace( FurnaceNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).HeatingCoilIndex, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxHeatCoilFluidFlow > 0.0 ) {
@@ -4632,7 +4632,7 @@ namespace Furnaces {
 					errFlag = false;
 					ScanPlantLoopsForObject( Furnace( FurnaceNum ).SuppHeatCoilName, TypeOf_CoilWaterSimpleHeating, Furnace( FurnaceNum ).LoopNumSupp, Furnace( FurnaceNum ).LoopSideSupp, Furnace( FurnaceNum ).BranchNumSupp, Furnace( FurnaceNum ).CompNumSupp, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );
+						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 					Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", Furnace( FurnaceNum ).SuppHeatCoilName, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
@@ -4643,7 +4643,7 @@ namespace Furnaces {
 					errFlag = false;
 					ScanPlantLoopsForObject( Furnace( FurnaceNum ).SuppHeatCoilName, TypeOf_CoilSteamAirHeating, Furnace( FurnaceNum ).LoopNumSupp, Furnace( FurnaceNum ).LoopSideSupp, Furnace( FurnaceNum ).BranchNumSupp, Furnace( FurnaceNum ).CompNumSupp, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );
+						ShowFatalError( "InitFurnace: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 					Furnace( FurnaceNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( Furnace( FurnaceNum ).SuppHeatCoilIndex, ErrorsFound );
 					if ( Furnace( FurnaceNum ).MaxSuppCoilFluidFlow > 0.0 ) {
@@ -4798,7 +4798,7 @@ namespace Furnaces {
 			MyCheckFlag( FurnaceNum ) = false;
 			if ( Furnace( FurnaceNum ).ZoneInletNode == 0 ) {
 				ShowSevereError( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\": The zone inlet node in the controlled zone (" + Zone( Furnace( FurnaceNum ).ControlZoneNum ).Name + ") is not found." );
-				ShowFatalError( "Subroutine InitFurnace: Errors found in getting " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " input.  Preceding condition(s) causes termination." );
+				ShowFatalError( "Subroutine InitFurnace: Errors found in getting " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " input.  Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -8960,7 +8960,7 @@ namespace Furnaces {
 						}
 					}
 				} else if ( SolFla == -2 ) {
-					ShowFatalError( "VS WSHP unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + Furnace( FurnaceNum ).Name );
+					ShowFatalError( "VS WSHP unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + Furnace( FurnaceNum ).Name );  // LCOV_EXCL_LINE
 				}
 			} else {
 				// Check to see which speed to meet the load
@@ -9009,7 +9009,7 @@ namespace Furnaces {
 						}
 					}
 				} else if ( SolFla == -2 ) {
-					ShowFatalError( "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" + Furnace( FurnaceNum ).Name );
+					ShowFatalError( "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" + Furnace( FurnaceNum ).Name );  // LCOV_EXCL_LINE
 				}
 			}
 		}

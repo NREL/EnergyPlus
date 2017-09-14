@@ -814,7 +814,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		// *** Read AirflowNetwork simulation parameters
@@ -827,7 +827,7 @@ namespace AirflowNetworkBalanceManager {
 			return;
 		}
 		if ( NumAirflowNetwork > 1 ) {
-			ShowFatalError( RoutineName + "Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed." );
+			ShowFatalError( RoutineName + "Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed." );  // LCOV_EXCL_LINE
 		}
 
 		SimObjectError = false;
@@ -872,7 +872,7 @@ namespace AirflowNetworkBalanceManager {
 				} else {
 					ShowSevereError( RoutineName + "More AirLoopHVACs are found. Currently only one (\"1\") AirLoopHVAC object per simulation is allowed when using AirflowNetwork Distribution Systems" );
 				}
-				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -1006,7 +1006,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		if ( SimObjectError ) {
-			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		AirflowNetworkSimu.MaxIteration = Numbers( 1 );
@@ -1084,7 +1084,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		} else {
 			ShowSevereError( RoutineName + "For an AirflowNetwork Simulation, at least one " + CurrentModuleObject + " object is required but none were found." );
-			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		// ==> Zone data validation
@@ -1185,7 +1185,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 				if ( MultizoneZoneData( i ).ASH55PeopleInd == 0 ) {
-					ShowFatalError( "ASHRAE55 ventilation control for zone " + MultizoneZoneData( i ).ZoneName + " requires a people object with respective model calculations." );
+					ShowFatalError( "ASHRAE55 ventilation control for zone " + MultizoneZoneData( i ).ZoneName + " requires a people object with respective model calculations." );  // LCOV_EXCL_LINE
 				}
 			} else if ( SELECT_CASE_var == "CEN15251ADAPTIVE" ) {
 				// Check that for the given zone, there is a people object for which CEN-15251 calculations are carried out
@@ -1197,7 +1197,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 				if ( MultizoneZoneData( i ).CEN15251PeopleInd == 0 ) {
-					ShowFatalError( "CEN15251 ventilation control for zone " + MultizoneZoneData( i ).ZoneName + " requires a people object with respective model calculations." );
+					ShowFatalError( "CEN15251 ventilation control for zone " + MultizoneZoneData( i ).ZoneName + " requires a people object with respective model calculations." );  // LCOV_EXCL_LINE
 				}
 			} else {
 			}}
@@ -1423,7 +1423,7 @@ namespace AirflowNetworkBalanceManager {
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 1 ) + " = " + MultizoneSurfaceData( i ).SurfName );
 				ShowContinueError( "..Zone for inside surface must be defined in a AirflowNetwork:MultiZone:Zone object.  Could not find Zone = " + Zone( Surface( MultizoneSurfaceData( i ).SurfNum ).Zone ).Name );
-				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 			}
 
 			// Calculate equivalent width and height
@@ -2271,7 +2271,7 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 
 		// Write wind pressure coefficients in the EIO file
 		gio::write( OutputFileInits, fmtA ) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
@@ -2327,15 +2327,15 @@ namespace AirflowNetworkBalanceManager {
 
 		// If no zone object, exit
 		if ( AirflowNetworkNumOfZones == 0 ) {
-			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 		// If zone node number =0, exit.
 		for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
 			if ( MultizoneSurfaceData( j ).NodeNums( 1 ) == 0 && ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 			}
 			if ( MultizoneSurfaceData( j ).NodeNums( 2 ) == 0 && ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+				ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -2472,7 +2472,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( !SameString( SimAirNetworkKey, "MultizoneWithoutDistribution" ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " model requires Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey + "." );
 				ErrorsFound = true;
-				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object." " Previous error(s) cause program termination." );
+				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object." " Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -2856,7 +2856,7 @@ namespace AirflowNetworkBalanceManager {
 					this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum = FindItemInList( Alphas( surfNum + 1 ), Surface );
 
 					if ( this_VF_object.LinkageSurfaceData( surfNum ).SurfaceNum == 0 ) {
-						ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.LinkageName );
+						ShowFatalError( "Surface " + Alphas( surfNum + 1 ) + " not found. See: " + CurrentModuleObject + " " + this_VF_object.LinkageName );  // LCOV_EXCL_LINE
 					}
 
 					// Surface view factor
@@ -3057,7 +3057,7 @@ namespace AirflowNetworkBalanceManager {
 		NumOfOAFans = GetNumObjectsFound( CurrentModuleObject );
 		if ( NumOfOAFans > 1 ) {
 			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
-			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 		if ( NumOfOAFans > 0 ) {
 			DisSysCompOutdoorAirData.allocate( NumOfOAFans );
@@ -3103,7 +3103,7 @@ namespace AirflowNetworkBalanceManager {
 		NumOfReliefFans = GetNumObjectsFound( CurrentModuleObject );
 		if ( NumOfReliefFans > 1 ) {
 			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
-			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 		if ( NumOfReliefFans > 0 ) {
 			DisSysCompReliefAirData.allocate( NumOfReliefFans );
@@ -3149,7 +3149,7 @@ namespace AirflowNetworkBalanceManager {
 		NumOfPressureControllers = GetNumObjectsFound( CurrentModuleObject );
 		if ( NumOfPressureControllers > 1 ) {
 			ShowSevereError( RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems." );
-			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumOfPressureControllers > 0 ) {
@@ -4072,7 +4072,7 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		Alphas.deallocate();
@@ -4568,7 +4568,7 @@ namespace AirflowNetworkBalanceManager {
 		if ( OneTimeFlag ) {
 			OneTimeFlag = false;
 			if ( ErrorsFound ) {
-				ShowFatalError( "GetAirflowNetworkInput: Program terminates for preceding reason(s)." );
+				ShowFatalError( "GetAirflowNetworkInput: Program terminates for preceding reason(s)." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -4742,7 +4742,7 @@ namespace AirflowNetworkBalanceManager {
 							}
 						}
 					} else if ( SolFla == -2 ) {
-						ShowFatalError( "Zone pressure control failed using an exhaust fan: no solution is reached, for " + PressureControllerData( 1 ).Name );
+						ShowFatalError( "Zone pressure control failed using an exhaust fan: no solution is reached, for " + PressureControllerData( 1 ).Name );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -4802,7 +4802,7 @@ namespace AirflowNetworkBalanceManager {
 							}
 						}
 					} else if ( SolFla == -2 ) {
-						ShowFatalError( "Zone pressure control failed using relief air: no solution is reached, for " + PressureControllerData( 1 ).Name );
+						ShowFatalError( "Zone pressure control failed using relief air: no solution is reached, for " + PressureControllerData( 1 ).Name );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -5088,7 +5088,7 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) { //do the standard surface average coefficient calculation
 			// Create the array of wind directions
-			
+
 
 			// Create a curve for each facade
 			for ( FacadeNum = 1; FacadeNum <= 5; ++FacadeNum ) {
@@ -5156,7 +5156,7 @@ namespace AirflowNetworkBalanceManager {
 
 			// Calculate the wind pressure coefficients vs. wind direction for each external node
 			// The wind pressure coeffients are stored temporarily in the "valsByFacade" vector and then
-			// converted into a table near the end of this else. There will be at least seven profiles 
+			// converted into a table near the end of this else. There will be at least seven profiles
 			// (four sides plus one roof plus two for each pair of windows). The name is thus a little
 			// misleading, as it isn't really the values by facade once you get beyond the first five.
 			std::vector< std::vector< Real64 > > valsByFacade( 5 );
@@ -5619,7 +5619,7 @@ namespace AirflowNetworkBalanceManager {
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "The sum of the airflows entering the zone is greater than the airflows leaving the zone (e.g., wind and stack effect)." );
 					ShowContinueError( "Please check wind speed or reduce values of \"Window/Door Opening Factor, or Crack Factor\" defined in AirflowNetwork:MultiZone:Surface objects." );
-					ShowFatalError( "AirflowNetwork: The previous error causes termination." );
+					ShowFatalError( "AirflowNetwork: The previous error causes termination." );  // LCOV_EXCL_LINE
 				}
 
 				if ( AirflowNetworkLinkageData( i ).ZoneNum < 0 ) {
@@ -5848,7 +5848,7 @@ namespace AirflowNetworkBalanceManager {
 					NT = AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).EPlusNodeNum;
 				}
 				if ( ( NF == 0 ) || ( NT == 0 ) ) {
-					ShowFatalError( "Node number in the primary air loop is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE = " + AirflowNetworkLinkageData( i ).Name );
+					ShowFatalError( "Node number in the primary air loop is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE = " + AirflowNetworkLinkageData( i ).Name );  // LCOV_EXCL_LINE
 				}
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -5928,7 +5928,7 @@ namespace AirflowNetworkBalanceManager {
 		// Check singularity
 		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
 			if ( MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 1.0e-6 ) {
-				ShowFatalError( "CalcAirflowNetworkHeatBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );
+				ShowFatalError( "CalcAirflowNetworkHeatBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -6118,7 +6118,7 @@ namespace AirflowNetworkBalanceManager {
 					NT = AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).EPlusNodeNum;
 				}
 				if ( ( NF == 0 ) || ( NT == 0 ) ) {
-					ShowFatalError( "Node number in the primary air loop is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE = " + AirflowNetworkLinkageData( i ).Name );
+					ShowFatalError( "Node number in the primary air loop is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE = " + AirflowNetworkLinkageData( i ).Name );  // LCOV_EXCL_LINE
 				}
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) {
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
@@ -6196,7 +6196,7 @@ namespace AirflowNetworkBalanceManager {
 		// Check singularity
 		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
 			if ( MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 1.0e-6 ) {
-				ShowFatalError( "CalcAirflowNetworkMoisBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );
+				ShowFatalError( "CalcAirflowNetworkMoisBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -6409,7 +6409,7 @@ namespace AirflowNetworkBalanceManager {
 		// Check singularity
 		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
 			if ( MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 1.0e-6 ) {
-				ShowFatalError( "CalcAirflowNetworkCO2Balance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );
+				ShowFatalError( "CalcAirflowNetworkCO2Balance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -6622,7 +6622,7 @@ namespace AirflowNetworkBalanceManager {
 		// Check singularity
 		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
 			if ( MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 1.0e-6 ) {
-				ShowFatalError( "CalcAirflowNetworkGCBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );
+				ShowFatalError( "CalcAirflowNetworkGCBalance: A diagonal entity is zero in AirflowNetwork matrix at node " + AirflowNetworkNodeData( i ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -8388,7 +8388,7 @@ namespace AirflowNetworkBalanceManager {
 
 			OneTimeFlag = false;
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Program terminates for preceding reason(s)." );
+				ShowFatalError( RoutineName + "Program terminates for preceding reason(s)." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -8540,7 +8540,7 @@ namespace AirflowNetworkBalanceManager {
 
 			OneTimeFlag = false;
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Program terminates for preceding reason(s)." );
+				ShowFatalError( RoutineName + "Program terminates for preceding reason(s)." );  // LCOV_EXCL_LINE
 			}
 		}
 

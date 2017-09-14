@@ -177,7 +177,7 @@ namespace PipeHeatTransfer {
 			}
 		}
 		// If we didn't find it, fatal
-		ShowFatalError( "PipeHTFactory: Error getting inputs for pipe named: " + objectName );
+		ShowFatalError( "PipeHTFactory: Error getting inputs for pipe named: " + objectName );  // LCOV_EXCL_LINE
 		// Shut up the compiler
 		return nullptr;
 	}
@@ -662,7 +662,7 @@ namespace PipeHeatTransfer {
 
 		// final error check
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetPipesHeatTransfer: Errors found in input. Preceding conditions cause termination." );
+			ShowFatalError( "GetPipesHeatTransfer: Errors found in input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
@@ -871,7 +871,7 @@ namespace PipeHeatTransfer {
 			errFlag = false;
 			ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitPipesHeatTransfer: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitPipesHeatTransfer: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			// unset one-time flag
 			this->OneTimeInit = false;

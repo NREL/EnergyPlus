@@ -457,7 +457,7 @@ namespace ThermalChimney {
 		} // IF (TotThermalChimney > 1) THEN
 
 		if ( ErrorsFound ) {
-			ShowFatalError( cCurrentModuleObject + " Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( cCurrentModuleObject + " Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}

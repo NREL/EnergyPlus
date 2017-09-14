@@ -178,7 +178,7 @@ namespace HighTempRadiantSystem {
 		HighTempRadSysNumericFields.deallocate();
 	}
 
-	
+
 	void
 	SimHighTempRadiantSystem(
 		std::string const & CompName, // name of the low temperature radiant system
@@ -230,7 +230,7 @@ namespace HighTempRadiantSystem {
 		if ( GetInputFlag ) {
 			ErrorsFoundInGet = false;
 			GetHighTempRadiantSystem( ErrorsFoundInGet );
-			if ( ErrorsFoundInGet ) ShowFatalError( "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination." );
+			if ( ErrorsFoundInGet ) ShowFatalError( "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			GetInputFlag = false;
 		}
 
@@ -238,17 +238,17 @@ namespace HighTempRadiantSystem {
 		if ( CompIndex == 0 ) {
 			RadSysNum = FindItemInList( CompName, HighTempRadSys );
 			if ( RadSysNum == 0 ) {
-				ShowFatalError( "SimHighTempRadiantSystem: Unit not found=" + CompName );
+				ShowFatalError( "SimHighTempRadiantSystem: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = RadSysNum;
 		} else {
 			RadSysNum = CompIndex;
 			if ( RadSysNum > NumOfHighTempRadSys || RadSysNum < 1 ) {
-				ShowFatalError( "SimHighTempRadiantSystem:  Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Number of Units=" + TrimSigDigits( NumOfHighTempRadSys ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimHighTempRadiantSystem:  Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Number of Units=" + TrimSigDigits( NumOfHighTempRadSys ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( RadSysNum ) ) {
 				if ( CompName != HighTempRadSys( RadSysNum ).Name ) {
-					ShowFatalError( "SimHighTempRadiantSystem: Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + HighTempRadSys( RadSysNum ).Name );
+					ShowFatalError( "SimHighTempRadiantSystem: Invalid CompIndex passed=" + TrimSigDigits( RadSysNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + HighTempRadSys( RadSysNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( RadSysNum ) = false;
 			}
@@ -1386,7 +1386,7 @@ namespace HighTempRadiantSystem {
 						ShowContinueError( "Occurs in ZoneHVAC:HighTemperatureRadiant = " + HighTempRadSys( RadSysNum ).Name );
 						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in ZoneHVAC:HighTemperatureRadiant" );
-						ShowFatalError( "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected" );
+						ShowFatalError( "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected" );  // LCOV_EXCL_LINE
 					}
 				} else { // small surface
 					ShowSevereError( "DistributeHTRadGains:  surface not large enough to receive thermal radiation heat flux" );
@@ -1394,7 +1394,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
 					ShowContinueError( "Occurs in ZoneHVAC:HighTemperatureRadiant = " + HighTempRadSys( RadSysNum ).Name );
 					ShowContinueError( "Assign a larger surface area or more surfaces in ZoneHVAC:HighTemperatureRadiant" );
-					ShowFatalError( "DistributeHTRadGains:  surface not large enough to receive thermal radiation heat flux" );
+					ShowFatalError( "DistributeHTRadGains:  surface not large enough to receive thermal radiation heat flux" );  // LCOV_EXCL_LINE
 
 				}
 

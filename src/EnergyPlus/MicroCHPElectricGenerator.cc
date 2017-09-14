@@ -199,16 +199,16 @@ namespace MicroCHPElectricGenerator {
 
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, MicroCHP );
-			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + GeneratorName );
+			if ( GenNum == 0 ) ShowFatalError( "SimMicroCHPGenerator: Specified Generator not one of Valid Micro CHP Generators " + GeneratorName );  // LCOV_EXCL_LINE
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumMicroCHPs || GenNum < 1 ) {
-				ShowFatalError( "SimMicroCHPGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of Micro CHP Generators=" + TrimSigDigits( NumMicroCHPs ) + ", Generator name=" + GeneratorName );
+				ShowFatalError( "SimMicroCHPGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of Micro CHP Generators=" + TrimSigDigits( NumMicroCHPs ) + ", Generator name=" + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != MicroCHP( GenNum ).Name ) {
-					ShowFatalError( "SimMicroCHPNoNormalizeGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + MicroCHP( GenNum ).Name );
+					ShowFatalError( "SimMicroCHPNoNormalizeGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + MicroCHP( GenNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -481,7 +481,7 @@ namespace MicroCHPElectricGenerator {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+				ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 			}
 
 			//setup report variables
@@ -625,7 +625,7 @@ namespace MicroCHPElectricGenerator {
 			ScanPlantLoopsForObject( MicroCHP( GeneratorNum ).Name, TypeOf_Generator_MicroCHP, MicroCHP( GeneratorNum ).CWLoopNum, MicroCHP( GeneratorNum ).CWLoopSideNum, MicroCHP( GeneratorNum ).CWBranchNum, MicroCHP( GeneratorNum ).CWCompNum, _, _, _, _, _, errFlag );
 
 			if ( errFlag ) {
-				ShowFatalError( "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions." );
+				ShowFatalError( "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ! MicroCHP( GeneratorNum ).A42Model.InternalFlowControl ) {
@@ -1555,7 +1555,7 @@ namespace MicroCHPElectricGenerator {
 		if ( InitLoopEquip ) {
 			CompNum = FindItemInList( CompName, MicroCHP );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + CompName );
+				ShowFatalError( "SimMicroCHPPlantHeatRecovery: MicroCHP Generator Unit not found=" + CompName );  // LCOV_EXCL_LINE
 				return;
 			}
 			InitMicroCHPNoNormalizeGenerators( CompNum, FirstHVACIteration );

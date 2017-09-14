@@ -140,20 +140,20 @@ namespace EnergyPlus {
 			if ( CompIndex == 0 ) {
 				DXCoilNum = FindItemInList( CompName, IntegratedHeatPumps );
 				if ( DXCoilNum == 0 ) {
-					ShowFatalError( "Integrated Heat Pump not found=" + CompName );
+					ShowFatalError( "Integrated Heat Pump not found=" + CompName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = DXCoilNum;
 			}
 			else {
 				DXCoilNum = CompIndex;
 				if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-					ShowFatalError( "SimIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+					ShowFatalError( "SimIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 					                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 					                ", IHP name=" +
 					                CompName );
 				}
 				if ( !CompName.empty() && CompName != IntegratedHeatPumps( DXCoilNum ).Name ) {
-					ShowFatalError( "SimIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+					ShowFatalError( "SimIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 					                ", Integrated HP name=" + CompName + ", stored Integrated HP Name for that index=" +
 					                IntegratedHeatPumps( DXCoilNum ).Name );
 				}
@@ -1067,7 +1067,7 @@ namespace EnergyPlus {
 
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject +
+				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject +  // LCOV_EXCL_LINE
 				                " input.  Preceding condition(s) causes termination." );
 			}
 			else {
@@ -1116,7 +1116,7 @@ namespace EnergyPlus {
 			};
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "SizeIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "SizeIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -1135,7 +1135,7 @@ namespace EnergyPlus {
 
 			SizeVarSpeedCoil( IntegratedHeatPumps( DXCoilNum ).SCCoilIndex );//size cooling coil
 			if ( ErrorsFound ) {
-				ShowFatalError(
+				ShowFatalError(  // LCOV_EXCL_LINE
 					"SizeIHP: failed to size SC coil\"" + IntegratedHeatPumps( DXCoilNum ).SCCoilName + "\"" );
 				ErrorsFound = false;
 			}
@@ -1248,7 +1248,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "InitializeIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "InitializeIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -1288,7 +1288,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "UpdateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "UpdateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -1446,7 +1446,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "DecideWorkMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "DecideWorkMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -1470,7 +1470,7 @@ namespace EnergyPlus {
 					IntegratedHeatPumps( DXCoilNum ).WHtankType, IntegratedHeatPumps( DXCoilNum ).WHtankName,
 					IntegratedHeatPumps( DXCoilNum ).WHtankID,
 					false, false,
-					MyLoad, MaxCap, MinCap, OptCap, true, IntegratedHeatPumps( DXCoilNum ).LoopNum, 
+					MyLoad, MaxCap, MinCap, OptCap, true, IntegratedHeatPumps( DXCoilNum ).LoopNum,
 					IntegratedHeatPumps( DXCoilNum ).LoopSideNum );
 			}
 			IntegratedHeatPumps( DXCoilNum ).CheckWHCall = false;//clear checking flag
@@ -1573,7 +1573,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "ClearCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "ClearCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -1611,7 +1611,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "GetCurWorkMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "GetCurWorkMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -1960,7 +1960,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "GetLowSpeedNumIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "GetLowSpeedNumIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -2010,7 +2010,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "GetMaxSpeedNumIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "GetMaxSpeedNumIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -2070,7 +2070,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "GetAirVolFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "GetAirVolFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -2183,7 +2183,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "GetWaterVolFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "GetWaterVolFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}
@@ -2268,7 +2268,7 @@ namespace EnergyPlus {
 			}
 
 			if ( DXCoilNum > static_cast< int >( IntegratedHeatPumps.size() ) || DXCoilNum < 1 ) {
-				ShowFatalError( "GetAirMassFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +
+				ShowFatalError( "GetAirMassFlowRateIHP: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) +  // LCOV_EXCL_LINE
 				                ", Number of Integrated HPs=" + TrimSigDigits( IntegratedHeatPumps.size() ) +
 				                ", IHP name=" + "AS-IHP" );
 			}

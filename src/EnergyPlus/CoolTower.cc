@@ -422,7 +422,7 @@ namespace CoolTower {
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
 
-		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );
+		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );  // LCOV_EXCL_LINE
 
 		for ( CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum ) {
 			SetupOutputVariable( "Zone Cooltower Sensible Heat Loss Energy", OutputProcessor::Unit::J, CoolTowerSys( CoolTowerNum ).SenHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );

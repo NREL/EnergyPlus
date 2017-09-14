@@ -323,8 +323,8 @@ namespace DataSizing {
 	Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
 	Array1D< AirTerminalSizingSpecData > AirTerminalSizingSpec; // Input data for zone HVAC sizing
 	// used only for Facility Load Component Summary
-	Array1D< FacilitySizingData > CalcFacilitySizing; // Data for zone sizing 
-	FacilitySizingData CalcFinalFacilitySizing; // Final data for zone sizing 
+	Array1D< FacilitySizingData > CalcFacilitySizing; // Data for zone sizing
+	FacilitySizingData CalcFinalFacilitySizing; // Final data for zone sizing
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.
@@ -442,7 +442,7 @@ namespace DataSizing {
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
 
-		CalcFacilitySizing.deallocate(); 
+		CalcFacilitySizing.deallocate();
 		CalcFinalFacilitySizing.DOASHeatAddSeq.deallocate();
 		CalcFinalFacilitySizing.DOASLatAddSeq.deallocate();
 		CalcFinalFacilitySizing.CoolOutHumRatSeq.deallocate();
@@ -453,7 +453,7 @@ namespace DataSizing {
 		CalcFinalFacilitySizing.HeatOutTempSeq.deallocate();
 		CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
 		CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
-	
+
 		DataWaterCoilSizCoolDeltaT = 0.0;
 		DataWaterCoilSizHeatDeltaT = 0.0;
 		DataNomCapInpMeth = false;

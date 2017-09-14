@@ -1217,7 +1217,7 @@ namespace PollutionModule {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting Pollution Calculation Reporting Input" );
+			ShowFatalError( "Errors found in getting Pollution Calculation Reporting Input" );  // LCOV_EXCL_LINE
 		}
 
 	}

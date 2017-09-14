@@ -215,7 +215,7 @@ namespace MatrixDataManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination." );
+			ShowFatalError( "GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}

@@ -676,7 +676,7 @@ namespace ZoneEquipmentManager {
 				else {
 					ShowSevereError( RoutineName + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing" );
 					ShowContinueError( "there must be at least one zone air inlet node" );
-					ShowFatalError( "Previous severe error causes abort " );
+					ShowFatalError( "Previous severe error causes abort " );  // LCOV_EXCL_LINE
 				}
 				// set the DOAS mass flow rate and supply temperature and humidity ratio
 				HR90H = PsyWFnTdbRhPb( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).DOASHighSetpoint, 0.9, StdBaroPress );
@@ -918,7 +918,7 @@ namespace ZoneEquipmentManager {
 			}
 		}
 		else {
-			ShowFatalError( RoutineName + ":illegal DOAS design control strategy" );
+			ShowFatalError( RoutineName + ":illegal DOAS design control strategy" );  // LCOV_EXCL_LINE
 		}
 	}
 
@@ -1026,7 +1026,7 @@ namespace ZoneEquipmentManager {
 			}
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( "SetUpZoneSizingArrays: Errors found in Sizing:Zone input" );
+			ShowFatalError( "SetUpZoneSizingArrays: Errors found in Sizing:Zone input" );  // LCOV_EXCL_LINE
 		}
 
 		// Put Auto Sizing of Sizing:Zone inputs here!
@@ -2777,7 +2777,7 @@ namespace ZoneEquipmentManager {
 						// issue 6006, heating coils sizing to 0 when no heating load in zone
 						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.empty() ) {
 							ShowSevereError( RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
-							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );  // LCOV_EXCL_LINE
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesCoolSetPtSeq.end() );
 						}
@@ -2907,7 +2907,7 @@ namespace ZoneEquipmentManager {
 						// issue 6006, heating coils sizing to 0 when no heating load in zone
 						if ( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.empty() ) {
 							ShowSevereError( RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " + FinalZoneSizing( CtrlZoneNum ).ZoneName );
-							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );
+							ShowFatalError( "Please send your input file to the EnergyPlus support/development team for further investigation." );  // LCOV_EXCL_LINE
 						} else {
 							FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak = *std::max_element( ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).DesHeatSetPtSeq.end() );
 							FinalZoneSizing( CtrlZoneNum ).OutTempAtHeatPeak = *std::min_element( ZoneSizing( DDNumF, CtrlZoneNum ).HeatOutTempSeq.begin(), ZoneSizing( DDNumF, CtrlZoneNum ).HeatOutTempSeq.end() );
@@ -2929,12 +2929,12 @@ namespace ZoneEquipmentManager {
 
 				// set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
 				// minimum flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, 
-					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, 
+				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow,
+					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2,
 					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
 				// set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
 				// max heating flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, 
+				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow,
 					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) *
 					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
 				// Determine the design cooling supply air temperature if the supply air temperature difference is specified by user.
@@ -3091,7 +3091,7 @@ namespace ZoneEquipmentManager {
 				} else {
 					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );
 					ShowContinueError( "Invalid Supply Air Path Component=" + SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 				}}
 			}
@@ -3286,10 +3286,10 @@ namespace ZoneEquipmentManager {
 
 				} else if ( SELECT_CASE_var == CoolingPanel_Num ) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 					SimCoolingPanel( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
-					
+
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
 					LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
-					
+
 				} else if ( SELECT_CASE_var == HiTempRadiant_Num ) { // 'ZoneHVAC:HighTemperatureRadiant'
 					SimHighTempRadiantSystem( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 					LatOutputProvided = 0.0; // This baseboard currently sends its latent heat gain directly to predictor/corrector
@@ -3416,7 +3416,7 @@ namespace ZoneEquipmentManager {
 				} else {
 					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );
 					ShowContinueError( "Invalid Supply Air Path Component=" + SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 				}}
 			}
@@ -3444,7 +3444,7 @@ namespace ZoneEquipmentManager {
 				}
 			}
 			if ( ErrorFlag ) {
-				ShowFatalError( "Preceding condition causes termination" );
+				ShowFatalError( "Preceding condition causes termination" );  // LCOV_EXCL_LINE
 			}
 			MyOneTimeFlag = false;
 		}
@@ -3946,7 +3946,7 @@ namespace ZoneEquipmentManager {
 	//							Node( RetNode ).MassFlowRate = ;
 							}
 						}
-					
+
 					}
 				}
 
@@ -4620,7 +4620,7 @@ namespace ZoneEquipmentManager {
 			}
 			else {
 				HumRatExt = OutHumRat;
-				EnthalpyExt = OutEnthalpy;					
+				EnthalpyExt = OutEnthalpy;
 			}
 			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, HumRatExt );
 			CpAir = PsyCpAirFnWTdb( HumRatExt, TempExt );
@@ -5195,7 +5195,7 @@ namespace ZoneEquipmentManager {
 			WindSpeedExt = Zone( NZ ).WindSpeed;
 
 			// Use air node information linked to the zone if defined
-			
+
 			if ( Zone( NZ ).HasLinkedOutAirNode ) {
 				HumRatExt = Node( Zone( NZ ).LinkedOutAirNode ).HumRat;
 				}
@@ -5540,7 +5540,7 @@ namespace ZoneEquipmentManager {
 
 		// REFERENCES:
 		// See IO Ref for suggested values
-		
+
 		// Using/Aliasing
 
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5612,7 +5612,7 @@ namespace ZoneEquipmentManager {
 			}
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in DOAS sizing input. Program terminates." );
+			ShowFatalError( "Errors found in DOAS sizing input. Program terminates." );  // LCOV_EXCL_LINE
 		}
 	}
 
@@ -5659,7 +5659,7 @@ namespace ZoneEquipmentManager {
 
 		// BSLLC Start
 		// if ( sqlite ) {
-		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, 
+		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin,
 		// 		PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
 		// }
 		// BSLLC Finish

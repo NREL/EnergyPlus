@@ -236,7 +236,7 @@ namespace NodeInputManager {
 			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type." );
 			ShowContinueError( "..Invalid FluidType=" + cNodeFluidType );
 			ErrorsFound = true;
-			ShowFatalError( "Preceding issue causes termination." );
+			ShowFatalError( "Preceding issue causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( not_blank( Name ) ) {
@@ -660,7 +660,7 @@ namespace NodeInputManager {
 		rNumbers.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + CurrentModuleObject + ": Error getting input - causes termination." );
+			ShowFatalError( RoutineName + CurrentModuleObject + ": Error getting input - causes termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -716,7 +716,7 @@ namespace NodeInputManager {
 			strip( cNodeFluidType );
 			ShowSevereError( "AssignNodeNumber: Invalid FluidType=" + cNodeFluidType );
 			ErrorsFound = true;
-			ShowFatalError( "AssignNodeNumber: Preceding issue causes termination." );
+			ShowFatalError( "AssignNodeNumber: Preceding issue causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		NumNode = 0;
@@ -909,10 +909,10 @@ namespace NodeInputManager {
 		}
 
 		if ( ! CurCheckContextName.empty() ) {
-			ShowFatalError( "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was already in progress." );
+			ShowFatalError( "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was already in progress." );  // LCOV_EXCL_LINE
 		}
 		if ( ContextName == BlankString ) {
-			ShowFatalError( "Init Uniqueness called with Blank Context Name" );
+			ShowFatalError( "Init Uniqueness called with Blank Context Name" );  // LCOV_EXCL_LINE
 		}
 		if ( allocated( UniqueNodeNames ) ) {
 			UniqueNodeNames.deallocate();
@@ -981,7 +981,7 @@ namespace NodeInputManager {
 
 		if ( nodeType == "NodeName" ) {
 			if ( ! present( CheckName ) ) {
-				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument." );
+				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument." );  // LCOV_EXCL_LINE
 			}
 			if ( ! CheckName().empty() ) {
 				Found = FindItemInList( CheckName, UniqueNodeNames, NumCheckNodes );
@@ -1003,7 +1003,7 @@ namespace NodeInputManager {
 
 		} else if ( nodeType == "NodeNumber" ) {
 			if ( ! present( CheckNumber ) ) {
-				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument." );
+				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument." );  // LCOV_EXCL_LINE
 			}
 			if ( CheckNumber != 0 ) {
 				Found = FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
@@ -1024,7 +1024,7 @@ namespace NodeInputManager {
 			}
 
 		} else {
-			ShowFatalError( "CheckUniqueNodes called with invalid Check Type=" + CheckType );
+			ShowFatalError( "CheckUniqueNodes called with invalid Check Type=" + CheckType );  // LCOV_EXCL_LINE
 			ErrorsFound = true;
 
 		}}
@@ -1069,10 +1069,10 @@ namespace NodeInputManager {
 		// na
 
 		if ( CurCheckContextName != ContextName ) {
-			ShowFatalError( "End Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was in progress." );
+			ShowFatalError( "End Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was in progress." );  // LCOV_EXCL_LINE
 		}
 		if ( ContextName == BlankString ) {
-			ShowFatalError( "End Uniqueness called with Blank Context Name" );
+			ShowFatalError( "End Uniqueness called with Blank Context Name" );  // LCOV_EXCL_LINE
 		}
 		CurCheckContextName = BlankString;
 		if ( allocated( UniqueNodeNames ) ) {

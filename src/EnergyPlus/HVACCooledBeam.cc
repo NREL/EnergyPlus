@@ -207,23 +207,23 @@ namespace HVACCooledBeam {
 		if ( CompIndex == 0 ) {
 			CBNum = FindItemInList( CompName, CoolBeam );
 			if ( CBNum == 0 ) {
-				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );
+				ShowFatalError( "SimCoolBeam: Cool Beam Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CBNum;
 		} else {
 			CBNum = CompIndex;
 			if ( CBNum > NumCB || CBNum < 1 ) {
-				ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Cool Beam Units=" + TrimSigDigits( NumCB ) + ", System name=" + CompName );
+				ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Cool Beam Units=" + TrimSigDigits( NumCB ) + ", System name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( CBNum ) ) {
 				if ( CompName != CoolBeam( CBNum ).Name ) {
-					ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Cool Beam Unit name=" + CompName + ", stored Cool Beam Unit for that index=" + CoolBeam( CBNum ).Name );
+					ShowFatalError( "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Cool Beam Unit name=" + CompName + ", stored Cool Beam Unit for that index=" + CoolBeam( CBNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( CBNum ) = false;
 			}
 		}
 		if ( CBNum == 0 ) {
-			ShowFatalError( "Cool Beam Unit not found = " + CompName );
+			ShowFatalError( "Cool Beam Unit not found = " + CompName );  // LCOV_EXCL_LINE
 		}
 
 		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingNum;
@@ -447,7 +447,7 @@ namespace HVACCooledBeam {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input. Preceding conditions cause termination." );
+			ShowFatalError( RoutineName + "Errors found in getting input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -520,7 +520,7 @@ namespace HVACCooledBeam {
 			errFlag = false;
 			ScanPlantLoopsForObject( CoolBeam( CBNum ).Name, TypeOf_CooledBeamAirTerminal, CoolBeam( CBNum ).CWLoopNum, CoolBeam( CBNum ).CWLoopSideNum, CoolBeam( CBNum ).CWBranchNum, CoolBeam( CBNum ).CWCompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitCoolBeam: Program terminated for previous conditions." );
+				ShowFatalError( "InitCoolBeam: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 			}
 			PlantLoopScanFlag( CBNum ) = false;
 
@@ -809,7 +809,7 @@ namespace HVACCooledBeam {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding cooled beam sizing errors cause program termination" );
+			ShowFatalError( "Preceding cooled beam sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}

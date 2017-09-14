@@ -224,17 +224,17 @@ namespace HVACDXHeatPumpSystem {
 		if ( CompIndex == 0 ) {
 			DXSystemNum = FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
 			if ( DXSystemNum == 0 ) {
-				ShowFatalError( "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName );
+				ShowFatalError( "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DXSystemNum;
 		} else {
 			DXSystemNum = CompIndex;
 			if ( DXSystemNum > NumDXHeatPumpSystems || DXSystemNum < 1 ) {
-				ShowFatalError( "SimDXHeatPumpSystem:  Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", Number of DX Units=" + TrimSigDigits( NumDXHeatPumpSystems ) + ", DX Unit name=" + DXHeatPumpSystemName );
+				ShowFatalError( "SimDXHeatPumpSystem:  Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", Number of DX Units=" + TrimSigDigits( NumDXHeatPumpSystems ) + ", DX Unit name=" + DXHeatPumpSystemName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DXSystemNum ) ) {
 				if ( DXHeatPumpSystemName != DXHeatPumpSystem( DXSystemNum ).Name ) {
-					ShowFatalError( "SimDXHeatPumpSystem: Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", DX Unit name=" + DXHeatPumpSystemName + ", stored DX Unit Name for that index=" + DXHeatPumpSystem( DXSystemNum ).Name );
+					ShowFatalError( "SimDXHeatPumpSystem: Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", DX Unit name=" + DXHeatPumpSystemName + ", stored DX Unit Name for that index=" + DXHeatPumpSystem( DXSystemNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DXSystemNum ) = false;
 			}
@@ -263,7 +263,7 @@ namespace HVACDXHeatPumpSystem {
 			SimVariableSpeedCoils( CompName, DXHeatPumpSystem( DXSystemNum ).HeatPumpCoilIndex, DXHeatPumpSystem( DXSystemNum ).FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, DXHeatPumpSystem( DXSystemNum ).PartLoadFrac, DXHeatPumpSystem( DXSystemNum ).SpeedNum, DXHeatPumpSystem( DXSystemNum ).SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 		} else {
-			ShowFatalError( "SimDXCoolingSystem: Invalid DX Heating System/Coil=" + DXHeatPumpSystem( DXSystemNum ).HeatPumpCoilType );
+			ShowFatalError( "SimDXCoolingSystem: Invalid DX Heating System/Coil=" + DXHeatPumpSystem( DXSystemNum ).HeatPumpCoilType );  // LCOV_EXCL_LINE
 
 		}}
 		// set econo lockout flag
@@ -445,7 +445,7 @@ namespace HVACDXHeatPumpSystem {
 		} //End of the DX System Loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
@@ -583,7 +583,7 @@ namespace HVACDXHeatPumpSystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Brent Griffith (derived from ControlDXSystem by Richard Liesen)
 		//       DATE WRITTEN   Jan 2012
-		//       MODIFIED       Nov. 2003, R. Raustad, FSEC 
+		//       MODIFIED       Nov. 2003, R. Raustad, FSEC
 		//                      Feb. 2005, M. J. Witte, GARD. Add dehumidification controls and support for multimode DX coil
 		//                      Jan. 2008, R. Raustad, FSEC. Added coolreheat to all coil types
 		//                      Feb. 2013, B. Shen, ORNL. Add Coil:Heating:DX:VariableSpeed
@@ -696,7 +696,7 @@ namespace HVACDXHeatPumpSystem {
 			//update the DesOutTemp
 			DesOutTemp -= DXHeatPumpSystem( DXSystemNum ).FaultyCoilSATOffset;
 		}
-		
+
 		// If DXHeatingSystem is scheduled on and there is flow
 		if ( ( GetCurrentScheduleValue( DXHeatPumpSystem( DXSystemNum ).SchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
@@ -926,7 +926,7 @@ namespace HVACDXHeatPumpSystem {
 					}
 
 				} else {
-					ShowFatalError( "ControlDXHeatingSystem: Invalid DXHeatPumpSystem coil type = " + DXHeatPumpSystem( DXSystemNum ).HeatPumpCoilType );
+					ShowFatalError( "ControlDXHeatingSystem: Invalid DXHeatPumpSystem coil type = " + DXHeatPumpSystem( DXSystemNum ).HeatPumpCoilType );  // LCOV_EXCL_LINE
 
 				}}
 			} // End of cooling load type (sensible or latent) if block

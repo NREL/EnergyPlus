@@ -292,13 +292,13 @@ namespace CostEstimateManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing cost estimate input" );
+			ShowFatalError( "Errors found in processing cost estimate input" );  // LCOV_EXCL_LINE
 		}
 
 		CheckCostEstimateInput( ErrorsFound );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing cost estimate input" );
+			ShowFatalError( "Errors found in processing cost estimate input" );  // LCOV_EXCL_LINE
 		}
 
 	}

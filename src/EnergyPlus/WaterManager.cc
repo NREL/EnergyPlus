@@ -798,7 +798,7 @@ namespace WaterManager {
 			lNumericFieldBlanks.deallocate();
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in processing input for water manager objects" );
+				ShowFatalError( "Errors found in processing input for water manager objects" );  // LCOV_EXCL_LINE
 			}
 			// <SetupOutputVariables here...>, CurrentModuleObject='WaterUse:Storage'
 			for ( Item = 1; Item <= NumWaterStorageTanks; ++Item ) {
@@ -1186,7 +1186,7 @@ namespace WaterManager {
 			WaterStorage( TankNum ).Twater = GetCurrentScheduleValue( WaterStorage( TankNum ).TempSchedID );
 			WaterStorage( TankNum ).TouterSkin = WaterStorage( TankNum ).Twater;
 		} else if ( SELECT_CASE_var == TankZoneThermalCoupled ) {
-			ShowFatalError( "WaterUse:Storage (Water Storage Tank) zone thermal model incomplete" );
+			ShowFatalError( "WaterUse:Storage (Water Storage Tank) zone thermal model incomplete" );  // LCOV_EXCL_LINE
 		}}
 
 		//set supply avail data from overflows in Receiving tank

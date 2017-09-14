@@ -810,7 +810,7 @@ env_var_on( std::string const & env_var_str )
 }
 
 void
-ShowFatalError(
+ShowFatalError(  // LCOV_EXCL_LINE
 	std::string const & ErrorMessage,
 	Optional_int OutUnit1,
 	Optional_int OutUnit2

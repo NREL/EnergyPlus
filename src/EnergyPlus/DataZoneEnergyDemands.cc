@@ -88,7 +88,7 @@ namespace DataZoneEnergyDemands {
 		CurDeadBandOrSetback.deallocate();
 		ZoneSysEnergyDemand.deallocate();
 		ZoneSysMoistureDemand.deallocate();
-	
+
 	}
 
 } // DataZoneEnergyDemands

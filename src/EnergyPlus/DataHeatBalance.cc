@@ -1787,7 +1787,7 @@ namespace DataHeatBalance {
 		if ( present( ScreenNumber ) ) {
 			ScNum = ScreenNumber;
 			if ( ! present( Theta ) || ! present( Phi ) ) {
-				ShowFatalError( "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used." );
+				ShowFatalError( "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used." );  // LCOV_EXCL_LINE
 			}
 		} else {
 			ScNum = SurfaceWindow( SurfaceNum ).ScreenNumber;

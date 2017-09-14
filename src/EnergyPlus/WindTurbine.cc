@@ -187,16 +187,16 @@ namespace WindTurbine {
 		if ( GeneratorIndex == 0 ) {
 			WindTurbineNum = FindItemInList( GeneratorName, WindTurbineSys );
 			if ( WindTurbineNum == 0 ) {
-				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName );
+				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			GeneratorIndex = WindTurbineNum;
 		} else {
 			WindTurbineNum = GeneratorIndex;
 			if ( WindTurbineNum > NumWindTurbines || WindTurbineNum < 1 ) {
-				ShowFatalError( "SimWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits( WindTurbineNum ) + ", Number of Wind Turbine Generators=" + TrimSigDigits( NumWindTurbines ) + ", Generator name=" + GeneratorName );
+				ShowFatalError( "SimWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits( WindTurbineNum ) + ", Number of Wind Turbine Generators=" + TrimSigDigits( NumWindTurbines ) + ", Generator name=" + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			if ( GeneratorName != WindTurbineSys( WindTurbineNum ).Name ) {
-				ShowFatalError( "SimMWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits( WindTurbineNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + WindTurbineSys( WindTurbineNum ).Name );
+				ShowFatalError( "SimMWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits( WindTurbineNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + WindTurbineSys( WindTurbineNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -589,7 +589,7 @@ namespace WindTurbine {
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
 
-		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );
+		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );  // LCOV_EXCL_LINE
 
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
 			SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, WindTurbineSys( WindTurbineNum ).Power, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
@@ -674,7 +674,7 @@ namespace WindTurbine {
 				ReadStatus = 0;
 				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, DataStringGlobals::inStatFileName, flags ); ReadStatus = flags.ios(); }
 				if ( ReadStatus != 0 ) {
-					ShowFatalError( "InitWindTurbine: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );
+					ShowFatalError( "InitWindTurbine: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );  // LCOV_EXCL_LINE
 				}
 				while ( ReadStatus == 0 ) { //end of file
 					{ IOFlags flags; gio::read( statFile, fmtA, flags ) >> lineIn; ReadStatus = flags.ios(); }

@@ -367,7 +367,7 @@ namespace PlantUtilities {
 					SeriesBranchMinAvail = 0.0;
 
 					// inserting EMS On/Off Supervisory control here to series branch constraint and assuming EMS should shut off flow completely
-					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent)
 					EMSLoadOverride = false;
 
 					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
@@ -413,7 +413,7 @@ namespace PlantUtilities {
 					Node( OutletNode ).MassFlowRate = min( Node( InletNode ).MassFlowRateMax, Node( OutletNode ).MassFlowRate );
 
 					// inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
-					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent)
 					EMSLoadOverride = false;
 
 					for ( CompNum = 1; CompNum <= loop_side.Branch( BranchIndex ).TotalComponents; ++CompNum ) {
@@ -436,7 +436,7 @@ namespace PlantUtilities {
 			Node( OutletNode ).MassFlowRate = Node( InletNode ).MassFlowRate;
 			CompFlow = Node( OutletNode ).MassFlowRate;
 		} else {
-			ShowFatalError( "SetComponentFlowRate: Flow lock out of range" ); //DEBUG error...should never get here
+			ShowFatalError( "SetComponentFlowRate: Flow lock out of range" ); //DEBUG error...should never get here  // LCOV_EXCL_LINE
 		}
 
 		if ( comp.CurOpSchemeType == DemandOpSchemeType ) {
@@ -535,7 +535,7 @@ namespace PlantUtilities {
 					// add MassFlowRateMin hardware constraints
 
 					// inserting EMS On/Off Supervisory control here to override min constraint assuming EMS should shut off flow completely
-					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent) 
+					// action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent)
 					EMSLoadOverride = false;
 					// check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
 					for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
@@ -586,7 +586,7 @@ namespace PlantUtilities {
 					ShowContinueError( "Node minimum flow rate available [kg/s] = " + RoundSigDigits( a_node.MassFlowRateMinAvail, 8 ) );
 				}
 			} else {
-				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + RoundSigDigits( loop_side.FlowLock ) ); //DEBUG error...should never get here
+				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + RoundSigDigits( loop_side.FlowLock ) ); //DEBUG error...should never get here  // LCOV_EXCL_LINE
 			}
 
 			Real64 const a_node_MasFlowRate( a_node.MassFlowRate );
@@ -983,7 +983,7 @@ namespace PlantUtilities {
 						ShowContinueError( "Plant Connector:Splitter name= " + PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Splitter( SplitNum ).Name );
 						ShowContinueError( "Splitter inlet mass flow rate= " + RoundSigDigits( Node( SplitterInletNode ).MassFlowRate, 6 ) + " {kg/s}" );
 						ShowContinueError( "Difference in two mass flow rates= " + RoundSigDigits( AbsDifference, 6 ) + " {kg/s}" );
-						ShowFatalError( "CheckPlantMixerSplitterConsistency: Simulation terminated because of problems in plant flow resolver" );
+						ShowFatalError( "CheckPlantMixerSplitterConsistency: Simulation terminated because of problems in plant flow resolver" );  // LCOV_EXCL_LINE
 					}
 				}
 
@@ -1026,7 +1026,7 @@ namespace PlantUtilities {
 					//                                    TRIM(RoundSigDigits(Node(SplitterInletNode)%MassFlowRate,6))//' {kg/s}')
 					//          CALL ShowContinueError('Difference in two mass flow rates= '//  &
 					//                                    TRIM(RoundSigDigits(AbsDifference,6))//' {kg/s}')
-					//          CALL ShowFatalError('CheckPlantMixerSplitterConsistency: Simulation terminated because of problems in plant flow resolver')
+					//          CALL ShowFatalError('CheckPlantMixerSplitterConsistency: Simulation terminated because of problems in plant flow resolver')  // LCOV_EXCL_LINE
 					//        ENDIF
 				}
 
@@ -1203,7 +1203,7 @@ namespace PlantUtilities {
 			ShowContinueError( "    lots of node time series data to see what is going wrong." );
 			ShowContinueError( "  If this is happening during Warmup, you can use Output:Diagnostics,ReportDuringWarmup;" );
 			ShowContinueError( "  This is detected at the loop level, but the typical problems are in the components." );
-			ShowFatalError( "CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too " + hotcold );
+			ShowFatalError( "CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too " + hotcold );  // LCOV_EXCL_LINE
 		}
 
 	}

@@ -309,7 +309,7 @@ namespace WindowComplexManager {
 				}
 			}
 			if ( WindowStateList( NumStates, NumComplexWind ).IncBasisIndx <= 0 ) {
-				ShowFatalError( "Complex Window Init: Window Basis not in BasisList." );
+				ShowFatalError( "Complex Window Init: Window Basis not in BasisList." );  // LCOV_EXCL_LINE
 			}
 		}
 		//  Should now have a WindowList with NumComplexWind entries containing all the complex fenestrations
@@ -1366,7 +1366,7 @@ namespace WindowComplexManager {
 				for ( I = 2; I <= NThetas; ++I ) {
 					Thetas( I ) = Construct( IConst ).BSDFInput.BasisMat( 1, I ) * DegToRadians;
 					NPhis( I ) = std::floor( Construct( IConst ).BSDFInput.BasisMat( 2, I ) + 0.001 );
-					if ( NPhis( I ) <= 0 ) ShowFatalError( "WindowComplexManager: incorrect input, no. phis must be positive." );
+					if ( NPhis( I ) <= 0 ) ShowFatalError( "WindowComplexManager: incorrect input, no. phis must be positive." );  // LCOV_EXCL_LINE
 					NumElem += NPhis( I );
 				}
 				MaxNPhis = maxval( NPhis( {1,NThetas} ) );
@@ -1375,7 +1375,7 @@ namespace WindowComplexManager {
 				Basis.Phis = 0.0; // Initialize so undefined elements will contain zero
 				Basis.BasisIndex = 0; //Initialize so undefined elements will contain zero
 				if ( NumElem != Construct( IConst ).BSDFInput.NBasis ) { //Constructed Basis must match property matrices
-					ShowFatalError( "WindowComplexManager: Constructed basis length does not match property matrices." );
+					ShowFatalError( "WindowComplexManager: Constructed basis length does not match property matrices." );  // LCOV_EXCL_LINE
 				}
 				Basis.Thetas = Thetas;
 				Basis.NPhis = NPhis;
@@ -1439,7 +1439,7 @@ namespace WindowComplexManager {
 				Basis.Phis = 0.0; // Initialize so undefined elements will contain zero
 				Basis.BasisIndex = 0; //Initialize so undefined elements will contain zero
 				if ( NumElem != Construct( IConst ).BSDFInput.NBasis ) { //Constructed Basis must match property matrices
-					ShowFatalError( "WindowComplexManager: Constructed basis length does not match property matrices." );
+					ShowFatalError( "WindowComplexManager: Constructed basis length does not match property matrices." );  // LCOV_EXCL_LINE
 				}
 				Basis.Thetas = Thetas;
 				Basis.NPhis = NPhis;
@@ -1486,7 +1486,7 @@ namespace WindowComplexManager {
 				}
 			} // BST
 		} else { // BTW
-			ShowFatalError( "WindowComplexManager: Non-Window6 basis type not yet implemented." );
+			ShowFatalError( "WindowComplexManager: Non-Window6 basis type not yet implemented." );  // LCOV_EXCL_LINE
 		} // BTW
 		Thetas.deallocate();
 		NPhis.deallocate();
@@ -1563,7 +1563,7 @@ namespace WindowComplexManager {
 		} else {
 			//Non-WINDOW6 Type Basis
 			//Currently not implemented
-			ShowFatalError( "WindowComplexManager: Custom basis type not yet implemented." );
+			ShowFatalError( "WindowComplexManager: Custom basis type not yet implemented." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -3355,7 +3355,7 @@ namespace WindowComplexManager {
 				//            END DO ! ZoneEquipConfigNum
 				// check whether this zone is a controlled zone or not
 				if ( ! Zone( ZoneNum ).IsControlled ) {
-					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
+					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 					return;
 				}
 				// determine supply air conditions
@@ -3397,7 +3397,7 @@ namespace WindowComplexManager {
 					ZoneEquipConfigNum = ZoneNum;
 					// check whether this zone is a controlled zone or not
 					if ( ! Zone( ZoneNum ).IsControlled ) {
-						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
+						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 						return;
 					}
 					// determine supply air conditions
@@ -3442,7 +3442,7 @@ namespace WindowComplexManager {
 						}
 						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 							Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-						}					
+						}
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
@@ -3624,7 +3624,7 @@ namespace WindowComplexManager {
 				ShowContinueError( "   - WindowMaterial:Glazing" );
 				ShowContinueError( "   - WindowMaterial:ComplexShade" );
 				ShowContinueError( "   - WindowMaterial:Gap" );
-				ShowFatalError( "halting because of error in layer definition for Construction:ComplexFenestrationState" );
+				ShowFatalError( "halting because of error in layer definition for Construction:ComplexFenestrationState" );  // LCOV_EXCL_LINE
 			}
 
 		} // End of loop over glass, gap and blind/shade layers in a window construction
@@ -3737,7 +3737,7 @@ namespace WindowComplexManager {
 				ShowContinueError( "surface name = " + Surface( SurfNum ).Name );
 			}
 			ShowContinueError( "construction name = " + Construct( ConstrNum ).Name );
-			ShowFatalError( "halting because of error in tarcog" );
+			ShowFatalError( "halting because of error in tarcog" );  // LCOV_EXCL_LINE
 		} else if ( CalcCondition == winterCondition ) {
 			NominalU( ConstrNum ) = ufactor;
 		} else if ( CalcCondition == summerCondition ) {

@@ -224,7 +224,7 @@ namespace HeatRecovery {
 		Optional_bool_const RegenInletIsOANode, // flag to determine if supply inlet is OA node, if so air flow cycles
 		Optional_bool_const EconomizerFlag, // economizer operation flag passed by airloop or OA sys
 		Optional_bool_const HighHumCtrlFlag, // high humidity control flag passed by airloop or OA sys
-		Optional_int_const CompanionCoilType_Num // cooling coil type of coil 
+		Optional_int_const CompanionCoilType_Num // cooling coil type of coil
 	)
 	{
 
@@ -276,17 +276,17 @@ namespace HeatRecovery {
 		if ( CompIndex == 0 ) {
 			HeatExchNum = FindItemInList( CompName, ExchCond );
 			if ( HeatExchNum == 0 ) {
-				ShowFatalError( "SimHeatRecovery: Unit not found=" + CompName );
+				ShowFatalError( "SimHeatRecovery: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = HeatExchNum;
 		} else {
 			HeatExchNum = CompIndex;
 			if ( HeatExchNum > NumHeatExchangers || HeatExchNum < 1 ) {
-				ShowFatalError( "SimHeatRecovery:  Invalid CompIndex passed=" + TrimSigDigits( HeatExchNum ) + ", Number of Units=" + TrimSigDigits( NumHeatExchangers ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimHeatRecovery:  Invalid CompIndex passed=" + TrimSigDigits( HeatExchNum ) + ", Number of Units=" + TrimSigDigits( NumHeatExchangers ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( HeatExchNum ) ) {
 				if ( CompName != ExchCond( HeatExchNum ).Name ) {
-					ShowFatalError( "SimHeatRecovery: Invalid CompIndex passed=" + TrimSigDigits( HeatExchNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + ExchCond( HeatExchNum ).Name );
+					ShowFatalError( "SimHeatRecovery: Invalid CompIndex passed=" + TrimSigDigits( HeatExchNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + ExchCond( HeatExchNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( HeatExchNum ) = false;
 			}
@@ -684,7 +684,7 @@ namespace HeatRecovery {
 			cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
 			GetObjectItem( cCurrentModuleObject, PerfDataIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			PerfDataNum = PerfDataIndex;
-						
+
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames.allocate( NumNumbers );
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = "";
 			BalDesDehumPerfNumericFields( PerfDataNum ).NumericFieldNames = cNumericFieldNames;
@@ -1107,7 +1107,7 @@ namespace HeatRecovery {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1283,7 +1283,7 @@ namespace HeatRecovery {
 					}
 
 					if ( FatalError ) {
-						ShowFatalError( "Heat exchanger design calculation caused fatal error: program terminated." );
+						ShowFatalError( "Heat exchanger design calculation caused fatal error: program terminated." );  // LCOV_EXCL_LINE
 					}
 
 					ExchCond( ExIndex ).UA0 = NTU0 * CMin0 * CpAir;
@@ -1292,19 +1292,19 @@ namespace HeatRecovery {
 
 					// check validity
 					if ( ExchCond( ExIndex ).NomSupAirMassFlow * ExchCond( ExIndex ).NomSecAirMassFlow < SmallMassFlow * SmallMassFlow ) {
-						ShowFatalError( "Mass flow in HeatExchanger:AirToAir:FlatPlate too small in initialization." );
+						ShowFatalError( "Mass flow in HeatExchanger:AirToAir:FlatPlate too small in initialization." );  // LCOV_EXCL_LINE
 					}
 
 					if ( ExchCond( ExIndex ).mTSup0 < SmallMassFlow ) {
-						ShowFatalError( "(m*T)Sup,in in HeatExchanger:AirToAir:FlatPlate too small in initialization." );
+						ShowFatalError( "(m*T)Sup,in in HeatExchanger:AirToAir:FlatPlate too small in initialization." );  // LCOV_EXCL_LINE
 					}
 
 					if ( ExchCond( ExIndex ).mTSec0 < SmallMassFlow ) {
-						ShowFatalError( "(m*T)Sec,in in HeatExchanger:AirToAir:FlatPlate too small in initialization." );
+						ShowFatalError( "(m*T)Sec,in in HeatExchanger:AirToAir:FlatPlate too small in initialization." );  // LCOV_EXCL_LINE
 					}
 
 					if ( CMin0 < SmallMassFlow ) {
-						ShowFatalError( "CMin0 in HeatExchanger:AirToAir:FlatPlate too small in initialization." );
+						ShowFatalError( "CMin0 in HeatExchanger:AirToAir:FlatPlate too small in initialization." );  // LCOV_EXCL_LINE
 					}
 
 				} else if ( SELECT_CASE_var == HX_AIRTOAIR_GENERIC ) {
@@ -1314,7 +1314,7 @@ namespace HeatRecovery {
 							if ( ! AnyEnergyManagementSystemInModel ) {
 								ShowSevereError( "Missing temperature setpoint for " + cHXTypes( ExchCond( ExIndex ).ExchTypeNum ) + " \"" + ExchCond( ExIndex ).Name + "\" :" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger." );
-								ShowFatalError( " Previous condition causes program termination." );
+								ShowFatalError( " Previous condition causes program termination." );  // LCOV_EXCL_LINE
 							} else {
 								// need call to EMS to check node
 								CheckIfNodeSetPointManagedByEMS( ExchCond( ExIndex ).SupOutletNode, iTemperatureSetPoint, FatalError );
@@ -1322,7 +1322,7 @@ namespace HeatRecovery {
 									ShowSevereError( "Missing temperature setpoint for " + cHXTypes( ExchCond( ExIndex ).ExchTypeNum ) + " \"" + ExchCond( ExIndex ).Name + "\" :" );
 									ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger." );
 									ShowContinueError( "  or use an EMS actuator to establish a setpoint at the supply air outlet node of the Heat Exchanger." );
-									ShowFatalError( " Previous condition causes program termination." );
+									ShowFatalError( " Previous condition causes program termination." );  // LCOV_EXCL_LINE
 								}
 							}
 						}
@@ -1513,7 +1513,7 @@ namespace HeatRecovery {
 				}
 				DataFractionUsedForSizing = 1.0;
 			} else {
-				if ( ZoneSizingRunDone ) {					
+				if ( ZoneSizingRunDone ) {
 					SizingMethod = AutoCalculateSizing;
 					if ( ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent ) {
 						// Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
@@ -3085,7 +3085,7 @@ namespace HeatRecovery {
 
 		// check input validity
 		if ( Z < 0.0 || Z > 1.0 ) {
-			ShowFatalError( "Variable Z (" + RoundSigDigits( Z, 2 ) + ") out of range [0.0,1.0] in CalculateEpsFromNTUandZ" );
+			ShowFatalError( "Variable Z (" + RoundSigDigits( Z, 2 ) + ") out of range [0.0,1.0] in CalculateEpsFromNTUandZ" );  // LCOV_EXCL_LINE
 		}
 
 		// effectiveness
@@ -3111,7 +3111,7 @@ namespace HeatRecovery {
 			} else if ( SELECT_CASE_var == Cross_Flow_Other ) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
 				Eps = ( 1.0 - std::exp( -Z * ( 1.0 - std::exp( -NTU ) ) ) ) / Z;
 			} else {
-				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value=" + RoundSigDigits( FlowArr ) );
+				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value=" + RoundSigDigits( FlowArr ) );  // LCOV_EXCL_LINE
 			}}
 		}
 
@@ -3220,7 +3220,7 @@ namespace HeatRecovery {
 			} else if ( SELECT_CASE_var == Cross_Flow_Other ) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
 				NTU = - std::log( 1.0 + std::log( 1.0 - Eps * Z ) / Z );
 			} else {
-				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value=" + RoundSigDigits( FlowArr ) );
+				ShowFatalError( "HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value=" + RoundSigDigits( FlowArr ) );  // LCOV_EXCL_LINE
 			}}
 		}
 
@@ -3286,9 +3286,9 @@ namespace HeatRecovery {
 		SolveRoot( Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par );
 
 		if ( SolFla == -2 ) {
-			ShowFatalError( "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed" );
+			ShowFatalError( "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed" );  // LCOV_EXCL_LINE
 		} else if ( SolFla == -1 ) {
-			ShowFatalError( "HeatRecovery: No convergence in solving for NTU in GetNTUforCrossFlowBothUnmixed" );
+			ShowFatalError( "HeatRecovery: No convergence in solving for NTU in GetNTUforCrossFlowBothUnmixed" );  // LCOV_EXCL_LINE
 		}
 
 		return NTU;

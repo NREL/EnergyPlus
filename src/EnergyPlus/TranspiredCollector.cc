@@ -202,17 +202,17 @@ namespace TranspiredCollector {
 		if ( CompIndex == 0 ) {
 			UTSCNum = FindItemInList( CompName, UTSC );
 			if ( UTSCNum == 0 ) {
-				ShowFatalError( "Transpired Collector not found=" + CompName );
+				ShowFatalError( "Transpired Collector not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = UTSCNum;
 		} else {
 			UTSCNum = CompIndex;
 			if ( UTSCNum > NumUTSC || UTSCNum < 1 ) {
-				ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits( UTSCNum ) + ", Number of Transpired Collectors=" + TrimSigDigits( NumUTSC ) + ", UTSC name=" + CompName );
+				ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits( UTSCNum ) + ", Number of Transpired Collectors=" + TrimSigDigits( NumUTSC ) + ", UTSC name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( UTSCNum ) ) {
 				if ( CompName != UTSC( UTSCNum ).Name ) {
-					ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits( UTSCNum ) + ", Transpired Collector name=" + CompName + ", stored Transpired Collector Name for that index=" + UTSC( UTSCNum ).Name );
+					ShowFatalError( "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits( UTSCNum ) + ", Transpired Collector name=" + CompName + ", stored Transpired Collector Name for that index=" + UTSC( UTSCNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( UTSCNum ) = false;
 			}
@@ -646,7 +646,7 @@ namespace TranspiredCollector {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetTranspiredCollectorInput: Errors found in input" );
+			ShowFatalError( "GetTranspiredCollectorInput: Errors found in input" );  // LCOV_EXCL_LINE
 		}
 
 		Alphas.deallocate();
@@ -766,7 +766,7 @@ namespace TranspiredCollector {
 		if ( ! BeginEnvrnFlag ) {
 			MyEnvrnFlag( UTSCNum ) = true;
 		}
-		
+
 		// determine average ambient temperature
 		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
 		if ( !DataEnvironment::IsRain ) {
@@ -1392,7 +1392,7 @@ namespace TranspiredCollector {
 		}
 
 		if ( SurfacePtr == 0 ) {
-			ShowFatalError( "Invalid surface passed to GetTranspiredCollectorIndex, Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Invalid surface passed to GetTranspiredCollectorIndex, Surface name = " + Surface( SurfacePtr ).Name );  // LCOV_EXCL_LINE
 		}
 
 		UTSCNum = 0;
@@ -1407,7 +1407,7 @@ namespace TranspiredCollector {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in UTSC description in GetTranspiredCollectorIndex, Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in UTSC description in GetTranspiredCollectorIndex, Surface name = " + Surface( SurfacePtr ).Name );  // LCOV_EXCL_LINE
 		} else {
 
 			UTSCIndex = UTSCNum;

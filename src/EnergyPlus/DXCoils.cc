@@ -294,17 +294,17 @@ namespace DXCoils {
 		if ( CompIndex == 0 ) {
 			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
-				ShowFatalError( "DX Coil not found=" + CompName );
+				ShowFatalError( "DX Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DXCoilNum;
 		} else {
 			DXCoilNum = CompIndex;
 			if ( DXCoilNum > NumDXCoils || DXCoilNum < 1 ) {
-				ShowFatalError( "SimDXCoil: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "SimDXCoil: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DXCoilNum ) ) {
 				if ( ! CompName.empty() && CompName != DXCoil( DXCoilNum ).Name ) {
-					ShowFatalError( "SimDXCoil: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );
+					ShowFatalError( "SimDXCoil: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DXCoilNum ) = false;
 			}
@@ -368,7 +368,7 @@ namespace DXCoils {
 		} else {
 			ShowSevereError( "Error detected in DX Coil=" + CompName );
 			ShowContinueError( "Invalid DX Coil Type=" + DXCoil( DXCoilNum ).DXCoilType );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -428,17 +428,17 @@ namespace DXCoils {
 		if ( CompIndex == 0 ) {
 			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
-				ShowFatalError( "DX Coil not found=" + CompName );
+				ShowFatalError( "DX Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DXCoilNum;
 		} else {
 			DXCoilNum = CompIndex;
 			if ( DXCoilNum > NumDXCoils || DXCoilNum < 1 ) {
-				ShowFatalError( "SimDXCoilMultiSpeed: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "SimDXCoilMultiSpeed: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DXCoilNum ) ) {
 				if ( ! CompName.empty() && CompName != DXCoil( DXCoilNum ).Name ) {
-					ShowFatalError( "SimDXCoilMultiSpeed: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );
+					ShowFatalError( "SimDXCoilMultiSpeed: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DXCoilNum ) = false;
 			}
@@ -471,7 +471,7 @@ namespace DXCoils {
 		} else {
 			ShowSevereError( "Error detected in DX Coil=" + CompName );
 			ShowContinueError( "Invalid DX Coil Type=" + DXCoil( DXCoilNum ).DXCoilType );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -564,17 +564,17 @@ namespace DXCoils {
 		if ( CompIndex == 0 ) {
 			DXCoilNum = FindItemInList( CompName, DXCoil );
 			if ( DXCoilNum == 0 ) {
-				ShowFatalError( "DX Coil not found=" + CompName );
+				ShowFatalError( "DX Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DXCoilNum;
 		} else {
 			DXCoilNum = CompIndex;
 			if ( DXCoilNum > NumDXCoils || DXCoilNum < 1 ) {
-				ShowFatalError( "SimDXCoilMultiMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "SimDXCoilMultiMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of DX Coils=" + TrimSigDigits( NumDXCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DXCoilNum ) ) {
 				if ( ( CompName != "" ) && ( CompName != DXCoil( DXCoilNum ).Name ) ) {
-					ShowFatalError( "SimDXCoilMultiMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );
+					ShowFatalError( "SimDXCoilMultiMode: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + DXCoil( DXCoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DXCoilNum ) = false;
 			}
@@ -617,7 +617,7 @@ namespace DXCoils {
 
 			DXCoil( DXCoilNum ).DehumidificationMode = DehumidMode;
 			if ( DehumidMode > DXCoil( DXCoilNum ).NumDehumidModes ) {
-				ShowFatalError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Requested enhanced dehumidification mode not available." );
+				ShowFatalError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Requested enhanced dehumidification mode not available." );  // LCOV_EXCL_LINE
 			}
 
 			// If a single-stage coil OR If part load is zero,
@@ -794,7 +794,7 @@ namespace DXCoils {
 		} else {
 			ShowSevereError( "Error detected in DX Coil=" + CompName );
 			ShowContinueError( "Invalid DX Coil Type=" + DXCoil( DXCoilNum ).DXCoilType );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -1233,7 +1233,7 @@ namespace DXCoils {
 
 			//Set minimum OAT for compressor operation
 			DXCoil( DXCoilNum ).MinOATCompressor = Numbers( 6 );
-			if ( NumNumbers < 6 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included 
+			if ( NumNumbers < 6 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included
 
 			DXCoil( DXCoilNum ).Twet_Rated( 1 ) = Numbers( 7 );
 			DXCoil( DXCoilNum ).Gamma_Rated( 1 ) = Numbers( 8 );
@@ -1427,7 +1427,7 @@ namespace DXCoils {
 		} // end of the Doe2 DX coil loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Loop over the Multimode DX Coils and get & load the data
@@ -1865,7 +1865,7 @@ namespace DXCoils {
 
 			//Set minimum OAT for compressor operation
 			DXCoil( DXCoilNum ).MinOATCompressor = Numbers( 5 );
-			if ( NumNumbers < 5 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included 
+			if ( NumNumbers < 5 ) DXCoil( DXCoilNum ).MinOATCompressor = minOATCompDXCooling; // input field is after min fields and won't default if field not included
 
 			//Basin heater power as a function of temperature must be greater than or equal to 0
 			DXCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = Numbers( 6 );
@@ -1900,7 +1900,7 @@ namespace DXCoils {
 		} // end of the Multimode DX coil loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		//************* Read Heat Pump (DX Heating Coil) Input **********
@@ -2291,7 +2291,7 @@ namespace DXCoils {
 		} // end of the DX heating coil loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		CurrentModuleObject = "Coil:Cooling:DX:TwoSpeed";
@@ -2795,7 +2795,7 @@ namespace DXCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Loop over the Pumped DX Water Heater Coils and get & load the data
@@ -3208,7 +3208,7 @@ namespace DXCoils {
 		} // end of the DX water heater coil loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 		// Loop over the Wrapped DX Water Heater Coils and get & load the data
 		CurrentModuleObject = cAllCoilTypes( CoilDX_HeatPumpWaterHeaterWrapped );
@@ -3525,7 +3525,7 @@ namespace DXCoils {
 		} // end of the DX water heater wrapped coil loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// DX Multispeed cooling coil
@@ -4000,7 +4000,7 @@ namespace DXCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// DX multispeed heating coil
@@ -4550,7 +4550,7 @@ namespace DXCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Loop over the VRF Heating Coils and get & load the data
@@ -4666,7 +4666,7 @@ namespace DXCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Loop over the VRF Cooling Coils for VRF FluidTCtrl Model_zrp 2015
@@ -4756,7 +4756,7 @@ namespace DXCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Loop over the VRF Heating Coils for VRF FluidTCtrl Model_zrp 2015
@@ -4836,7 +4836,7 @@ namespace DXCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		for ( DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum ) {
@@ -5291,9 +5291,9 @@ namespace DXCoils {
 					ErrorsFound = true;
 				}
 				if ( ErrorsFound ) {
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
-				
+
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Cooling ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
 					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -5325,7 +5325,7 @@ namespace DXCoils {
 							ErrorsFound = true;
 						}
 						if ( ErrorsFound ) {
-							ShowFatalError( "Preceding condition causes termination." );
+							ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 						}
 						// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
 						RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -5354,12 +5354,12 @@ namespace DXCoils {
 					ErrorsFound = true;
 				}
 				if ( ErrorsFound ) {
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 				RatedHeatPumpIndoorAirTemp = 21.11; // 21.11C or 70F
 				RatedHeatPumpIndoorHumRat = 0.00881; // Humidity ratio corresponding to 70F dry bulb/60F wet bulb
 				DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) * PsyRhoAirFnPbTdbW( StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName );
-				
+
 				// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating ){ // the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil
 					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -5402,7 +5402,7 @@ namespace DXCoils {
 						ErrorsFound = true;
 					}
 					if ( ErrorsFound ) {
-						ShowFatalError( "Preceding condition causes termination." );
+						ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 					}
 					// Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
 					RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
@@ -6049,25 +6049,25 @@ namespace DXCoils {
 					if ( DXCoil( DXCoilNum ).EvapCondAirFlow2 > DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ) ) {
 						ShowSevereError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Evaporative Condenser low speed air flow must be less than or equal to high speed air flow." );
 						ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).EvapCondAirFlow2, 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).EvapCondAirFlow( Mode ), 2 ) );
-						ShowFatalError( "Preceding conditions cause termination." );
+						ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 					}
 
 					if ( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2 > DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode ) ) {
 						ShowSevereError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Evaporative Condenser low speed pump power must be less than or equal to high speed pump power." );
 						ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower2, 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).EvapCondPumpElecNomPower( Mode ), 2 ) );
-						ShowFatalError( "Preceding conditions cause termination." );
+						ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 					}
 
 					if ( DXCoil( DXCoilNum ).RatedTotCap2 > DXCoil( DXCoilNum ).RatedTotCap( Mode ) ) {
 						ShowSevereError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Rated Total Cooling Capacity, Low Speed must be less than or equal to Rated Total Cooling Capacity, High Speed." );
 						ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).RatedTotCap2, 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).RatedTotCap( Mode ), 2 ) );
-						ShowFatalError( "Preceding conditions cause termination." );
+						ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 					}
 
 					if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate2 > DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) ) {
-						ShowFatalError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Rated Air Volume Flow Rate, low speed must be less than or equal to Rated Air Volume Flow Rate, high speed." );
+						ShowFatalError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Rated Air Volume Flow Rate, low speed must be less than or equal to Rated Air Volume Flow Rate, high speed." );  // LCOV_EXCL_LINE
 						ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate2, 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), 2 ) );
-						ShowFatalError( "Preceding conditions cause termination." );
+						ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 					}
 				}
 
@@ -6162,7 +6162,7 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ) ) {
 					ShowWarningError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Speed " + TrimSigDigits( Mode ) + " Rated Air Flow Rate must be less than or equal to Speed " + TrimSigDigits( Mode + 1 ) + " Rated Air Flow Rate." );
 					ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ), 2 ) );
-					ShowFatalError( "Preceding conditions cause termination." );
+					ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -6367,7 +6367,7 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).MSRatedTotCap( Mode ) > DXCoil( DXCoilNum ).MSRatedTotCap( Mode + 1 ) ) {
 					ShowWarningError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Speed " + TrimSigDigits( Mode ) + " Rated Total Cooling Capacity must be less than or equal to Speed " + TrimSigDigits( Mode + 1 ) + " Rated Total Cooling Capacity." );
 					ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedTotCap( Mode ), 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedTotCap( Mode + 1 ), 2 ) );
-					ShowFatalError( "Preceding conditions cause termination." );
+					ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -6477,7 +6477,7 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).MSEvapCondAirFlow( Mode ) > DXCoil( DXCoilNum ).MSEvapCondAirFlow( Mode + 1 ) ) {
 					ShowWarningError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Speed " + TrimSigDigits( Mode ) + " Evaporative Condenser Air Flow Rate must be less than or equal to Speed " + TrimSigDigits( Mode + 1 ) + " Evaporative Condenser Air Flow Rate." );
 					ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).MSEvapCondAirFlow( Mode ), 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).MSEvapCondAirFlow( Mode + 1 ), 2 ) );
-					ShowFatalError( "Preceding conditions cause termination." );
+					ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -6515,7 +6515,7 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( Mode ) > DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( Mode + 1 ) ) {
 					ShowWarningError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Speed " + TrimSigDigits( Mode ) + " Rated Evaporative Condenser Pump Power Consumption must be less than or equal to Speed " + TrimSigDigits( Mode + 1 ) + " Rated Evaporative Condenser Pump Power Consumption." );
 					ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( Mode ), 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).MSEvapCondPumpElecNomPower( Mode + 1 ), 2 ) );
-					ShowFatalError( "Preceding conditions cause termination." );
+					ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -6626,7 +6626,7 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) > DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ) ) {
 					ShowWarningError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Speed " + TrimSigDigits( Mode ) + " Rated Air Flow Rate must be less than or equal to Speed " + TrimSigDigits( Mode + 1 ) + " Rated Air Flow Rate." );
 					ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ), 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode + 1 ), 2 ) );
-					ShowFatalError( "Preceding conditions cause termination." );
+					ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 				}
 			}
 			// Rated Secondary Coil Airflow Rates for AirCooled condenser type
@@ -6702,7 +6702,7 @@ namespace DXCoils {
 				if ( DXCoil( DXCoilNum ).MSRatedTotCap( Mode ) > DXCoil( DXCoilNum ).MSRatedTotCap( Mode + 1 ) ) {
 					ShowWarningError( "SizeDXCoil: " + DXCoil( DXCoilNum ).DXCoilType + ' ' + DXCoil( DXCoilNum ).Name + ", Speed " + TrimSigDigits( Mode ) + " Rated Total Heating Capacity must be less than or equal to Speed " + TrimSigDigits( Mode + 1 ) + " Rated Total Heating Capacity." );
 					ShowContinueError( "Instead, " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedTotCap( Mode ), 2 ) + " > " + RoundSigDigits( DXCoil( DXCoilNum ).MSRatedTotCap( Mode + 1 ), 2 ) );
-					ShowFatalError( "Preceding conditions cause termination." );
+					ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -7046,7 +7046,7 @@ namespace DXCoils {
 		} else {
 			locFanElecPower = Fans::GetFanPower( Coil.SupplyFanIndex );
 		}
-		
+
 		// calculate evaporator total cooling capacity
 		if ( HPRTF > 0.0 ) {
 			if ( Coil.FanPowerIncludedInCOP ) {
@@ -7419,7 +7419,7 @@ namespace DXCoils {
 			//  InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRat,InletAirPressure)
 			//  AirVolumeFlowRate = AirMassFlow/ PsyRhoAirFnPbTdbW(InletAirPressure,InletAirDryBulbTemp, InletAirHumRat)
 			if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
-				ShowFatalError( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );
+				ShowFatalError( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );  // LCOV_EXCL_LINE
 			}
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 				VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap2;
@@ -8239,7 +8239,7 @@ namespace DXCoils {
 			VolFlowperRatedTotCap = AirVolumeFlowRate / DXCoil( DXCoilNum ).RatedTotCap( Mode );
 
 			if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
-				ShowFatalError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );
+				ShowFatalError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ! FirstHVACIteration && ! WarmupFlag && ( ( VolFlowperRatedTotCap < MinOperVolFlowPerRatedTotCap( DXCT ) ) || ( VolFlowperRatedTotCap > MaxCoolVolFlowPerRatedTotCap( DXCT ) ) ) ) {
@@ -9623,7 +9623,7 @@ Label50: ;
 				}
 			}
 			ShowContinueErrorTimeStamp( "" );
-			ShowFatalError( "Check and revise the input data for this coil before rerunning the simulation." );
+			ShowFatalError( "Check and revise the input data for this coil before rerunning the simulation." );  // LCOV_EXCL_LINE
 		}
 		// Calculate slope at given conditions
 		if ( DeltaT > 0.0 ) SlopeAtConds = DeltaHumRat / DeltaT;
@@ -9718,7 +9718,7 @@ Label50: ;
 
 		// Show fatal error for specific coil that caused a CBF error
 		if ( CBFErrors ) {
-			ShowFatalError( UnitType + " \"" + UnitName + "\" Errors found in calculating coil bypass factors" );
+			ShowFatalError( UnitType + " \"" + UnitName + "\" Errors found in calculating coil bypass factors" );  // LCOV_EXCL_LINE
 		}
 
 		return CBF;
@@ -10273,19 +10273,19 @@ Label50: ;
 				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
 				ShowContinueErrorTimeStamp( "" );
 				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ",SpeedNum=" + RoundSigDigits( double( SpeedNum ), 0 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-				ShowFatalError( "Preceding condition(s) causes termination." );
+				ShowFatalError( "Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 			} else {
 				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0" );
 				ShowContinueErrorTimeStamp( "" );
 				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-				ShowFatalError( "Preceding condition(s) causes termination." );
+				ShowFatalError( "Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 			}
 		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
 			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
 			ShowContinueErrorTimeStamp( "" );
 			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
-			ShowFatalError( "Preceding condition(s) causes termination." );
+			ShowFatalError( "Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		DXCoil( DXCoilNum ).PartLoadRatio = 0.0;
@@ -10912,19 +10912,19 @@ Label50: ;
 				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
 				ShowContinueErrorTimeStamp( "" );
 				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ",SpeedNum=" + RoundSigDigits( double( SpeedNum ), 0 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-				ShowFatalError( "Preceding condition(s) causes termination." );
+				ShowFatalError( "Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 			} else {
 				ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0" );
 				ShowContinueErrorTimeStamp( "" );
 				ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
-				ShowFatalError( "Preceding condition(s) causes termination." );
+				ShowFatalError( "Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 			}
 		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
 			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
 			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
 			ShowContinueErrorTimeStamp( "" );
 			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
-			ShowFatalError( "Preceding condition(s) causes termination." );
+			ShowFatalError( "Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		AirFlowRatio = 1.0;
@@ -11749,7 +11749,7 @@ Label50: ;
 				}
 
 				FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-				
+
 
 				NetCoolingCapRated = DXCoil( DXCoilNum ).RatedTotCap( 1 ) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 			}
@@ -12870,7 +12870,7 @@ Label50: ;
 				//     ErrorFound, Coil:Heating:DX:SingleSpeed is used in wrong type of parent object (should never get here)
 				ShowSevereError( "Configuration error in " + CompSetsParentType + " \"" + CompSetsParentName + "\"" );
 				ShowContinueError( "DX heating coil not allowed in this configuration." );
-				ShowFatalError( "Preceding condition(s) causes termination." );
+				ShowFatalError( "Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 			}
 			break;
 		}
@@ -13931,7 +13931,7 @@ Label50: ;
 		// 		ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet temperature error continues...", DXCoil( DXCoilNum ).LowAmbErrIndex, DXCoil( DXCoilNum ).LowTempLast, DXCoil( DXCoilNum ).LowTempLast, _, "[C]", "[C]" );
 		// 	}
 		// }
-        // 
+        //
 		// if ( DXCoil( DXCoilNum ).PrintHighAmbMessage ) { // .AND. &
 		// 	if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
 		// 		if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
@@ -13966,7 +13966,7 @@ Label50: ;
 		if ( ( AirMassFlow > 0.0 ) && ( GetCurrentScheduleValue( DXCoil( DXCoilNum ).SchedPtr ) > 0.0 ) && ( PartLoadRatio > 0.0 ) && ( CompOp == On ) ) { // for cycling fan, reset mass flow to full on rate
 
 			if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) <= 0.0 ) {
-				ShowFatalError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );
+				ShowFatalError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Rated total cooling capacity is zero or less." );  // LCOV_EXCL_LINE
 			}
 
 			TotCap = DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -14011,7 +14011,7 @@ Label50: ;
 			// 		DXCoil( DXCoilNum ).LowAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString();
 			// 	}
 			// }
-            // 
+            //
 			// // check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
 			// if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! WarmupFlag ) {
 			// 	DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
@@ -14539,7 +14539,7 @@ Label50: ;
 			C2Tevap = DXCoil( CoilIndex ).C2Te;
 			C3Tevap = DXCoil( CoilIndex ).C3Te;
 			BF = DXCoil( CoilIndex ).RateBFVRFIUEvap;
-			
+
 			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagCoolMode, CoilIndex, Tin, TeTc, SH, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = Tin - QinSenPerFlowRate / 1005;
@@ -14640,7 +14640,7 @@ Label50: ;
 			C2Tcond = DXCoil( CoilIndex ).C2Tc;
 			C3Tcond = DXCoil( CoilIndex ).C3Tc;
 			BF = DXCoil( CoilIndex ).RateBFVRFIUCond;
-			
+
 			// Coil sensible heat transfer_minimum value
 			CalcVRFCoilSenCap( FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1 );
 			To_1 = QinSenPerFlowRate / 1005 + Tin;
@@ -14845,7 +14845,7 @@ Label50: ;
 
 		if ( OperationMode == FlagCoolMode ) {
 		//Cooling: OperationMode 0
-			
+
 			if ( present( BF ) ) {
 				BF_real = BF;
 			} else {
@@ -14861,10 +14861,10 @@ Label50: ;
 			} else {
 				SHSC_real = SH_rate;
 			}
-			
+
 			// Coil capacity at rated conditions
 			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, 26, Te_rate, SH_rate, BFC_rate, Q_rate, Ts );
-			
+
 			// Coil capacity at given conditions
 			CalcVRFCoilSenCap( FlagCoolMode, CoilNum, Tinlet, TeTc_real, SHSC_real, BF_real, Q_real, Ts );
 

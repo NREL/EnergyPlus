@@ -825,7 +825,7 @@ namespace AirflowNetworkSolver {
 			ShowWarningError( "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, Absolute airflow convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem." );
 			ShowContinueErrorTimeStamp( "" );
 			ShowContinueError( "..Iterations=" + RoundSigDigits( ITER ) + ", Max allowed=" + RoundSigDigits( AirflowNetworkSimu.MaxIteration ) );
-			ShowFatalError( "AirflowNetwork: SOLVER, The previous error causes termination." );
+			ShowFatalError( "AirflowNetwork: SOLVER, The previous error causes termination." );  // LCOV_EXCL_LINE
 		} else {
 			ShowRecurringWarningErrorAtEnd( "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.", AirflowNetworkSimu.ExtLargeOpeningErrIndex );
 		}
@@ -1928,7 +1928,7 @@ namespace AirflowNetworkSolver {
 			k = 5 * ( j - 1 ) + 1;
 			BX = DisSysCompDetFanData( CompNum ).Coeff( k );
 			BY = DisSysCompDetFanData( CompNum ).Coeff( k + 1 ) + BX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 2 ) + BX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 3 ) + BX * DisSysCompDetFanData( CompNum ).Coeff( k + 4 ) ) ) - PRISE;
-			if ( BY < 0.0 ) ShowFatalError( "Out of range, too low in an AirflowNetwork detailed Fan" );
+			if ( BY < 0.0 ) ShowFatalError( "Out of range, too low in an AirflowNetwork detailed Fan" );  // LCOV_EXCL_LINE
 
 			while ( true ) {
 				DX = DisSysCompDetFanData( CompNum ).Coeff( k + 5 );
@@ -1936,7 +1936,7 @@ namespace AirflowNetworkSolver {
 				if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << " fp0:" << j << BX << BY << DX << DY;
 				if ( BY * DY <= 0.0 ) break;
 				++j;
-				if ( j > NumCur ) ShowFatalError( "Out of range, too high (FAN) in ADS simulation" );
+				if ( j > NumCur ) ShowFatalError( "Out of range, too high (FAN) in ADS simulation" );  // LCOV_EXCL_LINE
 				k += 5;
 				BX = DX;
 				BY = DY;
@@ -1946,7 +1946,7 @@ namespace AirflowNetworkSolver {
 			CY = 0.0;
 Label40: ;
 			++L;
-			if ( L > 100 ) ShowFatalError( "Too many iterations (FAN) in AirflowNtework simulation" );
+			if ( L > 100 ) ShowFatalError( "Too many iterations (FAN) in AirflowNtework simulation" );  // LCOV_EXCL_LINE
 			CCY = CY;
 			CX = BX - BY * ( ( DX - BX ) / ( DY - BY ) );
 			CY = DisSysCompDetFanData( CompNum ).Coeff( k + 1 ) + CX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 2 ) + CX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 3 ) + CX * DisSysCompDetFanData( CompNum ).Coeff( k + 4 ) ) ) - PRISE;
@@ -3835,7 +3835,7 @@ Label90: ;
 				ShowContinueError( "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:SimpleOpening, etc.), to an external" );
 				ShowContinueError( "node (AirflowNetwork:MultiZone:Surface)." );
 				ShowContinueError( "Please send your input file and weather file to EnergyPlus support/development team for further investigation." );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 			}
 			AD( k ) = 1.0 / ( AD( k ) - SUMD );
 			JHK = JHK1;
@@ -4285,7 +4285,7 @@ Label90: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac2 - MultizoneCompDetOpeningData( CompNum ).HeightFac1 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff2 - MultizoneCompDetOpeningData( CompNum ).DischCoeff1 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -4299,7 +4299,7 @@ Label90: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac3 - MultizoneCompDetOpeningData( CompNum ).HeightFac2 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff3 - MultizoneCompDetOpeningData( CompNum ).DischCoeff2 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -4317,7 +4317,7 @@ Label90: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac4 - MultizoneCompDetOpeningData( CompNum ).HeightFac3 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff4 - MultizoneCompDetOpeningData( CompNum ).DischCoeff3 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 

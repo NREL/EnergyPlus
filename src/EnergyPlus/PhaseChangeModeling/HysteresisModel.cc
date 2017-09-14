@@ -371,14 +371,14 @@ namespace EnergyPlus {
 				// still validate the name to make sure there aren't any duplicates or blanks
 				// blanks are easy: fatal if blank
 				if ( DataIPShortCuts::lAlphaFieldBlanks[0] ) {
-					ShowFatalError( "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+					ShowFatalError( "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +  // LCOV_EXCL_LINE
 									" object: Name cannot be blank" );
 				}
 
 				// we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
 				for ( auto &existingHysteresisModel : hysteresisPhaseChangeModels ) {
 					if ( DataIPShortCuts::cAlphaArgs( 1 ) == existingHysteresisModel.name ) {
-						ShowFatalError( "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+						ShowFatalError( "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +  // LCOV_EXCL_LINE
 										" object: Duplicate name found: " + existingHysteresisModel.name );
 					}
 				}

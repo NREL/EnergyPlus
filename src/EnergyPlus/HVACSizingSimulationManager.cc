@@ -396,7 +396,7 @@ namespace EnergyPlus {
 
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Error condition occurred.  Previous Severe Errors cause termination." );
+				ShowFatalError( "Error condition occurred.  Previous Severe Errors cause termination." );  // LCOV_EXCL_LINE
 			}
 
 
