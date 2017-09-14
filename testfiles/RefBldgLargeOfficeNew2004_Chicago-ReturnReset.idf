@@ -609,7 +609,7 @@
     0.0000,                  !- Direction of Relative North {deg}
     0.0000,                  !- X Origin {m}
     0.0400,                  !- Y Origin {m}
-    0.2000,                  !- Z Origin {m}
+    0.0000,                  !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     ,                        !- Ceiling Height {m}
