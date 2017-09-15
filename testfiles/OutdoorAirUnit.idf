@@ -1135,13 +1135,13 @@
   Coil:Cooling:Water,
     Zone4OAUWCcoil,          !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
-    autosize,                !- Design Water Flow Rate {m3/s}
-    autosize,                !- Design Air Flow Rate {m3/s}
-    autosize,                !- Design Inlet Water Temperature {C}
-    autosize,                !- Design Inlet Air Temperature {C}
-    autosize,                !- Design Outlet Air Temperature {C}
-    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
-    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
+    0.001,                   !- Design Water Flow Rate {m3/s}
+    0.84,                    !- Design Air Flow Rate {m3/s}
+    6.67,                    !- Design Inlet Water Temperature {C}
+    30,                      !- Design Inlet Air Temperature {C}
+    11,                      !- Design Outlet Air Temperature {C}
+    0.014,                   !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     Zone4OAUChWInletNode,    !- Water Inlet Node Name
     Zone4OAUChWOutletNode,   !- Water Outlet Node Name
     Zone4OAUCCoilIn,         !- Air Inlet Node Name

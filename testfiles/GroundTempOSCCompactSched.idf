@@ -37,51 +37,25 @@
     ;                        !- Use Weather File Snow Indicators
 
   Site:Location,
-    anyplace,                !- Name
-    41.98,                   !- Latitude {deg}
-    -87.92,                  !- Longitude {deg}
-    -6,                      !- Time Zone {hr}
-    0.3048;                  !- Elevation {m}
+    USA IL-CHICAGO-OHARE,    !- Name
+    41.77,                   !- Latitude {deg}
+    -87.75,                  !- Longitude {deg}
+    -6.00,                   !- Time Zone {hr}
+    190;                     !- Elevation {m}
+
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
 
   SizingPeriod:DesignDay,
-    anyplace summer,         !- Name
-    7,                       !- Month
-    21,                      !- Day of Month
-    Monday,                  !- Day Type
-    32.22222,                !- Maximum Dry-Bulb Temperature {C}
-    11.1111111111111,        !- Daily Dry-Bulb Temperature Range {deltaC}
-    ,                        !- Dry-Bulb Temperature Range Modifier Type
-    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
-    Wetbulb,                 !- Humidity Condition Type
-    15.55556,                !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-    ,                        !- Humidity Condition Day Schedule Name
-    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    99458,                   !- Barometric Pressure {Pa}
-    0.44704,                 !- Wind Speed {m/s}
-    215,                     !- Wind Direction {deg}
-    No,                      !- Rain Indicator
-    No,                      !- Snow Indicator
-    No,                      !- Daylight Saving Time Indicator
-    ASHRAEClearSky,          !- Solar Model Indicator
-    ,                        !- Beam Solar Day Schedule Name
-    ,                        !- Diffuse Solar Day Schedule Name
-    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1;                       !- Sky Clearness
-
-  SizingPeriod:DesignDay,
-    anyplace winter,         !- Name
+    CHICAGO Ann Htg 99.6% Condns DB,  !- Name
     1,                       !- Month
     21,                      !- Day of Month
     WinterDesignDay,         !- Day Type
-    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    -20.6,                   !- Maximum Dry-Bulb Temperature {C}
     0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
     ,                        !- Dry-Bulb Temperature Range Modifier Type
     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     Wetbulb,                 !- Humidity Condition Type
-    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    -20.6,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
     ,                        !- Humidity Condition Day Schedule Name
     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
@@ -98,6 +72,36 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
+
+! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.2,                    !- Maximum Dry-Bulb Temperature {C}
+    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    25.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
 
   Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
 
@@ -263,44 +267,10 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,
-    Exterior-Light,          !- Name
-    E11 - 1 / 2 IN FIBERBOARD SHEATHING,  !- Outside Layer
-    INS - GLASS FIBER BONDED 3 IN,  !- Layer 2
-    INS - GLASS FIBER BONDED 3 IN,  !- Layer 3
-    E8 - 5 / 8 IN PLASTER OR GYP BOARD;  !- Layer 4
-
-  Construction,
-    Roof,                    !- Name
-    CONCRETE - 120 LB / CU FT 4 IN,  !- Outside Layer
-    E4 - CEILING AIRSPACE,   !- Layer 2
-    E5 - ACOUSTIC TILE;      !- Layer 3
-
-  Construction,
-    Floor,                   !- Name
-    CONCRETE - 60 LB / CU FT 4 IN,  !- Outside Layer
-    B7 - 1 IN WOOD;          !- Layer 2
-
-  Construction,
-    SinglePaneWindow,        !- Name
-    GLASS - CLEAR SHEET 1 / 8 IN;  !- Outside Layer
-
-  Construction,
     InteriorWall,            !- Name
     BLBD - GYPSUM PLASTER 1 / 2 IN,  !- Outside Layer
     CB61 - 4 IN LW HOLLOW CBLK,  !- Layer 2
     BLBD - GYPSUM PLASTER 1 / 2 IN;  !- Layer 3
-
-  Construction,
-    InteriorFloor,           !- Name
-    E5 - ACOUSTIC TILE,      !- Outside Layer
-    E4 - CEILING AIRSPACE,   !- Layer 2
-    CONCRETE - 120 LB / CU FT 4 IN;  !- Layer 3
-
-  Construction,
-    DropCeiling,             !- Name
-    CONCRETE - 120 LB / CU FT 4 IN,  !- Outside Layer
-    E4 - CEILING AIRSPACE,   !- Layer 2
-    E5 - ACOUSTIC TILE;      !- Layer 3
 
   Construction,
     CeilingTile,             !- Name
