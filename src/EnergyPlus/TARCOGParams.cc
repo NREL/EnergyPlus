@@ -178,6 +178,12 @@ namespace TARCOGParams {
 
 	Real64 const TemperatureQuessDiff( 1.0 ); // in case outside and inside temperatures are identical
 
+	// Coefficients for new airflow algorithm.
+	// Robert Hart, Howdy Goudey & D. Charlie Curcija (2017): Experimental
+	// validation and model development for thermal transmittances of porous window screens
+	// and horizontal louvred blind systems, Journal of Building Performance Simulation, DOI:
+	// 10.1080/19401493.2017.1323010
+
 	Real64 const C1_VENET( 0.016 );
 	Real64 const C2_VENET( -0.63 );
 	Real64 const C3_VENET( 0.53 );
