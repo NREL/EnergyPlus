@@ -417,10 +417,10 @@ namespace DirectAirManager {
 
 		//Setup output for the Direct Air Units.  This allows a comparison with
 		for ( Loop = 1; Loop <= NumDirectAir; ++Loop ) {
-			SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy [J]", DirectAir( Loop ).HeatEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy [J]", DirectAir( Loop ).CoolEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
-			SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate [W]", DirectAir( Loop ).HeatRate, "System", "Average", DirectAir( Loop ).EquipID );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate [W]", DirectAir( Loop ).CoolRate, "System", "Average", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy", OutputProcessor::Unit::J, DirectAir( Loop ).HeatEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, DirectAir( Loop ).CoolEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate", OutputProcessor::Unit::W, DirectAir( Loop ).HeatRate, "System", "Average", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, DirectAir( Loop ).CoolRate, "System", "Average", DirectAir( Loop ).EquipID );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirTerminal:SingleDuct:Uncontrolled", DirectAir( Loop ).EquipID, "Mass Flow Rate", "[kg/s]", DirectAir( Loop ).EMSOverrideAirFlow, DirectAir( Loop ).EMSMassFlowRateValue );
