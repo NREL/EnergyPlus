@@ -1774,7 +1774,7 @@ namespace FluidProperties {
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid field" );
 				ShowContinueError( "..." + cAlphaFieldNames( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
-				ShowContinueError( "... Legal values are PropoleneGlycol, EthyleneGlycol or UserDefinedGlycolType." );
+				ShowContinueError( "... Legal values are PropyleneGlycol, EthyleneGlycol or UserDefinedGlycolType." );
 				ErrorsFound = true;
 			}
 			if ( ! GlycolFound ) continue;
@@ -4491,7 +4491,7 @@ namespace FluidProperties {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Performs iterations to calculate the refrigerant temperature corresponding to the given 
+		// Performs iterations to calculate the refrigerant temperature corresponding to the given
 		// enthalpy and pressure.  Works only in superheated region.
 
 		// METHODOLOGY EMPLOYED:
@@ -4515,7 +4515,7 @@ namespace FluidProperties {
 		Real64 RefTHigh; // High Temperature Value for Ps (max in tables)
 		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
 		Real64 Temp; // Temperature of the superheated refrigerant at the given enthalpy and pressure
-		
+
 		if ( GetInput ) {
 			GetFluidPropertiesData();
 			GetInput = false;
@@ -4543,7 +4543,7 @@ namespace FluidProperties {
 		// check temperature data range and attempt to cap if necessary
 		RefTHigh = refrig.PsHighTempValue;
 		RefTSat = GetSatTemperatureRefrig( Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
-		
+
 		if ( TempLow < RefTSat ) {
 			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
 			ShowContinueError( " Called From:" + CalledFrom );
@@ -4563,7 +4563,7 @@ namespace FluidProperties {
 			TempLow = RefTSat;
 			TempUp = RefTHigh;
 		}
-		
+
 		// check enthalpy data range and attempt to cap if necessary
 		EnthalpyLow = GetSupHeatEnthalpyRefrig( Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
 		EnthalpyHigh = GetSupHeatEnthalpyRefrig( Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
@@ -4575,18 +4575,18 @@ namespace FluidProperties {
 			ReturnValue = TempUp;
 			return ReturnValue;
 		}
-		
+
 		//Perform iterations to obtain the temperature level
 		{
 			Array1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
 			Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
 			int const MaxIte( 500 ); // maximum number of iterations
 			int SolFla; // Flag of RegulaFalsi solver
-			
+
 			Par( 1 ) = RefrigNum;
 			Par( 2 ) = Enthalpy;
 			Par( 3 ) = Pressure;
-			
+
 			SolveRoot( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
 			ReturnValue = Temp;
 		}
@@ -4594,11 +4594,11 @@ namespace FluidProperties {
 		return ReturnValue;
 
 	}
-	
+
 	Real64
 	GetSupHeatTempRefrigResidual(
 		Real64 const Temp, // temperature of the refrigerant
-		Array1< Real64 > const & Par 
+		Array1< Real64 > const & Par
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -4609,7 +4609,7 @@ namespace FluidProperties {
 
 		// PURPOSE OF THIS FUNCTION:
 		//  Calculates residual function (( Enthalpy_Actual - Enthalpy_Req ) / Enthalpy_Req )
-		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given 
+		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given
 		//  enthalpy and pressure in superheated region.
 
 		// REFERENCES:
@@ -4642,23 +4642,23 @@ namespace FluidProperties {
 		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrigResidual" );
 		std::string Refrigerant; // carries in substance name
 		int RefrigNum; // index for refrigerant under consideration
-		Real64 Pressure; // pressure of the refrigerant 
+		Real64 Pressure; // pressure of the refrigerant
 		Real64 Enthalpy_Req; // enthalpy of the refrigerant to meet
 		Real64 Enthalpy_Act; // enthalpy of the refrigerant calculated
-		
+
 		RefrigNum = int( Par( 1 ) );
 		Enthalpy_Req = Par( 2 );
 		Pressure = Par( 3 );
 		Refrigerant = RefrigErrorTracking( RefrigNum ).Name;
 		if ( std::abs( Enthalpy_Req ) < 100.0 ) Enthalpy_Req = sign( 100.0, Enthalpy_Req );
-		
+
 		Enthalpy_Act = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
-		
+
 		TempResidual = ( Enthalpy_Act - Enthalpy_Req ) / Enthalpy_Req;
 
 		return TempResidual;
 	}
-	
+
 	//*****************************************************************************
 
 	Real64
