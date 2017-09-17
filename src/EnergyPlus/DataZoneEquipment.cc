@@ -771,9 +771,11 @@ namespace DataZoneEquipment {
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodePlenumNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode = 0; // initialize to zero here
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodePlenumNum = 0; // initialize to zero here
 
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );
@@ -1320,6 +1322,54 @@ namespace DataZoneEquipment {
 		}
 
 		return ReturnAirNodeNumber;
+
+	}
+
+	int
+	GetReturnNumForZone(
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	) 
+	{
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function returns the zone return number (not the node number) for the indicated
+		// zone and node name.  If NodeName is blank, return 1 (the first return node)
+		// otherwise return the index of the matching return node name.  
+		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		int ReturnIndex; // Return number for the given zone (not the node number)
+
+		int ControlledZoneIndex;
+
+		if ( ! ZoneEquipInputsFilled ) {
+			GetZoneEquipmentData1();
+			ZoneEquipInputsFilled = true;
+		}
+
+		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ReturnIndex = 0; // default if not found
+		if ( ControlledZoneIndex > 0 ) {
+			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
+				if ( NodeName == "" ) {
+					// If NodeName is blank, return first return node number
+					ReturnIndex = 1;
+				} else {
+					for ( int nodeCount = 1; nodeCount <= ZoneEquipConfig( ControlledZoneIndex ).NumReturnNodes; ++nodeCount ) {
+						int curNodeNum = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( nodeCount );
+						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
+							ReturnIndex = nodeCount;
+						}
+					}
+				}
+			}
+		}
+
+		return ReturnIndex;
 
 	}
 

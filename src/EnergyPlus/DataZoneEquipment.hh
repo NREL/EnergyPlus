@@ -339,9 +339,10 @@ namespace DataZoneEquipment {
 		Array1D_int ExhaustNode; // zone air exhaust nodes
 		Array1D_int ReturnNode; // zone return air nodes (node numbers)
 		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
-		Array1D_int ReturnNodeInletNum; // zone supply air inlet that matched this return node (same zone, same airloop)
+		Array1D_int ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
+		Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
-		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
+
 		int AirLoopNum; // the air loop index for this controlled zone
 		int FanOpMode; // =0 if no central sys;
 		// -1 if central sys is in cycling fan mode;
@@ -385,7 +386,7 @@ namespace DataZoneEquipment {
 			NumReturnFlowBasisNodes( 0 ),
 			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),
-			ReturnZonePlenumCondNum( 0 ),
+
 			AirLoopNum( 0 ),
 			FanOpMode( 0 ),
 			ZonalSystemOnly( false ),
@@ -590,6 +591,12 @@ namespace DataZoneEquipment {
 
 	int
 	GetReturnAirNodeForZone( 
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	);
+
+	int
+	GetReturnNumForZone( 
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
 		std::string const & NodeName  // Return air node name to match (may be blank)
 	);

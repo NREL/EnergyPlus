@@ -721,9 +721,11 @@ namespace ZonePlenum {
 						// Loop through ZoneEquipConfig's and look for return air node value = InletNode
 						for ( ZoneEquipConfigLoop = 1; ZoneEquipConfigLoop <= NumOfZones; ++ZoneEquipConfigLoop ) {
 							if ( ! ZoneEquipConfig( ZoneEquipConfigLoop ).IsControlled ) continue;
-							if ( ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnAirNode == InletNode ) {
-								ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnZonePlenumCondNum = ZonePlenumLoop;
-								ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) = ZoneEquipConfigLoop;
+							for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigLoop ).NumReturnNodes; ++retNode ) {
+								if ( ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnNode( retNode ) == InletNode ) {
+									ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnNodePlenumNum = ZonePlenumLoop;
+									ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) = ZoneEquipConfigLoop;
+								}
 							}
 						}
 						// count the ADUs that can leak to this plenum

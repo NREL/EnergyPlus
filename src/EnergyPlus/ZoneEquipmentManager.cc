@@ -3414,17 +3414,17 @@ namespace ZoneEquipmentManager {
 		SimReturnAirPath();
 
 		if ( MyOneTimeFlag ) {
-			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-				if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
-				if ( ZoneEquipConfig( ControlledZoneNum ).SupLeakToRetPlen && ZoneEquipConfig( ControlledZoneNum ).ReturnZonePlenumCondNum == 0 ) {
-					ShowSevereError( "No return plenum for simple duct leakage model for Zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-					ShowContinueError( "  The simple duct leakage model requires plenum return for all zone with leaks" );
-					ErrorFlag = true;
-				}
-			}
-			if ( ErrorFlag ) {
-				ShowFatalError( "Preceding condition causes termination" );
-			}
+			//for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
+			//	if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
+			//	if ( ZoneEquipConfig( ControlledZoneNum ).SupLeakToRetPlen && ZoneEquipConfig( ControlledZoneNum ).ReturnZonePlenumCondNum == 0 ) {
+			//		ShowSevereError( "No return plenum for simple duct leakage model for Zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+			//		ShowContinueError( "  The simple duct leakage model requires plenum return for all zone with leaks" );
+			//		ErrorFlag = true;
+			//	}
+			//}
+			//if ( ErrorFlag ) {
+			//	ShowFatalError( "Preceding condition causes termination" );
+			//}
 			MyOneTimeFlag = false;
 		}
 

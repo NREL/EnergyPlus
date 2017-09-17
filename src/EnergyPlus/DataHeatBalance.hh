@@ -1670,7 +1670,7 @@ namespace DataHeatBalance {
 		bool FractionReturnAirIsCalculated;
 		Real64 FractionReturnAirPlenTempCoeff1;
 		Real64 FractionReturnAirPlenTempCoeff2;
-		int ReturnNodePtr;
+		int ZoneReturnNum; // zone return index (not the node number) for return heat gain
 		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
 		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
 		bool ManageDemand; // Flag to indicate whether to use demand limiting
@@ -1707,7 +1707,7 @@ namespace DataHeatBalance {
 			FractionReturnAirIsCalculated( false ),
 			FractionReturnAirPlenTempCoeff1( 0.0 ),
 			FractionReturnAirPlenTempCoeff2( 0.0 ),
-			ReturnNodePtr( 1 ),
+			ZoneReturnNum( 1 ),
 			NomMinDesignLevel( 0.0 ),
 			NomMaxDesignLevel( 0.0 ),
 			ManageDemand( false ),
