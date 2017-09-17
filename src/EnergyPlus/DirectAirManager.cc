@@ -376,7 +376,7 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
-							thisZoneEqConfig.SDUNum = DirectAirNum;
+							thisZoneEqConfig.InletNodeSDUNum( SupAirIn ) = DirectAirNum;
 							DirectAir( DirectAirNum ).TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							DirectAir( DirectAirNum ).ZoneEqNum = CtrlZone;
 							// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit

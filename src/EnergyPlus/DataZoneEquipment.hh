@@ -336,6 +336,7 @@ namespace DataZoneEquipment {
 		Array1D_int InletNode; // zone supply air inlet nodes
 		Array1D_int InletNodeAirLoopNum; // air loop number connected to this inlet node (0 if not an airloop node)
 		Array1D_int InletNodeADUNum; // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
+		Array1D_int InletNodeSDUNum; // Single duct uncontrolled connected to this inlet node (0 if none, could be zone equip or ADU)
 		Array1D_int ExhaustNode; // zone air exhaust nodes
 		Array1D_int ReturnNode; // zone return air nodes (node numbers)
 		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
@@ -366,8 +367,6 @@ namespace DataZoneEquipment {
 		bool InWallActiveElement; // Convection adapation, true if zone has in-wall HVAC
 		bool InCeilingActiveElement; // Convection adapation,
 		// true when zone has in-ceiling HVAC
-		int ADUNum; // index of Air Distribution Unit
-		int SDUNum; // index of Single Duct Uncontrolled
 		bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
 		bool ZoneHasAirLoopWithOASys; // true if zone is served by one or more airloops with an outdoor air system
 
@@ -397,8 +396,6 @@ namespace DataZoneEquipment {
 			InFloorActiveElement( false ),
 			InWallActiveElement( false ),
 			InCeilingActiveElement( false ),
-			ADUNum( 0 ),
-			SDUNum( 0 ),
 			ZoneHasAirFlowWindowReturn( false ),
 			ZoneHasAirLoopWithOASys( false )
 		{}

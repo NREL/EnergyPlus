@@ -1320,6 +1320,10 @@ namespace DataHeatBalance {
 		Real64 ExtGrossGroundWallArea_Multiplied; // Ground contact Wall Area for Zone (Gross) with multipliers
 		int SystemZoneNodeNumber; // This is the zone node number for the system for a controlled zone
 		bool IsControlled; // True when this is a controlled zone.
+		bool IsSupplyPlenum; // True when this zone is a supply plenum
+		bool IsReturnPlenum; // True when this zone is a return plenum
+		int ZoneEqNum; // Controlled zone equip config number
+		int PlenumCondNum; // Supply or return plenum conditions number, 0 if this is not a plenum zone
 		int TempControlledZoneIndex; // this is the index number for TempControlledZone structure for lookup
 		//            Pointers to Surface Data Structure
 		int SurfaceFirst; // First Surface in Zone
@@ -1418,6 +1422,10 @@ namespace DataHeatBalance {
 			ExtGrossGroundWallArea_Multiplied( 0.0 ),
 			SystemZoneNodeNumber( 0 ),
 			IsControlled( false ),
+			IsSupplyPlenum( false ),
+			IsReturnPlenum( false ),
+			ZoneEqNum ( 0 ),
+			PlenumCondNum( 0 ),
 			TempControlledZoneIndex( 0 ),
 			SurfaceFirst( 0 ),
 			SurfaceLast( 0 ),

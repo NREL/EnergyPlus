@@ -449,6 +449,7 @@ namespace DataZoneEquipment {
 					continue;
 				}
 				Zone( ControlledZoneNum ).IsControlled = true;
+				Zone( ControlledZoneNum ).ZoneEqNum = ControlledZoneNum;
 				ZoneEquipConfig( ControlledZoneNum ).IsControlled = true;
 				ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum = ControlledZoneNum;
 			}
@@ -715,6 +716,7 @@ namespace DataZoneEquipment {
 				ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeSDUNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
 
@@ -727,6 +729,7 @@ namespace DataZoneEquipment {
 					}
 					ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( NodeNum ) = 0;
 					ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum( NodeNum ) = 0;
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeSDUNum( NodeNum ) = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;

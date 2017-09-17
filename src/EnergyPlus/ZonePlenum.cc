@@ -416,6 +416,9 @@ namespace ZonePlenum {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
+			} else {
+				Zone( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum ).IsReturnPlenum = true;
+				Zone( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum ).PlenumCondNum = ZonePlenumNum;
 			}
 			//  Check if this zone is used as a controlled zone
 			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
@@ -558,6 +561,9 @@ namespace ZonePlenum {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
+			} else {
+				Zone( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum ).IsSupplyPlenum = true;
+				Zone( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum ).PlenumCondNum = ZonePlenumNum;
 			}
 			//  Check if this zone is used as a controlled zone
 			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
