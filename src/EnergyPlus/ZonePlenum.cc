@@ -731,6 +731,7 @@ namespace ZonePlenum {
 						// count the ADUs that can leak to this plenum
 						for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 							if ( AirDistUnit( ADUNum ).ZoneEqNum == ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) ) {
+								AirDistUnit( ADUNum ).RetPlenumNum = ZonePlenumLoop;
 								++NumADUsToPlen;
 							}
 						}
@@ -740,14 +741,26 @@ namespace ZonePlenum {
 				ZoneRetPlenCond( ZonePlenumLoop ).NumADUs = NumADUsToPlen;
 				// fill the list of air distribution units that can leak to this plenum
 				if ( NumADUsToPlen > 0 ) {
-					for ( InletNodeLoop = 1; InletNodeLoop <= ZoneRetPlenCond( ZonePlenumLoop ).NumInletNodes; ++InletNodeLoop ) {
-						for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-							if ( AirDistUnit( ADUNum ).ZoneEqNum == ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) ) {
-								++ADUsToPlenIndex;
-								ZoneRetPlenCond( ZonePlenumLoop ).ADUIndex( ADUsToPlenIndex ) = ADUNum;
-							}
+					for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+						if ( AirDistUnit( ADUNum ).RetPlenumNum == ZonePlenumLoop ) {
+							++ADUsToPlenIndex;
+							ZoneRetPlenCond( ZonePlenumLoop ).ADUIndex( ADUsToPlenIndex ) = ADUNum;
 						}
 					}
+				}
+			}
+
+
+			// Check that all ADUs with leakage found a return plenum
+			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+				auto & thisADU( AirDistUnit( ADUNum ) );
+				if ( ( thisADU.DownStreamLeak || thisADU.DownStreamLeak ) &&  ( thisADU.RetPlenumNum == 0 ) ) {
+					ShowWarningError( "No return plenum found for simple duct leakage for ZoneHVAC:AirDistributionUnit=" + thisADU.Name + " in Zone=" + ZoneEquipConfig( thisADU.ZoneEqNum ).ZoneName );
+					ShowContinueError( "Leakage will be ignored for this ADU." );
+					thisADU.UpStreamLeak = false;
+					thisADU.DownStreamLeak = false;
+					thisADU.UpStreamLeakFrac = 0.0;
+					thisADU.DownStreamLeakFrac = 0.0;
 				}
 			}
 

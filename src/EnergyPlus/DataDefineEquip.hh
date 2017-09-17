@@ -128,6 +128,7 @@ namespace DataDefineEquip {
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
 		bool UpStreamLeak; // if true, there is an upstream leak
 		bool DownStreamLeak; // if true, there is an downstream leak
+		int RetPlenumNum; // return plenum number that this ADU can leak to, zero if none
 		int ZoneNum; // index of the zone object for this terminal unit
 	 	bool AccountForDOAS; // if true user has asked for DOAS
 		Real64 HeatRate; // [W]
@@ -164,6 +165,7 @@ namespace DataDefineEquip {
 			LeakLoadMult( 0.0 ),
 			UpStreamLeak( false ),
 			DownStreamLeak( false ),
+			RetPlenumNum( 0 ),
 			ZoneNum( 0 ),
 			AccountForDOAS( false ),
 			HeatRate( 0.0 ),

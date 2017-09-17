@@ -362,8 +362,6 @@ namespace DataZoneEquipment {
 		// duct AIR DISTRIBUTION object in the ZoneEquipList.
 		Array1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
 		Array1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
-		bool SupLeakToRetPlen; // True if there is supply duct leak to the
-		// plenum (simple duct leakage model)
 		bool InFloorActiveElement; // Convection adapation, true if zone has in-floor HVAC
 		bool InWallActiveElement; // Convection adapation, true if zone has in-wall HVAC
 		bool InCeilingActiveElement; // Convection adapation,
@@ -396,7 +394,6 @@ namespace DataZoneEquipment {
 			PlenumMassFlow( 0.0 ),
 			ExcessZoneExh( 0.0 ),
 			TotAvailAirLoopOA( 0.0 ),
-			SupLeakToRetPlen( false ),
 			InFloorActiveElement( false ),
 			InWallActiveElement( false ),
 			InCeilingActiveElement( false ),

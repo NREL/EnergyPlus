@@ -531,10 +531,6 @@ namespace ZoneAirLoopEquipmentManager {
 			thisZoneEqConfig.ADUNum = AirDistUnitNum;
 			for ( int inletNum = 1; inletNum <= thisZoneEqConfig.NumInletNodes; ++inletNum ){
 				if ( thisZoneEqConfig.InletNode( inletNum ) == thisADU.OutletNodeNum ) thisZoneEqConfig.InletNodeADUNum( inletNum ) = AirDistUnitNum;
-			}
-
-			if ( thisADU.UpStreamLeak || thisADU.DownStreamLeak ) {
-				thisZoneEqConfig.SupLeakToRetPlen = true;
 			}}
 
 			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
