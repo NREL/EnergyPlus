@@ -460,9 +460,8 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "Zone";
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
-
+	DataHeatBalance::Zone( 1 ).ZoneEqNum = 1;
+	DataHeatBalance::Zone( 1 ).IsControlled = true;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;

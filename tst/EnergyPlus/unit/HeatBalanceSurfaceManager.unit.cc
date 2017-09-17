@@ -713,10 +713,8 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "LIVING ZONE";
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-		std::vector< int > controlledZoneEquipConfigNums;
-		controlledZoneEquipConfigNums.push_back( 1 );
 		DataHeatBalance::Zone( 1 ).IsControlled = true;
-
+		DataHeatBalance::Zone( 1 ).ZoneEqNum = 1;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).NumInletNodes = 2;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;

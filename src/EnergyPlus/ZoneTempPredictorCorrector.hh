@@ -277,8 +277,7 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	CorrectZoneHumRat(
-		int const ZoneNum,
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		int const ZoneNum
 	);
 
 	void
@@ -307,8 +306,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		Real64 & SumSysMCpT // Zone sum of air system MassFlowRate*Cp*T
 	);
 
 	void
@@ -323,8 +321,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		Real64 & imBalance // put all terms in eq. 5 on RHS , should be zero
 	);
 
 	bool

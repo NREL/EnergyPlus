@@ -1148,7 +1148,7 @@ namespace InternalHeatGains {
 						Lights( Loop ).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone( Zone( Lights( Loop ).ZonePtr ).Name, retNodeName );
 					}
 
-					if ( Lights( Loop ).ZoneReturnNum == 0 ) {
+					if ( ( Lights( Loop ).ZoneReturnNum == 0 ) && ( Lights( Loop ).FractionReturnAir > 0.0 ) &&  ( !lAlphaFieldBlanks( 7 ) ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 7 ) + " =" + AlphaName( 7 ) );
 						ShowContinueError( "No matching Zone Return Air Node found." );
 						ErrorsFound = true;
@@ -1192,7 +1192,10 @@ namespace InternalHeatGains {
 						SetupEMSInternalVariable( "Lighting Power Design Level", Lights( Loop ).Name, "[W]", Lights( Loop ).DesignLevel );
 					} // EMS
 					//setup internal gains
-					int returnNodeNum = DataZoneEquipment::ZoneEquipConfig( Lights( Loop ).ZonePtr ).ReturnNode( Lights( Loop ).ZoneReturnNum );
+					int returnNodeNum = 0;
+					if ( ( Lights( Loop ).ZoneReturnNum > 0 ) && (  Lights( Loop ).ZoneReturnNum <= DataZoneEquipment::ZoneEquipConfig( Lights( Loop ).ZonePtr ).NumReturnNodes ) ) {
+						returnNodeNum = DataZoneEquipment::ZoneEquipConfig( Lights( Loop ).ZonePtr ).ReturnNode( Lights( Loop ).ZoneReturnNum );
+					}
 					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, returnNodeNum );
 
 					// send values to predefined lighting summary report
