@@ -1006,18 +1006,18 @@ namespace UnitVentilator {
 
 		// Setup Report variables for the Unit Ventilators, CurrentModuleObject='ZoneHVAC:UnitVentilator'
 		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) {
-			SetupOutputVariable( "Zone Unit Ventilator Heating Rate [W]", UnitVent( UnitVentNum ).HeatPower, "System", "Average", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Heating Energy [J]", UnitVent( UnitVentNum ).HeatEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Rate [W]", UnitVent( UnitVentNum ).TotCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Energy [J]", UnitVent( UnitVentNum ).TotCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Rate [W]", UnitVent( UnitVentNum ).SensCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Energy [J]", UnitVent( UnitVentNum ).SensCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Power [W]", UnitVent( UnitVentNum ).ElecPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Heating Rate", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).HeatPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Heating Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).HeatEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Rate", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).TotCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).TotCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Rate", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).SensCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).SensCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Power", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).ElecPower, "System", "Average", UnitVent( UnitVentNum ).Name );
 			// Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
-			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Energy [J]", UnitVent( UnitVentNum ).ElecEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Fan Availability Status []", UnitVent( UnitVentNum ).AvailStatus, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).ElecEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Fan Availability Status", OutputProcessor::Unit::None, UnitVent( UnitVentNum ).AvailStatus, "System", "Average", UnitVent( UnitVentNum ).Name );
 			if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff ) {
-				SetupOutputVariable( "Zone Unit Ventilator Fan Part Load Ratio []", UnitVent( UnitVentNum ).FanPartLoadRatio, "System", "Average", UnitVent( UnitVentNum ).Name );
+				SetupOutputVariable( "Zone Unit Ventilator Fan Part Load Ratio", OutputProcessor::Unit::None, UnitVent( UnitVentNum ).FanPartLoadRatio, "System", "Average", UnitVent( UnitVentNum ).Name );
 			}
 		}
 

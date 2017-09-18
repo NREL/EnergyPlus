@@ -525,6 +525,10 @@ namespace OutdoorAirUnit {
 				OutAirUnit( OAUnitNum ).ExtFan = false;
 				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\": No input of " + cAlphaFields( 7 ) + "." );
 				ShowContinueError( "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced. Please reconsider your input." );
+				if ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFields( 7 ) + " is blank." );
+					ShowContinueError( "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced." );
+				}
 			} else if ( ! lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFanName = cAlphaArgs( 7 );
 				VerifyName( cAlphaArgs( 7 ), OutAirUnit, &OAUnitData::ExtFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
@@ -555,10 +559,10 @@ namespace OutdoorAirUnit {
 
 			//N2
 			OutAirUnit( OAUnitNum ).ExtAirVolFlow = NumArray( 2 );
-			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+			if ( ( OutAirUnit( OAUnitNum ).ExtFan ) && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ){
 				if ( NumArray( 2 ) != NumArray( 1 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" unbalanbce inputs between " + cNumericFields( 1 ) + " and " + cNumericFields( 2 ) + " may cause unbalance mass flow rate between supply and exhaust." );
-					ShowContinueError( "The entered value of " + cNumericFields( 1 ) + " is " + General::RoundSigDigits( NumArray( 1 ), 3 ) + " and the entered value of " + cNumericFields( 2 ) + " is " + General::RoundSigDigits( NumArray( 2 ), 3 ) );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFields( 1 ) + " and " + cNumericFields( 2 ) + " are not equal. This may cause unbalanced flow." );
+					ShowContinueError( cNumericFields( 1 ) + "=" + General::RoundSigDigits( NumArray( 1 ), 3 ) + " and " + cNumericFields( 2 ) + "=" + General::RoundSigDigits( NumArray( 2 ), 3 ) );
 				}
 			}
 			//A8
@@ -567,12 +571,12 @@ namespace OutdoorAirUnit {
 			OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr = GetScheduleIndex( OutAirUnit( OAUnitNum ).ExtAirSchedName );
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 				if ( ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr == 0 ) || ( lNumericBlanks( 2 ) ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 					ErrorsFound = true;
 				} else {
-					if ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr != OutAirUnit( OAUnitNum ).OutAirSchedPtr ) {
-						ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" different schedule inputs between " + cAlphaFields( 4 ) + " and " + cAlphaFields( 9 ) + " may cause unbalance mass flow rate between supply and exhaust." );
-						ShowContinueError( "The entered name of " + cAlphaFields( 4 ) + " is " + cAlphaArgs( 4 ) + " and the entered name of " + cAlphaFields( 9 ) + " is " + cAlphaArgs( 9 ) );
+					if ( ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr != OutAirUnit( OAUnitNum ).OutAirSchedPtr ) && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
+						ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", different schedule inputs for outdoor air and exhaust air schedules may cause unbalanced mass flow." );
+						ShowContinueError( cAlphaFields( 4 ) + "=" + cAlphaArgs( 4 ) + " and " + cAlphaFields( 8 ) + "=" + cAlphaArgs( 8 ) );
 					}
 				}
 			}
@@ -830,22 +834,22 @@ namespace OutdoorAirUnit {
 
 		// Setup Report variables for the zone outdoor air unit CurrentModuleObject='ZoneHVAC:OutdoorAirUnit'
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Rate [W]", OutAirUnit( OAUnitNum ).TotHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Energy [J]", OutAirUnit( OAUnitNum ).TotHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Rate [W]", OutAirUnit( OAUnitNum ).SensHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Energy [J]", OutAirUnit( OAUnitNum ).SensHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Rate [W]", OutAirUnit( OAUnitNum ).LatHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Energy [J]", OutAirUnit( OAUnitNum ).LatHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Rate [W]", OutAirUnit( OAUnitNum ).TotCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Energy [J]", OutAirUnit( OAUnitNum ).TotCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Rate [W]", OutAirUnit( OAUnitNum ).SensCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Energy [J]", OutAirUnit( OAUnitNum ).SensCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Rate [W]", OutAirUnit( OAUnitNum ).LatCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Energy [J]", OutAirUnit( OAUnitNum ).LatCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Air Mass Flow Rate [kg/s]", OutAirUnit( OAUnitNum ).AirMassFlow, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Power [W]", OutAirUnit( OAUnitNum ).ElecFanRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Energy [J]", OutAirUnit( OAUnitNum ).ElecFanEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Availability Status []", OutAirUnit( OAUnitNum ).AvailStatus, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).TotHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).TotHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).SensHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).SensHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).LatHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).LatHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).TotCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).TotCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).SensCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).SensCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).LatCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).LatCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Air Mass Flow Rate", OutputProcessor::Unit::kg_s, OutAirUnit( OAUnitNum ).AirMassFlow, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Power", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).ElecFanRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).ElecFanEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Availability Status", OutputProcessor::Unit::None, OutAirUnit( OAUnitNum ).AvailStatus, "System", "Average", OutAirUnit( OAUnitNum ).Name );
 			//! Note that the outdoor air unit fan electric is NOT metered because this value is already metered through the fan component
 
 		}
@@ -1522,7 +1526,7 @@ namespace OutdoorAirUnit {
 			}
 
 			// Air mass balance check
-			if ( std::abs( OutAirUnit( OAUnitNum ).ExtAirMassFlow - OutAirUnit( OAUnitNum ).OutAirMassFlow ) > 0.001 ) {
+			if ( ( std::abs( OutAirUnit( OAUnitNum ).ExtAirMassFlow - OutAirUnit( OAUnitNum ).OutAirMassFlow ) > 0.001 )  && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
 				if ( !OutAirUnit( OAUnitNum ).FlowError ) {
 					ShowWarningError( "Air mass flow between zone supply and exhaust is not balanced" );
 					ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit( OAUnitNum ).Name );

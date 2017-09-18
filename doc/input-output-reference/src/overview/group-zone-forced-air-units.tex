@@ -1616,9 +1616,7 @@ The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to
 \caption{Zone Outdoor Air Unit Schematic \protect \label{fig:zone-outdoor-air-unit-schematic}}
 \end{figure}
 
-Zones may contain one or more zone outdoor air units.~ The user can choose to have each unit have its own exhaust fan or may choose to have only one unit have an exhaust fan that will handle the flow of all of the zone outdoor air units.~ Note that the user will need to account for any flow balance among the zone outdoor air units on the supply and exhaust sides.
-
-When an AirloopHVAC serves the same zone, it is strongly recommended that the outdoor and exhaust air flow rates are balanced. In addition, the exhaust airflow rate and air schedule should be the same as outdoor air flow rate and outdoor air schedule, respectively. Otherwise, possible unbalanced flows will cause improper return airflow from the AirLoopHVAC.  
+When an AirloopHVAC serves the same zone, it is strongly recommended that the outdoor and exhaust air flow rates are balanced. In addition, the exhaust airflow rate and air schedule should be the same as outdoor air flow rate and outdoor air schedule, respectively. Otherwise, possible unbalanced flows will cause improper return airflow unless ZoneAirMassFlowConservation is active.  
 
 The full input for zone outdoor air units is described below using a variety of fields.
 
