@@ -1,6 +1,6 @@
 \section{Baseboard Heaters }\label{baseboard-heaters}
 
-There are five different baseboard models in EnergyPlus.  Two of these models are convection only while three of these models have both radiative and convective heat transfer to the zone.  The hot water and electric baseboard models with only convection provide a simple convective heat gain to the space via the baseboard unit.  The models for these convection only units are fairly simple and simply provide convective heating to the space in an attempt to meet whatever heating load is present.  The convection only models do not require iteration or resimulation of the surface heat balances because it is assumed that there is no radiation given off by the unit.
+There are five different baseboard models in EnergyPlus.  Two of these models are convection only while three of these models have both radiative and convective heat transfer to the zone.  The hot water and electric baseboard models with only convection provide a simple convective heat gain to the space via the baseboard unit.  The models for these convection only units are fairly simple and provide convective heating to the space in an attempt to meet whatever heating load is present.  The convection only models do not require iteration or resimulation of the surface heat balances because it is assumed that there is no radiation given off by the unit.
 
 The hot water, electric, and steam baseboard models with radiation and convection allow the user to account for some of the energy given off by the unit to be via radiation.  These models are both more realistic and more sophisticated.  They are more realistic because most baseboard units will give off some amount of radiation, even if in many cases that fraction is small.  They are more sophisticated because adding radiation to a space is more complicated than simply adding heat to the zone air heat balance directly via convection.  The addition of radiation energy involves distribution of that radiation and also the need to resimulate the surface heat balances to account for this new thermal energy incident on surfaces throughout the space.  This also then means that the baseboard heaters with radiation and convection will take longer to simulate since all Zone HVAC models that have a radiant component need to iterate through the surface heat balances more than once.  These iterations slow down the simulation but are necessary to correctly account for the changes to the radiation balance on the surfaces in the zone.
 
@@ -128,7 +128,7 @@ Base on manufacturer's information for the rated capacity, the rated water flow 
 {T_{w,out}} = 2{T_{w,avg}} - {T_{w,in}}
 \end{equation}
 
-where \({c_{p,w}}\) is the specific heat capacity the water (calculated based on the average water temperature).
+where \({c_{p,w}}\) is the specific heat capacity of the water (calculated based on the average water temperature).
 
 The model then assumes the air mass flow rate is given by the following expression:
 
