@@ -4644,8 +4644,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_HAMT;
@@ -4971,8 +4969,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
@@ -5261,8 +5257,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataDefineEquip::AirDistUnit;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
