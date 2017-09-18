@@ -1732,7 +1732,6 @@ namespace HeatBalanceSurfaceManager {
 			QsrcHistM = 0.0;
 		}
 		CondFDRelaxFactor = CondFDRelaxFactorInput;
-
 		for ( auto & e : SurfaceWindow ) {
 			// Initialize window frame and divider temperatures
 			e.FrameTempSurfIn = 23.0;
@@ -1741,7 +1740,7 @@ namespace HeatBalanceSurfaceManager {
 			e.DividerTempSurfIn = 23.0;
 			e.DividerTempSurfInOld = 23.0;
 			e.DividerTempSurfOut = 23.0;
-		
+
 			// Initialize previous-timestep shading indicators
 			e.ExtIntShadePrevTS = 0;
 			e.ShadingFlag = NoShade;
@@ -3423,8 +3422,7 @@ namespace HeatBalanceSurfaceManager {
 							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
 								TransDiffWin = Construct( ConstrNumSh ).TransDiff;
 								DiffAbsShade = Construct( ConstrNumSh ).AbsDiffBackShade;
-							}
-							else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
+							} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
 								TransDiffWin = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
 								DiffAbsShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
 							}

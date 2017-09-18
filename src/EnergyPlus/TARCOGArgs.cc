@@ -582,7 +582,7 @@ namespace TARCOGArgs {
 					if ( thick( i ) < SlatThick( i ) ) thick( i ) = SlatThick( i );
 				} else if ( ( ThermalMod == THERM_MOD_ISO15099 ) || ( ThermalMod == THERM_MOD_CSM ) ) {
 					thick( i ) = SlatThick( i );
-					double slatAngRad = SlatAngle( i ) * 2.0 * DataGlobals::Pi / 360.0;
+					Real64 slatAngRad = SlatAngle( i ) * 2.0 * DataGlobals::Pi / 360.0;
 					if ( Ah( i ) > 1e-8 ) {
 						thick( i ) = C4_VENET * ( SlatWidth( i ) * cos( slatAngRad ) );
 					}
