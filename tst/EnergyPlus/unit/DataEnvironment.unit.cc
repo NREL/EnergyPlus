@@ -44,60 +44,38 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <string>
-#include <vector>
+// EnergyPlus::DataPlant Unit Tests
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
-#include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Array2S.hh>
-#include <ObjexxFCL/Array3D.hh>
-#include <ObjexxFCL/Optional.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <OutputReportData.hh>
-#include <InputProcessor.hh>
-#include <OutputProcessor.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-	AnnualFieldSet::AnnualFieldSet( std::string varName, AnnualFieldSet::AggregationKind kindOfAggregation, int numDigitsShown )
-	{
-		m_variMeter = varName;
-		m_aggregate = kindOfAggregation;
-		m_showDigits = numDigitsShown;
-	}
+using namespace EnergyPlus;
+using namespace ObjexxFCL;
 
-	int
-	AnnualFieldSet::getVariableKeyCountandTypeFromFldSt( int &typeVar, int &avgSumVar, int &stepTypeVar, OutputProcessor::Unit &unitsVar )
-	{
-		int numkeys;
-		GetVariableKeyCountandType( m_variMeter, numkeys, typeVar, avgSumVar, stepTypeVar, unitsVar );  //call outputprocessor routine with member variable
-		return numkeys;
-	}
+TEST_F( EnergyPlusFixture, DataEnvironment_WindSpeedAt )
+{
+	DataEnvironment::WindSpeed = 10;
+	DataEnvironment::WeatherFileWindModCoeff = 0.3;
+	DataEnvironment::SiteWindBLHeight = 20;
 
-	void
-	AnnualFieldSet::getVariableKeysFromFldSt( int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int>  &indexesForKeyVar )
-	{
-		// this hides the Objexx arrays and returns regular vectors
-		Array1D_string tempNamesOfKeys;
-		Array1D_int tempIndexesForKeyVar;
-		tempNamesOfKeys.allocate( keyCount );
-		tempIndexesForKeyVar.allocate( keyCount );
-		GetVariableKeys( m_variMeter, typeVar, tempNamesOfKeys, tempIndexesForKeyVar ); //call outputprocessor routine with member variable
-		namesOfKeys.clear();
-		indexesForKeyVar.clear();
-		for ( int iKey = 1; iKey <= keyCount; ++iKey ) {
-			namesOfKeys.push_back( tempNamesOfKeys( iKey ) );
-			indexesForKeyVar.push_back( tempIndexesForKeyVar( iKey ) );
-		}
-	}
-
-
-
-} // EnergyPlus
-
+	// Start with normal mode
+	DataEnvironment::SiteWindExp = 0.1;
+	EXPECT_NEAR( 0.000, DataEnvironment::WindSpeedAt( -1.0 ), 0.001 );
+	EXPECT_NEAR( 0.000, DataEnvironment::WindSpeedAt( 0.0 ), 0.001 );
+	EXPECT_NEAR( 2.223, DataEnvironment::WindSpeedAt( 1.0 ), 0.001 );
+	EXPECT_NEAR( 2.612, DataEnvironment::WindSpeedAt( 5.0 ), 0.001 );
+	EXPECT_NEAR( 2.799, DataEnvironment::WindSpeedAt( 10.0 ), 0.001 );
+	EXPECT_NEAR( 3.000, DataEnvironment::WindSpeedAt( 20.0 ), 0.001 );
+	
+	// If the site wind exponent is zero, the wind speed is either zero or the actual wind speed
+	DataEnvironment::SiteWindExp = 0.0;
+	EXPECT_NEAR( 0.0, DataEnvironment::WindSpeedAt( -1.0 ), 0.001 );
+	EXPECT_NEAR( 0.0, DataEnvironment::WindSpeedAt( 0.0 ), 0.001 );
+	EXPECT_NEAR( 10.0, DataEnvironment::WindSpeedAt( 1.0 ), 0.001 );
+}
 
