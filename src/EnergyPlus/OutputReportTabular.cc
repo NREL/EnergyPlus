@@ -309,6 +309,8 @@ namespace OutputReportTabular {
 	Array2D< Real64 > gatherEndUseBEPS( numResourceTypes, NumEndUses, 0.0 );
 	Array2D< Real64 > gatherEndUseBySourceBEPS( numResourceTypes, NumEndUses, 0.0 );
 	Array3D< Real64 > gatherEndUseSubBEPS;
+	Array1D_bool needOtherRowLEED45( NumEndUses );
+
 	// arrays the hold the demand values
 	Array1D< Real64 > gatherDemandTotal( numResourceTypes, 0.0 );
 	Array2D< Real64 > gatherDemandEndUse( numResourceTypes, NumEndUses, 0.0 );
@@ -7122,7 +7124,6 @@ namespace OutputReportTabular {
 		Array2D< Real64 > collapsedEndUse( 6, NumEndUses );
 		Array3D< Real64 > collapsedEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
 		Array2D< Real64 > endUseSubOther( 6, NumEndUses );
-		Array1D_bool needOtherRow( NumEndUses );
 		Real64 totalOnsiteHeat;
 		Real64 totalOnsiteWater;
 		Real64 totalWater;
@@ -7855,7 +7856,7 @@ namespace OutputReportTabular {
 
 			//determine if subcategories add up to the total and
 			//if not, determine the difference for the 'other' row
-			needOtherRow = false; //set array to all false assuming no other rows are needed
+			needOtherRowLEED45 = false; //set array to all false assuming no other rows are needed
 			for ( iResource = 1; iResource <= 6; ++iResource ) {
 				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
@@ -7867,7 +7868,7 @@ namespace OutputReportTabular {
 						}
 						//if just a small value remains set it to zero
 						if ( std::abs( endUseSubOther( iResource, jEndUse ) ) > 0.01 ) {
-							needOtherRow( jEndUse ) = true;
+							needOtherRowLEED45( jEndUse ) = true;
 						} else {
 							endUseSubOther( iResource, jEndUse ) = 0.0;
 						}
@@ -7885,7 +7886,7 @@ namespace OutputReportTabular {
 						++numRows;
 					}
 					// check if an 'other' row is needed
-					if ( needOtherRow( jEndUse ) ) {
+					if ( needOtherRowLEED45( jEndUse ) ) {
 						++numRows;
 					}
 				} else {
@@ -7912,7 +7913,7 @@ namespace OutputReportTabular {
 						++i;
 					}
 					// check if an 'other' row is needed
-					if ( needOtherRow( jEndUse ) ) {
+					if ( needOtherRowLEED45( jEndUse ) ) {
 						tableBody( 1, i ) = "Other";
 						++i;
 					}
@@ -7957,7 +7958,7 @@ namespace OutputReportTabular {
 							++i;
 						}
 						//put other
-						if ( needOtherRow( jEndUse ) ) {
+						if ( needOtherRowLEED45( jEndUse ) ) {
 							tableBody( iResource + 1, i ) = RealToStr( endUseSubOther( iResource, jEndUse ), 2 );
 							++i;
 						}
@@ -7998,7 +7999,7 @@ namespace OutputReportTabular {
 							++i;
 						}
 						//put other
-						if ( needOtherRow( jEndUse ) ) {
+						if ( needOtherRowLEED45( jEndUse ) ) {
 							PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- Other", unconvert * endUseSubOther( iResource, jEndUse ) );
 							++i;
 						}
@@ -8726,6 +8727,7 @@ namespace OutputReportTabular {
 		Array1D_int collapsedTimeStep( 6 );
 		Array3D< Real64 > collapsedEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
 		Array3D< Real64 > collapsedIndEndUseSub( MaxNumSubcategories, NumEndUses, 6 );
+		Array2D< Real64 > endUseSubOther( 6, NumEndUses );
 		int iResource;
 		int jEndUse;
 		int kEndUseSub;
@@ -9131,7 +9133,24 @@ namespace OutputReportTabular {
 			}
 
 			// EAp2-4/5. Performance Rating Method Compliance
-			// repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
+			for ( iResource = 1; iResource <= 6; ++iResource ) {
+				for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
+					if ( needOtherRowLEED45( jEndUse ) ) {
+						if ( EndUseCategory( jEndUse ).NumSubcategories == 0 ) {
+							endUseSubOther( iResource, jEndUse ) = collapsedIndEndUse( iResource, jEndUse ); // often the case that no subcategories are defined
+						} else {
+							Real64 sumOfSubcategories = 0.;
+							for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
+								sumOfSubcategories += collapsedIndEndUseSub( kEndUseSub, jEndUse, iResource );
+							}
+							endUseSubOther( iResource, jEndUse ) = collapsedIndEndUse( iResource, jEndUse ) - sumOfSubcategories;
+							if ( endUseSubOther( iResource, jEndUse ) < 0. ) {
+								endUseSubOther( iResource, jEndUse ) = 0.;
+							}
+						}
+					}
+				}
+			}
 
 			Array1D_int resource_entry_map;
 			resource_entry_map.allocate( 5 );
@@ -9147,6 +9166,11 @@ namespace OutputReportTabular {
 					if ( EndUseCategory( jEndUse ).NumSubcategories > 0 ) {
 						for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 							PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- " + EndUseCategory( jEndUse ).SubcategoryName( kEndUseSub ), collapsedIndEndUseSub( kEndUseSub, jEndUse, iResource ) );
+							++i;
+						}
+						//put other
+						if ( needOtherRowLEED45( jEndUse ) ) {
+							PreDefTableEntry( resource_entry_map( iResource ), EndUseCategory( jEndUse ).DisplayName + " -- Other", endUseSubOther( iResource, jEndUse ) );
 							++i;
 						}
 					} else {
