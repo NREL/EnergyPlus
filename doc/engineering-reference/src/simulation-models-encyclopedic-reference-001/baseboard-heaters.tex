@@ -1,24 +1,28 @@
 \section{Baseboard Heaters }\label{baseboard-heaters}
 
+There are five different baseboard models in EnergyPlus.  Two of these models are convection only while three of these models have both radiative and convective heat transfer to the zone.  The hot water and electric baseboard models with only convection provide a simple convective heat gain to the space via the baseboard unit.  The models for these convection only units are fairly simple and simply provide convective heating to the space in an attempt to meet whatever heating load is present.  The convection only models do not require iteration or resimulation of the surface heat balances because it is assumed that there is no radiation given off by the unit.
+
+The hot water, electric, and steam baseboard models with radiation and convection allow the user to account for some of the energy given off by the unit to be via radiation.  These models are both more realistic and more sophisticated.  They are more realistic because most baseboard units will give off some amount of radiation, even if in many cases that fraction is small.  They are more sophisticated because adding radiation to a space is more complicated than simply adding heat to the zone air heat balance directly via convection.  The addition of radiation energy involves distribution of that radiation and also the need to resimulate the surface heat balances to account for this new thermal energy incident on surfaces throughout the space.  This also then means that the baseboard heaters with radiation and convection will take longer to simulate since all Zone HVAC models that have a radiant component need to iterate through the surface heat balances more than once.  These iterations slow down the simulation but are necessary to correctly account for the changes to the radiation balance on the surfaces in the zone.
+
+This section provides some of the calculation details for the five different baseboard models.  More information on the input required for these models can be found in the Input/Output Reference for EnergyPlus.
+
 \subsection{Hot Water Baseboard Heater with Only Convection}\label{hot-water-baseboard-heater-with-only-convection}
-
-\subsubsection{Overview}\label{overview-006}
-
-The convective water baseboard heater (Ref. ZoneHVAC:Baseboard:Convective:Water) is a simple model for establishing a convective-only heat addition to a space through a baseboard heater.~ In most situations, the baseboard heater does give a significant amount of heat off via natural convection, but some heat is given off via radiation.~ In this model, the radiant component is ignored and all heat is assumed to be delivered to the space via convection.~ The baseboard heater is supplied with hot water from the primary system which is circulated through the inside of a finned tube within the space.~ Heat is transferred from the water inside the pipe, through the tube and fins, and eventually convected to the surrounding air within the space.~ EnergyPlus then assumes that this heat is evenly spread throughout the space thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.
-
-The model requests an effective UA value to handle the heat exchange between the water loop and the zone air.~ From there, it employs an effectiveness-NTU heat exchanger model to determine the heat transfer between the water and the zone air.~ This is necessary because during the simulation only the inlet water and ``inlet air'' (assumed to be zone air) is known.~ As a result, the effectiveness-NTU heat exchanger methodology is better suited to determine the performance of the system.
 
 \subsubsection{Model Description}\label{model-description-003}
 
+The convective water baseboard heater (Ref. ZoneHVAC:Baseboard:Convective:Water) is a simple model for establishing a convective-only heat addition to a space through a baseboard heater. In most situations, the baseboard heater does give a significant amount of heat off via natural convection, but some heat is given off via radiation. In this model, the radiant component is ignored and all heat is assumed to be delivered to the space via convection. The baseboard heater is supplied with hot water from the primary system which is circulated through the inside of a finned tube within the zone. Heat is transferred from the water inside the pipe, through the tube and fins, and eventually convected to the surrounding air within the zone. EnergyPlus then assumes that this heat is evenly spread throughout the zone thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the zone.
+
+In general, the hot water baseboard heater resides in the equipment list of two different half loops--the zone equipment loop (the air side of the baseboard unit) and the plant demand loop (the water side of the baseboard unit). The model utilizes an effective UA value to handle the heat exchange between the water loop and the zone air. From there, it employs an effectiveness-NTU heat exchanger model to determine the heat transfer between the water and the zone air. This is necessary because during the simulation only the inlet water and ``inlet air'' (assumed to be zone air) is known. As a result, the effectiveness-NTU heat exchanger methodology is better suited to determine the performance of the system than the Log Mean Temperature Difference (LMTD) approach to characterizing heat exchangers.
+
 \subsubsection{Convective Water Baseboard Heater Inputs}\label{convective-water-baseboard-heater-inputs}
 
-Like many other HVAC components, the convective-only water baseboard model requires a unique identifying name, an availability schedule, and water side inlet and outlet nodes.~ These define the availability of the unit for providing condition to the space and the node connections that relate to the primary system.~ In addition, a convergence tolerance is requested of the user to help define the ability of the local controls to tightly control the system output.~ In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.
+Like many other HVAC components, the convective-only water baseboard model requires a unique identifying name, an availability schedule, and water side inlet and outlet nodes. These define the availability of the unit for providing conditioning to the zone and the node connections that relate to the primary system or the plant demand side loop. In addition, the user specifies a convergence tolerance to help define the ability of the local controls to tightly control the system output. In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.
 
-The input also requires a UA value and a maximum design flow rate for the unit.~ Both of these parameters can be chosen to be auto-sized by EnergyPlus.~ The UA value corresponds to the convective heat transfer from the water to the tube, the conduction through the tube and fin material, and the natural convection from the tube/fins to the zone air.~ The maximum flow rate and UA value define the performance and maximum output of the baseboard unit.
+The input also requires a UA value and a maximum design flow rate for the unit. Both of these parameters can be auto-sized by EnergyPlus if the user so chooses. The UA value corresponds to the convective heat transfer from the water to the pipe, the conduction through the pipe and fin material, and the natural convection from the pipe/fins to the zone air. The maximum flow rate and UA value define the performance and maximum output of the baseboard unit.
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-000}
 
-The simulation of the convective water baseboard unit follows standard effectiveness-NTU methodology.~ It begins by calculating the product of the specific heat and mass flow rate for both the air and water sides of the unit (heat exchanger).~ In the initialization of the model, it is assumed that the air mass flow rate is equal to 2.0 times the water mass flow rate.~ The purpose of this calculation is to provide some reasonable estimate of the air mass flow rate so that the model can calculate system performance correctly.~ This calculation is kept constant throughout the rest of the simulation.
+The simulation of the convective water baseboard unit follows a standard effectiveness-NTU heat exchanger methodology. It begins by calculating the product of the specific heat and mass flow rate for both the air and water sides of the baseboard unit. In the initialization of the model, it is assumed that the air mass flow rate is equal to 2.0 times the water mass flow rate. The purpose of this calculation is to provide some reasonable estimate of the air mass flow rate so that the model can calculate system performance correctly.~ This calculation is kept constant throughout the rest of the simulation.
 
 Each system time step, the baseboard attempts to meet any remaining heating requirement of the zone through the following calculations:
 
@@ -46,7 +50,7 @@ Each system time step, the baseboard attempts to meet any remaining heating requ
 \varepsilon  = 1 - {e^{\left( {\frac{{NT{U^{0.22}}}}{{{C_{ratio}}}}{e^{\left( { - {C_{ratio}}NT{U^{0.78}}} \right)}} - 1} \right)}}
 \end{equation}
 
-Once the effectiveness is determined, the outlet conditions for and output from the unit are determined using the following equations:
+Once the effectiveness is determined, the outlet conditions for the baseboard unit are determined using the following equations:
 
 \begin{equation}
 {T_{air,outlet}} = {T_{air,inlet}} + \varepsilon {{\left( {{T_{water,inlet}} - {T_{air,inlet}}} \right){C_{\min }}} \mathord{\left/ {\vphantom {{\left( {{T_{water,inlet}} - {T_{air,inlet}}} \right){C_{\min }}} {{C_{air}}}}} \right. } {{C_{air}}}}
@@ -56,71 +60,65 @@ Once the effectiveness is determined, the outlet conditions for and output from 
 {T_{water,outlet}} = {T_{water,inlet}} - \left( {{T_{air,outlet}} - {T_{air,inlet}}} \right){{{C_{air}}} \mathord{\left/ {\vphantom {{{C_{air}}} {{C_{water}}}}} \right. } {{C_{water}}}}
 \end{equation}
 
+Now that the outlet conditions have been determined, the output of the baseboard unit (all convective) is calculated from:
+
 \begin{equation}
 Output\left( {Convective} \right) = {C_{water}}\left( {{T_{water,inlet}} - {T_{water,outlet}}} \right)
 \end{equation}
 
-If the unit was scheduled off or there is no water flow rate through the baseboard unit, then there will be no convection from the unit.~ The model assumes no heat storage in the baseboard unit itself and thus no residual heat transfer in future system time steps due to heat storage in the water or metal of the baseboard unit.
+If the unit was scheduled off or there is no water flow rate through the baseboard unit, then by definition there will be no heat transfer from the unit to the zone. The model assumes no heat storage in the baseboard unit itself and thus no residual heat transfer in future system time steps due to heat storage in the water or metal of the baseboard unit.
 
 \subsubsection{References}\label{references-006}
 
-The effectiveness-NTU method is taken from Incropera and DeWitt, Fundamentals of Heat and Mass Transfer, Chapter 11.4, p.~523, eq. 11.33.~ The user can always refer to the ASHRAE Handbook series for general information on different system types as needed.
+The effectiveness-NTU method is taken from Incropera and DeWitt, Fundamentals of Heat and Mass Transfer, Chapter 11.4, p.~523, eq. 11.33. However, the user can always refer to any heat transfer textbook for more information on heat exchanger methodology or the ASHRAE Handbook series for general information on different system types as needed.
 
 \subsection{Electric Baseboard Heater with Only Convection}\label{electric-baseboard-heater-with-only-convection}
 
-\subsubsection{Overview}\label{overview-1-002}
-
-The input object ZoneHVAC:Baseboard:Convective:Electric provides a model for electric baseboard heaters that assumes only convective heat addition to a space from a baseboard heater.~ In most situations, the baseboard heater does give a significant amount of heat off via natural convection, but some heat is given off via radiation.~ In this model, the radiant component is ignored and all heat is assumed to be delivered to the space via convection.~ The baseboard heater is transferred to the unit via electric resistance heating.~ EnergyPlus then assumes that this heat is evenly spread throughout the space thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.
-
 \subsubsection{Model Description}\label{model-description-1-002}
+
+The input object ZoneHVAC:Baseboard:Convective:Electric is used to define an electric baseboard heaters that assumes only convective heat addition to a zone from the unit. In most situations, the baseboard heater does give a significant amount of heat off via natural convection, but some heat is given off via radiation. In this model, the radiant component is ignored and all heat is assumed to be delivered to the space via convection. The baseboard heater provides heat to the zone via electric resistance heating and thus consumes electricity rather than be supplied with hot water. EnergyPlus then assumes that this heat is evenly spread throughout the zone thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.
 
 \subsubsection{Convective Electric Baseboard Heater Inputs}\label{convective-electric-baseboard-heater-inputs}
 
-Like many other HVAC components, the convective-only electric baseboard model requires a unique identifying name and an availability schedule.~ The availability schedule defines the availability of the unit for providing condition to the space.
-
-The input also requires a capacity and efficiency for the unit.~ While the efficiency is a required input that defaults to unity, the capacity can be chosen to be auto-sized by EnergyPlus.
+Like many other HVAC components, the convective-only electric baseboard model requires a unique identifying name and an availability schedule. The availability schedule defines when unit is available to provide heating to the zone. The input also requires a capacity and efficiency for the electric baseboard. While the efficiency is a required input that defaults to unity, the user can choose to have the capacity auto-sized by EnergyPlus.
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-1-000}
 
-When the unit is available and there is a heating load within a space, the electric baseboard unit will meet the entire remaining provided that it has enough capacity to do so.~ The energy consumption of the baseboard heat is calculated using the user-supplied efficiency and the current load on the baseboard unit as follows:
+When the unit is available and there is a heating load within a space, the electric baseboard unit will meet the entire remaining provided that it has enough capacity to do so. The energy consumption of the baseboard heat is calculated using the user-supplied efficiency and the current load on the baseboard unit as follows:
 
 \begin{equation}
 Energ{y_{electric}} = {{Heatin{g_{baseboard}}} \mathord{\left/ {\vphantom {{Heatin{g_{baseboard}}} {Efficiency}}} \right. } {Efficiency}}
 \end{equation}
 
-If the unit was scheduled off or there is no heating load for the zone, then there will be no convection from the unit.~ The model assumes no heat storage in the baseboard unit itself and thus no residual heat transfer in future system time steps due to heat storage in the metal of the baseboard unit.
+If the unit was scheduled off or there is no heating load for the zone, then there will be no convective heat transfer to the zone from the baseboard unit. The model assumes no heat storage in the baseboard system itself and thus no residual heat transfer in future system time steps due to heat storage in the metal of the baseboard unit.
 
 \subsubsection{References}\label{references-1-002}
 
-No specific reference.~ Refer to the ASHRAE Handbook series for general information on different system types as needed.
+While there are no specific references for this model as it is fairly intuitive, the user can always refer to the ASHRAE Handbook series for general information on different system types as needed.
 
 \subsection{Hot Water Baseboard Heater with Radiation and Convection}\label{hot-water-baseboard-heater-with-radiation-and-convection}
 
-\subsubsection{Overview}\label{overview-2-002}
-
-The water baseboard heater model is intended to calculate the mass flow rate of the water by determining the actual system impact not only to the surrounding air via convection but also to the surfaces and people via radiation. The actual system impact by the heater in the zone is the sum of the additional convective heat transfer from the surfaces to the zone air after they have been heated as well as radiant heat transferred to people and the convective heat transfer to the zone. This actual convective power tries to meet any remaining heating requirement in the zone. The model thus improves the accuracy of thermal comfort predictions and system responses.
-
-The radiant components are calculated to interact with the surfaces in the zone through the radiant distribution fractions. Heat is also delivered to the space via convection. The baseboard heater is supplied with hot water from the primary system which is circulated through the inside of a finned tube within the space. This could also be used to model a hot water radiator (convector in the UK). Heat is transferred from the water inside the pipe, through the tube and fins. It is also not only convected to the surrounding air but also radiated to the surfaces within the space. The user is allowed to specify the percentage of radiant heat from the heater to the surfaces. In addition, the user is allowed the ability to define what fraction of radiation leaving the heater is incident directly on a person within the zone for thermal comfort purposes. This amount of heat is then used in the thermal comfort models as the high temperature radiant heater model.
-
-This model calculates the UA values using the log mean temperature difference (LMTD) method. The calculation is based on standard conditions of both fluids obtained in a rating document or manufacturer's literature. Overall energy balances to the hot water and air handle the heat exchange between the water loop and the zone air. Once the UA for the baseboard heater has been determined, the model employs an effectiveness-NTU heat exchanger method to determine the heat transfer between the water and zone air. This is necessary because during the simulation only the inlet water and ``inlet air'' (assumed to be zone air) temperatures are known. As a result, the effectiveness-NTU heat exchanger methodology is suited to determine the performance of the system during the simulation.
-
 \subsubsection{Model Description}\label{model-description-2-002}
+
+The input object ZoneHVAC:Baseboard:RadiantConvective:Water is used to model a hot water baseboard unit that transfers heat to the zone air via convection and to the surfaces and people via radiation. The actual system impact of the baseboard heater on the zone is the sum of the convective heat transfer to the zone air, the additional convective heat transfer from the surfaces to the zone air after they have been heated, and the radiant heat transferred to people which is assumed to be added to the zone air heat balance by convection from people to the zone air. This actual convective power is used to directly meet any remaining heating requirement in the zone based on the thermostatic controls. The model thus improves the accuracy of thermal comfort predictions by allowing the impact of radiation from the baseboard unit to people in the zone to be taken into account while better accounting for the actual effect of the radiation from the baseboard unit to surfaces.
+
+The baseboard heater is supplied with hot water from the primary system which is circulated through the inside of a finned tube within the space. This could also be used to model a hot water radiator (convector in the UK). Heat is transferred from the water inside the pipe, through the tube and fins. It is also not only convected to the surrounding air but also radiated to the surfaces and people within the zone. The user is allowed to specify the percentage of radiant heat from the heater to the surfaces as well as how that radiation is distributed to individual surfaces through the use of radiant distribution fractions. In addition, the user has the option to define what fraction of radiation leaving the heater is incident directly on a person within the zone for thermal comfort purposes. This amount of heat is then used in the thermal comfort models in the same way that radiation from a high temperature radiant heater is utilized.
+
+This model calculates a UA value using the log mean temperature difference (LMTD) method for heat exchangers. The calculation is based on standard conditions of both fluids inputted by the user who obtains the information in a rating document or manufacturer's literature. Overall energy balances to the hot water and air account for the heat exchange between the water loop and the zone air. Once the UA for the baseboard heater has been determined, the model employs an effectiveness-NTU heat exchanger method during simulation to determine the heat transfer between the water and zone air. This is necessary because during the simulation only the inlet water and ``inlet air'' (assumed to be zone air) temperatures are known. As a result, the effectiveness-NTU heat exchanger methodology is better suited to determine the performance of the system during the simulation than the Log Mean Temperature Difference (LMTD) approach to characterizing heat exchangers.
 
 \subsubsection{Water Baseboard Heater Inputs}\label{water-baseboard-heater-inputs}
 
-Like many other HVAC components, the water baseboard model requires a unique identifying name, an available schedule, and water inlet and outlet nodes. These define the availability of the unit for providing conditions to the space and the node connections that relate to the primary system. For the calculation of the UA value of the unit, standard conditions of both fluids are necessary. The user can specifies such standard conditions from manufacturers' information such as I = B = R rating document. The user provides the rated capacity, average water temperature, water mass flow rate, and standard inlet air temperature. However, the model also has the ability to autosize the rated capacity, which allows the user simulate and design any baseboard units when manufacturer's data is unavailable.
+Like many other HVAC components, the water baseboard model requires a unique identifying name, an availability schedule, and water inlet and outlet nodes. These define the availability of the unit for providing heating to the zone and the node connections that relate to the primary system. For the calculation of the UA value of the unit, standard conditions of both fluids are necessary. The user specifies such standard conditions based on information obtained from manufacturers directly or other documents such as the I = B = R rating guide. The information required includes the rated capacity, average water temperature, water mass flow rate, and standard inlet air temperature. However, the model also has the ability to autosize the rated capacity, which allows the user simulate a generic baseboard unit when manufacturer's data is unavailable.
 
-The UA value corresponds to the convective heat transfer from the water to the tube, the conduction through the tube and fin material, the natural convection from the tube/fins to the zone air, and radiation to the surfaces. In addition, a convergence tolerance is requested of the user to help define the ability of the local controls to tightly control the system output. In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.
+The UA value characterizes the total heat transfer to the zone from the unit including the convective heat transfer from the water to the tube, the conduction through the tube and fin material, the natural convection from the tube/fins to the zone air, and radiation to the zone surfaces. In addition, a convergence tolerance is requested of the user to help define the ability of the local controls to manage the system output. In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.
 
-Many of the inputs for the radiant heat calculation are the same as the high temperature radiant heater model. User inputs of the fraction radiant and of the fraction of radiant energy incident both on people and on surfaces are required to calculate radiant energy distribution from the heater to the people and surfaces. The sum of radiant energy of these distribution fractions must sum to unity, and each water baseboard heater is allowed to distribute energy to up to 20 surfaces.
+Many of the inputs for the radiant heat transfer portion of the hot water baseboard model are the same as for the high temperature radiant heater model. The user inputs the fraction radiant and the fraction of radiant energy incident both on people and on surfaces as this information is required to calculate the radiant energy distribution from the heater to people and surfaces in the zone. The sum of these radiant distribution fractions (surfaces and people) must sum to unity, and each water baseboard heater is allowed to distribute radiant energy to up to 20 surfaces.
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-2-000}
 
-The simulation of the main algorithm of this water baseboard model with radiation and convection is similar to the convection-only baseboard model. However, this model determines the UA value of the unit based on rated heating capacities available in the manufacturer's literature. Almost all baseboards or radiators are rated under standard conditions such as water flow rate, inlet air temperature and average water temperature. Those standard conditions should thus be obtained from manufacturers' information. The model then determines the UA value of the unit, employing the log mean temperature difference (LMTD) method so that the heating output from the heater can be determined more correctly than other models.
+One difference between the model for this baseboard unit and the convection-only baseboard model is that this model determines the UA value of the unit based on rated heating capacities available in manufacturers' literature. Almost all baseboards or radiators are rated under standard conditions such as the water flow rate, the inlet air temperature, and the average water temperature and thus this information can be obtained from manufacturers. Based on this user supplied information, the model determines the UA value of the unit, employing the log mean temperature difference (LMTD) heat exchanger methodology.  During the simulation, this UA value is then used to determine the heating output from the baseboard heater. So, EnergyPlus calculates the UA value once from standard conditions of the air and water provided by the user during initialization and uses this constant UA value throughout the simulation for this baseboard unit.
 
-This model initializes all the conditions at the inlet node such as mass flow rates, temperatures, and specific heat capacities. It calculates the UA value once from standard conditions of the air and water during initialization and it is kept throughout the simulation of the unit.
-
-In case that the user has manufacturer's information regarding the rated capacity, the rated water flow rate, and the rated average water temperature, standard conditions such as the rated heating capacity, \emph{q\(_{std}\)}, average water temperature, \({T_{w,avg}}\) , and water mass flow rate, \(\dot m{}_w\) , are known from the user inputs. The standard water inlet temperature, \({T_{w,in}}\) , and outlet temperature, \({T_{w,out}}\) , are thus obtained from expressions
+Base on manufacturer's information for the rated capacity, the rated water flow rate, and the rated average water temperature, standard conditions such as the rated heating capacity (\({q_{std}}\)), the average water temperature (\({T_{w,avg}}\)), and the water mass flow rate (\(\dot m{}_w\)) can be determined based on these user-supplied inputs. The standard water inlet temperature (\({T_{w,in}}\)) and outlet temperature (\({T_{w,out}}\)) are obtained from the following expressions:
 
 \begin{equation}
 {T_{w,in}} = \frac{{{q_{std}}}}{{2\dot m{}_w{c_{p,w}}}} + {T_{w,avg}}
@@ -130,19 +128,23 @@ In case that the user has manufacturer's information regarding the rated capacit
 {T_{w,out}} = 2{T_{w,avg}} - {T_{w,in}}
 \end{equation}
 
-where \({c_{p,w}}\) ~is the specific heat capacity of the water.
+where \({c_{p,w}}\) is the specific heat capacity the water (calculated based on the average water temperature).
 
 The model then assumes the air mass flow rate is given by the following expression:
 
-$\dot{m}_{a,std} = 0.0062 + .0000275 \dot{Q}_{design}$
+\begin{equation}
+\dot{m}_{a,std} = 0.0062 + .0000275 \dot{Q}_{design}
+\end{equation}
 
-Since the inlet air temperature, \{T\_\{a,in\}\} , of 18°C and the heating capacity of the unit, i.e.~rated capacity, are known, the outlet air temperature, \{T\_\{a,out\}\} , can be obtained from expression
+Since the inlet air temperature (\({T_{a,in}}\)) is assumed to be 18°C and the heating capacity of the unit, i.e. the rated capacity, are known, the outlet air temperature (\({T_{a,out}}\)) can be obtained from the following expression:
 
-$T_{a,out} = \frac{q_{std}}{\dot{m}_{a,std}c_{p,a}} + T_{a,in}$
+\begin{equation}
+T_{a,out} = \frac{q_{std}}{\dot{m}_{a,std}c_{p,a}} + T_{a,in}
+\end{equation}
 
-where \({c_{p,a}}\) ~is the specific heat capacity of the air.
+where \({c_{p,a}}\) is the specific heat capacity of the air at standard conditions.
 
-All temperatures at each node are now known. The mean temperature difference, \(\Delta {T_{lm}}\) , is thus obtained from the following expressions:
+At this point, all four temperatures (air inlet, air outlet, water inlet, and water outlet) are known, and the mean temperature difference (\(\Delta {T_{lm}}\)) can be obtained from the following expressions:
 
 \begin{equation}
 \Delta {T_1} = {T_{w,in}} - {T_{a,out}}
@@ -156,15 +158,15 @@ All temperatures at each node are now known. The mean temperature difference, \(
 \Delta {T_{lm}} = \frac{{\Delta {T_1} - \Delta {T_2}}}{{\log \left( {\frac{{\Delta {T_1}}}{{\Delta {T_2}}}} \right)}}
 \end{equation}
 
-The UA value of the unit is thus
+The UA value of the baseboard unit is thus:
 
 \begin{equation}
 UA = \frac{{{q_{std}}}}{{\Delta {T_{lm}}}}
 \end{equation}
 
-The model allows the user requests to autosize the rated capacity when the user does not know a particular baseboard unit. It also has the ability to perform parametric study to design the unit based on the design heating load in the zone. The user is also able to modify both rated average water temperature and rated water mass flow rate when manufactures' information is available while the model assumes the default values for both fields if unavailable.
+The user is able to specify both rated average water temperature and rated water mass flow rate when manufacturer's data is available. However, if this information is not available, EnergyPlus will use default values for both of these fields.
 
-In case that the user requests autosizing the rated capacity, the model employs the design heating load and design water mass flow rate in the zone, so that the standard water inlet and outlet temperatures are estimated as
+If desired, EnergyPlus will autosize the rated capacity of the baseboard unit when the user does not know this value. In this case, the model employs the design heating load and design water mass flow rate in the zone, so that the standard water inlet and outlet temperatures are estimated as:
 
 \begin{equation}
 {T_{w,in}} = \frac{{{q_{design}}}}{{2\dot m{}_{w,design}{c_{p,w}}}} + {T_{w,avg}}
@@ -174,7 +176,7 @@ In case that the user requests autosizing the rated capacity, the model employs 
 {T_{w,out}} = 2{T_{w,avg}} - {T_{w,in}}
 \end{equation}
 
-where \({q_{design}}\) ~is the design heating load estimated by EnergyPlus in the zone.
+where \({q_{design}}\) is the design zone heating load estimated by EnergyPlus.
 
 Similarly, the model estimates the air outlet temperature using the air mass flow rate calculated above:
 
@@ -182,27 +184,41 @@ Similarly, the model estimates the air outlet temperature using the air mass flo
 {T_{a,out}} = \frac{{{q_{design}}}}{{\dot m_{a,std} {c_{p,a}}}} + {T_{a,in}}
 \end{equation}
 
-Temperatures at the nodes are now known and the UA value is determined in the same fashion as the previous case.
+Temperatures at all four locations (air inlet, air outlet, water inlet, and water outlet) are now known and the UA value is determined in the same way as shown above.
 
-Once the UA value is determined, the model employs an effectiveness-NTU heat exchanger method to determine the heat transfer between the water and the zone air as convection-only model does (see ``Hot Water Baseboard Heater with Only Convection'' model). During this calculation the air mass flow rate is proportioned to the water mass flow rate:
+Once the UA value is determined, the model employs an effectiveness-NTU heat exchanger method to determine the total overall heat transfer between the water and the zone air in the same way that the convection-only model does (see ``Hot Water Baseboard Heater with Only Convection'' model). For this calculation, the actual air mass flow rate is calculated from the design air mass flow rate and a ratio of the actual water mass flow rate to the maximum water mass flow rate:
 
-$\dot{m}_a = \dot{m}_{a,std} \frac{\dot{m}_w}{\dot{m}_{w,max}}$
+\begin{equation}
+\dot{m}_a = \dot{m}_{a,std} \frac{\dot{m}_w}{\dot{m}_{w,max}}
+\end{equation}
 
-The model then determines the radiant heat addition by
+The model then determines the radiant heat addition by:
 
-$q_{rad} = q \cdot Frac_{rad}$
+\begin{equation}
+q_{rad} = q \cdot Frac_{rad}
+\end{equation}
 
-where \emph{q} is the total heating capacity of the heater and \emph{Frac\(_{rad}\)} is the user-defined fraction.
+where \emph{q\(_{rad}\)} is the total radiant heat transfer from the baseboard unit, \emph{q} is the lesser of the heating capacity of the unit and the zone heating load, and \emph{Frac\(_{rad}\)} is the user-defined radiant fraction for the baseboard unit. The radiant heat additions to people and surfaces are thus:
 
-The model now distributes the radiant heat additions to the appropriate surfaces, people for thermal comfort purpose, and the air in the zone. The surface heat balances are then recalculated to determine all heat sources or sinks for radiant systems in the zone. It is assumed that the radiant heat incident on people in the zone is converted to convection to the zone so that the zone heat balance includes this amount of heat which will be lost (see High Temperature Radiant Heater Model). The load met, the actual convective system impact, for the baseboard heater, \emph{q\(_{req}\)}, is therefore determined as
+\begin{equation}
+{q_{people}} = {q_{rad}} \cdot Fra{c_{people}}
+\end{equation}
+
+\begin{equation}
+{q_{surface,i}} = {{q_{rad}} \cdot Fra{c_{surface,i}}}
+\end{equation}
+
+where \emph{q\(_{people}\)} is the radiant heat transfer to people, \emph{q\(_{surface,i}\)} is the heat radiated to surface i, \emph{Frac\(_{people}\)} is the fraction of the heat radiated to people, and \emph{Frac\(_{surface,i}\)} is the fraction of the heat radiated to surface i.
+
+Based on these above equations, the model then distributes the radiant heat additions to the appropriate surfaces and people in the zone and the convective heat addition to air in the zone. The surface heat balances are then recalculated to account for the radiant heat added to the zone surfaces by the baseboard unit. It is assumed that the radiant heat incident on people in the zone is taken into account in the thermal comfort models and then is converted to convection to the zone so that the zone heat balance includes this amount of heat which would otherwise be lost (see the High Temperature Radiant Heater Model for more information about how radiant energy added by these types of systems affect thermal comfort). The load met, the actual convective system impact for the baseboard heater, \emph{q\(_{req}\)}, is calculated using the following equation:
 
 \begin{equation}
 {q_{req}} = ({q_{surf,c}} - {q_{surf,z}}) + {q_{conv}} + {q_{people}}
 \end{equation}
 
-where \emph{q\(_{surf,c}\)} ~is convection from the surfaces to the air in the zone with radiant systems; \emph{q\(_{surf,z}\)} is zero source convection from the surfaces when radiant systems are unavailable; \emph{q\(_{conv}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{people}\)} is radiant heat to the people.
+where \emph{q\(_{surf,c}\)} is the convection from the surfaces to the air in the zone once the radiation from the baseboard unit is taken into account; \emph{q\(_{surf,z}\)} is the convection from the surfaces to the air in the zone when the radiation from the baseboard unit was zero; \emph{q\(_{conv}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{people}\)} is radiant heat to the people.
 
-The radiant heat simulation in the water baseboard heater is very similar to the high temperature radiant system model. The controls are the same as shown in Figure~\ref{fig:variable-flow-low-temperature-radiant-system}.~ Variable Flow Low Temperature Radiant System Controls.~ After all system time steps have been simulated, an ``average'' zone heat balance calculation is done (similar to the radiant systems). If the unit was scheduled off or there is no water flow rate through the baseboard unit, then, there will be no heat transfer from the unit. The model assumes no heat storage in the unit itself and thus no residual heat transfer in future system time steps due to heat storage in the water or metal of the unit.
+The accounting of the radiant heat added to the zone (surfaces) by the water baseboard heater is very similar to the method used in the high temperature radiant system model. After all the system time steps have been simulated for the zone time step, an ``average'' zone heat balance calculation is done (similar to the radiant systems). If the unit was scheduled off or there is no water flow rate through the baseboard unit, then, there will be no heat transfer from the unit. The model assumes no heat storage in the unit itself and thus no residual heat transfer in future system time steps due to heat storage in the water or metal of the unit.
 
 \subsubsection{References}\label{references-2-001}
 
