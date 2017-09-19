@@ -232,6 +232,7 @@ namespace HVACControllers {
 		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		bool BypassControllerCalc; // set true for OA sys water coils
 
 		// Default Constructor
 		ControllerPropsType() :
@@ -275,7 +276,8 @@ namespace HVACControllers {
 			BadActionErrIndex( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+			BypassControllerCalc( false)
 		{}
 
 	};
@@ -343,10 +345,10 @@ namespace HVACControllers {
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
 		int const AirLoopNum, // unused1208
-		int const AirLoopPass,
 		int const Operation,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
+		bool & BypassOAController,
 		Optional_bool AllowWarmRestartFlag = _
 	);
 
@@ -421,12 +423,6 @@ namespace HVACControllers {
 		int const ControlNum,
 		bool const FirstHVACIteration,
 		bool const IsConvergedFlag
-	);
-
-	void
-	LimitController(
-		int & ControlNum, // unused1208
-		bool & IsConvergedFlag // unused1208
 	);
 
 	// End Algorithm Section of the Module
@@ -547,6 +543,14 @@ namespace HVACControllers {
 	CheckCoilWaterInletNode(
 		int const WaterInletNodeNum, // input actuator node number
 		bool & NodeNotFound // true if matching actuator node not found
+	);
+
+	void
+	GetControllerNameAndIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		std::string & ControllerName, // controller name used by water coil
+		int & ControllerIndex, // controller index used by water coil
+		bool & ErrorsFound // true if matching actuator node not found
 	);
 
 	void

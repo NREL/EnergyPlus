@@ -2312,6 +2312,7 @@ namespace SimAirServingZones {
 			for ( AirLoopPass = 1; AirLoopPass <= 2; ++AirLoopPass ) {
 
 				SysReSim = false;
+				AirLoopControlInfo( AirLoopNum ).AirLoopPass = AirLoopPass; // save for use without passing as argument
 
 				// Simulate controllers on air loop with current air mass flow rates
 				SimAirLoop( FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls );
@@ -2445,7 +2446,7 @@ namespace SimAirServingZones {
 
 		if ( ! DoWarmRestartFlag ) {
 			// Solve controllers with cold start using default initial values
-			SolveAirLoopControllers( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
+			SolveAirLoopControllers( FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
 
 			// Update air loop trackers
 			WarmRestartStatus = iControllerWarmRestartNone;
@@ -2454,7 +2455,7 @@ namespace SimAirServingZones {
 			AirLoopIterTot += IterTot;
 		} else {
 			// First try with speculative warm restart using previous solution
-			ReSolveAirLoopControllers( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
+			ReSolveAirLoopControllers( FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
 
 			// Update air loop trackers
 			WarmRestartStatus = iControllerWarmRestartSuccess;
@@ -2464,7 +2465,7 @@ namespace SimAirServingZones {
 
 			// Retry with cold start using default initial values if speculative warm restart did not work
 			if ( ! AirLoopConvergedFlag ) {
-				SolveAirLoopControllers( FirstHVACIteration, AirLoopPass, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
+				SolveAirLoopControllers( FirstHVACIteration, AirLoopNum, AirLoopConvergedFlag, IterMax, IterTot, NumCalls );
 
 				// Update air loop trackers
 				WarmRestartStatus = iControllerWarmRestartFail;
@@ -2502,7 +2503,6 @@ namespace SimAirServingZones {
 	void
 	SolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,
@@ -2573,6 +2573,8 @@ namespace SimAirServingZones {
 		static std::string ErrEnvironmentName;
 		// A character string equivalent of ErrCount
 		std::string CharErrOut;
+		static bool BypassOAController; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
+
 
 		// FLOW:
 
@@ -2584,6 +2586,7 @@ namespace SimAirServingZones {
 		IterTot = 0;
 
 		AirLoopConvergedFlag = true;
+		BypassOAController = true; // don't simulate OA contollers at this time (see SolveWaterCoilController)
 		IsUpToDateFlag = false;
 		PrimaryAirSystem( AirLoopNum ).ControlConverged = false;
 
@@ -2600,7 +2603,9 @@ namespace SimAirServingZones {
 		// E.g., actuator inlet water flow
 		for ( AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
 
-			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, AirLoopPass, iControllerOpColdStart, ControllerConvergedFlag, IsUpToDateFlag, AllowWarmRestartFlag );
+			// BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA system
+			// ControllerConvergedFlag is returned true here for water coils in OA system
+			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, iControllerOpColdStart, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController, AllowWarmRestartFlag );
 
 			// Detect whether the speculative warm restart feature is supported by each controller
 			// on this air loop.
@@ -2628,7 +2633,7 @@ namespace SimAirServingZones {
 
 				++Iter;
 
-				ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, AirLoopPass, iControllerOpIterate, ControllerConvergedFlag, IsUpToDateFlag );
+				ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, iControllerOpIterate, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
 
 				PrimaryAirSystem( AirLoopNum ).ControlConverged( AirLoopControlNum ) = ControllerConvergedFlag;
 
@@ -2663,7 +2668,13 @@ namespace SimAirServingZones {
 
 					// Re-evaluate air loop components with new actuated variables
 					++NumCalls;
+					// this call to SimAirLoopComponents will simulate the OA system and set the PrimaryAirSystem( AirLoopNum ).ControlConverged( AirLoopControlNum ) flag for controllers of water coils in the OA system
+					// for controllers not in the OA system, this flag is set above in this function
 					SimAirLoopComponents( AirLoopNum, FirstHVACIteration );
+					// pass convergence flag from OA system water coils (i.e., SolveWaterCoilController) back to this loop
+					// for future reference, the PrimaryAirSystem().ControlConverged flag is set while managing OA system water coils.
+					// If convergence is not achieved with OA system water coils, suspect how this flag is passed back here or why OA system coils do not converge
+					ControllerConvergedFlag = PrimaryAirSystem( AirLoopNum ).ControlConverged( AirLoopControlNum );
 					IsUpToDateFlag = true;
 
 				}
@@ -2691,7 +2702,7 @@ namespace SimAirServingZones {
 
 			ControllerConvergedFlag = false;
 
-			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, AirLoopPass, iControllerOpEnd, ControllerConvergedFlag, IsUpToDateFlag );
+			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, iControllerOpEnd, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
 
 			PrimaryAirSystem( AirLoopNum ).ControlConverged( AirLoopControlNum ) = ControllerConvergedFlag;
 
@@ -2702,9 +2713,176 @@ namespace SimAirServingZones {
 	}
 
 	void
+	SolveWaterCoilController(
+		bool const FirstHVACIteration,
+		int const AirLoopNum,
+		std::string const & CompName,
+		int & CompIndex,
+		std::string const & ControllerName,
+		int ControllerIndex,
+		bool const HXAssistedWaterCoil
+	)
+	{
+
+		// SUBROUTINE INFORMATION
+		//       AUTHOR:  Richard Raustad (FSEC)
+		//       DATE WRITTEN:  July 2017
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine solves for the controllers in the specfied air loop OA system.
+
+		// METHODOLOGY EMPLOYED:
+		// For the specified primary air system:
+		// (1) the specific component in the OA system is simulated
+		// (2) The controllers and their actions are simulated
+		// (3) Steps 2 and 3 are repeated until the control criteria are satisfied
+		// (4) convergence is passed back to SolveAirLoopControllers via PrimaryAirSystem( AirLoopNum ).ControlConverged( ControllerIndex )
+
+		// REFERENCES: None
+
+		// Using/Aliasing
+		using namespace DataHVACControllers;
+		using HVACControllers::ManageControllers;
+		using General::CreateSysTimeIntervalString;
+		using WaterCoils::SimulateWaterCoilComponents;
+		using DataAirLoop::AirLoopControlInfo;
+		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// TRUE if first full HVAC iteration in an HVAC timestep
+		// DO loop index; there are 2 passes the 2nd is done only if mass balance fails
+		// Index of the air loop being simulated
+		// TRUE when primary air system & controllers simulation has converged;
+		// Max number of iterations performed by controllers across this air loop
+		// Aggregated number of iterations across all controllers on this air loop
+		// Total number of times SimAirLoopComponents() has been invoked
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// Maximum iterations of an air system/controllers simulation sequence
+		int const MaxIter( 50 );
+		static gio::Fmt fmtLD( "*" );
+
+		// SUBROUTINE LOCAL VARIABLE DEFINITIONS
+		// TRUE if controller supports speculative warm restart
+		bool AllowWarmRestartFlag;
+		// TRUE when controller has converged
+		bool ControllerConvergedFlag;
+		// TRUE when air loop has been evaluated with latest actuated variables
+		bool IsUpToDateFlag;
+		// Iteration counter
+		static int Iter( 0 );
+		// Number of times that the maximum iterations was exceeded
+		static int ErrCount( 0 );
+		// Number of times that the maximum iterations was exceeded
+		static int MaxErrCount( 0 );
+		// Placeholder for environment name used in error reporting
+		static std::string ErrEnvironmentName;
+		// A character string equivalent of ErrCount
+		std::string CharErrOut;
+		int static AirLoopPass;
+		static bool BypassOAController;
+
+		// FLOW:
+
+		BypassOAController = false; // simulate OA water coil controllers
+		AirLoopPass = AirLoopControlInfo( AirLoopNum ).AirLoopPass;
+		IsUpToDateFlag = false;
+		PrimaryAirSystem( AirLoopNum ).ControlConverged = false;
+
+		AllowWarmRestartFlag = true;
+		AirLoopControlInfo( AirLoopNum ).AllowWarmRestartFlag = true;
+
+		// This call to ManageControllers reinitializes the controllers actuated variables to zero
+
+		// BypassOAController is false here since we want to simulate the controller
+		ManageControllers( ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpColdStart, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController, AllowWarmRestartFlag );
+
+		// Detect whether the speculative warm restart feature is supported by each controller on this air loop.
+		AirLoopControlInfo( AirLoopNum ).AllowWarmRestartFlag = AirLoopControlInfo( AirLoopNum ).AllowWarmRestartFlag && AllowWarmRestartFlag;
+
+		// Evaluate water coils with new actuated variables
+		if ( HXAssistedWaterCoil ) {
+			SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil );
+		} else {
+			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+		}
+		IsUpToDateFlag = true;
+
+		// Loop over the air sys controllers until convergence or MaxIter iterations
+		Iter = 0;
+		ControllerConvergedFlag = false;
+		// if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
+		if ( AirLoopControlInfo( AirLoopNum ).EconoActive && PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( ControllerIndex ) ) {
+			ControllerConvergedFlag = true;
+		}
+
+		// For this controller, iterate until convergence
+		while ( !ControllerConvergedFlag ) {
+
+			++Iter;
+
+			ManageControllers( ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpIterate, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
+
+			PrimaryAirSystem( AirLoopNum ).ControlConverged( ControllerIndex ) = ControllerConvergedFlag;
+
+			if ( !ControllerConvergedFlag ) {
+				// Only check abnormal termination if not yet converged
+				// The iteration counter has been exceeded.
+				if ( Iter > MaxIter ) {
+
+					// The warning message will be suppressed during the warm up days.
+					if ( !WarmupFlag ) {
+						++ErrCount;
+						if ( ErrCount < 15 ) {
+							ErrEnvironmentName = EnvironmentName;
+							gio::write( CharErrOut, fmtLD ) << MaxIter;
+							strip( CharErrOut );
+							ShowWarningError( "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " + PrimaryAirSystem( AirLoopNum ).Name + ":" + ControllerName + ", at " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString() );
+						} else {
+							if ( EnvironmentName != ErrEnvironmentName ) {
+								MaxErrCount = 0;
+								ErrEnvironmentName = EnvironmentName;
+							}
+							ShowRecurringWarningErrorAtEnd( "SolveAirLoopControllers: Exceeding Maximum iterations for " + PrimaryAirSystem( AirLoopNum ).Name + " during " + EnvironmentName + " continues", MaxErrCount );
+						}
+					}
+
+					// It is necessary to execute this statement anytime, even if the warning message is suppressed.
+					// To continue the simulation it must be able to goto the Exit statement
+					break; // It will not converge this time
+				}
+
+				// Re-evaluate air loop components with new actuated variables
+				if ( HXAssistedWaterCoil ) {
+					SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil );
+				} else {
+					SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				}
+				IsUpToDateFlag = true;
+
+			}
+
+		} // End of the Convergence Iteration
+
+		IsUpToDateFlag = true;
+
+		// Check that this controller is still converged
+
+		ControllerConvergedFlag = false;
+
+		ManageControllers( ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpEnd, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
+
+		// pass convergence of OA system water coils back to SolveAirLoopControllers via PrimaryAirSystem().ControlConverged flag
+		PrimaryAirSystem( AirLoopNum ).ControlConverged( ControllerIndex ) = ControllerConvergedFlag;
+
+		AirLoopControlInfo( AirLoopNum ).ConvergedFlag = AirLoopControlInfo( AirLoopNum ).ConvergedFlag && ControllerConvergedFlag;
+
+	}
+
+	void
 	ReSolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,
@@ -2761,6 +2939,7 @@ namespace SimAirServingZones {
 		// TRUE when air loop needs to be refreshed.
 		// Note that it is not used by ManageControllers() in the WARM_RESTART mode.
 		bool IsUpToDateFlag;
+		static bool BypassOAController; // logical to bypass HVAC controller calcs 
 
 		// FLOW:
 
@@ -2772,6 +2951,7 @@ namespace SimAirServingZones {
 		IterTot = 0;
 
 		AirLoopConvergedFlag = true;
+		BypassOAController = false; // not exactly sure of this but it seems all controllers need to be simulated -- don't bypass
 		IsUpToDateFlag = false;
 		PrimaryAirSystem( AirLoopNum ).ControlConverged = false;
 
@@ -2779,7 +2959,8 @@ namespace SimAirServingZones {
 		// E.g., actuator inlet water flow
 		for ( AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
 
-			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, AirLoopPass, iControllerOpWarmRestart, ControllerConvergedFlag, IsUpToDateFlag );
+			// BypassOAController is false here since we want to simulate the controller during ReSolveAirLoopControllers calls ?
+			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, iControllerOpWarmRestart, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
 
 		}
 
@@ -2794,7 +2975,7 @@ namespace SimAirServingZones {
 
 			ControllerConvergedFlag = false;
 
-			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, AirLoopPass, iControllerOpEnd, ControllerConvergedFlag, IsUpToDateFlag );
+			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, iControllerOpEnd, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
 
 			PrimaryAirSystem( AirLoopNum ).ControlConverged( AirLoopControlNum ) = ControllerConvergedFlag;
 
