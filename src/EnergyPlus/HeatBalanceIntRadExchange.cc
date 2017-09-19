@@ -330,7 +330,7 @@ namespace HeatBalanceIntRadExchange {
 				auto const & surface_window( SurfaceWindow( SendSurfNum ) );
 				ConstrNumSend = Surface( SendSurfNum ).Construction;
 				auto const & construct( Construct( ConstrNumSend ) );
-				if ( construct.WindowTypeEQL ) {
+				if ( construct.WindowTypeEQL || construct.WindowTypeBSDF ) {
 					SendSurfTemp = surface_window.EffInsSurfTemp;
 				} else if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser ) {
 					if ( SurfIterations == 0 && surface_window.ShadingFlag <= 0 ) {
@@ -361,6 +361,9 @@ namespace HeatBalanceIntRadExchange {
 				if ( construct.WindowTypeEQL ) {
 					RecSurfEmiss = EQLWindowInsideEffectiveEmiss( ConstrNumRec );
 					RecSurfTemp = surface_window.EffInsSurfTemp;
+				} else if ( construct.WindowTypeBSDF && surface_window.ShadingFlag == IntShadeOn ) {
+					RecSurfTemp = surface_window.EffInsSurfTemp;
+					RecSurfEmiss = surface_window.EffShBlindEmiss[ 0 ] + surface_window.EffGlassEmiss[ 0 ];
 				} else if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser ) {
 					if ( SurfIterations == 0 && surface_window.ShadingFlag <= 0 ) {
 						// If the window is bare this TS and it is the first time through we use the previous TS glass

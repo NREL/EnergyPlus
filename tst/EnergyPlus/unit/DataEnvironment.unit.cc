@@ -44,101 +44,38 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef TARCOGCommon_hh_INCLUDED
-#define TARCOGCommon_hh_INCLUDED
+// EnergyPlus::DataPlant Unit Tests
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
-#include <ObjexxFCL/Array2A.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-namespace TARCOGCommon {
+using namespace EnergyPlus;
+using namespace ObjexxFCL;
 
-	// Functions
+TEST_F( EnergyPlusFixture, DataEnvironment_WindSpeedAt )
+{
+	DataEnvironment::WindSpeed = 10;
+	DataEnvironment::WeatherFileWindModCoeff = 0.3;
+	DataEnvironment::SiteWindBLHeight = 20;
 
-	bool
-	IsShadingLayer( int const layertype );
+	// Start with normal mode
+	DataEnvironment::SiteWindExp = 0.1;
+	EXPECT_NEAR( 0.000, DataEnvironment::WindSpeedAt( -1.0 ), 0.001 );
+	EXPECT_NEAR( 0.000, DataEnvironment::WindSpeedAt( 0.0 ), 0.001 );
+	EXPECT_NEAR( 2.223, DataEnvironment::WindSpeedAt( 1.0 ), 0.001 );
+	EXPECT_NEAR( 2.612, DataEnvironment::WindSpeedAt( 5.0 ), 0.001 );
+	EXPECT_NEAR( 2.799, DataEnvironment::WindSpeedAt( 10.0 ), 0.001 );
+	EXPECT_NEAR( 3.000, DataEnvironment::WindSpeedAt( 20.0 ), 0.001 );
+	
+	// If the site wind exponent is zero, the wind speed is either zero or the actual wind speed
+	DataEnvironment::SiteWindExp = 0.0;
+	EXPECT_NEAR( 0.0, DataEnvironment::WindSpeedAt( -1.0 ), 0.001 );
+	EXPECT_NEAR( 0.0, DataEnvironment::WindSpeedAt( 0.0 ), 0.001 );
+	EXPECT_NEAR( 10.0, DataEnvironment::WindSpeedAt( 1.0 ), 0.001 );
+}
 
-	Real64
-	LDSumMax(
-		Real64 const Width,
-		Real64 const Height
-	);
-
-	Real64
-	LDSumMean(
-		Real64 const Width,
-		Real64 const Height
-	);
-
-	void
-	modifyHcGap(
-		Array1< Real64 > const & hcgap,  // Convective coefficient for gap
-		Array1< Real64 > const & qv,     // Heat flow from ventilation [W/m2]
-		Array1< Real64 > const & hcv,    // Convective heat flow coefficient due to ventilation
-		Array1< Real64 > & hcgapMod,     // Modified heat flow coefficient for gap
-		int const nlayer,                // Number of layers
-		Real64 const edgeGlCorrFac       // Edge of glass correction factor
-	);
-
-	void
-	matrixQBalance(
-		int const nlayer,
-		Array2< Real64 > & a,
-		Array1< Real64 > & b,
-		Array1< Real64 > const & thick,
-		Array1< Real64 > const & hcgas,
-		Array1< Real64 > & hcgapMod,
-		Array1< Real64 > const & asol,
-		Array1< Real64 > const & qv,
-		Array1< Real64 > const & hcv,
-		Real64 const Tin,
-		Real64 const Tout,
-		Real64 const Gin,
-		Real64 const Gout,
-		Array1< Real64 > const & theta,
-		Array1< Real64 > const & tir,
-		Array1< Real64 > const & rir,
-		Array1< Real64 > const & emis,
-		Real64 const edgeGlCorrFac
-	);
-
-	void
-	EquationsSolver(
-		Array2< Real64 > & a,
-		Array1< Real64 > & b,
-		int const n,
-		int & nperr,
-		std::string & ErrorMessage
-	);
-
-	void
-	ludcmp(
-		Array2< Real64 > & a,
-		int const n,
-		Array1_int & indx,
-		Real64 & d,
-		int & nperr,
-		std::string & ErrorMessage
-	);
-
-	void
-	lubksb(
-		Array2A< Real64 > const a,
-		int const n,
-		Array1A_int const indx,
-		Array1A< Real64 > b
-	);
-
-	Real64
-	pos( Real64 const x );
-
-} // TARCOGCommon
-
-} // EnergyPlus
-
-#endif
