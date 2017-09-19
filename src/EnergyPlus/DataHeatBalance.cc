@@ -442,6 +442,10 @@ namespace DataHeatBalance {
 	bool AnyConstructInternalSourceInInput( false ); // true if the user has entered any constructions with internal sources
 	bool AdaptiveComfortRequested_CEN15251( false ); // true if people objects have adaptive comfort requests. CEN15251
 	bool AdaptiveComfortRequested_ASH55( false ); // true if people objects have adaptive comfort requests. ASH55
+
+	bool NoFfactorConstructionsUsed( true );
+	bool NoCfactorConstructionsUsed( true );
+
 	int NumRefrigeratedRacks( 0 ); // Total number of refrigerated case compressor racks in input
 	int NumRefrigSystems( 0 ); // Total number of detailed refrigeration systems in input
 	int NumRefrigCondensers( 0 ); // Total number of detailed refrigeration condensers in input
@@ -766,6 +770,8 @@ namespace DataHeatBalance {
 		AnyConstructInternalSourceInInput = false;
 		AdaptiveComfortRequested_CEN15251 = false;
 		AdaptiveComfortRequested_ASH55 = false;
+		NoFfactorConstructionsUsed = true;
+		NoCfactorConstructionsUsed = true;
 		NumRefrigeratedRacks = 0;
 		NumRefrigSystems = 0;
 		NumRefrigCondensers = 0;

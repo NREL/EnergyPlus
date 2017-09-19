@@ -1784,7 +1784,7 @@
     ,                        !- Baseboard Heating Availability Schedule Name
     ;                        !- Baseboard Heating Capacity {W}
 
-  Schedule:Constant,Always1,,1.0;
+  Schedule:Constant,Always1,Any Number,1.0;
 
   HVACTemplate:Zone:PTHP,
     SPACE2-1,                !- Zone Name

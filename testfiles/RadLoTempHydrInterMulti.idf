@@ -350,10 +350,6 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,
-    FLOOR SLAB 8 IN,         !- Name
-    C10 - 8 IN HW CONCRETE;  !- Outside Layer
-
-  Construction,
     WIN-CON-LIGHT,           !- Name
     WIN-LAY-GLASS-LIGHT;     !- Outside Layer
 
