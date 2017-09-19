@@ -157,6 +157,7 @@ set( test_src
   WeatherManager.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
+  WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

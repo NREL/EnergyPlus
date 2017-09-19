@@ -2652,8 +2652,6 @@
 
   Output:Variable,SouthZone:South Wall,CondFD Surface Temperature Node 5,Hourly;
 
-  Output:Variable,SouthZone:South Wall,CondFD Surface Temperature Node 6,Hourly;
-
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 1,Hourly;
 
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 2,Hourly;
@@ -2663,8 +2661,6 @@
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 4,Hourly;
 
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 5,Hourly;
-
-  Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 6,Hourly;
 
   Output:Variable,SouthZone:North Wall,CondFD Surface Temperature Node 1,Hourly;
 
@@ -2676,8 +2672,6 @@
 
   Output:Variable,SouthZone:North Wall,CondFD Surface Temperature Node 5,Hourly;
 
-  Output:Variable,SouthZone:North Wall,CondFD Surface Temperature Node 6,Hourly;
-
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 1,Hourly;
 
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 2,Hourly;
@@ -2687,8 +2681,6 @@
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 4,Hourly;
 
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 5,Hourly;
-
-  Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 6,Hourly;
 
   Output:Variable,SouthZone:Floor,CondFD Surface Temperature Node 1,Hourly;
 
