@@ -91,6 +91,7 @@ namespace TarcogShading {
 		Array1_int const & LayerType,
 		Array1< Real64 > & Tgaps,
 		Array1< Real64 > & qv,
+		Array1< Real64 > & hcv,
 		int & nperr,
 		std::string & ErrorMessage,
 		Array1< Real64 > & vfreevent
@@ -192,6 +193,25 @@ namespace TarcogShading {
 		int & nperr,
 		std::string & ErrorMessage,
 		Real64 & speed
+	);
+
+	void
+	updateEffectiveMultipliers(
+		int const nlayer,                  // Number of layers
+		Real64 const width,                // IGU width [m]
+		Real64 const height,               // IGU height [m]
+		Array1A< Real64 > const Atop,      // Top openning area [m2]
+		Array1A< Real64 > const Abot,      // Bottom openning area [m2]
+		Array1A< Real64 > const Al,        // Left side openning area [m2]
+		Array1A< Real64 > const Ar,        // Right side openning area [m2]
+		Array1A< Real64 > const Ah,        // Front side openning area [m2]
+		Array1D< Real64 > & Atop_eff,      // Output - Effective top openning area [m2]
+		Array1D< Real64 > & Abot_eff,      // Output - Effective bottom openning area [m2]
+		Array1D< Real64 > & Al_eff,        // Output - Effective left side openning area [m2]
+		Array1D< Real64 > & Ar_eff,        // Output - Effective right side openning area [m2]
+		Array1D< Real64 > & Ah_eff,        // Output - Effective front side openning area [m2]
+		Array1A_int const LayerType,       // Layer type
+		Array1A< Real64 > const SlatAngle  // Venetian layer slat angle [deg]
 	);
 
 } // TarcogShading
