@@ -391,7 +391,7 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).PadDepth = rNumericArgs( 2 );
 			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 3 );
 
-			SetupOutputVariable( "Evaporative Cooler Wet Bulb Effectiveness []", EvapCond( EvapCoolNum ).SatEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Wet Bulb Effectiveness", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).SatEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 
 			// A6 ; \Field Name of Water Supply Storage Tank
 			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 6 );
@@ -452,8 +452,8 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).IndirectFanDeltaPress = rNumericArgs( 6 );
 			EvapCond( EvapCoolNum ).IndirectHXEffectiveness = rNumericArgs( 7 );
 
-			SetupOutputVariable( "Evaporative Cooler Wetbulb Effectiveness []", EvapCond( EvapCoolNum ).SatEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
-			SetupOutputVariable( "Evaporative Cooler Total Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Wetbulb Effectiveness", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).SatEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Total Stage Effectiveness", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 
 			// A6 ; \Field Name of Water Supply Storage Tank
 			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 6 );
@@ -527,7 +527,7 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).IndirectFanEff = rNumericArgs( 5 );
 			EvapCond( EvapCoolNum ).IndirectFanDeltaPress = rNumericArgs( 6 );
 
-			SetupOutputVariable( "Evaporative Cooler Total Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Total Stage Effectiveness", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 
 			//  A6 ; \Field Name of Water Supply Storage Tank
 			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 6 );
@@ -656,11 +656,11 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).PumpPowerModifierCurveIndex = GetCurveIndex( cAlphaArgs( 5 ) );
 			EvapCond( EvapCoolNum ).FanPowerModifierCurveIndex = GetCurveIndex( cAlphaArgs( 6 ) );
 
-			SetupOutputVariable( "Evaporative Cooler Total Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
-			SetupOutputVariable( "Evaporative Cooler Part Load Ratio []", EvapCond( EvapCoolNum ).PartLoadFract, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Total Stage Effectiveness", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Part Load Ratio", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).PartLoadFract, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 
-			SetupOutputVariable( "Evaporative Cooler Dewpoint Bound Status []", EvapCond( EvapCoolNum ).DewPointBoundFlag, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
-			SetupOutputVariable( "Evaporative Cooler Operating Mode Status []", EvapCond( EvapCoolNum ).IECOperatingStatus, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Dewpoint Bound Status", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).DewPointBoundFlag, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Operating Mode Status", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).IECOperatingStatus, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 
 
 		} // end of Indirect Research Special cooler input loop
@@ -737,7 +737,7 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex = GetCurveIndex( cAlphaArgs( 3 ) );
 			EvapCond( EvapCoolNum ).PumpPowerModifierCurveIndex = GetCurveIndex( cAlphaArgs( 4 ) );
 
-			SetupOutputVariable( "Evaporative Cooler Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Stage Effectiveness", OutputProcessor::Unit::None, EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 		}
 
 		if ( ErrorsFound ) {
@@ -746,17 +746,17 @@ namespace EvaporativeCoolers {
 
 		for ( EvapCoolNum = 1; EvapCoolNum <= NumEvapCool; ++EvapCoolNum ) {
 			// Setup Report variables for the Evap Coolers
-			SetupOutputVariable( "Evaporative Cooler Electric Energy [J]", EvapCond( EvapCoolNum ).EvapCoolerEnergy, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Electric", "Cooling", _, "System" );
-			SetupOutputVariable( "Evaporative Cooler Electric Power [W]", EvapCond( EvapCoolNum ).EvapCoolerPower, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Electric Energy", OutputProcessor::Unit::J, EvapCond( EvapCoolNum ).EvapCoolerEnergy, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Electric", "Cooling", _, "System" );
+			SetupOutputVariable( "Evaporative Cooler Electric Power", OutputProcessor::Unit::W, EvapCond( EvapCoolNum ).EvapCoolerPower, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 			// this next report variable is setup differently depending on how the water should be metered here.
 			if ( EvapCond( EvapCoolNum ).EvapWaterSupplyMode == WaterSupplyFromMains ) {
-				SetupOutputVariable( "Evaporative Cooler Water Volume [m3]", EvapCond( EvapCoolNum ).EvapWaterConsump, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Water", "Cooling", _, "System" );
-				SetupOutputVariable( "Evaporative Cooler Mains Water Volume [m3]", EvapCond( EvapCoolNum ).EvapWaterConsump, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "MainsWater", "Cooling", _, "System" );
+				SetupOutputVariable( "Evaporative Cooler Water Volume", OutputProcessor::Unit::m3, EvapCond( EvapCoolNum ).EvapWaterConsump, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Water", "Cooling", _, "System" );
+				SetupOutputVariable( "Evaporative Cooler Mains Water Volume", OutputProcessor::Unit::m3, EvapCond( EvapCoolNum ).EvapWaterConsump, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "MainsWater", "Cooling", _, "System" );
 
 			} else if ( EvapCond( EvapCoolNum ).EvapWaterSupplyMode == WaterSupplyFromTank ) {
-				SetupOutputVariable( "Evaporative Cooler Storage Tank Water Volume [m3]", EvapCond( EvapCoolNum ).EvapWaterConsump, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Water", "Cooling", _, "System" );
-				SetupOutputVariable( "Evaporative Cooler Starved Water Volume [m3]", EvapCond( EvapCoolNum ).EvapWaterStarvMakup, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Water", "Cooling", _, "System" );
-				SetupOutputVariable( "Evaporative Cooler Starved Mains Water Volume [m3]", EvapCond( EvapCoolNum ).EvapWaterStarvMakup, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "MainsWater", "Cooling", _, "System" );
+				SetupOutputVariable( "Evaporative Cooler Storage Tank Water Volume", OutputProcessor::Unit::m3, EvapCond( EvapCoolNum ).EvapWaterConsump, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Water", "Cooling", _, "System" );
+				SetupOutputVariable( "Evaporative Cooler Starved Water Volume", OutputProcessor::Unit::m3, EvapCond( EvapCoolNum ).EvapWaterStarvMakup, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Water", "Cooling", _, "System" );
+				SetupOutputVariable( "Evaporative Cooler Starved Mains Water Volume", OutputProcessor::Unit::m3, EvapCond( EvapCoolNum ).EvapWaterStarvMakup, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "MainsWater", "Cooling", _, "System" );
 			}
 
 		}
@@ -3721,16 +3721,16 @@ namespace EvaporativeCoolers {
 		// setup output variables
 		for ( UnitLoop = 1; UnitLoop <= NumZoneEvapUnits; ++UnitLoop ) {
 
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Heating Rate [W]", ZoneEvapUnit( UnitLoop ).UnitLatentHeatingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Heating Energy [J]", ZoneEvapUnit( UnitLoop ).UnitLatentHeatingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Cooling Rate [W]", ZoneEvapUnit( UnitLoop ).UnitLatentCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Cooling Energy [J]", ZoneEvapUnit( UnitLoop ).UnitLatentCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Fan Speed Ratio []", ZoneEvapUnit( UnitLoop ).UnitFanSpeedRatio, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
-			SetupOutputVariable( "Zone Evaporative Cooler Unit Fan Availability Status []", ZoneEvapUnit( UnitLoop ).FanAvailStatus, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Rate", OutputProcessor::Unit::W, ZoneEvapUnit( UnitLoop ).UnitTotalCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Total Cooling Energy", OutputProcessor::Unit::J, ZoneEvapUnit( UnitLoop ).UnitTotalCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Rate", OutputProcessor::Unit::W, ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Sensible Cooling Energy", OutputProcessor::Unit::J, ZoneEvapUnit( UnitLoop ).UnitSensibleCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Heating Rate", OutputProcessor::Unit::W, ZoneEvapUnit( UnitLoop ).UnitLatentHeatingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Heating Energy", OutputProcessor::Unit::J, ZoneEvapUnit( UnitLoop ).UnitLatentHeatingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Cooling Rate", OutputProcessor::Unit::W, ZoneEvapUnit( UnitLoop ).UnitLatentCoolingRate, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Latent Cooling Energy", OutputProcessor::Unit::J, ZoneEvapUnit( UnitLoop ).UnitLatentCoolingEnergy, "System", "Sum", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Fan Speed Ratio", OutputProcessor::Unit::None, ZoneEvapUnit( UnitLoop ).UnitFanSpeedRatio, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
+			SetupOutputVariable( "Zone Evaporative Cooler Unit Fan Availability Status", OutputProcessor::Unit::None, ZoneEvapUnit( UnitLoop ).FanAvailStatus, "System", "Average", ZoneEvapUnit( UnitLoop ).Name );
 		}
 
 	}

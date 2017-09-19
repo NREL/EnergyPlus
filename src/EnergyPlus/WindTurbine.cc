@@ -592,19 +592,19 @@ namespace WindTurbine {
 		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );
 
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
-			SetupOutputVariable( "Generator Produced Electric Power [W]", WindTurbineSys( WindTurbineNum ).Power, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-			SetupOutputVariable( "Generator Produced Electric Energy [J]", WindTurbineSys( WindTurbineNum ).Energy, "System", "Sum", WindTurbineSys( WindTurbineNum ).Name, _, "ElectricityProduced", "WINDTURBINE", _, "Plant" );
-			SetupOutputVariable( "Generator Turbine Local Wind Speed [m/s]", WindTurbineSys( WindTurbineNum ).LocalWindSpeed, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-			SetupOutputVariable( "Generator Turbine Local Air Density [kg/m3]", WindTurbineSys( WindTurbineNum ).LocalAirDensity, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-			SetupOutputVariable( "Generator Turbine Tip Speed Ratio []", WindTurbineSys( WindTurbineNum ).TipSpeedRatio, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, WindTurbineSys( WindTurbineNum ).Power, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, WindTurbineSys( WindTurbineNum ).Energy, "System", "Sum", WindTurbineSys( WindTurbineNum ).Name, _, "ElectricityProduced", "WINDTURBINE", _, "Plant" );
+			SetupOutputVariable( "Generator Turbine Local Wind Speed", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).LocalWindSpeed, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Turbine Local Air Density", OutputProcessor::Unit::kg_m3, WindTurbineSys( WindTurbineNum ).LocalAirDensity, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Turbine Tip Speed Ratio", OutputProcessor::Unit::None, WindTurbineSys( WindTurbineNum ).TipSpeedRatio, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 			{ auto const SELECT_CASE_var( WindTurbineSys( WindTurbineNum ).RotorType );
 			if ( SELECT_CASE_var == HAWT ) {
-				SetupOutputVariable( "Generator Turbine Power Coefficient []", WindTurbineSys( WindTurbineNum ).PowerCoeff, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Power Coefficient", OutputProcessor::Unit::None, WindTurbineSys( WindTurbineNum ).PowerCoeff, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 			} else if ( SELECT_CASE_var == VAWT ) {
-				SetupOutputVariable( "Generator Turbine Chordal Component Velocity [m/s]", WindTurbineSys( WindTurbineNum ).ChordalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-				SetupOutputVariable( "Generator Turbine Normal Component Velocity [m/s]", WindTurbineSys( WindTurbineNum ).NormalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-				SetupOutputVariable( "Generator Turbine Relative Flow Velocity [m/s]", WindTurbineSys( WindTurbineNum ).RelFlowVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-				SetupOutputVariable( "Generator Turbine Attack Angle [deg]", WindTurbineSys( WindTurbineNum ).AngOfAttack, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Chordal Component Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).ChordalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Normal Component Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).NormalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Relative Flow Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).RelFlowVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Attack Angle", OutputProcessor::Unit::deg, WindTurbineSys( WindTurbineNum ).AngOfAttack, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 			}}
 		}
 

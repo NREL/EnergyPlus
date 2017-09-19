@@ -3037,25 +3037,25 @@ namespace MixedAir {
 
 					//    Note use of OAControllerLoop here to keep DO Loop index separate from InitOAController local variable
 					// CurrentModuleObject='AirLoopHVAC'
-					SetupOutputVariable( "Air System Outdoor Air Economizer Status []", loopOAController.EconomizerStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Economizer Status", OutputProcessor::Unit::None, loopOAController.EconomizerStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Status []", loopOAController.HeatRecoveryBypassStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Status", OutputProcessor::Unit::None, loopOAController.HeatRecoveryBypassStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status []", loopOAController.HRHeatingCoilActive, "System", "Average", airloopName );
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature [C]", loopOAController.MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status", OutputProcessor::Unit::None, loopOAController.HRHeatingCoilActive, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature", OutputProcessor::Unit::C, loopOAController.MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air High Humidity Control Status []", loopOAController.HighHumCtrlStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air High Humidity Control Status", OutputProcessor::Unit::None, loopOAController.HighHumCtrlStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Flow Fraction []", loopOAController.OAFractionRpt, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Flow Fraction", OutputProcessor::Unit::None, loopOAController.OAFractionRpt, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Minimum Flow Fraction []", loopOAController.MinOAFracLimit, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Minimum Flow Fraction", OutputProcessor::Unit::None, loopOAController.MinOAFracLimit, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Mass Flow Rate [kg/s]", loopOAController.OAMassFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.OAMassFlow, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate [kg/s]", loopOAController.MixMassFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.MixMassFlow, "System", "Average", airloopName );
 
 					if ( loopOAController.MixedAirSPMNum > 0 ) {
-						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction []", loopOAController.MaxOAFracBySetPoint, "System", "Average", airloopName );
+						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction", OutputProcessor::Unit::None, loopOAController.MaxOAFracBySetPoint, "System", "Average", airloopName );
 					}
 
 					if ( AnyEnergyManagementSystemInModel ) {
@@ -3066,7 +3066,7 @@ namespace MixedAir {
 
 					VentMechObjectNum = loopOAController.VentMechObjectNum;
 					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
-						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate  [kg/s]", loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
+						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
 						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
 							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
 						}
