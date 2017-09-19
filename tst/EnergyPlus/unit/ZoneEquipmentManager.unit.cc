@@ -128,7 +128,6 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 		Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRate = 1.0;
 	}
 
-	ZoneEquipConfig( ZoneNum ).AirLoopNum = 0;
 	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 ) = 0;
 	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNum ( 1 ) = 1;
 

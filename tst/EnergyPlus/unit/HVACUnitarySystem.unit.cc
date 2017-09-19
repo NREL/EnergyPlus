@@ -4376,7 +4376,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
-	AirLoopNum = ZoneEquipConfig( 1 ).AirLoopNum;
+	AirLoopNum = 0;
 	HeatingLoad = false;
 	CoolingLoad = false;
 
@@ -5881,8 +5881,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
 	GetZoneEquipmentData1( ); // read zone equipment configuration and list objects
-
-	ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 	BranchInputManager::ManageBranchInput( ); // just gets input and returns.
 

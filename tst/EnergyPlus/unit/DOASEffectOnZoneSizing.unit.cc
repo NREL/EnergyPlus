@@ -276,8 +276,6 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	Node( 8 ).MassFlowRateMinAvail = 0.0;
 	Node( 8 ).MassFlowRateMaxAvail = 0.0;
 	Node( 8 ).MassFlowRateMax = 0.0;
-	ZoneEquipConfig( 1 ).AirLoopNum = 0;
-	ZoneEquipConfig( 2 ).AirLoopNum = 0;
 	ZoneEquipConfig( 1 ).ZoneExh = 0.0;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	ZoneEquipConfig( 1 ).PlenumMassFlow = 0.0;

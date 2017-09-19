@@ -414,7 +414,6 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
 		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 		ZoneEquipConfig( 1 ).IsControlled = true;
-		ZoneEquipConfig( 1 ).AirLoopNum = 1;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 		ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
 		ZoneEquipConfig( 1 ).InletNodeADUNum.allocate( 1 );
@@ -441,7 +440,6 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 2 ).ReturnNode.allocate( 1 );
 		ZoneEquipConfig( 2 ).ReturnNode( 1 ) = 8;
 		ZoneEquipConfig( 2 ).IsControlled = true;
-		ZoneEquipConfig( 2 ).AirLoopNum = 1;
 		ZoneEquipConfig( 2 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 		ZoneEquipConfig( 2 ).InletNodeAirLoopNum.allocate( 1 );
 		ZoneEquipConfig( 2 ).InletNodeADUNum.allocate( 1 );

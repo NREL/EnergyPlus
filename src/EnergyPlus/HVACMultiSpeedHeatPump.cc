@@ -296,7 +296,7 @@ namespace HVACMultiSpeedHeatPump {
 		// Initialize the engine driven heat pump
 		InitMSHeatPump( MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnLoad, OnOffAirFlowRatio );
 
-		SimMSHP( MSHeatPumpNum, FirstHVACIteration, QSensUnitOut, QZnLoad, OnOffAirFlowRatio );
+		SimMSHP( MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnLoad, OnOffAirFlowRatio );
 
 		// Update the unit outlet nodes
 		UpdateMSHeatPump( MSHeatPumpNum );
@@ -312,6 +312,7 @@ namespace HVACMultiSpeedHeatPump {
 	SimMSHP(
 		int const MSHeatPumpNum, // number of the current engine driven Heat Pump being simulated
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		int const AirLoopNum, // air loop index
 		Real64 & QSensUnitOut, // cooling/heating deliveded to zones [W]
 		Real64 const QZnReq, // required zone load
 		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
@@ -367,7 +368,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 QTotUnitOut;
 		int SpeedNum; // Speed number
 		int CompOp; // compressor operation; 1=on, 0=off
-		int AirLoopNumber; // Index to air loop
 		Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
@@ -400,9 +400,8 @@ namespace HVACMultiSpeedHeatPump {
 
 		OnOffFanPartLoadFraction = 1.0;
 
-		AirLoopNumber = ZoneEquipConfig( MSHeatPump( MSHeatPumpNum ).ControlZoneNum ).AirLoopNum;
 		SaveMassFlowRate = Node( InletNode ).MassFlowRate;
-		if ( ! FirstHVACIteration && MSHeatPump( MSHeatPumpNum ).OpMode == CycFanCycCoil && QZnReq < 0.0 && AirLoopControlInfo( AirLoopNumber ).EconoActive ) {
+		if ( ! FirstHVACIteration && MSHeatPump( MSHeatPumpNum ).OpMode == CycFanCycCoil && QZnReq < 0.0 && AirLoopControlInfo( AirLoopNum ).EconoActive ) {
 			// for cycling fan, cooling load, check whether furnace can meet load with compressor off
 			CompOp = Off;
 			ControlMSHPOutput( MSHeatPumpNum, FirstHVACIteration, CompOp, OpMode, QZnReq, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad );
@@ -590,7 +589,6 @@ namespace HVACMultiSpeedHeatPump {
 		bool AirNodeFound; // True when an air node is found
 		bool AirLoopFound; // True when an air loop is found
 		int ControlledZoneNum; // Controlled zone number
-		int AirLoopNumber; // Index to air loop
 		int FanType; // Fan type
 		int BranchNum; // Index to branch
 		int CompNum; // Index to component
@@ -703,34 +701,34 @@ namespace HVACMultiSpeedHeatPump {
 					// Find the controlled zone number for the specified thermostat location
 					MSHeatPump( MSHPNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 					// Determine if furnace is on air loop served by the thermostat location specified
-					AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					if ( AirLoopNumber > 0 ) {
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, MSHeatPump( MSHPNum ).Name ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-								AirLoopFound = true;
-								break;
+					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+						int AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
+						if ( AirLoopNumber > 0 ) {
+							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
+								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+									if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, MSHeatPump( MSHPNum ).Name ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+									AirLoopFound = true;
+									break;
+								}
+								MSHeatPump( MSHPNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( zoneInNode );
+								if ( AirLoopFound ) break;
 							}
-							if ( AirLoopFound ) break;
+							for ( TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum ) {
+								if ( TempControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
+								AirNodeFound = true;
+							}
+							for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
+								if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
+								AirNodeFound = true;
+							}
+							for ( TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum ) {
+								if ( StageControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
+								AirNodeFound = true;
+							}
 						}
-						for ( TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum ) {
-							if ( TempControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
-							AirNodeFound = true;
-						}
-						for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
-							if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
-							AirNodeFound = true;
-						}
-						for ( TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum ) {
-							if ( StageControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
-							AirNodeFound = true;
-						}
-					} else {
-						ShowSevereError( "Did not find a AirLoopHVAC for " + CurrentModuleObject + " = \"\"" + MSHeatPump( MSHPNum ).Name );
-						ShowContinueError( "Specified " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
-						ErrorsFound = true;
+						if ( AirLoopFound ) break;
 					}
-					break;
+					if ( AirLoopFound ) break;
 				}
 				if ( ! AirNodeFound ) {
 					ShowSevereError( "Did not find Air Node (" + cAlphaFields( 5 ) + "), " + CurrentModuleObject + " = \"\"" + MSHeatPump( MSHPNum ).Name );
@@ -743,18 +741,6 @@ namespace HVACMultiSpeedHeatPump {
 					ErrorsFound = true;
 				}
 			}
-
-			//    MSHeatPump(MSHPNum)%FlowFraction = Numbers(1)
-			//    IF (MSHeatPump(MSHPNum)%FlowFraction .LE. 0.0 .AND. MSHeatPump(MSHPNum)%FlowFraction /= AutoSize) THEN
-			//      CALL ShowSevereError(TRIM(CurrentModuleObject)//', "'//TRIM(MSHeatPump(MSHPNum)%Name)//&
-			//                           '", '//TRIM(cNumericFields(1))//' must greater than zero.')
-			//      ErrorsFound = .TRUE.
-			//    END IF
-			//    IF (MSHeatPump(MSHPNum)%FlowFraction .GT. 1.0 .AND. MSHeatPump(MSHPNum)%FlowFraction /= AutoSize) THEN
-			//      CALL ShowSevereError(TRIM(CurrentModuleObject)//', "'//TRIM(MSHeatPump(MSHPNum)%Name)//&
-			//                           '", '//TRIM(cNumericFields(1))//' cannot be greater than 1.0.')
-			//      ErrorsFound = .TRUE.
-			//    END IF
 
 			//Get supply fan data
 			MSHeatPump( MSHPNum ).FanName = Alphas( 7 );
@@ -1762,26 +1748,7 @@ namespace HVACMultiSpeedHeatPump {
 
 		if ( allocated( ZoneEquipConfig ) && MyCheckFlag( MSHeatPumpNum ) ) {
 			for ( i = 1; i <= NumOfZones; ++i ) {
-				if ( AirLoopNum != ZoneEquipConfig( i ).AirLoopNum ) continue;
 				if ( MSHeatPump( MSHeatPumpNum ).ControlZoneNum == ZoneEquipConfig( i ).ActualZoneNum ) {
-					for ( j = 1; j <= ZoneEquipConfig( i ).NumInletNodes; ++j ) {
-						if ( MSHeatPump( MSHeatPumpNum ).ZoneInletNode == 0 ) {
-							for ( k = 1; k <= ZoneEquipConfig( i ).NumInletNodes; ++k ) {
-								if ( ZoneEquipConfig( i ).InletNode( j ) == ZoneEquipConfig( i ).AirDistUnitCool( k ).OutNode ) {
-									MSHeatPump( MSHeatPumpNum ).ZoneInletNode = ZoneEquipConfig( i ).InletNode( j );
-									break;
-								}
-							}
-						}
-						if ( MSHeatPump( MSHeatPumpNum ).ZoneInletNode == 0 ) {
-							for ( k = 1; k <= ZoneEquipConfig( i ).NumInletNodes; ++k ) {
-								if ( ZoneEquipConfig( i ).InletNode( j ) == ZoneEquipConfig( i ).AirDistUnitHeat( k ).OutNode ) {
-									MSHeatPump( MSHeatPumpNum ).ZoneInletNode = ZoneEquipConfig( i ).InletNode( j );
-									break;
-								}
-							}
-						}
-					}
 					//setup furnace zone equipment sequence information based on finding an air terminal
 					if ( ZoneEquipConfig( i ).EquipListIndex > 0 ) {
 						for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {

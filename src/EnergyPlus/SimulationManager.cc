@@ -2200,6 +2200,7 @@ namespace SimulationManager {
 				gio::write( ChrOut3, fmtLD ) << ZoneEquipConfig( Count ).NumReturnNodes;
 				strip( ChrOut );
 				strip( ChrOut2 );
+				strip( ChrOut3 );
 				gio::write( OutputFileBNDetails, Format_713 ) << " Controlled Zone," + ZoneEquipConfig( Count ).ZoneName + ',' + ZoneEquipConfig( Count ).EquipListName + ',' + ZoneEquipConfig( Count ).ControlListName + ',' + NodeID( ZoneEquipConfig( Count ).ZoneNode ) + ',' + ChrOut + ',' + ChrOut2 + ',' + ChrOut3;
 				for ( Count1 = 1; Count1 <= ZoneEquipConfig( Count ).NumInletNodes; ++Count1 ) {
 					gio::write( ChrOut, fmtLD ) << Count1;
