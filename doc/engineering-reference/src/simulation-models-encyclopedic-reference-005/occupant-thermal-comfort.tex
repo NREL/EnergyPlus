@@ -227,7 +227,7 @@ DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 \end{equation}
 
 \begin{equation}
-{Q_{r}}=3.96*f\(_{l}\)*{[}(0.01*T\(_{a}\))\(^{4}\)-(0.01*T\(_{a}\))\(^{4}\){]}}
+{Q_{r}}=3.96*f\left(_{l}\right)*{[}(0.01*T\left(_{a}\right))\left(^{4}\right)-(0.01*T\left(_{a}\right))\left(^{4}\right){]}}
 \end{equation}
 
 In the EnergyPlus source code, Q\(_{dry}\), Q\(_{c}\) and Q\(_{r}\) are calculated using the following equations, respectively:
@@ -239,15 +239,15 @@ ConvHeatLos = CloBodyRat*Hc*(CloSurfTemp - AirTemp)
 RadHeatLoss = 3.96*CloBodyRat*{[}(0.01*AbsCloSurfTemp)**4 - (0.01*AbsRadTemp)**4{]}
 
 \begin{equation}
-{E_{rsw}} = 0.42(H - 58.2) for \(H > 58.2\)
+{E_{rsw}} = 0.42(H - 58.2) for \left(H > 58.2\right)
 \end{equation}
 
 \begin{equation}
-{E_{rsw}} = 0 for \(H \le 58.2\)
+{E_{rsw}} = 0 for \left(H \le 58.2\right)
 \end{equation}
 
 \begin{equation}
-{E_{f}}=0.00305*(5733.0-6.99H-P\(_{a}\))}
+{E_{f}}=0.00305*(5733.0-6.99H-P\left(_{a}\right))}
 \end{equation}
 
 \begin{equation}
@@ -398,7 +398,7 @@ In the EnergyPlus code, when AvgBodyTemp is greater than AvgBodyTempSet(36.49�C)
 The skin flood flow rate in L/hr•m\(^{2}\) is calculated using:
 
 \begin{equation}
-\(SKBF = (6.3 + C{}_{dil} \times SI{G_{cr}})/(1 + {S_{tr}} \times (SI{G_{sk}}))\)
+SKBF = (6.3 + C{}_{dil} \times SI{G_{cr}})/(1 + {S_{tr}} \times (SI{G_{sk}}))
 \end{equation}
 
 In the EnergyPlus code, this equation is calculated using the following equations:
@@ -412,13 +412,13 @@ VasoconstrictFac = Str*SkinColdDelTemp
 The rate of regulatory sweating in g/hr•m\(^{2}\) is calculated using:
 
 \begin{equation}
-\(S{W_{reg}} = {C_{sw}}SI{G_b}{e^{(SI{G_{sk}}/10.7)}}\)
+S{W_{reg}} = {C_{sw}}SI{G_b}{e^{(SI{G_{sk}}/10.7)}}
 \end{equation}
 
 and the shivering response in W/m\(^{2}\) is calculated using:
 
 \begin{equation}
-\({M_{shiv}} = 19.4(SI{G_{cr}})(SI{G_{sk}})\)
+{M_{shiv}} = 19.4(SI{G_{cr}})(SI{G_{sk}})
 \end{equation}
 
 In the EnergyPlus code, the sweat and shivering response determined by the above two equations are calculated using the follow expressions:
@@ -442,7 +442,7 @@ L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W
 \end{equation}
 
 \begin{equation}
-\(\begin{array}{l}{Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a}(torr)}) + 0.0014M(34 - {T_a})\\{Q_{res}} = 0.017251M(5.8662 - {P_{a}(kPa)}) + 0.0014M(34 - {T_a})\end{array}\)
+\begin{array}{l}{Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a}(torr)}) + 0.0014M(34 - {T_a})\\{Q_{res}} = 0.017251M(5.8662 - {P_{a}(kPa)}) + 0.0014M(34 - {T_a})\end{array}
 \end{equation}
 
 In the EnergyPlus code, the calculation of Q\(_{res}\) or RespHeatLoss is accomplished using the following equations:
@@ -774,11 +774,11 @@ OpTemp = (Hc*AirTemp + Hr*RadTemp)/H
 In the KSU Two-Node Model, evaporative heat losses are defined by these equations:
 
 \begin{equation}
-For \({E_{sw}} \le {E_{\max }}\), {E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}
+For \left({E_{sw}} \le {E_{\max }}\right), {E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}
 \end{equation}
 
 \begin{equation}
-For \({E_{sw}} > {E_{\max }}\), {E_{sk}} = {E_{\max }}
+For \left({E_{sw}} > {E_{\max }}\right), {E_{sk}} = {E_{\max }}
 \end{equation}
 
 \begin{equation}
