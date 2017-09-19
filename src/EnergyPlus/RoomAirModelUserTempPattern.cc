@@ -1046,7 +1046,6 @@ namespace RoomAirModelUserTempPattern {
 		Real64 CpAir; // Air heat capacity [J/kg-K]
 		Real64 TempRetAir; // Return air temperature [C]
 		Real64 TempZoneAir; // Zone air temperature [C]
-		int ReturnNode; // Node number of controlled zone's return air
 		int ZoneNode; // Node number of controlled zone
 		int SurfNum; // Surface number
 		Real64 MassFlowRA; // Return air mass flow [kg/s]
@@ -1075,9 +1074,10 @@ namespace RoomAirModelUserTempPattern {
 			Node( AirPatternZoneInfo( ZoneNum ).ZoneNodeID ).Temp = AirPatternZoneInfo( ZoneNum ).Tleaving;
 		}
 
-		if ( AirPatternZoneInfo( ZoneNum ).ReturnAirNodeID != 0 ) {
+		int zoneEquipNum = Zone( ZoneNum ).ZoneEqNum;
+		for ( int nodeCount = 1; nodeCount <= DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).NumReturnNodes; ++nodeCount ) {
 			//BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
-			ReturnNode = AirPatternZoneInfo( ZoneNum ).ReturnAirNodeID;
+			int ReturnNode = DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).ReturnNode( nodeCount );
 			ZoneNode = AirPatternZoneInfo( ZoneNum ).ZoneNodeID;
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 			//RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
@@ -1098,11 +1098,13 @@ namespace RoomAirModelUserTempPattern {
 			WinGapTtoRA = 0.0;
 			WinGapFlowTtoRA = 0.0;
 
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
-				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
-					FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
-					WinGapFlowToRA += FlowThisTS;
-					WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+			if ( DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).ZoneHasAirFlowWindowReturn ) {
+				for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
+						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
+						WinGapFlowToRA += FlowThisTS;
+						WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+					}
 				}
 			}
 			if ( WinGapFlowToRA > 0.0 ) WinGapTtoRA = WinGapFlowTtoRA / WinGapFlowToRA;

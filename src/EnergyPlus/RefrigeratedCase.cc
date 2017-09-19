@@ -1034,7 +1034,10 @@ namespace RefrigeratedCase {
 				if ( !lAlphaBlanks( 15 ) ) {
 					retNodeName = Alphas( 15 );
 				}
-				RefrigCase( CaseNum ).ZoneRANode = GetReturnAirNodeForZone( RefrigCase( CaseNum ).ZoneName, retNodeName );
+				if ( RefrigCase( CaseNum ).RAFrac > 0.0 ) {
+					std::string callDescription = CurrentModuleObject + "=" + RefrigCase( CaseNum ).Name;
+					RefrigCase( CaseNum ).ZoneRANode = GetReturnAirNodeForZone( RefrigCase( CaseNum ).ZoneName, retNodeName, callDescription );
+				}
 
 				if ( RefrigCase( CaseNum ).ActualZoneNum >= 0 ) {
 					if ( RefrigCase( CaseNum ).ZoneNodeNum == 0 ) {

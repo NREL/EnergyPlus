@@ -811,8 +811,13 @@ namespace ZoneEquipmentManager {
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
-			ReturnNode = ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode;
-			ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
+			// MJW for now - use first return node, make a separate commit to add a dimension to all of the sizing rettemp variables
+			if ( ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes > 0 ) {
+				ReturnNode = ZoneEquipConfig( ControlledZoneNum ).ReturnNode( 1 );
+			} else {
+				ReturnNode = 0;
+			}
+				ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 			ActualZoneNum = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ActualZoneNum;
 			if ( ReturnNode > 0 ) {
 				RetTemp = Node( ReturnNode ).Temp;

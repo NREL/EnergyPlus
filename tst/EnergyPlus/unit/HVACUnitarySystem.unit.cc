@@ -151,7 +151,9 @@ protected:
 		ZoneEquipConfig( 1 ).ZoneName = "EAST ZONE";
 		ZoneEquipConfig( 1 ).EquipListName = "ZONE2EQUIPMENT";
 		ZoneEquipConfig( 1 ).ZoneNode = 20;
-		ZoneEquipConfig( 1 ).ReturnAirNode = 21;
+		ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 21;
 		Zone( ZoneEquipConfig( 1 ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( 1 ).ZoneNode;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 		ZoneEquipList( 1 ).Name = "ZONE2EQUIPMENT";

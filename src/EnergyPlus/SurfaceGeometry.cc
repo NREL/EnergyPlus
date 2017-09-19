@@ -7939,7 +7939,8 @@ namespace SurfaceGeometry {
 					if ( !lAlphaFieldBlanks( 7 ) ) {
 						retNodeName = cAlphaArgs( 7 );
 					}
-					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName );
+					std::string callDescription = cCurrentModuleObject + "=" + Surface( SurfNum ).Name;
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName, callDescription );
 					if ( SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Surface( SurfNum ).Name + "\", airflow window return air node not found for " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 						if ( !lAlphaFieldBlanks( 7 ) ) ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" did not find a matching return air node." );

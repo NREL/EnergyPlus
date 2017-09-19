@@ -641,7 +641,6 @@ namespace RoomAirModelManager {
 				found = FindItemInList( AirPatternZoneInfo( i ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( found != 0 ) {
 
-					AirPatternZoneInfo( i ).ReturnAirNodeID = ZoneEquipConfig( found ).ReturnAirNode;
 					AirPatternZoneInfo( i ).ZoneNodeID = ZoneEquipConfig( found ).ZoneNode;
 					if ( allocated( ZoneEquipConfig( found ).ExhaustNode ) ) {
 						AirPatternZoneInfo( i ).ExhaustAirNodeID.allocate( ZoneEquipConfig( found ).NumExhaustNodes );
@@ -2882,104 +2881,49 @@ namespace RoomAirModelManager {
 		} else if ( TypeNum == 22 ) {  // WaterHeater : HeatPump
 			SupplyNodeName = Alphas( 8 );
 			ReturnNodeName = Alphas( 7 );
+		// For AirTerminals, find matching return node later
 		} else if ( TypeNum == 23 ) {  // AirTerminal : SingleDuct : Uncontrolled
 			SupplyNodeName = Alphas( 3 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 24 ) {  // AirTerminal : DualDuct : ConstantVolume
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 25 ) {  // AirTerminal : DualDuct : VAV
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 26 ) {  // AirTerminal : SingleDuct : ConstantVolume : Reheat
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 27 ) {  // AirTerminal : SingleDuct : VAV : Reheat
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 28 ) {  // AirTerminal : SingleDuct : VAV : NoReheat
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 29 ) {  // AirTerminal : SingleDuct : SeriesPIU : Reheat
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 30 ) {  // AirTerminal : SingleDuct : ParallelPIU : Reheat
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 31 ) {  // AirTerminal : SingleDuct : ConstantVolume : FourPipeInduction
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 32 ) {  // AirTerminal : SingleDuct : VAV : Reheat : VariableSpeedFan
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 33 ) {  // AirTerminal : SingleDuct : VAV : HeatAndCool : Reheat
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 34 ) {  // AirTerminal : SingleDuct : VAV : HeatAndCool : NoReheat
 			SupplyNodeName = Alphas( 1 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 35 ) {  // AirTerminal : SingleDuct : ConstantVolume : CooledBeam
 			SupplyNodeName = Alphas( 5 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 36 ) {  // AirTerminal : DualDuct : VAV : OutdoorAir
 			SupplyNodeName = Alphas( 3 );
-			if ( allocated( ZoneEquipConfig ) ) {
-				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
-			} else {
-				ReturnNodeName = "";
-			}
+			ReturnNodeName = "";
 		} else if ( TypeNum == 37 ) {  // AirLoopHVACReturnAir
 			SupplyNodeName = Alphas( 4 ); //
 			ReturnNodeName = ""; //

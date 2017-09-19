@@ -782,8 +782,6 @@ namespace DataZoneEquipment {
 
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );
-					// Save the first return air node number for now in ReturnAirNode (this wil be removed later)
-					if ( NodeNum == 1 ) ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = NodeNums( NodeNum );
 					UniqueNodeError = false;
 					CheckUniqueNodes( "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 					if ( UniqueNodeError ) {
@@ -1278,8 +1276,9 @@ namespace DataZoneEquipment {
 	int
 	GetReturnAirNodeForZone(
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
-		std::string const & NodeName  // Return air node name to match (may be blank)
-	) 
+		std::string const & NodeName,  // Return air node name to match (may be blank)
+		std::string const & calledFromDescription  // String identifying the calling function and object
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -1309,19 +1308,24 @@ namespace DataZoneEquipment {
 		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		ReturnAirNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
-			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
+			{ auto const & thisZoneEquip( ZoneEquipConfig( ControlledZoneIndex ) );
+			if ( thisZoneEquip.ActualZoneNum > 0 ) {
 				if ( NodeName == "" ) {
-					// If NodeName is blank, return first return node number
-					ReturnAirNodeNumber = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( 1 );
+					// If NodeName is blank, return first return node number, but warn if there are multiple return nodes for this zone
+					ReturnAirNodeNumber = thisZoneEquip.ReturnNode( 1 );
+					if ( thisZoneEquip.NumReturnNodes > 1 ){ 
+						ShowWarningError( "GetReturnAirNodeForZone: " + calledFromDescription + ", request for zone return node is ambiguous." );
+						ShowContinueError( "Zone=" + thisZoneEquip.ZoneName + " has "+ General::RoundSigDigits(thisZoneEquip.NumReturnNodes ) + " return nodes. First return node will be used." );
+					}
 				} else {
-					for ( int nodeCount = 1; nodeCount <= ZoneEquipConfig( ControlledZoneIndex ).NumReturnNodes; ++nodeCount ) {
-						int curNodeNum = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( nodeCount );
+					for ( int nodeCount = 1; nodeCount <= thisZoneEquip.NumReturnNodes; ++nodeCount ) {
+						int curNodeNum = thisZoneEquip.ReturnNode( nodeCount );
 						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
 							ReturnAirNodeNumber = curNodeNum;
 						}
 					}
 				}
-			}
+			}}
 		}
 
 		return ReturnAirNodeNumber;

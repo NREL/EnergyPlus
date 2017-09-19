@@ -212,8 +212,6 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	ZoneEquipConfig( 2 ).InletNode( 2 ) = 7;
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 	ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 8;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 0;
-	ZoneEquipConfig( 2 ).ReturnAirNode = 0;
 	ZoneEquipConfig( 1 ).NumReturnNodes = 0;
 	ZoneEquipConfig( 2 ).NumReturnNodes = 0;
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;

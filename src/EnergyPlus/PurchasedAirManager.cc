@@ -930,8 +930,12 @@ namespace PurchasedAirManager {
 				UseReturnNode = true;
 			}
 			if ( UseReturnNode ) {
-				if ( ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode > 0 ) {
-					PurchAir( PurchAirNum ).ZoneRecircAirNodeNum = ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode;
+				if ( ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes == 1 ) {
+					PurchAir( PurchAirNum ).ZoneRecircAirNodeNum = ZoneEquipConfig( ControlledZoneNum ).ReturnNode( 1 );
+				} else if ( ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes > 1 ) {
+					ShowWarningError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
+					ShowContinueError( "No Zone Exhaust Air Node Name has been specified for this system and the zone has more than one Return Air Node." );
+					ShowContinueError( "Using the first return air node =" + NodeID( ZoneEquipConfig( ControlledZoneNum ).ReturnNode( 1 ) ) );
 				} else {
 					ShowFatalError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
 					ShowContinueError( " Invalid recirculation node. No exhaust or return node has been specified for this zone in ZoneHVAC:EquipmentConnections." );

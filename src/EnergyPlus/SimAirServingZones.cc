@@ -684,11 +684,14 @@ namespace SimAirServingZones {
 					break;
 				}
 			}
-			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) ) { // there, see if it's in the controlled zone info
+			if ( ( test == 0 ) && ( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes > 0 ) ) { // there, see if it's in the controlled zone info
 				for ( count = 1; count <= NumOfZones; ++count ) {
-					if ( ZoneEquipConfig( count ).ReturnAirNode != AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) ) continue;
-					test = count;
-					break;
+					for ( int retNode = 1; retNode <= DataZoneEquipment::ZoneEquipConfig( count ).NumReturnNodes; ++retNode) {
+						if ( ZoneEquipConfig( count ).ReturnNode( retNode ) != AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) ) continue;
+						test = count;
+						break;
+					}
+				if ( test == count ) break;
 				}
 			}
 			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) ) {

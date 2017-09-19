@@ -4709,8 +4709,11 @@ namespace ZoneTempPredictorCorrector {
 				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
 
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
-				TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
+			TotExitMassFlowRate = ExhMassFlowRate;
+			if ( ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes > 0 ) {
+				for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes; ++retNode ) {
+					TotExitMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnNode( retNode ) ).MassFlowRate / ZoneMult;
+				}
 			}
 
 			// Do the calculations for the plenum zone

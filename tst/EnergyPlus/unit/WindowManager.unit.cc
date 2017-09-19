@@ -469,7 +469,9 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	DataLoopNode::Node.allocate( 4 );
 	DataHeatBalance::TempEffBulkAir.allocate( 3 );

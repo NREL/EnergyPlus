@@ -326,7 +326,6 @@ namespace DataZoneEquipment {
 		int EquipListIndex;
 		std::string ControlListName;
 		int ZoneNode;
-		int ReturnAirNode; // first return node number
 		int NumInletNodes; // number of inlet nodes
 		int NumExhaustNodes; // number of exhaust nodes
 		int NumReturnNodes; // number of return air nodes
@@ -376,7 +375,6 @@ namespace DataZoneEquipment {
 			ActualZoneNum( 0 ),
 			EquipListIndex( 0 ),
 			ZoneNode( 0 ),
-			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
 			NumExhaustNodes( 0 ),
 			NumReturnNodes( 0 ),
@@ -586,7 +584,8 @@ namespace DataZoneEquipment {
 	int
 	GetReturnAirNodeForZone( 
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
-		std::string const & NodeName  // Return air node name to match (may be blank)
+		std::string const & NodeName,  // Return air node name to match (may be blank)
+		std::string const & calledFromDescription  // String identifying the calling function and object
 	);
 
 	int
