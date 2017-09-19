@@ -2358,8 +2358,6 @@
     
   Output:Variable,Zn005:Wall002:Win001,Surface Outside Face Temperature,hourly;  
   
-  Output:Variable,Zn004:Wall002:Win001,Surface Outside Face Temperature,hourly;    
-  
   Output:Meter,Electricity:Building,hourly;
 
   Output:Surfaces:Drawing,dxf,Triangulate3DFace;
