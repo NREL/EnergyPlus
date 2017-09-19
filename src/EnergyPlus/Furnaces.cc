@@ -4427,8 +4427,6 @@ namespace Furnaces {
 		Real64 DeltaMassRate; // Difference of mass flow rate between
 		// inlet node and system outlet node
 		int i; // index to get the zone inlet node
-		int j;
-		int k;
 		Real64 MassFlowRate; // mass flow rate to calculate loss
 		Real64 MaxTemp; // Maximum temperature used in latent loss calculation
 		std::string FanType; // used in warning messages

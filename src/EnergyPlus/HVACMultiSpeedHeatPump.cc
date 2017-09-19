@@ -1598,8 +1598,6 @@ namespace HVACMultiSpeedHeatPump {
 		int i; // Index to speed
 		int NumOfSpeedCooling; // Number of speeds for cooling
 		int NumOfSpeedHeating; // Number of speeds for heating
-		int j;
-		int k;
 		Real64 MinHumRat; // Minimum humidity ratio for sensible capacity calculation (kg/kg)
 		Real64 DeltaMassRate; // Difference of mass flow rate between inlet node and system outlet node
 

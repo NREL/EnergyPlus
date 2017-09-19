@@ -2209,7 +2209,6 @@ namespace MixedAir {
 		int ControlledZoneNum; // Index to controlled zones
 		bool AirNodeFound; // Used to determine if control zone is valid
 		bool AirLoopFound; // Used to determine if control zone is served by furnace air loop
-		int AirLoopNumber; // Used to determine if control zone is served by furnace air loop
 		int BranchNum; // Used to determine if control zone is served by furnace air loop
 		int CompNum; // Used to determine if control zone is served by furnace air loop
 		int HStatZoneNum; // Used to determine if control zone has a humidistat object

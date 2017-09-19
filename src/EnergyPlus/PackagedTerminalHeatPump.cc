@@ -5656,14 +5656,11 @@ namespace PackagedTerminalHeatPump {
 		Real64 AirMassFlow; // air mass flow rate [kg/s]
 		Real64 QTotUnitOut; // capacity output
 		static int SpeedNum( 1 ); // Speed number
-		int AirLoopNumber; // Index to air loop
 		Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 		Real64 QSensUnitOut; // sensible capacity output
 		Real64 QLatUnitOut; // latent capacity output
 		int CompOp; // compressor operation; 1=on, 0=off
 		static Real64 TotalZoneLatentLoad; // Total ZONE heating load (not including outside air)
-		int TotBranchNum; // total outlet branch number
-		int ZoneSideNodeNum; // zone equip supply node
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
 
