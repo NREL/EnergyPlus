@@ -111,7 +111,14 @@ namespace RoomAirModelManager {
 	GetRAFNNodeNum( std::string const & RAFNNodeName, int & ZoneNum, int & RAFNNodeNum, bool & Errorfound ); // find zone number and node number based on the node name
 
 	bool
-	CheckEquipName( int ZoneNum, std::string const & EquipType, std::string const & EquipName, std::string & SupplyNodeName, std::string & ReturnNodeName, int TotNumEquip, int TypeNum ); // Ensure valid equipment name
+	CheckEquipName(
+		std::string const & EquipType,
+		std::string const & EquipName,
+		std::string & SupplyNodeName,
+		std::string & ReturnNodeName,
+		int TotNumEquip,
+		int TypeNum
+	); // Ensure valid equipment name
 
 	//*****************************************************************************************
 

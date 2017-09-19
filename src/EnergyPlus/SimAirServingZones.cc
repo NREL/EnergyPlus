@@ -694,7 +694,7 @@ namespace SimAirServingZones {
 				if ( test == count ) break;
 				}
 			}
-			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) ) {
+			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) &&  ! lAlphaBlanks( 7 ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid." );
 				ShowContinueError( cAlphaFields( 7 ) + " (Return Air Path or ZoneHVAC:EquipmentConnections) not valid = \"" + Alphas( 7 ) + "\"." );
 				ErrorsFound = true;

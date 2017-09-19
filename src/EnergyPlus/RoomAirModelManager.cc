@@ -1782,7 +1782,7 @@ namespace RoomAirModelManager {
 							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).SupplyFraction = rNumericArgs( 1 + ( EquipLoop - 1 ) * 2 );
 							RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ReturnFraction = rNumericArgs( 2 + ( EquipLoop - 1 ) * 2 );
 
-							IntEquipError = CheckEquipName( ZoneNum, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ObjectTypeName,
+							IntEquipError = CheckEquipName( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ObjectTypeName,
 								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).Name,
 								RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).SupplyNodeName, RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RAFNNodeNum ).HVAC( EquipLoop ).ReturnNodeName,
 								TotNumEquip, TypeNum );
@@ -2717,7 +2717,6 @@ namespace RoomAirModelManager {
 
 	bool
 	CheckEquipName(
-		int ZoneNum,  // Zone number
 		std::string const & EquipType, // Equipment type
 		std::string const & EquipName, // Equipment Name
 		std::string & SupplyNodeName, // Supply node name
