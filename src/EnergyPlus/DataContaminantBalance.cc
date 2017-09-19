@@ -172,10 +172,84 @@ namespace DataContaminantBalance {
 	Array1D< ZoneContamGenericDataDVS > ZoneContamGenericDVS;
 	Array1D< ZoneContamGenericDataDRS > ZoneContamGenericDRS;
 
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// MODULE VARIABLE DECLARATIONS:
+	// Clears the global data in DataContaminantBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state()
+	{
+		ZoneCO2SetPoint.deallocate();
+		CO2PredictedRate.deallocate();
+		ZoneCO2Gain.deallocate();
+		ZoneCO2GainFromPeople.deallocate();
+		ZoneAirCO2Avg.deallocate();
+		ZoneAirCO2.deallocate();
+		CO2ZoneTimeMinus1.deallocate();
+		CO2ZoneTimeMinus2.deallocate();
+		CO2ZoneTimeMinus3.deallocate();
+		CO2ZoneTimeMinus4.deallocate();
+		DSCO2ZoneTimeMinus1.deallocate();
+		DSCO2ZoneTimeMinus2.deallocate();
+		DSCO2ZoneTimeMinus3.deallocate();
+		DSCO2ZoneTimeMinus4.deallocate();
+		ZoneAirCO2Temp.deallocate();
+		CO2ZoneTimeMinus1Temp.deallocate();
+		CO2ZoneTimeMinus2Temp.deallocate();
+		CO2ZoneTimeMinus3Temp.deallocate();
+		ZoneAirCO2Old.deallocate();
+		ZoneCO2MX.deallocate();
+		ZoneCO2M2.deallocate();
+		ZoneCO21.deallocate();
+		CONTRAT.deallocate();
+		MixingMassFlowCO2.deallocate();
+		NumContControlledZones = 0;
+		OutdoorCO2 = 0.0;
+		ZoneAirDensityCO.deallocate();
+		AZ.deallocate();
+		BZ.deallocate();
+		CZ.deallocate();
+		ZoneGCSetPoint.deallocate();
+		GCPredictedRate.deallocate();
+		ZoneGCGain.deallocate();
+		ZoneAirGCAvg.deallocate();
+		ZoneAirGC.deallocate();
+		GCZoneTimeMinus1.deallocate();
+		GCZoneTimeMinus2.deallocate();
+		GCZoneTimeMinus3.deallocate();
+		GCZoneTimeMinus4.deallocate();
+		DSGCZoneTimeMinus1.deallocate();
+		DSGCZoneTimeMinus2.deallocate();
+		DSGCZoneTimeMinus3.deallocate();
+		DSGCZoneTimeMinus4.deallocate();
+		ZoneAirGCTemp.deallocate();
+		GCZoneTimeMinus1Temp.deallocate();
+		GCZoneTimeMinus2Temp.deallocate();
+		GCZoneTimeMinus3Temp.deallocate();
+		ZoneAirGCOld.deallocate();
+		ZoneGCMX.deallocate();
+		ZoneGCM2.deallocate();
+		ZoneGC1.deallocate();
+		CONTRATGC.deallocate();
+		MixingMassFlowGC.deallocate();
+		OutdoorGC = 0.0;
+		ZoneAirDensityGC.deallocate();
+		AZGC.deallocate();
+		BZGC.deallocate();
+		CZGC.deallocate();
+		ZoneSysContDemand.deallocate();
+		Contaminant.SimulateContaminants = false;
+		Contaminant.CO2Simulation = false;
+		Contaminant.CO2OutdoorSchedPtr = 0;
+		Contaminant.GenericContamSimulation = false;
+		Contaminant.GenericContamOutdoorSchedPtr = 0;
+		ContaminantControlledZone.deallocate();
+		ZoneContamGenericConstant.deallocate();
+		ZoneContamGenericPDriven.deallocate();
+		ZoneContamGenericCutoff.deallocate();
+		ZoneContamGenericDecay.deallocate();
+		ZoneContamGenericBLDiff.deallocate();
+		ZoneContamGenericDVS.deallocate();
+		ZoneContamGenericDRS.deallocate();
+	}
 
 } // DataContaminantBalance
 

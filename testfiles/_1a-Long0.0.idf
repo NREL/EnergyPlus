@@ -10,7 +10,7 @@
 ! Plant:    None.
 ! Modified:
 
-  Version,8.7;
+  Version,8.8;
 
   Site:Location,
     UNKNOWN,                 !- Name
@@ -665,20 +665,6 @@
     Type 2-GypsumPlaster;    !- Layer 3
 
   Construction,
-    CONST 3-Ceiling,         !- Name
-    Type 3-PlasticCovering-Exterior,  !- Outside Layer
-    Type 3-CementFloor,      !- Layer 2
-    Type 3-InsulatingLayer,  !- Layer 3
-    Type 3-Concrete-Interior;!- Layer 4
-
-  Construction,
-    CONST 3-Floor,           !- Name
-    Type 3-Concrete-Exterior,!- Outside Layer
-    Type 3-InsulatingLayer,  !- Layer 2
-    Type 3-CementFloor,      !- Layer 3
-    Type 3-PlasticCovering-Interior;  !- Layer 4
-
-  Construction,
     CONST 4-Ceiling,         !- Name
     Type 4-PlasticCovering-Exterior,  !- Outside Layer
     Type 4-CementFloor,      !- Layer 2
@@ -695,12 +681,6 @@
     Type 4-InsulatingLayer,  !- Layer 4
     Type 4-CementFloor,      !- Layer 5
     Type 4-PlasticCovering-Interior;  !- Layer 6
-
-  Construction,
-    CONST 5,                 !- Name
-    Type 5-ExternalLayer,    !- Outside Layer
-    Type 5-InsulatingLayer,  !- Layer 2
-    Type 5-Concrete;         !- Layer 3
 
 !  Input for First Try with Single Pane Glass and Exterior Shade
 

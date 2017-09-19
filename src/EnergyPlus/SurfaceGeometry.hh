@@ -281,6 +281,12 @@ namespace SurfaceGeometry {
 	GetShadingSurfReflectanceData( bool & ErrorsFound ); // If errors found in input
 
 	void
+	GetSurfaceSrdSurfsData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+
+	void
+	GetSurfaceLocalEnvData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
+
+	void
 	GetHTSurfExtVentedCavityData( bool & ErrorsFound ); // Error flag indicator (true if errors found)
 
 	void
@@ -340,8 +346,135 @@ namespace SurfaceGeometry {
 
 	void
 	CalculateZoneVolume(
-		bool & ErrorsFound, // If errors found in input
 		Array1S_bool const CeilingHeightEntered
+	);
+
+	struct EdgeOfSurf
+	{
+		int surfNum;
+		Vector start;
+		Vector end;
+		EdgeOfSurf():
+			surfNum( 0 ),
+			start( Vector( 0., 0., 0. ) ),
+			end( Vector( 0., 0., 0. ) )
+		{}
+	};
+
+	bool
+	isEnclosedVolume(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<EdgeOfSurf> & edgeNot2
+	);
+
+	std::vector<EdgeOfSurf>
+	edgesInBoth(
+		std::vector<EdgeOfSurf> edges1,
+		std::vector<EdgeOfSurf> edges2
+	);
+
+	bool
+	edgesEqualOnSameSurface(
+		EdgeOfSurf a,
+		EdgeOfSurf b
+	);
+
+	std::vector<EdgeOfSurf>
+	edgesNotTwoForEnclosedVolumeTest(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqueVertices
+	);
+
+	void
+	makeListOfUniqueVertices(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> & uniqVertices
+	);
+
+	DataVectorTypes::Polyhedron
+	updateZonePolygonsForMissingColinearPoints(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		std::vector<Vector> const & uniqVertices
+	);
+
+	void
+	insertVertexOnFace(
+		DataVectorTypes::Face & face,
+		int const & indexBefore,
+		DataVectorTypes::Vector const & vertexToInsert
+	);
+
+	bool
+	areFloorAndCeilingSame(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	bool
+	areWallHeightSame(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	std::tuple< bool, bool, bool >
+	areSurfaceHorizAndVert(
+		DataVectorTypes::Polyhedron const & zonePoly
+	);
+
+	bool
+	areOppositeWallsSame(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 & oppositeWallArea,
+		Real64 & distanceBetweenOppositeWalls
+	);
+
+	std::vector<int>
+	listOfFacesFacingAzimuth(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		Real64 const & azimuth
+	);
+
+	int
+	findPossibleOppositeFace(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex
+	);
+
+	bool
+	areCornersEquidistant(
+		DataVectorTypes::Polyhedron const & zonePoly,
+		int const & faceIndex,
+		int const & opFaceIndex,
+		Real64 & distanceBetween
+	);
+
+	bool
+	isAlmostEqual3dPt(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	);
+
+	bool
+	isAlmostEqual2dPt(
+		DataVectorTypes::Vector_2d v1,
+		DataVectorTypes::Vector_2d v2
+	);
+
+	int
+	findIndexOfVertex(
+		DataVectorTypes::Vector vertexToFind,
+		std::vector<DataVectorTypes::Vector> listOfVertices
+	);
+
+	Real64
+	distance(
+		DataVectorTypes::Vector v1,
+		DataVectorTypes::Vector v2
+	);
+
+	bool
+	isPointOnLineBetweenPoints(
+		DataVectorTypes::Vector start,
+		DataVectorTypes::Vector end,
+		DataVectorTypes::Vector test
 	);
 
 	void

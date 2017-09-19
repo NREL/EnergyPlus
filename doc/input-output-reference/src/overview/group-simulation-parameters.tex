@@ -341,28 +341,36 @@ Four values are allowed to select which solution will be used.
   The \textbf{ConductionTransferFunction} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements.
 \item
   The \textbf{MoisturePenetrationDepthConductionTransferFunction} selection is a sensible heat diffusion and an inside surface moisture storage algorithm that also needs additional moisture material property information. Sometimes, this is referred to as the Effective Moisture Penetration Depth or EMPD. See the moisture material property object for additional information and description of outputs:
-\item
-  MaterialProperty:MoisturePenetrationDepth:Settings
+  \begin{itemize}
+  \item
+    MaterialProperty:MoisturePenetrationDepth:Settings
+  \end{itemize}
 \item
   \textbf{Advanced/Research usage:}The \textbf{ConductionFiniteDifference} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements. This solution technique uses a 1-D finite difference solution in the construction elements. Outputs for the surfaces are described with the material property objects. The Conduction Finite Difference (aka CondFD) property objects are:
-\item
-  MaterialProperty:PhaseChange
-\item
-  MaterialProperty:VariableThermalConductivity
+  \begin{itemize}
+  \item
+    MaterialProperty:PhaseChange
+  \item
+    MaterialProperty:VariableThermalConductivity
+  \item
+    MaterialProperty:PhaseChangeHysteresis
+  \end{itemize}
 \item
   \textbf{Advanced/Research usage:} The \textbf{CombinedHeatAndMoistureFiniteElement} is a coupled heat and moisture transfer and storage solution. The solution technique uses a one dimensional finite difference solution in the construction elements and requires further material properties described in the Heat and Moisture Transfer material properties objects. Outputs from the algorithm are described with these objects. The Heat and Moisture Transfer property objects are:
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Settings
-\item
-  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Suction
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Redistribution
-\item
-  MaterialProperty:HeatAndMoistureTransfer:Diffusion
-\item
-  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+  \begin{itemize}
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Settings
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Suction
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Redistribution
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:Diffusion
+  \item
+    MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
+  \end{itemize}
 \end{itemize}
 
 \paragraph{Field: Surface Temperature Upper Limit}\label{field-surface-temperature-upper-limit}
@@ -747,6 +755,32 @@ SimulationControl,
   Yes,                     !- Run Simulation for Weather File Run Periods
   No,                      !- Do HVAC Sizing Simulation for Sizing Periods
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
+\end{lstlisting}
+
+\subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
+
+The HVACSystemRootFindingAlgorithm object provides a way to select what type of solution
+algorithm will be used to find a part load ratio or mass flow rate at given equipment/system load in HVAC system simulations. This object is an optional object. If the default algorithm is used, this object is not required in an input file.
+
+
+\subsubsection{Inputs}\label{inputs-hvacystemrootfindingalgorithm}
+
+\paragraph{Field: Algorithm}\label{field-algorithm}
+
+Five choices are allowed to select which solution algorithm will be used: RegulaFalsi, Bisection,  BisectionThenRegulaFalsi, RegulaFalsiThenBisection, and Alternation. The RegulaFalsi
+selection is the default selection. Bisection selction will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.  
+
+
+\paragraph{Field: Number of Iterations Before Algorithm Switch}\label{field-number-of-iteration-before-algorithm-switch}
+
+This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi or Alternation is entered. When the iteration number is greater than the value, algorithm switches either from RegulaFalsi to Bisection or from Bisection to RegulaFalsi with choices of RegulaFalsiThenBisection or BisectionThenRegulaFalsi. 
+
+An IDF example:
+
+\begin{lstlisting}
+HVACSystemRootFindingAlgorithm,
+  RegulaFalsiThenBisection, !- Algorithm
+  20;                      !- Number of Iteration Before Algorithm Switch
 \end{lstlisting}
 
 \subsection{Meter:Custom}\label{metercustom}

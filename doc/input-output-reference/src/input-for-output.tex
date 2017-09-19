@@ -116,12 +116,12 @@ Output:Surfaces:List, ViewFactorInfo;
 
 This report (in \textbf{eplusout.eio}) provides details about the thermal radiation exchange view factors and interchange factors.~ Specific details on this report can be found in the Output Details and Examples document.
 
-\paragraph{DecayCurvesfromZoneComponentLoads}\label{decaycurvesfromzonecomponentloads}
+\paragraph{DecayCurvesFromComponentLoadsSummary}\label{decaycurvesfromcomponentloadssummary}
 
 An example input object for this report follows.
 
 \begin{lstlisting}
-Output:Surfaces:List, DecayCurvesfromZoneComponentLoads;
+Output:Surfaces:List, DecayCurvesFromComponentLoadsSummary;
 \end{lstlisting}
 
 This report (in \textbf{eplusout.eio}) provides an intermediate calculation used, called a decay curve,~ in the Zone Component Loads Summary report for the estimate of the sensible-delayed column values. A decay curve is created for each surface in a zone by introducing a radiant pulse. Each value in each row of the report corresponds to a zone time step from the time the pulse was introduced. See Zone Component Load Summary described in object Output:Table:SummaryReports for more detailed information.

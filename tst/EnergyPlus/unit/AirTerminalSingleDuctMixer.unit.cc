@@ -75,7 +75,6 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 using namespace EnergyPlus::BranchInputManager;
@@ -1080,7 +1079,6 @@ namespace EnergyPlus {
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
 			"    SPACE1-1 HP Heating Mode,     !- Heating Coil Name",
 			"    0.001,                   !- Heating Convergence Tolerance {dimensionless}",
-			"    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
 			"    SPACE1-1 HP Cooling Mode,     !- Cooling Coil Name",
 			"    0.001,                   !- Cooling Convergence Tolerance {dimensionless}",
@@ -1492,7 +1490,6 @@ namespace EnergyPlus {
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
 			"    SPACE1-1 HP Heating Mode,     !- Heating Coil Name",
 			"    0.001,                    !- Heating Convergence Tolerance {dimensionless}",
-			"    -5.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
 			"    SPACE1-1 HP Cooling Mode,     !- Cooling Coil Name",
 			"    0.001,                   !- Cooling Convergence Tolerance {dimensionless}",

@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -201,6 +201,12 @@
     Yes,                     !- Run Simulation for Weather File Run Periods
     YES,                     !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  ConvergenceLimits ,
+    0,                       !- Minimum System Timestep (0 = same as zone timestep)
+    25,                      !- Maximum HVAC Iterations
+    3,                       !- Minimum Plant Iterations
+    9;                       !- Maximum Plant Iterations
 
 ! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4°C
 
@@ -433,14 +439,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -536,26 +534,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
@@ -629,8 +609,6 @@
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,117.239997864; !- Field 3
-
-                             !- Field 4
 
   Schedule:Compact,
     ShadeTransSch,           !- Name
@@ -2603,8 +2581,8 @@
     Mixed Air Node 1,        !- Air Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
     ,                        !- Condensate Collection Water Storage Tank Name
-    6.0;                     !- Design Water Temperature Difference
- 
+    6.0;                     !- Design Water Temperature Difference {deltaC}
+
   Coil:Heating:Water,
     Main Heating Coil 1,     !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
@@ -2621,7 +2599,7 @@
     71.1,                    !- Rated Outlet Water Temperature {C}
     32.2,                    !- Rated Outlet Air Temperature {C}
     ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference
+    11;                      !- Design Water Temperature Difference {deltaC}
 
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name

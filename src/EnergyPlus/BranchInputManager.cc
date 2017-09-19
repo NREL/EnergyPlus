@@ -281,7 +281,7 @@ namespace BranchInputManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found; // Points to correct Branch List/Branch
-		bool ErrFound; // True when error has occured (cannot find Branch List)
+		bool ErrFound; // True when error has occurred (cannot find Branch List)
 
 		ErrFound = false;
 
@@ -1651,7 +1651,7 @@ namespace BranchInputManager {
 		int BCount; // Actual Branch List Count
 		int Loop; // Loop Counter
 		int Found; // Points to correct Branch List/Branch
-		bool ErrFound; // True when error has occured (cannot find Branch List)
+		bool ErrFound; // True when error has occurred (cannot find Branch List)
 		// Following are needed because routine calls GetBranchInput
 		// which would overwrite the module Alphas and NumAlphas
 		bool IsNotOK; // Flag for "VerifyName" routine

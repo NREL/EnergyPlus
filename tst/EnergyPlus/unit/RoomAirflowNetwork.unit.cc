@@ -70,7 +70,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <ObjexxFCL/gio.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -249,6 +248,9 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	NodeID.allocate( NumOfNodes );
 	Node.allocate( NumOfNodes );
 	ZoneEquipConfig( ZoneNum ).ReturnAirNode = 2;
+	ZoneEquipConfig( ZoneNum ).NumReturnNodes = 1;
+	ZoneEquipConfig( ZoneNum ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( ZoneNum ).ReturnNode( 1 ) = 2;
 
 	Zone( ZoneNum ).Volume = 100;
 	Zone( ZoneNum ).IsControlled = true;

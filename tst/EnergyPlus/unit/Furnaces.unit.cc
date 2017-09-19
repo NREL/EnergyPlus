@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>

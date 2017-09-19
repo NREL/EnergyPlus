@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -1341,6 +1341,7 @@
     FanAndCoilAvailSched,    !- Fan Schedule Name
     CycleOnAnyCoolingOrHeatingZone,  !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800,                    !- Cycling Run Time {s}
     ,                        !- Control Zone or Zone List Name
     Reheat System 1 Cooling Zones,  !- Cooling Control Zone or Zone List Name
@@ -2276,21 +2277,21 @@
     Zone 1 PIU Sec Air Inlet Node;  !- Inlet 2 Node Name
 
   Fan:SystemModel,
-    Zone 1 PIU Fan ,           !- Name
-    FanAndCoilAvailSched,      !- Availability Schedule Name
+    Zone 1 PIU Fan,          !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 1 PIU Mixer Air Outlet Node,  !- Air Inlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Outlet Node Name
-    AUTOSIZE ,                   !- Design Maximum Air Flow Rate
-    Discrete ,                   !- Speed Control Method
-    0.0,                         !- Electric Power Minimum Flow Rate Fraction
-    50.0,                        !- Design Pressure Rise
-    0.9 ,                        !- Motor Efficiency
-    1.0 ,                        !- Motor In Air Stream Fraction
-    AUTOSIZE,                    !- Design Electric Power Consumption
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    50.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
-    ,                            !- Electric Power Per Unit Flow Rate
-    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.50;                        !- Fan Total Efficiency
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Heating:Water,
     Reheat Coil Zone 1,      !- Name
@@ -2327,21 +2328,21 @@
     ;                        !- Rated Ratio for Air and Water Convection
 
   Fan:SystemModel,
-    Zone 3 PIU Fan ,           !- Name
-    FanAndCoilAvailSched,      !- Availability Schedule Name
+    Zone 3 PIU Fan,          !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 3 PIU Sec Air Inlet Node,  !- Air Inlet Node Name
-    Zone 3 PIU Fan Air Outlet Node, !- Air Outlet Node Name
-    AUTOSIZE ,                   !- Design Maximum Air Flow Rate
-    Discrete ,                   !- Speed Control Method
-    0.0,                         !- Electric Power Minimum Flow Rate Fraction
-    50.0,                        !- Design Pressure Rise
-    0.9 ,                        !- Motor Efficiency
-    1.0 ,                        !- Motor In Air Stream Fraction
-    AUTOSIZE,                    !- Design Electric Power Consumption
+    Zone 3 PIU Fan Air Outlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    50.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
-    ,                            !- Electric Power Per Unit Flow Rate
-    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.50;                        !- Fan Total Efficiency
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   AirLoopHVAC:ZoneMixer,
     Zone 3 PIU Mixer,        !- Name
