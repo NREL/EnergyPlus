@@ -1802,19 +1802,19 @@ namespace EvaporativeCoolers {
 			if ( StageEff >= 1.0 ) StageEff = 1.0;
 			// This is a rough approximation of the Total Indirect Stage Efficiency.  I think that
 			//   this would mainly be used for evap sizing purposes.
-			
+
 			//If there is a fault of fouling (zrp_Jan2017)
 			if( EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 				int FaultIndex = EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingIndex;
 				Real64 StageEff_ff = StageEff;
-			
+
 				//calculate the Faulty Evaporative Cooler Fouling Factor using fault information
 				EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFactor = FaultsEvapCoolerFouling( FaultIndex ).CalFoulingFactor();
-				
+
 				//update the StageEff at faulty cases
 				StageEff = StageEff_ff * EvapCond( EvapCoolNum ).FaultyEvapCoolerFoulingFactor;
 			}
- 
+
 			EvapCond( EvapCoolNum ).StageEff = StageEff;
 			//***************************************************************************
 			//   TEMP LEAVING DRY BULB IS CALCULATED FROM A SIMPLE WET BULB APPROACH
@@ -4150,7 +4150,7 @@ namespace EvaporativeCoolers {
 					Node( ZoneEvapUnit( UnitNum ).FanOutletNodeNum ).MassFlowRate = Node( ZoneEvapUnit( UnitNum ).OAInletNodeNum ).MassFlowRate;
 					Node( ZoneEvapUnit( UnitNum ).FanOutletNodeNum ).MassFlowRateMaxAvail = Node( ZoneEvapUnit( UnitNum ).OAInletNodeNum ).MassFlowRate;
 					if ( ZoneEvapUnit( UnitNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-						Fans::SimulateFanComponents( ZoneEvapUnit( UnitNum ).FanName, false, ZoneEvapUnit( UnitNum ).FanIndex, ZoneEvapUnit( UnitNum ).DesignFanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ); 
+						Fans::SimulateFanComponents( ZoneEvapUnit( UnitNum ).FanName, false, ZoneEvapUnit( UnitNum ).FanIndex, ZoneEvapUnit( UnitNum ).DesignFanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 					} else {
 						HVACFan::fanObjs[ ZoneEvapUnit( UnitNum ).FanIndex ]->simulate( _ , ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 					}
