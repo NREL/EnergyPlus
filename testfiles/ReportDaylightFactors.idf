@@ -385,10 +385,6 @@
     DropCeiling,             !- Name
     Std AC02;                !- Outside Layer
 
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
 ! Common Materials
 
   Material,

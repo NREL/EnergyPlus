@@ -2297,85 +2297,10 @@
     F16 Acoustic tile;       !- Layer 3
 
   Construction,
-    Light Partitions,        !- Name
-    G01a 19mm gypsum board,  !- Outside Layer
-    F04 Wall air space resistance,  !- Layer 2
-    G01a 19mm gypsum board;  !- Layer 3
-
-  Construction,
     Light Floor,             !- Name
     F16 Acoustic tile,       !- Outside Layer
     F05 Ceiling air space resistance,  !- Layer 2
     M11 100mm lightweight concrete;  !- Layer 3
-
-! use with InternalMass at 50% of floor area
-
-  Construction,
-    Light Furnishings,       !- Name
-    G05 25mm wood;           !- Outside Layer
-
-  Construction,
-    Medium Exterior Wall,    !- Name
-    M01 100mm brick,         !- Outside Layer
-    I02 50mm insulation board,  !- Layer 2
-    F04 Wall air space resistance,  !- Layer 3
-    G01a 19mm gypsum board;  !- Layer 4
-
-  Construction,
-    Medium Roof/Ceiling,     !- Name
-    M14a 100mm heavyweight concrete,  !- Outside Layer
-    F05 Ceiling air space resistance,  !- Layer 2
-    F16 Acoustic tile;       !- Layer 3
-
-  Construction,
-    Medium Partitions,       !- Name
-    G01a 19mm gypsum board,  !- Outside Layer
-    F04 Wall air space resistance,  !- Layer 2
-    G01a 19mm gypsum board;  !- Layer 3
-
-  Construction,
-    Medium Floor,            !- Name
-    F16 Acoustic tile,       !- Outside Layer
-    F05 Ceiling air space resistance,  !- Layer 2
-    M14a 100mm heavyweight concrete;  !- Layer 3
-
-! use with InternalMass at 50% of floor area
-
-  Construction,
-    Medium Furnishings,      !- Name
-    G05 25mm wood;           !- Outside Layer
-
-  Construction,
-    Heavy Exterior Wall,     !- Name
-    M01 100mm brick,         !- Outside Layer
-    M15 200mm heavyweight concrete,  !- Layer 2
-    I02 50mm insulation board,  !- Layer 3
-    F04 Wall air space resistance,  !- Layer 4
-    G01a 19mm gypsum board;  !- Layer 5
-
-  Construction,
-    Heavy Roof/Ceiling,      !- Name
-    M15 200mm heavyweight concrete,  !- Outside Layer
-    F05 Ceiling air space resistance,  !- Layer 2
-    F16 Acoustic tile;       !- Layer 3
-
-  Construction,
-    Heavy Partitions,        !- Name
-    G01a 19mm gypsum board,  !- Outside Layer
-    M05 200mm concrete block,!- Layer 2
-    G01a 19mm gypsum board;  !- Layer 3
-
-  Construction,
-    Heavy Floor,             !- Name
-    F16 Acoustic tile,       !- Outside Layer
-    F05 Ceiling air space resistance,  !- Layer 2
-    M15 200mm heavyweight concrete;  !- Layer 3
-
-! use with InternalMass at 50% of floor area
-
-  Construction,
-    Heavy Furnishings,       !- Name
-    G05 25mm wood;           !- Outside Layer
 
 !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
 !========================
@@ -2652,8 +2577,6 @@
 
   Output:Variable,SouthZone:South Wall,CondFD Surface Temperature Node 5,Hourly;
 
-  Output:Variable,SouthZone:South Wall,CondFD Surface Temperature Node 6,Hourly;
-
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 1,Hourly;
 
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 2,Hourly;
@@ -2663,8 +2586,6 @@
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 4,Hourly;
 
   Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 5,Hourly;
-
-  Output:Variable,SouthZone:East Wall,CondFD Surface Temperature Node 6,Hourly;
 
   Output:Variable,SouthZone:North Wall,CondFD Surface Temperature Node 1,Hourly;
 
@@ -2676,8 +2597,6 @@
 
   Output:Variable,SouthZone:North Wall,CondFD Surface Temperature Node 5,Hourly;
 
-  Output:Variable,SouthZone:North Wall,CondFD Surface Temperature Node 6,Hourly;
-
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 1,Hourly;
 
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 2,Hourly;
@@ -2687,8 +2606,6 @@
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 4,Hourly;
 
   Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 5,Hourly;
-
-  Output:Variable,SouthZone:West Wall,CondFD Surface Temperature Node 6,Hourly;
 
   Output:Variable,SouthZone:Floor,CondFD Surface Temperature Node 1,Hourly;
 

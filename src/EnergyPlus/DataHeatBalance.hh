@@ -425,6 +425,10 @@ namespace DataHeatBalance {
 	extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
 	extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
 	extern bool AdaptiveComfortRequested_ASH55; // true if people objects have adaptive comfort requests. ASH55
+
+	extern bool NoFfactorConstructionsUsed;
+	extern bool NoCfactorConstructionsUsed;
+
 	extern int NumRefrigeratedRacks; // Total number of refrigerated case compressor racks in input
 	extern int NumRefrigSystems; // Total number of detailed refrigeration systems in input
 	extern int NumRefrigCondensers; // Total number of detailed refrigeration condensers in input

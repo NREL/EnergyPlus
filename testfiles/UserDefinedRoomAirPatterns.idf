@@ -976,20 +976,6 @@
     Wood 6inch;              !- Outside Layer
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    MAT-CC05 4  MW CONCRETE, !- Outside Layer
-    CP02 CARPET PAD;         !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    CP02 CARPET PAD,         !- Outside Layer
-    MAT-CC05 4  MW CONCRETE; !- Layer 2
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    MAT-CC05 4  MW CONCRETE; !- Outside Layer
-
-  Construction,
     DropCeiling,             !- Name
     AC02;                    !- Outside Layer
 
@@ -1002,18 +988,6 @@
     Raised-Floor-UnderSide,  !- Name
     CP02 CARPET PAD,         !- Outside Layer
     1.5  MW CONCRETE;        !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Clear Acrylic Plastic;   !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Diffusing Acrylic Plastic;  !- Outside Layer
 
   Material,
     ASHRAE 90.1-1999_Table B-17_ROOFING - BUILT UP ROOFING - 3 /,  !- Name
@@ -1172,12 +1146,6 @@
     ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37)_1,  !- Outside Layer
     ASHRAE 90.1-1999_Table B-17_AIR 6MM(37),  !- Layer 2
     ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37)_1;  !- Layer 3
-
-  Construction,
-    North_window,            !- Name
-    ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37),  !- Outside Layer
-    ASHRAE 90.1-1999_Table B-17_AIR 6MM(37),  !- Layer 2
-    ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37);  !- Layer 3
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position

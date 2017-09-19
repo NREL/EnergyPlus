@@ -410,14 +410,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -434,26 +426,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Coil:Heating:Fuel,
     Zone2OAUHeatingCoil,     !- Name
@@ -1161,13 +1135,13 @@
   Coil:Cooling:Water,
     Zone4OAUWCcoil,          !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
-    autosize,                !- Design Water Flow Rate {m3/s}
-    autosize,                !- Design Air Flow Rate {m3/s}
-    autosize,                !- Design Inlet Water Temperature {C}
-    autosize,                !- Design Inlet Air Temperature {C}
-    autosize,                !- Design Outlet Air Temperature {C}
-    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
-    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
+    0.001,                   !- Design Water Flow Rate {m3/s}
+    0.84,                    !- Design Air Flow Rate {m3/s}
+    6.67,                    !- Design Inlet Water Temperature {C}
+    30,                      !- Design Inlet Air Temperature {C}
+    11,                      !- Design Outlet Air Temperature {C}
+    0.014,                   !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     Zone4OAUChWInletNode,    !- Water Inlet Node Name
     Zone4OAUChWOutletNode,   !- Water Outlet Node Name
     Zone4OAUCCoilIn,         !- Air Inlet Node Name
@@ -3535,4 +3509,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
