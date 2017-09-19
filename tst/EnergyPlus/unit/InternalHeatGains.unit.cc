@@ -321,6 +321,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 		"ElectricEquipment:ITE:AirCooled,",
 		"  Data Center Servers,     !- Name",
 		"  Zone1,                   !- Zone Name",
+		"  ,",
 		"  Watts/Unit,              !- Design Power Input Calculation Method",
 		"  500,                     !- Watts per Unit {W}",
 		"  100,                     !- Number of Units",
@@ -513,3 +514,135 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals) {
 	convGains.deallocate();
 }
 
+TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperatures) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.8;",
+
+		"Zone,Zone1;",
+
+		"ElectricEquipment:ITE:AirCooled,",
+		"  Data Center Servers,     !- Name",
+		"  Zone1,                   !- Zone Name",
+		"  FlowControlWithApproachTemperatures,    !- Calculation Method",
+		"  Watts/Unit,              !- Design Power Input Calculation Method",
+		"  500,                     !- Watts per Unit {W}",
+		"  100,                     !- Number of Units",
+		"  ,                        !- Watts per Zone Floor Area {W/m2}",
+		"  ,  !- Design Power Input Schedule Name",
+		"  ,  !- CPU Loading  Schedule Name",
+		"  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+		"  0.4,                     !- Design Fan Power Input Fraction",
+		"  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+		"  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+		"  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+		"  15,                      !- Design Entering Air Temperature {C}",
+		"  A3,                      !- Environmental Class",
+		"  AdjustedSupply,          !- Air Inlet Connection Type",
+		"  ,                        !- Air Inlet Room Air Model Node Name",
+		"  ,                        !- Air Outlet Room Air Model Node Name",
+		"  Main Zone Inlet Node,    !- Supply Air Node Name",
+		"  0.1,                     !- Design Recirculation Fraction",
+		"  Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
+		"  0.9,                     !- Design Electric Power Supply Efficiency",
+		"  UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+		"  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+		"  ITE-CPU,                 !- CPU End-Use Subcategory",
+		"  ITE-Fans,                !- Fan End-Use Subcategory",
+		"  ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
+		"  2,                       !- Supply Approach Temperature",
+		"  ,                        !- Supply Approach Temperature Schedule",
+		"  -2,                      !- Return Approach Temperature",
+		"  ;                        !- Return Approach Temperature Schedule",
+		"",
+		"Curve:Quadratic,",
+		"  ECM FanPower fFlow,      !- Name",
+		"  0.0,                     !- Coefficient1 Constant",
+		"  1.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Minimum Value of x",
+		"  99.0;                    !- Maximum Value of x",
+		"",
+		"Curve:Quadratic,",
+		"  UPS Efficiency fPLR,     !- Name",
+		"  1.0,                     !- Coefficient1 Constant",
+		"  0.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Minimum Value of x",
+		"  99.0;                    !- Maximum Value of x",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Servers Power fLoadTemp,  !- Name",
+		"  -1.0,                    !- Coefficient1 Constant",
+		"  1.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.06667,                 !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Servers Airflow fLoadTemp,  !- Name",
+		"  -1.4,                    !- Coefficient1 Constant",
+		"  0.9,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.1,                     !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Recirculation fLoadTemp,  !- Name",
+		"  1.0,                     !- Coefficient1 Constant",
+		"  0.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+	
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
+
+	bool ErrorsFound( false );
+
+	HeatBalanceManager::GetZoneData( ErrorsFound );
+	ASSERT_FALSE( ErrorsFound );
+	DataHeatBalFanSys::MAT.allocate( 1 );
+	DataHeatBalFanSys::ZoneAirHumRat.allocate( 1 );
+
+	DataHeatBalFanSys::MAT( 1 ) = 24.0;
+	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.008;
+	InternalHeatGains::GetInternalHeatGainsInput();
+
+	DataLoopNode::Node( 1 ).Temp = 45.0;
+	InternalHeatGains::CalcZoneITEq();
+	ASSERT_DOUBLE_EQ( DataHeatBalance::ZoneITEq( 1 ).AirOutletDryBulbT + DataHeatBalance::ZoneITEq( 1 ).ReturnApproachTemp, DataHeatBalance::Zone( 1 ).AdjustedTempToReturnAir );
+	ASSERT_DOUBLE_EQ( DataLoopNode::Node( 1 ).Temp + DataHeatBalance::ZoneITEq( 1 ).SupplyApproachTemp, DataHeatBalance::ZoneITEq( 1 ).AirInletDryBulbT );
+}

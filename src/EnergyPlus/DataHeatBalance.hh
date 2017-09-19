@@ -1365,6 +1365,8 @@ namespace DataHeatBalance {
 		int AirHBimBalanceErrIndex; // error management counter
 		bool NoHeatToReturnAir; // TRUE means that heat to return air should be added to the zone load
 		bool RefrigCaseRA; // TRUE means there is potentially heat removal from return air
+		bool HasApproachTempToReturnAir; // TRUE means that return temp to return air is different from the zone mixed air temp
+		Real64 AdjustedTempToReturnAir; // Diff of the return temp from the zone mixed air temp
 		// from refrigeration cases for this zone
 		Real64 InternalHeatGains; // internal loads (W)
 		Real64 NominalInfilVent; // internal infiltration/ventilation
@@ -1459,6 +1461,8 @@ namespace DataHeatBalance {
 			AirHBimBalanceErrIndex( 0 ),
 			NoHeatToReturnAir( false ),
 			RefrigCaseRA( false ),
+			HasApproachTempToReturnAir( false ),
+			AdjustedTempToReturnAir( 0.0 ),
 			InternalHeatGains( 0.0 ),
 			NominalInfilVent( 0.0 ),
 			NominalMixing( 0.0 ),
@@ -1811,6 +1815,7 @@ namespace DataHeatBalance {
 		// Members
 		std::string Name; // EQUIPMENT object name
 		int ZonePtr; // Which zone internal gain is in
+		bool FlowControlWithApproachTemps; // True if using supply and return approach temperature for ITE object.
 		Real64 DesignTotalPower; // Design level for internal gain [W]
 		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
 		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
@@ -1843,6 +1848,11 @@ namespace DataHeatBalance {
 		Real64 EMSFanPower; // Value EMS is directing to use for override of Fan power [W]
 		bool EMSUPSPowerOverrideOn; // EMS actuating UPS power if .TRUE.
 		Real64 EMSUPSPower; // Value EMS is directing to use for override of UPS power [W]
+		Real64 SupplyApproachTemp; // The difference of the IT inlet temperature from the AHU supply air temperature
+		int SupplyApproachTempSch; // The difference schedule of the IT inlet temperature from the AHU supply air temperature
+		Real64 ReturnApproachTemp; // The difference of the unit outlet temperature from the well mixed zone temperature
+		int ReturnApproachTempSch; // The difference schedule of the unit outlet temperature from the well mixed zone temperature
+
 		// Report variables
 		Real64 CPUPower; // ITE CPU Electric Power [W]
 		Real64 FanPower; // ITE Fan Electric Power [W]
@@ -1883,6 +1893,7 @@ namespace DataHeatBalance {
 		// Default Constructor
 		ITEquipData() :
 			ZonePtr( 0 ),
+			FlowControlWithApproachTemps( false ),
 			DesignTotalPower( 0.0 ),
 			NomMinDesignLevel( 0.0 ),
 			NomMaxDesignLevel( 0.0 ),
@@ -1946,7 +1957,11 @@ namespace DataHeatBalance {
 			DewpointTAboveDeltaT( 0.0 ),
 			DewpointTBelowDeltaT( 0.0 ),
 			RHAboveDeltaRH( 0.0 ),
-			RHBelowDeltaRH( 0.0 )
+			RHBelowDeltaRH( 0.0 ),
+			SupplyApproachTemp( 0.0 ),
+			SupplyApproachTempSch( 0 ),
+			ReturnApproachTemp( 0.0 ),
+			ReturnApproachTempSch( 0 )
 		{}
 
 	};
@@ -3260,6 +3275,7 @@ namespace DataHeatBalance {
 		Real64 ITEqTimeBelowDewpointT; // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
 		Real64 ITEqTimeAboveRH; // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
 		Real64 ITEqTimeBelowRH; // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+		Real64 ITEAdjReturnTemp; // Zone ITE Adjusted Return Air Temperature
 		// Overall Zone Variables
 		Real64 TotRadiantGain;
 		Real64 TotVisHeatGain;
@@ -3392,6 +3408,7 @@ namespace DataHeatBalance {
 			ITEqTimeBelowDewpointT( 0.0 ),
 			ITEqTimeAboveRH( 0.0 ),
 			ITEqTimeBelowRH( 0.0 ),
+			ITEAdjReturnTemp( 0.0 ),
 			TotRadiantGain( 0.0 ),
 			TotVisHeatGain( 0.0 ),
 			TotConvectiveGain( 0.0 ),

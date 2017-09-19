@@ -4240,7 +4240,9 @@ namespace ZoneEquipmentManager {
 					// update the return air node for zonal and central on/off systems
 					Node( ReturnNode ).Temp = Node( ZoneNode ).Temp;
 				}
-
+				if ( Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
+					Node( ReturnNode ).Temp = Zone( ActualZoneNum ).AdjustedTempToReturnAir;
+				}
 				// Update the rest of the Return Air Node conditions, if the return air system exists!
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
