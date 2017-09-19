@@ -167,17 +167,17 @@ namespace HVACDuct {
 		if ( CompIndex == 0 ) {
 			DuctNum = FindItemInList( CompName, Duct );
 			if ( DuctNum == 0 ) {
-				ShowFatalError( "SimDuct: Component not found=" + CompName );
+				ShowFatalError( "SimDuct: Component not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DuctNum;
 		} else {
 			DuctNum = CompIndex;
 			if ( DuctNum > NumDucts || DuctNum < 1 ) {
-				ShowFatalError( "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Number of Components=" + TrimSigDigits( NumDucts ) + ", Entered Component name=" + CompName );
+				ShowFatalError( "SimDuct:  Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Number of Components=" + TrimSigDigits( NumDucts ) + ", Entered Component name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DuctNum ) ) {
 				if ( CompName != Duct( DuctNum ).Name ) {
-					ShowFatalError( "SimDuct: Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Component name=" + CompName + ", stored Component Name for that index=" + Duct( DuctNum ).Name );
+					ShowFatalError( "SimDuct: Invalid CompIndex passed=" + TrimSigDigits( DuctNum ) + ", Component name=" + CompName + ", stored Component Name for that index=" + Duct( DuctNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DuctNum ) = false;
 			}
@@ -266,7 +266,7 @@ namespace HVACDuct {
 		// No output variables
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + " Errors found in input" );
+			ShowFatalError( RoutineName + " Errors found in input" );  // LCOV_EXCL_LINE
 		}
 
 	}

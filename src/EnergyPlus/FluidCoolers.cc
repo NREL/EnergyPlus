@@ -240,17 +240,17 @@ namespace FluidCoolers {
 		if ( CompIndex == 0 ) {
 			FluidCoolerNum = FindItemInList( FluidCoolerName, SimpleFluidCooler );
 			if ( FluidCoolerNum == 0 ) {
-				ShowFatalError( "SimFluidCoolers: Unit not found = " + FluidCoolerName );
+				ShowFatalError( "SimFluidCoolers: Unit not found = " + FluidCoolerName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = FluidCoolerNum;
 		} else {
 			FluidCoolerNum = CompIndex;
 			if ( FluidCoolerNum > NumSimpleFluidCoolers || FluidCoolerNum < 1 ) {
-				ShowFatalError( "SimFluidCoolers:  Invalid CompIndex passed = " + TrimSigDigits( FluidCoolerNum ) + ", Number of Units = " + TrimSigDigits( NumSimpleFluidCoolers ) + ", Entered Unit name = " + FluidCoolerName );
+				ShowFatalError( "SimFluidCoolers:  Invalid CompIndex passed = " + TrimSigDigits( FluidCoolerNum ) + ", Number of Units = " + TrimSigDigits( NumSimpleFluidCoolers ) + ", Entered Unit name = " + FluidCoolerName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( FluidCoolerNum ) ) {
 				if ( FluidCoolerName != SimpleFluidCooler( FluidCoolerNum ).Name ) {
-					ShowFatalError( "SimFluidCoolers: Invalid CompIndex passed = " + TrimSigDigits( FluidCoolerNum ) + ", Unit name = " + FluidCoolerName + ", stored Unit Name for that index = " + SimpleFluidCooler( FluidCoolerNum ).Name );
+					ShowFatalError( "SimFluidCoolers: Invalid CompIndex passed = " + TrimSigDigits( FluidCoolerNum ) + ", Unit name = " + FluidCoolerName + ", stored Unit Name for that index = " + SimpleFluidCooler( FluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( FluidCoolerNum ) = false;
 			}
@@ -290,7 +290,7 @@ namespace FluidCoolers {
 			ReportFluidCooler( RunFlag, FluidCoolerNum );
 
 		} else {
-			ShowFatalError( "SimFluidCoolers: Invalid Fluid Cooler Type Requested = " + FluidCoolerType );
+			ShowFatalError( "SimFluidCoolers: Invalid Fluid Cooler Type Requested = " + FluidCoolerType );  // LCOV_EXCL_LINE
 
 		}} // TypeOfEquip
 
@@ -372,7 +372,7 @@ namespace FluidCoolers {
 		NumTwoSpeedFluidCoolers = GetNumObjectsFound( "FluidCooler:TwoSpeed" );
 		NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
-		if ( NumSimpleFluidCoolers <= 0 ) ShowFatalError( "No fluid cooler objects found in input, however, a branch object has specified a fluid cooler. Search the input for fluid cooler to determine the cause for this error." );
+		if ( NumSimpleFluidCoolers <= 0 ) ShowFatalError( "No fluid cooler objects found in input, however, a branch object has specified a fluid cooler. Search the input for fluid cooler to determine the cause for this error." );  // LCOV_EXCL_LINE
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleFluidCooler ) ) return;
@@ -512,7 +512,7 @@ namespace FluidCoolers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting fluid cooler input." );
+			ShowFatalError( "Errors found in getting fluid cooler input." );  // LCOV_EXCL_LINE
 		}
 
 		// Set up output variables, CurrentModuleObject='FluidCooler:SingleSpeed'
@@ -938,7 +938,7 @@ namespace FluidCoolers {
 			ScanPlantLoopsForObject( SimpleFluidCooler( FluidCoolerNum ).Name, TypeOf_Num, SimpleFluidCooler( FluidCoolerNum ).LoopNum, SimpleFluidCooler( FluidCoolerNum ).LoopSideNum, SimpleFluidCooler( FluidCoolerNum ).BranchNum, SimpleFluidCooler( FluidCoolerNum ).CompNum, _, _, _, _, _, ErrorsFound );
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "InitFluidCooler: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitFluidCooler: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			OneTimeFlagForEachFluidCooler( FluidCoolerNum ) = false;
@@ -1081,7 +1081,7 @@ namespace FluidCoolers {
 			} else {
 				if ( PlantFirstSizesOkayToFinalize ) {
 					ShowSevereError( "Autosizing error for fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );
-					ShowFatalError( "Autosizing of fluid cooler condenser flow rate requires a loop Sizing:Plant object." );
+					ShowFatalError( "Autosizing of fluid cooler condenser flow rate requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 				}
 			}
 			// This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
@@ -1091,7 +1091,7 @@ namespace FluidCoolers {
 				ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
 				ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
 				ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
-				ShowFatalError( "Review and revise design input values as appropriate." );
+				ShowFatalError( "Review and revise design input values as appropriate." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -1126,7 +1126,7 @@ namespace FluidCoolers {
 							ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
 							ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
 							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
-							ShowFatalError( "Review and revise design input values as appropriate." );
+							ShowFatalError( "Review and revise design input values as appropriate." );  // LCOV_EXCL_LINE
 						}
 						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1140,7 +1140,7 @@ namespace FluidCoolers {
 				} else {
 					if ( PlantFirstSizesOkayToFinalize ) {
 						ShowSevereError( "Autosizing of fluid cooler fan power requires a loop Sizing:Plant object." );
-						ShowFatalError( " Occurs in fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );
+						ShowFatalError( " Occurs in fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -1186,7 +1186,7 @@ namespace FluidCoolers {
 							ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
 							ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
 							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
-							ShowFatalError( "Review and revise design input values as appropriate." );
+							ShowFatalError( "Review and revise design input values as appropriate." );  // LCOV_EXCL_LINE
 						}
 						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1200,7 +1200,7 @@ namespace FluidCoolers {
 				} else {
 					if ( PlantFirstSizesOkayToFinalize ) {
 						ShowSevereError( "Autosizing of fluid cooler air flow rate requires a loop Sizing:Plant object" );
-						ShowFatalError( " Occurs in fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );
+						ShowFatalError( " Occurs in fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -1239,7 +1239,7 @@ namespace FluidCoolers {
 						ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
 						ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
-						ShowFatalError( "Review and revise design input values as appropriate." );
+						ShowFatalError( "Review and revise design input values as appropriate." );  // LCOV_EXCL_LINE
 					}
 					rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1287,7 +1287,7 @@ namespace FluidCoolers {
 						ShowContinueError( "Design Fluid Cooler Water Inlet Temp [C]           = " + RoundSigDigits( SimpleFluidCoolerInlet( FluidCoolerNum ).WaterTemp, 2 ) );
 						ShowContinueError( "Calculated water outlet temp at low UA [C] (UA = " + RoundSigDigits( UA0, 2 ) + " W/K) = " + RoundSigDigits( OutWaterTempAtUA0, 2 ) );
 						ShowContinueError( "Calculated water outlet temp at high UA [C](UA = " + RoundSigDigits( UA1, 2 ) + " W/K) = " + RoundSigDigits( OutWaterTempAtUA1, 2 ) );
-						ShowFatalError( "Autosizing of Fluid Cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
+						ShowFatalError( "Autosizing of Fluid Cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 					}
 					tmpHighSpeedEvapFluidCoolerUA = UA;
 					if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
@@ -1322,7 +1322,7 @@ namespace FluidCoolers {
 			} else {
 				if ( PlantFirstSizesOkayToFinalize ) {
 					ShowSevereError( "Autosizing error for fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );
-					ShowFatalError( "Autosizing of fluid cooler UA requires a loop Sizing:Plant object." );
+					ShowFatalError( "Autosizing of fluid cooler UA requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -1375,7 +1375,7 @@ namespace FluidCoolers {
 					ShowContinueError( "Design Fluid Cooler Water Inlet Temp [C]           = " + RoundSigDigits( SimpleFluidCoolerInlet( FluidCoolerNum ).WaterTemp, 2 ) );
 					ShowContinueError( "Calculated water outlet temp at low UA [C] (UA = " + RoundSigDigits( UA0, 2 ) + " W/K) = " + RoundSigDigits( OutWaterTempAtUA0, 2 ) );
 					ShowContinueError( "Calculated water outlet temp at high UA [C] (UA = " + RoundSigDigits( UA1, 2 ) + " W/K) = " + RoundSigDigits( OutWaterTempAtUA1, 2 ) );
-					ShowFatalError( "Autosizing of Fluid Cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of Fluid Cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = UA;
 			} else {
@@ -1502,7 +1502,7 @@ namespace FluidCoolers {
 					ShowContinueError( "Design Fluid Cooler Water Inlet Temp [C]             = " + RoundSigDigits( SimpleFluidCoolerInlet( FluidCoolerNum ).WaterTemp, 2 ) );
 					ShowContinueError( "Calculated water outlet temp at low UA [C](UA = " + RoundSigDigits( UA0, 2 ) + " W/C) = " + RoundSigDigits( OutWaterTempAtUA0, 2 ) );
 					ShowContinueError( "Calculated water outlet temp at high UA [C](UA = " + RoundSigDigits( UA1, 2 ) + " W/C) = " + RoundSigDigits( OutWaterTempAtUA1, 2 ) );
-					ShowFatalError( "Autosizing of Fluid Cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of Fluid Cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA = UA;
 			} else {
@@ -1543,7 +1543,7 @@ namespace FluidCoolers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "SizeFluidCooler: Program terminated due to previous condition(s)." );
+			ShowFatalError( "SizeFluidCooler: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 		}
 
 	}

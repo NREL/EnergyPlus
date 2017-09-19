@@ -118,7 +118,7 @@ namespace EnergyPlus {
 			groundTempModels.push_back( thisModel );
 			return thisModel;
 		} else {
-			ShowFatalError( "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+			ShowFatalError( "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");  // LCOV_EXCL_LINE
 			return nullptr;
 		}
 	}

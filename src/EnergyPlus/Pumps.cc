@@ -240,17 +240,17 @@ namespace Pumps {
 		if ( PumpIndex == 0 ) {
 			PumpNum = FindItemInList( PumpName, PumpEquip ); // Determine which pump to simulate
 			if ( PumpNum == 0 ) {
-				ShowFatalError( "ManagePumps: Pump requested not found =" + PumpName ); // Catch any bad names before crashing
+				ShowFatalError( "ManagePumps: Pump requested not found =" + PumpName ); // Catch any bad names before crashing  // LCOV_EXCL_LINE
 			}
 			PumpIndex = PumpNum;
 		} else {
 			PumpNum = PumpIndex;
 			if ( PumpEquip( PumpNum ).CheckEquipName ) {
 				if ( PumpNum > NumPumps || PumpNum < 1 ) {
-					ShowFatalError( "ManagePumps: Invalid PumpIndex passed=" + TrimSigDigits( PumpNum ) + ", Number of Pumps=" + TrimSigDigits( NumPumps ) + ", Pump name=" + PumpName );
+					ShowFatalError( "ManagePumps: Invalid PumpIndex passed=" + TrimSigDigits( PumpNum ) + ", Number of Pumps=" + TrimSigDigits( NumPumps ) + ", Pump name=" + PumpName );  // LCOV_EXCL_LINE
 				}
 				if ( PumpName != PumpEquip( PumpNum ).Name ) {
-					ShowFatalError( "ManagePumps: Invalid PumpIndex passed=" + TrimSigDigits( PumpNum ) + ", Pump name=" + PumpName + ", stored Pump Name for that index=" + PumpEquip( PumpNum ).Name );
+					ShowFatalError( "ManagePumps: Invalid PumpIndex passed=" + TrimSigDigits( PumpNum ) + ", Pump name=" + PumpName + ", stored Pump Name for that index=" + PumpEquip( PumpNum ).Name );  // LCOV_EXCL_LINE
 				}
 				PumpEquip( PumpNum ).CheckEquipName = false;
 			}
@@ -995,7 +995,7 @@ namespace Pumps {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting Pump input" );
+			ShowFatalError( "Errors found in getting Pump input" );  // LCOV_EXCL_LINE
 		}
 
 		for ( PumpNum = 1; PumpNum <= NumPumps; ++PumpNum ) { //CurrentModuleObject='Pumps'
@@ -1142,7 +1142,7 @@ namespace Pumps {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "InitializePumps: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitializePumps: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( PumpEquip( PumpNum ).LoopSideNum ).Branch( PumpEquip( PumpNum ).BranchNum ).Comp( PumpEquip( PumpNum ).CompNum ).CompNum = PumpNum;
 
@@ -1166,7 +1166,7 @@ namespace Pumps {
 					ShowSevereError( "Check input.  Calculated Pump Efficiency=" + RoundSigDigits( PumpEquip( PumpNum ).PumpEffic * 100.0, 3 ) + "% which is bigger than 100%, for pump=" + PumpEquip( PumpNum ).Name );
 					ShowContinueError( "Calculated Pump_Efficiency % =Total_Efficiency % [" + RoundSigDigits( TotalEffic * 100.0, 1 ) + "] / Motor_Efficiency % [" + RoundSigDigits( PumpEquip( PumpNum ).MotorEffic * 100.0, 1 ) + ']' );
 					ShowContinueError( "Total_Efficiency % =(Rated_Volume_Flow_Rate [" + RoundSigDigits( PumpEquip( PumpNum ).NomVolFlowRate, 1 ) + "] * Rated_Pump_Head [" + RoundSigDigits( PumpEquip( PumpNum ).NomPumpHead, 1 ) + "] / Rated_Power_Use [" + RoundSigDigits( PumpEquip( PumpNum ).NomPowerUse, 1 ) + "]) * 100." );
-					ShowFatalError( "Errors found in Pump input" );
+					ShowFatalError( "Errors found in Pump input" );  // LCOV_EXCL_LINE
 				}
 			} else {
 				ShowWarningError( "Check input. Pump nominal power or motor efficiency is set to 0, for pump=" + PumpEquip( PumpNum ).Name );
@@ -1657,7 +1657,7 @@ namespace Pumps {
 				if ( TotalEffic == 0.0 ) {
 					ShowSevereError( RoutineName + " Plant pressure simulation encountered a pump with zero efficiency: " + PumpEquip( PumpNum ).Name );
 					ShowContinueError( "Check efficiency inputs for this pump component." );
-					ShowFatalError( "Errors in plant calculation would result in divide-by-zero cause program termination." );
+					ShowFatalError( "Errors in plant calculation would result in divide-by-zero cause program termination." );  // LCOV_EXCL_LINE
 				}
 				Power = VolFlowRate * PlantLoop( PumpEquip( PumpNum ).LoopNum ).PressureDrop / TotalEffic;
 			}
@@ -1670,7 +1670,7 @@ namespace Pumps {
 			if ( TotalEffic == 0.0 ) {
 				ShowSevereError( RoutineName + " Plant pump simulation encountered a pump with zero efficiency: " + PumpEquip( PumpNum ).Name );
 				ShowContinueError( "Check efficiency inputs for this pump component." );
-				ShowFatalError( "Errors in plant calculation would result in divide-by-zero cause program termination." );
+				ShowFatalError( "Errors in plant calculation would result in divide-by-zero cause program termination." );  // LCOV_EXCL_LINE
 			}
 			Power = VolFlowRate * PumpEquip( PumpNum ).EMSPressureOverrideValue / TotalEffic;
 		}
@@ -1902,7 +1902,7 @@ namespace Pumps {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}

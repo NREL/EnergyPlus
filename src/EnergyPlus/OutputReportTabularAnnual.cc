@@ -261,11 +261,11 @@ namespace EnergyPlus {
 				}
 			}
 			if ( invalidAggregationOrderFound ) {
-				ShowFatalError( "OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed." );
+				ShowFatalError( "OutputReportTabularAnnual: Invalid aggregations detected, no simulation performed." );  // LCOV_EXCL_LINE
 			}
 		}
 
-		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017 
+		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017
 		bool
 		AnnualTable::invalidAggregationOrder( )
 		{

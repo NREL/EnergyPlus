@@ -231,17 +231,17 @@ namespace PoweredInductionUnits {
 		if ( CompIndex == 0 ) {
 			PIUNum = FindItemInList( CompName, PIU );
 			if ( PIUNum == 0 ) {
-				ShowFatalError( "SimPIU: PIU Unit not found=" + CompName );
+				ShowFatalError( "SimPIU: PIU Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = PIUNum;
 		} else {
 			PIUNum = CompIndex;
 			if ( PIUNum > NumPIUs || PIUNum < 1 ) {
-				ShowFatalError( "SimPIU: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of PIU Units=" + TrimSigDigits( NumPIUs ) + ", PIU Unit name=" + CompName );
+				ShowFatalError( "SimPIU: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of PIU Units=" + TrimSigDigits( NumPIUs ) + ", PIU Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( PIUNum ) ) {
 				if ( CompName != PIU( PIUNum ).Name ) {
-					ShowFatalError( "SimPIU: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", PIU Unit name=" + CompName + ", stored PIU Unit Name for that index=" + PIU( PIUNum ).Name );
+					ShowFatalError( "SimPIU: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", PIU Unit name=" + CompName + ", stored PIU Unit Name for that index=" + PIU( PIUNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( PIUNum ) = false;
 			}
@@ -267,7 +267,7 @@ namespace PoweredInductionUnits {
 		} else {
 			ShowSevereError( "Illegal PI Unit Type used=" + PIU( PIUNum ).UnitType );
 			ShowContinueError( "Occurs in PI Unit=" + PIU( PIUNum ).Name );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -671,7 +671,7 @@ namespace PoweredInductionUnits {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input.  Preceding conditions cause termination." );
+			ShowFatalError( RoutineName + "Errors found in getting input.  Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		for ( PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum ) {
@@ -753,7 +753,7 @@ namespace PoweredInductionUnits {
 				errFlag = false;
 				ScanPlantLoopsForObject( PIU( PIUNum ).HCoil, PIU( PIUNum ).HCoil_PlantTypeNum, PIU( PIUNum ).HWLoopNum, PIU( PIUNum ).HWLoopSide, PIU( PIUNum ).HWBranchNum, PIU( PIUNum ).HWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitPIU: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitPIU: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				PIU( PIUNum ).HotCoilOutNodeNum = PlantLoop( PIU( PIUNum ).HWLoopNum ).LoopSide( PIU( PIUNum ).HWLoopSide ).Branch( PIU( PIUNum ).HWBranchNum ).Comp( PIU( PIUNum ).HWCompNum ).NodeNumOut;
 			}
@@ -1291,7 +1291,7 @@ namespace PoweredInductionUnits {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}

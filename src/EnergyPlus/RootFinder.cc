@@ -249,7 +249,7 @@ namespace RootFinder {
 			ShowSevereError( "SetupRootFinder: Invalid function slope specification. Valid choices are:" );
 			ShowContinueError( "SetupRootFinder: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "SetupRootFinder: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-			ShowFatalError( "SetupRootFinder: Preceding error causes program termination." );
+			ShowFatalError( "SetupRootFinder: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 		}
 		RootFinderData.Controls.SlopeType = SlopeType;
 
@@ -261,26 +261,26 @@ namespace RootFinder {
 			ShowContinueError( "SetupRootFinder: iMethodFalsePosition=" + TrimSigDigits( iMethodFalsePosition ) );
 			ShowContinueError( "SetupRootFinder: iMethodSecant=" + TrimSigDigits( iMethodSecant ) );
 			ShowContinueError( "SetupRootFinder: iMethodBrent=" + TrimSigDigits( iMethodBrent ) );
-			ShowFatalError( "SetupRootFinder: Preceding error causes program termination." );
+			ShowFatalError( "SetupRootFinder: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 		}
 		RootFinderData.Controls.MethodType = MethodType;
 
 		// Load relative tolerance parameter for X variables
 		if ( TolX < 0.0 ) {
-			ShowFatalError( "SetupRootFinder: Invalid tolerance specification for X variables. TolX >= 0" );
+			ShowFatalError( "SetupRootFinder: Invalid tolerance specification for X variables. TolX >= 0" );  // LCOV_EXCL_LINE
 		}
 		RootFinderData.Controls.TolX = TolX;
 
 		// Load absolute tolerance parameter for X variables
 		if ( ATolX < 0.0 ) {
-			ShowFatalError( "SetupRootFinder: Invalid absolute tolerance specification for X variables. ATolX >= 0" );
+			ShowFatalError( "SetupRootFinder: Invalid absolute tolerance specification for X variables. ATolX >= 0" );  // LCOV_EXCL_LINE
 		}
 		RootFinderData.Controls.ATolX = ATolX;
 
 		// Load absolute tolerance parameter for Y variables
 		if ( ATolY < 0.0 ) {
-			ShowFatalError( "SetupRootFinder: Invalid absolute tolerance specification for Y variables. ATolY >= 0" );
+			ShowFatalError( "SetupRootFinder: Invalid absolute tolerance specification for Y variables. ATolY >= 0" );  // LCOV_EXCL_LINE
 		}
 		RootFinderData.Controls.ATolY = ATolY;
 
@@ -427,7 +427,7 @@ namespace RootFinder {
 			if ( XMax == 0.0 ) {
 				XMinReset = XMax;
 			} else {
-				ShowFatalError( "InitializeRootFinder: Invalid min/max bounds XMin=" + TrimSigDigits( XMin, 6 ) + " must be smaller than XMax=" + TrimSigDigits( XMax, 6 ) );
+				ShowFatalError( "InitializeRootFinder: Invalid min/max bounds XMin=" + TrimSigDigits( XMin, 6 ) + " must be smaller than XMax=" + TrimSigDigits( XMax, 6 ) );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -785,7 +785,7 @@ namespace RootFinder {
 				ShowSevereError( "CheckInternalConsistency: Invalid function slope specification. Valid choices are:" );
 				ShowContinueError( "CheckInternalConsistency: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 				ShowContinueError( "CheckInternalConsistency: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-				ShowFatalError( "CheckInternalConsistency: Preceding error causes program termination." );
+				ShowFatalError( "CheckInternalConsistency: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 			}}
 
 			// Check for in singularity with respect to the existing lower and upper points
@@ -819,7 +819,7 @@ namespace RootFinder {
 				ShowSevereError( "CheckInternalConsistency: Invalid function slope specification. Valid choices are:" );
 				ShowContinueError( "CheckInternalConsistency: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 				ShowContinueError( "CheckInternalConsistency: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-				ShowFatalError( "CheckInternalConsistency: Preceding error causes program termination." );
+				ShowFatalError( "CheckInternalConsistency: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 			}}
 		}
 
@@ -843,7 +843,7 @@ namespace RootFinder {
 				ShowSevereError( "CheckInternalConsistency: Invalid function slope specification. Valid choices are:" );
 				ShowContinueError( "CheckInternalConsistency: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 				ShowContinueError( "CheckInternalConsistency: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-				ShowFatalError( "CheckInternalConsistency: Preceding error causes program termination." );
+				ShowFatalError( "CheckInternalConsistency: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 			}}
 		}
 
@@ -1107,7 +1107,7 @@ namespace RootFinder {
 			ShowSevereError( "CheckSlope: Invalid function slope specification. Valid choices are:" );
 			ShowContinueError( "CheckSlope: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "CheckSlope: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-			ShowFatalError( "CheckSlope: Preceding error causes program termination." );
+			ShowFatalError( "CheckSlope: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -1252,7 +1252,7 @@ namespace RootFinder {
 			ShowSevereError( "CheckMinConstraint: Invalid function slope specification. Valid choices are:" );
 			ShowContinueError( "CheckMinConstraint: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "CheckMinConstraint: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-			ShowFatalError( "CheckMinConstraint: Preceding error causes program termination." );
+			ShowFatalError( "CheckMinConstraint: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 		}}
 
 		CheckMinConstraint = false;
@@ -1325,7 +1325,7 @@ namespace RootFinder {
 			ShowSevereError( "CheckMaxConstraint: Invalid function slope specification. Valid choices are:" );
 			ShowContinueError( "CheckMaxConstraint: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "CheckMaxConstraint: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-			ShowFatalError( "CheckMaxConstraint: Preceding error causes program termination." );
+			ShowFatalError( "CheckMaxConstraint: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 		}}
 
 		CheckMaxConstraint = false;
@@ -1647,7 +1647,7 @@ namespace RootFinder {
 						ShowSevereError( "UpdateBracket: Current iterate is smaller than the lower bracket." );
 						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
 						ShowContinueError( "UpdateBracket: XLower=" + TrimSigDigits( RootFinderData.LowerPoint.X, 15 ) + ", YLower=" + TrimSigDigits( RootFinderData.LowerPoint.Y, 15 ) );
-						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
+						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 					}
 				}
 
@@ -1672,7 +1672,7 @@ namespace RootFinder {
 						ShowSevereError( "UpdateBracket: Current iterate is greater than the upper bracket." );
 						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
 						ShowContinueError( "UpdateBracket: XUpper=" + TrimSigDigits( RootFinderData.UpperPoint.X, 15 ) + ", YUpper=" + TrimSigDigits( RootFinderData.UpperPoint.Y, 15 ) );
-						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
+						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -1700,7 +1700,7 @@ namespace RootFinder {
 						ShowSevereError( "UpdateBracket: Current iterate is smaller than the lower bracket." );
 						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
 						ShowContinueError( "UpdateBracket: XLower=" + TrimSigDigits( RootFinderData.LowerPoint.X, 15 ) + ", YLower=" + TrimSigDigits( RootFinderData.LowerPoint.Y, 15 ) );
-						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
+						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 					}
 				}
 
@@ -1725,7 +1725,7 @@ namespace RootFinder {
 						ShowSevereError( "UpdateBracket: Current iterate is greater than the upper bracket." );
 						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
 						ShowContinueError( "UpdateBracket: XUpper=" + TrimSigDigits( RootFinderData.UpperPoint.X, 15 ) + ", YUpper=" + TrimSigDigits( RootFinderData.UpperPoint.Y, 15 ) );
-						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
+						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -1735,7 +1735,7 @@ namespace RootFinder {
 			ShowSevereError( "UpdateBracket: Invalid function slope specification. Valid choices are:" );
 			ShowContinueError( "UpdateBracket: iSlopeIncreasing=" + TrimSigDigits( iSlopeIncreasing ) );
 			ShowContinueError( "UpdateBracket: iSlopeDecreasing=" + TrimSigDigits( iSlopeDecreasing ) );
-			ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
+			ShowFatalError( "UpdateBracket: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -2039,7 +2039,7 @@ namespace RootFinder {
 					RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 				} else {
 					// Should never happen
-					ShowFatalError( "AdvanceRootFinder: Cannot find lower bracket." );
+					ShowFatalError( "AdvanceRootFinder: Cannot find lower bracket." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -2054,7 +2054,7 @@ namespace RootFinder {
 					RootFinderData.XCandidate = RootFinderData.MaxPoint.X;
 				} else {
 					// Should never happen
-					ShowFatalError( "AdvanceRootFinder: Cannot find upper bracket." );
+					ShowFatalError( "AdvanceRootFinder: Cannot find upper bracket." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -2100,7 +2100,7 @@ namespace RootFinder {
 					ShowContinueError( "AdvanceRootFinder: iMethodFalsePosition=" + TrimSigDigits( iMethodFalsePosition ) );
 					ShowContinueError( "AdvanceRootFinder: iMethodSecant=" + TrimSigDigits( iMethodSecant ) );
 					ShowContinueError( "AdvanceRootFinder: iMethodBrent=" + TrimSigDigits( iMethodBrent ) );
-					ShowFatalError( "AdvanceRootFinder: Preceding error causes program termination." );
+					ShowFatalError( "AdvanceRootFinder: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 				}}
 			}}
 		}

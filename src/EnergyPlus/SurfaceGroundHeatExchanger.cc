@@ -202,7 +202,7 @@ namespace loc {
 			}
 		}
 		// If we didn't find it, fatal
-		ShowFatalError( "Surface Ground Heat Exchanger: Error getting inputs for pipe named: " + objectName );
+		ShowFatalError( "Surface Ground Heat Exchanger: Error getting inputs for pipe named: " + objectName );  // LCOV_EXCL_LINE
 		// Shut up the compiler
 		return nullptr;
 	}
@@ -380,7 +380,7 @@ namespace loc {
 
 		// final error check
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		// Set up the output variables
@@ -481,7 +481,7 @@ namespace loc {
 			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgSurface, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 
 			if ( errFlag ) {
-				ShowFatalError( "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			rho = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, constant_zero, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 			this->DesignMassFlowRate = Pi / 4.0 * pow_2( this->TubeDiameter ) * DesignVelocity * rho * this->TubeCircuits;

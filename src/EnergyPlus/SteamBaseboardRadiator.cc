@@ -223,17 +223,17 @@ namespace SteamBaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );
+				ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumSteamBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimSteamBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumSteamBaseboards ) + ", Entered Unit name=" + EquipName );
+				ShowFatalError( "SimSteamBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumSteamBaseboards ) + ", Entered Unit name=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != SteamBaseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "SimSteamBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + SteamBaseboard( BaseboardNum ).EquipID );
+					ShowFatalError( "SimSteamBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + SteamBaseboard( BaseboardNum ).EquipID );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -264,7 +264,7 @@ namespace SteamBaseboardRadiator {
 				} else {
 					ShowSevereError( "SimSteamBaseboard: Errors in Baseboard=" + SteamBaseboard( BaseboardNum ).EquipID );
 					ShowContinueError( "Invalid or unimplemented equipment type=" + TrimSigDigits( SteamBaseboard( BaseboardNum ).EquipType ) );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 				}}
 
@@ -282,7 +282,7 @@ namespace SteamBaseboardRadiator {
 			ReportSteamBaseboard( BaseboardNum );
 
 		} else {
-			ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );
+			ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -607,7 +607,7 @@ namespace SteamBaseboardRadiator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + cCMO_BBRadiator_Steam + "Errors found getting input. Program terminates." );
+			ShowFatalError( RoutineName + cCMO_BBRadiator_Steam + "Errors found getting input. Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		// Setup Report variables for the Coils
@@ -722,7 +722,7 @@ namespace SteamBaseboardRadiator {
 				ScanPlantLoopsForObject( SteamBaseboard( BaseboardNum ).EquipID, SteamBaseboard( BaseboardNum ).EquipType, SteamBaseboard( BaseboardNum ).LoopNum, SteamBaseboard( BaseboardNum ).LoopSideNum, SteamBaseboard( BaseboardNum ).BranchNum, SteamBaseboard( BaseboardNum ).CompNum, _, _, _, _, _, errFlag );
 				SetLoopIndexFlag( BaseboardNum ) = false;
 				if ( errFlag ) {
-					ShowFatalError( "InitSteamBaseboard: Program terminated for previous conditions." );
+					ShowFatalError( "InitSteamBaseboard: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -867,7 +867,7 @@ namespace SteamBaseboardRadiator {
 		if ( PltSizSteamNum > 0 ) {
 
 			DataScalableCapSizingON = false;
-			
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax == AutoSize ) {
@@ -969,7 +969,7 @@ namespace SteamBaseboardRadiator {
 		RegisterPlantCompDesignFlow( SteamBaseboard( BaseboardNum ).SteamInletNode, SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1304,7 +1304,7 @@ namespace SteamBaseboardRadiator {
 						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Steam + " = " + SteamBaseboard( BaseboardNum ).EquipID );
 						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Steam );
-						ShowFatalError( "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected" );
+						ShowFatalError( "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected" );  // LCOV_EXCL_LINE
 					}
 				} else { // small surface
 					ShowSevereError( "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux" );
@@ -1312,7 +1312,7 @@ namespace SteamBaseboardRadiator {
 					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
 					ShowContinueError( "Occurs in " + cCMO_BBRadiator_Steam + " = " + SteamBaseboard( BaseboardNum ).EquipID );
 					ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Steam );
-					ShowFatalError( "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux" );
+					ShowFatalError( "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux" );  // LCOV_EXCL_LINE
 
 				}
 			}
@@ -1491,20 +1491,20 @@ namespace SteamBaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( BaseboardName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "UpdateSteamBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName );
+				ShowFatalError( "UpdateSteamBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumSteamBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "UpdateSteamBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of baseboards=" + TrimSigDigits( NumSteamBaseboards ) + ", Entered baseboard name=" + BaseboardName );
+				ShowFatalError( "UpdateSteamBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of baseboards=" + TrimSigDigits( NumSteamBaseboards ) + ", Entered baseboard name=" + BaseboardName );  // LCOV_EXCL_LINE
 			}
 			if ( KickOffSimulation ) {
 				if ( BaseboardName != SteamBaseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + SteamBaseboard( BaseboardNum ).EquipID );
+					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + SteamBaseboard( BaseboardNum ).EquipID );  // LCOV_EXCL_LINE
 				}
 				if ( BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Steam ) {
-					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + ccSimPlantEquipTypes( BaseboardTypeNum ) );
+					ShowFatalError( "UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + ccSimPlantEquipTypes( BaseboardTypeNum ) );  // LCOV_EXCL_LINE
 				}
 			}
 		}

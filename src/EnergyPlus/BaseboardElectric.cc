@@ -181,17 +181,17 @@ namespace BaseboardElectric {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipName );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
+				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumBaseboards ) + ", Entered Unit name=" + EquipName );
+				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumBaseboards ) + ", Entered Unit name=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != Baseboard( BaseboardNum ).EquipName ) {
-					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + Baseboard( BaseboardNum ).EquipName );
+					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + Baseboard( BaseboardNum ).EquipName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -395,7 +395,7 @@ namespace BaseboardElectric {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination." );
+				ShowFatalError( RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 		}
 

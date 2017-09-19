@@ -161,16 +161,16 @@ namespace ICEngineElectricGenerator {
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, ICEngineGenerator );
-			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );
+			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );  // LCOV_EXCL_LINE
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumICEngineGenerators || GenNum < 1 ) {
-				ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of IC Engine Generators=" + TrimSigDigits( NumICEngineGenerators ) + ", Generator name=" + GeneratorName );
+				ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of IC Engine Generators=" + TrimSigDigits( NumICEngineGenerators ) + ", Generator name=" + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != ICEngineGenerator( GenNum ).Name ) {
-					ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + ICEngineGenerator( GenNum ).Name );
+					ShowFatalError( "SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + ICEngineGenerator( GenNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -291,7 +291,7 @@ namespace ICEngineElectricGenerator {
 		if ( InitLoopEquip ) {
 			CompNum = FindItemInList( CompName, ICEngineGenerator );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );
+				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );  // LCOV_EXCL_LINE
 				return;
 			}
 			MinCap = 0.0;
@@ -511,7 +511,7 @@ namespace ICEngineElectricGenerator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum ) {
@@ -947,7 +947,7 @@ namespace ICEngineElectricGenerator {
 			errFlag = false;
 			ScanPlantLoopsForObject( ICEngineGenerator( GeneratorNum ).Name, TypeOf_Generator_ICEngine, ICEngineGenerator( GeneratorNum ).HRLoopNum, ICEngineGenerator( GeneratorNum ).HRLoopSideNum, ICEngineGenerator( GeneratorNum ).HRBranchNum, ICEngineGenerator( GeneratorNum ).HRCompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitICEngineGenerators: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitICEngineGenerators: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			MyPlantScanFlag( GeneratorNum ) = false;

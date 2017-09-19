@@ -218,17 +218,17 @@ namespace SteamCoils {
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + CompName );
+				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CoilNum;
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumSteamCoils || CoilNum < 1 ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Steam Coils=" + TrimSigDigits( NumSteamCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Steam Coils=" + TrimSigDigits( NumSteamCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( CoilNum ) ) {
 				if ( CompName != SteamCoil( CoilNum ).Name ) {
-					ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + SteamCoil( CoilNum ).Name );
+					ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + SteamCoil( CoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( CoilNum ) = false;
 			}
@@ -434,7 +434,7 @@ namespace SteamCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input." );
+			ShowFatalError( RoutineName + "Errors found in getting input." );  // LCOV_EXCL_LINE
 		}
 
 		AlphArray.deallocate();
@@ -517,7 +517,7 @@ namespace SteamCoils {
 			errFlag = false;
 			ScanPlantLoopsForObject( SteamCoil( CoilNum ).Name, SteamCoil( CoilNum ).Coil_PlantTypeNum, SteamCoil( CoilNum ).LoopNum, SteamCoil( CoilNum ).LoopSide, SteamCoil( CoilNum ).BranchNum, SteamCoil( CoilNum ).CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitSteamCoil: Program terminated for previous conditions." );
+				ShowFatalError( "InitSteamCoil: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 			}
 			MyPlantScanFlag( CoilNum ) = false;
 		}
@@ -880,7 +880,7 @@ namespace SteamCoils {
 		RegisterPlantCompDesignFlow( SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding Steam coil sizing errors cause program termination" );
+			ShowFatalError( "Preceding Steam coil sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -982,7 +982,7 @@ namespace SteamCoils {
 			//update the TempSetPoint
 			TempSetPoint -= SteamCoil( CoilNum ).FaultyCoilSATOffset;
 		}
-		
+
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
@@ -1545,17 +1545,17 @@ namespace SteamCoils {
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + CompName );
+				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CoilNum;
 			Value = GetCurrentScheduleValue( SteamCoil( CoilNum ).SchedPtr ); // not scheduled?
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumSteamCoils || CoilNum < 1 ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Steam Coils=" + TrimSigDigits( NumSteamCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Steam Coils=" + TrimSigDigits( NumSteamCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CompName != SteamCoil( CoilNum ).Name ) {
-				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + SteamCoil( CoilNum ).Name );
+				ShowFatalError( "SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + SteamCoil( CoilNum ).Name );  // LCOV_EXCL_LINE
 			}
 			Value = GetCurrentScheduleValue( SteamCoil( CoilNum ).SchedPtr ); // not scheduled?
 		}
@@ -2459,7 +2459,7 @@ namespace SteamCoils {
 		int const CoilNum, // Number of hot water heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used
 		) {
 
 		// FUNCTION INFORMATION:

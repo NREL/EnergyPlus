@@ -229,7 +229,7 @@ namespace PlantLoopSolver {
 			// Now that the op scheme types are updated, do LoopSide validation
 			IsLoopSideValid = ValidateFlowControlPaths( LoopNum, ThisSide );
 			if ( ! IsLoopSideValid.Valid ) {
-				ShowFatalError( "ERROR:" + IsLoopSideValid.Reason );
+				ShowFatalError( "ERROR:" + IsLoopSideValid.Reason );  // LCOV_EXCL_LINE
 			}
 
 			// Set the flag to false so we won't do these again this time step
@@ -493,7 +493,7 @@ namespace PlantLoopSolver {
 			} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
 				//throw fatal
 				ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name );
-				ShowFatalError( "ValidateFlowControlPaths: developer notice, Inlet path validation loop" );
+				ShowFatalError( "ValidateFlowControlPaths: developer notice, Inlet path validation loop" );  // LCOV_EXCL_LINE
 			} else { //~ Other control type
 				if ( EncounteredLRB ) {
 					EncounteredNonLRBAfterLRB = true;
@@ -555,7 +555,7 @@ namespace PlantLoopSolver {
 					} else if ( SELECT_CASE_var == UnknownStatusOpSchemeType ) { //~ Uninitialized, this should be sufficient place to catch for this on other branches
 						//throw fatal error
 						ShowSevereError( "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name );
-						ShowFatalError( "ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop" );
+						ShowFatalError( "ValidateFlowControlPaths: developer notice, problem in Parallel path validation loop" );  // LCOV_EXCL_LINE
 					} else { //~ Other control type
 						if ( EncounteredLRB ) {
 							EncounteredNonLRBAfterLRB = true;
@@ -995,13 +995,13 @@ namespace PlantLoopSolver {
 			} else if ( ThisSide == SupplySide ) {
 				ShowContinueError( "Add a pump to the supply side of the plant loop" );
 			}
-			ShowFatalError( "Program terminates due to preceding conditions." );
+			ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 
 		} else if ( ! ThisSideHasPumps && ! OtherSideHasPumps ) {
 			ShowSevereError( "SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop" );
 			ShowContinueError( "Occurs on plant loop name =\"" + PlantLoop( LoopNum ).Name + "\"" );
 			ShowContinueError( "All plant loops require at least one pump" );
-			ShowFatalError( "Program terminates due to preceding conditions." );
+			ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1405,7 +1405,7 @@ namespace PlantLoopSolver {
 					break;
 				default:
 					if ( ( CurOpSchemeType >= LoadRangeBasedMin ) && ( CurOpSchemeType <= LoadRangeBasedMax ) ) { //~ load range based
-						ShowFatalError( "Encountered Load Based Object after other components, invalid." );
+						ShowFatalError( "Encountered Load Based Object after other components, invalid." );  // LCOV_EXCL_LINE
 					} else { //~ Typical control equipment
 						SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
 					}
@@ -1746,7 +1746,7 @@ namespace PlantLoopSolver {
 						ShowContinueError( "Loop Heating Low Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
 						ShowContinueError( "Loop Cooling High Setpoint=" + RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
 
-						ShowFatalError( "Program terminates due to above conditions." );
+						ShowFatalError( "Program terminates due to above conditions." );  // LCOV_EXCL_LINE
 					}
 					if ( LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0 ) {
 						LoadToLoopSetPoint = LoadToHeatingSetPoint;
@@ -1760,7 +1760,7 @@ namespace PlantLoopSolver {
 						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 						ShowContinueError( "Loop Heating Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
 						ShowContinueError( "Loop Cooling Setpoint=" + RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
-						ShowFatalError( "Program terminates due to above conditions." );
+						ShowFatalError( "Program terminates due to above conditions." );  // LCOV_EXCL_LINE
 					}
 				} else {
 					LoadToLoopSetPoint = 0.0;
@@ -2034,7 +2034,7 @@ namespace PlantLoopSolver {
 				ShowSevereError( "Plant topology problem for PlantLoop: " + PlantLoop( LoopNum ).Name + ", " + LoopSideName( LoopSideNum ) + " side." );
 				ShowContinueError( "There are multiple branches, yet no splitter.  This is an invalid configuration." );
 				ShowContinueError( "Add a set of connectors, use put components on a single branch." );
-				ShowFatalError( "Invalid plant topology causes program termination." );
+				ShowFatalError( "Invalid plant topology causes program termination." );  // LCOV_EXCL_LINE
 				return;
 			}
 		}
@@ -2049,7 +2049,7 @@ namespace PlantLoopSolver {
 				ShowSevereError( "Plant topology problem for PlantLoop: " + PlantLoop( LoopNum ).Name + ", " + LoopSideName( LoopSideNum ) + " side." );
 				ShowContinueError( "Diagnostic error in PlantLoopSolver::ResolveParallelFlows." );
 				ShowContinueError( "Splitter improperly specified, no splitter outlets." );
-				ShowFatalError( "Invalid plant topology causes program termination." );
+				ShowFatalError( "Invalid plant topology causes program termination." );  // LCOV_EXCL_LINE
 			}
 
 			NumActiveBranches = 0;

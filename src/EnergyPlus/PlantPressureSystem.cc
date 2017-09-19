@@ -304,7 +304,7 @@ namespace PlantPressureSystem {
 
 			} //Has pressure components
 
-			if ( ErrorsFound ) ShowFatalError( "Preceding errors cause program termination" );
+			if ( ErrorsFound ) ShowFatalError( "Preceding errors cause program termination" );  // LCOV_EXCL_LINE
 
 			//Also issue one time warning if there is a mismatch between plant loop simulation type and whether objects were entered
 			if ( loop.HasPressureComponents && ( loop.PressureSimType == Press_NoPressure ) ) {
@@ -574,7 +574,7 @@ namespace PlantPressureSystem {
 						ShowSevereError( "Pressure system information was found in a demand pump (common pipe) simulation" );
 						ShowContinueError( "Currently the pressure simulation is not set up to handle common pipe simulations" );
 						ShowContinueError( "Either modify simulation to avoid common pipe, or remove pressure curve information" );
-						ShowFatalError( "Pressure configuration mismatch causes program termination" );
+						ShowFatalError( "Pressure configuration mismatch causes program termination" );  // LCOV_EXCL_LINE
 					}
 					// If we are on the supply side, we simply hit the branch pump, so we exit the IF statement as
 					//  we don't need to simulate the splitter or inlet branch
@@ -718,7 +718,7 @@ namespace PlantPressureSystem {
 				}
 				ShowContinueError( "Branch contains only a single pump component, yet also a pressure drop component." );
 				ShowContinueError( "Either add a second component to this branch after the pump, or move pressure drop data." );
-				ShowFatalError( "Preceding pressure drop error causes program termination" );
+				ShowFatalError( "Preceding pressure drop error causes program termination" );  // LCOV_EXCL_LINE
 			}
 			return;
 		}

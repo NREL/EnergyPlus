@@ -287,7 +287,7 @@ namespace OutAirNodeManager {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );
+				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -315,7 +315,7 @@ namespace OutAirNodeManager {
 					continue;
 				}
 
-				
+
 
 				if ( ! any_eq( TmpNums, NodeNums( 1 ) ) ) {
 					++ListSize;
@@ -357,7 +357,7 @@ namespace OutAirNodeManager {
 				}
 			}
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );
+				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -442,7 +442,7 @@ namespace OutAirNodeManager {
 
 			Node( NodeNum ).Temp = Node( NodeNum ).OutAirDryBulb;
 			if ( Node( NodeNum ).OutAirDryBulbSchedNum != 0 || Node( NodeNum ).OutAirWetBulbSchedNum != 0 ) {
-				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );				
+				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );
 			}
 			else {
 				Node(NodeNum).HumRat = OutHumRat;

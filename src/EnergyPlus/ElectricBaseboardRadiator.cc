@@ -164,17 +164,17 @@ namespace ElectricBaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, ElecBaseboard, &ElecBaseboardParams::EquipName );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
+				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumElecBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumElecBaseboards ) + ", Entered Unit name=" + EquipName );
+				ShowFatalError( "SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumElecBaseboards ) + ", Entered Unit name=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != ElecBaseboard( BaseboardNum ).EquipName ) {
-					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + ElecBaseboard( BaseboardNum ).EquipName );
+					ShowFatalError( "SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + ElecBaseboard( BaseboardNum ).EquipName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -191,7 +191,7 @@ namespace ElectricBaseboardRadiator {
 		} else {
 			ShowSevereError( "SimElecBaseboard: Errors in Baseboard=" + ElecBaseboard( BaseboardNum ).EquipName );
 			ShowContinueError( "Invalid or unimplemented equipment type=" + cCMO_BBRadiator_Electric );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -460,7 +460,7 @@ namespace ElectricBaseboardRadiator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + cCurrentModuleObject + "Errors found getting input. Program terminates." );
+			ShowFatalError( RoutineName + cCurrentModuleObject + "Errors found getting input. Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		for ( BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum ) {
@@ -802,7 +802,7 @@ namespace ElectricBaseboardRadiator {
 				} else {
 
 					UpdateElectricBaseboardOn( AirOutletTemp, ElecBaseboard( BaseboardNum ).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
-	
+
 				}
 
 			} else { // zero radiant fraction, no need of recalculation of heat balances
@@ -1026,7 +1026,7 @@ namespace ElectricBaseboardRadiator {
 							ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
 							ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 							ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
-							ShowFatalError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );
+							ShowFatalError( "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected" );  // LCOV_EXCL_LINE
 						}
 					} else {
 						ShowSevereError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
@@ -1034,7 +1034,7 @@ namespace ElectricBaseboardRadiator {
 						ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
 						ShowContinueError( "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard( BaseboardNum ).EquipName );
 						ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric );
-						ShowFatalError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );
+						ShowFatalError( "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux" );  // LCOV_EXCL_LINE
 					}
 				}
 			}

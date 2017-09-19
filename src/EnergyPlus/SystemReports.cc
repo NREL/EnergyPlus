@@ -4229,7 +4229,7 @@ namespace SystemReports {
 
 				} else {
 
-					ShowFatalError( "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if to do nothing" );
+					ShowFatalError( "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if to do nothing" );  // LCOV_EXCL_LINE
 
 				}}
 

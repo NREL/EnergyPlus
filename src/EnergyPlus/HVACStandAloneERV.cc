@@ -230,17 +230,17 @@ namespace HVACStandAloneERV {
 		if ( CompIndex == 0 ) {
 			StandAloneERVNum = FindItem( CompName, StandAloneERV );
 			if ( StandAloneERVNum == 0 ) {
-				ShowFatalError( "SimStandAloneERV: Unit not found=" + CompName );
+				ShowFatalError( "SimStandAloneERV: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = StandAloneERVNum;
 		} else {
 			StandAloneERVNum = CompIndex;
 			if ( StandAloneERVNum > NumStandAloneERVs || StandAloneERVNum < 1 ) {
-				ShowFatalError( "SimStandAloneERV:  Invalid CompIndex passed=" + TrimSigDigits( StandAloneERVNum ) + ", Number of Units=" + TrimSigDigits( NumStandAloneERVs ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimStandAloneERV:  Invalid CompIndex passed=" + TrimSigDigits( StandAloneERVNum ) + ", Number of Units=" + TrimSigDigits( NumStandAloneERVs ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( StandAloneERVNum ) ) {
 				if ( CompName != StandAloneERV( StandAloneERVNum ).Name ) {
-					ShowFatalError( "SimStandAloneERV: Invalid CompIndex passed=" + TrimSigDigits( StandAloneERVNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + StandAloneERV( StandAloneERVNum ).Name );
+					ShowFatalError( "SimStandAloneERV: Invalid CompIndex passed=" + TrimSigDigits( StandAloneERVNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + StandAloneERV( StandAloneERVNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( StandAloneERVNum ) = false;
 			}
@@ -1017,7 +1017,7 @@ namespace HVACStandAloneERV {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting ZoneHVAC:EnergyRecoveryVentilator input." );
+			ShowFatalError( "Errors found in getting ZoneHVAC:EnergyRecoveryVentilator input." );  // LCOV_EXCL_LINE
 		}
 
 		// Setup report variables for the stand alone ERVs

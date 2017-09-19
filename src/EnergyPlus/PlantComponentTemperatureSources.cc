@@ -168,17 +168,17 @@ namespace PlantComponentTemperatureSources {
 		if ( CompIndex == 0 ) {
 			SourceNum = FindItemInList( SourceName, WaterSource );
 			if ( SourceNum == 0 ) {
-				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );
+				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = SourceNum;
 		} else {
 			SourceNum = CompIndex;
 			if ( SourceNum > NumSources || SourceNum < 1 ) {
-				ShowFatalError( "SimWaterSource:  Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Number of Units=" + TrimSigDigits( NumSources ) + ", Entered Unit name=" + SourceName );
+				ShowFatalError( "SimWaterSource:  Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Number of Units=" + TrimSigDigits( NumSources ) + ", Entered Unit name=" + SourceName );  // LCOV_EXCL_LINE
 			}
 			if ( WaterSource( SourceNum ).CheckEquipName ) {
 				if ( SourceName != WaterSource( SourceNum ).Name ) {
-					ShowFatalError( "SimWaterSource: Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Unit name=" + SourceName + ", stored Unit Name for that index=" + WaterSource( SourceNum ).Name );
+					ShowFatalError( "SimWaterSource: Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Unit name=" + SourceName + ", stored Unit Name for that index=" + WaterSource( SourceNum ).Name );  // LCOV_EXCL_LINE
 				}
 				WaterSource( SourceNum ).CheckEquipName = false;
 			}
@@ -312,7 +312,7 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( SourceNum = 1; SourceNum <= NumSources; ++SourceNum ) {
@@ -389,7 +389,7 @@ namespace PlantComponentTemperatureSources {
 			errFlag = false;
 			ScanPlantLoopsForObject( WaterSource( SourceNum ).Name, TypeOf_WaterSource, WaterSource( SourceNum ).Location.loopNum, WaterSource( SourceNum ).Location.loopSideNum, WaterSource( SourceNum ).Location.branchNum, WaterSource( SourceNum ).Location.compNum, _, _, _, WaterSource( SourceNum ).InletNodeNum, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
+				ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			WaterSource( SourceNum ).MyFlag = false;
 		}
@@ -570,7 +570,7 @@ namespace PlantComponentTemperatureSources {
 		RegisterPlantCompDesignFlow( WaterSource( SourceNum ).InletNodeNum, tmpVolFlowRate );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}

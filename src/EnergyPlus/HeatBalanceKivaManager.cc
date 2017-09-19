@@ -92,7 +92,7 @@ void kivaErrorCallback(
 		ShowWarningError( "Kiva: " + message );
 	} else /* if (messageType == Kiva::MSG_ERR) */ {
 		ShowSevereError( "Kiva: " + message );
-		ShowFatalError( "Kiva: Errors discovered, program terminates." );
+		ShowFatalError( "Kiva: Errors discovered, program terminates." );  // LCOV_EXCL_LINE
 	}
 }
 
@@ -448,7 +448,7 @@ void KivaManager::readWeatherData()
 	{
 		IOFlags flags; flags.ACTION( "read" ); gio::open( kivaWeatherFileUnitNumber, DataStringGlobals::inputWeatherFileName, flags );
 		if ( flags.err() )
-			ShowFatalError( "Kiva::ReadWeatherFile: Could not OPEN EPW Weather File" );
+			ShowFatalError( "Kiva::ReadWeatherFile: Could not OPEN EPW Weather File" );  // LCOV_EXCL_LINE
 	}
 
 	// Read in Header Information
@@ -461,7 +461,7 @@ void KivaManager::readWeatherData()
 		{
 			IOFlags flags; gio::read( kivaWeatherFileUnitNumber, "(A)", flags ) >> Line;
 			if ( flags.end() )
-				ShowFatalError( "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ) );
+				ShowFatalError( "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ) );  // LCOV_EXCL_LINE
 		}
 		// Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
 		int endcol = len( Line );
@@ -469,7 +469,7 @@ void KivaManager::readWeatherData()
 			if ( int( Line[ endcol - 1 ] ) == DataSystemVariables::iUnicode_end ) {
 				ShowSevereError( "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
+				ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 			}
 		}
 		std::string::size_type Pos = FindNonSpace( Line );
@@ -482,7 +482,7 @@ void KivaManager::readWeatherData()
 		if ( ( Pos == std::string::npos ) && ( ! has_prefixi( Header( HdLine ), "COMMENTS" ) ) ) {
 			ShowSevereError( "Invalid Header line in in.epw -- no commas" );
 			ShowContinueError( "Line=" + Line );
-			ShowFatalError( "Previous conditions cause termination." );
+			ShowFatalError( "Previous conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 		if ( Pos != std::string::npos ) Line.erase( 0, Pos + 1 );
 

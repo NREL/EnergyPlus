@@ -254,17 +254,17 @@ namespace EvaporativeFluidCoolers {
 		if ( CompIndex == 0 ) {
 			EvapFluidCoolerNum = FindItemInList( EvapFluidCoolerName, SimpleEvapFluidCooler );
 			if ( EvapFluidCoolerNum == 0 ) {
-				ShowFatalError( "SimEvapFluidCoolers: Unit not found = " + EvapFluidCoolerName );
+				ShowFatalError( "SimEvapFluidCoolers: Unit not found = " + EvapFluidCoolerName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = EvapFluidCoolerNum;
 		} else {
 			EvapFluidCoolerNum = CompIndex;
 			if ( EvapFluidCoolerNum > NumSimpleEvapFluidCoolers || EvapFluidCoolerNum < 1 ) {
-				ShowFatalError( "SimEvapFluidCoolers:  Invalid CompIndex passed = " + TrimSigDigits( EvapFluidCoolerNum ) + ", Number of Units = " + TrimSigDigits( NumSimpleEvapFluidCoolers ) + ", Entered Unit name = " + EvapFluidCoolerName );
+				ShowFatalError( "SimEvapFluidCoolers:  Invalid CompIndex passed = " + TrimSigDigits( EvapFluidCoolerNum ) + ", Number of Units = " + TrimSigDigits( NumSimpleEvapFluidCoolers ) + ", Entered Unit name = " + EvapFluidCoolerName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( EvapFluidCoolerNum ) ) {
 				if ( EvapFluidCoolerName != SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name ) {
-					ShowFatalError( "SimEvapFluidCoolers: Invalid CompIndex passed = " + TrimSigDigits( EvapFluidCoolerNum ) + ", Unit name = " + EvapFluidCoolerName + ", stored Unit Name for that index = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "SimEvapFluidCoolers: Invalid CompIndex passed = " + TrimSigDigits( EvapFluidCoolerNum ) + ", Unit name = " + EvapFluidCoolerName + ", stored Unit Name for that index = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( EvapFluidCoolerNum ) = false;
 			}
@@ -315,7 +315,7 @@ namespace EvaporativeFluidCoolers {
 			ReportEvapFluidCooler( RunFlag, EvapFluidCoolerNum );
 
 		} else {
-			ShowFatalError( "SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType );
+			ShowFatalError( "SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType );  // LCOV_EXCL_LINE
 
 		}} // TypeOfEquip
 
@@ -406,7 +406,7 @@ namespace EvaporativeFluidCoolers {
 		NumTwoSpeedEvapFluidCoolers = GetNumObjectsFound( cEvapFluidCooler_TwoSpeed );
 		NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
-		if ( NumSimpleEvapFluidCoolers <= 0 ) ShowFatalError( "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. Search the input for evaporative fluid cooler to determine the cause for this error." );
+		if ( NumSimpleEvapFluidCoolers <= 0 ) ShowFatalError( "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. Search the input for evaporative fluid cooler to determine the cause for this error." );  // LCOV_EXCL_LINE
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleEvapFluidCooler ) ) return;
@@ -919,7 +919,7 @@ namespace EvaporativeFluidCoolers {
 		} // End Two-Speed Evaporative Fluid Cooler Loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting evaporative fluid cooler input." );
+			ShowFatalError( "Errors found in getting evaporative fluid cooler input." );  // LCOV_EXCL_LINE
 		}
 
 		// Set up output variables
@@ -1121,7 +1121,7 @@ namespace EvaporativeFluidCoolers {
 			ScanPlantLoopsForObject( SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, TypeOf_Num, SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopSideNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).BranchNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).CompNum, _, _, _, _, _, ErrorsFound );
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "InitEvapFluidCooler: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitEvapFluidCooler: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
@@ -1138,7 +1138,7 @@ namespace EvaporativeFluidCoolers {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "InitEvapFluidCooler: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitEvapFluidCooler: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			OneTimeFlagForEachEvapFluidCooler( EvapFluidCoolerNum ) = false;
@@ -1285,7 +1285,7 @@ namespace EvaporativeFluidCoolers {
 			} else {
 				if ( PlantFirstSizesOkayToFinalize ) {
 					ShowSevereError( "Autosizing error for evaporative fluid cooler object = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-					ShowFatalError( "Autosizing of evaporative fluid cooler condenser flow rate requires a loop Sizing:Plant object." );
+					ShowFatalError( "Autosizing of evaporative fluid cooler condenser flow rate requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 				}
 			}
 			// Check when the user specified Condenser/Evaporative Fluid Cooler water design setpoint
@@ -1300,7 +1300,7 @@ namespace EvaporativeFluidCoolers {
 				ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air wet-bulb temperature (" + RoundSigDigits( DesignEnteringAirWetBulb, 2 ) + " C) when autosizing the Evaporative Fluid Cooler UA." );
 				ShowContinueError( "It is recommended that the Design Loop Exit Temperature = Design Entering Air Wet-bulb Temp plus the Evaporative Fluid Cooler design approach temperature (e.g., 4 C)." );
 				ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > Design Entering Air Wet-bulb Temp if autosizing the Evaporative Fluid Cooler." );
-				ShowFatalError( "Review and revise design input values as appropriate." );
+				ShowFatalError( "Review and revise design input values as appropriate." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -1371,7 +1371,7 @@ namespace EvaporativeFluidCoolers {
 				} else {
 					if ( PlantFirstSizesOkayToFinalize ) {
 						ShowSevereError( "Autosizing of evaporative fluid cooler fan power requires a loop Sizing:Plant object." );
-						ShowFatalError( " Occurs in evaporative fluid cooler object= " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+						ShowFatalError( " Occurs in evaporative fluid cooler object= " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -1438,7 +1438,7 @@ namespace EvaporativeFluidCoolers {
 						ShowContinueError( "The Design Loop Exit Temperature specified in Sizing:Plant object = " + PlantSizData( PltSizCondNum ).PlantLoopName );
 						ShowContinueError( "It is recommended that the Design Loop Exit Temperature = 25.6 C plus the Evaporative Fluid Cooler design approach temperature (e.g., 4 C)." );
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > 25.6 C if autosizing the Evaporative Fluid Cooler." );
-						ShowFatalError( "Review and revise design input values as appropriate." );
+						ShowFatalError( "Review and revise design input values as appropriate." );  // LCOV_EXCL_LINE
 					}
 					rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1486,7 +1486,7 @@ namespace EvaporativeFluidCoolers {
 						ShowContinueError( "Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " + RoundSigDigits( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp, 2 ) );
 						ShowContinueError( "Calculated water outlet temperature at low UA [C](UA = " + RoundSigDigits( UA0, 2 ) + " W/C)  = " + RoundSigDigits( OutWaterTempAtUA0, 2 ) );
 						ShowContinueError( "Calculated water outlet temperature at high UA [C](UA = " + RoundSigDigits( UA1, 2 ) + " W/C)  = " + RoundSigDigits( OutWaterTempAtUA1, 2 ) );
-						ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+						ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 					}
 					tmpHighSpeedEvapFluidCoolerUA = UA;
 					if ( PlantFirstSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
@@ -1519,7 +1519,7 @@ namespace EvaporativeFluidCoolers {
 			} else {
 				if ( PlantFirstSizesOkayToFinalize ) {
 					ShowSevereError( "Autosizing error for evaporative fluid cooler object = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-					ShowFatalError( "Autosizing of evaporative fluid cooler UA requires a loop Sizing:Plant object." );
+					ShowFatalError( "Autosizing of evaporative fluid cooler UA requires a loop Sizing:Plant object." );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -1551,7 +1551,7 @@ namespace EvaporativeFluidCoolers {
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( CalledFrom + ": The combination of design input values did not allow the calculation of a " );
 					ShowContinueError( "reasonable UA value. Review and revise design input values as appropriate. " );
-					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = UA;
 			} else {
@@ -1629,7 +1629,7 @@ namespace EvaporativeFluidCoolers {
 					ShowContinueError( "Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " + RoundSigDigits( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp, 2 ) );
 					ShowContinueError( "Calculated water outlet temperature at low UA [C](UA = " + RoundSigDigits( UA0, 2 ) + " W/C)  = " + RoundSigDigits( OutWaterTempAtUA0, 2 ) );
 					ShowContinueError( "Calculated water outlet temperature at high UA [C](UA = " + RoundSigDigits( UA1, 2 ) + " W/C)  = " + RoundSigDigits( OutWaterTempAtUA1, 2 ) );
-					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = UA;
 			} else {
@@ -1723,7 +1723,7 @@ namespace EvaporativeFluidCoolers {
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( CalledFrom + ": The combination of design input values did not allow the calculation of a " );
 					ShowContinueError( "reasonable low-speed UA value. Review and revise design input values as appropriate. " );
-					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA = UA;
 			} else {
@@ -1763,7 +1763,7 @@ namespace EvaporativeFluidCoolers {
 				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating EvaporativeFluidCooler UA" );
-					ShowFatalError( "Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				} else if ( SolFla == -2 ) {
 					SimSimpleEvapFluidCooler( int( Par( 2 ) ), Par( 3 ), Par( 4 ), UA0, OutWaterTempAtUA0 );
 					SimSimpleEvapFluidCooler( int( Par( 2 ) ), Par( 3 ), Par( 4 ), UA1, OutWaterTempAtUA1 );
@@ -1785,7 +1785,7 @@ namespace EvaporativeFluidCoolers {
 					ShowContinueError( "Design Evaporative Fluid Cooler Water Inlet Temp [C]    = " + RoundSigDigits( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp, 2 ) );
 					ShowContinueError( "Calculated water outlet temperature at low UA(" + RoundSigDigits( UA0, 2 ) + ")  = " + RoundSigDigits( OutWaterTempAtUA0, 2 ) );
 					ShowContinueError( "Calculated water outlet temperature at high UA(" + RoundSigDigits( UA1, 2 ) + ")  = " + RoundSigDigits( OutWaterTempAtUA1, 2 ) );
-					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA = UA;
 			} else {

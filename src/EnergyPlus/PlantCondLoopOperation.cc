@@ -291,7 +291,7 @@ namespace PlantCondLoopOperation {
 			RangeVariable = FindRangeVariable( LoopNum, CurSchemePtr, CurSchemeType );
 		} else {
 			// No controls specified.  This is a fatal error
-			ShowFatalError( "Invalid Operation Scheme Type Requested=" + PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).TypeOf + ", in ManagePlantLoadDistribution" );
+			ShowFatalError( "Invalid Operation Scheme Type Requested=" + PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).TypeOf + ", in ManagePlantLoadDistribution" );  // LCOV_EXCL_LINE
 		}
 
 		//Find the proper list within the specified scheme
@@ -549,7 +549,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes" );
+			ShowFatalError( RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -647,7 +647,7 @@ namespace PlantCondLoopOperation {
 		NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
 		NumUncontrolledSchemes = GetNumObjectsFound( "PlantEquipmentOperation:Uncontrolled" );
 		if ( ( NumSchemes + NumUncontrolledSchemes ) <= 0 ) {
-			ShowFatalError( "No PlantEquipmentOperation:* objects specified. Stop simulation." );
+			ShowFatalError( "No PlantEquipmentOperation:* objects specified. Stop simulation." );  // LCOV_EXCL_LINE
 		}
 
 		// test for blank or duplicates -- this section just determines if there are any duplicate operation scheme names
@@ -696,7 +696,7 @@ namespace PlantCondLoopOperation {
 				CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
 				Count = Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes - NumUserDefOpSchemes;
 			} else {
-				ShowFatalError( "Error in control scheme identification" );
+				ShowFatalError( "Error in control scheme identification" );  // LCOV_EXCL_LINE
 			}
 
 			GetObjectItem( CurrentModuleObject, Count, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
@@ -814,7 +814,7 @@ namespace PlantCondLoopOperation {
 
 		// Validate that component names/types in each list correspond to a valid component in input file
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 		}
 	}
 
@@ -1279,7 +1279,7 @@ namespace PlantCondLoopOperation {
 				}
 			}
 			if ( ErrorsFound ) {
-				ShowFatalError( "LoadEquipList/GetEquipmentLists: Failed due to preceding errors." );
+				ShowFatalError( "LoadEquipList/GetEquipmentLists: Failed due to preceding errors." );  // LCOV_EXCL_LINE
 			}
 			LoadEquipListOneTimeFlag = false;
 		}
@@ -1854,7 +1854,7 @@ namespace PlantCondLoopOperation {
 								ShowContinueError( "Operation Scheme name = " + this_op_scheme.Name );
 								ShowContinueError( "Loop name = " + this_plant_loop.Name );
 								ShowContinueError( "Component name = " + this_equip.Name );
-								ShowFatalError( "InitLoadDistribution: Simulation terminated because of error in operation scheme." );
+								ShowFatalError( "InitLoadDistribution: Simulation terminated because of error in operation scheme." );  // LCOV_EXCL_LINE
 							}
 
 							this_equip.LoopNumPtr = DummyLoopNum;
@@ -2101,7 +2101,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		if ( errFlag2 ) {
-			ShowFatalError( "InitLoadDistribution: Fatal error caused by previous severe error(s)." );
+			ShowFatalError( "InitLoadDistribution: Fatal error caused by previous severe error(s)." );  // LCOV_EXCL_LINE
 		}
 
 	}

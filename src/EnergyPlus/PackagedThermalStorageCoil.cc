@@ -219,17 +219,17 @@ namespace PackagedThermalStorageCoil {
 		if ( CompIndex == 0 ) {
 			TESCoilNum = FindItemInList( CompName, TESCoil );
 			if ( TESCoilNum == 0 ) {
-				ShowFatalError( "Thermal Energy Storage Cooling Coil not found=" + CompName );
+				ShowFatalError( "Thermal Energy Storage Cooling Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = TESCoilNum;
 		} else {
 			TESCoilNum = CompIndex;
 			if ( TESCoilNum > NumTESCoils || TESCoilNum < 1 ) {
-				ShowFatalError( "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits( TESCoilNum ) + ", Number of Thermal Energy Storage Cooling Coil Coils=" + TrimSigDigits( NumTESCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits( TESCoilNum ) + ", Number of Thermal Energy Storage Cooling Coil Coils=" + TrimSigDigits( NumTESCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( TESCoilNum ) ) {
 				if ( ! CompName.empty() && CompName != TESCoil( TESCoilNum ).Name ) {
-					ShowFatalError( "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits( TESCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + TESCoil( TESCoilNum ).Name );
+					ShowFatalError( "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits( TESCoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + TESCoil( TESCoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( TESCoilNum ) = false;
 			}
@@ -1618,7 +1618,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		// setup reporting
@@ -1765,7 +1765,7 @@ namespace PackagedThermalStorageCoil {
 
 				// double check node names match
 				if ( errFlag ) {
-					ShowFatalError( "InitTESCoil: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitTESCoil: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				TESCoil( TESCoilNum ).TESPlantLoopNum = plloopnum;
 				TESCoil( TESCoilNum ).TESPlantLoopSideNum = lsnum;
@@ -1782,7 +1782,7 @@ namespace PackagedThermalStorageCoil {
 					errFlag = true;
 				}
 				if ( errFlag ) {
-					ShowFatalError( "InitTESCoil: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitTESCoil: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 			} // any plant connection to TES

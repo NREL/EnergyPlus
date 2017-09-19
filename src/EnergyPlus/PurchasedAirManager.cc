@@ -264,17 +264,17 @@ namespace PurchasedAirManager {
 		if ( CompIndex == 0 ) {
 			PurchAirNum = FindItemInList( PurchAirName, PurchAir );
 			if ( PurchAirNum == 0 ) {
-				ShowFatalError( "SimPurchasedAir: Unit not found=" + PurchAirName );
+				ShowFatalError( "SimPurchasedAir: Unit not found=" + PurchAirName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = PurchAirNum;
 		} else {
 			PurchAirNum = CompIndex;
 			if ( PurchAirNum > NumPurchAir || PurchAirNum < 1 ) {
-				ShowFatalError( "SimPurchasedAir:  Invalid CompIndex passed=" + TrimSigDigits( PurchAirNum ) + ", Number of Units=" + TrimSigDigits( NumPurchAir ) + ", Entered Unit name=" + PurchAirName );
+				ShowFatalError( "SimPurchasedAir:  Invalid CompIndex passed=" + TrimSigDigits( PurchAirNum ) + ", Number of Units=" + TrimSigDigits( NumPurchAir ) + ", Entered Unit name=" + PurchAirName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( PurchAirNum ) ) {
 				if ( PurchAirName != PurchAir( PurchAirNum ).Name ) {
-					ShowFatalError( "SimPurchasedAir: Invalid CompIndex passed=" + TrimSigDigits( PurchAirNum ) + ", Unit name=" + PurchAirName + ", stored Unit Name for that index=" + PurchAir( PurchAirNum ).Name );
+					ShowFatalError( "SimPurchasedAir: Invalid CompIndex passed=" + TrimSigDigits( PurchAirNum ) + ", Unit name=" + PurchAirName + ", stored Unit Name for that index=" + PurchAir( PurchAirNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( PurchAirNum ) = false;
 			}
@@ -794,7 +794,7 @@ namespace PurchasedAirManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input. Preceding conditions cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -906,7 +906,7 @@ namespace PurchasedAirManager {
 					ShowSevereError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
 					ShowContinueError( "Zone Supply Air Node Name=" + NodeID( SupplyNodeNum ) + " is not a zone inlet node." );
 					ShowContinueError( "Check ZoneHVAC:EquipmentConnections for zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -933,9 +933,9 @@ namespace PurchasedAirManager {
 				if ( ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode > 0 ) {
 					PurchAir( PurchAirNum ).ZoneRecircAirNodeNum = ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode;
 				} else {
-					ShowFatalError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
+					ShowFatalError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );  // LCOV_EXCL_LINE
 					ShowContinueError( " Invalid recirculation node. No exhaust or return node has been specified for this zone in ZoneHVAC:EquipmentConnections." );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 			}
 			// If there is OA and economizer is active, then there must be a limit on cooling flow rate
@@ -1037,7 +1037,7 @@ namespace PurchasedAirManager {
 			}
 		}
 		//      IF (ErrorsFound .and. .not. WarmupFlag) THEN
-		//        CALL ShowFatalError('Preceding conditions cause termination.')
+		//        CALL ShowFatalError('Preceding conditions cause termination.')  // LCOV_EXCL_LINE
 		//      ENDIF
 
 	}
@@ -3038,7 +3038,7 @@ namespace PurchasedAirManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ReturnPlenumIndex; // index to ZoneHVAC:ReturnPlenum object
 		int ReturnPlenumNum; // loop counter
-		bool PlenumNotFound; // logical to determine if same plenum is used by other ideal loads air systems 
+		bool PlenumNotFound; // logical to determine if same plenum is used by other ideal loads air systems
 		int Loop; // loop counters
 		int Loop2; // loop counters
 		Array1D_int TempPurchArray; // temporary array used for dynamic allocation

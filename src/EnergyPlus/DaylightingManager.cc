@@ -312,11 +312,11 @@ namespace DaylightingManager {
 				if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 0 ) {
 					ShowSevereError( "DayltgAveInteriorReflectance: Multiplier > 1.0 for window " + Surface( ISurf ).Name + " in Zone=" + Surface( ISurf ).ZoneName );
 					ShowContinueError( "...not allowed since it is in a zone with daylighting." );
-					ShowFatalError( "Program terminates due to preceding conditions." );
+					ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 				} else {
 					ShowSevereError( "DayltgAveInteriorReflectance: Multiplier > 1.0 for window " + Surface( ISurf ).Name + " in Zone=" + Surface( ISurf ).ZoneName );
 					ShowContinueError( "...an adjacent Zone has daylighting. Simulation cannot proceed." );
-					ShowFatalError( "Program terminates due to preceding conditions." );
+					ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( IType == SurfaceClass_Wall || IType == SurfaceClass_Floor || IType == SurfaceClass_Roof || IType == SurfaceClass_Window || IType == SurfaceClass_Door ) {
@@ -750,7 +750,7 @@ namespace DaylightingManager {
 			OutputFileDFS = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDFS, DataStringGlobals::outputDfsFileName, flags ); write_stat = flags.ios(); }
 			if ( write_stat != 0 ) {
-				ShowFatalError( "CalcDayltgCoefficients: Could not open file "+DataStringGlobals::outputDfsFileName+" for output (write)." );
+				ShowFatalError( "CalcDayltgCoefficients: Could not open file "+DataStringGlobals::outputDfsFileName+" for output (write)." );  // LCOV_EXCL_LINE
 			} else {
 				gio::write( OutputFileDFS, fmtA ) << "This file contains daylight factors for all exterior windows of daylight zones.";
 				gio::write( OutputFileDFS, fmtA ) << "If only one reference point the last 4 columns in the data will be zero.";
@@ -893,7 +893,7 @@ namespace DaylightingManager {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects. Program terminates." );
+				ShowFatalError( "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects. Program terminates." );  // LCOV_EXCL_LINE
 			}
 			VeryFirstTime = false;
 		}
@@ -1655,7 +1655,7 @@ namespace DaylightingManager {
 				if ( D1a > 0.0 && D1b > 0.0 && D1b <= HW && D1a <= WW ) {
 					ShowSevereError( "CalcDaylightCoeffRefPoints: Daylighting calculation cannot be done for zone " + Zone( ZoneNum ).Name + " because reference point #" + RoundSigDigits( iRefPoint ) + " is less than 0.15m (6\") from window plane " + Surface( IWin ).Name );
 					ShowContinueError( "Distance=[" + RoundSigDigits( ALF, 5 ) + "]. This is too close; check position of reference point." );
-					ShowFatalError( "Program terminates due to preceding condition." );
+					ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 				}
 			} else if ( ALF < 0.1524 && ExtWinType == AdjZoneExtWin ) {
 				if ( RefErrIndex( iRefPoint, IWin ) == 0 ) { // only show error message once
@@ -4073,7 +4073,7 @@ namespace DaylightingManager {
 			GeometryTransformForDaylighting(  );
 			GetInputIlluminanceMap( ErrorsFound );
 			GetLightWellData( ErrorsFound );
-			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );
+			if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons, related to DAYLIGHTING" );  // LCOV_EXCL_LINE
 			DayltgSetupAdjZoneListsAndPointers();
 		}
 
@@ -4208,7 +4208,7 @@ namespace DaylightingManager {
 				// Sequentially read lines in DElight Daylight Factors Error File
 				// and process them using standard EPlus warning/error handling calls
 				// Process all error/warning messages first
-				// Then, if any error has occurred, ShowFatalError to terminate processing
+				// Then, if any error has occurred, ShowFatalError to terminate processing  // LCOV_EXCL_LINE
 				bEndofErrFile = false;
 				bRecordsOnErrFile = false;
 				while ( ! bEndofErrFile ) {
@@ -4237,7 +4237,7 @@ namespace DaylightingManager {
 				} else {
 					{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 				}
-				// If any DElight Error occurred then ShowFatalError to terminate
+				// If any DElight Error occurred then ShowFatalError to terminate  // LCOV_EXCL_LINE
 				if ( iErrorFlag > 0 ) {
 					ErrorsFound = true;
 				}
@@ -4262,7 +4262,7 @@ namespace DaylightingManager {
 			}
 		}
 
-		if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons" );
+		if ( ErrorsFound ) ShowFatalError( "Program terminated for above reasons" );  // LCOV_EXCL_LINE
 
 	}
 
@@ -5094,7 +5094,7 @@ namespace DaylightingManager {
 			}
 		} // ShelfNum
 
-		if ( ErrorsFound ) ShowFatalError( "CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input." );
+		if ( ErrorsFound ) ShowFatalError( "CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -9271,15 +9271,15 @@ namespace DaylightingManager {
 		return;
 
 Label901: ;
-		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTabFileName + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTabFileName + MapNoString + "\" for output (write)." );  // LCOV_EXCL_LINE
 		return;
 
 Label902: ;
-		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapCsvFileName + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapCsvFileName + MapNoString + "\" for output (write)." );  // LCOV_EXCL_LINE
 		return;
 
 Label903: ;
-		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTxtFileName + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTxtFileName + MapNoString + "\" for output (write)." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -9350,7 +9350,7 @@ Label903: ;
 				while ( ios == 0 ) {
 					{ IOFlags flags; gio::read( IllumMap( MapNum ).UnitNo, FmtA, flags ) >> mapLine; ios = flags.ios(); }
 					if ( ios > 0 ) { // usually a read error
-						ShowFatalError( "CloseReportIllumMaps: Failed to read map. IOError=" + TrimSigDigits( ios ) );
+						ShowFatalError( "CloseReportIllumMaps: Failed to read map. IOError=" + TrimSigDigits( ios ) );  // LCOV_EXCL_LINE
 					} else if ( ios != 0 ) {
 						if ( NumLines == 0 ) {
 							ShowSevereError( "CloseReportIllumMaps: IllumMap=\"" + IllumMap( MapNum ).Name + "\" is empty." );
@@ -9375,15 +9375,15 @@ Label903: ;
 		return;
 
 Label901: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTabFileName+" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTabFileName+" for output (write)." );  // LCOV_EXCL_LINE
 		return;
 
 Label902: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapCsvFileName+" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapCsvFileName+" for output (write)." );  // LCOV_EXCL_LINE
 		return;
 
 Label903: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTxtFileName+" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTxtFileName+" for output (write)." );  // LCOV_EXCL_LINE
 
 	}
 

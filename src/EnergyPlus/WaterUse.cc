@@ -286,17 +286,17 @@ namespace WaterUse {
 		if ( CompIndex == 0 ) {
 			WaterConnNum = FindItemInList( CompName, WaterConnections );
 			if ( WaterConnNum == 0 ) {
-				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );
+				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = WaterConnNum;
 		} else {
 			WaterConnNum = CompIndex;
 			if ( WaterConnNum > NumWaterConnections || WaterConnNum < 1 ) {
-				ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Number of Units=" + TrimSigDigits( NumWaterConnections ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Number of Units=" + TrimSigDigits( NumWaterConnections ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( WaterConnNum ) ) {
 				if ( CompName != WaterConnections( WaterConnNum ).Name ) {
-					ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WaterConnections( WaterConnNum ).Name );
+					ShowFatalError( "SimulateWaterUseConnection: Invalid CompIndex passed=" + TrimSigDigits( WaterConnNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WaterConnections( WaterConnNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( WaterConnNum ) = false;
 			}
@@ -504,7 +504,7 @@ namespace WaterUse {
 
 			} // WaterEquipNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 
 		}
 
@@ -626,7 +626,7 @@ namespace WaterUse {
 
 			} // WaterConnNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			if ( ErrorsFound ) ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 
 			if ( NumWaterConnections > 0 ) {
 				CheckEquipName.allocate( NumWaterConnections );
@@ -1020,7 +1020,7 @@ namespace WaterUse {
 				errFlag = false;
 				ScanPlantLoopsForObject( WaterConnections( WaterConnNum ).Name, TypeOf_WaterUseConnection, WaterConnections( WaterConnNum ).PlantLoopNum, WaterConnections( WaterConnNum ).PlantLoopSide, WaterConnections( WaterConnNum ).PlantLoopBranchNum, WaterConnections( WaterConnNum ).PlantLoopCompNum, _, _, _, _, _, errFlag ); //DSU | DSU | DSU | DSU | DSU | DSU | DSU
 				if ( errFlag ) { //DSU
-					ShowFatalError( "InitConnections: Program terminated due to previous condition(s)." ); //DSU
+					ShowFatalError( "InitConnections: Program terminated due to previous condition(s)." ); //DSU  // LCOV_EXCL_LINE
 				} //DSU
 				SetLoopIndexFlag( WaterConnNum ) = false; //DSU
 			} //DSU

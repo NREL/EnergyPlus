@@ -261,7 +261,7 @@ namespace ReturnAirPathManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination." );
+			ShowFatalError( "Errors found getting AirLoopHVAC:ReturnPath.  Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -325,7 +325,7 @@ namespace ReturnAirPathManager {
 			} else {
 				ShowSevereError( "Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath( ReturnAirPathNum ).ComponentType( ComponentNum ) );
 				ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath( ReturnAirPathNum ).Name );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			}}
 

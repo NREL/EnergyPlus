@@ -275,17 +275,17 @@ namespace HVACMultiSpeedHeatPump {
 		if ( CompIndex == 0 ) {
 			MSHeatPumpNum = FindItemInList( CompName, MSHeatPump );
 			if ( MSHeatPumpNum == 0 ) {
-				ShowFatalError( "MultiSpeed Heat Pump is not found=" + CompName );
+				ShowFatalError( "MultiSpeed Heat Pump is not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = MSHeatPumpNum;
 		} else {
 			MSHeatPumpNum = CompIndex;
 			if ( MSHeatPumpNum > NumMSHeatPumps || MSHeatPumpNum < 1 ) {
-				ShowFatalError( "SimMSHeatPump: Invalid CompIndex passed=" + TrimSigDigits( MSHeatPumpNum ) + ", Number of MultiSpeed Heat Pumps=" + TrimSigDigits( NumMSHeatPumps ) + ", Heat Pump name=" + CompName );
+				ShowFatalError( "SimMSHeatPump: Invalid CompIndex passed=" + TrimSigDigits( MSHeatPumpNum ) + ", Number of MultiSpeed Heat Pumps=" + TrimSigDigits( NumMSHeatPumps ) + ", Heat Pump name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( MSHeatPumpNum ) ) {
 				if ( CompName != MSHeatPump( MSHeatPumpNum ).Name ) {
-					ShowFatalError( "SimMSHeatPump: Invalid CompIndex passed=" + TrimSigDigits( MSHeatPumpNum ) + ", Heat Pump name=" + CompName + MSHeatPump( MSHeatPumpNum ).Name );
+					ShowFatalError( "SimMSHeatPump: Invalid CompIndex passed=" + TrimSigDigits( MSHeatPumpNum ) + ", Heat Pump name=" + CompName + MSHeatPump( MSHeatPumpNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( MSHeatPumpNum ) = false;
 			}
@@ -821,7 +821,7 @@ namespace HVACMultiSpeedHeatPump {
 					ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
 					ShowContinueError( cAlphaFields( 10 ) + " must be Coil:Heating:DX:MultiSpeed " );
-					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 					ErrorsFound = true;
 				}
 				LocalError = false;
@@ -856,7 +856,7 @@ namespace HVACMultiSpeedHeatPump {
 						ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 						ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
 						ShowContinueError( cAlphaFields( 10 ) + " must be Coil:Heating:Electric:MultiStage " );
-						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 						ErrorsFound = true;
 					}
 				} else {
@@ -866,7 +866,7 @@ namespace HVACMultiSpeedHeatPump {
 						ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 						ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
 						ShowContinueError( cAlphaFields( 10 ) + " must be Coil:Heating:Gas:MultiStage " );
-						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 						ErrorsFound = true;
 					}
 				}
@@ -1014,7 +1014,7 @@ namespace HVACMultiSpeedHeatPump {
 					ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( cAlphaFields( 13 ) + " \"" + Alphas( 13 ) + "\" not found." );
 					ShowContinueError( cAlphaFields( 12 ) + " must be Coil:Cooling:DX:MultiSpeed " );
-					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
+					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 					ErrorsFound = true;
 				}
 				LocalError = false;
@@ -1487,7 +1487,7 @@ namespace HVACMultiSpeedHeatPump {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 		// End of multispeed heat pump
 
@@ -1670,7 +1670,7 @@ namespace HVACMultiSpeedHeatPump {
 				errFlag = false;
 				ScanPlantLoopsForObject( MSHeatPump( MSHeatPumpNum ).Name, TypeOf_MultiSpeedHeatPumpRecovery, MSHeatPump( MSHeatPumpNum ).HRLoopNum, MSHeatPump( MSHeatPumpNum ).HRLoopSideNum, MSHeatPump( MSHeatPumpNum ).HRBranchNum, MSHeatPump( MSHeatPumpNum ).HRCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );
+					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 
 				MyPlantScantFlag( MSHeatPumpNum ) = false;
@@ -1681,7 +1681,7 @@ namespace HVACMultiSpeedHeatPump {
 				errFlag = false;
 				ScanPlantLoopsForObject( MSHeatPump( MSHeatPumpNum ).HeatCoilName, TypeOf_CoilWaterSimpleHeating, MSHeatPump( MSHeatPumpNum ).LoopNum, MSHeatPump( MSHeatPumpNum ).LoopSide, MSHeatPump( MSHeatPumpNum ).BranchNum, MSHeatPump( MSHeatPumpNum ).CompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );
+					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 				MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).HeatCoilName, ErrorsFound );
 
@@ -1697,7 +1697,7 @@ namespace HVACMultiSpeedHeatPump {
 				errFlag = false;
 				ScanPlantLoopsForObject( MSHeatPump( MSHeatPumpNum ).HeatCoilName, TypeOf_CoilSteamAirHeating, MSHeatPump( MSHeatPumpNum ).LoopNum, MSHeatPump( MSHeatPumpNum ).LoopSide, MSHeatPump( MSHeatPumpNum ).BranchNum, MSHeatPump( MSHeatPumpNum ).CompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );
+					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 				MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow = GetCoilMaxSteamFlowRate( MSHeatPump( MSHeatPumpNum ).HeatCoilNum, ErrorsFound );
 				if ( MSHeatPump( MSHeatPumpNum ).MaxCoilFluidFlow > 0.0 ) {
@@ -1715,7 +1715,7 @@ namespace HVACMultiSpeedHeatPump {
 				errFlag = false;
 				ScanPlantLoopsForObject( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, TypeOf_CoilWaterSimpleHeating, MSHeatPump( MSHeatPumpNum ).SuppLoopNum, MSHeatPump( MSHeatPumpNum ).SuppLoopSide, MSHeatPump( MSHeatPumpNum ).SuppBranchNum, MSHeatPump( MSHeatPumpNum ).SuppCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );
+					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 				MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, ErrorsFound );
 
@@ -1731,7 +1731,7 @@ namespace HVACMultiSpeedHeatPump {
 				errFlag = false;
 				ScanPlantLoopsForObject( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilName, TypeOf_CoilSteamAirHeating, MSHeatPump( MSHeatPumpNum ).SuppLoopNum, MSHeatPump( MSHeatPumpNum ).SuppLoopSide, MSHeatPump( MSHeatPumpNum ).SuppBranchNum, MSHeatPump( MSHeatPumpNum ).SuppCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );
+					ShowFatalError( "InitMSHeatPump: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 				MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate( MSHeatPump( MSHeatPumpNum ).SuppHeatCoilNum, ErrorsFound );
 				if ( MSHeatPump( MSHeatPumpNum ).MaxSuppCoilFluidFlow > 0.0 ) {
@@ -1796,7 +1796,7 @@ namespace HVACMultiSpeedHeatPump {
 			MyCheckFlag( MSHeatPumpNum ) = false;
 			if ( MSHeatPump( MSHeatPumpNum ).ZoneInletNode == 0 ) {
 				ShowSevereError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, \"" + MSHeatPump( MSHeatPumpNum ).Name + "\", The zone inlet node in the controlled zone (" + MSHeatPump( MSHeatPumpNum ).ControlZoneName + ") is not found." );
-				ShowFatalError( "Subroutine InitMSHeatPump: Errors found in getting AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed input.  Preceding condition(s) causes termination." );
+				ShowFatalError( "Subroutine InitMSHeatPump: Errors found in getting AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed input.  Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -2114,7 +2114,7 @@ namespace HVACMultiSpeedHeatPump {
 			if ( MSHeatPump( MSHeatPumpNum ).HeatCoolMode == CoolingMode ) {
 				CoilAvailSchPtr = GetDXCoilAvailSchPtr( "Coil:Cooling:DX:MultiSpeed", MSHeatPump( MSHeatPumpNum ).DXCoolCoilName, ErrorsFound, MSHeatPump( MSHeatPumpNum ).DXCoolCoilIndex );
 				if ( ErrorsFound ) {
-					ShowFatalError( "InitMSHeatPump, The previous error causes termination." );
+					ShowFatalError( "InitMSHeatPump, The previous error causes termination." );  // LCOV_EXCL_LINE
 				}
 				if ( GetCurrentScheduleValue( CoilAvailSchPtr ) == 0.0 ) {
 					if ( MSHeatPump( MSHeatPumpNum ).CoolCountAvail == 0 ) {
@@ -2130,7 +2130,7 @@ namespace HVACMultiSpeedHeatPump {
 			if ( MSHeatPump( MSHeatPumpNum ).HeatCoolMode == HeatingMode && MSHeatPump( MSHeatPumpNum ).HeatCoilType == MultiSpeedHeatingCoil ) {
 				CoilAvailSchPtr = GetDXCoilAvailSchPtr( "Coil:Heating:DX:MultiSpeed", MSHeatPump( MSHeatPumpNum ).DXHeatCoilName, ErrorsFound, MSHeatPump( MSHeatPumpNum ).DXHeatCoilIndex );
 				if ( ErrorsFound ) {
-					ShowFatalError( "InitMSHeatPump, The previous error causes termination." );
+					ShowFatalError( "InitMSHeatPump, The previous error causes termination." );  // LCOV_EXCL_LINE
 				}
 				if ( GetCurrentScheduleValue( CoilAvailSchPtr ) == 0.0 ) {
 					if ( MSHeatPump( MSHeatPumpNum ).HeatCountAvail == 0 ) {
@@ -2569,7 +2569,7 @@ namespace HVACMultiSpeedHeatPump {
 						}
 					}
 				} else if ( SolFla == -2 ) {
-					ShowFatalError( "DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );
+					ShowFatalError( "DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );  // LCOV_EXCL_LINE
 				}
 			} else {
 				// Check to see which speed to meet the load
@@ -2606,7 +2606,7 @@ namespace HVACMultiSpeedHeatPump {
 						}
 					}
 				} else if ( SolFla == -2 ) {
-					ShowFatalError( "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );
+					ShowFatalError( "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );  // LCOV_EXCL_LINE
 				}
 			}
 		} else {
@@ -2643,7 +2643,7 @@ namespace HVACMultiSpeedHeatPump {
 								}
 							}
 						} else if ( SolFla == -2 ) {
-							ShowFatalError( "DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );
+							ShowFatalError( "DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );  // LCOV_EXCL_LINE
 						}
 					} else {
 						FullOutput = LowOutput;
@@ -2673,7 +2673,7 @@ namespace HVACMultiSpeedHeatPump {
 									}
 								}
 							} else if ( SolFla == -2 ) {
-								ShowFatalError( "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );
+								ShowFatalError( "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" + MSHeatPump( MSHeatPumpNum ).DXCoolCoilName );  // LCOV_EXCL_LINE
 							}
 						} else {
 							SpeedRatio = 1.0;

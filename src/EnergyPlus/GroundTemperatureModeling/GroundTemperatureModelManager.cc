@@ -120,7 +120,7 @@ namespace GroundTemperatureManager {
 			objectType = objectType_XingGroundTemp;
 		} else {
 			// Error out if no ground temperature object types recognized
-			ShowFatalError( "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized." );
+			ShowFatalError( "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized." );  // LCOV_EXCL_LINE
 		}
 
 		int numGTMs = groundTempModels.size();

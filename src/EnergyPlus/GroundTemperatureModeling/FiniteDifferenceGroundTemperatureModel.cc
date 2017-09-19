@@ -141,7 +141,7 @@ namespace EnergyPlus {
 			// Return the pointer
 			return thisModel;
 		} else {
-			ShowFatalError( "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model" );
+			ShowFatalError( "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model" );  // LCOV_EXCL_LINE
 			return nullptr;
 		}
 	}
@@ -225,7 +225,7 @@ namespace EnergyPlus {
 		if ( !WeatherFileExists ){
 			ShowContinueError( "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file." );
 			ShowContinueError( "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
-			ShowFatalError( "Simulation halted due to input error in ground temperaure model." );
+			ShowFatalError( "Simulation halted due to input error in ground temperaure model." );  // LCOV_EXCL_LINE
 		}
 
 		++NumOfEnvrn;

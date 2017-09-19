@@ -243,7 +243,7 @@ namespace SizingManager {
 			if ( ( NumSysSizInput > 0 && NumZoneSizingInput == 0 ) || ( ! DoZoneSizing && DoSystemSizing && NumSysSizInput > 0 ) ) {
 				ShowSevereError( RoutineName + "Requested System Sizing but did not request Zone Sizing." );
 				ShowContinueError( "System Sizing cannot be done without Zone Sizing" );
-				ShowFatalError( "Program terminates for preceding conditions." );
+				ShowFatalError( "Program terminates for preceding conditions." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -279,17 +279,17 @@ namespace SizingManager {
 			if ( SizingFileColSep == CharComma ) {
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszCsvFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszCsvFileName +" for output (write)." );  // LCOV_EXCL_LINE
 				}
 			} else if ( SizingFileColSep == CharTab ) {
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputZszTabFileName+" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputZszTabFileName+" for output (write)." );  // LCOV_EXCL_LINE
 				}
 			} else {
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszTxtFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszTxtFileName +" for output (write)." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -422,7 +422,7 @@ namespace SizingManager {
 								//  After the first iteration of HeatBalance, all the "input" has been gotten
 								if ( BeginSimFlag ) {
 									if ( GetNumRangeCheckErrorsFound() > 0 ) {
-										ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
+										ShowFatalError( RoutineName + "Out of \"range\" values found in input" );  // LCOV_EXCL_LINE
 									}
 								}
 
@@ -496,17 +496,17 @@ namespace SizingManager {
 			if ( SizingFileColSep == CharComma ) {
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszCsvFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszCsvFileName +" for output (write)." );  // LCOV_EXCL_LINE
 				}
 			} else if ( SizingFileColSep == CharTab ) {
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszTabFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszTabFileName +" for output (write)." );  // LCOV_EXCL_LINE
 				}
 			} else {
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputSszTxtFileName+ " for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputSszTxtFileName+ " for output (write)." );  // LCOV_EXCL_LINE
 				}
 			}
 			SimAir = true;
@@ -515,7 +515,7 @@ namespace SizingManager {
 			ManageZoneEquipment( true, SimZoneEquip, SimAir );
 			ManageAirLoops( true, SimAir, SimZoneEquip );
 			if ( GetNumRangeCheckErrorsFound() > 0 ) {
-				ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
+				ShowFatalError( RoutineName + "Out of \"range\" values found in input" );  // LCOV_EXCL_LINE
 			}
 
 			ResetEnvironmentCounter();
@@ -764,7 +764,7 @@ namespace SizingManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Program terminates due to preceding conditions." );
+			ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -873,7 +873,7 @@ namespace SizingManager {
 			lNumericBlanks.deallocate();
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+				ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 
 		}
@@ -1198,7 +1198,7 @@ namespace SizingManager {
 			lNumericBlanks.deallocate();
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+				ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 
 		}
@@ -1277,7 +1277,7 @@ namespace SizingManager {
 			GlobalCoolSizingFactor = 1.0;
 			NumTimeStepsInAvg = NumOfTimeStepInHour;
 		} else {
-			ShowFatalError( cCurrentModuleObject + ": More than 1 occurence of this object; only 1 allowed" );
+			ShowFatalError( cCurrentModuleObject + ": More than 1 occurence of this object; only 1 allowed" );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumTimeStepsInAvg < NumOfTimeStepInHour ) {
@@ -1906,7 +1906,7 @@ namespace SizingManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );
+			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2501,7 +2501,7 @@ namespace SizingManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );
+			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2647,7 +2647,7 @@ namespace SizingManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );
+			ShowFatalError( cCurrentModuleObject + ": Errors found in getting input. Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -3483,7 +3483,7 @@ namespace SizingManager {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -3547,7 +3547,7 @@ namespace SizingManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -3555,7 +3555,7 @@ namespace SizingManager {
 
 	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
 	void
-	UpdateFacilitySizing( 
+	UpdateFacilitySizing(
 		int const CallIndicator
 	)
 	{

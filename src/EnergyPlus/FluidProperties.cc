@@ -535,7 +535,7 @@ namespace FluidProperties {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + " Previous errors in input cause program termination." );
+			ShowFatalError( RoutineName + " Previous errors in input cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumOfRefrigerants + 1 > 0 ) {
@@ -1066,7 +1066,7 @@ namespace FluidProperties {
 			// Check: TEMPERATURES for saturated density (must all be the same)
 			//    IF (RefrigData(Loop)%NumCpPoints /= RefrigData(Loop)%NumCpPoints) THEN
 			//!!!  Error -- can never happen, does this mean NumCp vs. NumRho?
-			//      CALL ShowFatalError('GetFluidPropertiesData: Number of specific heat fluid and gas/fluid points are not the same')
+			//      CALL ShowFatalError('GetFluidPropertiesData: Number of specific heat fluid and gas/fluid points are not the same')  // LCOV_EXCL_LINE
 			//    ELSE
 			//      DO TempLoop = 1, RefrigData(Loop)%NumCpPoints
 			//!!! Error -- something else that can never happen
@@ -1923,7 +1923,7 @@ namespace FluidProperties {
 		lNumericFieldBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Previous errors in input cause program termination." );
+			ShowFatalError( RoutineName + "Previous errors in input cause program termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( GetNumSectionsFound( "REPORTGLYCOLS" ) > 0 ) DebugReportGlycols = true;
@@ -2445,7 +2445,7 @@ namespace FluidProperties {
 					}
 				}
 			} else { // user has input data for concentrations that are too close or repeated, this must be fixed
-				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );
+				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -2548,7 +2548,7 @@ namespace FluidProperties {
 					}
 				}
 			} else { // user has input data for concentrations that are too close or repeated, this must be fixed
-				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );
+				ShowFatalError( RoutineName + "concentration values too close or data repeated, check your fluid property input data" );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -3710,7 +3710,7 @@ namespace FluidProperties {
 		if ( ( Quality < 0.0 ) || ( Quality > 1.0 ) ) {
 			ShowSevereError( RoutineName + ": Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom );
 			ShowContinueError( "Saturated refrigerant quality must be between 0 and 1, entered value=[" + RoundSigDigits( Quality, 4 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition." );
+			ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 		}
 
 		if ( RefrigIndex > 0 ) {
@@ -3804,7 +3804,7 @@ namespace FluidProperties {
 		if ( ( Quality < 0.0 ) || ( Quality > 1.0 ) ) {
 			ShowSevereError( RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom );
 			ShowContinueError( "Saturated density quality must be between 0 and 1, entered value=[" + RoundSigDigits( Quality, 4 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition." );
+			ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 		}
 
 		// Find which refrigerant (index) is being requested and then determine
@@ -3938,7 +3938,7 @@ namespace FluidProperties {
 		if ( ( Quality < 0.0 ) || ( Quality > 1.0 ) ) {
 			ShowSevereError( RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom );
 			ShowContinueError( "Saturated density quality must be between 0 and 1, entered value=[" + RoundSigDigits( Quality, 4 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition." );
+			ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 		}
 
 		// Find which refrigerant (index) is being requested and then determine
@@ -5446,7 +5446,7 @@ namespace FluidProperties {
 	void
 	GetInterpValue_error()
 	{
-		ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );
+		ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );  // LCOV_EXCL_LINE
 	}
 
 	//*****************************************************************************
@@ -6185,7 +6185,7 @@ namespace FluidProperties {
 		}
 		if ( RefrigNo > 0 ) ShowContinueError( "Note: that fluid is listed as a Refrigerant from input." );
 
-		ShowFatalError( "Program terminates due to preceding condition." );
+		ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -6246,7 +6246,7 @@ namespace FluidProperties {
 		}
 		if ( GlycolNo > 0 ) ShowContinueError( "Note: that fluid is listed as a Glycol from input." );
 
-		ShowFatalError( "Program terminates due to preceding condition." );
+		ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 
 	}
 

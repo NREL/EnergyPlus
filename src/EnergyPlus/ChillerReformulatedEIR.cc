@@ -246,16 +246,16 @@ namespace ChillerReformulatedEIR {
 		if ( CompIndex == 0 ) {
 			EIRChillNum = FindItemInList( EIRChillerName, ElecReformEIRChiller );
 			if ( EIRChillNum == 0 ) {
-				ShowFatalError( "SimReformulatedEIRChiller: Specified Chiller not one of Valid Reformulated EIR Electric Chillers=" + EIRChillerName );
+				ShowFatalError( "SimReformulatedEIRChiller: Specified Chiller not one of Valid Reformulated EIR Electric Chillers=" + EIRChillerName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = EIRChillNum;
 		} else {
 			EIRChillNum = CompIndex;
 			if ( EIRChillNum > NumElecReformEIRChillers || EIRChillNum < 1 ) {
-				ShowFatalError( "SimReformulatedEIRChiller:  Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Number of Units=" + TrimSigDigits( NumElecReformEIRChillers ) + ", Entered Unit name=" + EIRChillerName );
+				ShowFatalError( "SimReformulatedEIRChiller:  Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Number of Units=" + TrimSigDigits( NumElecReformEIRChillers ) + ", Entered Unit name=" + EIRChillerName );  // LCOV_EXCL_LINE
 			}
 			if ( EIRChillerName != ElecReformEIRChiller( EIRChillNum ).Name ) {
-				ShowFatalError( "SimReformulatedEIRChiller: Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Unit name=" + EIRChillerName + ", stored Unit Name for that index=" + ElecReformEIRChiller( EIRChillNum ).Name );
+				ShowFatalError( "SimReformulatedEIRChiller: Invalid CompIndex passed=" + TrimSigDigits( EIRChillNum ) + ", Unit name=" + EIRChillerName + ", stored Unit Name for that index=" + ElecReformEIRChiller( EIRChillNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -641,7 +641,7 @@ namespace ChillerReformulatedEIR {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElecReformEIRChillers; ++EIRChillerNum ) {
@@ -786,7 +786,7 @@ namespace ChillerReformulatedEIR {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "InitElecReformEIRChiller: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitElecReformEIRChiller: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ElecReformEIRChiller( EIRChillNum ).FlowMode == ConstantFlow ) {
@@ -1363,7 +1363,7 @@ namespace ChillerReformulatedEIR {
 				}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2034,20 +2034,20 @@ namespace ChillerReformulatedEIR {
 		TempLowLimitEout = ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElecReformEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
 		PartLoadCurveType = ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType; //zrp_Aug2014
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerRefCap;
 			Real64 ReferenceCOP_ff = ReferenceCOP;
-		
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerRefCap = NomCap_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 			ReferenceCOP = ReferenceCOP_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
-			
+
 		}
 
 		// Set mass flow rates
@@ -2080,18 +2080,18 @@ namespace ChillerReformulatedEIR {
 		} else {
 			assert( false );
 		}}
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the EvapOutletTempSetPoint
 			EvapOutletTempSetPoint = max( ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
 			ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
-			
+
 		}
 
 		// correct temperature if using heat recovery
@@ -2291,7 +2291,7 @@ namespace ChillerReformulatedEIR {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

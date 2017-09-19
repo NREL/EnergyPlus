@@ -301,17 +301,17 @@ namespace WaterCoils {
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "SimulateWaterCoilComponents: Coil not found=" + CompName );
+				ShowFatalError( "SimulateWaterCoilComponents: Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CoilNum;
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
-				ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Water Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Water Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( CoilNum ) ) {
 				if ( CompName != WaterCoil( CoilNum ).Name ) {
-					ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );
+					ShowFatalError( "SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( CoilNum ) = false;
 			}
@@ -741,7 +741,7 @@ namespace WaterCoils {
 				WaterCoil( CoilNum ).UseDesignWaterDeltaTemp = true;
 			} else {
 				WaterCoil( CoilNum ).UseDesignWaterDeltaTemp = false;
-			}			
+			}
 
 			WaterCoil( CoilNum ).WaterInletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 			WaterCoil( CoilNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
@@ -814,7 +814,7 @@ namespace WaterCoils {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input." );
+			ShowFatalError( RoutineName + "Errors found in getting input." );  // LCOV_EXCL_LINE
 		}
 
 		AlphArray.deallocate();
@@ -994,7 +994,7 @@ namespace WaterCoils {
 			errFlag = false;
 			ScanPlantLoopsForObject( WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterCoilType_Num, WaterCoil( CoilNum ).WaterLoopNum, WaterCoil( CoilNum ).WaterLoopSide, WaterCoil( CoilNum ).WaterLoopBranchNum, WaterCoil( CoilNum ).WaterLoopCompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitWaterCoil: Program terminated for previous conditions." );
+				ShowFatalError( "InitWaterCoil: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 			}
 			PlantLoopScanFlag( CoilNum ) = false;
 		}
@@ -1362,7 +1362,7 @@ namespace WaterCoils {
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "  Iteration limit exceeded in calculating coil UA" );
-					// CALL ShowFatalError('Preceeding error causes program termination')
+					// CALL ShowFatalError('Preceeding error causes program termination')  // LCOV_EXCL_LINE
 					WaterCoil( CoilNum ).UACoilExternal = UA0 * 10.0;
 					WaterCoil( CoilNum ).UACoilInternal = WaterCoil( CoilNum ).UACoilExternal * 3.3;
 					WaterCoil( CoilNum ).UACoilTotal = 1.0 / ( 1.0 / WaterCoil( CoilNum ).UACoilExternal + 1.0 / WaterCoil( CoilNum ).UACoilInternal );
@@ -1374,7 +1374,7 @@ namespace WaterCoils {
 				} else if ( SolFla == -2 ) {
 					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + WaterCoil( CoilNum ).Name );
 					ShowContinueError( "  Bad starting values for UA" );
-					// CALL ShowFatalError('Preceeding error causes program termination')
+					// CALL ShowFatalError('Preceeding error causes program termination')  // LCOV_EXCL_LINE
 					WaterCoil( CoilNum ).UACoilExternal = UA0 * 10.0;
 					WaterCoil( CoilNum ).UACoilInternal = WaterCoil( CoilNum ).UACoilExternal * 3.3;
 					WaterCoil( CoilNum ).UACoilTotal = 1.0 / ( 1.0 / WaterCoil( CoilNum ).UACoilExternal + 1.0 / WaterCoil( CoilNum ).UACoilInternal );
@@ -1698,7 +1698,7 @@ namespace WaterCoils {
 			PltSizCoolNum = MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
 		}
 
-		
+
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling ) { // 'Cooling'
 
 			if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
@@ -1706,11 +1706,11 @@ namespace WaterCoils {
 			} else {
 				if ( PltSizCoolNum > 0 ) {
 					DataWaterCoilSizCoolDeltaT = PlantSizData( PltSizCoolNum ).DeltaT;
-				} 
+				}
 			}
 
 			if ( PltSizCoolNum > 0 ) {
-			
+
 				DataPltSizCoolNum = PltSizCoolNum;
 				DataWaterLoopNum = WaterCoil ( CoilNum ).WaterLoopNum;
 
@@ -1992,10 +1992,10 @@ namespace WaterCoils {
 				} else if ( CurSysNum > 0 ) {
 					if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea ) {
 						NomCapUserInp = true;
-					} else if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && 
+					} else if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity &&
 						FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0 ) {
 						NomCapUserInp = true;
-					} 
+					}
 				} else {
 					NomCapUserInp = false;
 				}
@@ -2045,7 +2045,7 @@ namespace WaterCoils {
 				WaterCoil( CoilNum ).DesTotWaterCoilLoad = TempSize;
 				DataCapacityUsedForSizing = WaterCoil( CoilNum ).DesWaterHeatingCoilRate;
 
-				// We now have the design load if it was autosized. For the case of CoilPerfInpMeth == NomCap, calculate the air flow rate specified 
+				// We now have the design load if it was autosized. For the case of CoilPerfInpMeth == NomCap, calculate the air flow rate specified
 				// by the NomCap inputs. This overrides all previous values
 				if ( WaterCoil( CoilNum ).CoilPerfInpMeth == NomCap && NomCapUserInp ) {
 					WaterCoil( CoilNum ).InletAirMassFlowRate = WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( CpAirStd*( WaterCoil( CoilNum ).DesOutletAirTemp -
@@ -2054,7 +2054,7 @@ namespace WaterCoils {
 					DataAirFlowUsedForSizing = WaterCoil( CoilNum ).DesAirVolFlowRate;
 					DataFlowUsedForSizing = WaterCoil( CoilNum ).DesAirVolFlowRate;
 				}
-				
+
 
 				FieldNum = 2; // N2 , \field Maximum Water Flow Rate
 				SizingString = WaterCoilNumericFields( CoilNum ).FieldNames( FieldNum ) + " [m3/s]";
@@ -2121,7 +2121,7 @@ namespace WaterCoils {
 					WaterCoil( CoilNum ).InletAirMassFlowRate = TempSize;
 				}
 
-				// zone and air loop coils use different design coil load calculations, air loop coils use air side capacity, 
+				// zone and air loop coils use different design coil load calculations, air loop coils use air side capacity,
 				// zone coils use water side capacity
 				DataDesInletAirTemp = WaterCoil ( CoilNum ).InletAirTemp; // used in error mesages
 				DataDesInletAirHumRat = WaterCoil ( CoilNum ).InletAirHumRat; // used in error mesages
@@ -2167,7 +2167,7 @@ namespace WaterCoils {
 					ShowContinueError( " Plant design loop exit temperature = " + TrimSigDigits( PlantSizData( DataPltSizHeatNum ).ExitTemp, 2 ) + " C" );
 					ShowContinueError( " Plant design loop exit temperature is low for design load and leaving air temperature anticipated." );
 					ShowContinueError( " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits( DesCoilInletWaterTempUsed, 2 ) + " C" );
-					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
+					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
 				}
 				WaterCoil( CoilNum ).UACoil = TempSize;
 				// if coil UA did not size due to one of these variables being 0, must set UACoilVariable to avoid crash later on
@@ -2178,7 +2178,7 @@ namespace WaterCoils {
 				}
 				WaterCoil( CoilNum ).UACoilVariable = TempSize;
 				WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
-				WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
+				WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
 
 				DataWaterLoopNum = 0; // reset all globals to 0 to ensure correct sizing for other child components
 				DataPltSizHeatNum = 0;
@@ -2214,7 +2214,7 @@ namespace WaterCoils {
 		}
 
 		if ( ErrorsFound || DataErrorsFound) {
-			ShowFatalError( "Preceding water coil sizing errors cause program termination" );
+			ShowFatalError( "Preceding water coil sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2330,7 +2330,7 @@ namespace WaterCoils {
 		if ( ( ( CapacitanceAir > 0.0 ) && ( CapacitanceWater > 0.0 ) ) && ( CalcMode == DesignCalc || MySizeFlag( CoilNum ) || MyUAAndFlowCalcFlag( CoilNum ) || GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ) > 0.0 ) ) {
 
 			if ( UA <= 0.0 ) {
-				ShowFatalError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );
+				ShowFatalError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );  // LCOV_EXCL_LINE
 			}
 			NTU = UA / CapacitanceMin;
 			ETA = std::pow( NTU, 0.22 );
@@ -2580,7 +2580,7 @@ namespace WaterCoils {
 			AirVelocity = AirMassFlow * AirDensity / WaterCoil( CoilNum ).MinAirFlowArea;
 			ShowContinueError( "Air Face Velocity[m/s]=" + TrimSigDigits( AirVelocity, 6 ) );
 			ShowContinueError( "Approximate MassFlowRate limit for Face Area[kg/s]=" + TrimSigDigits( 2.5 * WaterCoil( CoilNum ).MinAirFlowArea / AirDensity, 6 ) );
-			ShowFatalError( "Coil:Cooling:Water:DetailedGeometry needs to be resized/autosized to handle capacity" );
+			ShowFatalError( "Coil:Cooling:Water:DetailedGeometry needs to be resized/autosized to handle capacity" );  // LCOV_EXCL_LINE
 		}
 
 		// If Coil is Scheduled ON then do the simulation
@@ -4985,17 +4985,17 @@ Label10: ;
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CompName, WaterCoil );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "CheckWaterCoilSchedule: Coil not found=" + CompName );
+				ShowFatalError( "CheckWaterCoilSchedule: Coil not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CoilNum;
 			Value = GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ); // not scheduled?
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
-				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );
+				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Heating Coils=" + TrimSigDigits( NumWaterCoils ) + ", Coil name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CompName != WaterCoil( CoilNum ).Name ) {
-				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );
+				ShowFatalError( "CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CompName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );  // LCOV_EXCL_LINE
 			}
 			Value = GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ); // not scheduled?
 		}
@@ -6104,20 +6104,20 @@ Label10: ;
 		if ( CompIndex == 0 ) {
 			CoilNum = FindItemInList( CoilName, WaterCoil );
 			if ( CoilNum == 0 ) {
-				ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName );
+				ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CoilNum;
 		} else {
 			CoilNum = CompIndex;
 			if ( CoilNum > NumWaterCoils || CoilNum < 1 ) {
-				ShowFatalError( "UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Coils=" + TrimSigDigits( NumWaterCoils ) + ", Entered Coil name=" + CoilName );
+				ShowFatalError( "UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Number of Coils=" + TrimSigDigits( NumWaterCoils ) + ", Entered Coil name=" + CoilName );  // LCOV_EXCL_LINE
 			}
 			if ( KickOffSimulation ) {
 				if ( CoilName != WaterCoil( CoilNum ).Name ) {
-					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CoilName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );
+					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CoilName + ", stored Coil Name for that index=" + WaterCoil( CoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				if ( CoilTypeNum != WaterCoil( CoilNum ).WaterCoilType_Num ) {
-					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CoilName + ", stored Coil Name for that index=" + ccSimPlantEquipTypes( CoilTypeNum ) );
+					ShowFatalError( "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( CoilNum ) + ", Coil name=" + CoilName + ", stored Coil Name for that index=" + ccSimPlantEquipTypes( CoilTypeNum ) );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -6235,7 +6235,7 @@ Label10: ;
 		int const CoilNum, // Number of hot water heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used
 		) {
 
 		// FUNCTION INFORMATION:
@@ -6277,19 +6277,19 @@ Label10: ;
 		int const FanOpMode, // fan operating mode
 		Real64 const PartLoadRatio, // part-load ratio of heating coil
 		Real64 const UAMax, // maximum UA-Value = design heating capacity
-		Real64 & DesCoilInletWaterTempUsed // estimated coil design inlet water temperature 
+		Real64 & DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
 	)
 	{
 		// SUBROUTINE INFORMATION:
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// returns estimated coil inlet water temperature given UA value for assumed 
+		// returns estimated coil inlet water temperature given UA value for assumed
 		// maximum effectiveness value for heating coil
 
 		// METHODOLOGY EMPLOYED:
-		// applies energy balance around the water coil and estimates coil water inlet temperature 
+		// applies energy balance around the water coil and estimates coil water inlet temperature
 		// assuming coil effectiveness of 0.8
-		
+
 		// REFERENCES:
 		// na
 
@@ -6330,7 +6330,7 @@ Label10: ;
 		Real64 Effec;
 		Real64 Cp;
 
-		UA = UAMax; 
+		UA = UAMax;
 		DesCoilInletWaterTempUsed = DesCoilHWInletTempMin;
 		TempAirIn = WaterCoil( CoilNum ).InletAirTemp;
 		Win = WaterCoil( CoilNum ).InletAirHumRat;
@@ -6386,11 +6386,11 @@ Label10: ;
 				Effec = 1.0 - E2;
 			}
 			TempAirOut = TempAirIn + Effec * CapacitanceMin * ( TempWaterIn - TempAirIn ) / CapacitanceAir;
-			// this formulation assumes coil effectiveness of 0.80 to increase the estimated coil water inlet temperatures 
+			// this formulation assumes coil effectiveness of 0.80 to increase the estimated coil water inlet temperatures
 			DesCoilInletWaterTempUsed = CapacitanceAir * ( TempAirOut - TempAirIn ) / ( CapacitanceMin * EffectivnessMaxAssumed ) + TempAirIn;
 			// water coil should not be sized at coil water inlet temperature lower than 46.0C (for convergence problem in Regulafalsi)
 			DesCoilInletWaterTempUsed = max( DesCoilInletWaterTempUsed, DesCoilHWInletTempMin );
-		} 
+		}
 	}
 
 	// End of Coil Utility subroutines

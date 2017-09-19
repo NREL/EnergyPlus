@@ -84,7 +84,7 @@ namespace DataHVACGlobals {
 	Real64 const BlankNumeric( -99999.0 ); // indicates numeric input field was blank
 	Real64 const RetTempMax( 60.0 ); // maximum return air temperature [deg C]
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
-	Real64 const DesCoilHWInletTempMin( 46.0 ); // minimum heating water coil water inlet temp for UA sizing only. [deg C] 
+	Real64 const DesCoilHWInletTempMin( 46.0 ); // minimum heating water coil water inlet temp for UA sizing only. [deg C]
 
 	// Number of Sizing types from list below
 	int const NumOfSizingTypes( 33 ); // number of sizing types
@@ -156,7 +156,7 @@ namespace DataHVACGlobals {
 	int const FanType_SimpleVAV( 2 );
 	int const FanType_SimpleOnOff( 3 );
 	int const FanType_ZoneExhaust( 4 );
-	int const FanType_ComponentModel( 5 ); // cpw22Aug2010 
+	int const FanType_ComponentModel( 5 ); // cpw22Aug2010
 	int const FanType_SystemModelObject( 6 ); // new for V8.7, simple versatile fan object
 
 	// Fan Minimum Flow Fraction Input Method
@@ -172,7 +172,7 @@ namespace DataHVACGlobals {
 	int const BypassWhenWithinEconomizerLimits( 0 ); // heat recovery controlled by economizer limits
 	int const BypassWhenOAFlowGreaterThanMinimum( 1 ); // heat recovery ON at minimum OA in economizer mode
 
-	Array1D_string const cFanTypes( NumAllFanTypes, { "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel" } ); 
+	Array1D_string const cFanTypes( NumAllFanTypes, { "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel" } );
 
 	// parameters describing unitary systems
 	int const NumUnitarySystemTypes( 7 );
@@ -226,7 +226,7 @@ namespace DataHVACGlobals {
 	int const Coil_CoolingAirToAirVariableSpeed( 30 );
 	int const Coil_HeatingAirToAirVariableSpeed( 31 );
 	int const CoilDX_HeatPumpWaterHeaterVariableSpeed( 32 );
-	
+
 	int const CoilVRF_FluidTCtrl_Cooling( 33 );
 	int const CoilVRF_FluidTCtrl_Heating( 34 );
 

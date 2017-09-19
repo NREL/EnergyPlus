@@ -205,23 +205,23 @@ namespace DirectAirManager {
 		if ( CompIndex == 0 ) {
 			DirectAirNum = FindItemInList( EquipName, DirectAir, &DirectAirProps::EquipID );
 			if ( DirectAirNum == 0 ) {
-				ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
+				ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DirectAirNum;
 		} else {
 			DirectAirNum = CompIndex;
 			if ( DirectAirNum > NumDirectAir || DirectAirNum < 1 ) {
-				ShowFatalError( "SimDirectAir:  Invalid CompIndex passed=" + TrimSigDigits( DirectAirNum ) + ", Number of Units=" + TrimSigDigits( NumDirectAir ) + ", Entered Unit name=" + EquipName );
+				ShowFatalError( "SimDirectAir:  Invalid CompIndex passed=" + TrimSigDigits( DirectAirNum ) + ", Number of Units=" + TrimSigDigits( NumDirectAir ) + ", Entered Unit name=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DirectAirNum ) ) {
 				if ( EquipName != DirectAir( DirectAirNum ).EquipID ) {
-					ShowFatalError( "SimDirectAir: Invalid CompIndex passed=" + TrimSigDigits( DirectAirNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + DirectAir( DirectAirNum ).EquipID );
+					ShowFatalError( "SimDirectAir: Invalid CompIndex passed=" + TrimSigDigits( DirectAirNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + DirectAir( DirectAirNum ).EquipID );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DirectAirNum ) = false;
 			}
 		}
 		if ( DirectAirNum <= 0 ) {
-			ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
+			ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 		}
 
 		// With the correct DirectAirNum to Initialize the system
@@ -412,7 +412,7 @@ namespace DirectAirManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		//Setup output for the Direct Air Units.  This allows a comparison with
@@ -488,13 +488,13 @@ namespace DirectAirManager {
 
 			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
 			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-			if ( ControlledZoneNum > 0 ) { 
-				if ( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum > 0  ) {  
-					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum; 
-					DirectAir( DirectAirNum ).CtrlZoneNum = ControlledZoneNum; 
+			if ( ControlledZoneNum > 0 ) {
+				if ( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum > 0  ) {
+					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
+					DirectAir( DirectAirNum ).CtrlZoneNum = ControlledZoneNum;
 					MySizeFlag( DirectAirNum ) = false;
 				}
-			} 
+			}
 		}
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( DirectAirNum ) ) {
@@ -541,13 +541,13 @@ namespace DirectAirManager {
 			//The first time through set the mass flow rate to the Max
 			if ( ( Node( ZoneNode ).MassFlowRateMaxAvail > 0.0 ) && ( GetCurrentScheduleValue( DirectAir( DirectAirNum ).SchedPtr ) > 0.0 ) ) {
 				if ( ! ( SimulateAirflowNetwork > AirflowNetworkControlMultizone && AirflowNetworkFanActivated ) ) {
-					if ( DirectAir( DirectAirNum ).NoOAFlowInputFromUser ) { 
+					if ( DirectAir( DirectAirNum ).NoOAFlowInputFromUser ) {
 						Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).AirMassFlowRateMax;
 						Node( ZoneNode ).MassFlowRateMaxAvail = DirectAir( DirectAirNum ).AirMassFlowRateMax;
-					} else { 
-						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement; 
-						Node( ZoneNode ).MassFlowRateMaxAvail = mDotFromOARequirement; 
-					} 
+					} else {
+						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement;
+						Node( ZoneNode ).MassFlowRateMaxAvail = mDotFromOARequirement;
+					}
 
 					if ( DirectAir( DirectAirNum ).EMSOverrideAirFlow ) Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).EMSMassFlowRateValue;
 				}
@@ -568,13 +568,13 @@ namespace DirectAirManager {
 						} else {
 							Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMaxAvail;
 						}
-					} else {  
-						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement;  
-						// but also apply constraints 
-						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMaxAvail );  
-						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMax );  
-						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMinAvail );  
-						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMin ); 
+					} else {
+						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement;
+						// but also apply constraints
+						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMaxAvail );
+						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMax );
+						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMinAvail );
+						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMin );
 					}
 				} else {
 					Node( ZoneNode ).MassFlowRate = 0.0;

@@ -256,7 +256,7 @@ namespace EMSManager {
 				OutputEMSFileUnitNum = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputEMSFileUnitNum, DataStringGlobals::outputEddFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( "CheckIFAnyEMS: Could not open file "+ DataStringGlobals::outputEddFileName +" for output (write)." );
+					ShowFatalError( "CheckIFAnyEMS: Could not open file "+ DataStringGlobals::outputEddFileName +" for output (write)." );  // LCOV_EXCL_LINE
 				}
 			}
 		} else {
@@ -1056,7 +1056,7 @@ namespace EMSManager {
 		lNumericFieldBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in getting Energy Management System input. Preceding condition causes termination." );
+			ShowFatalError( "Errors found in getting Energy Management System input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1299,7 +1299,7 @@ namespace EMSManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing Energy Management System input. Preceding condition causes termination." );
+			ShowFatalError( "Errors found in processing Energy Management System input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( reportErrors ) {

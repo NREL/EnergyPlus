@@ -349,7 +349,7 @@ namespace FourPipeBeam {
 			FourPipeBeams.push_back( thisBeam );
 			return thisBeam;
 		} else {
-			ShowFatalError( routineName + "Errors found in getting input. Preceding conditions cause termination." );
+			ShowFatalError( routineName + "Errors found in getting input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 			return nullptr;
 		}
 
@@ -412,7 +412,7 @@ namespace FourPipeBeam {
 					this->cWLocation.loopSideNum, this->cWLocation.branchNum, this->cWLocation.compNum, _, _, _,
 					this->cWInNodeNum, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( routineName + " Program terminated for previous conditions." );
+					ShowFatalError( routineName + " Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( this->beamHeatingPresent ){
@@ -420,7 +420,7 @@ namespace FourPipeBeam {
 					this->hWLocation.loopSideNum, this->hWLocation.branchNum, this->hWLocation.compNum, _, _, _,
 					this->hWInNodeNum, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( routineName + " Program terminated for previous conditions." );
+					ShowFatalError( routineName + " Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 			}
 			this->plantLoopScanFlag = false;
@@ -794,7 +794,7 @@ namespace FourPipeBeam {
 					( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot ) );
 			} else {
 				ShowSevereError( "Four pipe beam requires system sizing. Turn on system sizing." );
-				ShowFatalError( "Program terminating due to previous errors" );
+				ShowFatalError( "Program terminating due to previous errors" );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -850,7 +850,7 @@ namespace FourPipeBeam {
 			RegisterPlantCompDesignFlow( this->hWInNodeNum, this->vDotDesignHW );
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding four pipe beam sizing errors cause program termination" );
+			ShowFatalError( "Preceding four pipe beam sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	} //set_size

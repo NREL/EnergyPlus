@@ -216,7 +216,7 @@ namespace DataEnvironment {
 	std::string EnvironmentStartEnd; // Start/End dates for Environment
 	bool CurrentYearIsLeapYear( false ); // true when current year is leap year (convoluted logic dealing with
 	// whether weather file allows leap years, runperiod inputs.
-	
+
 	int varyingLocationSchedIndexLat( 0 );
 	int varyingLocationSchedIndexLong( 0 );
 	int varyingOrientationSchedIndex( 0 );
@@ -388,7 +388,7 @@ namespace DataEnvironment {
 		if ( LocalOutDryBulbTemp < -100.0 ) {
 			ShowSevereError( "OutDryBulbTempAt: outdoor drybulb temperature < -100 C" );
 			ShowContinueError( "...check heights, this height=[" + RoundSigDigits( Z, 0 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition(s)." );
+			ShowFatalError( "Program terminates due to preceding condition(s)." );  // LCOV_EXCL_LINE
 		}
 
 		return LocalOutDryBulbTemp;
@@ -439,7 +439,7 @@ namespace DataEnvironment {
 		if ( LocalOutWetBulbTemp < -100.0 ) {
 			ShowSevereError( "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C" );
 			ShowContinueError( "...check heights, this height=[" + RoundSigDigits( Z, 0 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition(s)." );
+			ShowFatalError( "Program terminates due to preceding condition(s)." );  // LCOV_EXCL_LINE
 		}
 
 		return LocalOutWetBulbTemp;
@@ -491,7 +491,7 @@ namespace DataEnvironment {
 		if ( LocalOutDewPointTemp < -100.0 ) {
 			ShowSevereError( "OutDewPointTempAt: outdoor dewpoint temperature < -100 C" );
 			ShowContinueError( "...check heights, this height=[" + RoundSigDigits( Z, 0 ) + "]." );
-			ShowFatalError( "Program terminates due to preceding condition(s)." );
+			ShowFatalError( "Program terminates due to preceding condition(s)." );  // LCOV_EXCL_LINE
 		}
 
 		return LocalOutDewPointTemp;
@@ -604,7 +604,7 @@ namespace DataEnvironment {
 			ShowContinueError( "...according to your maximum Z height, your building is somewhere in the Stratosphere." );
 			ShowContinueError( "...look at " + Settings + " Name= " + SettingsName );
 		}
-		ShowFatalError( "Program terminates due to preceding condition(s)." );
+		ShowFatalError( "Program terminates due to preceding condition(s)." );  // LCOV_EXCL_LINE
 	}
 
 	void

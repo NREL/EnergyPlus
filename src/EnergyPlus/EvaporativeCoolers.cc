@@ -235,17 +235,17 @@ namespace EvaporativeCoolers {
 		if ( CompIndex == 0 ) {
 			EvapCoolNum = FindItemInList( CompName, EvapCond, &EvapConditions::EvapCoolerName );
 			if ( EvapCoolNum == 0 ) {
-				ShowFatalError( "SimEvapCooler: Unit not found=" + CompName );
+				ShowFatalError( "SimEvapCooler: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = EvapCoolNum;
 		} else {
 			EvapCoolNum = CompIndex;
 			if ( EvapCoolNum > NumEvapCool || EvapCoolNum < 1 ) {
-				ShowFatalError( "SimEvapCooler:  Invalid CompIndex passed=" + TrimSigDigits( EvapCoolNum ) + ", Number of Units=" + TrimSigDigits( NumEvapCool ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimEvapCooler:  Invalid CompIndex passed=" + TrimSigDigits( EvapCoolNum ) + ", Number of Units=" + TrimSigDigits( NumEvapCool ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( EvapCoolNum ) ) {
 				if ( CompName != EvapCond( EvapCoolNum ).EvapCoolerName ) {
-					ShowFatalError( "SimEvapCooler: Invalid CompIndex passed=" + TrimSigDigits( EvapCoolNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + EvapCond( EvapCoolNum ).EvapCoolerName );
+					ShowFatalError( "SimEvapCooler: Invalid CompIndex passed=" + TrimSigDigits( EvapCoolNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + EvapCond( EvapCoolNum ).EvapCoolerName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( EvapCoolNum ) = false;
 			}
@@ -741,7 +741,7 @@ namespace EvaporativeCoolers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for evaporative coolers" );
+			ShowFatalError( "Errors found in processing input for evaporative coolers" );  // LCOV_EXCL_LINE
 		}
 
 		for ( EvapCoolNum = 1; EvapCoolNum <= NumEvapCool; ++EvapCoolNum ) {
@@ -1521,7 +1521,7 @@ namespace EvaporativeCoolers {
 				ShowContinueError( "Check size of Pad Area and/or Pad Depth in input" );
 				ShowContinueError( "Cooler Effectiveness calculated as: " + RoundSigDigits( SatEff, 2 ) );
 				ShowContinueError( "Air velocity (m/s) through pads calculated as: " + RoundSigDigits( AirVel, 2 ) );
-				ShowFatalError( "Program Terminates due to previous error condition" );
+				ShowFatalError( "Program Terminates due to previous error condition" );  // LCOV_EXCL_LINE
 
 			}
 			EvapCond( EvapCoolNum ).SatEff = SatEff;
@@ -3356,17 +3356,17 @@ namespace EvaporativeCoolers {
 		if ( CompIndex == 0 ) {
 			CompNum = FindItemInList( CompName, ZoneEvapUnit );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimZoneEvaporativeCoolerUnit: Zone evaporative cooler unit not found." );
+				ShowFatalError( "SimZoneEvaporativeCoolerUnit: Zone evaporative cooler unit not found." );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumZoneEvapUnits ) {
-				ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumZoneEvapUnits ) + ", Entered Unit name = " + CompName );
+				ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumZoneEvapUnits ) + ", Entered Unit name = " + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckZoneEvapUnitName( CompNum ) ) {
 				if ( CompName != ZoneEvapUnit( CompNum ).Name ) {
-					ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + ZoneEvapUnit( CompNum ).Name );
+					ShowFatalError( "SimZoneEvaporativeCoolerUnit: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + ZoneEvapUnit( CompNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckZoneEvapUnitName( CompNum ) = false;
 			}
@@ -3714,7 +3714,7 @@ namespace EvaporativeCoolers {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input." );
+			ShowFatalError( RoutineName + "Errors found in getting input." );  // LCOV_EXCL_LINE
 			ShowContinueError( "... Preceding condition causes termination." );
 		}
 

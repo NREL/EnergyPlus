@@ -524,7 +524,7 @@ namespace SetPointManager {
 		GetSetPointManagerInputData( ErrorsFound );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -3867,7 +3867,7 @@ namespace SetPointManager {
 			InitSetPointManagersOneTimeFlag = false;
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "InitSetPointManagers: Errors found in getting SetPointManager input." );
+				ShowFatalError( "InitSetPointManagers: Errors found in getting SetPointManager input." );  // LCOV_EXCL_LINE
 			}
 
 		}
@@ -4298,7 +4298,7 @@ namespace SetPointManager {
 			if ( ! InitSetPointManagersOneTimeFlag ) InitSetPointManagersOneTimeFlag2 = false;
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "InitSetPointManagers: Errors found. Program Terminates." );
+				ShowFatalError( "InitSetPointManagers: Errors found. Program Terminates." );  // LCOV_EXCL_LINE
 			}
 
 		} // end begin environment inits
@@ -5437,7 +5437,7 @@ namespace SetPointManager {
 					ShowSevereError( "CalcOAPretreatSetPoint: Missing reference setpoint for Outdoor Air Pretreat Setpoint Manager " + this->Name );
 					ShowContinueError( "Node Referenced =" + NodeID( RefNode ) );
 					ShowContinueError( "use a Setpoint Manager to establish a setpoint at this node." );
-					ShowFatalError( "Missing reference setpoint." );
+					ShowFatalError( "Missing reference setpoint." );  // LCOV_EXCL_LINE
 				} else {
 					LocalSetPointCheckFailed = false;
 					{ auto const SELECT_CASE_var( this->CtrlTypeMode );
@@ -5455,7 +5455,7 @@ namespace SetPointManager {
 						ShowContinueError( "Node Referenced =" + NodeID( RefNode ) );
 						ShowContinueError( "use a Setpoint Manager to establish a setpoint at this node." );
 						ShowContinueError( "Or use an EMS actuator to control a setpoint at this node." );
-						ShowFatalError( "Missing reference setpoint." );
+						ShowFatalError( "Missing reference setpoint." );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -5635,7 +5635,7 @@ namespace SetPointManager {
 				SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
 			}
 		} else {
-			// single-duct or central heated and cooled zones 
+			// single-duct or central heated and cooled zones
 			for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++ZonesHeatedIndex ) {
 				CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedIndex );
 				ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).CoolZoneInletNodes( ZonesHeatedIndex );
@@ -7002,7 +7002,7 @@ namespace SetPointManager {
 					if ( ! DataPlant::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
 						ShowSevereError( "Node problem for SetpointManager:ReturnTemperature:ChilledWater." );
 						ShowContinueError( "Return and Supply nodes were not found on the same plant loop.  Verify node names." );
-						ShowFatalError( "Simulation aborts due to setpoint node problem" );
+						ShowFatalError( "Simulation aborts due to setpoint node problem" );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -7039,7 +7039,7 @@ namespace SetPointManager {
 				ShowContinueError( "The manager is specified to look to the return node setpoint to find a target return temperature, but the node setpoint was invalid" );
 				ShowContinueError( "Verify that a separate sepoint manager is specified to set the setpoint on the return node named \"" + NodeID( this->returnNodeIndex ) + "\"" );
 				ShowContinueError( "Or change the target return temperature input type to constant or scheduled" );
-				ShowFatalError( "Missing reference setpoint" );
+				ShowFatalError( "Missing reference setpoint" );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -7108,7 +7108,7 @@ namespace SetPointManager {
 					if ( ! DataPlant::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
 						ShowSevereError( "Node problem for SetpointManager:ReturnTemperature:HotWater." );
 						ShowContinueError( "Return and Supply nodes were not found on the same plant loop.  Verify node names." );
-						ShowFatalError( "Simulation aborts due to setpoint node problem" );
+						ShowFatalError( "Simulation aborts due to setpoint node problem" );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -7142,7 +7142,7 @@ namespace SetPointManager {
 				ShowContinueError( "The manager is specified to look to the return node setpoint to find a target return temperature, but the node setpoint was invalid" );
 				ShowContinueError( "Verify that a separate sepoint manager is specified to set the setpoint on the return node named \"" + NodeID( this->returnNodeIndex ) + "\"" );
 				ShowContinueError( "Or change the target return temperature input type to constant or scheduled" );
-				ShowFatalError( "Missing reference setpoint" );
+				ShowFatalError( "Missing reference setpoint" );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -8305,7 +8305,7 @@ namespace SetPointManager {
 		ErrorsFoundinTESSchSetup = false;
 		VerifySetPointManagers( ErrorsFoundinTESSchSetup );
 		if ( ErrorsFoundinTESSchSetup ) {
-			ShowFatalError( "Errors found in verification step of SetUpNewScheduledTESSetPtMgr.  Program terminates." );
+			ShowFatalError( "Errors found in verification step of SetUpNewScheduledTESSetPtMgr.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 		// Since all of the other setpoint managers not only been read and verified but also initialized, simulated, and updated,
 		// we must now also initialize, simulate, and update the current SchTESStPtMgr that was just added.  But the init and simulate

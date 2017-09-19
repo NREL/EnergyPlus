@@ -350,7 +350,7 @@ namespace WeatherManager {
 	static gio::Fmt fmtAN( "(A,$)" );
 
 	std::vector< UnderwaterBoundary > underwaterBoundaries;
-	
+
 	// MODULE SUBROUTINES:
 
 	// Functions
@@ -606,15 +606,15 @@ namespace WeatherManager {
 		int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 		for ( int i = 1; i <= Num; i++ ) {
 			InputProcessor::GetObjectItem(
-				DataIPShortCuts::cCurrentModuleObject, i, 
-				DataIPShortCuts::cAlphaArgs, 
-				NumAlpha, 
-				DataIPShortCuts::rNumericArgs, 
-				NumNumber, 
-				IOStat, 
-				DataIPShortCuts::lNumericFieldBlanks, 
-				DataIPShortCuts::lAlphaFieldBlanks, 
-				DataIPShortCuts::cAlphaFieldNames, 
+				DataIPShortCuts::cCurrentModuleObject, i,
+				DataIPShortCuts::cAlphaArgs,
+				NumAlpha,
+				DataIPShortCuts::rNumericArgs,
+				NumNumber,
+				IOStat,
+				DataIPShortCuts::lNumericFieldBlanks,
+				DataIPShortCuts::lAlphaFieldBlanks,
+				DataIPShortCuts::cAlphaFieldNames,
 				DataIPShortCuts::cNumericFieldNames
 			);
 			underwaterBoundaries.push_back( UnderwaterBoundary() );
@@ -643,7 +643,7 @@ namespace WeatherManager {
 			if ( errorsFound ) break;
 		}
 		if ( errorsFound ) {
-			ShowFatalError( "Previous input problems cause program termination" );
+			ShowFatalError( "Previous input problems cause program termination" );  // LCOV_EXCL_LINE
 		}
 		return ( Num > 0 );
 	}
@@ -698,15 +698,15 @@ namespace WeatherManager {
 		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
 		DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
 		if ( InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
-		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1, 
-			DataIPShortCuts::cAlphaArgs, 
-			NumAlpha, 
-			DataIPShortCuts::rNumericArgs, 
-			NumNumber, 
-			IOStat, 
-			DataIPShortCuts::lNumericFieldBlanks, 
-			DataIPShortCuts::lAlphaFieldBlanks, 
-			DataIPShortCuts::cAlphaFieldNames, 
+		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1,
+			DataIPShortCuts::cAlphaArgs,
+			NumAlpha,
+			DataIPShortCuts::rNumericArgs,
+			NumNumber,
+			IOStat,
+			DataIPShortCuts::lNumericFieldBlanks,
+			DataIPShortCuts::lAlphaFieldBlanks,
+			DataIPShortCuts::cAlphaFieldNames,
 			DataIPShortCuts::cNumericFieldNames
 		);
 		DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 1 ) );
@@ -1095,7 +1095,7 @@ namespace WeatherManager {
 							} else {
 								ShowContinueError( "Multiple Weather Data Periods 1st (Start=" + StDate + ",End=" + EnDate + ')' );
 							}
-							ShowFatalError( RoutineName + "Program terminates due to preceding condition." );
+							ShowFatalError( RoutineName + "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 						}
 
 						// Following builds Environment start/end for ASHRAE 55 warnings
@@ -1821,7 +1821,7 @@ namespace WeatherManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Program terminates due to preceding condition(s)." );
+			ShowFatalError( RoutineName + "Program terminates due to preceding condition(s)." );  // LCOV_EXCL_LINE
 		}
 
 		if ( present( DSTActStMon ) ) {
@@ -1953,7 +1953,7 @@ namespace WeatherManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Program terminates due to preceding condition(s)." );
+			ShowFatalError( RoutineName + "Program terminates due to preceding condition(s)." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2426,7 +2426,7 @@ namespace WeatherManager {
 		// Determine if Sun is up or down, set Solar Cosine values for time step.
 		DetermineSunUpDown( SOLCOS );
 		if ( SunIsUp && SolarAltitudeAngle < 0.0 ) {
-			ShowFatalError( "SetCurrentWeather: At " + CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0" );
+			ShowFatalError( "SetCurrentWeather: At " + CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0" );  // LCOV_EXCL_LINE
 		}
 
 		OutDryBulbTemp = TodayOutDryBulbTemp( TimeStep, HourOfDay );
@@ -2806,7 +2806,7 @@ namespace WeatherManager {
 					BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 					gio::write( ErrOut, fmtLD ) << ReadStatus;
 					strip( ErrOut );
-					ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+					ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );  // LCOV_EXCL_LINE
 				}
 				if ( CurDayOfWeek <= 7 ) {
 					CurDayOfWeek = mod( CurDayOfWeek, 7 ) + 1;
@@ -2844,7 +2844,7 @@ namespace WeatherManager {
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );  // LCOV_EXCL_LINE
 						}
 					}
 					for ( Item = 1; Item <= 23 * NumIntervalsPerHour; ++Item ) {
@@ -2852,7 +2852,7 @@ namespace WeatherManager {
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );  // LCOV_EXCL_LINE
 						}
 					}
 				}
@@ -2928,17 +2928,17 @@ namespace WeatherManager {
 								InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
 							} else {
 								BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-								ShowFatalError( "End-of-File encountered after " + BadRecord + ", starting from first day of Weather File would not be \"next day\"" );
+								ShowFatalError( "End-of-File encountered after " + BadRecord + ", starting from first day of Weather File would not be \"next day\"" );  // LCOV_EXCL_LINE
 							}
 						} else {
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-							ShowFatalError( "Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OutputFileStandard );
+							ShowFatalError( "Unexpected error condition in middle of reading EPW file, stopped at " + BadRecord, OutputFileStandard );  // LCOV_EXCL_LINE
 						}
 					}
 
 					if ( Hour != WHour ) {
 						BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-						ShowFatalError( "Unexpected error condition in middle of reading EPW file, " + BadRecord, OutputFileStandard );
+						ShowFatalError( "Unexpected error condition in middle of reading EPW file, " + BadRecord, OutputFileStandard );  // LCOV_EXCL_LINE
 					}
 
 					//         Set possible missing values
@@ -3552,7 +3552,7 @@ namespace WeatherManager {
 
 		if ( DateInError ) {
 			ShowSevereError( "Reading Weather Data Line, Invalid Date, Year=" + RoundSigDigits( WYear ) + ", Month=" + RoundSigDigits( WMonth ) + ", Day=" + RoundSigDigits( WDay ) );
-			ShowFatalError( "Program terminates due to previous condition." );
+			ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 		}
 
 		Pos = index( Line, ',' ); // WYear
@@ -3700,28 +3700,28 @@ namespace WeatherManager {
 Label900: ;
 		ShowSevereError( "Invalid Date info in Weather Line" );
 		ShowContinueError( "Entire Data Line=" + SaveLine );
-		ShowFatalError( "Error in Reading Weather Data" );
+		ShowFatalError( "Error in Reading Weather Data" );  // LCOV_EXCL_LINE
 
 Label901: ;
 		gio::write( DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)" ) << WYear << WMonth << WDay << WHour << WMinute;
 		ShowSevereError( "Invalid Weather Line at date=" + DateError );
 		ShowContinueError( "Full Data Line=" + SaveLine );
 		ShowContinueError( "Remainder of line=" + Line );
-		ShowFatalError( "Error in Reading Weather Data" );
+		ShowFatalError( "Error in Reading Weather Data" );  // LCOV_EXCL_LINE
 
 Label902: ;
 		gio::write( DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)" ) << WYear << WMonth << WDay << WHour << WMinute;
 		ShowSevereError( "Invalid Weather Line (no commas) at date=" + DateError );
 		ShowContinueError( "Full Data Line=" + SaveLine );
 		ShowContinueError( "Remainder of line=" + Line );
-		ShowFatalError( "Error in Reading Weather Data" );
+		ShowFatalError( "Error in Reading Weather Data" );  // LCOV_EXCL_LINE
 
 //Label903: ;
 //		gio::write( DateError, "(I4,'/',I2,'/',I2,' Hour#=',I2,' Min#=',I2)" ) << WYear << WMonth << WDay << WHour << WMinute;
 //		ShowSevereError( "Invalid Weather Line at date=" + DateError );
 //		ShowContinueError( "Full Data Line=" + SaveLine );
 //		ShowContinueError( "Partial line read; Remainder of line=" + Line );
-//		ShowFatalError( "Error in Reading Weather Data" );
+//		ShowFatalError( "Error in Reading Weather Data" );  // LCOV_EXCL_LINE
 
 	}
 
@@ -4862,13 +4862,13 @@ Label902: ;
 Label9997: ;
 		ShowSevereError( "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.", OutputFileStandard );
 		ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-		ShowFatalError( "Program terminates due to previous condition." );
+		ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 
 Label9998: ;
-		ShowFatalError( "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ), OutputFileStandard );
+		ShowFatalError( "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ), OutputFileStandard );  // LCOV_EXCL_LINE
 
 Label9999: ;
-		ShowFatalError( "OpenWeatherFile: Could not OPEN EPW Weather File", OutputFileStandard );
+		ShowFatalError( "OpenWeatherFile: Could not OPEN EPW Weather File", OutputFileStandard );  // LCOV_EXCL_LINE
 
 	}
 
@@ -5100,7 +5100,7 @@ Label9999: ;
 		// the simulation must be terminated
 
 		if ( LocationError ) {
-			ShowFatalError( "Due to previous error condition, simulation terminated" );
+			ShowFatalError( "Due to previous error condition, simulation terminated" );  // LCOV_EXCL_LINE
 		}
 
 		if ( TimeZoneNumber <= 12.00 ) {
@@ -5234,7 +5234,7 @@ Label9999: ;
 
 		AssignReportNumber( EnvironmentReportNbr );
 		if ( EnvironmentReportNbr != 1 ) { //  problem
-			ShowFatalError( "ReportOutputFileHeaders: Assigned report number for Environment title is not 1.  Contact Support." );
+			ShowFatalError( "ReportOutputFileHeaders: Assigned report number for Environment title is not 1.  Contact Support." );  // LCOV_EXCL_LINE
 		}
 		gio::write( EnvironmentReportChr, IntFmt ) << EnvironmentReportNbr;
 		strip( EnvironmentReportChr );
@@ -5479,7 +5479,7 @@ Label9999: ;
 		SPSiteScheduleUnits.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetWeatherInput: Above errors cause termination" );
+			ShowFatalError( "GetWeatherInput: Above errors cause termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -8255,7 +8255,7 @@ Label9999: ;
 		if ( ( Pos == std::string::npos ) && ( ! has_prefixi( HeaderString, "COMMENTS" ) ) ) {
 			ShowSevereError( "Invalid Header line in in.epw -- no commas" );
 			ShowContinueError( "Line=" + Line );
-			ShowFatalError( "Previous conditions cause termination." );
+			ShowFatalError( "Previous conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 		if ( Pos != std::string::npos ) Line.erase( 0, Pos + 1 );
 
@@ -8871,7 +8871,7 @@ Label9999: ;
 			}
 
 		} else {
-			ShowFatalError( "Invalid EPW Header designation found=" + HeaderString );
+			ShowFatalError( "Invalid EPW Header designation found=" + HeaderString );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -8996,7 +8996,7 @@ Label9999: ;
 		return;
 
 Label9998: ;
-		ShowFatalError( "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header, OutputFileStandard );
+		ShowFatalError( "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header, OutputFileStandard );  // LCOV_EXCL_LINE
 
 	}
 

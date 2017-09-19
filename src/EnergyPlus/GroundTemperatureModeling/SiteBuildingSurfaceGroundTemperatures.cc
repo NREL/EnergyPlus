@@ -67,9 +67,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Site:GroundTemperature:BuildingSurface factory
-	std::shared_ptr< SiteBuildingSurfaceGroundTemps > 
-	SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory( 
-		int objectType, 
+	std::shared_ptr< SiteBuildingSurfaceGroundTemps >
+	SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -84,7 +84,7 @@ namespace EnergyPlus {
 
 		// USE STATEMENTS:
 		using DataEnvironment::GroundTempObjInput;
-		using DataGlobals::OutputFileInits;		
+		using DataGlobals::OutputFileInits;
 		using namespace DataIPShortCuts;
 		using namespace GroundTemperatureManager;
 		using namespace ObjexxFCL::gio;

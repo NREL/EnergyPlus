@@ -1933,7 +1933,7 @@ namespace ThermalComfort {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetAngleFactorList: Program terminated due to preceding errors." );
+			ShowFatalError( "GetAngleFactorList: Program terminated due to preceding errors." );  // LCOV_EXCL_LINE
 		}
 
 		for ( Item = 1; Item <= TotPeople; ++Item ) {
@@ -1952,7 +1952,7 @@ namespace ThermalComfort {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetAngleFactorList: Program terminated due to preceding errors." );
+			ShowFatalError( "GetAngleFactorList: Program terminated due to preceding errors." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2659,7 +2659,7 @@ namespace ThermalComfort {
 				statFile = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, DataStringGlobals::inStatFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );  // LCOV_EXCL_LINE
 				}
 				while ( readStat == 0 ) {
 					{ IOFlags flags; gio::read( statFile, fmtA, flags ) >> lineIn; readStat = flags.ios(); }
@@ -2680,7 +2680,7 @@ namespace ThermalComfort {
 				epwFile = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, DataStringGlobals::inputWeatherFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file " + DataStringGlobals::inputWeatherFileName+ " for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file " + DataStringGlobals::inputWeatherFileName+ " for input (read)." );  // LCOV_EXCL_LINE
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
 					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
@@ -2910,7 +2910,7 @@ namespace ThermalComfort {
 				epwFile = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, DataStringGlobals::inputWeatherFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveCEN15251: Could not open file "+DataStringGlobals::inputWeatherFileName+" for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveCEN15251: Could not open file "+DataStringGlobals::inputWeatherFileName+" for input (read)." );  // LCOV_EXCL_LINE
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
 					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }

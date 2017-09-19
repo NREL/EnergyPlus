@@ -189,17 +189,17 @@ namespace SolarCollectors {
 		if ( CompIndex == 0 ) {
 			CollectorNum = FindItemInList( CompName, Collector );
 			if ( CollectorNum == 0 ) {
-				ShowFatalError( "SimSolarCollector: Specified solar collector not Valid =" + CompName );
+				ShowFatalError( "SimSolarCollector: Specified solar collector not Valid =" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CollectorNum;
 		} else {
 			CollectorNum = CompIndex;
 			if ( CollectorNum > NumOfCollectors || CollectorNum < 1 ) {
-				ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + TrimSigDigits( CollectorNum ) + ", Number of Units=" + TrimSigDigits( NumOfCollectors ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + TrimSigDigits( CollectorNum ) + ", Number of Units=" + TrimSigDigits( NumOfCollectors ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( CollectorNum ) ) {
 				if ( CompName != Collector( CollectorNum ).Name ) {
-					ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + TrimSigDigits( CollectorNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + Collector( CollectorNum ).Name );
+					ShowFatalError( "SimSolarCollector: Invalid CompIndex passed=" + TrimSigDigits( CollectorNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + Collector( CollectorNum ).Name );  // LCOV_EXCL_LINE
 
 				}
 				CheckEquipName( CollectorNum ) = false;
@@ -416,7 +416,7 @@ namespace SolarCollectors {
 				}
 			} // ParametersNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleParamObject + " input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleParamObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumOfCollectors > 0 ) {
@@ -606,7 +606,7 @@ namespace SolarCollectors {
 
 			} // end of ParametersNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleParamObject + " input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleParamObject + " input." );  // LCOV_EXCL_LINE
 
 			CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
 
@@ -746,7 +746,7 @@ namespace SolarCollectors {
 
 			} // ICSNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleObject + " input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 
 			if ( NumOfCollectors > 0 ) {
 				CheckEquipName.dimension( NumOfCollectors, true );
@@ -830,7 +830,7 @@ namespace SolarCollectors {
 				errFlag = false;
 				ScanPlantLoopsForObject( Collector( CollectorNum ).Name, Collector( CollectorNum ).TypeNum, Collector( CollectorNum ).WLoopNum, Collector( CollectorNum ).WLoopSideNum, Collector( CollectorNum ).WLoopBranchNum, Collector( CollectorNum ).WLoopCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitSolarCollector: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitSolarCollector: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				SetLoopIndexFlag( CollectorNum ) = false;
 			}
@@ -1244,7 +1244,7 @@ namespace SolarCollectors {
 				gio::write( String, fmtLD ) << IAM;
 				ShowContinueError( "Calculated Incident Angle Modifier =" + String );
 				ShowContinueError( "Expected Incident Angle Modifier should be approximately 1.5 or less." );
-				ShowFatalError( "Errors in SolarCollectorPerformance:FlatPlate input." );
+				ShowFatalError( "Errors in SolarCollectorPerformance:FlatPlate input." );  // LCOV_EXCL_LINE
 			}
 
 		} // not greater than cut off angle
@@ -1501,7 +1501,7 @@ namespace SolarCollectors {
 
 			} else { // this should never occur
 				ShowSevereError( "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - report to EnergyPlus Development Team" );
-				ShowFatalError( "Program terminates due to above conditions." );
+				ShowFatalError( "Program terminates due to above conditions." );  // LCOV_EXCL_LINE
 			}
 		} else {
 			// In the absence of absorber plate thermal mass, only the collector water heat balance has a
@@ -2282,7 +2282,7 @@ namespace SolarCollectors {
 
 		if ( SurfacePtr == 0 ) {
 			// should be trapped already
-			ShowFatalError( "Invalid surface passed to GetExtVentedCavityIndex" );
+			ShowFatalError( "Invalid surface passed to GetExtVentedCavityIndex" );  // LCOV_EXCL_LINE
 		}
 
 		CavNum = 0;
@@ -2297,7 +2297,7 @@ namespace SolarCollectors {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );  // LCOV_EXCL_LINE
 		} else {
 
 			VentCavIndex = CavNum;

@@ -248,17 +248,17 @@ namespace UnitVentilator {
 		if ( CompIndex == 0 ) {
 			UnitVentNum = FindItemInList( CompName, UnitVent );
 			if ( UnitVentNum == 0 ) {
-				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );
+				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = UnitVentNum;
 		} else {
 			UnitVentNum = CompIndex;
 			if ( UnitVentNum > NumOfUnitVents || UnitVentNum < 1 ) {
-				ShowFatalError( "SimUnitVentilator:  Invalid CompIndex passed=" + TrimSigDigits( UnitVentNum ) + ", Number of Units=" + TrimSigDigits( NumOfUnitVents ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimUnitVentilator:  Invalid CompIndex passed=" + TrimSigDigits( UnitVentNum ) + ", Number of Units=" + TrimSigDigits( NumOfUnitVents ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( UnitVentNum ) ) {
 				if ( CompName != UnitVent( UnitVentNum ).Name ) {
-					ShowFatalError( "SimUnitVentilator: Invalid CompIndex passed=" + TrimSigDigits( UnitVentNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + UnitVent( UnitVentNum ).Name );
+					ShowFatalError( "SimUnitVentilator: Invalid CompIndex passed=" + TrimSigDigits( UnitVentNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + UnitVent( UnitVentNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( UnitVentNum ) = false;
 			}
@@ -1002,7 +1002,7 @@ namespace UnitVentilator {
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
 
-		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found in input." );
+		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found in input." );  // LCOV_EXCL_LINE
 
 		// Setup Report variables for the Unit Ventilators, CurrentModuleObject='ZoneHVAC:UnitVentilator'
 		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) {
@@ -1132,7 +1132,7 @@ namespace UnitVentilator {
 				ScanPlantLoopsForObject( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoil_PlantTypeNum, UnitVent( UnitVentNum ).HWLoopNum, UnitVent( UnitVentNum ).HWLoopSide, UnitVent( UnitVentNum ).HWBranchNum, UnitVent( UnitVentNum ).HWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + UnitVent( UnitVentNum ).Name + "\", type=ZoneHVAC:UnitVentilator" );
-					ShowFatalError( "InitUnitVentilator: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitUnitVentilator: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 				UnitVent( UnitVentNum ).HotCoilOutNodeNum = PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).LoopSide( UnitVent( UnitVentNum ).HWLoopSide ).Branch( UnitVent( UnitVentNum ).HWBranchNum ).Comp( UnitVent( UnitVentNum ).HWCompNum ).NodeNumOut;
@@ -1142,12 +1142,12 @@ namespace UnitVentilator {
 				ScanPlantLoopsForObject( UnitVent( UnitVentNum ).CCoilPlantName, UnitVent( UnitVentNum ).CCoil_PlantTypeNum, UnitVent( UnitVentNum ).CWLoopNum, UnitVent( UnitVentNum ).CWLoopSide, UnitVent( UnitVentNum ).CWBranchNum, UnitVent( UnitVentNum ).CWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + UnitVent( UnitVentNum ).Name + "\", type=ZoneHVAC:UnitVentilator" );
-					ShowFatalError( "InitUnitVentilator: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitUnitVentilator: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 				UnitVent( UnitVentNum ).ColdCoilOutNodeNum = PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).LoopSide( UnitVent( UnitVentNum ).CWLoopSide ).Branch( UnitVent( UnitVentNum ).CWBranchNum ).Comp( UnitVent( UnitVentNum ).CWCompNum ).NodeNumOut;
 			} else {
-				if ( UnitVent( UnitVentNum ).CCoilPresent ) ShowFatalError( "InitUnitVentilator: Unit=" + UnitVent( UnitVentNum ).Name + ", invalid cooling coil type. Program terminated." );
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) ShowFatalError( "InitUnitVentilator: Unit=" + UnitVent( UnitVentNum ).Name + ", invalid cooling coil type. Program terminated." );  // LCOV_EXCL_LINE
 			}
 			MyPlantScanFlag( UnitVentNum ) = false;
 		} else if ( MyPlantScanFlag( UnitVentNum ) && ! AnyPlantInModel ) {
@@ -2108,7 +2108,7 @@ namespace UnitVentilator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2240,7 +2240,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
-				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
+				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))  // LCOV_EXCL_LINE
 			}}
 
 			{ auto const SELECT_CASE_var1( UnitVent( UnitVentNum ).CCoilType );
@@ -2252,7 +2252,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Cooling_CoilHXAssisted ) {
 				CheckHXAssistedCoolingCoilSchedule( "CoilSystem:Cooling:Water:HeatExchangerAssisted", UnitVent( UnitVentNum ).CCoilName, UnitVent( UnitVentNum ).CCoilSchedValue, UnitVent( UnitVentNum ).CCoil_Index );
 			} else {
-				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%CCoilType))
+				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%CCoilType))  // LCOV_EXCL_LINE
 			}}
 
 		} else if ( SELECT_CASE_var == HeatingOption ) {
@@ -2268,7 +2268,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
 				CheckHeatingCoilSchedule( "Coil:Heating:Fuel", UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilSchedValue, UnitVent( UnitVentNum ).HCoil_Index );
 			} else {
-				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
+				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))  // LCOV_EXCL_LINE
 			}}
 
 		} else if ( SELECT_CASE_var == CoolingOption ) {
@@ -2282,7 +2282,7 @@ namespace UnitVentilator {
 			} else if ( SELECT_CASE_var1 == Cooling_CoilHXAssisted ) {
 				CheckHXAssistedCoolingCoilSchedule( "CoilSystem:Cooling:Water:HeatExchangerAssisted", UnitVent( UnitVentNum ).CCoilName, UnitVent( UnitVentNum ).CCoilSchedValue, UnitVent( UnitVentNum ).CCoil_Index );
 			} else {
-				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%CCoilType))
+				//      CALL ShowFatalError('Illegal coil type='//TRIM(UnitVent(UnitVentNum)%CCoilType))  // LCOV_EXCL_LINE
 
 			}}
 
@@ -2439,7 +2439,7 @@ namespace UnitVentilator {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );
+							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}
@@ -2514,7 +2514,7 @@ namespace UnitVentilator {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );
+							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}
@@ -2650,7 +2650,7 @@ namespace UnitVentilator {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );
+							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}
@@ -2717,7 +2717,7 @@ namespace UnitVentilator {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );
+							ShowFatalError( "ZoneHVAC:UnitVentilator simulation control: illogical condition for " + UnitVent( UnitVentNum ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}

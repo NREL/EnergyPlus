@@ -139,7 +139,7 @@ namespace ChillerAbsorption {
 	Real64 EvaporatorEnergy( 0.0 ); // J - heat transfer to the evaporator coil
 	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
-	
+
 	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	static std::string const BlankString;
@@ -228,17 +228,17 @@ namespace ChillerAbsorption {
 		if ( CompIndex == 0 ) {
 			ChillNum = FindItemInList( AbsorberName, BLASTAbsorber );
 			if ( ChillNum == 0 ) {
-				ShowFatalError( "SimBLASTAbsorber: Specified Absorber not one of Valid Absorption Chillers=" + AbsorberName );
+				ShowFatalError( "SimBLASTAbsorber: Specified Absorber not one of Valid Absorption Chillers=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = ChillNum;
 		} else {
 			ChillNum = CompIndex;
 			if ( ChillNum > NumBLASTAbsorbers || ChillNum < 1 ) {
-				ShowFatalError( "SimBLASTAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumBLASTAbsorbers ) + ", Entered Unit name=" + AbsorberName );
+				ShowFatalError( "SimBLASTAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumBLASTAbsorbers ) + ", Entered Unit name=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( ChillNum ) ) {
 				if ( AbsorberName != BLASTAbsorber( ChillNum ).Name ) {
-					ShowFatalError( "SimBLASTAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + BLASTAbsorber( ChillNum ).Name );
+					ShowFatalError( "SimBLASTAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + BLASTAbsorber( ChillNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( ChillNum ) = false;
 			}
@@ -284,7 +284,7 @@ namespace ChillerAbsorption {
 			UpdateAbsorberChillerComponentGeneratorSide( LoopNum, LoopSide, TypeOf_Chiller_Absorption, BLASTAbsorber( ChillNum ).GeneratorInletNodeNum, BLASTAbsorber( ChillNum ).GeneratorOutletNodeNum, BLASTAbsorber( ChillNum ).GenHeatSourceType, BLASTAbsorberReport( ChillNum ).QGenerator, BLASTAbsorberReport( ChillNum ).SteamMdot, FirstIteration );
 
 		} else {
-			ShowFatalError( "SimBLASTAbsorber: Invalid LoopNum passed=" + TrimSigDigits( LoopNum ) + ", Unit name=" + AbsorberName + ", stored chilled water loop=" + TrimSigDigits( BLASTAbsorber( ChillNum ).CWLoopNum ) + ", stored condenser water loop=" + TrimSigDigits( BLASTAbsorber( ChillNum ).CDLoopNum ) + ", stored generator loop=" + TrimSigDigits( BLASTAbsorber( ChillNum ).GenLoopNum ) );
+			ShowFatalError( "SimBLASTAbsorber: Invalid LoopNum passed=" + TrimSigDigits( LoopNum ) + ", Unit name=" + AbsorberName + ", stored chilled water loop=" + TrimSigDigits( BLASTAbsorber( ChillNum ).CWLoopNum ) + ", stored condenser water loop=" + TrimSigDigits( BLASTAbsorber( ChillNum ).CDLoopNum ) + ", stored generator loop=" + TrimSigDigits( BLASTAbsorber( ChillNum ).GenLoopNum ) );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -513,7 +513,7 @@ namespace ChillerAbsorption {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum ) {
@@ -650,7 +650,7 @@ namespace ChillerAbsorption {
 				InterConnectTwoPlantLoopSides( BLASTAbsorber( ChillNum ).CDLoopNum, BLASTAbsorber( ChillNum ).CDLoopSideNum, BLASTAbsorber( ChillNum ).GenLoopNum, BLASTAbsorber( ChillNum ).GenCompNum, TypeOf_Chiller_Absorption, false );
 			}
 			if ( errFlag ) {
-				ShowFatalError( "InitBLASTAbsorberModel: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitBLASTAbsorberModel: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( BLASTAbsorber( ChillNum ).FlowMode == ConstantFlow ) {
@@ -1219,7 +1219,7 @@ namespace ChillerAbsorption {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 		if ( PlantFinalSizesOkayToReport ) {
@@ -1380,18 +1380,18 @@ namespace ChillerAbsorption {
 		LoopSideNum = BLASTAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( BLASTAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset ));
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		// If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
@@ -1522,7 +1522,7 @@ namespace ChillerAbsorption {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

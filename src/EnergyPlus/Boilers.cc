@@ -224,17 +224,17 @@ namespace Boilers {
 		if ( CompIndex == 0 ) {
 			BoilerNum = FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
-				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
+				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BoilerNum;
 		} else {
 			BoilerNum = CompIndex;
 			if ( BoilerNum > NumBoilers || BoilerNum < 1 ) {
-				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Number of Units=" + TrimSigDigits( NumBoilers ) + ", Entered Unit name=" + BoilerName );
+				ShowFatalError( "SimBoiler:  Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Number of Units=" + TrimSigDigits( NumBoilers ) + ", Entered Unit name=" + BoilerName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( BoilerNum ) ) {
 				if ( BoilerName != Boiler( BoilerNum ).Name ) {
-					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Unit name=" + BoilerName + ", stored Unit Name for that index=" + Boiler( BoilerNum ).Name );
+					ShowFatalError( "SimBoiler: Invalid CompIndex passed=" + TrimSigDigits( BoilerNum ) + ", Unit name=" + BoilerName + ", stored Unit Name for that index=" + Boiler( BoilerNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( BoilerNum ) = false;
 			}
@@ -527,7 +527,7 @@ namespace Boilers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );
+			ShowFatalError( RoutineName + "Errors found in processing " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
@@ -610,7 +610,7 @@ namespace Boilers {
 			errFlag = false;
 			ScanPlantLoopsForObject( Boiler( BoilerNum ).Name, TypeOf_Boiler_Simple, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum, _, Boiler( BoilerNum ).TempUpLimitBoilerOut, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitBoiler: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitBoiler: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ( Boiler( BoilerNum ).FlowMode == LeavingSetPointModulated ) || ( Boiler( BoilerNum ).FlowMode == ConstantFlow ) ) {
@@ -841,7 +841,7 @@ namespace Boilers {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -941,22 +941,22 @@ namespace Boilers {
 			if ( EquipFlowCtrl == ControlType_SeriesActive ) BoilerMassFlowRate = Node( BoilerInletNode ).MassFlowRate;
 			return;
 		}
-		
+
 		//If there is a fault of boiler fouling (zrp_Nov2016)
 		if( Boiler( BoilerNum ).FaultyBoilerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = Boiler( BoilerNum ).FaultyBoilerFoulingIndex;
 			Real64 NomCap_ff = BoilerNomCap;
 			Real64 BoilerEff_ff = BoilerEff;
-			
+
 			//calculate the Faulty Boiler Fouling Factor using fault information
 			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the boiler nominal capacity at faulty cases
 			BoilerNomCap = NomCap_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
 			BoilerEff = BoilerEff_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
-			
+
 		}
- 
+
 		//Set the current load equal to the boiler load
 		BoilerLoad = MyLoad;
 

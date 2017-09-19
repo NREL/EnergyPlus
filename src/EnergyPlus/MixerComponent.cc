@@ -195,17 +195,17 @@ namespace MixerComponent {
 		if ( CompIndex == 0 ) {
 			MixerNum = FindItemInList( CompName, MixerCond, &MixerConditions::MixerName );
 			if ( MixerNum == 0 ) {
-				ShowFatalError( "SimAirLoopMixer: Mixer not found=" + CompName );
+				ShowFatalError( "SimAirLoopMixer: Mixer not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = MixerNum;
 		} else {
 			MixerNum = CompIndex;
 			if ( MixerNum > NumMixers || MixerNum < 1 ) {
-				ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits( MixerNum ) + ", Number of Mixers=" + TrimSigDigits( NumMixers ) + ", Mixer name=" + CompName );
+				ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits( MixerNum ) + ", Number of Mixers=" + TrimSigDigits( NumMixers ) + ", Mixer name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( MixerNum ) ) {
 				if ( CompName != MixerCond( MixerNum ).MixerName ) {
-					ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits( MixerNum ) + ", Mixer name=" + CompName + ", stored Mixer Name for that index=" + MixerCond( MixerNum ).MixerName );
+					ShowFatalError( "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits( MixerNum ) + ", Mixer name=" + CompName + ", stored Mixer Name for that index=" + MixerCond( MixerNum ).MixerName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( MixerNum ) = false;
 			}
@@ -385,7 +385,7 @@ namespace MixerComponent {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input." );
+			ShowFatalError( RoutineName + "Errors found in getting input." );  // LCOV_EXCL_LINE
 		}
 
 	}

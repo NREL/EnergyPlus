@@ -1469,7 +1469,7 @@ namespace ScheduleManager {
 				if ( read_stat != 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\" cannot be opened." );
 					ShowContinueError( "... It may be open in another program (such as Excel).  Please close and try again." );
-					ShowFatalError( "Program terminates due to previous condition." );
+					ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 				}
 				// check for stripping
 				{ IOFlags flags; gio::read( SchdFile, fmtA, flags ) >> LineIn; read_stat = flags.ios(); }
@@ -1479,7 +1479,7 @@ namespace ScheduleManager {
 						gio::close( SchdFile );
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + " appears to be a Unicode or binary file." );
 						ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-						ShowFatalError( "Program terminates due to previous condition." );
+						ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 					}
 				}
 				gio::backspace( SchdFile );
@@ -1869,7 +1869,7 @@ namespace ScheduleManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Preceding Errors cause termination." );
+			ShowFatalError( RoutineName + "Preceding Errors cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		if ( NumScheduleTypes + NumDaySchedules + NumWeekSchedules + NumSchedules > 0 ) { // Report to EIO file
@@ -3467,7 +3467,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -3579,7 +3579,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -3684,7 +3684,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -3785,7 +3785,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckScheduleValueMinMax called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -3886,7 +3886,7 @@ namespace ScheduleManager {
 		} else if ( ScheduleIndex == 0 ) {
 			CheckScheduleValue = ( Value == 0.0 );
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "CheckScheduleValue called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckScheduleValue called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -3960,7 +3960,7 @@ namespace ScheduleManager {
 		} else if ( ScheduleIndex == 0 ) {
 			CheckScheduleValue = ( Value == 0 );
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "CheckScheduleValue called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckScheduleValue called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -4039,7 +4039,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumDaySchedules ) {
-			ShowFatalError( "CheckDayScheduleValueMinMax called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckDayScheduleValueMinMax called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -4134,7 +4134,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumDaySchedules ) {
-			ShowFatalError( "CheckDayScheduleValueMinMax called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckDayScheduleValueMinMax called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -4217,7 +4217,7 @@ namespace ScheduleManager {
 		if ( ScheduleIndex == -1 || ScheduleIndex == 0 ) {
 
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "HasFractionalScheduleValue called with ScheduleIndex out of range" );
+			ShowFatalError( "HasFractionalScheduleValue called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		HasFractions = false;
@@ -4309,7 +4309,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "GetScheduleMinValue called with ScheduleIndex out of range" );
+			ShowFatalError( "GetScheduleMinValue called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -4395,7 +4395,7 @@ namespace ScheduleManager {
 			MinValue = 0.0;
 			MaxValue = 0.0;
 		} else if ( ScheduleIndex < 1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "CheckScheduleMaxValue called with ScheduleIndex out of range" );
+			ShowFatalError( "CheckScheduleMaxValue called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		if ( ScheduleIndex > 0 ) {
@@ -4699,7 +4699,7 @@ namespace ScheduleManager {
 	)
 	{
 		// J. Glazer - July 2017
-		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek()
 
 		int DaysInYear;
 
@@ -4710,7 +4710,7 @@ namespace ScheduleManager {
 		}
 
 		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "ScheduleAnnualFullLoadHours called with ScheduleIndex out of range" );
+			ShowFatalError( "ScheduleAnnualFullLoadHours called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		int DayT = StartDayOfWeek;
@@ -4758,7 +4758,7 @@ namespace ScheduleManager {
 		}
 
 		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range" );
+			ShowFatalError( "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		Real64 TotalHours = ScheduleAnnualFullLoadHours( ScheduleIndex , StartDayOfWeek, isItLeapYear );
@@ -4776,7 +4776,7 @@ namespace ScheduleManager {
 		)
 	{
 		// J. Glazer - July 2017
-		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek()
 
 		int DaysInYear;
 
@@ -4787,7 +4787,7 @@ namespace ScheduleManager {
 		}
 
 		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
-			ShowFatalError( "ScheduleHoursGT1perc called with ScheduleIndex out of range" );
+			ShowFatalError( "ScheduleHoursGT1perc called with ScheduleIndex out of range" );  // LCOV_EXCL_LINE
 		}
 
 		int DayT = StartDayOfWeek;

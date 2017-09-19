@@ -286,7 +286,7 @@ namespace DataTimings {
 		}
 
 		if ( found == 0 ) {
-			ShowFatalError( "epStopTime: No element=" + ctimingElementstring );
+			ShowFatalError( "epStopTime: No element=" + ctimingElementstring );  // LCOV_EXCL_LINE
 		}
 
 		TSTOP( stoptime );
@@ -442,7 +442,7 @@ namespace DataTimings {
 		}
 
 		if ( found == 0 && ! AbortProcessing ) {
-			ShowFatalError( "epGetTimeUsed: No element=" + ctimingElementstring );
+			ShowFatalError( "epGetTimeUsed: No element=" + ctimingElementstring );  // LCOV_EXCL_LINE
 		} else {
 			ShowSevereError( "epGetTimeUsed: No element=" + ctimingElementstring );
 		}
@@ -502,7 +502,7 @@ namespace DataTimings {
 		}
 
 		if ( found == 0 ) {
-			ShowFatalError( "epGetTimeUsedperCall: No element=" + ctimingElementstring );
+			ShowFatalError( "epGetTimeUsedperCall: No element=" + ctimingElementstring );  // LCOV_EXCL_LINE
 		} else {
 			ShowSevereError( "epGetTimeUsedperCall: No element=" + ctimingElementstring );
 		}

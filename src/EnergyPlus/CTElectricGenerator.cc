@@ -165,16 +165,16 @@ namespace CTElectricGenerator {
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, CTGenerator );
-			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName );
+			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName );  // LCOV_EXCL_LINE
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumCTGenerators || GenNum < 1 ) {
-				ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of CT Engine Generators=" + TrimSigDigits( NumCTGenerators ) + ", Generator name=" + GeneratorName );
+				ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of CT Engine Generators=" + TrimSigDigits( NumCTGenerators ) + ", Generator name=" + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != CTGenerator( GenNum ).Name ) {
-					ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + CTGenerator( GenNum ).Name );
+					ShowFatalError( "SimCTGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + CTGenerator( GenNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -240,7 +240,7 @@ namespace CTElectricGenerator {
 		if ( InitLoopEquip ) {
 			CompNum = FindItemInList( CompName, CTGenerator );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName );
+				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName );  // LCOV_EXCL_LINE
 				return;
 			}
 			MinCap = 0.0;
@@ -472,7 +472,7 @@ namespace CTElectricGenerator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
@@ -833,7 +833,7 @@ namespace CTElectricGenerator {
 			errFlag = false;
 			ScanPlantLoopsForObject( CTGenerator( GeneratorNum ).Name, TypeOf_Generator_CTurbine, CTGenerator( GeneratorNum ).HRLoopNum, CTGenerator( GeneratorNum ).HRLoopSideNum, CTGenerator( GeneratorNum ).HRBranchNum, CTGenerator( GeneratorNum ).HRCompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitCTGenerators: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitCTGenerators: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			MyPlantScanFlag( GeneratorNum ) = false;
 		}

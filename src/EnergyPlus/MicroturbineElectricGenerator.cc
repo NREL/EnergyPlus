@@ -173,17 +173,17 @@ namespace MicroturbineElectricGenerator {
 		// SELECT and CALL GENERATOR MODEL
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, MTGenerator );
-			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );
+			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );  // LCOV_EXCL_LINE
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumMTGenerators || GenNum < 1 ) {
-				ShowFatalError( "SimMTGenerator: Invalid GeneratorIndex passed = " + TrimSigDigits( GenNum ) + ", Number of CT Engine Generators = " + TrimSigDigits( NumMTGenerators ) + ", Generator name = " + GeneratorName );
+				ShowFatalError( "SimMTGenerator: Invalid GeneratorIndex passed = " + TrimSigDigits( GenNum ) + ", Number of CT Engine Generators = " + TrimSigDigits( NumMTGenerators ) + ", Generator name = " + GeneratorName );  // LCOV_EXCL_LINE
 			}
 
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != MTGenerator( GenNum ).Name ) {
-					ShowFatalError( "SimMTGenerator: Invalid GeneratorIndex passed = " + TrimSigDigits( GenNum ) + ", Generator name = " + GeneratorName + ", stored Generator Name for that index = " + MTGenerator( GenNum ).Name );
+					ShowFatalError( "SimMTGenerator: Invalid GeneratorIndex passed = " + TrimSigDigits( GenNum ) + ", Generator name = " + GeneratorName + ", stored Generator Name for that index = " + MTGenerator( GenNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -253,7 +253,7 @@ namespace MicroturbineElectricGenerator {
 		if ( InitLoopEquip ) {
 			CompNum = FindItemInList( CompName, MTGenerator );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );
+				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );  // LCOV_EXCL_LINE
 				return;
 			}
 			MinCap = MTGenerator( CompNum ).MinThermalPowerOutput;
@@ -1038,7 +1038,7 @@ namespace MicroturbineElectricGenerator {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
@@ -1176,7 +1176,7 @@ namespace MicroturbineElectricGenerator {
 			errFlag = false;
 			ScanPlantLoopsForObject( MTGenerator( GenNum ).Name, TypeOf_Generator_MicroTurbine, MTGenerator( GenNum ).HRLoopNum, MTGenerator( GenNum ).HRLoopSideNum, MTGenerator( GenNum ).HRBranchNum, MTGenerator( GenNum ).HRCompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitMTGenerators: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitMTGenerators: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			MyPlantScanFlag( GenNum ) = false;
@@ -2052,7 +2052,7 @@ namespace MicroturbineElectricGenerator {
 		CompNum = FindItemInList( CompName, MTGenerator );
 
 		if ( CompNum == 0 ) {
-			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );
+			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 		} else {
 			ExhaustOutletNodeNum = MTGenerator( CompNum ).CombustionAirOutletNodeNum;
 		}

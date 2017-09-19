@@ -964,7 +964,7 @@ namespace WindowEquivalentLayer {
 						}
 						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 							Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-						}					
+						}
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
@@ -8276,7 +8276,7 @@ namespace WindowEquivalentLayer {
 
 		// TODO handle vert blind cases etc
 		// the slat normal points along the profile angle to block the beam solar
-		VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; // 
+		VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; //
 
 		return VB_CriticalSlatAngle;
 	}
@@ -9020,7 +9020,7 @@ namespace WindowEquivalentLayer {
 			}
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Program terminates for preceding reason(s)." );
+			ShowFatalError( RoutineName + "Program terminates for preceding reason(s)." );  // LCOV_EXCL_LINE
 		}
 
 	}

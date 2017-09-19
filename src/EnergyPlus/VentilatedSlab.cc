@@ -282,17 +282,17 @@ namespace VentilatedSlab {
 		if ( CompIndex == 0 ) {
 			Item = FindItemInList( CompName, VentSlab );
 			if ( Item == 0 ) {
-				ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );
+				ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = Item;
 		} else {
 			Item = CompIndex;
 			if ( Item > NumOfVentSlabs || Item < 1 ) {
-				ShowFatalError( "SimVentilatedSlab:  Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", Number of Systems=" + TrimSigDigits( NumOfVentSlabs ) + ", Entered System name=" + CompName );
+				ShowFatalError( "SimVentilatedSlab:  Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", Number of Systems=" + TrimSigDigits( NumOfVentSlabs ) + ", Entered System name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( Item ) ) {
 				if ( CompName != VentSlab( Item ).Name ) {
-					ShowFatalError( "SimVentilatedSlab: Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", System name=" + CompName + ", stored System Name for that index=" + VentSlab( Item ).Name );
+					ShowFatalError( "SimVentilatedSlab: Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", System name=" + CompName + ", stored System Name for that index=" + VentSlab( Item ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( Item ) = false;
 			}
@@ -1077,7 +1077,7 @@ namespace VentilatedSlab {
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
 
-		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );
+		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );  // LCOV_EXCL_LINE
 
 		// Setup Report variables for the VENTILATED SLAB
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) {
@@ -1249,7 +1249,7 @@ namespace VentilatedSlab {
 				ScanPlantLoopsForObject( VentSlab( Item ).HCoilName, VentSlab( Item ).HCoil_PlantTypeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
-					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 				VentSlab( Item ).HotCoilOutNodeNum = PlantLoop( VentSlab( Item ).HWLoopNum ).LoopSide( VentSlab( Item ).HWLoopSide ).Branch( VentSlab( Item ).HWBranchNum ).Comp( VentSlab( Item ).HWCompNum ).NodeNumOut;
@@ -1260,11 +1260,11 @@ namespace VentilatedSlab {
 				ScanPlantLoopsForObject( VentSlab( Item ).CCoilPlantName, VentSlab( Item ).CCoil_PlantTypeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
-					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				VentSlab( Item ).ColdCoilOutNodeNum = PlantLoop( VentSlab( Item ).CWLoopNum ).LoopSide( VentSlab( Item ).CWLoopSide ).Branch( VentSlab( Item ).CWBranchNum ).Comp( VentSlab( Item ).CWCompNum ).NodeNumOut;
 			} else {
-				if ( VentSlab( Item ).CCoilPresent ) ShowFatalError( "InitVentilatedSlab: Unit=" + VentSlab( Item ).Name + ", invalid cooling coil type. Program terminated." );
+				if ( VentSlab( Item ).CCoilPresent ) ShowFatalError( "InitVentilatedSlab: Unit=" + VentSlab( Item ).Name + ", invalid cooling coil type. Program terminated." );  // LCOV_EXCL_LINE
 			}
 			MyPlantScanFlag( Item ) = false;
 		} else if ( MyPlantScanFlag( Item ) && ! AnyPlantInModel ) {
@@ -2070,7 +2070,7 @@ namespace VentilatedSlab {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2311,7 +2311,7 @@ namespace VentilatedSlab {
 		} else { // Should never get here
 			SetPointTemp = 0.0; // Suppress uninitialized warning
 			ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 		}}
 
 		// Load Check
@@ -2381,7 +2381,7 @@ namespace VentilatedSlab {
 				if ( SetPointTempHi < SetPointTempLo ) {
 					ShowSevereError( "Heating setpoint temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 				AirTempHi = GetCurrentScheduleValue( VentSlab( Item ).HotAirHiTempSchedPtr );
 				AirTempLo = GetCurrentScheduleValue( VentSlab( Item ).HotAirLoTempSchedPtr );
@@ -2389,7 +2389,7 @@ namespace VentilatedSlab {
 				if ( AirTempHi < AirTempLo ) {
 					ShowSevereError( "Heating Air temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 
 				if ( SetPointTemp >= SetPointTempHi ) {
@@ -2509,7 +2509,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
+							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}
@@ -2572,7 +2572,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
+							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}
@@ -2613,7 +2613,7 @@ namespace VentilatedSlab {
 				if ( SetPointTempHi < SetPointTempLo ) {
 					ShowSevereError( "Cooling setpoint temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 
 				AirTempHi = GetCurrentScheduleValue( VentSlab( Item ).ColdAirHiTempSchedPtr );
@@ -2621,7 +2621,7 @@ namespace VentilatedSlab {
 				if ( AirTempHi < AirTempLo ) {
 					ShowSevereError( "Cooling Air temperature mismatch in" + VentSlab( Item ).Name );
 					ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 
 				if ( SetPointTemp <= SetPointTempLo ) {
@@ -2735,7 +2735,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
+							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}
@@ -2801,7 +2801,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							// It should NEVER get to this point, but just in case...
-							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
+							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );  // LCOV_EXCL_LINE
 						}
 
 					}}

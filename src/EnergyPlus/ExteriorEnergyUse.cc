@@ -455,7 +455,7 @@ namespace ExteriorEnergyUse {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -552,7 +552,7 @@ namespace ExteriorEnergyUse {
 			FuelTypeString = "DistrictHeating";
 		} else {
 			ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\"." );
-			ShowFatalError( "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha );
+			ShowFatalError( "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha );  // LCOV_EXCL_LINE
 		}
 
 	}

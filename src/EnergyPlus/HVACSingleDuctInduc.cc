@@ -225,17 +225,17 @@ namespace HVACSingleDuctInduc {
 		if ( CompIndex == 0 ) {
 			IUNum = FindItemInList( CompName, IndUnit );
 			if ( IUNum == 0 ) {
-				ShowFatalError( "SimIndUnit: Induction Unit not found=" + CompName );
+				ShowFatalError( "SimIndUnit: Induction Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = IUNum;
 		} else {
 			IUNum = CompIndex;
 			if ( IUNum > NumIndUnits || IUNum < 1 ) {
-				ShowFatalError( "SimIndUnit: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Induction Units=" + TrimSigDigits( NumIndUnits ) + ", System name=" + CompName );
+				ShowFatalError( "SimIndUnit: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Number of Induction Units=" + TrimSigDigits( NumIndUnits ) + ", System name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( IUNum ) ) {
 				if ( CompName != IndUnit( IUNum ).Name ) {
-					ShowFatalError( "SimIndUnit: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Induction Unit name=" + CompName + ", stored Induction Unit for that index=" + IndUnit( IUNum ).Name );
+					ShowFatalError( "SimIndUnit: Invalid CompIndex passed=" + TrimSigDigits( CompIndex ) + ", Induction Unit name=" + CompName + ", stored Induction Unit for that index=" + IndUnit( IUNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( IUNum ) = false;
 			}
@@ -257,7 +257,7 @@ namespace HVACSingleDuctInduc {
 		} else {
 			ShowSevereError( "Illegal Induction Unit Type used=" + IndUnit( IUNum ).UnitType );
 			ShowContinueError( "Occurs in Induction Unit=" + IndUnit( IUNum ).Name );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -511,7 +511,7 @@ namespace HVACSingleDuctInduc {
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input. Preceding conditions cause termination." );
+			ShowFatalError( RoutineName + "Errors found in getting input. Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -597,7 +597,7 @@ namespace HVACSingleDuctInduc {
 			}
 			if ( errFlag ) {
 				ShowContinueError( "Reference Unit=\"" + IndUnit( IUNum ).Name + "\", type=" + IndUnit( IUNum ).UnitType );
-				ShowFatalError( "InitIndUnit: Program terminated for previous conditions." );
+				ShowFatalError( "InitIndUnit: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 			}
 			MyPlantScanFlag( IUNum ) = false;
 		} else if ( MyPlantScanFlag( IUNum ) && ! AnyPlantInModel ) {

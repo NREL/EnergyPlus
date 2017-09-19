@@ -206,17 +206,17 @@ namespace UserDefinedComponents {
 		if ( CompIndex == 0 ) {
 			CompNum = FindItemInList( EquipName, UserPlantComp );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Plant Component not found" );
+				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Plant Component not found" );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserPlantComps ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserPlantComps ) + ", Entered Unit name = " + EquipName );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserPlantComps ) + ", Entered Unit name = " + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckUserPlantCompName( CompNum ) ) {
 				if ( EquipName != UserPlantComp( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserPlantComp( CompNum ).Name );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserPlantComp( CompNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckUserPlantCompName( CompNum ) = false;
 			}
@@ -246,7 +246,7 @@ namespace UserDefinedComponents {
 
 			} else {
 				// throw warning
-				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );  // LCOV_EXCL_LINE
 			}
 			return;
 		}
@@ -334,17 +334,17 @@ namespace UserDefinedComponents {
 		if ( CompIndex == 0 ) {
 			CompNum = FindItemInList( EquipName, UserCoil );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
+				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserCoils ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserCoils ) + ", Entered Unit name = " + EquipName );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserCoils ) + ", Entered Unit name = " + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckUserCoilName( CompNum ) ) {
 				if ( EquipName != UserCoil( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserCoil( CompNum ).Name );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + EquipName + ", stored unit name for that index=" + UserCoil( CompNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckUserCoilName( CompNum ) = false;
 			}
@@ -453,17 +453,17 @@ namespace UserDefinedComponents {
 		if ( CompIndex == 0 ) {
 			CompNum = FindItemInList( CompName, UserZoneAirHVAC );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
+				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserZoneAir ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserZoneAir ) + ", Entered Unit name = " + CompName );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserZoneAir ) + ", Entered Unit name = " + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckUserZoneAirName( CompNum ) ) {
 				if ( CompName != UserZoneAirHVAC( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserZoneAirHVAC( CompNum ).Name );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserZoneAirHVAC( CompNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckUserZoneAirName( CompNum ) = false;
 			}
@@ -565,17 +565,17 @@ namespace UserDefinedComponents {
 		if ( CompIndex == 0 ) {
 			CompNum = FindItemInList( CompName, UserAirTerminal );
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );
+				ShowFatalError( "SimUserDefinedPlantComponent: User Defined Coil not found" );  // LCOV_EXCL_LINE
 			}
 			CompIndex = CompNum;
 		} else {
 			CompNum = CompIndex;
 			if ( CompNum < 1 || CompNum > NumUserAirTerminals ) {
-				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserAirTerminals ) + ", Entered Unit name = " + CompName );
+				ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of units =" + TrimSigDigits( NumUserAirTerminals ) + ", Entered Unit name = " + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckUserAirTerminal( CompNum ) ) {
 				if ( CompName != UserAirTerminal( CompNum ).Name ) {
-					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserAirTerminal( CompNum ).Name );
+					ShowFatalError( "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored unit name for that index=" + UserAirTerminal( CompNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckUserAirTerminal( CompNum ) = false;
 			}
@@ -889,7 +889,7 @@ namespace UserDefinedComponents {
 		} //NumUserPlantComps > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 		cCurrentModuleObject = "Coil:UserDefined";
@@ -1042,7 +1042,7 @@ namespace UserDefinedComponents {
 		} //NumUserCoils > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 		cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
@@ -1194,7 +1194,7 @@ namespace UserDefinedComponents {
 		} //NumUserZoneAir > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
@@ -1382,7 +1382,7 @@ namespace UserDefinedComponents {
 		} //NumUserZoneAir > 0
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );
+			ShowFatalError( "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1452,7 +1452,7 @@ namespace UserDefinedComponents {
 				errFlag = false;
 				ScanPlantLoopsForObject( UserPlantComp( CompNum ).Name, TypeOf_PlantComponentUserDefined, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopSideNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).BranchNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).CompNum, _, _, _, UserPlantComp( CompNum ).Loop( ConnectionNum ).InletNodeNum );
 				if ( errFlag ) {
-					ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 				//set user input for flow priority
@@ -1538,7 +1538,7 @@ namespace UserDefinedComponents {
 				errFlag = false;
 				ScanPlantLoopsForObject( UserCoil( CompNum ).Name, TypeOf_CoilUserDefined, UserCoil( CompNum ).Loop.LoopNum, UserCoil( CompNum ).Loop.LoopSideNum, UserCoil( CompNum ).Loop.BranchNum, UserCoil( CompNum ).Loop.CompNum );
 				if ( errFlag ) {
-					ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				//set user input for flow priority
 				PlantLoop( UserCoil( CompNum ).Loop.LoopNum ).LoopSide( UserCoil( CompNum ).Loop.LoopSideNum ).Branch( UserCoil( CompNum ).Loop.BranchNum ).Comp( UserCoil( CompNum ).Loop.CompNum ).FlowPriority = UserCoil( CompNum ).Loop.FlowPriority;
@@ -1629,7 +1629,7 @@ namespace UserDefinedComponents {
 					errFlag = false;
 					ScanPlantLoopsForObject( UserZoneAirHVAC( CompNum ).Name, TypeOf_ZoneHVACAirUserDefined, UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopSideNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).BranchNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).CompNum, _, _, _, UserZoneAirHVAC( CompNum ).Loop( Loop ).InletNodeNum );
 					if ( errFlag ) {
-						ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
+						ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					}
 					//set user input for flow priority
 					PlantLoop( UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopNum ).LoopSide( UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopSideNum ).Branch( UserZoneAirHVAC( CompNum ).Loop( Loop ).BranchNum ).Comp( UserZoneAirHVAC( CompNum ).Loop( Loop ).CompNum ).FlowPriority = UserZoneAirHVAC( CompNum ).Loop( Loop ).FlowPriority;
@@ -1729,7 +1729,7 @@ namespace UserDefinedComponents {
 					errFlag = false;
 					ScanPlantLoopsForObject( UserAirTerminal( CompNum ).Name, TypeOf_AirTerminalUserDefined, UserAirTerminal( CompNum ).Loop( Loop ).LoopNum, UserAirTerminal( CompNum ).Loop( Loop ).LoopSideNum, UserAirTerminal( CompNum ).Loop( Loop ).BranchNum, UserAirTerminal( CompNum ).Loop( Loop ).CompNum, _, _, _, UserAirTerminal( CompNum ).Loop( Loop ).InletNodeNum );
 					if ( errFlag ) {
-						ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
+						ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 					}
 					//set user input for flow priority
 					PlantLoop( UserAirTerminal( CompNum ).Loop( Loop ).LoopNum ).LoopSide( UserAirTerminal( CompNum ).Loop( Loop ).LoopSideNum ).Branch( UserAirTerminal( CompNum ).Loop( Loop ).BranchNum ).Comp( UserAirTerminal( CompNum ).Loop( Loop ).CompNum ).FlowPriority = UserAirTerminal( CompNum ).Loop( Loop ).FlowPriority;

@@ -468,7 +468,7 @@ namespace HeatBalanceManager {
 		CheckUsedConstructions( ErrorsFound );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in Building Input, Program Stopped" );
+			ShowFatalError( "Errors found in Building Input, Program Stopped" );  // LCOV_EXCL_LINE  // LCOV_EXCL_LINE
 		}
 
 		// following is done to "get internal heat gains" input so that lights are gotten before
@@ -5631,7 +5631,7 @@ namespace HeatBalanceManager {
 		OutputFileShadingFrac = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file " + DataStringGlobals::outputExtShdFracFileName + " for output (write)." );   // LCOV_EXCL_LINE  // LCOV_EXCL_LINE
 		}
 		gio::write( OutputFileShadingFrac, fmtA ) << "This file contains external shading fractions for all shading surfaces of all zones.";
 		{ IOFlags flags; flags.ADVANCE("No"); gio::write( OutputFileShadingFrac, fmtA, flags ) << "Surface Name,"; }
@@ -5941,10 +5941,10 @@ namespace HeatBalanceManager {
 		CheckForActualFileName( DesiredFileName, exists, TempFullFileName );
 		//INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
 		if ( ! exists ) {
-			ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" + DesiredFileName );
-			ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
-			ShowContinueError( "Try again with putting full path and file name in the field." );
-			ShowFatalError( "Program terminates due to these conditions." );
+			ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" + DesiredFileName );   // LCOV_EXCL_LINE
+			ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );   // LCOV_EXCL_LINE
+			ShowContinueError( "Try again with putting full path and file name in the field." );   // LCOV_EXCL_LINE
+			ShowFatalError( "Program terminates due to these conditions." );   // LCOV_EXCL_LINE  // LCOV_EXCL_LINE
 		}
 
 		W5DataFileNum = GetNewUnitNumber();
@@ -5955,7 +5955,7 @@ namespace HeatBalanceManager {
 			if ( int( NextLine[ endcol - 1 ] ) == iUnicode_end ) {
 				ShowSevereError( "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName + " fiile, appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
+				ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -5967,7 +5967,7 @@ namespace HeatBalanceManager {
 		++FileLineCount;
 		if ( ! has_prefixi( NextLine, "WINDOW5" ) ) {
 			ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName );
-			ShowFatalError( "Error reading Window5 Data File: first word of window entry is \"" + NextLine.substr( 0, 7 ) + "\", should be Window5." );
+			ShowFatalError( "Error reading Window5 Data File: first word of window entry is \"" + NextLine.substr( 0, 7 ) + "\", should be Window5." );  // LCOV_EXCL_LINE
 		}
 
 Label10: ;
@@ -6001,7 +6001,7 @@ Label20: ;
 			++FileLineCount;
 			gio::read( NextLine.substr( 19 ), "*" ) >> NGlSys;
 			if ( NGlSys <= 0 || NGlSys > 2 ) {
-				ShowFatalError( "Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " + TrimSigDigits( NGlSys ) + " glazing systems; only 1 or 2 are allowed." );
+				ShowFatalError( "Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " + TrimSigDigits( NGlSys ) + " glazing systems; only 1 or 2 are allowed." );  // LCOV_EXCL_LINE
 			}
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
@@ -6162,7 +6162,7 @@ Label20: ;
 				}
 			}
 
-			if ( ErrorsFound ) ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used because of above errors" );
+			if ( ErrorsFound ) ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used because of above errors" );  // LCOV_EXCL_LINE
 
 			TotMaterialsPrev = TotMaterials;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -6507,7 +6507,7 @@ Label20: ;
 				}
 				FileLineCount += 5;
 
-				if ( ErrorsFound ) ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used because of above errors" );
+				if ( ErrorsFound ) ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used because of above errors" );  // LCOV_EXCL_LINE
 
 				// Hemis
 				Construct( ConstrNum ).TransDiff = Tsol( 11 );
@@ -6621,7 +6621,7 @@ Label20: ;
 		return;
 
 Label999: ;
-		ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: Could not open Window5 Data File, expecting it as file name=" + DesiredFileName );
+		ShowFatalError( "HeatBalanceManager: SearchWindow5DataFile: Could not open Window5 Data File, expecting it as file name=" + DesiredFileName );  // LCOV_EXCL_LINE
 		return;
 
 Label1000: ;
@@ -7526,7 +7526,7 @@ Label1000: ;
 		//step 8.  Hemispherical terms are averaged using standard method
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Program halted because of input problem(s) in WindowMaterial:SimpleGlazingSystem" );
+			ShowFatalError( "Program halted because of input problem(s) in WindowMaterial:SimpleGlazingSystem" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -7876,7 +7876,7 @@ Label1000: ;
 				}
 			}
 
-			if ( ErrorsFound ) ShowFatalError( "Error in complex fenestration material input." );
+			if ( ErrorsFound ) ShowFatalError( "Error in complex fenestration material input." );  // LCOV_EXCL_LINE
 
 		}
 
@@ -8587,7 +8587,7 @@ Label1000: ;
 		if ( allocated( locAlphaArgs ) ) locAlphaArgs.deallocate();
 		if ( allocated( locNumericArgs ) ) locNumericArgs.deallocate();
 
-		if ( ErrorsFound ) ShowFatalError( "Error in complex fenestration input." );
+		if ( ErrorsFound ) ShowFatalError( "Error in complex fenestration input." );  // LCOV_EXCL_LINE
 
 	}
 

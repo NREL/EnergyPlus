@@ -463,17 +463,17 @@ namespace WaterThermalTanks {
 			if ( CompIndex == 0 ) {
 				CompNum = FindItem( CompName, WaterThermalTank );
 				if ( CompNum == 0 ) {
-					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );
+					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = CompNum;
 			} else {
 				CompNum = CompIndex;
 				if ( CompNum > NumWaterThermalTank || CompNum < 1 ) {
-					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of Units=" + TrimSigDigits( NumWaterThermalTank ) + ", Entered Unit name=" + CompName );
+					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of Units=" + TrimSigDigits( NumWaterThermalTank ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 				}
 				if ( CheckWTTEquipName( CompNum ) ) {
 					if ( CompName != WaterThermalTank( CompNum ).Name ) {
-						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WaterThermalTank( CompNum ).Name );
+						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + WaterThermalTank( CompNum ).Name );  // LCOV_EXCL_LINE
 					}
 					CheckWTTEquipName( CompNum ) = false;
 				}
@@ -482,17 +482,17 @@ namespace WaterThermalTanks {
 			if ( CompIndex == 0 ) {
 				CompNum = FindItem( CompName, HPWaterHeater );
 				if ( CompNum == 0 ) {
-					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );
+					ShowFatalError( "SimWaterThermalTank:  Unit not found=" + CompName );  // LCOV_EXCL_LINE
 				}
 				CompIndex = CompNum;
 			} else {
 				CompNum = CompIndex;
 				if ( CompNum > NumWaterThermalTank || CompNum < 1 ) {
-					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of Units=" + TrimSigDigits( NumHeatPumpWaterHeater ) + ", Entered Unit name=" + CompName );
+					ShowFatalError( "SimWaterThermalTank:  Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Number of Units=" + TrimSigDigits( NumHeatPumpWaterHeater ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 				}
 				if ( CheckHPWHEquipName( CompNum ) ) {
 					if ( CompName != HPWaterHeater( CompNum ).Name ) {
-						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + HPWaterHeater( CompNum ).Name );
+						ShowFatalError( "SimWaterThermalTank: Invalid CompIndex passed=" + TrimSigDigits( CompNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + HPWaterHeater( CompNum ).Name );  // LCOV_EXCL_LINE
 					}
 					CheckHPWHEquipName( CompNum ) = false;
 				}
@@ -696,7 +696,7 @@ namespace WaterThermalTanks {
 		} else {
 			ShowSevereError( "SimWaterThermalTank: Invalid Water Thermal Tank Equipment Type=" + TrimSigDigits( CompType ) );
 			ShowContinueError( "Occurs in Water Thermal Tank Equipment named = " + CompName );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -751,7 +751,7 @@ namespace WaterThermalTanks {
 			TestNum = WaterHeaterNum;
 			SimWaterThermalTank( WaterThermalTank( WaterHeaterNum ).TypeNum, WaterThermalTank( WaterHeaterNum ).Name, TestNum, LocalRunFlag, LocalInitLoopEquip, MyLoad, MinCap, MaxCap, OptCap, FirstHVACIteration );
 			if ( TestNum != WaterHeaterNum ) {
-				ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + TrimSigDigits( WaterHeaterNum ) + "] does not match returned WaterHeater Num[" + TrimSigDigits( TestNum ) + "] Name=\"" + WaterThermalTank( WaterHeaterNum ).Name + "\"." );
+				ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + TrimSigDigits( WaterHeaterNum ) + "] does not match returned WaterHeater Num[" + TrimSigDigits( TestNum ) + "] Name=\"" + WaterThermalTank( WaterHeaterNum ).Name + "\"." );  // LCOV_EXCL_LINE
 			}
 
 			// HPWHs with inlet air from a zone and not connected to a plant loop are simulated through a CALL from ZoneEquipmentManager.
@@ -775,7 +775,7 @@ namespace WaterThermalTanks {
 				TestNum = WaterHeaterNum;
 				SimWaterThermalTank( WaterThermalTank( WaterHeaterNum ).TypeNum, WaterThermalTank( WaterHeaterNum ).Name, TestNum, LocalRunFlag, LocalInitLoopEquip, MyLoad, MinCap, MaxCap, OptCap, FirstHVACIteration );
 				if ( TestNum != WaterHeaterNum ) {
-					ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + TrimSigDigits( WaterHeaterNum ) + "] does not match returned WaterHeater Num[" + TrimSigDigits( TestNum ) + "] Name=\"" + WaterThermalTank( WaterHeaterNum ).Name + "\"." );
+					ShowFatalError( "SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + TrimSigDigits( WaterHeaterNum ) + "] does not match returned WaterHeater Num[" + TrimSigDigits( TestNum ) + "] Name=\"" + WaterThermalTank( WaterHeaterNum ).Name + "\"." );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -831,13 +831,13 @@ namespace WaterThermalTanks {
 		if ( CompIndex == 0 ) {
 			HeatPumpNum = FindItemInList( CompName, HPWaterHeater );
 			if ( HeatPumpNum == 0 ) {
-				ShowFatalError( "SimHeatPumpWaterHeater: Unit not found=" + CompName );
+				ShowFatalError( "SimHeatPumpWaterHeater: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = HeatPumpNum;
 		} else {
 			HeatPumpNum = CompIndex;
 			if ( HeatPumpNum > NumHeatPumpWaterHeater || HeatPumpNum < 1 ) {
-				ShowFatalError( "SimHeatPumpWaterHeater:  Invalid CompIndex passed=" + TrimSigDigits( HeatPumpNum ) + ", Number of Units=" + TrimSigDigits( NumHeatPumpWaterHeater ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimHeatPumpWaterHeater:  Invalid CompIndex passed=" + TrimSigDigits( HeatPumpNum ) + ", Number of Units=" + TrimSigDigits( NumHeatPumpWaterHeater ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -977,7 +977,7 @@ namespace WaterThermalTanks {
 		GetWaterThermalTankInputData( ErrorsFound );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting thermal storage input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting thermal storage input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 		return ErrorsFound;
@@ -1477,7 +1477,7 @@ namespace WaterThermalTanks {
 				}
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );
+					ShowFatalError( "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 
 			}
@@ -1903,7 +1903,7 @@ namespace WaterThermalTanks {
 						}
 
 					}
-					// issue #5630, set fan info in coils. 
+					// issue #5630, set fan info in coils.
 					if ( bIsVScoil == true ) {
 						VariableSpeedCoils::setVarSpeedHPWHFanTypeNum( HPWH.DXCoilNum, HPWH.FanType_Num );
 						VariableSpeedCoils::setVarSpeedHPWHFanIndex( HPWH.DXCoilNum, HPWH.FanNum );
@@ -5123,7 +5123,7 @@ namespace WaterThermalTanks {
 				errFlag = false;
 				ScanPlantLoopsForObject( WaterThermalTank( WaterThermalTankNum ).Name, WaterThermalTank( WaterThermalTankNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
@@ -5131,7 +5131,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
 				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
 					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
-					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ( UseInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) ) {
@@ -5140,7 +5140,7 @@ namespace WaterThermalTanks {
 				errFlag = false;
 				ScanPlantLoopsForObject( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
@@ -5148,7 +5148,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
 				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
 					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
-					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ( SourceInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum == 0 ) ) {
@@ -5159,14 +5159,14 @@ namespace WaterThermalTanks {
 				}
 
 				if ( errFlag ) {
-					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).PlantSizNum;
 				if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) ) {
 					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for source side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
-					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( ( ( SourceInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum > 0 ) ) || ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) ) {
@@ -5212,7 +5212,7 @@ namespace WaterThermalTanks {
 							ShowContinueError( "Nominal tank change over rate = " + RoundSigDigits( TankChangeRateScale, 2 ) + " [s]" );
 							ShowContinueError( "Change over rate is too fast, increase tank volume, decrease connection flow rates or use mixed tank model" );
 
-							ShowFatalError( "InitWaterThermalTank: Simulation halted because of sizing problem in stratified tank model." );
+							ShowFatalError( "InitWaterThermalTank: Simulation halted because of sizing problem in stratified tank model." );  // LCOV_EXCL_LINE
 						}
 					}
 				}
@@ -5671,9 +5671,9 @@ namespace WaterThermalTanks {
 				} else if ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ) {
 					GetFanVolFlow( HPWaterHeater( HPNum ).FanNum, FanVolFlow );
 				}
-				
+
 				if ( FanVolFlow  < HPWaterHeater( HPNum ).HPWHAirVolFlowRate( HPWaterHeater( HPNum ).NumofSpeed ) ) { // but this is the not the scaled mas flow
-				//if ( FanVolFlow  < HPWaterHeater( HPNum ).HPWHAirVolFlowRate( HPWaterHeater( HPNum ).NumofSpeed ) ) { 
+				//if ( FanVolFlow  < HPWaterHeater( HPNum ).HPWHAirVolFlowRate( HPWaterHeater( HPNum ).NumofSpeed ) ) {
 
 					ShowWarningError( "InitWaterThermalTank: -air flow rate = " + TrimSigDigits(FanVolFlow, 7) +
 						" in fan object " " is less than the MSHP system air flow rate" " when waterheating is required("
@@ -7629,7 +7629,7 @@ namespace WaterThermalTanks {
 
 			//   should never get here, case is checked in GetWaterThermalTankInput
 		} else {
-			ShowFatalError( "Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ":  invalid water heater tank type and name entered = " + WaterHeaterDesuperheater( DesuperheaterNum ).TankType + ", " + WaterHeaterDesuperheater( DesuperheaterNum ).TankName );
+			ShowFatalError( "Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ":  invalid water heater tank type and name entered = " + WaterHeaterDesuperheater( DesuperheaterNum ).TankType + ", " + WaterHeaterDesuperheater( DesuperheaterNum ).TankName );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -8767,7 +8767,7 @@ namespace WaterThermalTanks {
 		Node( FanInNode ).MassFlowRateMaxAvail = MdotAir;
 		Node( FanInNode ).MassFlowRateMax = MdotAir;
 		if ( ! ( HPWaterHeater( HPNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) ) {
-			Fans::Fan( HPWaterHeater( HPNum ).FanNum ).MassFlowRateMaxAvail = MdotAir; 
+			Fans::Fan( HPWaterHeater( HPNum ).FanNum ).MassFlowRateMaxAvail = MdotAir;
 		} // system fan will use the inlet node max avail.
 
 		MdotAirSav = MdotAir;
@@ -9415,7 +9415,7 @@ namespace WaterThermalTanks {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding water heater input errors cause program termination" );
+			ShowFatalError( "Preceding water heater input errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -9606,7 +9606,7 @@ namespace WaterThermalTanks {
 		} // connected to plant
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -10059,7 +10059,7 @@ namespace WaterThermalTanks {
 					}
 					tmpMaxCapacity = ( WaterThermalTank( WaterThermalTankNum ).Volume * rho * Cp * ( Tfinish - Tstart ) ) / ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryTime * SecInHour ); // m3 | kg/m3 | J/Kg/K | K | seconds
 				} else {
-					ShowFatalError( "SizeTankForSupplySide: Tank=\"" + WaterThermalTank( WaterThermalTankNum ).Name + "\", requested sizing for max capacity but entered Recovery Time is zero." );
+					ShowFatalError( "SizeTankForSupplySide: Tank=\"" + WaterThermalTank( WaterThermalTankNum ).Name + "\", requested sizing for max capacity but entered Recovery Time is zero." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -10353,7 +10353,7 @@ namespace WaterThermalTanks {
 		} // connected to plant
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -10443,7 +10443,7 @@ namespace WaterThermalTanks {
 
 						tmpMaxCapacity = ( WaterThermalTank( WaterThermalTankNum ).Volume * rho * Cp * ( Tfinish - Tstart ) ) / ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryTime * SecInHour ); // m3 | kg/m3 | J/Kg/K | K | seconds
 					} else {
-						ShowFatalError( "SizeStandAloneWaterHeater: Tank=\"" + WaterThermalTank( WaterThermalTankNum ).Name + "\", requested sizing for max capacity but entered Recovery Time is zero." );
+						ShowFatalError( "SizeStandAloneWaterHeater: Tank=\"" + WaterThermalTank( WaterThermalTankNum ).Name + "\", requested sizing for max capacity but entered Recovery Time is zero." );  // LCOV_EXCL_LINE
 					}
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );

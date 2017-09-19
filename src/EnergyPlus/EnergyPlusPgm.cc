@@ -478,7 +478,7 @@ EnergyPlusPgm( std::string const & filepath )
 				fileUnitNumber = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
 				if ( iostatus != 0 ) {
-					ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
+					ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );  // LCOV_EXCL_LINE
 				}
 				gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
 				gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
@@ -490,7 +490,7 @@ EnergyPlusPgm( std::string const & filepath )
 				fileUnitNumber = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
 				if ( iostatus != 0 ) {
-					ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
+					ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );  // LCOV_EXCL_LINE
 				}
 				gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
 				gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;

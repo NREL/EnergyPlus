@@ -216,7 +216,7 @@ namespace DElightManagerF {
 		{
 			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDelightInFileName, flags );
 			if ( flags.err() ) {
-				ShowFatalError( "DElightInputGenerator: Could not open file \"" + outputDelightInFileName + "\" for output (write)." );
+				ShowFatalError( "DElightInputGenerator: Could not open file \"" + outputDelightInFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -595,7 +595,7 @@ namespace DElightManagerF {
 
 		} // Glass Type loop
 
-		if ( ErrorsFound ) ShowFatalError( "Problems with Daylighting:DElight input, see previous error messages" );
+		if ( ErrorsFound ) ShowFatalError( "Problems with Daylighting:DElight input, see previous error messages" );  // LCOV_EXCL_LINE
 
 		gio::close( unit );
 

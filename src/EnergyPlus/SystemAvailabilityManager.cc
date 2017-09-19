@@ -1244,7 +1244,7 @@ namespace SystemAvailabilityManager {
 		lNumericFieldBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1370,7 +1370,7 @@ namespace SystemAvailabilityManager {
 		lNumericFieldBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetSysAvailManagerListInputs: Program terminates due to preceding conditions." );
+			ShowFatalError( "GetSysAvailManagerListInputs: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1852,7 +1852,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcSchedSysAvailMgr( SysAvailNum, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:Scheduled not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:Scheduled not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_ScheduledOn ) { // 'AvailabilityManager:ScheduledOn'
@@ -1862,7 +1862,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcSchedOnSysAvailMgr( SysAvailNum, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:ScheduledOn not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:ScheduledOn not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_ScheduledOff ) { // 'AvailabilityManager:ScheduledOff'
@@ -1872,7 +1872,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcSchedOffSysAvailMgr( SysAvailNum, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:ScheduledOff not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:ScheduledOff not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_NightCycle ) { // 'AvailabilityManager:NightCycle'
@@ -1882,7 +1882,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:NightCycle not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:NightCycle not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_OptimumStart ) { // 'AvailabilityManager:OptimumStart'
@@ -1892,7 +1892,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcOptStartSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:OptimumStart not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:OptimumStart not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_NightVent ) { // 'AvailabilityManager:NightVentilation'
@@ -1902,7 +1902,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcNVentSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:NightVentilation not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:NightVentilation not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_DiffThermo ) { // 'AvailabilityManager:DifferentialThermostat'
@@ -1912,7 +1912,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcDiffTSysAvailMgr( SysAvailNum, PreviousStatus, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:DifferentialThermostat not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_HiTempTOff ) { // 'AvailabilityManager:HighTemperatureTurnOff'
@@ -1922,7 +1922,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcHiTurnOffSysAvailMgr( SysAvailNum, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOff not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOff not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_HiTempTOn ) { // 'AvailabilityManager:HighTemperatureTurnOn'
@@ -1932,7 +1932,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcHiTurnOnSysAvailMgr( SysAvailNum, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOn not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:HighTemperatureTurnOn not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_LoTempTOff ) { // 'AvailabilityManager:LowTemperatureTurnOff'
@@ -1942,7 +1942,7 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcLoTurnOffSysAvailMgr( SysAvailNum, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOff not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOff not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else if ( SELECT_CASE_var == SysAvailMgr_LoTempTOn ) { // 'AvailabilityManager:LowTemperatureTurnOn'
@@ -1952,13 +1952,13 @@ namespace SystemAvailabilityManager {
 			if ( SysAvailNum > 0 ) {
 				CalcLoTurnOnSysAvailMgr( SysAvailNum, AvailStatus );
 			} else {
-				ShowFatalError( "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOn not found: " + SysAvailName );
+				ShowFatalError( "SimSysAvailManager: AvailabilityManager:LowTemperatureTurnOn not found: " + SysAvailName );  // LCOV_EXCL_LINE
 			}
 
 		} else {
 			ShowSevereError( "AvailabilityManager Type not found: " + TrimSigDigits( SysAvailType ) );
 			ShowContinueError( "Occurs in Manager=" + SysAvailName );
-			ShowFatalError( "Preceding condition causes termination." );
+			ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -2165,7 +2165,7 @@ namespace SystemAvailabilityManager {
 		int ZoneNum;
 		Real64 TempTol;
 		static Array1D_bool ZoneCompNCControlType;
-		int CyclingRunTimeControlType; 
+		int CyclingRunTimeControlType;
 
 		// reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
 		if ( WarmupFlag && BeginDayFlag ) {
@@ -2411,11 +2411,11 @@ namespace SystemAvailabilityManager {
 
 			if ( ( tstatType == SingleCoolingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) + TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			} else if ( tstatType == DualSetPointWithDeadBand ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) > DataHeatBalFanSys::ZoneThermostatSetPointHi( ZoneNum ) + TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			}}
 		}
@@ -2436,11 +2436,11 @@ namespace SystemAvailabilityManager {
 
 			if ( ( tstatType == SingleHeatingSetPoint ) ||  ( tstatType == SingleHeatCoolSetPoint) ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::TempZoneThermostatSetPoint( ZoneNum ) - TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			} else if ( tstatType == DualSetPointWithDeadBand ){
 				if ( DataHeatBalFanSys::TempTstatAir( ZoneNum ) < DataHeatBalFanSys::ZoneThermostatSetPointLo( ZoneNum ) - TempTolerance ) {
-					return true; // return on the first zone found 
+					return true; // return on the first zone found
 				}
 			}}
 		}
@@ -4562,7 +4562,7 @@ namespace SystemAvailabilityManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		// Set up output variables
@@ -4741,7 +4741,7 @@ namespace SystemAvailabilityManager {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in getting AvailabilityManager:* inputs" );
+				ShowFatalError( "Errors found in getting AvailabilityManager:* inputs" );  // LCOV_EXCL_LINE
 			}
 
 			MyOneTimeFlag = false;
@@ -5035,7 +5035,7 @@ namespace SystemAvailabilityManager {
 				}
 			} else {
 				ShowSevereError( cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + ": incorrect Control Type: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
-				ShowFatalError( "Errors found in getting " + cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + " Control mode value" );
+				ShowFatalError( "Errors found in getting " + cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + " Control mode value" );  // LCOV_EXCL_LINE
 
 			}}
 
@@ -5138,7 +5138,7 @@ namespace SystemAvailabilityManager {
 		HybridVentSysAvailVentCtrl( SysAvailNum ) = HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl;
 		if ( HybridVentSysAvailVentCtrl( SysAvailNum ) < 0 ) {
 			// Fatal error
-			ShowFatalError( "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control mode schedule" );
+			ShowFatalError( "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control mode schedule" );  // LCOV_EXCL_LINE
 		}
 
 		if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {

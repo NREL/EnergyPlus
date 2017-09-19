@@ -177,7 +177,7 @@ namespace FanCoilUnits {
 
 	// DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:	
+	// MODULE VARIABLE DECLARATIONS:
 	namespace {
 		bool InitFanCoilUnitsOneTimeFlag( true );
 		bool InitFanCoilUnitsCheckInZoneEquipmentListFlag( false ); // True after the Zone Equipment List has been checked for items
@@ -278,17 +278,17 @@ namespace FanCoilUnits {
 		if ( CompIndex == 0 ) {
 			FanCoilNum = FindItemInList( CompName, FanCoil );
 			if ( FanCoilNum == 0 ) {
-				ShowFatalError( "SimFanCoil: Unit not found=" + CompName );
+				ShowFatalError( "SimFanCoil: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = FanCoilNum;
 		} else {
 			FanCoilNum = CompIndex;
 			if ( FanCoilNum > NumFanCoils || FanCoilNum < 1 ) {
-				ShowFatalError( "SimFanCoil:  Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Number of Units=" + TrimSigDigits( NumFanCoils ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimFanCoil:  Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Number of Units=" + TrimSigDigits( NumFanCoils ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( FanCoilNum ) ) {
 				if ( CompName != FanCoil( FanCoilNum ).Name ) {
-					ShowFatalError( "SimFanCoil: Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + FanCoil( FanCoilNum ).Name );
+					ShowFatalError( "SimFanCoil: Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + FanCoil( FanCoilNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( FanCoilNum ) = false;
 			}
@@ -898,7 +898,7 @@ namespace FanCoilUnits {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input. Preceding condition(s) cause termination." );
+			ShowFatalError( RoutineName + "Errors found in input. Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		for ( FanCoilNum = 1; FanCoilNum <= NumFanCoils; ++FanCoilNum ) {
@@ -1010,7 +1010,7 @@ namespace FanCoilUnits {
 
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + FanCoil( FanCoilNum ).Name + "\", type=" + FanCoil( FanCoilNum ).UnitType );
-					ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );
+					ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 
 				FanCoil( FanCoilNum ).HotPlantOutletNode = PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).LoopSide( FanCoil( FanCoilNum ).HWLoopSide ).Branch( FanCoil( FanCoilNum ).HWBranchNum ).Comp( FanCoil( FanCoilNum ).HWCompNum ).NodeNumOut;
@@ -1018,18 +1018,18 @@ namespace FanCoilUnits {
 			} else if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Electric ) {
 				// do nothing, valid type
 			} else {
-				ShowFatalError( "InitFanCoilUnits: FanCoil=" + FanCoil( FanCoilNum ).Name + ", invalid heating coil type. Program terminated." );
+				ShowFatalError( "InitFanCoilUnits: FanCoil=" + FanCoil( FanCoilNum ).Name + ", invalid heating coil type. Program terminated." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ( FanCoil( FanCoilNum ).CCoilPlantTypeOfNum == TypeOf_CoilWaterCooling ) || ( FanCoil( FanCoilNum ).CCoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
 				ScanPlantLoopsForObject( FanCoil( FanCoilNum ).CCoilPlantName, FanCoil( FanCoilNum ).CCoilPlantTypeOfNum, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + FanCoil( FanCoilNum ).Name + "\", type=" + FanCoil( FanCoilNum ).UnitType );
-					ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );
+					ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 				FanCoil( FanCoilNum ).ColdPlantOutletNode = PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).LoopSide( FanCoil( FanCoilNum ).CWLoopSide ).Branch( FanCoil( FanCoilNum ).CWBranchNum ).Comp( FanCoil( FanCoilNum ).CWCompNum ).NodeNumOut;
 			} else {
-				ShowFatalError( "InitFanCoilUnits: FanCoil=" + FanCoil( FanCoilNum ).Name + ", invalid cooling coil type. Program terminated." );
+				ShowFatalError( "InitFanCoilUnits: FanCoil=" + FanCoil( FanCoilNum ).Name + ", invalid cooling coil type. Program terminated." );  // LCOV_EXCL_LINE
 			}
 
 			MyPlantScanFlag( FanCoilNum ) = false;
@@ -1397,7 +1397,7 @@ namespace FanCoilUnits {
 
 				//     If fan is autosized, get fan volumetric flow rate
 				if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
-					if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+					if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 						Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 						FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 					} else {
@@ -1434,7 +1434,7 @@ namespace FanCoilUnits {
 				}
 			}
 		} else if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
-			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 				FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 			} else {
@@ -1831,7 +1831,7 @@ namespace FanCoilUnits {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2089,9 +2089,9 @@ namespace FanCoilUnits {
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
 				}
 				else {
-					// flow lock on 
+					// flow lock on
 					if ( MdotLockC > CWFlow ) { // if mdot > CWFlow, bypass extra flow
-						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with CWFlow; rest will be bypassed 
+						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with CWFlow; rest will be bypassed
 						Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).MassFlowRate = MdotLockC;
 						// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
@@ -2213,9 +2213,9 @@ namespace FanCoilUnits {
 							FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
 					} else {
-						// flow lock on 
+						// flow lock on
 						if ( MdotLockH > HWFlow ) { // if mdot > HWFlow, bypass extra flow
-							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with HWFlow; rest will be bypassed 
+							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with HWFlow; rest will be bypassed
 							Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).MassFlowRate = MdotLockH;
 							// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
@@ -2253,7 +2253,7 @@ namespace FanCoilUnits {
 			} else {
 				FanCoil( FanCoilNum ).ElecPower = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 			}
-			
+
 			PowerMet = QUnitOut;
 			LatOutputProvided = LatentOutput;
 
@@ -2286,7 +2286,7 @@ namespace FanCoilUnits {
 			// speed fan selection only for multispeed cycling fan
 			if ( UnitOn && ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan ) ) {
 				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired;
- 
+
 				// set water side mass flow rate
 				if ( QCoilCoolSP < 0 ) {
 					Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = FanCoil( FanCoilNum ).MaxColdWaterFlow;
@@ -3244,7 +3244,7 @@ namespace FanCoilUnits {
 		} else {
 			MinWaterFlow = mdot;
 		}
-	
+
 	}
 
 	void
@@ -3337,7 +3337,7 @@ namespace FanCoilUnits {
 		} else {
 			PLRMin = PLR;
 		}
-	
+
 	}
 
 	void
@@ -4201,7 +4201,7 @@ namespace FanCoilUnits {
 						if ( Iter > 70 && SRatio == 0.0 && DelPLR < 0.0 ) Error = 0.0;
 					}
 				}
-				//FanElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio ); // why set the ugly global here? 
+				//FanElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio ); // why set the ugly global here?
 				FanCoil( FanCoilNum ).ElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio );
 			}
 		}
@@ -4717,7 +4717,7 @@ namespace FanCoilUnits {
 		ControlledZoneNum = int( Par( 3 ) );
 		QZnReq = Par( 4 );
 		WaterControlNode = int( Par( 5 ) );
-		
+
 		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode ) {
 			Node( WaterControlNode ).MassFlowRate = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
@@ -4759,7 +4759,7 @@ namespace FanCoilUnits {
 
 		// REFERENCES:
 		// na
-		
+
 		// USE STATEMENTS:
 		// na
 
@@ -4805,7 +4805,7 @@ namespace FanCoilUnits {
 		QZnReq = Par( 4 );
 
 		Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = HWFlow;
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); 
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 );
 
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
@@ -4885,7 +4885,7 @@ namespace FanCoilUnits {
 		QZnReq = Par( 4 );
 
 		Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = CWFlow;
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); 
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 );
 
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
@@ -4903,49 +4903,49 @@ namespace FanCoilUnits {
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
-		
+
 				// FUNCTION INFORMATION:
 				//       AUTHOR         Richard Raustad, FSEC
 				//       DATE WRITTEN   December 2015
 				//       MODIFIED       na
 				//       RE-ENGINEERED  na
-			
+
 				// PURPOSE OF THIS SUBROUTINE:
 				// To calculate the part-load ratio for the FCU with varying water flow rate
-			
+
 				// METHODOLOGY EMPLOYED:
 				// Use SolveRoot to CALL this Function to converge on a solution
-			
+
 				// REFERENCES:
 				// na
-			
+
 				// USE STATEMENTS:
 				// na
-			
+
 				// Return value
 		Real64 Residuum; // Result (forces solution to be within tolerance)
 
 				// Argument array dimensioning
-			
+
 				// Locals
 				// SUBROUTINE ARGUMENT DEFINITIONS:
-			
+
 				//   Parameter description example:
 				//       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
 				//       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
 				//       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
 				//       Par(4)  = QZnReq               ! zone load [W]
 				//       Par(5)  = WaterControlNode     ! CW or HW control node number
-			
+
 				// SUBROUTINE PARAMETER DEFINITIONS:
 				// na
-			
+
 				// INTERFACE BLOCK SPECIFICATIONS
 				// na
-			
+
 				// DERIVED TYPE DEFINITIONS
 				// na
-			
+
 				// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanCoilNum; // Index to this fan coil unit
 		bool FirstHVACIteration; // FirstHVACIteration flag
@@ -4955,7 +4955,7 @@ namespace FanCoilUnits {
 		Real64 QUnitOut; // delivered capacity [W]
 		Real64 QZnReq;
 		Real64 FCOutletTempOn; // FCU outlet temperature
-		
+
 		// Convert parameters to usable variables
 		FanCoilNum = int( Par( 1 ) );
 		if ( Par( 2 ) == 1.0 ) {
@@ -4967,70 +4967,70 @@ namespace FanCoilUnits {
 		OutletTemp = Par( 4 );
 		QZnReq = Par( 5 );
 		WaterControlNode = int( Par( 6 ) );
-		
+
 		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode || ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) ) {
 			Node( WaterControlNode ).MassFlowRate = WaterFlow;
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=1 for electric heating coil
 		}
-		
+
 		FCOutletTempOn = Node( FanCoil( FanCoilNum ).AirOutNode ).Temp;
 		// Calculate residual based on output magnitude
 		Residuum = ( FCOutletTempOn - OutletTemp );
-		
+
 		return Residuum;
 	}
-	
+
 	Real64
 	CalcFanCoilWaterFlowResidual(
 		Real64 const WaterFlow, // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
-		
+
 				// FUNCTION INFORMATION:
 				//       AUTHOR         Richard Raustad, FSEC
 				//       DATE WRITTEN   December 2015
 				//       MODIFIED       na
 				//       RE-ENGINEERED  na
-			
+
 				// PURPOSE OF THIS SUBROUTINE:
 				// To calculate the part-load ratio for the FCU with varying water flow rate
-			
+
 				// METHODOLOGY EMPLOYED:
 				// Use SolveRoot to CALL this Function to converge on a solution
-			
+
 				// REFERENCES:
 				// na
-			
+
 				// USE STATEMENTS:
 				// na
-			
+
 				// Return value
 		Real64 Residuum; // Result (forces solution to be within tolerance)
 
 				// Argument array dimensioning
-			
+
 				// Locals
 				// SUBROUTINE ARGUMENT DEFINITIONS:
-			
+
 				//   Parameter description example:
 				//       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
 				//       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
 				//       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
 				//       Par(4)  = QZnReq               ! zone load [W]
 				//       Par(5)  = WaterControlNode     ! CW or HW control node number
-			
+
 				// SUBROUTINE PARAMETER DEFINITIONS:
 				// na
-			
+
 				// INTERFACE BLOCK SPECIFICATIONS
 				// na
-			
+
 				// DERIVED TYPE DEFINITIONS
 				// na
-			
+
 				// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FanCoilNum; // Index to this fan coil unit
 		bool FirstHVACIteration; // FirstHVACIteration flag
@@ -5038,7 +5038,7 @@ namespace FanCoilUnits {
 		int WaterControlNode; // water node to control
 		Real64 QZnReq; // Sensible load to be met [W]
 		Real64 QUnitOut; // delivered capacity [W]
-		
+
 		// Convert parameters to usable variables
 		FanCoilNum = int( Par( 1 ) );
 		if ( Par( 2 ) == 1.0 ) {
@@ -5049,21 +5049,21 @@ namespace FanCoilUnits {
 		ControlledZoneNum = int( Par( 3 ) );
 		QZnReq = Par( 4 );
 		WaterControlNode = int( Par( 5 ) );
-		
+
 		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode || ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) ) {
 			Node( WaterControlNode ).MassFlowRate = WaterFlow;
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=1 for electric heating coil
 		}
-		
+
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
 			Residuum = ( QUnitOut - QZnReq ) / 100.0;
 		} else {
 			Residuum = ( QUnitOut - QZnReq ) / QZnReq;
 		}
-		
+
 		return Residuum;
 	}
 
@@ -5146,7 +5146,7 @@ namespace FanCoilUnits {
 			Node( WaterControlNode ).MassFlowRate = MinWaterFlow + ( PLR * ( FanCoil( FanCoilNum ).MaxHotWaterFlow - MinWaterFlow ) );
 		} else {
 			// developer error
-			ShowFatalError( "Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " + FanCoil( FanCoilNum ).Name );
+			ShowFatalError( "Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " + FanCoil( FanCoilNum ).Name );  // LCOV_EXCL_LINE
 		}
 		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
@@ -5248,7 +5248,7 @@ namespace FanCoilUnits {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 );
 		} else {
 			// developer error
-			ShowFatalError( "Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " + FanCoil( FanCoilNum ).Name );
+			ShowFatalError( "Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " + FanCoil( FanCoilNum ).Name );  // LCOV_EXCL_LINE
 		}
 
 		// Calculate residual based on output magnitude

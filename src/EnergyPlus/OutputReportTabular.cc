@@ -748,7 +748,7 @@ namespace OutputReportTabular {
 
 
 		if ( IndexTypeKey != ZoneTSReporting && IndexTypeKey != HVACTSReporting ) {
-			ShowFatalError( "Invalid reporting requested -- UpdateTabularReports" );
+			ShowFatalError( "Invalid reporting requested -- UpdateTabularReports" );  // LCOV_EXCL_LINE
 		}
 
 		if ( UpdateTabularReportsGetInput ) {
@@ -761,7 +761,7 @@ namespace OutputReportTabular {
 			// noel -- noticed this was called once and very slow -- sped up a little by caching keys
 			InitializeTabularMonthly();
 			if ( isInvalidAggregationOrder( ) ) {
-				ShowFatalError( "OutputReportTabular: Invalid aggregations detected, no simulation performed." );
+				ShowFatalError( "OutputReportTabular: Invalid aggregations detected, no simulation performed." );  // LCOV_EXCL_LINE
 			}
 			GetInputFuelAndPollutionFactors();
 			SetupUnitConversions();
@@ -2189,7 +2189,7 @@ namespace OutputReportTabular {
 			ErrorsFound = true;
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( CurrentModuleObject + ": Preceding errors cause termination." );
+			ShowFatalError( CurrentModuleObject + ": Preceding errors cause termination." );  // LCOV_EXCL_LINE
 		}
 		// if the BEPS report has been called for than initialize its arrays
 		if ( displayTabularBEPS || displayDemandEndUse || displaySourceEnergyEndUseSummary || displayLEEDSummary ) {
@@ -2525,14 +2525,14 @@ namespace OutputReportTabular {
 		namedMonthly( 62 ).title = "MechanicalVentilationLoadsMonthly";
 
 		if ( numNamedMonthly != NumMonthlyReports ) {
-			ShowFatalError( "InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits( numNamedMonthly ) + "] does not match number in DataOutputs=[" + RoundSigDigits( NumMonthlyReports ) + "]." );
+			ShowFatalError( "InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits( numNamedMonthly ) + "] does not match number in DataOutputs=[" + RoundSigDigits( NumMonthlyReports ) + "]." );  // LCOV_EXCL_LINE
 		} else {
 			for ( xcount = 1; xcount <= numNamedMonthly; ++xcount ) {
 				if ( ! SameString( MonthlyNamedReports( xcount ), namedMonthly( xcount ).title ) ) {
 					ShowSevereError( "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput." );
 					ShowContinueError( "first mismatch at ORT [" + RoundSigDigits( numNamedMonthly ) + "] =\"" + namedMonthly( xcount ).title + "\"." );
 					ShowContinueError( "same location in DO =\"" + MonthlyNamedReports( xcount ) + "\"." );
-					ShowFatalError( "Preceding condition causes termination." );
+					ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 				}
 			}
 		}
@@ -3498,7 +3498,7 @@ namespace OutputReportTabular {
 					DisplayString( "Writing tabular output file results using comma format." );
 					tbl_stream.open( DataStringGlobals::outputTblCsvFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblCsvFileName + "\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblCsvFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 					}
 					tbl_stream << "Program Version:" << curDel << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
@@ -3514,7 +3514,7 @@ namespace OutputReportTabular {
 					DisplayString( "Writing tabular output file results using tab format." );
 					tbl_stream.open( DataStringGlobals::outputTblTabFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTabFileName + "\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTabFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 					}
 					tbl_stream << "Program Version" << curDel << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
@@ -3530,7 +3530,7 @@ namespace OutputReportTabular {
 					DisplayString( "Writing tabular output file results using HTML format." );
 					tbl_stream.open( DataStringGlobals::outputTblHtmFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblHtmFileName + "\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblHtmFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 					}
 					tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
 					tbl_stream << "<html>\n";
@@ -3561,7 +3561,7 @@ namespace OutputReportTabular {
 					DisplayString( "Writing tabular output file results using XML format." );
 					tbl_stream.open( DataStringGlobals::outputTblXmlFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblXmlFileName + "\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblXmlFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 					}
 					tbl_stream << "<?xml version=\"1.0\"?>\n";
 					tbl_stream << "<EnergyPlusTabularReports>\n";
@@ -3582,7 +3582,7 @@ namespace OutputReportTabular {
 					DisplayString( "Writing tabular output file results using text format." );
 					tbl_stream.open( DataStringGlobals::outputTblTxtFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTxtFileName + "\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTxtFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 					}
 					tbl_stream << "Program Version: " << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
@@ -5488,7 +5488,7 @@ namespace OutputReportTabular {
 			statFile = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, DataStringGlobals::inStatFileName, flags ); readStat = flags.ios(); }
 			if ( readStat != 0 ) {
-				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );
+				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );  // LCOV_EXCL_LINE
 			}
 			IOFlags flags;
 			while ( readStat == 0 ) { //end of file, or error
@@ -7746,13 +7746,13 @@ namespace OutputReportTabular {
 			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
 			//  Energy Use Intensities
 			if ( buildingGrossFloorArea > 0 ) {
-				PreDefTableEntry( pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal( colElectricity, 3 ) / buildingGrossFloorArea, 2 ); 
+				PreDefTableEntry( pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal( colElectricity, 3 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal( colElectricity, 1 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal( colElectricity, 2 ) / buildingGrossFloorArea, 2 );
-				PreDefTableEntry( pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal( colElectricity, 7 ) / buildingGrossFloorArea, 2 );  
+				PreDefTableEntry( pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal( colElectricity, 7 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal( colElectricity, 12 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal( colElectricity, 5 ) / buildingGrossFloorArea, 2 );
-				PreDefTableEntry( pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * ( useVal( colElectricity, 15 ) ) / buildingGrossFloorArea, 2 ); 
+				PreDefTableEntry( pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * ( useVal( colElectricity, 15 ) ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal( colElectricity, 15 ) / buildingGrossFloorArea, 2 );
 			}
 
@@ -7771,7 +7771,7 @@ namespace OutputReportTabular {
 			if ( buildingGrossFloorArea > 0 ) {
 				PreDefTableEntry( pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal( colGas, 1 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal( colGas, 12 ) / buildingGrossFloorArea, 2 );
-				PreDefTableEntry( pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 ); 
+				PreDefTableEntry( pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 );
 				PreDefTableEntry( pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal( colGas, 15 ) / buildingGrossFloorArea, 2 );
 			}
 			PreDefTableEntry( pdchLeedEusTotal, "Natural Gas", unconvert * useVal( colGas, 15 ), 2 );
@@ -7808,10 +7808,10 @@ namespace OutputReportTabular {
 			leedSiteRecept = 0.0;
 			leedSiteTotal = 0.0;
 			for ( iResource = 1; iResource <= 5; ++iResource ) { // don't bother with water
-				leedSiteIntLite += useVal( iResource, 3 ); 
+				leedSiteIntLite += useVal( iResource, 3 );
 				leedSiteSpHeat += useVal( iResource, 1 );
 				leedSiteSpCool += useVal( iResource, 2 );
-				leedSiteFanInt += useVal( iResource, 7 ); 
+				leedSiteFanInt += useVal( iResource, 7 );
 				leedSiteSrvWatr += useVal( iResource, 12 );
 				leedSiteRecept += useVal( iResource, 5 );
 				leedSiteTotal += useVal( iResource, 15 );

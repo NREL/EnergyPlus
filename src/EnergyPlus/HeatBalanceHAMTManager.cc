@@ -650,7 +650,7 @@ namespace HeatBalanceHAMTManager {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetHeatBalHAMTInput: Errors found getting input.  Program terminates." );
+			ShowFatalError( "GetHeatBalHAMTInput: Errors found getting input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -808,7 +808,7 @@ namespace HeatBalanceHAMTManager {
 		}
 
 		if ( errorCount > 0 ) {
-			ShowFatalError( "CombinedHeatAndMoistureFiniteElement: Incomplete data to start solution, program terminates." );
+			ShowFatalError( "CombinedHeatAndMoistureFiniteElement: Incomplete data to start solution, program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		// Make the cells and initialize
@@ -1331,7 +1331,7 @@ namespace HeatBalanceHAMTManager {
 				if ( ! WarmupFlag ) {
 					ShowSevereError( "HAMT: HAMT: Temperature (high) out of bounds ( " + RoundSigDigits( tempmax, 2 ) + ") for surface=" + Surface( sid ).Name );
 					ShowContinueErrorTimeStamp( "" );
-					ShowFatalError( "Program terminates due to preceding condition." );
+					ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 				}
 			}
 			if ( tempmin < MinSurfaceTempLimit ) {
@@ -1347,7 +1347,7 @@ namespace HeatBalanceHAMTManager {
 				if ( ! WarmupFlag ) {
 					ShowSevereError( "HAMT: HAMT: Temperature (low) out of bounds ( " + RoundSigDigits( tempmin, 2 ) + ") for surface=" + Surface( sid ).Name );
 					ShowContinueErrorTimeStamp( "" );
-					ShowFatalError( "Program terminates due to preceding condition." );
+					ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -1416,7 +1416,7 @@ namespace HeatBalanceHAMTManager {
 				} else {
 					ShowSevereError( "CalcHeatBalHAMT: demoninator in calculating RH is zero.  Check material properties for accuracy." );
 					ShowContinueError( "...Problem occurs in Material=\"" + Material( cells( cid ).matid ).Name + "\"." );
-					ShowFatalError( "Program terminates due to preceding condition." );
+					ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 				}
 
 				if ( cells( cid ).rhp1 > rhmax ) {

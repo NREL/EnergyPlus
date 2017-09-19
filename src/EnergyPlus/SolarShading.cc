@@ -387,7 +387,7 @@ namespace SolarShading {
 
 			shd_stream.open( DataStringGlobals::outputShdFileName );
 			if ( ! shd_stream ) {
-				ShowFatalError( "InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write)." );
+				ShowFatalError( "InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( GetInputFlag ) {
@@ -1433,7 +1433,7 @@ namespace SolarShading {
 					ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
 					ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
 					ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
-					ShowFatalError( "Anisotropic solar calculation causes fatal error" );
+					ShowFatalError( "Anisotropic solar calculation causes fatal error" );  // LCOV_EXCL_LINE
 				}
 				CosIncAngBeamOnSurface = 1.0;
 			} else if ( CosIncAngBeamOnSurface < -1.0 ) {
@@ -1442,7 +1442,7 @@ namespace SolarShading {
 					ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
 					ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
 					ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
-					ShowFatalError( "Anisotropic solar calculation causes fatal error" );
+					ShowFatalError( "Anisotropic solar calculation causes fatal error" );  // LCOV_EXCL_LINE
 				}
 				CosIncAngBeamOnSurface = -1.0;
 			}
@@ -2484,7 +2484,7 @@ namespace SolarShading {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( NS > 2 * MaxHCS ) {
-			ShowFatalError( "Solar Shading: HTrans: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
+			ShowFatalError( "Solar Shading: HTrans: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );  // LCOV_EXCL_LINE
 		}
 
 		HCNV( NS ) = NumVertices;
@@ -2551,7 +2551,7 @@ namespace SolarShading {
 		// Locals
 
 		if ( NS > 2 * MaxHCS ) {
-			ShowFatalError( "Solar Shading: HTrans0: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
+			ShowFatalError( "Solar Shading: HTrans0: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );  // LCOV_EXCL_LINE
 		}
 
 		HCNV( NS ) = NumVertices;
@@ -2598,7 +2598,7 @@ namespace SolarShading {
 		using General::TrimSigDigits;
 
 		if ( NS > 2 * MaxHCS ) {
-			ShowFatalError( "Solar Shading: HTrans1: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
+			ShowFatalError( "Solar Shading: HTrans1: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );  // LCOV_EXCL_LINE
 		}
 
 		HCNV( NS ) = NumVertices;
@@ -3738,7 +3738,7 @@ namespace SolarShading {
 			}
 			CosIncAng( iTimeStep, iHour, SurfNum ) = CTHETA( SurfNum );
 		}
-		
+
 		if ( UseScheduledSunlitFrac ) {
 			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).SchedExternalShadingFrac ) {
@@ -3747,7 +3747,7 @@ namespace SolarShading {
 				else {
 					SunlitFrac( iTimeStep, iHour, SurfNum ) = 1.0;
 				}
-			} 
+			}
 		} else {
 			SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
 			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -8409,7 +8409,7 @@ namespace SolarShading {
 					SchedulePtr = SurfaceWindow( ISurf ).AirflowSchedulePtr;
 					ScheduleMult = GetCurrentScheduleValue( SchedulePtr );
 					if ( ScheduleMult < 0.0 || ScheduleMult > 1.0 ) {
-						ShowFatalError( "Airflow schedule has a value outside the range 0.0 to 1.0 for window=" + Surface( ISurf ).Name );
+						ShowFatalError( "Airflow schedule has a value outside the range 0.0 to 1.0 for window=" + Surface( ISurf ).Name );  // LCOV_EXCL_LINE
 					}
 					SurfaceWindow( ISurf ).AirflowThisTS = ScheduleMult * SurfaceWindow( ISurf ).MaxAirflow;
 				}

@@ -337,7 +337,7 @@ namespace ExternalInterface {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetExternalInterfaceInput: preceding conditions cause termination." );
+			ShowFatalError( "GetExternalInterfaceInput: preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 		StopExternalInterfaceIfError();
@@ -374,12 +374,12 @@ namespace ExternalInterface {
 						retVal = sendclientmessage( &socketFD, &flag2 );
 					}
 				}
-				ShowFatalError( "Error in ExternalInterface: Check EnergyPlus *.err file." );
+				ShowFatalError( "Error in ExternalInterface: Check EnergyPlus *.err file." );  // LCOV_EXCL_LINE
 			}
 		}
 		if ( NumExternalInterfacesFMUImport != 0 ) {
 			if ( ErrorsFound ) {
-				ShowFatalError( "ExternalInterface/StopExternalInterfaceIfError: Error in ExternalInterface: Check EnergyPlus *.err file." );
+				ShowFatalError( "ExternalInterface/StopExternalInterfaceIfError: Error in ExternalInterface: Check EnergyPlus *.err file." );  // LCOV_EXCL_LINE
 			}
 		}
 	}

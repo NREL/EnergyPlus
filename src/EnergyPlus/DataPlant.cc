@@ -304,7 +304,7 @@ namespace DataPlant {
 	// int const TypeOf_HPWrappedCondenser ?? 92 ??
 	int const TypeOf_FourPipeBeamAirTerminal( 93 );
 	int const TypeOf_CoolingPanel_Simple( 94 );
-	
+
 	// Parameters for General Equipment Types
 	int const NumGeneralEquipTypes( 23 );
 	Array1D_string const GeneralEquipTypes( NumGeneralEquipTypes, { "BOILER", "CHILLER", "COOLINGTOWER", "GENERATOR", "HEATEXCHANGER", "HEATPUMP", "PIPE", "PUMP", "DISTRICT", "THERMALSTORAGE", "TEMPERINGVALVE", "WATERHEATER", "WATERUSE", "DEMANDCOIL", "SOLARCOLLECTOR", "LOADPROFILE", "FLUIDCOOLER", "EVAPORATIVEFLUIDCOOLER", "GROUNDHEATEXCHANGER", "ZONEHVACDEMAND", "REFRIGERATION", "PLANTCOMPONENT", "CENTRALHEATPUMPSYSTEM" } );
@@ -602,7 +602,7 @@ namespace DataPlant {
 			} else {
 				ShowSevereError( "ScanPlantLoopsForObject: Invalid CompType passed [" + RoundSigDigits( CompType ) + "], Name=" + CompName );
 				ShowContinueError( "Valid CompTypes are in the range [1 - " + RoundSigDigits( NumSimPlantEquipTypes ) + "]." );
-				ShowFatalError( "Previous error causes program termination" );
+				ShowFatalError( "Previous error causes program termination" );  // LCOV_EXCL_LINE
 			}
 		}
 

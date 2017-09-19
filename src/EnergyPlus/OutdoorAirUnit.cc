@@ -269,17 +269,17 @@ namespace OutdoorAirUnit {
 		if ( CompIndex == 0 ) {
 			OAUnitNum = FindItemInList( CompName, OutAirUnit );
 			if ( OAUnitNum == 0 ) {
-				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
+				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = OAUnitNum;
 		} else {
 			OAUnitNum = CompIndex;
 			if ( OAUnitNum > NumOfOAUnits || OAUnitNum < 1 ) {
-				ShowFatalError( "SimOutdoorAirUnit:  Invalid CompIndex passed=" + TrimSigDigits( OAUnitNum ) + ", Number of Units=" + TrimSigDigits( NumOfOAUnits ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimOutdoorAirUnit:  Invalid CompIndex passed=" + TrimSigDigits( OAUnitNum ) + ", Number of Units=" + TrimSigDigits( NumOfOAUnits ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( OAUnitNum ) ) {
 				if ( CompName != OutAirUnit( OAUnitNum ).Name ) {
-					ShowFatalError( "SimOutdoorAirUnit: Invalid CompIndex passed=" + TrimSigDigits( OAUnitNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + OutAirUnit( OAUnitNum ).Name );
+					ShowFatalError( "SimOutdoorAirUnit: Invalid CompIndex passed=" + TrimSigDigits( OAUnitNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + OutAirUnit( OAUnitNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( OAUnitNum ) = false;
 			}
@@ -803,7 +803,7 @@ namespace OutdoorAirUnit {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + '.' );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + '.' );  // LCOV_EXCL_LINE
 		}
 
 		AlphArray.deallocate();
@@ -957,7 +957,7 @@ namespace OutdoorAirUnit {
 					errFlag = false;
 					ScanPlantLoopsForObject( OutAirUnit( OAUnitNum ).OAEquip( compLoop ).ComponentName, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CoilPlantTypeOfNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).LoopSideNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).BranchNum, OutAirUnit( OAUnitNum ).OAEquip( compLoop ).CompNum, _, _, _, _, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitOutdoorAirUnit: Program terminated for previous conditions." );
+						ShowFatalError( "InitOutdoorAirUnit: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 					}
 				}
 			}
@@ -1285,8 +1285,8 @@ namespace OutdoorAirUnit {
 		if( OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize ) {
 			if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, true, OutAirUnit( OAUnitNum ).SFan_Index, _, false, false );
-				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );			
-			
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );
+
 			} else {
 				HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,_,_,_);
 				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
@@ -1330,7 +1330,7 @@ namespace OutdoorAirUnit {
 		}
 
 		if( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1469,7 +1469,7 @@ namespace OutdoorAirUnit {
 				} else {
 					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn,ZoneCompTurnFansOff,_);
 				}
-				
+
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 					if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {
@@ -2022,7 +2022,7 @@ namespace OutdoorAirUnit {
 			}
 
 		} else {
-			ShowFatalError( "Invalid Outdoor Air Unit Component=" + EquipType ); // validate
+			ShowFatalError( "Invalid Outdoor Air Unit Component=" + EquipType ); // validate  // LCOV_EXCL_LINE
 		}}
 
 	}

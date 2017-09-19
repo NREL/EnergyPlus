@@ -927,7 +927,7 @@ namespace OutputProcessor {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetReportVariableInput:" + cCurrentModuleObject + ": errors in input." );
+			ShowFatalError( "GetReportVariableInput:" + cCurrentModuleObject + ": errors in input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1224,7 +1224,7 @@ namespace OutputProcessor {
 		//  The following should never happen to a user!!!!
 		ShowSevereError( "OutputProcessor/ValidateIndexType: Invalid Index Key passed to ValidateIndexType=" + IndexTypeKey );
 		ShowContinueError( "..Should be \"ZONE\", \"SYSTEM\", \"HVAC\"... was called from:" + CalledFrom );
-		ShowFatalError( "Preceding condition causes termination." );
+		ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 		return ValidateIndexType;
 
@@ -1454,7 +1454,7 @@ namespace OutputProcessor {
 		OutputFileMeterDetails = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, DataStringGlobals::outputMtdFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "InitializeMeters: Could not open file "+DataStringGlobals::outputMtdFileName+" for output (write)." );
+			ShowFatalError( "InitializeMeters: Could not open file "+DataStringGlobals::outputMtdFileName+" for output (write)." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2297,7 +2297,7 @@ namespace OutputProcessor {
 			EnergyMeters( NumEnergyMeters ).FinYrSMMinValDate = 0;
 		}
 		else {
-			ShowFatalError( "Requested to Add Meter which was already present=" + Name );
+			ShowFatalError( "Requested to Add Meter which was already present=" + Name );  // LCOV_EXCL_LINE
 		}
 		if ( ! ResourceType.empty() ) {
 			bool errFlag;
@@ -4035,7 +4035,7 @@ namespace OutputProcessor {
 		std::string const & variableName, // The variable's actual name
 		int const indexType,
 		OutputProcessor::Unit const & unitsForVar, // The variables units
-		Optional_string_const customUnitName, 
+		Optional_string_const customUnitName,
 		Optional_string_const ScheduleName
 	)
 	{
@@ -5233,7 +5233,7 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::kg_kg;
 		} else if ( unitUpper == "%" ) {
 			return OutputProcessor::Unit::Perc;
-		} else if ( unitUpper == "DEG" ) { 
+		} else if ( unitUpper == "DEG" ) {
 			return OutputProcessor::Unit::deg;
 		} else if ( unitUpper == "S" ) {
 			return OutputProcessor::Unit::s;
@@ -5823,7 +5823,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 	IndexType = IndexTypeKey;
 	if ( IndexType != ZoneTSReporting && IndexType != HVACTSReporting ) {
-		ShowFatalError( "Invalid reporting requested -- UpdateDataAndReport" );
+		ShowFatalError( "Invalid reporting requested -- UpdateDataAndReport" );  // LCOV_EXCL_LINE
 	}
 
 	if ( ( IndexType >= ZoneVar ) && ( IndexType <= HVACVar ) ) {
@@ -6627,7 +6627,7 @@ UpdateMeterReporting()
 	ReportMeterDetails();
 
 	if ( ErrorsLogged ) {
-		ShowFatalError( "UpdateMeterReporting: Previous Meter Specification errors cause program termination." );
+		ShowFatalError( "UpdateMeterReporting: Previous Meter Specification errors cause program termination." );  // LCOV_EXCL_LINE
 	}
 
 	MeterValue.dimension( NumEnergyMeters, 0.0 );
@@ -7248,11 +7248,11 @@ GetInternalVariableValue(
 		resultVal = 0.0;
 	} else if ( varType == 1 ) { // Integer
 		if ( keyVarIndex > NumOfIVariable ) {
-			ShowFatalError( "GetInternalVariableValue: Integer variable passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index beyond range of array." );  // LCOV_EXCL_LINE
 			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of integer variables = " + General::TrimSigDigits( NumOfIVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );  // LCOV_EXCL_LINE
 		}
 
 		IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
@@ -7260,11 +7260,11 @@ GetInternalVariableValue(
 		resultVal = double( IVar().Which );
 	} else if ( varType == 2 ) { // real
 		if ( keyVarIndex > NumOfRVariable ) {
-			ShowFatalError( "GetInternalVariableValue: Real variable passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValue: Real variable passed index beyond range of array." );  // LCOV_EXCL_LINE
 			ShowContinueError( "Index = " + General::TrimSigDigits( keyVarIndex ) + " Number of real variables = " + General::TrimSigDigits( NumOfRVariable ) );
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
+			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );  // LCOV_EXCL_LINE
 		}
 
 		RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
@@ -7334,10 +7334,10 @@ GetInternalVariableValueExternalInterface(
 		resultVal = 0.0;
 	} else if ( varType == 1 ) { // Integer
 		if ( keyVarIndex > NumOfIVariable ) {
-			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );  // LCOV_EXCL_LINE
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );  // LCOV_EXCL_LINE
 		}
 
 		IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
@@ -7345,10 +7345,10 @@ GetInternalVariableValueExternalInterface(
 		resultVal = double( IVar().EITSValue );
 	} else if ( varType == 2 ) { // REAL(r64)
 		if ( keyVarIndex > NumOfRVariable ) {
-			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );  // LCOV_EXCL_LINE
 		}
 		if ( keyVarIndex < 1 ) {
-			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );
+			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );  // LCOV_EXCL_LINE
 		}
 
 		RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
@@ -7845,7 +7845,7 @@ GetVariableKeys(
 					if ( ! Duplicate ) {
 						++numKeys;
 						if ( ( numKeys > maxKeyNames ) || ( numKeys > maxkeyVarIndexes ) ) {
-							ShowFatalError( "Invalid array size in GetVariableKeys" );
+							ShowFatalError( "Invalid array size in GetVariableKeys" );  // LCOV_EXCL_LINE
 						}
 						keyNames( numKeys ) = IVariableTypes( Loop ).VarNameUC.substr( 0, Position );
 						keyVarIndexes( numKeys ) = Loop;
@@ -7867,7 +7867,7 @@ GetVariableKeys(
 				if ( ! Duplicate ) {
 					++numKeys;
 					if ( ( numKeys > maxKeyNames ) || ( numKeys > maxkeyVarIndexes ) ) {
-						ShowFatalError( "Invalid array size in GetVariableKeys" );
+						ShowFatalError( "Invalid array size in GetVariableKeys" );  // LCOV_EXCL_LINE
 					}
 					keyNames( numKeys ) = RVariableTypes( Loop ).KeyNameOnlyUC;
 					keyVarIndexes( numKeys ) = Loop;
@@ -7877,14 +7877,14 @@ GetVariableKeys(
 	} else if ( varType == VarType_Meter ) { // Meter
 		numKeys = 1;
 		if ( ( numKeys > maxKeyNames ) || ( numKeys > maxkeyVarIndexes ) ) {
-			ShowFatalError( "Invalid array size in GetVariableKeys" );
+			ShowFatalError( "Invalid array size in GetVariableKeys" );  // LCOV_EXCL_LINE
 		}
 		keyNames( 1 ) = "Meter";
 		keyVarIndexes( 1 ) = GetMeterIndex( varName );
 	} else if ( varType == VarType_Schedule ) { // Schedule
 		numKeys = 1;
 		if ( ( numKeys > maxKeyNames ) || ( numKeys > maxkeyVarIndexes ) ) {
-			ShowFatalError( "Invalid array size in GetVariableKeys" );
+			ShowFatalError( "Invalid array size in GetVariableKeys" );  // LCOV_EXCL_LINE
 		}
 		keyNames( 1 ) = "Environment";
 		keyVarIndexes( 1 ) = GetScheduleIndex( varName );
@@ -8187,26 +8187,26 @@ ProduceRDDMDD()
 	if ( ProduceReportVDD == ReportVDD_Yes ) {
 		rdd_stream.open( DataStringGlobals::outputRddFileName ); // Text mode so we use \n as terminator
 		if ( ! rdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		rdd_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
 		rdd_stream << "Var Type (reported time step),Var Report Type,Variable Name [Units]" << '\n';
 		mdd_stream.open( DataStringGlobals::outputMddFileName );
 		if ( ! mdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		mdd_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
 		mdd_stream << "Var Type (reported time step),Var Report Type,Variable Name [Units]" << '\n';
 	} else if ( ProduceReportVDD == ReportVDD_IDF ) {
 		rdd_stream.open( DataStringGlobals::outputRddFileName ); // Text mode so we use \n as terminator
 		if ( ! rdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		rdd_stream << "! Program Version," << VerString << ',' << IDDVerString << '\n';
 		rdd_stream << "! Output:Variable Objects (applicable to this run)" << '\n';
 		mdd_stream.open( DataStringGlobals::outputMddFileName );
 		if ( ! mdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 		}
 		mdd_stream << "! Program Version," << VerString << ',' << IDDVerString << '\n';
 		mdd_stream << "! Output:Meter Objects (applicable to this run)" << '\n';

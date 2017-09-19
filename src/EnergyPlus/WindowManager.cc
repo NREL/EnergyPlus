@@ -844,7 +844,7 @@ namespace WindowManager {
 			if ( TotalIPhi > MaxNumOfIncidentAngles ) {
 				ShowSevereError( "WindowManage::InitGlassOpticalCalculations = " + Construct( ConstrNum ).Name + ", Invalid maximum value of common incidet angles = " + TrimSigDigits( TotalIPhi ) + "." );
 				ShowContinueError( "The maximum number of incident angles for each construct is " + TrimSigDigits( MaxNumOfIncidentAngles ) + ". Please rearrange the dataset." );
-				ShowFatalError( "Errors found getting inputs. Previous error(s) cause program termination." );
+				ShowFatalError( "Errors found getting inputs. Previous error(s) cause program termination." );  // LCOV_EXCL_LINE
 			}
 
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
@@ -2552,7 +2552,7 @@ namespace WindowManager {
 				//            END DO ! ZoneEquipConfigNum
 				// check whether this zone is a controlled zone or not
 				if ( ! Zone( ZoneNum ).IsControlled ) {
-					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
+					ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 					return;
 				}
 				// determine supply air conditions
@@ -2673,7 +2673,7 @@ namespace WindowManager {
 							if ( Material( ShadeLayPtr ).Group == WindowBlind ) {
 								ShowSevereError( "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" + Material( ShadeLayPtr ).Name + "\" is being used." );
 								ShowContinueError( "This is most likely a fault of the EMS values for shading control." );
-								ShowFatalError( "Preceding condition terminates program." );
+								ShowFatalError( "Preceding condition terminates program." );  // LCOV_EXCL_LINE
 							}
 						}
 						thick( TotGlassLay + 1 ) = Material( ShadeLayPtr ).Thickness;
@@ -2694,7 +2694,7 @@ namespace WindowManager {
 							if ( Material( ShadeLayPtr ).Group == Shade || Material( ShadeLayPtr ).Group == Screen ) {
 								ShowSevereError( "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" + Material( ShadeLayPtr ).Name + "\" is being used." );
 								ShowContinueError( "This is most likely a fault of the EMS values for shading control." );
-								ShowFatalError( "Preceding condition terminates program." );
+								ShowFatalError( "Preceding condition terminates program." );  // LCOV_EXCL_LINE
 							}
 						}
 						// Blind on
@@ -2766,7 +2766,7 @@ namespace WindowManager {
 					ZoneEquipConfigNum = ZoneNumAdj;
 					// check whether this zone is a controlled zone or not
 					if ( ! Zone( ZoneNumAdj ).IsControlled ) {
-						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
+						ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 						return;
 					}
 					// determine supply air conditions
@@ -2815,7 +2815,7 @@ namespace WindowManager {
 						}
 						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 							surface.ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
-						}					
+						}
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
@@ -3692,7 +3692,7 @@ namespace WindowManager {
 				}
 
 			} else {
-				ShowFatalError( "SolveForWindowTemperatures: Invalid number of Glass Layers=" + TrimSigDigits( ngllayer ) + ", up to 4 allowed." );
+				ShowFatalError( "SolveForWindowTemperatures: Invalid number of Glass Layers=" + TrimSigDigits( ngllayer ) + ", up to 4 allowed." );  // LCOV_EXCL_LINE
 			}}
 
 			LUdecomposition( Aface, nglfacep, indx, d ); // Note that these routines change Aface;
@@ -3848,7 +3848,7 @@ namespace WindowManager {
 
 			}
 
-			ShowFatalError( "Program halted because of convergence error in SolveForWindowTemperatures for window " + Surface( SurfNum ).Name );
+			ShowFatalError( "Program halted because of convergence error in SolveForWindowTemperatures for window " + Surface( SurfNum ).Name );  // LCOV_EXCL_LINE
 
 		}
 
@@ -4621,7 +4621,7 @@ namespace WindowManager {
 			for ( j = 1; j <= n; ++j ) {
 				if ( std::abs( ajac( j, i ) ) > aamax ) aamax = std::abs( ajac( j, i ) );
 			}
-			if ( aamax == 0.0 ) ShowFatalError( "Singular matrix in LUdecomposition, window calculations" );
+			if ( aamax == 0.0 ) ShowFatalError( "Singular matrix in LUdecomposition, window calculations" );  // LCOV_EXCL_LINE
 			vv( i ) = 1.0 / aamax;
 		}
 		for ( j = 1; j <= n; ++j ) {
@@ -7329,7 +7329,7 @@ namespace WindowManager {
 		// No convergence after MaxIterations; and/or error tolerance
 		if ( errtemp >= 10 * errtemptol ) {
 			// Fatal error: didn't converge
-			ShowFatalError( "Convergence error in WindowTempsForNominalCond for construction " + Construct( ConstrNum ).Name );
+			ShowFatalError( "Convergence error in WindowTempsForNominalCond for construction " + Construct( ConstrNum ).Name );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -8939,7 +8939,7 @@ Label99999: ;
 			}
 
 			if ( aamax == 0.0 ) {
-				ShowFatalError( "Singular matrix in LUDCMP, window calculations" );
+				ShowFatalError( "Singular matrix in LUDCMP, window calculations" );  // LCOV_EXCL_LINE
 			}
 			VV( i ) = 1.0 / aamax; // Was commented out prior to 10/5/01, which caused overflows
 			// in this routine in rare cases
@@ -9252,7 +9252,7 @@ Label99999: ;
 		rNumericArgs.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for user-defined solar/visible spectrum" );
+			ShowFatalError( "Errors found in processing input for user-defined solar/visible spectrum" );  // LCOV_EXCL_LINE
 		}
 
 		RunMeOnceFlag = true;

@@ -325,7 +325,7 @@ namespace Psychrometrics {
 			} else {
 				ShowContinueErrorTimeStamp( " Routine=Unknown," );
 			}
-			ShowFatalError( "Program terminates due to preceding condition." );
+			ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 		}
 	}
 #endif

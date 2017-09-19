@@ -203,7 +203,7 @@ namespace GroundHeatExchangers {
 			}
 		}
 		// If we didn't find it, fatal
-		ShowFatalError( "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );
+		ShowFatalError( "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName );  // LCOV_EXCL_LINE
 		// Shut up the compiler
 		return nullptr;
 	}
@@ -1414,7 +1414,7 @@ namespace GroundHeatExchangers {
 				}
 				//Check for Errors
 				if ( errorsFound ) {
-					ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+					ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -1564,7 +1564,7 @@ namespace GroundHeatExchangers {
 
 				//Check for Errors
 				if ( errorsFound ) {
-					ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+					ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 				}
 			}
 
@@ -2007,7 +2007,7 @@ namespace GroundHeatExchangers {
 			errFlag = false;
 			ScanPlantLoopsForObject( Name, TypeOf_GrndHtExchgVertical, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );
+				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			myFlag = false;
 		}
@@ -2099,7 +2099,7 @@ namespace GroundHeatExchangers {
 			errFlag = false;
 			ScanPlantLoopsForObject( Name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );
+				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			myFlag = false;
 		}

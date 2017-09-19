@@ -115,7 +115,7 @@ namespace PlantLoadProfile {
 			}
 		}
 		// If we didn't find it, fatal
-		ShowFatalError( "PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName );
+		ShowFatalError( "PlantLoadProfile::factory: Error getting inputs for pipe named: " + objectName );  // LCOV_EXCL_LINE
 		// Shut up the compiler
 		return nullptr;
 	}
@@ -217,7 +217,7 @@ namespace PlantLoadProfile {
 				errFlag = false;
 				ScanPlantLoopsForObject( this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitPlantProfile: Program terminated for previous conditions." );
+					ShowFatalError( "InitPlantProfile: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 
 				this->SetLoopIndexFlag = false;
@@ -445,7 +445,7 @@ namespace PlantLoadProfile {
 					SetupEMSActuator( "Plant Load Profile", PlantProfile( ProfileNum ).Name, "Power", "[W]", PlantProfile( ProfileNum ).EMSOverridePower, PlantProfile( ProfileNum ).EMSPowerValue );
 				}
 
-				if ( ErrorsFound ) ShowFatalError( "Errors in " + cCurrentModuleObject + " input." );
+				if ( ErrorsFound ) ShowFatalError( "Errors in " + cCurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 
 			} // ProfileNum
 		}

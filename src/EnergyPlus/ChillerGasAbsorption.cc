@@ -188,17 +188,17 @@ namespace ChillerGasAbsorption {
 		if ( CompIndex == 0 ) {
 			ChillNum = FindItemInList( AbsorberName, GasAbsorber );
 			if ( ChillNum == 0 ) {
-				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
+				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = ChillNum;
 		} else {
 			ChillNum = CompIndex;
 			if ( ChillNum > NumGasAbsorbers || ChillNum < 1 ) {
-				ShowFatalError( "SimGasAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumGasAbsorbers ) + ", Entered Unit name=" + AbsorberName );
+				ShowFatalError( "SimGasAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumGasAbsorbers ) + ", Entered Unit name=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( ChillNum ) ) {
 				if ( AbsorberName != GasAbsorber( ChillNum ).Name ) {
-					ShowFatalError( "SimGasAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + GasAbsorber( ChillNum ).Name );
+					ShowFatalError( "SimGasAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + GasAbsorber( ChillNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( ChillNum ) = false;
 			}
@@ -229,7 +229,7 @@ namespace ChillerGasAbsorption {
 			} else { // Error, nodes do not match
 				ShowSevereError( "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + AbsorberName );
 				ShowContinueError( "Node connections in branch are not consistent with object nodes." );
-				ShowFatalError( "Preceding conditions cause termination." );
+				ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 			} // Operate as Chiller or Heater
 			if ( GetSizingFactor ) {
 				SizingFactor = GasAbsorber( ChillNum ).SizFac;
@@ -267,7 +267,7 @@ namespace ChillerGasAbsorption {
 		} else { // Error, nodes do not match
 			ShowSevereError( "Invalid call to Gas Absorber Chiller " + AbsorberName );
 			ShowContinueError( "Node connections in branch are not consistent with object nodes." );
-			ShowFatalError( "Preceding conditions cause termination." );
+			ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -365,7 +365,7 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Hot Water Nodes" );
 			if ( Get_ErrorsFound ) {
-				ShowFatalError( "Errors found in processing node input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowFatalError( "Errors found in processing node input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );  // LCOV_EXCL_LINE
 				Get_ErrorsFound = false;
 			}
 
@@ -401,7 +401,7 @@ namespace ChillerGasAbsorption {
 			GasAbsorber( AbsorberNum ).HeatCapFCoolCurve = GetCurveCheck( cAlphaArgs( 13 ), Get_ErrorsFound, ChillerName );
 			GasAbsorber( AbsorberNum ).FuelHeatFHPLRCurve = GetCurveCheck( cAlphaArgs( 14 ), Get_ErrorsFound, ChillerName );
 			if ( Get_ErrorsFound ) {
-				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );  // LCOV_EXCL_LINE
 				Get_ErrorsFound = false;
 			}
 			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
@@ -489,7 +489,7 @@ namespace ChillerGasAbsorption {
 		}
 
 		if ( Get_ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
@@ -607,18 +607,18 @@ namespace ChillerGasAbsorption {
 			errFlag = false;
 			ScanPlantLoopsForObject( GasAbsorber( ChillNum ).Name, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CWLoopNum, GasAbsorber( ChillNum ).CWLoopSideNum, GasAbsorber( ChillNum ).CWBranchNum, GasAbsorber( ChillNum ).CWCompNum, GasAbsorber( ChillNum ).CHWLowLimitTemp, _, _, GasAbsorber( ChillNum ).ChillReturnNodeNum, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitGasAbsorber: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitGasAbsorber: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			ScanPlantLoopsForObject( GasAbsorber( ChillNum ).Name, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).HWLoopNum, GasAbsorber( ChillNum ).HWLoopSideNum, GasAbsorber( ChillNum ).HWBranchNum, GasAbsorber( ChillNum ).HWCompNum, _, _, _, GasAbsorber( ChillNum ).HeatReturnNodeNum, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitGasAbsorber: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitGasAbsorber: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( GasAbsorber( ChillNum ).isWaterCooled ) {
 				ScanPlantLoopsForObject( GasAbsorber( ChillNum ).Name, TypeOf_Chiller_DFAbsorption, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, GasAbsorber( ChillNum ).CDBranchNum, GasAbsorber( ChillNum ).CDCompNum, _, _, _, GasAbsorber( ChillNum ).CondReturnNodeNum, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitGasAbsorber: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitGasAbsorber: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				InterConnectTwoPlantLoopSides( GasAbsorber( ChillNum ).CWLoopNum, GasAbsorber( ChillNum ).CWLoopSideNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_DFAbsorption, true );
 				InterConnectTwoPlantLoopSides( GasAbsorber( ChillNum ).HWLoopNum, GasAbsorber( ChillNum ).HWLoopSideNum, GasAbsorber( ChillNum ).CDLoopNum, GasAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_DFAbsorption, true );
@@ -1067,7 +1067,7 @@ namespace ChillerGasAbsorption {
 		if ( GasAbsorber( ChillNum ).isWaterCooled ) RegisterPlantCompDesignFlow( GasAbsorber( ChillNum ).CondReturnNodeNum, tmpCondVolFlowRate );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 		if ( PlantFinalSizesOkayToReport ) {
@@ -1411,7 +1411,7 @@ namespace ChillerGasAbsorption {
 				} else {
 					ShowSevereError( "CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller=" + GasAbsorber( ChillNum ).Name );
 					ShowContinueErrorTimeStamp( "" );
-					ShowFatalError( "Program Terminates due to previous error condition." );
+					ShowFatalError( "Program Terminates due to previous error condition." );  // LCOV_EXCL_LINE
 				}
 			} else {
 				lCondSupplyTemp = lCondReturnTemp; //if air cooled condenser just set supply and return to same temperature

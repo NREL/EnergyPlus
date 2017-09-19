@@ -328,7 +328,7 @@ namespace HeatBalanceSurfaceManager {
 		//                      Added calls to alternative daylighting analysis using DElight
 		//                      All modifications demarked with RJH (Rob Hitchcock)
 		//                      RJH, Jul 2004: add error handling for DElight calls
-		//       MODIFIED       Aug. 2017 
+		//       MODIFIED       Aug. 2017
 		//                      Add initializations of surface data to linked air node value if defined
 		//       RE-ENGINEERED  na
 
@@ -465,7 +465,7 @@ namespace HeatBalanceSurfaceManager {
 			}
 		}
 
-		// Overwriting surface and zone level environmental data with EMS override value 
+		// Overwriting surface and zone level environmental data with EMS override value
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).OutDryBulbTempEMSOverrideOn ) {
@@ -476,7 +476,7 @@ namespace HeatBalanceSurfaceManager {
 				}
 				if ( Surface( SurfNum ).WindSpeedEMSOverrideOn ) {
 					Surface( SurfNum ).WindSpeed = Surface( SurfNum ).WindSpeedEMSOverrideValue;
-				} 
+				}
 				if ( Surface( SurfNum ).WindDirEMSOverrideOn ) {
 					Surface( SurfNum ).WindDir = Surface( SurfNum ).WindDirEMSOverrideValue;
 				}
@@ -602,7 +602,7 @@ namespace HeatBalanceSurfaceManager {
 						elOpened = false;
 					}
 					//            IF (iwriteStatus /= 0) THEN
-					//              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
+					//              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')  // LCOV_EXCL_LINE
 					//            ENDIF
 					//            Open(unit=iDElightErrorFile, file='eplusout.delighteldmp', action='READ')
 
@@ -631,9 +631,9 @@ namespace HeatBalanceSurfaceManager {
 
 					// Close DElight Error File and delete
 					if ( elOpened ) { IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); };
-					// If any DElight Error occurred then ShowFatalError to terminate
+					// If any DElight Error occurred then ShowFatalError to terminate  // LCOV_EXCL_LINE
 					if ( iErrorFlag > 0 ) {
-						ShowFatalError( "End of DElight Error Messages" );
+						ShowFatalError( "End of DElight Error Messages" );  // LCOV_EXCL_LINE
 					}
 				} else { // RJH 2008-03-07: No errors
 					// extract reference point illuminance values from DElight Electric Lighting dump file for reporting
@@ -641,7 +641,7 @@ namespace HeatBalanceSurfaceManager {
 					iDElightErrorFile = GetNewUnitNumber();
 					{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightEldmpFileName, flags ); iwriteStatus = flags.ios(); }
 					//            IF (iwriteStatus /= 0) THEN
-					//              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
+					//              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')  // LCOV_EXCL_LINE
 					//            ENDIF
 					if ( iwriteStatus == 0 ) {
 						elOpened = true;
@@ -4661,7 +4661,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 	Real64 RhoVaporSat; // Local temporary saturated vapor density for checking
 	bool MovInsulErrorFlag; // Movable Insulation error flag
 	Real64 TSurf; // Absolute temperature of the outside surface of an exterior surface
-	
+
 
 	// FUNCTION DEFINITIONS:
 	// na
@@ -4871,7 +4871,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			// Call the outside surface temp calculation and pass the necessary terms
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
-				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 			}
 
 			// This ends the calculations for this surface and goes on to the next SurfNum
@@ -4913,7 +4913,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 				}
 
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
-				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 
 			} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CondFD || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) {
 				if ( Surface( SurfNum ).ExtCavityPresent ) {
@@ -5035,9 +5035,9 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 			if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_CTF || Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_EMPD ) {
 
 				CalcOutsideSurfTemp( SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag );
-				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );
+				if (MovInsulErrorFlag) ShowFatalError( "CalcOutsideSurfTemp: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 			}
-			
+
 
 		} else if ( SELECT_CASE_var == KivaFoundation ) {
 			// Do nothing
@@ -5347,7 +5347,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			ZoneEquipConfigNum = ZoneNum;
 			// check whether this zone is a controlled zone or not
 			if ( ! Zone( ZoneNum ).IsControlled ) {
-				ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );
+				ShowFatalError( "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone( ZoneNum ).Name );  // LCOV_EXCL_LINE
 				return;
 			}
 			// determine supply air conditions
@@ -5630,7 +5630,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							ShowContinueError( "Construction " + construct.Name + " contains an internal source or sink but also uses" );
 							ShowContinueError( "interior movable insulation " + Material( Surface( SurfNum ).MaterialMovInsulInt ).Name + " for a surface with that construction." );
 							ShowContinueError( "This is not currently allowed because the heat balance equations do not currently accommodate this combination." );
-							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
+							ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 
 						}
 
@@ -5760,7 +5760,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 			//if ( std::isnan( TempSurfInRep( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
 				//// throw Error
-				//ShowFatalError( "Inside surface temperature is out of bound = " + Surface( SurfNum ).Name );
+				//ShowFatalError( "Inside surface temperature is out of bound = " + Surface( SurfNum ).Name );  // LCOV_EXCL_LINE
 			//}
 			// sign convention is positive means energy going into inside face from the air.
 			auto const HConvInTemp_fac( -HConvIn_surf * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) );
@@ -6052,10 +6052,10 @@ TestSurfTempCalcHeatBalanceInsideSurf(
 				if ( WarmupSurfTemp > 3 ) {
 					ShowSevereError( "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity" );
 					ShowContinueError( " and is having temperature out of bounds errors. Please correct zone geometry and rerun." );
-					ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
+					ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 				}
 			} else if ( WarmupSurfTemp > 10 ) {
-				ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );
+				ShowFatalError( "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 			}
 		}
 	}
@@ -6084,7 +6084,7 @@ TestSurfTempCalcHeatBalanceInsideSurf(
 					}
 					zone.TempOutOfBoundsReported = true;
 				}
-				ShowFatalError( "Program terminates due to preceding condition." );
+				ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 			} else {
 				ShowSevereError( "Temperature (high) out of bounds [" + RoundSigDigits( TH12, 2 ) + "] for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
 				ShowContinueErrorTimeStamp( "" );
@@ -6108,14 +6108,14 @@ TestSurfTempCalcHeatBalanceInsideSurf(
 					}
 					zone.TempOutOfBoundsReported = true;
 				}
-				ShowFatalError( "Program terminates due to preceding condition." );
+				ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 			}
 		} else{
 			if ( TH12 < -10000. || TH12 > 10000. ) {
 				ShowSevereError( "CalcHeatBalanceInsideSurf: The temperature of " + RoundSigDigits( TH12, 2 ) + " C for zone=\"" + zone.Name + "\", for surface=\"" + surface.Name + "\"" );
 				ShowContinueError( "..is very far out of bounds during warmup. This may be an indication of a malformed zone." );
 				ShowContinueErrorTimeStamp( "" );
-				ShowFatalError( "Program terminates due to preceding condition." );
+				ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 			}
 		}
 	}
@@ -6332,7 +6332,7 @@ CalcOutsideSurfTemp(
 	QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac;
 	QdotRadOutRepPerArea( SurfNum ) = HExtSurf_fac;
 
-	//QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac + QRadLWOutSrdSurfs( SurfNum );	
+	//QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac + QRadLWOutSrdSurfs( SurfNum );
 	//QdotRadOutRepPerArea( SurfNum ) = QdotRadOutRep( SurfNum ) / Surface( SurfNum ).Area;
 
 	QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;

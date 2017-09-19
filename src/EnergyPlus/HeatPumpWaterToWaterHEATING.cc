@@ -187,17 +187,17 @@ namespace HeatPumpWaterToWaterHEATING {
 		if ( CompIndex == 0 ) {
 			GSHPNum = FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
-				ShowFatalError( "SimHPWatertoWaterHEATING: Unit not found=" + GSHPName );
+				ShowFatalError( "SimHPWatertoWaterHEATING: Unit not found=" + GSHPName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = GSHPNum;
 		} else {
 			GSHPNum = CompIndex;
 			if ( GSHPNum > NumGSHPs || GSHPNum < 1 ) {
-				ShowFatalError( "SimHPWatertoWaterHEATING:  Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Number of Units=" + TrimSigDigits( NumGSHPs ) + ", Entered Unit name=" + GSHPName );
+				ShowFatalError( "SimHPWatertoWaterHEATING:  Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Number of Units=" + TrimSigDigits( NumGSHPs ) + ", Entered Unit name=" + GSHPName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( GSHPNum ) ) {
 				if ( GSHPName != GSHP( GSHPNum ).Name ) {
-					ShowFatalError( "SimHPWatertoWaterHEATING: Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Unit name=" + GSHPName + ", stored Unit Name for that index=" + GSHP( GSHPNum ).Name );
+					ShowFatalError( "SimHPWatertoWaterHEATING: Invalid CompIndex passed=" + TrimSigDigits( GSHPNum ) + ", Unit name=" + GSHPName + ", stored Unit Name for that index=" + GSHP( GSHPNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( GSHPNum ) = false;
 			}
@@ -220,7 +220,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		} else if ( LoopNum == GSHP( GSHPNum ).SourceLoopNum ) { // condenser loop
 			UpdateChillerComponentCondenserSide( GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, TypeOf_HPWaterEFHeating, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, - GSHPReport( GSHPNum ).QSource, GSHPReport( GSHPNum ).SourceSideWaterInletTemp, GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, GSHPReport( GSHPNum ).SourceSidemdot, FirstHVACIteration );
 		} else {
-			ShowFatalError( "SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + GSHPName );
+			ShowFatalError( "SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + GSHPName );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -418,12 +418,12 @@ namespace HeatPumpWaterToWaterHEATING {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors Found in getting " + ModuleCompNameUC + " Input" );
+			ShowFatalError( "Errors Found in getting " + ModuleCompNameUC + " Input" );  // LCOV_EXCL_LINE
 		}
 
 		GSHPRefrigIndex = FindRefrigerant( GSHPRefrigerant );
 		if ( GSHPRefrigIndex == 0 ) {
-			ShowFatalError( "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant );
+			ShowFatalError( "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant );  // LCOV_EXCL_LINE
 		}
 
 		// CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
@@ -454,7 +454,7 @@ namespace HeatPumpWaterToWaterHEATING {
 			}
 
 			if ( errFlag ) {
-				ShowFatalError( "GetWatertoWaterHPInput: Program terminated on scan for loop data" );
+				ShowFatalError( "GetWatertoWaterHPInput: Program terminated on scan for loop data" );  // LCOV_EXCL_LINE
 			}
 
 		}
@@ -775,12 +775,12 @@ namespace HeatPumpWaterToWaterHEATING {
 			if ( SourceSidePressure < LowPressCutoff ) {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Heating Source Side Pressure Less than the Design Minimum" );
 				ShowContinueError( "Source Side Pressure=" + TrimSigDigits( SourceSidePressure, 2 ) + " and user specified Design Minimum Pressure=" + TrimSigDigits( LowPressCutoff, 2 ) );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 			if ( LoadSidePressure > HighPressCutoff ) {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Heating Load Side Pressure greater than the Design Maximum" );
 				ShowContinueError( "Load Side Pressure=" + TrimSigDigits( LoadSidePressure, 2 ) + " and user specified Design Maximum Pressure=" + TrimSigDigits( HighPressCutoff, 2 ) );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 
 			// Determine Suction Pressure at compressor inlet
@@ -791,12 +791,12 @@ namespace HeatPumpWaterToWaterHEATING {
 			if ( SuctionPr < LowPressCutoff ) {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Heating Suction Pressure Less than the Design Minimum" );
 				ShowContinueError( "Heating Suction Pressure=" + TrimSigDigits( SuctionPr, 2 ) + " and user specified Design Minimum Pressure=" + TrimSigDigits( LowPressCutoff, 2 ) );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 			if ( DischargePr > HighPressCutoff ) {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Heating Discharge Pressure greater than the Design Maximum" );
 				ShowContinueError( "Heating Discharge Pressure=" + TrimSigDigits( DischargePr, 2 ) + " and user specified Design Maximum Pressure=" + TrimSigDigits( HighPressCutoff, 2 ) );
-				ShowFatalError( "Preceding Conditions cause termination." );
+				ShowFatalError( "Preceding Conditions cause termination." );  // LCOV_EXCL_LINE
 			}
 
 			// Determine the Source Side Outlet Enthalpy

@@ -204,17 +204,17 @@ namespace PlantCentralGSHP {
 		if ( CompIndex == 0 ) {
 			WrapperNum = FindItemInList( WrapperName, Wrapper );
 			if ( WrapperNum == 0 ) {
-				ShowFatalError( "SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + WrapperName );
+				ShowFatalError( "SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + WrapperName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = WrapperNum;
 		} else {
 			WrapperNum = CompIndex;
 			if ( WrapperNum > NumWrappers || WrapperNum < 1 ) {
-				ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + TrimSigDigits( WrapperNum ) + ", Number of Units=" + TrimSigDigits( NumWrappers ) + ", Entered Unit name=" + WrapperName );
+				ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + TrimSigDigits( WrapperNum ) + ", Number of Units=" + TrimSigDigits( NumWrappers ) + ", Entered Unit name=" + WrapperName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( WrapperNum ) ) {
 				if ( WrapperName != Wrapper( WrapperNum ).Name ) {
-					ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + TrimSigDigits( WrapperNum ) + ", Unit name=" + WrapperName + ", stored Unit Name for that index=" + Wrapper( WrapperNum ).Name );
+					ShowFatalError( "SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + TrimSigDigits( WrapperNum ) + ", Unit name=" + WrapperName + ", stored Unit Name for that index=" + Wrapper( WrapperNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( WrapperNum ) = false;
 			}
@@ -558,7 +558,7 @@ namespace PlantCentralGSHP {
 				}
 
 				if ( ErrorsFound ) {
-					ShowFatalError( "Preceding sizing errors cause program termination" );
+					ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 				}
 
 			}
@@ -737,12 +737,12 @@ namespace PlantCentralGSHP {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "GetWrapperInput: Invalid " + cCurrentModuleObject + " Input, preceding condition(s) cause termination." );
+				ShowFatalError( "GetWrapperInput: Invalid " + cCurrentModuleObject + " Input, preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 
 			// ALLOCATE ARRAYS
 			if ( ( NumChillerHeaters == 0 ) && ( Wrapper( WrapperNum ).ControlMode == SmartMixing ) ) {
-				ShowFatalError( "SmartMixing Control Mode in object " + cCurrentModuleObject + " : " + Wrapper( WrapperNum ).Name + " need to apply to ChillerHeaterPerformance:Electric:EIR object(s)." );
+				ShowFatalError( "SmartMixing Control Mode in object " + cCurrentModuleObject + " : " + Wrapper( WrapperNum ).Name + " need to apply to ChillerHeaterPerformance:Electric:EIR object(s)." );  // LCOV_EXCL_LINE
 			}
 
 		}
@@ -768,7 +768,7 @@ namespace PlantCentralGSHP {
 					if ( CompIndex <= 0 ) {
 						ShowSevereError( "GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name =" + CompName );
 						ShowContinueError( "Select the name of ChillerHeaterPerformance:Electric:EIR object(s) from the object list." );
-						ShowFatalError( "Program terminates due to preceding condition." );
+						ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 					}
 					Wrapper( WrapperNum ).WrapperComp( Comp ).WrapperPerformanceObjectIndex = CompIndex;
 					if ( ChillerHeater( CompIndex ).VariableFlow ) {
@@ -1226,7 +1226,7 @@ namespace PlantCentralGSHP {
 		}
 
 		if ( CHErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1660,7 +1660,7 @@ namespace PlantCentralGSHP {
 			if ( CompNum > Wrapper( WrapperNum ).NumOfComp ) {
 				ShowSevereError( "CalcChillerModel: ChillerHeater=\"" + Wrapper( WrapperNum ).Name + "\", calculated component number too big." );
 				ShowContinueError( "Max number of components=[" + RoundSigDigits( Wrapper( WrapperNum ).NumOfComp ) + "], indicated component number=[" + RoundSigDigits( CompNum ) + "]." );
-				ShowFatalError( "Program terminates due to preceding condition." );
+				ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 			}
 
 			// Check whether this chiller heater needs to run

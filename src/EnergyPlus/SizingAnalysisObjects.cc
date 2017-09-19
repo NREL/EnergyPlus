@@ -544,7 +544,7 @@ namespace EnergyPlus {
 		}
 
 		//step 3 calculate mdot from max load and delta T
-		if ( ( ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) && ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) ) && 
+		if ( ( ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) && ( NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0 ) ) &&
 			( ( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT ) > 0.0 ) )  {
 				peakLoadCalculatedMassFlow = NewFoundMaxDemandTimeStamp.runningAvgDataValue /
 											( specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT );

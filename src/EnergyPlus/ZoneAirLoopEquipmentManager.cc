@@ -207,16 +207,16 @@ namespace ZoneAirLoopEquipmentManager {
 		if ( CompIndex == 0 ) {
 			AirDistUnitNum = FindItemInList( ZoneAirLoopEquipName, AirDistUnit );
 			if ( AirDistUnitNum == 0 ) {
-				ShowFatalError( "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName );
+				ShowFatalError( "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = AirDistUnitNum;
 		} else {
 			AirDistUnitNum = CompIndex;
 			if ( AirDistUnitNum > NumAirDistUnits || AirDistUnitNum < 1 ) {
-				ShowFatalError( "ManageZoneAirLoopEquipment:  Invalid CompIndex passed=" + TrimSigDigits( AirDistUnitNum ) + ", Number of Units=" + TrimSigDigits( NumAirDistUnits ) + ", Entered Unit name=" + ZoneAirLoopEquipName );
+				ShowFatalError( "ManageZoneAirLoopEquipment:  Invalid CompIndex passed=" + TrimSigDigits( AirDistUnitNum ) + ", Number of Units=" + TrimSigDigits( NumAirDistUnits ) + ", Entered Unit name=" + ZoneAirLoopEquipName );  // LCOV_EXCL_LINE
 			}
 			if ( ZoneAirLoopEquipName != AirDistUnit( AirDistUnitNum ).Name ) {
-				ShowFatalError( "ManageZoneAirLoopEquipment: Invalid CompIndex passed=" + TrimSigDigits( AirDistUnitNum ) + ", Unit name=" + ZoneAirLoopEquipName + ", stored Unit Name for that index=" + AirDistUnit( AirDistUnitNum ).Name );
+				ShowFatalError( "ManageZoneAirLoopEquipment: Invalid CompIndex passed=" + TrimSigDigits( AirDistUnitNum ) + ", Unit name=" + ZoneAirLoopEquipName + ", stored Unit Name for that index=" + AirDistUnit( AirDistUnitNum ).Name );  // LCOV_EXCL_LINE
 			}
 		}
 		DataSizing::CurTermUnitSizingNum = AirDistUnit( AirDistUnitNum ).TermUnitSizingNum;
@@ -456,7 +456,7 @@ namespace ZoneAirLoopEquipmentManager {
 				} else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:UserDefined" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctUserDefined;
 				}
-				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:Mixer" ) ) {					
+				else if ( SameString( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), "AirTerminal:SingleDuct:Mixer" ) ) {
 					AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctATMixer;
 					if ( AirDistUnit( AirDistUnitNum ).UpStreamLeak || AirDistUnit( AirDistUnitNum ).DownStreamLeak ) {
 						ShowSevereError( "Error found in " + CurrentModuleObject + " = " + AirDistUnit( AirDistUnitNum ).Name );
@@ -498,7 +498,7 @@ namespace ZoneAirLoopEquipmentManager {
 			}
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " Input" );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " Input" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -707,7 +707,7 @@ namespace ZoneAirLoopEquipmentManager {
 			} else {
 				ShowSevereError( "Error found in ZoneHVAC:AirDistributionUnit=" + AirDistUnit( AirDistUnitNum ).Name );
 				ShowContinueError( "Invalid Component=" + AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompNum ) );
-				ShowFatalError( "Preceding condition causes termination." );
+				ShowFatalError( "Preceding condition causes termination." );  // LCOV_EXCL_LINE
 
 			}}
 

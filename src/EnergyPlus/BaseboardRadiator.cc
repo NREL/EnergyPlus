@@ -203,17 +203,17 @@ namespace BaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );
+				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "SimBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumBaseboards ) + ", Entered Unit name=" + EquipName );
+				ShowFatalError( "SimBaseboard:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of Units=" + TrimSigDigits( NumBaseboards ) + ", Entered Unit name=" + EquipName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( BaseboardNum ) ) {
 				if ( EquipName != Baseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "SimBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + Baseboard( BaseboardNum ).EquipID );
+					ShowFatalError( "SimBaseboard: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + Baseboard( BaseboardNum ).EquipID );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( BaseboardNum ) = false;
 			}
@@ -443,7 +443,7 @@ namespace BaseboardRadiator {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination." );
+				ShowFatalError( RoutineName + "Errors found in getting input.  Preceding condition(s) cause termination." );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -543,7 +543,7 @@ namespace BaseboardRadiator {
 			errFlag = false;
 			ScanPlantLoopsForObject( Baseboard( BaseboardNum ).EquipID, Baseboard( BaseboardNum ).EquipType, Baseboard( BaseboardNum ).LoopNum, Baseboard( BaseboardNum ).LoopSideNum, Baseboard( BaseboardNum ).BranchNum, Baseboard( BaseboardNum ).CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitBaseboard: Program terminated for previous conditions." );
+				ShowFatalError( "InitBaseboard: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 			}
 			SetLoopIndexFlag( BaseboardNum ) = false;
 		}
@@ -678,7 +678,7 @@ namespace BaseboardRadiator {
 		if ( PltSizHeatNum > 0 ) {
 
 			DataScalableCapSizingON = false;
-			
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {
@@ -894,7 +894,7 @@ namespace BaseboardRadiator {
 		RegisterPlantCompDesignFlow( Baseboard( BaseboardNum ).WaterInletNode, Baseboard( BaseboardNum ).WaterVolFlowRateMax );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "SizeBaseboard: Preceding sizing errors cause program termination" );
+			ShowFatalError( "SizeBaseboard: Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1256,20 +1256,20 @@ namespace BaseboardRadiator {
 		if ( CompIndex == 0 ) {
 			BaseboardNum = FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
-				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );
+				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );  // LCOV_EXCL_LINE
 			}
 			CompIndex = BaseboardNum;
 		} else {
 			BaseboardNum = CompIndex;
 			if ( BaseboardNum > NumBaseboards || BaseboardNum < 1 ) {
-				ShowFatalError( "UpdateBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of baseboards=" + TrimSigDigits( NumBaseboards ) + ", Entered baseboard name=" + BaseboardName );
+				ShowFatalError( "UpdateBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", Number of baseboards=" + TrimSigDigits( NumBaseboards ) + ", Entered baseboard name=" + BaseboardName );  // LCOV_EXCL_LINE
 			}
 			if ( KickOffSimulation ) {
 				if ( BaseboardName != Baseboard( BaseboardNum ).EquipID ) {
-					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + Baseboard( BaseboardNum ).EquipID );
+					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + Baseboard( BaseboardNum ).EquipID );  // LCOV_EXCL_LINE
 				}
 				if ( BaseboardTypeNum != TypeOf_Baseboard_Conv_Water ) {
-					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + ccSimPlantEquipTypes( BaseboardTypeNum ) );
+					ShowFatalError( "UpdateBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits( BaseboardNum ) + ", baseboard name=" + BaseboardName + ", stored baseboard Name for that index=" + ccSimPlantEquipTypes( BaseboardTypeNum ) );  // LCOV_EXCL_LINE
 				}
 			}
 		}

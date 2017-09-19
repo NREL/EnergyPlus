@@ -668,7 +668,7 @@ namespace DaylightingDevices {
 
 			} // PipeNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in DaylightingDevice:Tubular input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in DaylightingDevice:Tubular input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -865,7 +865,7 @@ namespace DaylightingDevices {
 
 			} // ShelfNum
 
-			if ( ErrorsFound ) ShowFatalError( "Errors in DaylightingDevice:Shelf input." );
+			if ( ErrorsFound ) ShowFatalError( "Errors in DaylightingDevice:Shelf input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1355,7 +1355,7 @@ namespace DaylightingDevices {
 		FindTDDPipe = 0;
 
 		if ( NumOfTDDPipes <= 0 ) {
-			ShowFatalError( "FindTDDPipe: Surface=" + Surface( WinNum ).Name + ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface." );
+			ShowFatalError( "FindTDDPipe: Surface=" + Surface( WinNum ).Name + ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface." );  // LCOV_EXCL_LINE
 		}
 
 		for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
@@ -1487,7 +1487,7 @@ namespace DaylightingDevices {
 		} else if ( Surface( Shelf( ShelfNum ).OutSurf ).Height == W ) {
 			L = Surface( Shelf( ShelfNum ).OutSurf ).Width;
 		} else {
-			ShowFatalError( "DaylightingDevice:Shelf = " + Shelf( ShelfNum ).Name + ":  Width of window and outside shelf do not match." );
+			ShowFatalError( "DaylightingDevice:Shelf = " + Shelf( ShelfNum ).Name + ":  Width of window and outside shelf do not match." );  // LCOV_EXCL_LINE
 		}
 
 		// Error if more or less than two vertices match
@@ -1501,7 +1501,7 @@ namespace DaylightingDevices {
 		if ( NumMatch < 2 ) {
 			ShowWarningError( "DaylightingDevice:Shelf = " + Shelf( ShelfNum ).Name + ":  Window and outside shelf must share two vertices.  View factor calculation may be inaccurate." );
 		} else if ( NumMatch > 2 ) {
-			ShowFatalError( "DaylightingDevice:Shelf = " + Shelf( ShelfNum ).Name + ":  Window and outside shelf share too many vertices." );
+			ShowFatalError( "DaylightingDevice:Shelf = " + Shelf( ShelfNum ).Name + ":  Window and outside shelf share too many vertices." );  // LCOV_EXCL_LINE
 		}
 
 		// Calculate exact analytical view factor from window to outside shelf

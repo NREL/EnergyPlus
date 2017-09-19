@@ -222,17 +222,17 @@ namespace ChillerExhaustAbsorption {
 		if ( CompIndex == 0 ) {
 			ChillNum = FindItemInList( AbsorberName, ExhaustAbsorber );
 			if ( ChillNum == 0 ) {
-				ShowFatalError( "SimExhaustAbsorber: Unit not found=" + AbsorberName );
+				ShowFatalError( "SimExhaustAbsorber: Unit not found=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = ChillNum;
 		} else {
 			ChillNum = CompIndex;
 			if ( ChillNum > NumExhaustAbsorbers || ChillNum < 1 ) {
-				ShowFatalError( "SimExhaustAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumExhaustAbsorbers ) + ", Entered Unit name=" + AbsorberName );
+				ShowFatalError( "SimExhaustAbsorber:  Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Number of Units=" + TrimSigDigits( NumExhaustAbsorbers ) + ", Entered Unit name=" + AbsorberName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( ChillNum ) ) {
 				if ( AbsorberName != ExhaustAbsorber( ChillNum ).Name ) {
-					ShowFatalError( "SimExhaustAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + ExhaustAbsorber( ChillNum ).Name );
+					ShowFatalError( "SimExhaustAbsorber: Invalid CompIndex passed=" + TrimSigDigits( ChillNum ) + ", Unit name=" + AbsorberName + ", stored Unit Name for that index=" + ExhaustAbsorber( ChillNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( ChillNum ) = false;
 			}
@@ -262,7 +262,7 @@ namespace ChillerExhaustAbsorption {
 			} else { // Error, nodes do not match
 				ShowSevereError( "SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater " + AbsorberName );
 				ShowContinueError( "Node connections in branch are not consistent with object nodes." );
-				ShowFatalError( "Preceding conditions cause termination." );
+				ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 			} // Operate as Chiller or Heater
 			if ( GetSizingFactor ) {
 				SizingFactor = ExhaustAbsorber( ChillNum ).SizFac;
@@ -301,7 +301,7 @@ namespace ChillerExhaustAbsorption {
 		} else { // Error, nodes do not match
 			ShowSevereError( "Invalid call to Exhaust Absorber Chiller " + AbsorberName );
 			ShowContinueError( "Node connections in branch are not consistent with object nodes." );
-			ShowFatalError( "Preceding conditions cause termination." );
+			ShowFatalError( "Preceding conditions cause termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -416,7 +416,7 @@ namespace ChillerExhaustAbsorption {
 			ExhaustAbsorber( AbsorberNum ).HeatSupplyNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), Get_ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Hot Water Nodes" );
 			if ( Get_ErrorsFound ) {
-				ShowFatalError( "Errors found in processing node input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowFatalError( "Errors found in processing node input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );  // LCOV_EXCL_LINE
 				Get_ErrorsFound = false;
 			}
 
@@ -452,7 +452,7 @@ namespace ChillerExhaustAbsorption {
 			ExhaustAbsorber( AbsorberNum ).HeatCapFCoolCurve = GetCurveCheck( cAlphaArgs( 13 ), Get_ErrorsFound, ChillerName );
 			ExhaustAbsorber( AbsorberNum ).ThermalEnergyHeatFHPLRCurve = GetCurveCheck( cAlphaArgs( 14 ), Get_ErrorsFound, ChillerName );
 			if ( Get_ErrorsFound ) {
-				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
+				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );  // LCOV_EXCL_LINE
 				Get_ErrorsFound = false;
 			}
 			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
@@ -516,7 +516,7 @@ namespace ChillerExhaustAbsorption {
 		}
 
 		if ( Get_ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );
+			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject );  // LCOV_EXCL_LINE
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumExhaustAbsorbers; ++AbsorberNum ) {
@@ -641,18 +641,18 @@ namespace ChillerExhaustAbsorption {
 			errFlag = false;
 			ScanPlantLoopsForObject( ExhaustAbsorber( ChillNum ).Name, TypeOf_Chiller_ExhFiredAbsorption, ExhaustAbsorber( ChillNum ).CWLoopNum, ExhaustAbsorber( ChillNum ).CWLoopSideNum, ExhaustAbsorber( ChillNum ).CWBranchNum, ExhaustAbsorber( ChillNum ).CWCompNum, ExhaustAbsorber( ChillNum ).CHWLowLimitTemp, _, _,  ExhaustAbsorber( ChillNum ).ChillReturnNodeNum, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitExhaustAbsorber: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitExhaustAbsorber: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			ScanPlantLoopsForObject( ExhaustAbsorber( ChillNum ).Name, TypeOf_Chiller_ExhFiredAbsorption, ExhaustAbsorber( ChillNum ).HWLoopNum, ExhaustAbsorber( ChillNum ).HWLoopSideNum, ExhaustAbsorber( ChillNum ).HWBranchNum, ExhaustAbsorber( ChillNum ).HWCompNum, _, _, _, ExhaustAbsorber( ChillNum ).HeatReturnNodeNum, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitExhaustAbsorber: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitExhaustAbsorber: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 
 			if ( ExhaustAbsorber( ChillNum ).isWaterCooled ) {
 				ScanPlantLoopsForObject( ExhaustAbsorber( ChillNum ).Name, TypeOf_Chiller_ExhFiredAbsorption, ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, ExhaustAbsorber( ChillNum ).CDBranchNum, ExhaustAbsorber( ChillNum ).CDCompNum, _, _, _, ExhaustAbsorber( ChillNum ).CondReturnNodeNum, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitExhaustAbsorber: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitExhaustAbsorber: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 				InterConnectTwoPlantLoopSides( ExhaustAbsorber( ChillNum ).CWLoopNum, ExhaustAbsorber( ChillNum ).CWLoopSideNum, ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_ExhFiredAbsorption, true );
 				InterConnectTwoPlantLoopSides( ExhaustAbsorber( ChillNum ).HWLoopNum, ExhaustAbsorber( ChillNum ).HWLoopSideNum, ExhaustAbsorber( ChillNum ).CDLoopNum, ExhaustAbsorber( ChillNum ).CDLoopSideNum, TypeOf_Chiller_ExhFiredAbsorption, true );
@@ -1107,7 +1107,7 @@ namespace ChillerExhaustAbsorption {
 		if ( ExhaustAbsorber( ChillNum ).isWaterCooled ) RegisterPlantCompDesignFlow( ExhaustAbsorber( ChillNum ).CondReturnNodeNum, tmpCondVolFlowRate );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 		if ( PlantFinalSizesOkayToReport ) {
@@ -1509,7 +1509,7 @@ namespace ChillerExhaustAbsorption {
 				} else {
 					ShowSevereError( "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=" + ExhaustAbsorber( ChillNum ).Name );
 					ShowContinueErrorTimeStamp( "" );
-					ShowFatalError( "Program Terminates due to previous error condition." );
+					ShowFatalError( "Program Terminates due to previous error condition." );  // LCOV_EXCL_LINE
 				}
 			} else {
 				lCondSupplyTemp = lCondReturnTemp; //if air cooled condenser just set supply and return to same temperature

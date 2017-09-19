@@ -67,9 +67,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Site:GroundTemperature:FCFactorMethod factory
-	std::shared_ptr< SiteFCFactorMethodGroundTemps > 
-	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory( 
-		int objectType, 
+	std::shared_ptr< SiteFCFactorMethodGroundTemps >
+	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -130,7 +130,7 @@ namespace EnergyPlus {
 			thisModel->errorsFound = true;
 
 		} else if ( wthFCGroundTemps ) {
-			
+
 			for ( int i = 1; i <= 12; ++i ) {
 				thisModel->fcFactorGroundTemps( i ) = GroundTempsFCFromEPWHeader( i );
 			}

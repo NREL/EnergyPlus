@@ -187,17 +187,17 @@ namespace SplitterComponent {
 		if ( CompIndex == 0 ) {
 			SplitterNum = FindItemInList( CompName, SplitterCond, &SplitterConditions::SplitterName );
 			if ( SplitterNum == 0 ) {
-				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );
+				ShowFatalError( "SimAirLoopSplitter: Splitter not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = SplitterNum;
 		} else {
 			SplitterNum = CompIndex;
 			if ( SplitterNum > NumSplitters || SplitterNum < 1 ) {
-				ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits( SplitterNum ) + ", Number of Splitters=" + TrimSigDigits( NumSplitters ) + ", Splitter name=" + CompName );
+				ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits( SplitterNum ) + ", Number of Splitters=" + TrimSigDigits( NumSplitters ) + ", Splitter name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( SplitterNum ) ) {
 				if ( CompName != SplitterCond( SplitterNum ).SplitterName ) {
-					ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits( SplitterNum ) + ", Splitter name=" + CompName + ", stored Splitter Name for that index=" + SplitterCond( SplitterNum ).SplitterName );
+					ShowFatalError( "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits( SplitterNum ) + ", Splitter name=" + CompName + ", stored Splitter Name for that index=" + SplitterCond( SplitterNum ).SplitterName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( SplitterNum ) = false;
 			}
@@ -367,7 +367,7 @@ namespace SplitterComponent {
 		lNumericBlanks.deallocate();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input." );
+			ShowFatalError( RoutineName + "Errors found in getting input." );  // LCOV_EXCL_LINE
 		}
 
 	}

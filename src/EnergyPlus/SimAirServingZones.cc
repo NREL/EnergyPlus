@@ -1178,10 +1178,10 @@ namespace SimAirServingZones {
 
 					} else if ( componentType == "FAN:VARIABLEVOLUME" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_Simple_VAV;
-					
+
 					} else if ( componentType == "FAN:SYSTEMMODEL") {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_System_Object;
-						//Construct fan object 
+						//Construct fan object
 						HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name ) );
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompIndex = HVACFan::getFanObjectVectorIndex( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name ) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
 						// cpw22Aug2010 Add Fan_ComponentModel type (new num=24)
@@ -1335,7 +1335,7 @@ namespace SimAirServingZones {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found retrieving input for " + CurrentModuleObject + '.' );
+			ShowFatalError( RoutineName + "Errors found retrieving input for " + CurrentModuleObject + '.' );  // LCOV_EXCL_LINE
 		}
 
 		for ( AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum ) {
@@ -1892,7 +1892,7 @@ namespace SimAirServingZones {
 			TermUnitSizingNumsHeat.deallocate();
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Preceding errors cause termination" );
+				ShowFatalError( "Preceding errors cause termination" );  // LCOV_EXCL_LINE
 			}
 
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
@@ -2144,7 +2144,7 @@ namespace SimAirServingZones {
 				for ( InNum = 1; InNum <= PrimaryAirSystem( AirLoopNum ).NumInletBranches; ++InNum ) {
 					InBranchNum = PrimaryAirSystem( AirLoopNum ).InletBranchNum( InNum );
 					if ( InBranchNum == 0 ) {
-						ShowFatalError( "Missing Inlet Branch on Primary Air System=" + PrimaryAirSystem( AirLoopNum ).Name );
+						ShowFatalError( "Missing Inlet Branch on Primary Air System=" + PrimaryAirSystem( AirLoopNum ).Name );  // LCOV_EXCL_LINE
 					}
 					NodeNumIn = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).NodeNumIn;
 
@@ -3144,7 +3144,7 @@ namespace SimAirServingZones {
 			}
 			// if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils involved but the fan should really run like constant volume and not cycle with compressor
 			DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
-			HVACFan::fanObjs[ CompIndex - 1 ]->simulate( _,_,_,_ ); // vector is 0 based, but CompIndex is 1 based so shift 
+			HVACFan::fanObjs[ CompIndex - 1 ]->simulate( _,_,_,_ ); // vector is 0 based, but CompIndex is 1 based so shift
 
 			// cpw22Aug2010 Add Fan:ComponentModel (new)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
@@ -3689,7 +3689,7 @@ namespace SimAirServingZones {
 				ShowSevereError( "AirLoopHVAC " + PrimaryAirSystem( AirLoopNum ).Name + " has no air flow" );
 				ShowContinueError( "Check flow rate inputs for components in this air loop and," );
 				ShowContinueError( "if autosized, check Sizing:Zone and Sizing:System objects and related inputs." );
-				ShowFatalError( "Previous condition causes termination." );
+				ShowFatalError( "Previous condition causes termination." );  // LCOV_EXCL_LINE
 
 			}
 
@@ -3713,7 +3713,7 @@ namespace SimAirServingZones {
 			}
 		} // End of component loop
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -3843,7 +3843,7 @@ namespace SimAirServingZones {
 			}
 		}
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in Sizing:System input" );
+			ShowFatalError( "Errors found in Sizing:System input" );  // LCOV_EXCL_LINE
 		}
 
 		SysSizing.allocate( TotDesDays + TotRunDesPersDays, NumPrimaryAirSys );
@@ -4274,7 +4274,7 @@ namespace SimAirServingZones {
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					if ( TermUnitSizingIndex == 0 ) {
 						ShowSevereError( "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + AirToZoneNodeInfo( AirLoopNum ).AirLoopName + ", Zone =" + Zone( AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum ) ).Name );
-						ShowFatalError( "This is a defect. Please report this issue." );
+						ShowFatalError( "This is a defect. Please report this issue." );  // LCOV_EXCL_LINE
 					}
 					if ( SysSizNum > 0 ) {
 						if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
@@ -6727,7 +6727,7 @@ namespace SimAirServingZones {
 					}
 				} else if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == CapacityPerFloorArea ) {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
-				} 
+				}
 				CalcSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
 			}}
@@ -6794,7 +6794,7 @@ namespace SimAirServingZones {
 					}
 				} else if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == CapacityPerFloorArea ) {
 					TempSize = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
-				} 
+				}
 				CalcSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
 			}}
@@ -6824,7 +6824,7 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = 0.0; // autosized, set to zero initially
 				}
 			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
-				// even for heating capacity we use cooled zones floor area ( *.FloorAreaOnAirLoopCooled ) served by the airloop 
+				// even for heating capacity we use cooled zones floor area ( *.FloorAreaOnAirLoopCooled ) served by the airloop
 				FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity ) {
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedHeatingCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity;
@@ -7046,7 +7046,7 @@ namespace SimAirServingZones {
 			ZoneOAFrac = 1.0 + Xs - FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
 			// reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
 			AvailSAFlow = Voz/ZoneOAFrac;
-			// save ZoneOAFrac 
+			// save ZoneOAFrac
 			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
 			// save new (increased) minimum flow rate
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;

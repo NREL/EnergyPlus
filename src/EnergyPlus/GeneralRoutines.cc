@@ -308,7 +308,7 @@ ControlCompOutput(
 				ShowSevereError( "ControlCompOutput:" + CompType + ':' + CompName + ", Min Control Flow is > Max Control Flow" );
 				ShowContinueError( "Acuated Node=" + NodeID( ActuatedNode ) + " MinFlow=[" + TrimSigDigits( MinFlow, 3 ) + "], Max Flow=" + TrimSigDigits( MaxFlow, 3 ) );
 				ShowContinueErrorTimeStamp( "" );
-				ShowFatalError( "Program terminates due to preceding condition." );
+				ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 			}
 		} // End of FirstHVACIteration Conditional If
 		// The interface managers can reset the Max or Min to available values during the time step
@@ -479,7 +479,7 @@ ControlCompOutput(
 			} else if ( Action == iReverseAction ) {
 				Denom = -max( std::abs( QZnReq ), 100.0 );
 			} else {
-				ShowFatalError( "ControlCompOutput: Illegal Action argument =[" + TrimSigDigits( Action ) + ']' );
+				ShowFatalError( "ControlCompOutput: Illegal Action argument =[" + TrimSigDigits( Action ) + ']' );  // LCOV_EXCL_LINE
 			}
 		}
 
@@ -574,7 +574,7 @@ ControlCompOutput(
 			break;
 
 		default:
-			ShowFatalError( "ControlCompOutput: Illegal Component Number argument =[" + TrimSigDigits( SimCompNum ) + ']' );
+			ShowFatalError( "ControlCompOutput: Illegal Component Number argument =[" + TrimSigDigits( SimCompNum ) + ']' );  // LCOV_EXCL_LINE
 			break;
 
 		}
@@ -666,7 +666,7 @@ CheckSysSizing(
 		if ( ! DoSystemSizing ) {
 			ShowContinueError( "The \"SimulationControl\" object did not have the field \"Do System Sizing Calculation\" set to Yes." );
 		}
-		ShowFatalError( "Program terminates due to previously shown condition(s)." );
+		ShowFatalError( "Program terminates due to previously shown condition(s)." );  // LCOV_EXCL_LINE
 	}
 
 }
@@ -776,7 +776,7 @@ CheckZoneSizing(
 		if ( ! DoZoneSizing ) {
 			ShowContinueError( "The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes." );
 		}
-		ShowFatalError( "Program terminates due to previously shown condition(s)." );
+		ShowFatalError( "Program terminates due to previously shown condition(s)." );  // LCOV_EXCL_LINE
 	}
 
 }

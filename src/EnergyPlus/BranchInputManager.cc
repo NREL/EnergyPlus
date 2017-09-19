@@ -293,7 +293,7 @@ namespace BranchInputManager {
 		//  Find this BranchList in the master BranchList Names
 		Found = FindItemInList( BranchListName, BranchList );
 		if ( Found == 0 ) {
-			ShowFatalError( "GetBranchList: BranchList Name not found=" + BranchListName );
+			ShowFatalError( "GetBranchList: BranchList Name not found=" + BranchListName );  // LCOV_EXCL_LINE
 		}
 
 		// Set data
@@ -320,7 +320,7 @@ namespace BranchInputManager {
 		}
 
 		if ( ErrFound ) {
-			ShowFatalError( "GetBranchList: preceding condition(s) causes program termination." );
+			ShowFatalError( "GetBranchList: preceding condition(s) causes program termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -374,7 +374,7 @@ namespace BranchInputManager {
 		//  Find this BranchList in the master BranchList Names
 		Found = FindItemInList( BranchListName, BranchList );
 		if ( Found == 0 ) {
-			ShowFatalError( "NumBranchesInBranchList: BranchList Name not found=" + BranchListName );
+			ShowFatalError( "NumBranchesInBranchList: BranchList Name not found=" + BranchListName );  // LCOV_EXCL_LINE
 		}
 
 		NumBranchesInBranchList = BranchList( Found ).NumOfBranchNames;
@@ -452,7 +452,7 @@ namespace BranchInputManager {
 			ShowSevereError( "GetBranchData: Component List arrays not big enough to hold Number of Components" );
 			ShowContinueError( "Input BranchName=" + BranchName + ", in Loop=" + LoopName );
 			ShowContinueError( "Max Component Array size=" + TrimSigDigits( MinCompsAllowed ) + ", but input size=" + TrimSigDigits( NumComps ) );
-			ShowFatalError( "Program terminates due to preceding conditions." );
+			ShowFatalError( "Program terminates due to preceding conditions." );  // LCOV_EXCL_LINE
 		}
 
 		for ( Count = 1; Count <= NumComps; ++Count ) {
@@ -889,7 +889,7 @@ namespace BranchInputManager {
 		if ( not_blank( ConnectorListName ) ) {
 			Count = FindItemInList( ConnectorListName, ConnectorLists );
 			if ( Count == 0 ) {
-				ShowFatalError( "GetConnectorList: Connector List not found=" + ConnectorListName );
+				ShowFatalError( "GetConnectorList: Connector List not found=" + ConnectorListName );  // LCOV_EXCL_LINE
 			}
 			Connectoid = ConnectorLists( Count );
 			if ( present( NumInList ) ) {
@@ -985,12 +985,12 @@ namespace BranchInputManager {
 			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Mixers );
 			if ( present( MixerNumber ) ) ++MixerNumber;
 			if ( Count == 0 ) {
-				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 1 ) );
+				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 1 ) );  // LCOV_EXCL_LINE
 			}
 		} else if ( SameString( Connectoid.ConnectorType( 2 ), cMIXER ) ) {
 			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Mixers );
 			if ( Count == 0 ) {
-				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 2 ) );
+				ShowFatalError( "GetLoopMixer: No Mixer Found=" + Connectoid.ConnectorName( 2 ) );  // LCOV_EXCL_LINE
 			}
 		} else {
 			Count = 0;
@@ -1033,7 +1033,7 @@ namespace BranchInputManager {
 				if ( NumInletNodes > isize( InletNodeNames ) || NumInletNodes > isize( InletNodeNums ) ) {
 					ShowSevereError( "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of Inlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( InletNodeNames ) ) + ", Mixer statement inlets=" + TrimSigDigits( NumInletNodes ) );
-					ShowFatalError( "Program terminates due to preceding condition." );
+					ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 				}
 				InletNodeNums = 0;
 				InletNodeNames = "";
@@ -1130,19 +1130,19 @@ namespace BranchInputManager {
 
 		if ( ConnectorListName == BlankString ) {
 			ShowSevereError( "GetLoopSplitter: ConnectorListName is blank.  LoopName=" + LoopName );
-			ShowFatalError( "Program terminates due to previous condition." );
+			ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 		}
 		GetConnectorList( ConnectorListName, Connectoid, ConnectorNumber );
 		if ( SameString( Connectoid.ConnectorType( 1 ), cSPLITTER ) ) {
 			Count = FindItemInList( Connectoid.ConnectorName( 1 ), Splitters );
 			if ( present( SplitterNumber ) ) ++SplitterNumber;
 			if ( Count == 0 ) {
-				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 1 ) );
+				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 1 ) );  // LCOV_EXCL_LINE
 			}
 		} else if ( SameString( Connectoid.ConnectorType( 2 ), cSPLITTER ) ) {
 			Count = FindItemInList( Connectoid.ConnectorName( 2 ), Splitters );
 			if ( Count == 0 ) {
-				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 2 ) );
+				ShowFatalError( "GetLoopSplitter: No Splitter Found=" + Connectoid.ConnectorName( 2 ) );  // LCOV_EXCL_LINE
 			}
 		} else {
 			Count = 0;
@@ -1185,7 +1185,7 @@ namespace BranchInputManager {
 				if ( NumOutletNodes > isize( OutletNodeNames ) || NumOutletNodes > isize( OutletNodeNums ) ) {
 					ShowSevereError( "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of Outlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( OutletNodeNames ) ) + ", Splitter statement outlets=" + TrimSigDigits( NumOutletNodes ) );
-					ShowFatalError( "Program terminates due to preceding condition." );
+					ShowFatalError( "Program terminates due to preceding condition." );  // LCOV_EXCL_LINE
 				}
 				OutletNodeNums = 0;
 				OutletNodeNames = "";
@@ -1993,7 +1993,7 @@ namespace BranchInputManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetConnectorListInput: Program terminates for preceding conditions." );
+			ShowFatalError( "GetConnectorListInput: Program terminates for preceding conditions." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2147,7 +2147,7 @@ namespace BranchInputManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetSplitterInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );
+			ShowFatalError( "GetSplitterInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		//  Everything supposed to be good.  Now make sure all branches in Splitter on same side of loop.
@@ -2226,7 +2226,7 @@ namespace BranchInputManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetSplitterInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );
+			ShowFatalError( "GetSplitterInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -2382,7 +2382,7 @@ namespace BranchInputManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetMixerInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );
+			ShowFatalError( "GetMixerInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		//  Everything supposed to be good.  Now make sure all branches in Splitter on same side of loop.
@@ -2460,7 +2460,7 @@ namespace BranchInputManager {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetMixerInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );
+			ShowFatalError( "GetMixerInput: Fatal Errors Found in " + CurrentModuleObject + ", program terminates." );  // LCOV_EXCL_LINE
 		}
 
 	}

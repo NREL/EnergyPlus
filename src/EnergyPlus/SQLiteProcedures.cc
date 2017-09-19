@@ -109,7 +109,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
 		std::shared_ptr<std::ofstream> errorStream = std::make_shared<std::ofstream>( DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc );
 		return std::unique_ptr<SQLite>(new SQLite( errorStream, DataStringGlobals::outputSqlFileName, DataStringGlobals::outputSqliteErrFileName, writeOutputToSQLite, writeTabularDataToSQLite ));
 	} catch( const std::runtime_error& error ) {
-		ShowFatalError(error.what());
+		ShowFatalError(error.what());  // LCOV_EXCL_LINE
 		return nullptr;
 	}
 }

@@ -177,12 +177,12 @@ namespace HVACVariableRefrigerantFlow {
 	// Flag for hex operation
 	int const FlagCondMode( 0 ); // Flag for the hex running as condenser [-]
 	int const FlagEvapMode( 1 ); // Flag for the hex running as evaporator [-]
-	
+
 	// Flag for VRF operational mode
 	int const ModeCoolingOnly( 1 ); // Flag for Cooling Only Mode [-]
 	int const ModeHeatingOnly( 2 ); // Flag for Heating Only Mode [-]
 	int const ModeCoolingAndHeating( 3 ); // Flag for Simultaneous Cooling and Heating Only Mode [-]
-	
+
 	// Fuel Types
 	int const FuelTypeElectric( 1 ); // Fuel type for electricity
 	int const FuelTypeNaturalGas( 2 ); // Fuel type for natural gas
@@ -338,18 +338,18 @@ namespace HVACVariableRefrigerantFlow {
 		if ( CompIndex == 0 ) {
 			VRFTUNum = FindItemInList( CompName, VRFTU );
 			if ( VRFTUNum == 0 ) {
-				ShowFatalError( "SimulateVRF: VRF Terminal Unit not found=" + CompName );
+				ShowFatalError( "SimulateVRF: VRF Terminal Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = VRFTUNum;
 
 		} else {
 			VRFTUNum = CompIndex;
 			if ( VRFTUNum > NumVRFTU || VRFTUNum < 1 ) {
-				ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", Number of VRF Terminal Units = " + TrimSigDigits( NumVRFTU ) + ", VRF Terminal Unit name = " + CompName );
+				ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", Number of VRF Terminal Units = " + TrimSigDigits( NumVRFTU ) + ", VRF Terminal Unit name = " + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( VRFTUNum ) ) {
 				if ( ! CompName.empty() && CompName != VRFTU( VRFTUNum ).Name ) {
-					ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", VRF Terminal Unit name=" + CompName + ", stored VRF TU Name for that index=" + VRFTU( VRFTUNum ).Name );
+					ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", VRF Terminal Unit name=" + CompName + ", stored VRF TU Name for that index=" + VRFTU( VRFTUNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( VRFTUNum ) = false;
 			}
@@ -478,7 +478,7 @@ namespace HVACVariableRefrigerantFlow {
 					MaxCap = max( VRF( VRFNum ).CoolingCapacity, VRF( VRFNum ).HeatingCapacity ); // greater of cooling and heating capacity
 					OptCap = max( VRF( VRFNum ).CoolingCapacity, VRF( VRFNum ).HeatingCapacity ); // connects to single loop, need to switch between cooling/heating capacity?
 				} else {
-					ShowFatalError( "SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType );
+					ShowFatalError( "SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType );  // LCOV_EXCL_LINE
 				}}
 				SizeVRFCondenser( VRFNum );
 				return;
@@ -493,13 +493,13 @@ namespace HVACVariableRefrigerantFlow {
 					UpdateChillerComponentCondenserSide( VRF( VRFNum ).SourceLoopNum, VRF( VRFNum ).SourceLoopSideNum, TypeOf_HeatPumpVRF, VRF( VRFNum ).CondenserNodeNum, VRF( VRFNum ).CondenserOutletNodeNum, VRF( VRFNum ).QCondenser, VRF( VRFNum ).CondenserInletTemp, VRF( VRFNum ).CondenserSideOutletTemp, VRF( VRFNum ).WaterCondenserMassFlow, FirstHVACIteration );
 
 				} else {
-					ShowFatalError( "SimVRFCondenserPlant:: Invalid loop connection " + cVRFTypes( VRF_HeatPump ) + ", Requested Unit=" + VRFName );
+					ShowFatalError( "SimVRFCondenserPlant:: Invalid loop connection " + cVRFTypes( VRF_HeatPump ) + ", Requested Unit=" + VRFName );  // LCOV_EXCL_LINE
 				}
 			} else {
-				ShowFatalError( "SimVRFCondenserPlant:: Invalid " + cVRFTypes( VRF_HeatPump ) + ", Requested Unit=" + VRFName );
+				ShowFatalError( "SimVRFCondenserPlant:: Invalid " + cVRFTypes( VRF_HeatPump ) + ", Requested Unit=" + VRFName );  // LCOV_EXCL_LINE
 			}
 		} else {
-			ShowFatalError( "SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType );
+			ShowFatalError( "SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType );  // LCOV_EXCL_LINE
 		}}
 
 	}
@@ -1270,7 +1270,7 @@ namespace HVACVariableRefrigerantFlow {
 		GetVRFInputData( ErrorsFound );
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. Preceding condition(s) causes termination." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1435,9 +1435,9 @@ namespace HVACVariableRefrigerantFlow {
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
-		
+
 		NumVRFCond = NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + NumVRFCond_FluidTCtrl_HR;
-		
+
 		NumVRFTULists = GetNumObjectsFound( "ZoneTerminalUnitList" );
 		if ( NumVRFTULists > 0 ) {
 			GetObjectDefMaxArgs( "ZoneTerminalUnitList", NumParams, NumAlphas, NumNums );
@@ -2670,13 +2670,13 @@ namespace HVACVariableRefrigerantFlow {
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
-			
+
 			VRF( VRFNum ).ThermostatPriority = LoadPriority;
 			VRF( VRFNum ).HeatRecoveryUsed = true;
 			VRF( VRFNum ).VRFSystemTypeNum = VRF_HeatPump;
 			VRF( VRFNum ).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
 			VRF( VRFNum ).FuelType = FuelTypeElectric;
-			
+
 			if ( lAlphaFieldBlanks( 2 ) ) {
 				VRF( VRFNum ).SchedPtr = ScheduleAlwaysOn;
 			} else {
@@ -2694,7 +2694,7 @@ namespace HVACVariableRefrigerantFlow {
 				ShowContinueError( cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + " not found." );
 				ErrorsFound = true;
 			}
-			
+
 			//Refrigerant type
 			VRF( VRFNum ).RefrigerantName = cAlphaArgs( 4 );
 			if ( EnergyPlus::FluidProperties::GetInput ) {
@@ -2706,17 +2706,17 @@ namespace HVACVariableRefrigerantFlow {
 				ShowContinueError( "Illegal " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
 				ErrorsFound = true;
 			}
-			
+
 			VRF( VRFNum ).RatedEvapCapacity = rNumericArgs( 1 );
 			VRF( VRFNum ).RatedCompPowerPerCapcity = rNumericArgs( 2 );
 			VRF( VRFNum ).RatedCompPower = VRF( VRFNum ).RatedCompPowerPerCapcity * VRF( VRFNum ).RatedEvapCapacity;
 			VRF( VRFNum ).CoolingCapacity = VRF( VRFNum ).RatedEvapCapacity;
 			VRF( VRFNum ).HeatingCapacity = VRF( VRFNum ).RatedEvapCapacity * ( 1 + VRF( VRFNum ).RatedCompPowerPerCapcity );
-			
+
 			//Reference system COP
 			VRF( VRFNum ).CoolingCOP = 1 / VRF( VRFNum ).RatedCompPowerPerCapcity;
 			VRF( VRFNum ).HeatingCOP = 1 / VRF( VRFNum ).RatedCompPowerPerCapcity + 1;
-			
+
 			//OA temperature range for VRF-HP operations
 			VRF( VRFNum ).MinOATCooling = rNumericArgs( 3 );
 			VRF( VRFNum ).MaxOATCooling = rNumericArgs( 4 );
@@ -2757,7 +2757,7 @@ namespace HVACVariableRefrigerantFlow {
 				VRF( VRFNum ).MaxOATHeatRecovery = max( VRF( VRFNum ).MaxOATCooling, VRF( VRFNum ).MaxOATHeating );
 				ShowContinueError( "... adjusted " + cNumericFieldNames( 8 ) + " = " + TrimSigDigits( VRF( VRFNum ).MaxOATHeatRecovery, 2 ) + " C" );
 			}
-			
+
 			// IU Control Type
 			if( SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
@@ -2766,11 +2766,11 @@ namespace HVACVariableRefrigerantFlow {
 			} else {
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
 			}
-			
+
 			//Reference IU Te/Tc for IU Control Algorithm: ConstantTemp
 			VRF( VRFNum ).EvapTempFixed  = rNumericArgs( 9 );
 			VRF( VRFNum ).CondTempFixed  = rNumericArgs( 10 );
-			
+
 			//Bounds of Te/Tc for IU Control Algorithm: VariableTemp
 			VRF( VRFNum ).IUEvapTempLow = rNumericArgs( 11 );
 			VRF( VRFNum ).IUEvapTempHigh = rNumericArgs( 12 );
@@ -2786,7 +2786,7 @@ namespace HVACVariableRefrigerantFlow {
 				ShowContinueError( "... " + cNumericFieldNames( 13 ) + " (" + TrimSigDigits( VRF( VRFNum ).IUCondTempLow, 3 ) + ") must be less than maximum (" + TrimSigDigits( VRF( VRFNum ).IUCondTempHigh, 3 ) + ")." );
 				ErrorsFound = true;
 			}
-			
+
 			//Reference OU SH/SC
 			VRF( VRFNum ).SH = rNumericArgs( 15 );
 			VRF( VRFNum ).SC = rNumericArgs( 16 );
@@ -2798,23 +2798,23 @@ namespace HVACVariableRefrigerantFlow {
 				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", \" " + cNumericFieldNames( 15 ) );
 				ShowContinueError( "...is higher than 20C, which is usually the maximum of normal range." );
 			}
-			
+
 			// OU Heat Exchanger Rated Bypass Factor
 			VRF( VRFNum ).RateBFOUEvap = rNumericArgs( 17 );
 			VRF( VRFNum ).RateBFOUCond = rNumericArgs( 18 );
-			
+
 			// Difference between Outdoor Unit Te and OAT during Simultaneous Heating and Cooling operations
 			VRF( VRFNum ).DiffOUTeTo = rNumericArgs( 19 );
 
 			// HR OU Heat Exchanger Capacity Ratio
 			VRF( VRFNum ).HROUHexRatio = rNumericArgs( 20 );
-			
+
 			//Get OU fan data
 			VRF( VRFNum ).RatedOUFanPowerPerCapcity = rNumericArgs( 21 );
 			VRF( VRFNum ).OUAirFlowRatePerCapcity = rNumericArgs( 22 );
 			VRF( VRFNum ).RatedOUFanPower = VRF( VRFNum ).RatedOUFanPowerPerCapcity * VRF( VRFNum ).RatedEvapCapacity;
 			VRF( VRFNum ).OUAirFlowRate = VRF( VRFNum ).OUAirFlowRatePerCapcity * VRF( VRFNum ).RatedEvapCapacity;
-			
+
 			// OUEvapTempCurve
 			int indexOUEvapTempCurve = GetCurveIndex( cAlphaArgs( 6 ) ); // convert curve name to index number
 			// Verify curve name and type
@@ -2842,7 +2842,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 				}
 			}
-			
+
 			// OUCondTempCurve
 			int indexOUCondTempCurve = GetCurveIndex( cAlphaArgs( 7 ) ); // convert curve name to index number
 			// Verify curve name and type
@@ -2870,7 +2870,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 				}
 			}
-			
+
 			// Pipe parameters
 			VRF( VRFNum ).RefPipDiaSuc   = rNumericArgs( 23 );
 			VRF( VRFNum ).RefPipDiaDis   = rNumericArgs( 24 );
@@ -2879,7 +2879,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).RefPipHei      = rNumericArgs( 27 );
 			VRF( VRFNum ).RefPipInsThi   = rNumericArgs( 28 );
 			VRF( VRFNum ).RefPipInsCon   = rNumericArgs( 29 );
-			
+
 			// Check the RefPipEquLen
 			if ( lNumericFieldBlanks( 26 ) && !lNumericFieldBlanks( 25 ) ) {
 				VRF( VRFNum ).RefPipEquLen = 1.2 * VRF( VRFNum ).RefPipLen;
@@ -2892,13 +2892,13 @@ namespace HVACVariableRefrigerantFlow {
 				ShowContinueError( "...Equivalent length of main pipe should be greater than or equal to the actual length." );
 				ShowContinueError( "...The value is recalculated based on the provided \"" + cNumericFieldNames( 25 ) + "\" value." );
 			}
-			
+
 			// Crank case
 			VRF( VRFNum ).CCHeaterPower = rNumericArgs( 30 );
 			VRF( VRFNum ).NumCompressors = rNumericArgs( 31 );
 			VRF( VRFNum ).CompressorSizeRatio = rNumericArgs( 32 );
 			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 33 );
-			
+
 			//Defrost
 			if ( ! lAlphaFieldBlanks( 8 ) ) {
 				if ( SameString( cAlphaArgs( 8 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
@@ -2945,14 +2945,14 @@ namespace HVACVariableRefrigerantFlow {
 					ErrorsFound = true;
 				}
 			}
-			
+
 			VRF( VRFNum ).DefrostFraction = rNumericArgs( 34 );
 			VRF( VRFNum ).DefrostCapacity = rNumericArgs( 35 );
 			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 36 );
 			if ( VRF( VRFNum ).DefrostCapacity == 0.0 && VRF( VRFNum ).DefrostStrategy == Resistive ) {
 				ShowWarningError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cNumericFieldNames( 35 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
-			
+
 			//HR mode transition
 			VRF( VRFNum ).HRInitialCoolCapFrac = rNumericArgs( 37 );
 			VRF( VRFNum ).HRCoolCapTC = rNumericArgs( 38 );
@@ -2962,16 +2962,16 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).HRHeatCapTC = rNumericArgs( 42 );
 			VRF( VRFNum ).HRInitialHeatEIRFrac = rNumericArgs( 43 );
 			VRF( VRFNum ).HRHeatEIRTC = rNumericArgs( 44 );
-			
+
 			// Compressor configuration
 			VRF( VRFNum ).CompMaxDeltaP  = rNumericArgs( 45 );
 			VRF( VRFNum ).EffCompInverter = rNumericArgs( 46 );
 			VRF( VRFNum ).CoffEvapCap = rNumericArgs( 47 );
-			
+
 			// The new VRF model is Air cooled
 			VRF( VRFNum ).CondenserType = AirCooled;
 			VRF( VRFNum ).CondenserNodeNum = 0;
-			
+
 			// Evaporative Capacity & Compressor Power Curves corresponding to each Loading Index / compressor speed
 			NumOfCompSpd = rNumericArgs( 48 );
 			VRF( VRFNum ).CompressorSpeed.dimension( NumOfCompSpd );
@@ -2984,7 +2984,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				// Evaporating Capacity Curve
 				if ( ! lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd ) ) {
-					int indexOUEvapCapCurve = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd ) ); // convert curve name to index number	
+					int indexOUEvapCapCurve = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd ) ); // convert curve name to index number
 					if ( indexOUEvapCapCurve == 0 ) {// Verify curve name and type
 						if ( lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd ) ) {
 							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
@@ -2996,7 +2996,7 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					} else {
 						{ auto const SELECT_CASE_var( GetCurveType( indexOUEvapCapCurve ) );
-					
+
 							if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 								VRF( VRFNum ).OUCoolingCAPFT( NumCompSpd ) = indexOUEvapCapCurve;
 							} else {
@@ -3008,10 +3008,10 @@ namespace HVACVariableRefrigerantFlow {
 						}
 					}
 				}
-				
+
 				// Compressor Power Curve
 				if ( ! lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd + 1 ) ) {
-					int indexOUCompPwrCurve = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd + 1 ) ); // convert curve name to index number	
+					int indexOUCompPwrCurve = GetCurveIndex( cAlphaArgs( Count2Index + 2 * NumCompSpd + 1 ) ); // convert curve name to index number
 					if ( indexOUCompPwrCurve == 0 ) {// Verify curve name and type
 						if ( lAlphaFieldBlanks( Count2Index + 2 * NumCompSpd + 1 ) ) {
 							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + VRF( VRFNum ).Name + "\", missing" );
@@ -3023,7 +3023,7 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					} else {
 						{ auto const SELECT_CASE_var( GetCurveType( indexOUCompPwrCurve ) );
-					
+
 							if ( SELECT_CASE_var == "BIQUADRATIC" ) {
 								VRF( VRFNum ).OUCoolingPWRFT( NumCompSpd ) = indexOUCompPwrCurve;
 							} else {
@@ -3035,11 +3035,11 @@ namespace HVACVariableRefrigerantFlow {
 						}
 					}
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		cCurrentModuleObject = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
 		for ( VRFNum = 1; VRFNum <= NumVRFTU; ++VRFNum ) {
 			VRFTUNum = VRFNum;
@@ -3919,7 +3919,7 @@ namespace HVACVariableRefrigerantFlow {
 				SetupOutputVariable( "VRF Heat Pump Indoor Unit Piping Correction for Heating", OutputProcessor::Unit::None, VRF( NumCond ).PipingCorrectionHeating, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate", OutputProcessor::Unit::W, VRF( NumCond ).OUEvapHeatRate, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Condenser Heat Release Rate", OutputProcessor::Unit::W, VRF( NumCond ).OUCondHeatRate, "System", "Average", VRF( NumCond ).Name );
-				
+
 			} else {
 			// For VRF_SysCurve Model
 				SetupOutputVariable( "VRF Heat Pump Maximum Capacity Cooling Rate", OutputProcessor::Unit::W, MaxCoolingCapacity( NumCond ), "System", "Average", VRF( NumCond ).Name );
@@ -4319,7 +4319,7 @@ namespace HVACVariableRefrigerantFlow {
 					} else {
 						GetFanVolFlow( VRFTU( VRFTUNum ).FanIndex, VRFTU( VRFTUNum ).ActualFanVolFlowRate );
 					}
-					
+
 				}
 			}
 		} // IF(MyVRFFlag(VRFTUNum))THEN
@@ -4523,7 +4523,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate );
-				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above
 				// (it is the "inlet" node flow rate)
 				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
 			}
@@ -5162,7 +5162,7 @@ namespace HVACVariableRefrigerantFlow {
 		DataZoneNumber = VRFTU( VRFTUNum ).ZoneNum;
 		if ( CurZoneEqNum > 0 ) {
 			if ( VRFTU( VRFTUNum ).HVACSizingIndex > 0 ) {
-				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;				
+				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;
 
 				SizingMethod = CoolingAirflowSizing;
 				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -5568,7 +5568,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			if ( FoundAll && ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeSysCurve )) {
 			// Size VRF rated cooling/heating capacity (VRF-SysCurve Model)
-			
+
 				// Size VRF( VRFCond ).CoolingCapacity
 				IsAutoSize = false;
 				if ( VRF( VRFCond ).CoolingCapacity == AutoSize ) {
@@ -5669,40 +5669,40 @@ namespace HVACVariableRefrigerantFlow {
 					HeatCombinationRatio( VRFCond ) = 1.0;
 				}
 			}
-			
+
 			if ( FoundAll && ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl )) {
 			// Size VRF rated evaporative capacity (VRF-FluidTCtrl Model)
-			
+
 				// Size VRF( VRFCond ).RatedEvapCapacity
 				IsAutoSize = false;
 				if ( VRF( VRFCond ).RatedEvapCapacity == AutoSize ) {
 					IsAutoSize = true;
 				}
-				
+
 				CoolingCapacityDes = TUCoolingCapacity;
 				HeatingCapacityDes = TUHeatingCapacity;
-				
+
 				if ( IsAutoSize ) {
 					//RatedEvapCapacity
 					VRF( VRFCond ).RatedEvapCapacity = max( CoolingCapacityDes, HeatingCapacityDes / ( 1 + VRF( VRFCond ).RatedCompPowerPerCapcity ) );
-					
+
 					//Other parameters dependent on RatedEvapCapacity
 					VRF( VRFCond ).RatedCompPower = VRF( VRFCond ).RatedCompPowerPerCapcity * VRF( VRFCond ).RatedEvapCapacity;
 					VRF( VRFCond ).RatedOUFanPower = VRF( VRFCond ).RatedOUFanPowerPerCapcity * VRF( VRFCond ).RatedEvapCapacity;
 					VRF( VRFCond ).OUAirFlowRate = VRF( VRFCond ).OUAirFlowRatePerCapcity * VRF( VRFCond ).RatedEvapCapacity;
-			
+
 					VRF( VRFCond ).CoolingCapacity = VRF( VRFCond ).RatedEvapCapacity;
 					VRF( VRFCond ).HeatingCapacity = VRF( VRFCond ).RatedEvapCapacity * ( 1 + VRF( VRFCond ).RatedCompPowerPerCapcity );
-					
+
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", VRF( VRFCond ).HeatingCapacity );
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", VRF( VRFCond ).CoolingCapacity );
 				} else {
 					CoolingCapacityUser = VRF( VRFCond ).CoolingCapacity;
 					HeatingCapacityUser = VRF( VRFCond ).HeatingCapacity;
-					
+
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", CoolingCapacityDes, "User-Specified Rated Total Cooling Capacity (gross) [W]", CoolingCapacityUser );
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", HeatingCapacityDes, "User-Specified Rated Total Heating Capacity [W]", HeatingCapacityUser );
-					
+
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( CoolingCapacityDes - CoolingCapacityUser ) / CoolingCapacityUser ) > AutoVsHardSizingThreshold ) {
 							ShowMessage( "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ) + ' ' + VRFTU( VRFCond ).Name );
@@ -5711,7 +5711,7 @@ namespace HVACVariableRefrigerantFlow {
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
-						
+
 						if ( ( std::abs( HeatingCapacityDes - HeatingCapacityUser ) / HeatingCapacityUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeVRF: Potential issue with equipment sizing for " + cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ) + ' ' + VRFTU( VRFCond ).Name );
 								ShowContinueError( "User-Specified Rated Total Heating Capacity of " + RoundSigDigits( HeatingCapacityUser, 2 ) + " [W]" );
@@ -5722,7 +5722,7 @@ namespace HVACVariableRefrigerantFlow {
 					}
 				}
 			}
-			
+
 			if ( FoundAll ) {
 				// autosize resistive defrost heater capacity
 				IsAutoSize = false;
@@ -5898,7 +5898,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Preceding sizing errors cause program termination" );
+				ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 			}
 
 			RegisterPlantCompDesignFlow( VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).WaterCondVolFlowRate );
@@ -6340,7 +6340,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRate = min( Node( VRFTU( VRFTUNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
-				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above
 				// (it is the "inlet" node flow rate)
 				SimATMixer( VRFTU( VRFTUNum ).ATMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).ATMixerIndex );
 			}
@@ -6393,7 +6393,7 @@ namespace HVACVariableRefrigerantFlow {
 				} else {
 					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				}
-				
+
 			} else {
 				Fans::SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			}
@@ -6413,7 +6413,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 		// calculate sensible load met
-		if ( VRFTU( VRFTUNum ).ATMixerExists ) {			
+		if ( VRFTU( VRFTUNum ).ATMixerExists ) {
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
 				// Air terminal supply side mixer
 				MinHumRat = min( Node( ZoneNode ).HumRat, Node( ATMixOutNode ).HumRat );
@@ -8297,7 +8297,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			// Update h_IU_evap_in in iterations Label12
-			h_IU_evap_in_new  = GetSatEnthalpyRefrig( this->RefrigerantName, this->CondensingTemp - this->SC, 0.0, RefrigerantIndex, RoutineName ); 		
+			h_IU_evap_in_new  = GetSatEnthalpyRefrig( this->RefrigerantName, this->CondensingTemp - this->SC, 0.0, RefrigerantIndex, RoutineName );
 			if( ( abs( h_IU_evap_in - h_IU_evap_in_new ) > Tolerance * h_IU_evap_in ) && ( h_IU_evap_in < h_IU_evap_in_up ) && ( h_IU_evap_in > h_IU_evap_in_low ) ) {
 				h_IU_evap_in = h_IU_evap_in_new;
 				NumIteHIUIn = NumIteHIUIn + 1;
@@ -8378,7 +8378,7 @@ namespace HVACVariableRefrigerantFlow {
 					if( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) > 0 ) {
 						TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU );
 						HeatCoilIndex = VRFTU( TUIndex ).HeatCoilIndex;
-						h_IU_cond_out_i = GetSatEnthalpyRefrig( this->RefrigerantName, GetSatTemperatureRefrig( this->RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName ) - DXCoil( HeatCoilIndex ).ActualSC, 0.0, RefrigerantIndex, RoutineName ); //Quality=0 		
+						h_IU_cond_out_i = GetSatEnthalpyRefrig( this->RefrigerantName, GetSatTemperatureRefrig( this->RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName ) - DXCoil( HeatCoilIndex ).ActualSC, 0.0, RefrigerantIndex, RoutineName ); //Quality=0
 						m_ref_IU_cond_i = ( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) <= 0.0 ) ? 0.0 : ( TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU ) / ( h_IU_cond_in - h_IU_cond_out_i ) );
 						m_ref_IU_cond = m_ref_IU_cond + m_ref_IU_cond_i;
 						h_IU_cond_out_ave = h_IU_cond_out_ave + m_ref_IU_cond_i * h_IU_cond_out_i;
@@ -8575,7 +8575,7 @@ namespace HVACVariableRefrigerantFlow {
 
 					RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, max( min( Pevap, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 					h_IU_evap_out_i = GetSupHeatEnthalpyRefrig( this->RefrigerantName, max( RefTSat, this->IUEvaporatingTemp + DXCoil( CoolCoilIndex ).ActualSH ), max( min( Pevap, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
-				
+
 					if( h_IU_evap_out_i > h_IU_evap_in  ) {
 						m_ref_IU_evap_i = ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) <= 0.0 ) ? 0.0 : ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) / ( h_IU_evap_out_i - h_IU_evap_in ) ); //Ref Flow Rate in the IU( kg/s )
 						m_ref_IU_evap  = m_ref_IU_evap + m_ref_IU_evap_i;
@@ -8802,7 +8802,7 @@ namespace HVACVariableRefrigerantFlow {
 
 					HRInitialEIRFrac = this->HRInitialCoolEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
 					HREIRTC = this->HRCoolEIRTC; // Time constant used to recover from initial degradation in cooling heat recovery
-					
+
 				} else if ( HeatingLoad( VRFCond ) ) {
 					if ( ! this->HRHeatingActive && this->HRCoolingActive ) {
 						this->HRModeChange = true;
@@ -8815,7 +8815,7 @@ namespace HVACVariableRefrigerantFlow {
 
 					HRInitialEIRFrac = this->HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
 					HREIRTC = this->HRHeatEIRTC; // Time constant used to recover from initial degradation in heating heat recovery
-					
+
 							} else {
 					//   zone thermostats satisfied, condenser is off. Set values anyway
 					// HRCAPFTConst = 1.0;
@@ -8893,7 +8893,7 @@ namespace HVACVariableRefrigerantFlow {
 					HeatingPLR = 0.0;
 				}
 			}
-			
+
 			this->VRFCondPLR = max( CoolingPLR, HeatingPLR );
 		}
 		}
@@ -8915,21 +8915,21 @@ namespace HVACVariableRefrigerantFlow {
 
 			this->ElecCoolingPower = VRF(VRFCond).Ncomp + this->OUFanPower;
 			this->ElecHeatingPower = 0;
-			
+
 		} else if ( this->OperatingMode == ModeHeatingOnly ) {
 			PartLoadFraction = 1.0;
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
 			this->ElecCoolingPower = 0;
 			this->ElecHeatingPower = this->Ncomp + this->OUFanPower;
-			
+
 		} else if ( this->OperatingMode == ModeCoolingAndHeating ) {
 			PartLoadFraction = 1.0;
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
 			this->ElecCoolingPower = ( this->Ncomp + this->OUFanPower ) * this->IUEvapHeatRate / ( this->IUCondHeatRate + this->IUEvapHeatRate );
 			this->ElecHeatingPower = ( this->Ncomp + this->OUFanPower ) * this->IUCondHeatRate / ( this->IUCondHeatRate + this->IUEvapHeatRate );
-			
+
 		} else {
 			this->ElecCoolingPower = 0;
 			this->ElecHeatingPower = 0;
@@ -9321,7 +9321,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( this->ATMixerType == ATMixer_InletSide ) { // if there is an inlet side air terminal mixer
 				// set the primary air inlet mass flow rate
 				Node( this->ATMixerPriNode ).MassFlowRate = min( Node( this->ATMixerPriNode ).MassFlowRateMaxAvail, Node( VRFTUInletNodeNum ).MassFlowRate );
-				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above 
+				// now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already been set above
 				// (it is the "inlet" node flow rate)
 				SimATMixer( this->ATMixerName, FirstHVACIteration, this->ATMixerIndex );
 			}
@@ -9495,7 +9495,7 @@ namespace HVACVariableRefrigerantFlow {
 			// The difference is usually 2-3C according to the engineering experience. 2 is used here for a slightly bigger fan flow rate.
 			if( VRF( VRFCond ).HeatRecoveryUsed )
 				TeTc = min( TeTc, OutDryBulbTemp - 2 );
-			
+
 		} else if ( ( ! VRF( VRFCond ).HeatRecoveryUsed && HeatingLoad( VRFCond ) ) || ( VRF( VRFCond ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
 			// VRF terminal unit is on heating mode
 			DXCoilNum = this->HeatCoilIndex;
@@ -9703,13 +9703,13 @@ namespace HVACVariableRefrigerantFlow {
 		// METHODOLOGY EMPLOYED:
 		// 		Call VRFOU_CompCap to calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational
 		// 		conditions, and then call VRFOU_TeTc to obtain Tsuction_new based on OU evaporator air-side calculations
-		
+
 
 		// REFERENCES:
 		// na
 
 		// Using/Aliasing
-		
+
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
@@ -9752,18 +9752,18 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Tfs; // OU evaporator coil surface temperature [C]
 
 		// FLOW
-		
+
 		// calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational conditions
 		VRF( VRFCond ).VRFOU_CompCap( CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp );
 		Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
-		
+
 		// Tsuction_new calculated based on OU evaporator air-side calculations (Tsuction_new < To)
 		VRF( VRFCond ).VRFOU_TeTc( FlagEvapMode, Q_c_OU_temp, VRF( VRFCond ).SH, m_air_evap_rated, OutDryBulbTemp, OutHumRat, OutBaroPress, Tfs, Te_new );
-		
+
 		TeResidual = Te_new - Te;
 
 		return TeResidual;
-		
+
 	}
 
 	Real64
@@ -9818,7 +9818,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 & TeTc // VRF Tc at cooling mode, or Te at heating mode [C]
 	)
 	{
-	
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jan 2016
@@ -9839,7 +9839,7 @@ namespace HVACVariableRefrigerantFlow {
 		//
 		// USE STATEMENTS:
 		using General::TrimSigDigits;
-	
+
 		Real64 BF; // VRF OU bypass  [-]
 		Real64 deltaT;     // Difference between Te/Tc and air temperature at coil surface [C]
 		Real64 h_coil_in; // Enthalpy of air at OU coil inlet [C]
@@ -9847,57 +9847,57 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_coil_out; // Air temperature at coil outlet [C]
 		Real64 T_coil_surf_sat; // Saturated air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
-		
+
 		if( OperationMode == FlagCondMode ) {
 		//IU Cooling: OperationMode 0
-		
+
 			if( m_air <= 0 ) {
 				TeTc = this->CondensingTemp;
 				ShowSevereMessage( " Unreasonable outdoor unit airflow rate (" + TrimSigDigits( m_air, 3 ) + " ) for \"" + this->Name + "\":" );
 				ShowContinueError( " This cannot be used to calculate outdoor unit refrigerant temperature." );
 				ShowContinueError( " Default condensing temperature is used: " + TrimSigDigits( TeTc, 3 ) );
 			}
-			
+
 			BF = this->RateBFOUCond; //0.219;
 			T_coil_out = T_coil_in + Q_coil / 1005.0 / m_air;
 			T_coil_surf = T_coil_in + ( T_coil_out - T_coil_in ) / ( 1 - BF );
-			
+
 			deltaT = this->C3Tc * pow_2( SHSC ) + this->C2Tc * SHSC + this->C1Tc;
-			
+
 			TeTc = T_coil_surf + deltaT;
-		
+
 		} else if( OperationMode == FlagEvapMode ) {
 		//IU Heating: OperationMode 1
-	
+
 			if( m_air <= 0 ) {
 				TeTc = this->EvaporatingTemp;
 				ShowSevereMessage( " Unreasonable outdoor unit airflow rate (" + TrimSigDigits( m_air, 3 ) + " ) for \"" + this->Name + "\":" );
 				ShowContinueError( " This cannot be used to calculate outdoor unit refrigerant temperature." );
 				ShowContinueError( " Default condensing temperature is used: " + TrimSigDigits( TeTc, 3 ) );
 			}
-			
+
 			BF = this->RateBFOUEvap; //0.45581;
 			h_coil_in = PsyHFnTdbW( T_coil_in, W_coil_in );
 			h_coil_out = h_coil_in - Q_coil / m_air / ( 1 - BF );
 			h_coil_out = max( 0.01, h_coil_out );
-			
+
 			T_coil_surf_sat = PsyTsatFnHPb( h_coil_out, OutdoorPressure, "VRFOU_TeTc" );
 			W_coil_surf_sat = PsyWFnTdbH( T_coil_surf_sat, h_coil_out, "VRFOU_TeTc" );
-			
+
 			if( W_coil_surf_sat < W_coil_in )
 			// There is dehumidification
 				T_coil_surf = T_coil_surf_sat;
 			else
 			// No dehumidification
 				T_coil_surf = PsyTdbFnHW( h_coil_out, W_coil_in );
-				
+
 			deltaT = this->C3Te * pow_2( SHSC ) + this->C2Te * SHSC + this->C1Te;
-			
+
 			TeTc = T_coil_surf - deltaT;
-		
+
 		}
 	}
-	
+
 	Real64
 	VRFCondenserEquipment::VRFOU_Cap(
 		int const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
@@ -9908,7 +9908,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
 	)
 	{
-	
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jan 2016
@@ -9929,7 +9929,7 @@ namespace HVACVariableRefrigerantFlow {
 		// USE STATEMENTS:
 		using General::TrimSigDigits;
 		using DataEnvironment::OutBaroPress;
-	
+
 		Real64 BF; // VRF OU bypass [-]
 		Real64 deltaT; // Difference between Te/Tc and air temperature at coil surface [C]
 		Real64 h_coil_in; // Enthalpy of air at OU coil inlet [C]
@@ -9938,36 +9938,36 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_coil_out; // Air temperature at coil outlet [C]
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
-		
+
 		Q_coil = 0.0;
-		
+
 		if( OperationMode == FlagCondMode ) {
 		//IU Cooling: OperationMode 0
 			if( m_air <= 0 ) {
 				ShowSevereMessage( " Unreasonable outdoor unit airflow rate (" + TrimSigDigits( m_air, 3 ) + " ) for \"" + this->Name + "\":" );
 				ShowContinueError( " This cannot be used to calculate outdoor unit capacity." );
 			}
-			
+
 			BF = this->RateBFOUCond; //0.219;
 			deltaT = this->C3Tc * pow_2( SHSC ) + this->C2Tc * SHSC + this->C1Tc;
 			T_coil_surf = TeTc - deltaT;
 			T_coil_out = T_coil_in + ( T_coil_surf - T_coil_in ) * ( 1 - BF );
 			Q_coil = ( T_coil_out - T_coil_in ) * 1005.0 * m_air;
-		
+
 		} else if( OperationMode == FlagEvapMode ) {
 		//IU Heating: OperationMode 1
 			if( m_air <= 0 ) {
 				ShowSevereMessage( " Unreasonable outdoor unit airflow rate (" + TrimSigDigits( m_air, 3 ) + " ) for \"" + this->Name + "\":" );
 				ShowContinueError( " This cannot be used to calculate outdoor unit capacity." );
 			}
-			
+
 			BF = this->RateBFOUEvap; //0.45581;
 			deltaT = this->C3Te * pow_2( SHSC ) + this->C2Te * SHSC + this->C1Te;
 			T_coil_surf = TeTc + deltaT;
-			
+
 			// saturated humidity ratio corresponding to T_coil_surf
 			W_coil_surf_sat = PsyWFnTdpPb( T_coil_surf, OutBaroPress );
-			
+
 			if( W_coil_surf_sat < W_coil_in ) {
 			// There is dehumidification, W_coil_out = W_coil_surf_sat
 				h_coil_out = PsyHFnTdbW( T_coil_surf, W_coil_surf_sat );
@@ -9978,16 +9978,16 @@ namespace HVACVariableRefrigerantFlow {
 			h_coil_out = max( 0.01, h_coil_out );
 			h_coil_in = PsyHFnTdbW( T_coil_in, W_coil_in );
 			Q_coil = ( h_coil_in - h_coil_out ) * m_air * ( 1 - BF ); // bypass airflow should not be included here
-			
+
 		} else {
 		//Should not come here
 			ShowSevereMessage( " Unreasonable outdoor unit operational mode for \"" + this->Name + "\":" );
 			ShowContinueError( " The operational mode is not correctly set in the function VRFOU_Cap." );
 		}
-		
+
 		return Q_coil;
 	}
-	
+
 	Real64
 	VRFCondenserEquipment::VRFOU_FlowRate(
 		int const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
@@ -9998,7 +9998,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 const W_coil_in // Humidity ratio of air at OU coil inlet [kg/kg]
 	)
 	{
-	
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Mar 2016
@@ -10019,7 +10019,7 @@ namespace HVACVariableRefrigerantFlow {
 		// USE STATEMENTS:
 		using General::TrimSigDigits;
 		using DataEnvironment::OutBaroPress;
-	
+
 		Real64 BF; // VRF OU bypass [-]
 		Real64 deltaT; // Difference between Te/Tc and air temperature at coil surface [C]
 		Real64 h_coil_in; // Enthalpy of air at OU coil inlet [C]
@@ -10028,28 +10028,28 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_coil_out; // Air temperature at coil outlet [C]
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
-		
+
 		m_air = 0.0;
-		
+
 		if( OperationMode == FlagCondMode ) {
 		//IU Cooling: OperationMode 0
-			
+
 			BF = this->RateBFOUCond; //0.219;
 			deltaT = this->C3Tc * pow_2( SHSC ) + this->C2Tc * SHSC + this->C1Tc;
 			T_coil_surf = TeTc - deltaT;
 			T_coil_out = T_coil_in + ( T_coil_surf - T_coil_in ) * ( 1 - BF );
 			m_air = Q_coil / ( T_coil_out - T_coil_in ) / 1005.0;
-		
+
 		} else if( OperationMode == FlagEvapMode ) {
 		//IU Heating: OperationMode 1
-			
+
 			BF = this->RateBFOUEvap; //0.45581;
 			deltaT = this->C3Te * pow_2( SHSC ) + this->C2Te * SHSC + this->C1Te;
 			T_coil_surf = TeTc + deltaT;
-			
+
 			// saturated humidity ratio corresponding to T_coil_surf
 			W_coil_surf_sat = PsyWFnTdpPb( T_coil_surf, OutBaroPress );
-			
+
 			if( W_coil_surf_sat < W_coil_in ) {
 			// There is dehumidification, W_coil_out = W_coil_surf_sat
 				h_coil_out = PsyHFnTdbW( T_coil_surf, W_coil_surf_sat );
@@ -10060,16 +10060,16 @@ namespace HVACVariableRefrigerantFlow {
 			h_coil_out = max( 0.01, h_coil_out );
 			h_coil_in = PsyHFnTdbW( T_coil_in, W_coil_in );
 			m_air = Q_coil / ( h_coil_in - h_coil_out ) / ( 1 - BF );
-			
+
 		} else {
 		//Should not come here
 			ShowSevereMessage( " Unreasonable outdoor unit operational mode for \"" + this->Name + "\":" );
 			ShowContinueError( " The operational mode is not correctly set in the function VRFOU_Cap." );
 		}
-		
+
 		return m_air;
 	}
-	
+
 	Real64
 	VRFCondenserEquipment::VRFOU_SCSH(
 		int const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
@@ -10081,7 +10081,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 const OutdoorPressure // Outdoor air pressure [Pa]
 	)
 	{
-	
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jan 2016
@@ -10103,7 +10103,7 @@ namespace HVACVariableRefrigerantFlow {
 		// USE STATEMENTS:
 		using General::TrimSigDigits;
 		using DataEnvironment::OutBaroPress;
-	
+
 		Real64 BF; // VRF OU bypass [-]
 		Real64 deltaT; // Difference between Te/Tc and air temperature at coil surface [C]
 		Real64 h_coil_in; // Enthalpy of air at OU coil inlet [C]
@@ -10113,66 +10113,66 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_coil_surf; // Air temperature at coil surface [C]
 		Real64 T_coil_surf_sat; // Saturated air temperature at coil surface [C]
 		Real64 W_coil_surf_sat; // Humidity ratio of saturated air at coil surface [kg/kg]
-		
+
 		SHSC = 0.0;
-		
+
 		if( OperationMode == FlagCondMode ) {
 		//Cooling: OperationMode 0
 			if( m_air <= 0 ) {
 				ShowSevereMessage( " Unreasonable outdoor unit airflow rate (" + TrimSigDigits( m_air, 3 ) + " ) for \"" + this->Name + "\":" );
 				ShowContinueError( " This cannot be used to calculate outdoor unit subcooling." );
 			}
-			
+
 			BF = this->RateBFOUCond; //0.219;
 			T_coil_out = T_coil_in + Q_coil / 1005.0 / m_air;
 			T_coil_surf = T_coil_in + ( T_coil_out - T_coil_in ) / ( 1 - BF );
 			deltaT = TeTc - T_coil_surf;
-			
+
 			// SC_OU
 			if( this->C3Tc == 0 )
 				SHSC = -( this->C1Tc - deltaT ) / this->C2Tc;
 			else
 				SHSC = ( - this->C2Tc + std::pow( ( pow_2( this->C2Tc ) - 4 * ( this->C1Tc - deltaT ) * this->C3Tc) , 0.5 ) ) / ( 2 * this->C3Tc );
-		
+
 		} else if( OperationMode == FlagEvapMode ) {
 		//Heating: OperationMode 1
 			if( m_air <= 0 ) {
 				ShowSevereMessage( " Unreasonable outdoor unit airflow rate (" + TrimSigDigits( m_air, 3 ) + " ) for \"" + this->Name + "\":" );
 				ShowContinueError( " This cannot be used to calculate outdoor unit super heating." );
 			}
-			
+
 			BF = this->RateBFOUEvap; //0.45581;
 			h_coil_in = PsyHFnTdbW( T_coil_in, W_coil_in );
 			h_coil_out = h_coil_in - Q_coil / m_air / ( 1 - BF );
 			h_coil_out = max( 0.01, h_coil_out );
-			
+
 			T_coil_surf_sat = PsyTsatFnHPb( h_coil_out, OutdoorPressure, "VRFOU_TeTc" );
 			W_coil_surf_sat = PsyWFnTdbH( T_coil_surf_sat, h_coil_out, "VRFOU_TeTc" );
-			
+
 			if( W_coil_surf_sat < W_coil_in )
 			// There is dehumidification
 				T_coil_surf = T_coil_surf_sat;
 			else
 			// No dehumidification
 				T_coil_surf = PsyTdbFnHW( h_coil_out, W_coil_in );
-			
+
 			deltaT = T_coil_surf - TeTc;
-			
+
 			// SH_OU
 			if( this->C3Te == 0 )
 				SHSC = -( this->C1Te - deltaT ) / this->C2Te;
 			else
 				SHSC = ( - this->C2Te + std::pow( ( pow_2( this->C2Te ) - 4 * ( this->C1Te - deltaT ) * this->C3Te) , 0.5 ) ) / ( 2 * this->C3Te );
-			
+
 		} else {
 		//Should not come here
 			ShowSevereMessage( " Unreasonable outdoor unit operational mode for \"" + this->Name + "\":" );
 			ShowContinueError( " The operational mode is not correctly set in the function VRFOU_Cap." );
 		}
-		
+
 		return SHSC;
 	}
-	
+
 	Real64
 	VRFCondenserEquipment::VRFOU_CapModFactor(
 		Real64 const h_comp_in_real, // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
@@ -10221,20 +10221,20 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 h_evap_in_rate; // enthalpy of refrigerant at the evaporator inlet at rated conditions [kJ/kg]
 		Real64 density_rate; // density of refrigerant at rated conditions [kg/m3]
 		Real64 density_real; // density of refrigerant at rated conditions [kg/m3]
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		static std::string const RoutineName( "VRFOU_CapModFactor" );
-		
+
 		// variable initializations
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
-		
+
 		//Saturated temperature at real evaporating pressure
 		RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, P_evap_real, RefrigerantIndex, RoutineName );
 
@@ -10251,18 +10251,18 @@ namespace HVACVariableRefrigerantFlow {
 			C_cap_density = density_rate / density_real;
 		else
 			C_cap_density = 1.0;
-			
+
 		if( ( h_comp_in_real - h_evap_in_real ) > 0 )
 			C_cap_enthalpy = abs( h_evap_out_rate - h_evap_in_rate) / abs( h_comp_in_real - h_evap_in_real );
 		else
 			C_cap_enthalpy = 1.0;
 
 		C_cap_operation = C_cap_density * C_cap_enthalpy;
-		
+
 		return C_cap_operation;
 
 	}
-	
+
 	void
 	VRFCondenserEquipment::VRFOU_TeModification(
 		Real64 const Te_up, // Upper bound of Te during iteration, i.e., Te before reduction [C]
@@ -10325,29 +10325,29 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Te_ItePreci; // Precision of iterations for Te [C]he superheat area [C]
 		Real64 Tfs; // Temperature of the air at the coil surface [C]]
 		Real64 Tsuction; // VRF compressor suction refrigerant temperature [Pa]
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "VRFOU_TeModification" );
-		
+
 		// variable initializations
 		TUListNum = this->ZoneTUListPtr;
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue;
 		RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue;
 		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
-		
+
 		//Initialization of Te iterations (Label11)
 		NumTeIte = 1;
 		Te_ItePreci = 0.1;
 		MaxNumTeIte = ( Te_up - Te_low ) / Te_ItePreci + 1; //upper bound and lower bound of Te iterations
 		Te_update = Te_up - Te_ItePreci;
-		
+
 		Label11: ;
 		Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
 		Pipe_h_IU_out = 0;
@@ -10355,25 +10355,25 @@ namespace HVACVariableRefrigerantFlow {
 		Pipe_m_ref_i = 0;
 		Pipe_SH_merged = 0;
 		Pe_update = GetSatPressureRefrig( this->RefrigerantName, Te_update, RefrigerantIndex, RoutineName );
-		
+
 		// Re-calculate total refrigerant flow rate, with updated SH
 		for ( int NumTU = 1; NumTU <= NumTUInList; NumTU++ ){
 			if( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) > 0  ) {
 				TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU );
 				CoolCoilIndex = VRFTU( TUIndex ).CoolCoilIndex;
-				
+
 				// The IU coil surface temperature should be the same.
 				Tfs = Te_up + ( this->C3Te * pow_2( DXCoil( CoolCoilIndex ).ActualSH ) + this->C2Te * DXCoil( CoolCoilIndex ).ActualSH + this->C1Te );
-				
+
 				// SH_IU_update is the updated SH for a specific IU
 				if( this->C3Te == 0 )
 					SH_IU_update = -( this->C1Te - Tfs + Te_update ) / this->C2Te;
 				else
 					SH_IU_update = ( - this->C2Te + std::pow( ( pow_2( this->C2Te ) - 4 * ( this->C1Te - Tfs + Te_update ) * this->C3Te) , 0.5 ) ) / ( 2 * this->C3Te );
-				
+
 				RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, Pe_update, RefrigerantIndex, RoutineName );
 				Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig( this->RefrigerantName, max( RefTSat, Te_update + SH_IU_update ), Pe_update, RefrigerantIndex, RoutineName ); // hB_i for the IU
-			
+
 				if( Pipe_h_IU_out_i > Pipe_h_IU_in ) {
 					Pipe_m_ref_i = ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) <= 0.0 ) ? 0.0 : ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) / ( Pipe_h_IU_out_i - Pipe_h_IU_in ) );
 					Pipe_m_ref = Pipe_m_ref + Pipe_m_ref_i;
@@ -10388,12 +10388,12 @@ namespace HVACVariableRefrigerantFlow {
 		} else {
 			Pipe_SH_merged = this->SH;
 			RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, Pe_update, RefrigerantIndex, RoutineName );
-			Pipe_h_IU_out = GetSupHeatEnthalpyRefrig( this->RefrigerantName, max( RefTSat, Te_update + Pipe_SH_merged ), Pe_update, RefrigerantIndex, RoutineName );	
+			Pipe_h_IU_out = GetSupHeatEnthalpyRefrig( this->RefrigerantName, max( RefTSat, Te_update + Pipe_SH_merged ), Pe_update, RefrigerantIndex, RoutineName );
 		}
 
 		// Re-calculate piping loss
 		this->VRFOU_PipeLossC( Pipe_m_ref, Pe_update, Pipe_h_IU_out, Pipe_SH_merged, OutdoorDryBulb, Pipe_Q, Pipe_DeltP, Pipe_h_comp_in );
-		
+
 		Tsuction = GetSatTemperatureRefrig( this->RefrigerantName, max( min( Pe_update - Pipe_DeltP, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 
 		if( ( abs( Tsuction - Te_low ) > 0.5 ) && ( Te_update < Te_up ) && ( Te_update > Te_low ) && ( NumTeIte < MaxNumTeIte ) ){
@@ -10401,7 +10401,7 @@ namespace HVACVariableRefrigerantFlow {
 			NumTeIte = NumTeIte + 1;
 			goto Label11;
 		}
-		
+
 		if( abs( Tsuction - Te_low ) > 0.5 ) {
 			NumTeIte = 999;
 			Tsuction = Te_low;
@@ -10410,7 +10410,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 	}
-	
+
 	void
 	VRFCondenserEquipment::VRFOU_CompSpd(
 		Real64 const Q_req, // Required capacity [W]
@@ -10466,33 +10466,33 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_comp_in; // Refrigerant temperature at compressor inlet (after piping loss) [C]
 		Array1D< Real64 > CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
 		Array1D< Real64 > CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "VRFOU_CompSpd" );
-		
+
 		// variable initializations: component index
 		TUListNum = this->ZoneTUListPtr;
 		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue;
 		RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue;
-		
+
 		// variable initializations: compressor
 		NumOfCompSpdInput = this->CompressorSpeed.size();
 		CompEvaporatingPWRSpd.dimension( NumOfCompSpdInput );
 		CompEvaporatingCAPSpd.dimension( NumOfCompSpdInput );
-		
+
 		// variable initializations: system operational parameters
 		P_suction = GetSatPressureRefrig( this->RefrigerantName, T_suction, RefrigerantIndex, RoutineName );
 		T_comp_in = GetSupHeatTempRefrig( this->RefrigerantName, max( min( P_suction, RefPHigh ), RefPLow ), h_comp_in, T_suction + 3, T_suction + 30, RefrigerantIndex, RoutineName );
 		SH_Comp = T_comp_in - T_suction;
-		
+
 		//Calculate capacity modification factor
 		C_cap_operation = this->VRFOU_CapModFactor( h_comp_in, h_IU_evap_in, max( min( P_suction, RefPHigh ), RefPLow ), T_suction + SH_Comp, T_suction + 8, T_discharge - 5 );
 
@@ -10500,74 +10500,74 @@ namespace HVACVariableRefrigerantFlow {
 		// Capacity to meet is for evaporator
 
 			Q_evap_req = Q_req;
-		
+
 			for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ){
 			//Iteration to find the VRF speed that can meet the required load, Iteration DoName1
-				
+
 				CompEvaporatingPWRSpd( CounterCompSpdTemp ) = this->RatedCompPower * CurveValue( this->OUCoolingPWRFT( CounterCompSpdTemp ), T_discharge, T_suction );
 				CompEvaporatingCAPSpd( CounterCompSpdTemp ) = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( CounterCompSpdTemp ), T_discharge, T_suction );
-				
+
 				if( Q_evap_req * C_cap_operation <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
 				// Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
-				
+
 					if( CounterCompSpdTemp > 1 ){
-					
+
 						CompSpdLB = CounterCompSpdTemp - 1;
 						CompSpdUB = CounterCompSpdTemp;
-						
+
 						CompSpdActual = this->CompressorSpeed( CompSpdLB ) + ( this->CompressorSpeed( CompSpdUB ) - this->CompressorSpeed( CompSpdLB ) )
 										/ ( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) * ( Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
-					
+
 					} else {
 						CompSpdActual = this->CompressorSpeed( 1 ) * ( Q_evap_req * C_cap_operation ) / CompEvaporatingCAPSpd( 1 );
 					}
-					
+
 					break; //EXIT DoName1
 				}
 			} // End: Iteration DoName1
-			
+
 			if( CounterCompSpdTemp > NumOfCompSpdInput ) {
 				CompSpdActual = this->CompressorSpeed( NumOfCompSpdInput );
 			}
-		
+
 		} else {
 		// Capacity to meet is for condenser
-		
+
 			Q_cond_req = Q_req;
 
 			for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ){
 			//Iteration to find the VRF speed that can meet the required load, Iteration DoName1
-				
+
 				CompEvaporatingPWRSpd( CounterCompSpdTemp ) = this->RatedCompPower * CurveValue( this->OUCoolingPWRFT( CounterCompSpdTemp ), T_discharge, T_suction );
 				CompEvaporatingCAPSpd( CounterCompSpdTemp ) = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( CounterCompSpdTemp ), T_discharge, T_suction );
-				
+
 				Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd( CounterCompSpdTemp );
 
 				if( Q_evap_req * C_cap_operation <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
 				// Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
-				
+
 					if( CounterCompSpdTemp > 1 ){
-					
+
 						CompSpdLB = CounterCompSpdTemp - 1;
 						CompSpdUB = CounterCompSpdTemp;
-						
+
 						CompSpdActual = this->CompressorSpeed( CompSpdLB ) + ( this->CompressorSpeed( CompSpdUB ) - this->CompressorSpeed( CompSpdLB ) )
 										/ ( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) * ( Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
-					
+
 					} else {
 						CompSpdActual = this->CompressorSpeed( 1 ) * ( Q_evap_req * C_cap_operation ) / CompEvaporatingCAPSpd( 1 );
 					}
-					
+
 					break; //EXIT DoName1
 				}
 			} // End: Iteration DoName1
-			
+
 			if( CounterCompSpdTemp > NumOfCompSpdInput ) {
 				CompSpdActual = this->CompressorSpeed( NumOfCompSpdInput );
 			}
-			
+
 		}
-		
+
 	}
 
 	void
@@ -10624,64 +10624,64 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 T_comp_in; // Refrigerant temperature at compressor inlet (after piping loss) [C]
 		Array1D< Real64 > CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
 		Array1D< Real64 > CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "VRFOU_CompCap" );
-		
+
 		// variable initializations: component index
 		TUListNum = this->ZoneTUListPtr;
 		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue;
 		RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue;
-		
+
 		// variable initializations: compressor
 		NumOfCompSpdInput = this->CompressorSpeed.size();
 		CompEvaporatingPWRSpd.dimension( NumOfCompSpdInput );
 		CompEvaporatingCAPSpd.dimension( NumOfCompSpdInput );
 
 		for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ){
-			
+
 			CompEvaporatingPWRSpd( CounterCompSpdTemp ) = this->RatedCompPower * CurveValue( this->OUCoolingPWRFT( CounterCompSpdTemp ), T_discharge, T_suction );
 			CompEvaporatingCAPSpd( CounterCompSpdTemp ) = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( CounterCompSpdTemp ), T_discharge, T_suction );
-			
+
 			if( CompSpdActual <= this->CompressorSpeed( CounterCompSpdTemp ) ) {
 			// Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
-			
+
 				if( CounterCompSpdTemp > 1 ){
-				
+
 					CompSpdLB = CounterCompSpdTemp - 1;
 					CompSpdUB = CounterCompSpdTemp;
-					
+
 					Q_evap_sys = CompEvaporatingCAPSpd( CompSpdLB ) + ( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) * ( CompSpdActual - this->CompressorSpeed( CompSpdLB )) / ( this->CompressorSpeed( CompSpdUB ) - this->CompressorSpeed( CompSpdLB ) );
 					Ncomp = CompEvaporatingPWRSpd( CompSpdLB ) + ( CompEvaporatingPWRSpd( CompSpdUB ) - CompEvaporatingPWRSpd( CompSpdLB ) ) * ( CompSpdActual - this->CompressorSpeed( CompSpdLB )) / ( this->CompressorSpeed( CompSpdUB ) - this->CompressorSpeed( CompSpdLB ) );
-				
-				
+
+
 				} else {
 					Q_evap_sys = CompEvaporatingCAPSpd( 1 ) * CompSpdActual / this->CompressorSpeed( 1 );
 					Ncomp = CompEvaporatingPWRSpd( 1 ) * CompSpdActual / this->CompressorSpeed( 1 );
 				}
-				
+
 				break;
 			}
 		}
-		
+
 		if( CounterCompSpdTemp > NumOfCompSpdInput ) {
 			Q_evap_sys = CompEvaporatingCAPSpd( NumOfCompSpdInput ) ;
 			Ncomp = CompEvaporatingPWRSpd( NumOfCompSpdInput );
 		}
-		
+
 		// variable initializations: system operational parameters
 		P_suction = GetSatPressureRefrig( this->RefrigerantName, T_suction, RefrigerantIndex, RoutineName );
 		T_comp_in = GetSupHeatTempRefrig( this->RefrigerantName, max( min( P_suction, RefPHigh ), RefPLow ), h_comp_in, T_suction + 3, T_suction + 30, RefrigerantIndex, RoutineName );
 		SH_Comp = T_comp_in - T_suction;
-		
+
 		//Calculate capacity modification factor
 		C_cap_operation = this->VRFOU_CapModFactor( h_comp_in, h_IU_evap_in, max( min( P_suction, RefPHigh ), RefPLow ), T_suction + SH_Comp, T_suction + 8, T_discharge - 5 );
 		C_cap_operation = min( 1.5, max( 0.5, C_cap_operation ));
@@ -10787,14 +10787,14 @@ namespace HVACVariableRefrigerantFlow {
 		Array1D< Real64 > CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
 		Array1D< Real64 > CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 		Array1D< Real64 > Par( 3 ); // Array for the parameters [-]
-		
-		
+
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "VRFOU_CalcCompC" );
 
@@ -10803,57 +10803,57 @@ namespace HVACVariableRefrigerantFlow {
 		CompEvaporatingPWRSpd.dimension( NumOfCompSpdInput );
 		CompEvaporatingCAPSpd.dimension( NumOfCompSpdInput );
 		Q_evap_req = TU_load + Pipe_Q;
-		
+
 		TUListNum = this->ZoneTUListPtr;
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue;
 		RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue;
 		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
-		
+
 		Modifi_SH = Pipe_T_comp_in - T_suction;
-		
+
 		// set condenser entering air conditions (Outdoor air conditions)
 		Real64 OutdoorDryBulb = OutDryBulbTemp;
 		Real64 OutdoorHumRat = OutHumRat;
 		Real64 OutdoorPressure = OutBaroPress;
 		Real64 RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
-		
+
 		//Calculate capacity modification factor
 		C_cap_operation = this->VRFOU_CapModFactor( Pipe_h_comp_in, Pipe_h_IU_in, max( min( P_suction, RefPHigh ), RefPLow ), T_suction + Modifi_SH, T_suction + 8, T_discharge - 5 );
 
 		for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ){
 		//Iteration to find the VRF speed that can meet the required load, Iteration DoName1
-			
+
 			CompEvaporatingPWRSpd( CounterCompSpdTemp ) = this->RatedCompPower * CurveValue( this->OUCoolingPWRFT( CounterCompSpdTemp ), T_discharge, T_suction );
 			CompEvaporatingCAPSpd( CounterCompSpdTemp ) = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( CounterCompSpdTemp ), T_discharge, T_suction );
-			
+
 			if( Q_evap_req * C_cap_operation <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) ) {
 			// Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
-			
+
 				if( CounterCompSpdTemp > 1 ){// Since: if( CounterCompSpdTemp <= 1 )
 					//Compressor speed > min
-				
+
 					CompSpdLB = CounterCompSpdTemp - 1;
 					CompSpdUB = CounterCompSpdTemp;
-					
+
 					CompSpdActual = this->CompressorSpeed( CompSpdLB ) +( this->CompressorSpeed( CompSpdUB ) - this->CompressorSpeed( CompSpdLB ) )
 									/ ( CompEvaporatingCAPSpd( CompSpdUB ) - CompEvaporatingCAPSpd( CompSpdLB ) ) * ( Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd( CompSpdLB ) );
-					
+
 					Ncomp = CompEvaporatingPWRSpd( CompSpdLB ) + ( CompEvaporatingPWRSpd( CompSpdUB ) - CompEvaporatingPWRSpd( CompSpdLB ) ) /
 								  ( this->CompressorSpeed( CompSpdUB ) - this->CompressorSpeed( CompSpdLB ) ) *
 								  ( CompSpdActual - this->CompressorSpeed( CompSpdLB ) );
 					break; //EXIT DoName1
-				
+
 				} else {
 				// Compressor runs at the min speed
 				// Low Load Modification Algorithm for cooling (IU side modification)
-				
+
 					//Initialization of NumIteCcap iterations (Label13)
 					Pipe_Q0 = Pipe_Q;
 					C_cap_operation0 = C_cap_operation;
 					T_discharge_new = T_discharge;
 					NumIteCcap = 1;
-					
+
 					//Update the C_cap_operation
 					Label13: ;
 					Q_evap_req = TU_load + Pipe_Q0; //Pipe_Q0 is updated during the iteration
@@ -10862,18 +10862,18 @@ namespace HVACVariableRefrigerantFlow {
 					Par( 1 ) = T_discharge_new;
 					Par( 2 ) = Q_evap_req * C_cap_operation0 / this->RatedEvapCapacity;  // 150130 To be confirmed
 					Par( 3 ) = this->OUCoolingCAPFT( CounterCompSpdTemp );
-					
+
 					// Update Te' (SmallLoadTe) to meet the required evaporator capacity
 					MinOutdoorUnitTe = 6;
 					P_discharge = GetSatPressureRefrig( this->RefrigerantName, T_discharge, RefrigerantIndex, RoutineName );
-					
+
 					MinRefriPe = GetSatPressureRefrig( this->RefrigerantName, -15, RefrigerantIndex, RoutineName );
 					MinOutdoorUnitPe = max( P_discharge - this->CompMaxDeltaP, MinRefriPe );
 					MinOutdoorUnitTe = GetSatTemperatureRefrig( this->RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
-					
+
 					SolveRoot( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par ); // SmallLoadTe is the updated Te'
 					if( SolFla < 0 ) SmallLoadTe = 6; //MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
-					
+
 					//Get an updated Te corresponding to the updated Te'
 					//VRFOU_TeModification( VRFCond, this->EvaporatingTemp, SmallLoadTe, Pipe_h_IU_in, OutdoorDryBulb, Pipe_Te_assumed, Pipe_Pe_assumed, Pipe_m_ref, Pipe_SH_merged );
 					{
@@ -10883,34 +10883,34 @@ namespace HVACVariableRefrigerantFlow {
 					NumIteTe = 1;
 					MaxNumIteTe = ( this->EvaporatingTemp - SmallLoadTe ) / 0.1 + 1; //upper bound and lower bound of Te iterations
 					Pipe_Te_assumed = this->EvaporatingTemp - 0.1;
-					
+
 					Label11: ;
 					Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
-					
+
 					// Re-calculate Piping loss due to the Te and SH updates
 					Pipe_h_IU_out = 0;
 					Pipe_h_IU_out_i = 0;
 					Pipe_m_ref_i = 0;
 					Pipe_SH_merged = 0;
 					Pipe_Pe_assumed = GetSatPressureRefrig( this->RefrigerantName, Pipe_Te_assumed, RefrigerantIndex, RoutineName );
-					
+
 					// Re-calculate total refrigerant flow rate, with updated SH
 					for ( int NumTU = 1; NumTU <= NumTUInList; NumTU++ ){
 						if( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) > 0  ) {
 							TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU );
 							CoolCoilIndex = VRFTU( TUIndex ).CoolCoilIndex;
-							
+
 							Tfs = this->EvaporatingTemp +( this->C3Te * pow_2( DXCoil( CoolCoilIndex ).ActualSH ) + this->C2Te * DXCoil( CoolCoilIndex ).ActualSH + this->C1Te );
-							
+
 							// Modifi_SH is the updated SH for a specific IU
 							if( this->C3Te == 0 )
 								Modifi_SHin = -( this->C1Te - Tfs + Pipe_Te_assumed ) /this->C2Te; //150130 Modifi_SH>Modifi_SHin
 							else
 								Modifi_SHin = ( -this->C2Te + std::pow( ( pow_2( this->C2Te ) - 4 * ( this->C1Te - Tfs + Pipe_Te_assumed ) * this->C3Te) , 0.5 ) ) / ( 2 * this->C3Te );
-							
+
 							RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, max( min( Pipe_Pe_assumed, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 							Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig( this->RefrigerantName, max( RefTSat, Pipe_Te_assumed + Modifi_SHin ), max( min( Pipe_Pe_assumed, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
-						
+
 							if( Pipe_h_IU_out_i > Pipe_h_IU_in ) {
 								Pipe_m_ref_i = ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) <= 0.0 ) ? 0.0 : ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) / ( Pipe_h_IU_out_i - Pipe_h_IU_in ) );
 								Pipe_m_ref = Pipe_m_ref + Pipe_m_ref_i;
@@ -10930,7 +10930,7 @@ namespace HVACVariableRefrigerantFlow {
 
 					// Re-calculate piping loss
 					this->VRFOU_PipeLossC( Pipe_m_ref, max( min( Pipe_Pe_assumed, RefPHigh ), RefPLow ), Pipe_h_IU_out, Pipe_SH_merged, OutdoorDryBulb, Pipe_Q, Pipe_DeltP, Pipe_h_comp_in );
-					
+
 					T_suction = GetSatTemperatureRefrig( this->RefrigerantName, max( min( Pipe_Pe_assumed - Pipe_DeltP, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 
 					if( ( abs( T_suction - SmallLoadTe ) > 0.5 ) && ( Pipe_Te_assumed < this->EvaporatingTemp ) && ( Pipe_Te_assumed > SmallLoadTe ) && ( NumIteTe < MaxNumIteTe ) ){
@@ -10938,7 +10938,7 @@ namespace HVACVariableRefrigerantFlow {
 						NumIteTe = NumIteTe + 1;
 						goto Label11;
 					}
-					
+
 					if( abs( T_suction - SmallLoadTe ) > 0.5 ) {
 						NumIteTe = 999;
 						T_suction = SmallLoadTe;
@@ -10947,25 +10947,25 @@ namespace HVACVariableRefrigerantFlow {
 					}
 					//Iteration_Te End
 					}
-					
+
 					//Perform iteration to calculate Pipe_T_comp_in( Te'+SH' )
 					Pipe_T_comp_in = GetSupHeatTempRefrig( this->RefrigerantName, max( min( Pipe_Pe_assumed - Pipe_DeltP, RefPHigh ), RefPLow ), Pipe_h_comp_in, T_suction + 3, T_suction + 30,  RefrigerantIndex, RoutineName );
-					
+
 					Modifi_SH = Pipe_T_comp_in - T_suction;
 					P_suction = Pipe_Pe_assumed - Pipe_DeltP;
 					OUCondHeatRelease = TU_load + Pipe_Q + Ncomp; //Pipe_Q is changed when T_suction is changed -> Tc is also changed
-					
+
 					// *VRF OU Tc calculations
 					this->VRFOU_TeTc( FlagCondMode, OUCondHeatRelease, this->SC, this->OUAirFlowRate * RhoAir, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, T_discharge );
 					T_discharge = min( MaxOutdoorUnitTc, T_discharge );
-					
+
 					// *Calculate capacity modification factor
 					C_cap_operation = this->VRFOU_CapModFactor( Pipe_h_comp_in, Pipe_h_IU_in, max( min( P_suction, RefPHigh ), RefPLow ), T_suction + Modifi_SH, T_suction + 8, T_discharge - 5 );
-					
+
 					Cap_Eva0 = ( TU_load + Pipe_Q ) * C_cap_operation; //New Pipe_Q & C_cap_operation
 					Cap_Eva1 = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( CounterCompSpdTemp ), T_discharge, T_suction );  //New Tc
 					CapDiff = abs( Cap_Eva1 - Cap_Eva0 );
-		
+
 					if( ( CapDiff > ( Tolerance * Cap_Eva0 ) ) && ( NumIteCcap < 30 ) ) {
 						Pipe_Q0 = Pipe_Q;
 						C_cap_operation0 = C_cap_operation;
@@ -10973,21 +10973,21 @@ namespace HVACVariableRefrigerantFlow {
 						NumIteCcap = NumIteCcap + 1;
 						goto Label13;
 					}
-						
+
 					if( CapDiff > ( Tolerance * Cap_Eva0 ) ) NumIteCcap = 999;
-					
+
 					Ncomp = this->RatedCompPower * CurveValue( this->OUCoolingPWRFT( CounterCompSpdTemp ), T_discharge, T_suction );
-					
+
 					this->CondensingTemp = T_discharge; // OU Tc' is updated due to OUCondHeatRelease updates, which is caused by IU Te' updates during low load conditions
-					
+
 					break; //EXIT DoName1
-	
+
 				} // End: if( CounterCompSpdTemp <= 1 ) Low load modification
-				
+
 			} // End: if( Q_evap_req <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) )
-			
+
 		} // End: Iteration DoName1
-		
+
 		if( CounterCompSpdTemp > NumOfCompSpdInput ) {
 		// Required load is beyond the maximum system capacity
 			CompEvaporatingCAPSpd( NumOfCompSpdInput ) = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( NumOfCompSpdInput ), T_discharge, T_suction );
@@ -10995,7 +10995,7 @@ namespace HVACVariableRefrigerantFlow {
 			CompSpdActual = this->CompressorSpeed( NumOfCompSpdInput );
 			Ncomp = CompEvaporatingPWRSpd( NumOfCompSpdInput );
 		}
-		
+
 	}
 
 	void
@@ -11078,13 +11078,13 @@ namespace HVACVariableRefrigerantFlow {
 		Array1D< Real64 > CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
 		Array1D< Real64 > CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 		Array1D< Real64 > Par( 3 ); // Array for the parameters [-]
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
-		
+
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "VRFOU_CalcCompH" );
 
@@ -11093,22 +11093,22 @@ namespace HVACVariableRefrigerantFlow {
 		CompEvaporatingPWRSpd.dimension( NumOfCompSpdInput );
 		CompEvaporatingCAPSpd.dimension( NumOfCompSpdInput );
 		Q_evap_req = TU_load + Pipe_Q - Ncomp;
-		
+
 		TUListNum = this->ZoneTUListPtr;
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue;
 		RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue;
 		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
-		
+
 		//Calculate capacity modification factor
 		MinOutdoorUnitPe = GetSatPressureRefrig( this->RefrigerantName, T_suction, RefrigerantIndex, RoutineName );
 		RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 		Pipe_h_comp_in = GetSupHeatEnthalpyRefrig( this->RefrigerantName, max( RefTSat, T_suction + this->SH ), max( min( MinOutdoorUnitPe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 		C_cap_operation = this->VRFOU_CapModFactor( Pipe_h_comp_in, Pipe_h_out_ave, max( min( MinOutdoorUnitPe, RefPHigh ), RefPLow ), T_suction + this->SH, T_suction + 8, IUMaxCondTemp - 5 );
-		
+
 		// Perform iterations to find the compressor speed that can meet the required heating load, Iteration DoName2
 		for ( CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++ ) {
-		
+
 			CompEvaporatingPWRSpd( CounterCompSpdTemp ) = this->RatedCompPower * CurveValue( this->OUCoolingPWRFT( CounterCompSpdTemp ), T_discharge, T_suction );
 			CompEvaporatingCAPSpd( CounterCompSpdTemp ) = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( CounterCompSpdTemp ), T_discharge, T_suction );
 
@@ -11126,17 +11126,17 @@ namespace HVACVariableRefrigerantFlow {
 					Ncomp = CompEvaporatingPWRSpd( CompSpdLB ) + ( CompEvaporatingPWRSpd( CompSpdUB ) - CompEvaporatingPWRSpd( CompSpdLB ) ) /
 								  ( this->CompressorSpeed( CompSpdUB ) - this->CompressorSpeed( CompSpdLB ) ) *
 								  ( CompSpdActual - this->CompressorSpeed( CompSpdLB ) );
-					
+
 					break; // EXIT DoName2
-					
+
 				} else {
 				//Compressor runs at the min speed
 				//Low Load Modifications
-				
+
 					NumIteCcap = 1;
 					Label19: ;
 					Q_evap_req = max( 0.0, TU_load + Pipe_Q - Ncomp );
-					
+
 					// Update Te'( SmallLoadTe ) to meet the required evaporator capacity
 					CompSpdActual = this->CompressorSpeed( 1 );
 					Par( 1 ) = T_discharge;
@@ -11145,9 +11145,9 @@ namespace HVACVariableRefrigerantFlow {
 
 					SolveRoot( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par );
 					if( SolFla < 0 ) SmallLoadTe = MinOutdoorUnitTe;
-					
+
 					T_suction = SmallLoadTe;
-					
+
 					//Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations
 					if( this->C3Te == 0 )
 						Modifi_SH = -( this->C1Te - Tfs + T_suction ) / this->C2Te;
@@ -11155,7 +11155,7 @@ namespace HVACVariableRefrigerantFlow {
 						Modifi_SH = ( -this->C2Te + std::pow( ( pow_2( this->C2Te ) - 4 * ( this->C1Te - Tfs + T_suction ) * this->C3Te ), 0.5 ) ) / ( 2*this->C3Te );
 
 					Modifi_Pe = GetSatPressureRefrig( this->RefrigerantName, T_suction, RefrigerantIndex, RoutineName );
-					
+
 					//Calculate capacity modification factor
 					RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, max( min( Modifi_Pe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 					Pipe_h_comp_in = GetSupHeatEnthalpyRefrig( this->RefrigerantName, max( RefTSat, T_suction + Modifi_SH ), max( min( Modifi_Pe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
@@ -11164,21 +11164,21 @@ namespace HVACVariableRefrigerantFlow {
 					Cap_Eva0 = Q_evap_req * C_cap_operation;
 					Cap_Eva1 = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue( this->OUCoolingCAPFT( CounterCompSpdTemp ), T_discharge, T_suction );
 					CapDiff = abs( Cap_Eva1 - Cap_Eva0 );
-		
+
 					if( ( CapDiff > ( Tolerance * Cap_Eva0 ) ) && ( NumIteCcap < 30 ) ) {
 						NumIteCcap = NumIteCcap + 1;
 						goto Label19;
 					}
 					if( CapDiff >( Tolerance*Cap_Eva0 ) ) NumIteCcap = 999;
-					
+
 					Ncomp = this->RatedCompPower * CurveValue( this->OUCoolingPWRFT( CounterCompSpdTemp ), T_discharge, T_suction );
-							
+
 					break; // EXIT DoName2
-					
+
 				} // End: if( CounterCompSpdTemp <= 1 ) Low load modification
-				
+
 			} //End: if( Q_evap_req <= CompEvaporatingCAPSpd( CounterCompSpdTemp ) )
-		
+
 		} // End: Iteration DoName2
 
 		if( CounterCompSpdTemp > NumOfCompSpdInput ) {
@@ -11188,9 +11188,9 @@ namespace HVACVariableRefrigerantFlow {
 			CompSpdActual = this->CompressorSpeed( NumOfCompSpdInput );
 			Ncomp = CompEvaporatingPWRSpd( NumOfCompSpdInput );
 		}
-		
+
 	}
-	
+
 	void
 	VRFCondenserEquipment::VRFHR_OU_HR_Mode(
 		Real64 const h_IU_evap_in, // enthalpy of IU evaporator at inlet [kJ/kg]
@@ -11213,7 +11213,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 & Ncomp // compressor power [W]
 	)
 	{
-	
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rongpeng Zhang, LBNL
 		//       DATE WRITTEN   Jan 2016
@@ -11248,7 +11248,7 @@ namespace HVACVariableRefrigerantFlow {
 		using FluidProperties::RefrigData;
 		using General::SolveRoot;
 		using General::TrimSigDigits;
-		
+
 		Array1D< Real64 > Par( 7 ); // Parameters passed to RegulaFalsi
 		int const FlagCondMode( 0 ); // Flag for running as condenser [-]
 		int const FlagEvapMode( 1 ); // Flag for running as evaporator [-]
@@ -11276,20 +11276,20 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Tfs; // temperature of the air at coil surface [C]
 		Real64 Tolerance( 0.05 ); // Tolerance for condensing temperature calculation [C}
 		Real64 Tsuction_new; // VRF compressor suction refrigerant temperature (new) [C]
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "VRFHR_OU_Mode" );
-		
+
 		// Initialization: operational parameters
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat);
 		m_air_rated = this->OUAirFlowRate * RhoAir;
 		C_OU_HexRatio = this->HROUHexRatio;
-		
+
 		// Initializations: component index
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue;
 		RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue;
-		
+
 		// **Q_OU: HR mode determination
 		//	 HRMode-1. Cooling Only
 		//	 HRMode-2. Cooling Dominant w/o HR Loss
@@ -11299,11 +11299,11 @@ namespace HVACVariableRefrigerantFlow {
 		//	 HRMode-6. Heating Only
 		//	 HRMode-7. OU Hex not running
 		{
-			
+
 			bool FlagMode5; // true if compressor speed satisfying IU cooling load < that satisfying IU heating load
 			bool FlagToLower; // true if To-5 is lower than the Tsuction determined by IU part
 			Real64 temp_Tsuction;
-		
+
 			// Determine FlagToLower
 			if( OutDryBulbTemp - this->DiffOUTeTo < Tsuction ) {
 				temp_Tsuction = OutDryBulbTemp - this->DiffOUTeTo;
@@ -11312,18 +11312,18 @@ namespace HVACVariableRefrigerantFlow {
 				temp_Tsuction = Tsuction;
 				FlagToLower = false;
 			}
-			
+
 			// Calculate compressor speed satisfying IU loads: rps1_evap & rps2_cond
 			this->VRFOU_CompSpd( Q_c_TU_PL, FlagEvapMode, temp_Tsuction, Tdischarge, h_IU_evap_in, h_IU_PLc_out, rps1_evap );
 			this->VRFOU_CompSpd( Q_h_TU_PL, FlagCondMode, temp_Tsuction, Tdischarge, h_IU_evap_in, h_IU_PLc_out, rps2_cond );
-			
+
 			// Determine FlagMode5
 			if( rps1_evap <= rps2_cond ) {
 				FlagMode5 = true;
 			} else {
 				FlagMode5 = false;
 			}
-			
+
 			// Determine HR Mode
 			if( FlagMode5 ){
 				HRMode = 5;
@@ -11332,39 +11332,39 @@ namespace HVACVariableRefrigerantFlow {
 				else
 					HRMode_sub = 2;
 			} else {
-				
+
 				if( FlagToLower )
 					HRMode = 3; //Mode 3&4 share the same logics below
 				else
 					HRMode = 2;
 			}
-			
+
 			this->VRFOperationSimPath = HRMode * 10 + HRMode_sub;
 		}
-		
+
 		// **Simulate outdoor unit and compressor performance, including
 		// (1) compressor spd/power (2) OU hex capacity (3) OU fan flow rate and power
 		// Tsuction/Te may also need updates
 		if ( HRMode == 5 && HRMode_sub == 2 ){
-		
+
 				CompSpdActual = rps2_cond; //constant in this mode
 				// Tsuction = Te'_iu < OutDryBulbTemp – 5; constant in this mode
-				
+
 				//compressor: Ncomp & Q_c_tot
 				this->VRFOU_CompCap( CompSpdActual, Tsuction, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp );
-				
+
 				//OU hex capacity
 				Q_c_OU = Q_c_tot - Q_c_TU_PL;
 				Q_h_OU = 0;
-				
+
 				//OU fan flow rate and power
 				m_air_evap = this->VRFOU_FlowRate( FlagEvapMode, Tsuction, this->SH, Q_c_OU, OutDryBulbTemp, OutHumRat );
 				m_air_evap_rated = m_air_rated;
 				N_fan_OU_evap = this->RatedOUFanPower * m_air_evap / m_air_evap_rated;
 				N_fan_OU_cond = 0;
-				
+
 		} else if ( HRMode == 5 && HRMode_sub == 1 ){
-			
+
 			//local parameters
 			int Counter_Iter_Ncomp;
 			bool Flag_Iter_Ncomp( true ); //Flag to perform iterations
@@ -11372,81 +11372,81 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 Ncomp_new;
 			Real64 Q_c_tot_temp;
 			Real64 Q_c_OU_temp;
-			
+
 			//===**Ncomp Iterations
-			
+
 			//initialization: Ncomp_ini, CompSpdActual
 			Counter_Iter_Ncomp = 1;
 			CompSpdActual = rps2_cond;
 			Tsuction_new = OutDryBulbTemp - this->DiffOUTeTo;
 			Pipe_Q_c_new = Pipe_Q_c;
-			
+
 			this->VRFOU_CompCap( CompSpdActual, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp_ini );
-			
+
 			while( Flag_Iter_Ncomp ){
-			
+
 				Q_c_tot_temp = Q_h_TU_PL - Ncomp_ini; //Q_h_OU = 0
 				Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
-				
+
 				// Tsuction_new updated based on OU evaporator air-side calculations (Tsuction_new < To)
 				m_air_evap_rated = m_air_rated;
 				this->VRFOU_TeTc( FlagEvapMode, Q_c_OU_temp, this->SH, m_air_evap_rated, OutDryBulbTemp, OutHumRat, OutBaroPress, Tfs, Tsuction_new );
 				Tsuction_new = min( Tsuction_new, Tsuction ); // should be lower than Tsuction_IU
-				
+
 				// Calculate updated rps corresponding to updated Tsuction_new and Q_c_tot_temp
 				this->VRFOU_CompSpd( Q_c_tot_temp, FlagEvapMode, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, CompSpdActual );
-				
+
 				// Calculate Ncomp_new, using updated CompSpdActual and Tsuction_new
 				this->VRFOU_CompCap( CompSpdActual, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_new );
-				
+
 				if( ( abs( Ncomp_new - Ncomp_ini ) > ( Tolerance * Ncomp_ini ) ) && ( Counter_Iter_Ncomp < 30 ) ) {
 					Ncomp_ini = 0.5 * Ncomp_ini + 0.5 * Ncomp_new;
 					Counter_Iter_Ncomp = Counter_Iter_Ncomp + 1;
 					continue;
 				}
-				
+
 				Flag_Iter_Ncomp = false;
-				
+
 			}
-			
+
 			// Ncomp Iterations Update
 			Ncomp = Ncomp_new;
 			Q_c_tot = Q_c_tot_temp;
-			
+
 			if ( Tsuction_new < Tsuction ) {
 				//Need to update the Tsuction, and thus update Te_update & Pipe_Q_c_new.
 				//Iteration continues.
-				
+
 				// temporary parameters
 				Real64 Pe_update;
 				Real64 Pipe_SH_merged;
 				Real64 Pipe_DeltP;
 				Real64 Pipe_h_IU_out;
-				
+
 				// Get an updated Te (Te_update) corresponding to the updated Te' (Tsuction_new). PL_c is re-performed.
 				this->VRFOU_TeModification( this->EvaporatingTemp, Tsuction_new, h_IU_evap_in, OutDryBulbTemp, Te_update, Pe_update, m_ref_IU_evap, Pipe_h_IU_out, Pipe_SH_merged );
-				
+
 				// Re-calculate piping loss, update Pipe_Q_c_new
 				this->VRFOU_PipeLossC( m_ref_IU_evap, Pe_update, Pipe_h_IU_out, Pipe_SH_merged, OutDryBulbTemp, Pipe_Q_c_new, Pipe_DeltP, h_IU_PLc_out );
-				
+
 				Tsuction = Tsuction_new;
 				Pipe_Q_c = Pipe_Q_c_new;
 			}
-			
+
 			//No need to update the Tsuction.
-		
+
 			//===**Ncomp Iteration Ends (Label200)
-			
+
 			//OU hex capacity
 			Q_c_OU = Q_c_tot - Q_c_TU_PL;
 			Q_h_OU = 0;
-			
+
 			//OU fan power
 			N_fan_OU_evap = this->RatedOUFanPower;
 			N_fan_OU_cond = 0;
-			
+
 		} else if ( HRMode == 3 ){ // Mode3 & Mode4 share the same algorithm
-			
+
 			//local parameters
 			Real64 Ncomp_new;
 			Real64 Q_c_tot_temp;
@@ -11454,12 +11454,12 @@ namespace HVACVariableRefrigerantFlow {
 			Real64 Tsuction_new;
 			Real64 Tsuction_LB = OutDryBulbTemp - this->DiffOUTeTo;
 			Real64 Tsuction_HB = Tsuction;
-			
+
 			//compressor speed is fixed in this mode
 			CompSpdActual = rps1_evap; //constant in this mode
 			m_air_evap_rated = m_air_rated * ( 1 - C_OU_HexRatio );
 			m_air_evap = m_air_evap_rated; // may be updated
-			
+
 			//perform iterations to calculate Te at the given compressor speed and operational conditions
 			{
 			Par( 1 ) = VRFTU( TerminalUnitList( this->ZoneTUListPtr ).ZoneTUPtr( 1 ) ).VRFSysNum; //VRFCond;
@@ -11476,73 +11476,73 @@ namespace HVACVariableRefrigerantFlow {
 			// Update Q_c_tot_temp using updated Tsuction_new
 			this->VRFOU_CompCap( CompSpdActual, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_new );
 			Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
-			
+
 			// Iterations_Te Update
 			Ncomp = Ncomp_new;
 			Tsuction = Tsuction_new;
 			Q_c_tot = Q_c_tot_temp;
 			Q_c_OU = Q_c_OU_temp;
 			}
-			
+
 			if( Tsuction >= Tsuction_HB ){
 			// modify m_air_evap to adjust OU evaporator capacity;
 			// update Ncomp, Q_c_OU, m_air_evap
-				
+
 				Tsuction = Tsuction_HB;
-				
+
 				// Q_c_tot
 				this->VRFOU_CompCap( CompSpdActual, Tsuction_new, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp );
 				Q_c_OU = Q_c_tot - Q_c_TU_PL;
-			
+
 				//OU evaporator fan flow rate and power
 				m_air_evap = this->VRFOU_FlowRate( FlagEvapMode, Tsuction, this->SH, Q_c_OU_temp, OutDryBulbTemp, OutHumRat );
-				
+
 			} else {
 				//Need to update Te_update & Pipe_Q_c_new, corresponding to Tsuction update.
-				
+
 				// temporary parameters
 				Real64 Pe_update;
 				Real64 Pipe_SH_merged;
 				Real64 Pipe_DeltP;
 				Real64 Pipe_h_IU_out;
-				
+
 				// Get an updated Te (Te_update) corresponding to the updated Te' (Tsuction_new). PL_c is re-performed.
 				this->VRFOU_TeModification( this->EvaporatingTemp, Tsuction_new, h_IU_evap_in, OutDryBulbTemp, Te_update, Pe_update, m_ref_IU_evap, Pipe_h_IU_out, Pipe_SH_merged );
-				
+
 				// Re-calculate piping loss, update Pipe_Q_c_new
 				this->VRFOU_PipeLossC( m_ref_IU_evap, Pe_update, Pipe_h_IU_out, Pipe_SH_merged, OutDryBulbTemp, Pipe_Q_c_new, Pipe_DeltP, h_IU_PLc_out );
 				Pipe_Q_c = Pipe_Q_c_new;
 			}
-			
+
 			// Q_h_ou
 			Q_h_tot = Q_c_tot + Ncomp;
 			Q_h_OU = Q_h_tot - Q_h_TU_PL;
-			
+
 			//OU condenser fan flow rate and power
 			m_air_cond = this->VRFOU_FlowRate( FlagCondMode, Tdischarge, this->SC, Q_h_OU, OutDryBulbTemp, OutHumRat );
-			
+
 			// OU fan power
 			N_fan_OU_evap = this->RatedOUFanPower * m_air_evap / m_air_rated;
 			N_fan_OU_cond = this->RatedOUFanPower * m_air_cond / m_air_rated;
-			
+
 		} else if ( HRMode == 2 ){
-		
+
 				CompSpdActual = rps1_evap; //constant in this mode
 				// Tsuction = Te'_iu < OutDryBulbTemp – 5; constant in this mode
-				
+
 				//compressor: Ncomp & Q_c_tot
 				this->VRFOU_CompCap( CompSpdActual, Tsuction, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp );
-				
+
 				//OU hex capacity
 				Q_h_tot = Q_c_tot + Ncomp;
 				Q_h_OU = Q_h_tot - Q_h_TU_PL;
 				Q_c_OU = 0;
-				
+
 				//OU fan flow rate and power
 				m_air_cond = this->VRFOU_FlowRate( FlagCondMode, Tdischarge, this->SC, Q_h_OU, OutDryBulbTemp, OutHumRat );
 				N_fan_OU_cond = this->RatedOUFanPower * m_air_cond / m_air_rated;
 				N_fan_OU_evap = 0;
-				
+
 		} else {
 				Ncomp = 0;
 				CompSpdActual = 0;
@@ -11552,37 +11552,37 @@ namespace HVACVariableRefrigerantFlow {
 				N_fan_OU_cond = 0;
 
 		}
-		
+
 		// OU fan power
 		N_fan_OU = N_fan_OU_evap + N_fan_OU_cond;
-		
+
 		// Calculate the m_ref_OU_evap & m_ref_OU_cond, with updated Tsuction
 		{
 			Real64 h_OU_evap_in;  // enthalpy of OU evaporator at inlet [kJ/kg]
 			Real64 h_OU_evap_out; // enthalpy of OU evaporator at outlet [kJ/kg]
 			Real64 h_OU_cond_in;  // enthalpy of OU condenser at inlet [kJ/kg]
 			Real64 h_OU_cond_out; // enthalpy of OU condenser at outlet [kJ/kg]
-			
+
 			Real64 Psuction = GetSatPressureRefrig( this->RefrigerantName, Tsuction, RefrigerantIndex, RoutineName );
-			
+
 			// enthalpy of OU evaporator/condenser inlets and outlets
 			h_OU_evap_in = h_IU_evap_in;
 			h_OU_cond_in = h_comp_out;
 			h_OU_evap_out = GetSupHeatEnthalpyRefrig( this->RefrigerantName, Tsuction + this->SH, max( min( Psuction, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 			h_OU_cond_out = GetSatEnthalpyRefrig( this->RefrigerantName, Tdischarge - this->SC, 0.0, RefrigerantIndex, RoutineName );
-			
+
 			if (( Q_c_OU == 0 ) || ( h_OU_evap_out - h_OU_evap_in ) <= 0 ){
 				m_ref_OU_evap = 0;
 			} else {
 				m_ref_OU_evap = Q_c_OU / ( h_OU_evap_out - h_OU_evap_in );
 			}
-			
+
 			if (( Q_h_OU == 0 ) || ( h_OU_cond_in - h_OU_cond_out <= 0 )) {
 				m_ref_OU_cond = 0;
 			} else {
 				m_ref_OU_cond = Q_h_OU / ( h_OU_cond_in - h_OU_cond_out );
 			}
-			
+
 			// Calculate the parameters of refrigerant at compressor inlet, which is
 			// a combination of refrigerant from IU evaporators and OU evaporator
 			if (( m_ref_OU_evap + m_ref_IU_evap ) > 0 ){
@@ -11590,7 +11590,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 	}
-	
+
 	void
 	VRFCondenserEquipment::VRFOU_PipeLossC(
 		Real64 const Pipe_m_ref, // Refrigerant mass flow rate [kg/s]
@@ -11613,7 +11613,7 @@ namespace HVACVariableRefrigerantFlow {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Determine the piping loss of the refrigerant, including both the heat loss and pressure drop.
 		// This happens at VRF cooling mode, within the Main Pipe connecting Outdoor Unit to Indoor Units.
-		
+
 		// METHODOLOGY EMPLOYED:
 		// Use a physics based piping loss model.
 
@@ -11632,14 +11632,14 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		
+
 		int TUListNum; // index to TU List
 		int TUIndex; // Index to terminal unit
 		int CoilIndex; // index to coil in terminal unit
 		int NumTUInList; // number of terminal units is list
 		int NumIUActivated; // number of the used indoor units [-]
 		int RefrigerantIndex; // Index of the refrigerant [-]
-		
+
 		Real64 Pipe_v_ref; // Piping Loss Algorithm Parameter: Refrigerant velocity [m/s]
 		Real64 Pipe_T_room; // Piping Loss Algorithm Parameter: Average Room Temperature [C]
 		Real64 Pipe_Num_Re; // Piping Loss Algorithm Parameter: refrigerant Re Number [-]
@@ -11656,33 +11656,33 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Ref_Coe_v2; // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
 		Real64 Ref_Coe_v3; // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
 		Real64 RefPipInsH; // Heat transfer coefficient for calculating piping loss [W/m2K]
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		static std::string const RoutineName( "VRFOU_PipeLossC" );
-		
-		
+
+
 		// variable initializations
-		
+
 		TUListNum = this->ZoneTUListPtr;
 		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
 		Pipe_conductivity_ref = this->RefPipInsCon;
-		
+
 		RefPipInsH = 9.3;
 		Pipe_cp_ref = 1.6;
-		
+
 		// Refrigerant data
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		Real64 RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
 		Real64 RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
-		
+
 		//Calculate Pipe_T_room
 		Pipe_T_room = 0;
 		NumIUActivated = 0;
@@ -11699,15 +11699,15 @@ namespace HVACVariableRefrigerantFlow {
 			Pipe_T_room = Pipe_T_room / NumIUActivated;
 		else
 			Pipe_T_room = 24;
-				
-				
+
+
 		if( Pipe_m_ref > 0 ) {
 			if( this->RefPipDiaSuc <= 0 ) this->RefPipDiaSuc = 0.025;
-			
+
 			Ref_Coe_v1 = Pevap/1000000/ 4.926;
 			Ref_Coe_v2 = Pipe_h_IU_out / 383.5510343;
 			Ref_Coe_v3 = ( this->EvaporatingTemp + Pipe_SH_merged + 273.15 ) / 344.39;
-			
+
 			Pipe_viscosity_ref = 4.302 * Ref_Coe_v1 + 0.81622 * pow_2( Ref_Coe_v1 ) - 120.98 * Ref_Coe_v2 + 139.17 * pow_2( Ref_Coe_v2 ) + 118.76 * Ref_Coe_v3 + 81.04 * pow_2( Ref_Coe_v3 ) + 5.7858 * Ref_Coe_v1 * Ref_Coe_v2 - 8.3817 * Ref_Coe_v1 * Ref_Coe_v3 - 218.48 * Ref_Coe_v2 * Ref_Coe_v3 + 21.58;
 			if( Pipe_viscosity_ref <= 0 ) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa*s) at T=353.15 K, P=2MPa
 
@@ -11716,9 +11716,9 @@ namespace HVACVariableRefrigerantFlow {
 			Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
 			Pipe_Num_Nu = 0.023 * std::pow( Pipe_Num_Re, 0.8) * std::pow( Pipe_Num_Pr, 0.3 );
 			Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
-		
+
 			Pipe_DeltP = max( 0.0, 8 * Pipe_Num_St * std::pow( Pipe_Num_Pr, 0.6667 ) * this->RefPipEquLen / this->RefPipDiaSuc * GetSupHeatDensityRefrig( this->RefrigerantName, this->EvaporatingTemp + Pipe_SH_merged, max( min( Pevap, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName ) * pow_2( Pipe_v_ref ) / 2 - this->RefPipHei * GetSupHeatDensityRefrig( this->RefrigerantName, this->EvaporatingTemp + Pipe_SH_merged, max( min( Pevap, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName ) *9.80665 );
-		
+
 			Pipe_Coe_k1 = Pipe_Num_Nu * Pipe_viscosity_ref;
 			Pipe_Coe_k3 = RefPipInsH *( this->RefPipDiaSuc + 2 * this->RefPipInsThi );
 			if(  this->RefPipInsThi >= 0.0 ){
@@ -11728,7 +11728,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			Pipe_Q = max( 0.0, ( Pi * this->RefPipLen ) * ( OutdoorDryBulb / 2 + Pipe_T_room / 2 - this->EvaporatingTemp - Pipe_SH_merged ) / ( 1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3 ) );
-		
+
 			Pipe_h_comp_in = Pipe_h_IU_out + Pipe_Q / Pipe_m_ref;
 
 		} else {
@@ -11736,9 +11736,9 @@ namespace HVACVariableRefrigerantFlow {
 			Pipe_Q = 0;
 			Pipe_h_comp_in = Pipe_h_IU_out;
 		}
-		
+
 	}
-	
+
 	void
 	VRFCondenserEquipment::VRFOU_PipeLossH(
 		Real64 const Pipe_m_ref, // Refrigerant mass flow rate [kg/s]
@@ -11782,14 +11782,14 @@ namespace HVACVariableRefrigerantFlow {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		
+
 		int TUListNum; // index to TU List
 		int TUIndex; // Index to terminal unit
 		int CoilIndex; // index to coil in terminal unit
 		int NumTUInList; // number of terminal units is list
 		int NumIUActivated; // number of the used indoor units [-]
 		int RefrigerantIndex; // Index of the refrigerant [-]
-		
+
 		Real64 Pipe_v_ref; // Piping Loss Algorithm Parameter: Refrigerant velocity [m/s]
 		Real64 Pipe_T_room; // Piping Loss Algorithm Parameter: Average Room Temperature [C]
 		Real64 Pipe_T_IU_in; // Piping Loss Algorithm Parameter: Average Refrigerant Temperature [C]
@@ -11807,38 +11807,38 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 Ref_Coe_v2; // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
 		Real64 Ref_Coe_v3; // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
 		Real64 RefPipInsH; // Heat transfer coefficient for calculating piping loss [W/m2K]
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
 		// DERIVED TYPE DEFINITIONS
 		// na
-		
+
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		
+
 		static std::string const RoutineName( "VRFOU_PipeLossH" );
-		
+
 		// variable initializations
-		
+
 		TUListNum = this->ZoneTUListPtr;
 		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
 		Pipe_conductivity_ref = this->RefPipInsCon;
-		
+
 		RefPipInsH = 9.3;
 		Pipe_cp_ref = 1.6;
-		
+
 		// Refrigerant data
 		RefrigerantIndex = FindRefrigerant( this->RefrigerantName );
 		Real64 RefTHigh = RefrigData( RefrigerantIndex ).PsHighTempValue; // High Temperature Value for Ps (max in tables)
 		Real64 RefPLow = RefrigData( RefrigerantIndex ).PsLowPresValue; // Low Pressure Value for Ps (>0.0)
 		Real64 RefPHigh = RefrigData( RefrigerantIndex ).PsHighPresValue; // High Pressure Value for Ps (max in tables)
 		Real64 RefTSat = GetSatTemperatureRefrig( this->RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
-		
+
 		//Perform iteration to calculate Pipe_T_IU_in, given P and h
 		Pipe_T_IU_in = GetSupHeatTempRefrig( this->RefrigerantName, max( min( Pcond, RefPHigh ), RefPLow ), Pipe_h_IU_in, max( this->IUCondensingTemp, RefTSat ), min( this->IUCondensingTemp + 50, RefTHigh ), RefrigerantIndex, RoutineName );
 		Pipe_T_IU_in = min( RefTHigh, Pipe_T_IU_in );
-		
+
 		// Calculate average room temperature
 		Pipe_T_room = 0;
 		NumIUActivated = 0;
@@ -11855,7 +11855,7 @@ namespace HVACVariableRefrigerantFlow {
 			Pipe_T_room = Pipe_T_room / NumIUActivated;
 		else
 			Pipe_T_room = 18;
-			
+
 		// Calculate piping loss
 		if( Pipe_m_ref > 0 ){
 			Ref_Coe_v1 = Pcond / 1000000 / 4.926;
@@ -11869,24 +11869,24 @@ namespace HVACVariableRefrigerantFlow {
 			Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
 			Pipe_Num_Nu = 0.023 * std::pow( Pipe_Num_Re, 0.8) * std::pow( Pipe_Num_Pr, 0.4);
 			Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
-	
+
 			Pipe_Coe_k1 = Pipe_Num_Nu * Pipe_viscosity_ref;
 			Pipe_Coe_k2 = this->RefPipInsCon * ( this->RefPipDiaDis + this->RefPipInsThi ) /this->RefPipInsThi;
 			Pipe_Coe_k3 = RefPipInsH * ( this->RefPipDiaDis + 2 * this->RefPipInsThi );
-		
+
 			Pipe_Q = max( 0.0, ( Pi * this->RefPipLen ) * ( Pipe_T_IU_in - OutdoorDryBulb / 2 - Pipe_T_room / 2 ) / ( 1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3 ) ); // [W]
 			Pipe_DeltP = max( 0.0, 8 * Pipe_Num_St * std::pow( Pipe_Num_Pr, 0.6667 ) * this->RefPipEquLen / this->RefPipDiaDis * GetSupHeatDensityRefrig( this->RefrigerantName,
 					Pipe_T_IU_in, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName ) * pow_2( Pipe_v_ref ) / 2 - this->RefPipHei * GetSupHeatDensityRefrig( this->RefrigerantName, Pipe_T_IU_in, max( min( Pcond, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName ) * 9.80665 );
-		
+
 			Pipe_h_comp_out = Pipe_h_IU_in + Pipe_Q / Pipe_m_ref;
-			
+
 		} else {
 			Pipe_DeltP = 0;
 			Pipe_Q = 0;
 			Pipe_h_comp_out = Pipe_h_IU_in;
 		}
 	}
-	
+
 	// Clears the global data in HVACVariableRefrigerantFlow.
 	// Needed for unit tests, should not be normally called.
 	void

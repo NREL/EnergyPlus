@@ -212,22 +212,22 @@ namespace PhotovoltaicThermalCollectors {
 			if ( PVTnum == 0 ) {
 				PVTnum = FindItemInList( PVTName, PVT );
 				if ( PVTnum == 0 ) {
-					ShowFatalError( "SimPVTcollectors: Unit not found=" + PVTName() );
+					ShowFatalError( "SimPVTcollectors: Unit not found=" + PVTName() );  // LCOV_EXCL_LINE
 				}
 			} else {
 				if ( PVTnum > NumPVT || PVTnum < 1 ) {
-					ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Number of PVT units=" + TrimSigDigits( NumPVT ) + ", Entered Unit name=" + PVTName() );
+					ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Number of PVT units=" + TrimSigDigits( NumPVT ) + ", Entered Unit name=" + PVTName() );  // LCOV_EXCL_LINE
 				}
 				if ( CheckEquipName( PVTnum ) ) {
 					if ( PVTName != PVT( PVTnum ).Name ) {
-						ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Unit name=" + PVTName() + ", stored name for that index=" + PVT( PVTnum ).Name );
+						ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Unit name=" + PVTName() + ", stored name for that index=" + PVT( PVTnum ).Name );  // LCOV_EXCL_LINE
 					}
 					CheckEquipName( PVTnum ) = false;
 				}
 			}
 		} else {
 			if ( PVTnum > NumPVT || PVTnum < 1 ) {
-				ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Number of PVT units=" + TrimSigDigits( NumPVT ) + ", Entered Unit name=" + PVTName() );
+				ShowFatalError( "SimPVTcollectors: Invalid PVT index passed = " + TrimSigDigits( PVTnum ) + ", Number of PVT units=" + TrimSigDigits( NumPVT ) + ", Entered Unit name=" + PVTName() );  // LCOV_EXCL_LINE
 			}
 		} // compName present
 
@@ -520,7 +520,7 @@ namespace PhotovoltaicThermalCollectors {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for photovoltaic thermal collectors" );
+			ShowFatalError( "Errors found in processing input for photovoltaic thermal collectors" );  // LCOV_EXCL_LINE
 		}
 
 		if ( allocated( tmpSimplePVTperf ) ) tmpSimplePVTperf.deallocate();
@@ -588,7 +588,7 @@ namespace PhotovoltaicThermalCollectors {
 				errFlag = false;
 				ScanPlantLoopsForObject( PVT( PVTnum ).Name, PVT( PVTnum ).TypeNum, PVT( PVTnum ).WLoopNum, PVT( PVTnum ).WLoopSideNum, PVT( PVTnum ).WLoopBranchNum, PVT( PVTnum ).WLoopCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
-					ShowFatalError( "InitPVTcollectors: Program terminated for previous conditions." );
+					ShowFatalError( "InitPVTcollectors: Program terminated for previous conditions." );  // LCOV_EXCL_LINE
 				}
 				SetLoopIndexFlag( PVTnum ) = false;
 			}
@@ -916,7 +916,7 @@ namespace PhotovoltaicThermalCollectors {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}

@@ -362,17 +362,17 @@ namespace HVACControllers {
 		if ( ControllerIndex == 0 ) {
 			ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 			if ( ControlNum == 0 ) {
-				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
+				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );  // LCOV_EXCL_LINE
 			}
 			ControllerIndex = ControlNum;
 		} else {
 			ControlNum = ControllerIndex;
 			if ( ControlNum > NumControllers || ControlNum < 1 ) {
-				ShowFatalError( "ManageControllers: Invalid ControllerIndex passed=" + TrimSigDigits( ControlNum ) + ", Number of controllers=" + TrimSigDigits( NumControllers ) + ", Controller name=" + ControllerName );
+				ShowFatalError( "ManageControllers: Invalid ControllerIndex passed=" + TrimSigDigits( ControlNum ) + ", Number of controllers=" + TrimSigDigits( NumControllers ) + ", Controller name=" + ControllerName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( ControlNum ) ) {
 				if ( ControllerName != ControllerProps( ControlNum ).ControllerName ) {
-					ShowFatalError( "ManageControllers: Invalid ControllerIndex passed=" + TrimSigDigits( ControlNum ) + ", Controller name=" + ControllerName + ", stored Controller Name for that index=" + ControllerProps( ControlNum ).ControllerName );
+					ShowFatalError( "ManageControllers: Invalid ControllerIndex passed=" + TrimSigDigits( ControlNum ) + ", Controller name=" + ControllerName + ", stored Controller Name for that index=" + ControllerProps( ControlNum ).ControllerName );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( ControlNum ) = false;
 			}
@@ -459,7 +459,7 @@ namespace HVACControllers {
 			if ( SELECT_CASE_var1 == ControllerSimple_Type ) { // 'Controller:WaterCoil'
 				CalcSimpleController( ControlNum, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerName );
 			} else {
-				ShowFatalError( "Invalid controller type in ManageControllers=" + ControllerProps( ControlNum ).ControllerType );
+				ShowFatalError( "Invalid controller type in ManageControllers=" + ControllerProps( ControlNum ).ControllerType );  // LCOV_EXCL_LINE
 			}}
 
 			// Update the current Controller to the outlet nodes
@@ -481,14 +481,14 @@ namespace HVACControllers {
 				CheckSimpleController( ControlNum, IsConvergedFlag );
 				SaveSimpleController( ControlNum, FirstHVACIteration, IsConvergedFlag );
 			} else {
-				ShowFatalError( "Invalid controller type in ManageControllers=" + ControllerProps( ControlNum ).ControllerType );
+				ShowFatalError( "Invalid controller type in ManageControllers=" + ControllerProps( ControlNum ).ControllerType );  // LCOV_EXCL_LINE
 			}}
 
 			// Report the current Controller
 			ReportController( ControlNum );
 
 		} else {
-			ShowFatalError( "ManageControllers: Invalid Operation passed=" + TrimSigDigits( Operation ) + ", Controller name=" + ControllerName );
+			ShowFatalError( "ManageControllers: Invalid Operation passed=" + TrimSigDigits( Operation ) + ", Controller name=" + ControllerName );  // LCOV_EXCL_LINE
 		}}
 
 		// Write detailed diagnostic for individual controller
@@ -812,7 +812,7 @@ namespace HVACControllers {
 		CheckControllerListOrder();
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );  // LCOV_EXCL_LINE
 		}
 
 	}
@@ -1155,7 +1155,7 @@ namespace HVACControllers {
 			if ( ControllerProps( ControlNum ).MaxVolFlowActuated == 0.0 ) {
 				ControllerProps( ControlNum ).MinVolFlowActuated = 0.0;
 			} else if ( ControllerProps( ControlNum ).MinVolFlowActuated >= ControllerProps( ControlNum ).MaxVolFlowActuated ) {
-				ShowFatalError( "Controller:WaterCoil, Minimum control flow is > or = Maximum control flow; " + ControllerProps( ControlNum ).ControllerName );
+				ShowFatalError( "Controller:WaterCoil, Minimum control flow is > or = Maximum control flow; " + ControllerProps( ControlNum ).ControllerName );  // LCOV_EXCL_LINE
 			}
 
 			// Setup root finder after sizing calculation
@@ -1166,7 +1166,7 @@ namespace HVACControllers {
 			} else if ( SELECT_CASE_var == iReverseAction ) {
 				SetupRootFinder( RootFinders( ControlNum ), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, ControllerProps( ControlNum ).Offset ); // Slope type | Method type | TolX: no relative tolerance for X variables | ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for Y variables
 			} else {
-				ShowFatalError( "InitController: Invalid controller action. Valid choices are \"Normal\" or \"Reverse\"" );
+				ShowFatalError( "InitController: Invalid controller action. Valid choices are \"Normal\" or \"Reverse\"" );  // LCOV_EXCL_LINE
 			}}
 
 			MySizeFlag( ControlNum ) = false;
@@ -1295,7 +1295,7 @@ namespace HVACControllers {
 			}
 
 		} else {
-			ShowFatalError( "Invalid Controller Variable Type=" + ControlVariableTypes( ControllerProps( ControlNum ).ControlVar ) );
+			ShowFatalError( "Invalid Controller Variable Type=" + ControlVariableTypes( ControllerProps( ControlNum ).ControlVar ) );  // LCOV_EXCL_LINE
 		}}
 
 		{ auto const SELECT_CASE_var( ControllerProps( ControlNum ).ActuatorVar );
@@ -1316,7 +1316,7 @@ namespace HVACControllers {
 			}
 
 		} else {
-			ShowFatalError( "Invalid Actuator Variable Type=" + ControlVariableTypes( ControllerProps( ControlNum ).ActuatorVar ) );
+			ShowFatalError( "Invalid Actuator Variable Type=" + ControlVariableTypes( ControllerProps( ControlNum ).ActuatorVar ) );  // LCOV_EXCL_LINE
 		}}
 
 		// Compute residual for control function using desired setpoint value and current sensed value
@@ -1539,7 +1539,7 @@ namespace HVACControllers {
 					ShowSevereError( "CalcSimpleController: HVAC controller failed at " + CreateHVACStepFullString() );
 					ShowContinueError( " Controller name=" + ControllerProps( ControlNum ).ControllerName );
 					ShowContinueError( " Unrecognized control variable type=" + TrimSigDigits( ControllerProps( ControlNum ).ControlVar ) );
-					ShowFatalError( "Preceding error causes program termination." );
+					ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 				}}
 
 			}
@@ -1556,7 +1556,7 @@ namespace HVACControllers {
 				ShowSevereError( "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString() );
 				ShowContinueError( " Controller name=\"" + ControllerName + "\"" );
 				ShowContinueError( " Setpoint is not available/defined." );
-				ShowFatalError( "Preceding error causes program termination." );
+				ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 			}
 			// Monitor invariants across successive controller iterations
 			// - min bound
@@ -1567,7 +1567,7 @@ namespace HVACControllers {
 				ShowContinueError( " Minimum bound must remain invariant during successive iterations." );
 				ShowContinueError( " Minimum root finder point=" + TrimSigDigits( RootFinders( ControlNum ).MinPoint.X, NumSigDigits ) );
 				ShowContinueError( " Minimum avail actuated=" + TrimSigDigits( ControllerProps( ControlNum ).MinAvailActuated, NumSigDigits ) );
-				ShowFatalError( "Preceding error causes program termination." );
+				ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 			}
 			if ( RootFinders( ControlNum ).MaxPoint.X != ControllerProps( ControlNum ).MaxAvailActuated ) {
 				ShowSevereError( "CalcSimpleController: Root finder failed at " + CreateHVACStepFullString() );
@@ -1575,7 +1575,7 @@ namespace HVACControllers {
 				ShowContinueError( " Maximum bound must remain invariant during successive iterations." );
 				ShowContinueError( " Maximum root finder point=" + TrimSigDigits( RootFinders( ControlNum ).MaxPoint.X, NumSigDigits ) );
 				ShowContinueError( " Maximum avail actuated=" + TrimSigDigits( ControllerProps( ControlNum ).MaxAvailActuated, NumSigDigits ) );
-				ShowFatalError( "Preceding error causes program termination." );
+				ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 			}
 
 			// Updates root finder with current iterate and computes next one if needed
@@ -1717,7 +1717,7 @@ namespace HVACControllers {
 			ShowContinueError( " Root candidate x=" + TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, NumSigDigits ) + " does not lie within the min/max bounds." );
 			ShowContinueError( " Min bound is x=" + TrimSigDigits( RootFinders( ControlNum ).MinPoint.X, NumSigDigits ) );
 			ShowContinueError( " Max bound is x=" + TrimSigDigits( RootFinders( ControlNum ).MaxPoint.X, NumSigDigits ) );
-			ShowFatalError( "Preceding error causes program termination." );
+			ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 			// Abnormal case: should never happen
 		} else if ( SELECT_CASE_var == iStatusErrorBracket ) {
@@ -1731,7 +1731,7 @@ namespace HVACControllers {
 			if ( RootFinders( ControlNum ).UpperPoint.DefinedFlag ) {
 				ShowContinueError( " Upper bracket is x=" + TrimSigDigits( RootFinders( ControlNum ).UpperPoint.X, NumSigDigits ) );
 			}
-			ShowFatalError( "Preceding error causes program termination." );
+			ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 			// Detected control function with wrong action between the min and max points.
 			// Should never happen: probably indicative of some serious problems in IDFs
@@ -1769,7 +1769,7 @@ namespace HVACControllers {
 			//    'x='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%X,NumSigDigits))//','// &
 			//    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%Y,NumSigDigits)) &
 			//  )
-			//  CALL ShowFatalError('FindRootSimpleController: Preceding error causes program termination.')
+			//  CALL ShowFatalError('FindRootSimpleController: Preceding error causes program termination.')  // LCOV_EXCL_LINE
 			if ( ! WarmupFlag && ControllerProps( ControlNum ).BadActionErrCount == 0 ) {
 				++ControllerProps( ControlNum ).BadActionErrCount;
 				ShowSevereError( "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"" );
@@ -1821,7 +1821,7 @@ namespace HVACControllers {
 			ShowSevereError( "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString() );
 			ShowContinueError( " Controller name=" + ControllerName );
 			ShowContinueError( " Unrecognized root finder status flag=" + TrimSigDigits( RootFinders( ControlNum ).StatusFlag ) );
-			ShowFatalError( "Preceding error causes program termination." );
+			ShowFatalError( "Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -2040,7 +2040,7 @@ namespace HVACControllers {
 			ShowSevereError( "CheckMinActiveController: Invalid controller action during " + CreateHVACStepFullString() + '.' );
 			ShowContinueError( "CheckMinActiveController: Controller name=" + ControllerProps( ControlNum ).ControllerName );
 			ShowContinueError( "CheckMinActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"" );
-			ShowFatalError( "CheckMinActiveController: Preceding error causes program termination." );
+			ShowFatalError( "CheckMinActiveController: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -2114,7 +2114,7 @@ namespace HVACControllers {
 			ShowSevereError( "CheckMaxActiveController: Invalid controller action during " + CreateHVACStepFullString() + '.' );
 			ShowContinueError( "CheckMaxActiveController: Controller name=" + ControllerProps( ControlNum ).ControllerName );
 			ShowContinueError( "CheckMaxActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"" );
-			ShowFatalError( "CheckMaxActiveController: Preceding error causes program termination." );
+			ShowFatalError( "CheckMaxActiveController: Preceding error causes program termination." );  // LCOV_EXCL_LINE
 
 		}}
 
@@ -2232,7 +2232,7 @@ namespace HVACControllers {
 			//     Node(ActuatedNode)%MassFlowRate = ControllerProps(ControlNum)%NextActuatedValue
 
 		} else {
-			ShowFatalError( "UpdateController: Invalid Actuator Variable Type=" + ControlVariableTypes( ControllerProps( ControlNum ).ActuatorVar ) );
+			ShowFatalError( "UpdateController: Invalid Actuator Variable Type=" + ControlVariableTypes( ControllerProps( ControlNum ).ActuatorVar ) );  // LCOV_EXCL_LINE
 		}}
 
 	}
@@ -2579,7 +2579,7 @@ namespace HVACControllers {
 		return;
 
 Label100: ;
-		ShowFatalError( "DumpAirLoopStatistics: Failed to open statistics file \"" + StatisticsFileName + "\" for output (write)." );
+		ShowFatalError( "DumpAirLoopStatistics: Failed to open statistics file \"" + StatisticsFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -2821,7 +2821,7 @@ Label100: ;
 		return;
 
 Label100: ;
-		ShowFatalError( "SetupAirLoopControllersTracer: Failed to open air loop trace file \"" + TraceFileName + "\" for output (write)." );
+		ShowFatalError( "SetupAirLoopControllersTracer: Failed to open air loop trace file \"" + TraceFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -3054,7 +3054,7 @@ Label100: ;
 		TraceFileUnit = GetNewUnitNumber();
 
 		if ( TraceFileUnit <= 0 ) {
-			ShowFatalError( "SetupIndividualControllerTracer: Invalid unit (<=0) for setting up controller trace file" );
+			ShowFatalError( "SetupIndividualControllerTracer: Invalid unit (<=0) for setting up controller trace file" );  // LCOV_EXCL_LINE
 			return;
 		}
 
@@ -3080,7 +3080,7 @@ Label100: ;
 		return;
 
 Label100: ;
-		ShowFatalError( "SetupIndividualControllerTracer: Failed to open controller trace file \"" + TraceFileName + "\" for output (write)." );
+		ShowFatalError( "SetupIndividualControllerTracer: Failed to open controller trace file \"" + TraceFileName + "\" for output (write)." );  // LCOV_EXCL_LINE
 
 	}
 
@@ -3202,7 +3202,7 @@ Label100: ;
 
 		} else {
 			// Should never happen
-			ShowFatalError( "TraceIndividualController: Invalid Operation passed=" + TrimSigDigits( Operation ) + ", Controller name=" + ControllerProps( ControlNum ).ControllerName );
+			ShowFatalError( "TraceIndividualController: Invalid Operation passed=" + TrimSigDigits( Operation ) + ", Controller name=" + ControllerProps( ControlNum ).ControllerName );  // LCOV_EXCL_LINE
 
 		}}
 

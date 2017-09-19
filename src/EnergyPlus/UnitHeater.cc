@@ -238,17 +238,17 @@ namespace UnitHeater {
 		if ( CompIndex == 0 ) {
 			UnitHeatNum = FindItemInList( CompName, UnitHeat );
 			if ( UnitHeatNum == 0 ) {
-				ShowFatalError( "SimUnitHeater: Unit not found=" + CompName );
+				ShowFatalError( "SimUnitHeater: Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = UnitHeatNum;
 		} else {
 			UnitHeatNum = CompIndex;
 			if ( UnitHeatNum > NumOfUnitHeats || UnitHeatNum < 1 ) {
-				ShowFatalError( "SimUnitHeater:  Invalid CompIndex passed=" + TrimSigDigits( UnitHeatNum ) + ", Number of Units=" + TrimSigDigits( NumOfUnitHeats ) + ", Entered Unit name=" + CompName );
+				ShowFatalError( "SimUnitHeater:  Invalid CompIndex passed=" + TrimSigDigits( UnitHeatNum ) + ", Number of Units=" + TrimSigDigits( NumOfUnitHeats ) + ", Entered Unit name=" + CompName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( UnitHeatNum ) ) {
 				if ( CompName != UnitHeat( UnitHeatNum ).Name ) {
-					ShowFatalError( "SimUnitHeater: Invalid CompIndex passed=" + TrimSigDigits( UnitHeatNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + UnitHeat( UnitHeatNum ).Name );
+					ShowFatalError( "SimUnitHeater: Invalid CompIndex passed=" + TrimSigDigits( UnitHeatNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + UnitHeat( UnitHeatNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( UnitHeatNum ) = false;
 			}
@@ -641,7 +641,7 @@ namespace UnitHeater {
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
 
-		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found in input" );
+		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found in input" );  // LCOV_EXCL_LINE
 
 		// Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
 		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) {
@@ -749,7 +749,7 @@ namespace UnitHeater {
 				ScanPlantLoopsForObject( UnitHeat( UnitHeatNum ).HCoilName, UnitHeat( UnitHeatNum ).HCoil_PlantTypeNum, UnitHeat( UnitHeatNum ).HWLoopNum, UnitHeat( UnitHeatNum ).HWLoopSide, UnitHeat( UnitHeatNum ).HWBranchNum, UnitHeat( UnitHeatNum ).HWCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + UnitHeat( UnitHeatNum ).Name + "\", type=ZoneHVAC:UnitHeater" );
-					ShowFatalError( "InitUnitHeater: Program terminated due to previous condition(s)." );
+					ShowFatalError( "InitUnitHeater: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 				}
 
 				UnitHeat( UnitHeatNum ).HotCoilOutNodeNum = PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).LoopSide( UnitHeat( UnitHeatNum ).HWLoopSide ).Branch( UnitHeat( UnitHeatNum ).HWBranchNum ).Comp( UnitHeat( UnitHeatNum ).HWCompNum ).NodeNumOut;
@@ -1236,7 +1236,7 @@ namespace UnitHeater {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+			ShowFatalError( "Preceding sizing errors cause program termination" );  // LCOV_EXCL_LINE
 		}
 
 	}

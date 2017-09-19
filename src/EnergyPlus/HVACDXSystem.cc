@@ -257,17 +257,17 @@ namespace HVACDXSystem {
 		if ( CompIndex == 0 ) {
 			DXSystemNum = FindItemInList( DXCoolingSystemName, DXCoolingSystem );
 			if ( DXSystemNum == 0 ) {
-				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName );
+				ShowFatalError( "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = DXSystemNum;
 		} else {
 			DXSystemNum = CompIndex;
 			if ( DXSystemNum > NumDXSystem || DXSystemNum < 1 ) {
-				ShowFatalError( "SimulateDXCoolingSystem:  Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", Number of DX Units=" + TrimSigDigits( NumDXSystem ) + ", DX Unit name=" + DXCoolingSystemName );
+				ShowFatalError( "SimulateDXCoolingSystem:  Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", Number of DX Units=" + TrimSigDigits( NumDXSystem ) + ", DX Unit name=" + DXCoolingSystemName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( DXSystemNum ) ) {
 				if ( DXCoolingSystemName != DXCoolingSystem( DXSystemNum ).Name ) {
-					ShowFatalError( "SimulateDXCoolingSystem: Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", DX Unit name=" + DXCoolingSystemName + ", stored DX Unit Name for that index=" + DXCoolingSystem( DXSystemNum ).Name );
+					ShowFatalError( "SimulateDXCoolingSystem: Invalid CompIndex passed=" + TrimSigDigits( DXSystemNum ) + ", DX Unit name=" + DXCoolingSystemName + ", stored DX Unit Name for that index=" + DXCoolingSystem( DXSystemNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( DXSystemNum ) = false;
 			}
@@ -311,7 +311,7 @@ namespace HVACDXSystem {
 			SimTESCoil( CompName, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, DXCoolingSystem( DXSystemNum ).FanOpMode, DXCoolingSystem( DXSystemNum ).TESOpMode, DXCoolingSystem( DXSystemNum ).PartLoadFrac );
 
 		} else {
-			ShowFatalError( "SimDXCoolingSystem: Invalid DX Cooling System/Coil=" + DXCoolingSystem( DXSystemNum ).CoolingCoilType );
+			ShowFatalError( "SimDXCoolingSystem: Invalid DX Cooling System/Coil=" + DXCoolingSystem( DXSystemNum ).CoolingCoilType );  // LCOV_EXCL_LINE
 
 		}}
 		// set econo lockout flag
@@ -633,7 +633,7 @@ namespace HVACDXSystem {
 		} //End of the DX System Loop
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );
+			ShowFatalError( RoutineName + "Errors found in input.  Program terminates." );  // LCOV_EXCL_LINE
 		}
 
 		for ( DXSystemNum = 1; DXSystemNum <= NumDXSystem; ++DXSystemNum ) {
@@ -846,7 +846,7 @@ namespace HVACDXSystem {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   Feb. 2001
-		//       MODIFIED       Nov. 2003, R. Raustad, FSEC 
+		//       MODIFIED       Nov. 2003, R. Raustad, FSEC
 		//                      Feb. 2005, M. J. Witte, GARD. Add dehumidification controls and support for multimode DX coil
 		//                      Jan. 2008, R. Raustad, FSEC. Added coolreheat to all coil types
 		//                      Feb. 2013, B. Shen, ORNL. Add Coil:Cooling:DX:VariableSpeed, capable of both sensible and latent cooling
@@ -985,7 +985,7 @@ namespace HVACDXSystem {
 			//update the DesOutTemp
 			DesOutTemp -= DXCoolingSystem( DXSystemNum ).FaultyCoilSATOffset;
 		}
-		
+
 		// If DXCoolingSystem is scheduled on and there is flow
 		if ( ( GetCurrentScheduleValue( DXCoolingSystem( DXSystemNum ).SchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
@@ -1448,7 +1448,7 @@ namespace HVACDXSystem {
 									ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating sensible speed ratio error continues. Sensible speed ratio statistics follow.", DXCoolingSystem( DXSystemNum ).MSpdSensPLRIterIndex, SpeedRatio, SpeedRatio );
 								}
 							} else if ( SolFla == -2 ) {
-								if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - compressor speed calculation failed: speed limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
+								if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - compressor speed calculation failed: speed limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );  // LCOV_EXCL_LINE
 							}
 						} else {
 							SpeedRatio = 1.0;
@@ -1469,7 +1469,7 @@ namespace HVACDXSystem {
 								ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating sensible cycling ratio error continues. Sensible cycling ratio statistics follow.", DXCoolingSystem( DXSystemNum ).MSpdCycSensPLRIterIndex, CycRatio, CycRatio );
 							}
 						} else if ( SolFla == -2 ) { // should never get here, if it does logic above to protect from this
-							if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - cycling ratio calculation failed: cycling limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
+							if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - cycling ratio calculation failed: cycling limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );  // LCOV_EXCL_LINE
 						}
 					} else {
 						PartLoadFrac = 0.0;
@@ -1514,7 +1514,7 @@ namespace HVACDXSystem {
 											ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating latent speed ratio error continues. Latent speed ratio statistics follow.", DXCoolingSystem( DXSystemNum ).MSpdLatPLRIterIndex, SpeedRatio, SpeedRatio );
 										}
 									} else if ( SolFla == -2 ) {
-										if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - compressor speed calculation failed:speed limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
+										if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - compressor speed calculation failed:speed limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );  // LCOV_EXCL_LINE
 									}
 								} else {
 									SpeedRatio = 1.0;
@@ -1535,7 +1535,7 @@ namespace HVACDXSystem {
 										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating latent cycling ratio error continues. Latent cycling ratio statistics follow.", DXCoolingSystem( DXSystemNum ).MSpdCycLatPLRIterIndex, CycRatio, CycRatio );
 									}
 								} else if ( SolFla == -2 ) { // should never get here, if it does logic above to protect from this
-									if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - cycling ratio calculation failed: cycling limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
+									if ( ! WarmupFlag ) ShowFatalError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - cycling ratio calculation failed: cycling limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );  // LCOV_EXCL_LINE
 								}
 							}
 
@@ -1594,7 +1594,7 @@ namespace HVACDXSystem {
 							} else if ( SolFla == -2 ) {
 								if ( ! WarmupFlag ) {
 									ShowSevereError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
-									ShowFatalError( "Program terminates due to previous condition." );
+									ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 								}
 							}
 						}
@@ -1658,7 +1658,7 @@ namespace HVACDXSystem {
 								} else if ( SolFla == -2 ) {
 									if ( ! WarmupFlag ) {
 										ShowSevereError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
-										ShowFatalError( "Program terminates due to previous condition." );
+										ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 									}
 								}
 
@@ -1684,7 +1684,7 @@ namespace HVACDXSystem {
 								} else if ( SolFla == -2 ) {
 									if ( ! WarmupFlag ) {
 										ShowSevereError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
-										ShowFatalError( "Program terminates due to previous condition." );
+										ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 									}
 								}
 							}
@@ -1735,7 +1735,7 @@ namespace HVACDXSystem {
 							} else if ( SolFla == -2 ) {
 								if ( ! WarmupFlag ) {
 									ShowSevereError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" + DXCoolingSystem( DXSystemNum ).Name );
-									ShowFatalError( "Program terminates due to previous condition." );
+									ShowFatalError( "Program terminates due to previous condition." );  // LCOV_EXCL_LINE
 								}
 							}
 						}
@@ -2017,12 +2017,12 @@ namespace HVACDXSystem {
 						DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFail, DXCoolingSystem( DXSystemNum ).DXCoilLatPLRFailIndex );
 
 				} else {
-					ShowFatalError( "ControlDXSystem: Invalid DXCoolingSystem coil type = " + DXCoolingSystem( DXSystemNum ).CoolingCoilType );
+					ShowFatalError( "ControlDXSystem: Invalid DXCoolingSystem coil type = " + DXCoolingSystem( DXSystemNum ).CoolingCoilType );  // LCOV_EXCL_LINE
 
 				}}
 			} // End of cooling load type (sensible or latent) if block
 		} // End of If DXCoolingSystem is scheduled on and there is flow
-		
+
 		//Set the final results
 		DXCoolingSystem( DXSystemNum ).PartLoadFrac = PartLoadFrac;
 		DXCoolingSystem( DXSystemNum ).SpeedRatio = SpeedRatio;

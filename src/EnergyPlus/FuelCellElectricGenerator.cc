@@ -175,16 +175,16 @@ namespace FuelCellElectricGenerator {
 
 		if ( GeneratorIndex == 0 ) {
 			GenNum = FindItemInList( GeneratorName, FuelCell );
-			if ( GenNum == 0 ) ShowFatalError( "SimFuelCellGenerator: Specified Generator not one of Valid FuelCell Generators " + GeneratorName );
+			if ( GenNum == 0 ) ShowFatalError( "SimFuelCellGenerator: Specified Generator not one of Valid FuelCell Generators " + GeneratorName );  // LCOV_EXCL_LINE
 			GeneratorIndex = GenNum;
 		} else {
 			GenNum = GeneratorIndex;
 			if ( GenNum > NumFuelCellGenerators || GenNum < 1 ) {
-				ShowFatalError( "SimFuelCellGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of FuelCell Generators=" + TrimSigDigits( NumFuelCellGenerators ) + ", Generator name=" + GeneratorName );
+				ShowFatalError( "SimFuelCellGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Number of FuelCell Generators=" + TrimSigDigits( NumFuelCellGenerators ) + ", Generator name=" + GeneratorName );  // LCOV_EXCL_LINE
 			}
 			if ( CheckEquipName( GenNum ) ) {
 				if ( GeneratorName != FuelCell( GenNum ).Name ) {
-					ShowFatalError( "SimFuelCellGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + FuelCell( GenNum ).Name );
+					ShowFatalError( "SimFuelCellGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits( GenNum ) + ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + FuelCell( GenNum ).Name );  // LCOV_EXCL_LINE
 				}
 				CheckEquipName( GenNum ) = false;
 			}
@@ -1033,7 +1033,7 @@ namespace FuelCellElectricGenerator {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Errors found in getting input for fuel cell model " );
+				ShowFatalError( "Errors found in getting input for fuel cell model " );  // LCOV_EXCL_LINE
 			}
 
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
@@ -3722,7 +3722,7 @@ namespace FuelCellElectricGenerator {
 				CompNum = FindItemInList( CompName, FuelCell, &FCDataStruct::NameStackCooler );
 			}
 			if ( CompNum == 0 ) {
-				ShowFatalError( "SimFuelCellPlantHeatRecovery: Fuel Cell Generator Unit not found=" + CompName );
+				ShowFatalError( "SimFuelCellPlantHeatRecovery: Fuel Cell Generator Unit not found=" + CompName );  // LCOV_EXCL_LINE
 			}
 			MinCap = 0.0;
 			MaxCap = 0.0;
@@ -3822,7 +3822,7 @@ namespace FuelCellElectricGenerator {
 			errFlag = false;
 			ScanPlantLoopsForObject( FuelCell( FCnum ).NameExhaustHX, TypeOf_Generator_FCExhaust, FuelCell( FCnum ).CWLoopNum, FuelCell( FCnum ).CWLoopSideNum, FuelCell( FCnum ).CWBranchNum, FuelCell( FCnum ).CWCompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitFuelCellGenerators: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitFuelCellGenerators: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			MyPlantScanFlag( FCnum ) = false;
 		}
