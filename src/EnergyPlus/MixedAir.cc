@@ -81,6 +81,7 @@
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
+#include <HVACControllers.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -96,6 +97,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SimAirServingZones.hh>
 #include <SteamCoils.hh>
 #include <TranspiredCollector.hh>
 #include <UserDefinedComponents.hh>
@@ -610,6 +612,7 @@ namespace MixedAir {
 		using HeatRecovery::SimHeatRecovery;
 		using DesiccantDehumidifiers::SimDesiccantDehumidifier;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+		using HVACHXAssistedCoolingCoil::HXAssistedCoil;
 		using HVACDXSystem::SimDXCoolingSystem;
 		using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
 		using SteamCoils::SimulateSteamCoilComponents;
@@ -622,6 +625,9 @@ namespace MixedAir {
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 		using Humidifiers::SimHumidifier;
+		using SimAirServingZones::SolveWaterCoilController;
+		using HVACControllers::ControllerProps;
+		using WaterCoils::WaterCoil;
 		// Locals
 		// SUBROUTINE ARGUMENTS:
 
@@ -672,12 +678,22 @@ namespace MixedAir {
 			// Coil Types
 		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water')
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == SteamCoil_AirHeat ) { // 'Coil:Heating:Steam'
@@ -687,7 +703,12 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == Coil_ElectricHeat ) { // 'Coil:Heating:Electric'
@@ -704,7 +725,12 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_CoolingHXAsst ) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
 			if ( Sim ) {
-				SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, HXAssistedCoil( CompIndex ).ControllerName, HXAssistedCoil( CompIndex ).ControllerIndex, true );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( HXAssistedCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == DXSystem ) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
@@ -3037,25 +3063,25 @@ namespace MixedAir {
 
 					//    Note use of OAControllerLoop here to keep DO Loop index separate from InitOAController local variable
 					// CurrentModuleObject='AirLoopHVAC'
-					SetupOutputVariable( "Air System Outdoor Air Economizer Status []", loopOAController.EconomizerStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Economizer Status", OutputProcessor::Unit::None, loopOAController.EconomizerStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Status []", loopOAController.HeatRecoveryBypassStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Status", OutputProcessor::Unit::None, loopOAController.HeatRecoveryBypassStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status []", loopOAController.HRHeatingCoilActive, "System", "Average", airloopName );
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature [C]", loopOAController.MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status", OutputProcessor::Unit::None, loopOAController.HRHeatingCoilActive, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature", OutputProcessor::Unit::C, loopOAController.MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air High Humidity Control Status []", loopOAController.HighHumCtrlStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air High Humidity Control Status", OutputProcessor::Unit::None, loopOAController.HighHumCtrlStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Flow Fraction []", loopOAController.OAFractionRpt, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Flow Fraction", OutputProcessor::Unit::None, loopOAController.OAFractionRpt, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Minimum Flow Fraction []", loopOAController.MinOAFracLimit, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Minimum Flow Fraction", OutputProcessor::Unit::None, loopOAController.MinOAFracLimit, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Mass Flow Rate [kg/s]", loopOAController.OAMassFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.OAMassFlow, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate [kg/s]", loopOAController.MixMassFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.MixMassFlow, "System", "Average", airloopName );
 
 					if ( loopOAController.MixedAirSPMNum > 0 ) {
-						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction []", loopOAController.MaxOAFracBySetPoint, "System", "Average", airloopName );
+						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction", OutputProcessor::Unit::None, loopOAController.MaxOAFracBySetPoint, "System", "Average", airloopName );
 					}
 
 					if ( AnyEnergyManagementSystemInModel ) {
@@ -3066,7 +3092,7 @@ namespace MixedAir {
 
 					VentMechObjectNum = loopOAController.VentMechObjectNum;
 					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
-						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate  [kg/s]", loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
+						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
 						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
 							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
 						}

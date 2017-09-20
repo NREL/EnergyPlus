@@ -756,7 +756,7 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						Sensor( SensorNum ).VariableNum = VariableNum;
-						ErlVariable( VariableNum ).Value.initialized = true; 
+						ErlVariable( VariableNum ).Value.initialized = true;
 					}
 				}
 
@@ -1343,7 +1343,7 @@ namespace EMSManager {
 		int KeyNum;
 		int AvgOrSum;
 		int StepType;
-		std::string Units;
+		OutputProcessor::Unit Units( OutputProcessor::Unit::None );
 		Array1D_string KeyName;
 		Array1D_int KeyIndex;
 		bool Found;
@@ -2168,7 +2168,7 @@ namespace EMSManager {
 	void
 	checkForUnusedActuatorsAtEnd()
 	{
-		// call at end of simulation to check if any of the user's actuators were never initialized.  
+		// call at end of simulation to check if any of the user's actuators were never initialized.
 		// Could be a mistake we want to help users catch // Issue #4404.
 		for ( int actuatorUsedLoop = 1; actuatorUsedLoop <= numActuatorsUsed; ++actuatorUsedLoop ) {
 			if ( ! ErlVariable( EMSActuatorUsed( actuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
@@ -2179,9 +2179,9 @@ namespace EMSManager {
 				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( actuatorUsedLoop ).ControlTypeName );
 			}
 		}
-	
+
 	}
-	
+
 } // EMSManager
 
 //Moved these setup EMS actuator routines out of module to solve circular use problems between

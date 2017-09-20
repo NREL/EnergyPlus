@@ -1022,23 +1022,23 @@ namespace HVACStandAloneERV {
 
 		// Setup report variables for the stand alone ERVs
 		for ( StandAloneERVIndex = 1; StandAloneERVIndex <= NumStandAloneERVs; ++StandAloneERVIndex ) {
-			SetupOutputVariable( "Zone Ventilator Sensible Cooling Rate [W]", StandAloneERV( StandAloneERVIndex ).SensCoolingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Sensible Cooling Energy [J]", StandAloneERV( StandAloneERVIndex ).SensCoolingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Latent Cooling Rate [W]", StandAloneERV( StandAloneERVIndex ).LatCoolingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Latent Cooling Energy [J]", StandAloneERV( StandAloneERVIndex ).LatCoolingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Total Cooling Rate [W]", StandAloneERV( StandAloneERVIndex ).TotCoolingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Total Cooling Energy [J]", StandAloneERV( StandAloneERVIndex ).TotCoolingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Sensible Cooling Rate", OutputProcessor::Unit::W, StandAloneERV( StandAloneERVIndex ).SensCoolingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Sensible Cooling Energy", OutputProcessor::Unit::J, StandAloneERV( StandAloneERVIndex ).SensCoolingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Latent Cooling Rate", OutputProcessor::Unit::W, StandAloneERV( StandAloneERVIndex ).LatCoolingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Latent Cooling Energy", OutputProcessor::Unit::J, StandAloneERV( StandAloneERVIndex ).LatCoolingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Total Cooling Rate", OutputProcessor::Unit::W, StandAloneERV( StandAloneERVIndex ).TotCoolingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Total Cooling Energy", OutputProcessor::Unit::J, StandAloneERV( StandAloneERVIndex ).TotCoolingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
 
-			SetupOutputVariable( "Zone Ventilator Sensible Heating Rate [W]", StandAloneERV( StandAloneERVIndex ).SensHeatingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Sensible Heating Energy [J]", StandAloneERV( StandAloneERVIndex ).SensHeatingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Latent Heating Rate [W]", StandAloneERV( StandAloneERVIndex ).LatHeatingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Latent Heating Energy [J]", StandAloneERV( StandAloneERVIndex ).LatHeatingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Total Heating Rate [W]", StandAloneERV( StandAloneERVIndex ).TotHeatingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Total Heating Energy [J]", StandAloneERV( StandAloneERVIndex ).TotHeatingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Sensible Heating Rate", OutputProcessor::Unit::W, StandAloneERV( StandAloneERVIndex ).SensHeatingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Sensible Heating Energy", OutputProcessor::Unit::J, StandAloneERV( StandAloneERVIndex ).SensHeatingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Latent Heating Rate", OutputProcessor::Unit::W, StandAloneERV( StandAloneERVIndex ).LatHeatingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Latent Heating Energy", OutputProcessor::Unit::J, StandAloneERV( StandAloneERVIndex ).LatHeatingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Total Heating Rate", OutputProcessor::Unit::W, StandAloneERV( StandAloneERVIndex ).TotHeatingRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Total Heating Energy", OutputProcessor::Unit::J, StandAloneERV( StandAloneERVIndex ).TotHeatingEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
 
-			SetupOutputVariable( "Zone Ventilator Electric Power [W]", StandAloneERV( StandAloneERVIndex ).ElecUseRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Electric Energy [J]", StandAloneERV( StandAloneERVIndex ).ElecUseEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
-			SetupOutputVariable( "Zone Ventilator Supply Fan Availability Status []", StandAloneERV( StandAloneERVIndex ).AvailStatus, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Electric Power", OutputProcessor::Unit::W, StandAloneERV( StandAloneERVIndex ).ElecUseRate, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Electric Energy", OutputProcessor::Unit::J, StandAloneERV( StandAloneERVIndex ).ElecUseEnergy, "System", "Sum", StandAloneERV( StandAloneERVIndex ).Name );
+			SetupOutputVariable( "Zone Ventilator Supply Fan Availability Status", OutputProcessor::Unit::None, StandAloneERV( StandAloneERVIndex ).AvailStatus, "System", "Average", StandAloneERV( StandAloneERVIndex ).Name );
 		}
 
 		Alphas.deallocate();
