@@ -1923,6 +1923,10 @@ namespace DataHeatBalance {
 			EMSFanPower( 0.0 ),
 			EMSUPSPowerOverrideOn( false ),
 			EMSUPSPower( 0.0 ),
+			SupplyApproachTemp( 0.0 ),
+			SupplyApproachTempSch( 0 ),
+			ReturnApproachTemp( 0.0 ),
+			ReturnApproachTempSch( 0 ),
 			CPUPower( 0.0 ),
 			FanPower( 0.0 ),
 			UPSPower( 0.0 ),
@@ -1957,11 +1961,7 @@ namespace DataHeatBalance {
 			DewpointTAboveDeltaT( 0.0 ),
 			DewpointTBelowDeltaT( 0.0 ),
 			RHAboveDeltaRH( 0.0 ),
-			RHBelowDeltaRH( 0.0 ),
-			SupplyApproachTemp( 0.0 ),
-			SupplyApproachTempSch( 0 ),
-			ReturnApproachTemp( 0.0 ),
-			ReturnApproachTempSch( 0 )
+			RHBelowDeltaRH( 0.0 )
 		{}
 
 	};
