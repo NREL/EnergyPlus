@@ -1003,6 +1003,8 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
+	SolarShading::clear_state();
+
 	SimulationManager::GetProjectData();
 	bool FoundError = false;
 
@@ -1052,18 +1054,24 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 	DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
 	DataSystemVariables::UseScheduledSunlitFrac = true;
 	SolarDistribution = FullExterior;
+	SolarShading::SUNCOS( 3 ) = 0.1;
 
 	CalcSkyDifShading = true;
 	SolarShading::InitSolarCalculations();
 	SolarShading::SkyDifSolarShading();
 	CalcSkyDifShading = false;
 
+	
 	ScheduleManager::UpdateScheduleValues();
 	FigureSolarBeamAtTimestep( DataGlobals::HourOfDay, DataGlobals::TimeStep );
 
+	EXPECT_TRUE( UseScheduledSunlitFrac );
+	EXPECT_FALSE( SolarShading::SUNCOS( 3 ) < DataEnvironment::SunIsUpValue );
+	EXPECT_DOUBLE_EQ( 0.5432, ScheduleManager::LookUpScheduleValue( 2, 9, 4 ) );
 	EXPECT_DOUBLE_EQ( 1, SunlitFrac( 4, 9, 3 ) );
 	EXPECT_DOUBLE_EQ( 1, SunlitFrac( 4, 9, 6 ) );
 	EXPECT_DOUBLE_EQ( 0.5432, SunlitFrac( 4, 9, 9 ) );
+	SolarShading::clear_state();
 
 }
 
