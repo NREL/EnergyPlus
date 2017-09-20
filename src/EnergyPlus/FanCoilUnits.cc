@@ -1111,7 +1111,7 @@ namespace FanCoilUnits {
 			}
 		}
 		// Set the inlet node mass flow rate
-		if ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 ) {
+		if ( ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn ) && ! DataHVACGlobals::ZoneCompTurnFansOff ) {
 			Node( InletNode ).MassFlowRate = FanCoil( FanCoilNum ).MaxAirMassFlow;
 			Node( InletNode ).MassFlowRateMaxAvail = Node( InletNode ).MassFlowRate;
 			Node( InletNode ).MassFlowRateMinAvail = Node( InletNode ).MassFlowRate;
@@ -3413,7 +3413,7 @@ namespace FanCoilUnits {
 
 		// Assume the unit is able to vary the flow. A cycling unit is treated as
 		// if it were variable flow, with the flow being the averaqe flow over the time step
-		if ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 ) {
+		if ( ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn ) && ! DataHVACGlobals::ZoneCompTurnFansOff  ) {
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow ) {
 				if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ASHRAE ) Node( InletNode ).MassFlowRate = PartLoad * Node( InletNode ).MassFlowRateMax;
 			} else {
