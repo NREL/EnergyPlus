@@ -2753,7 +2753,6 @@ namespace RoomAirModelManager {
 		using DataLoopNode::NodeID;
 		using namespace DataIPShortCuts;
 		using Fans::GetFanOutletNode;
-		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Return value
 		bool EquipFind; // True if an error is found

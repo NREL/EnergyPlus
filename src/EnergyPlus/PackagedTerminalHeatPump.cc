@@ -5652,7 +5652,6 @@ namespace PackagedTerminalHeatPump {
 		Real64 AirMassFlow; // air mass flow rate [kg/s]
 		Real64 QTotUnitOut; // capacity output
 		static int SpeedNum( 1 ); // Speed number
-		Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 		Real64 QSensUnitOut; // sensible capacity output
 		Real64 QLatUnitOut; // latent capacity output
 		int CompOp; // compressor operation; 1=on, 0=off
@@ -5705,23 +5704,9 @@ namespace PackagedTerminalHeatPump {
 
 		OnOffFanPartLoadFraction = 1.0;
 
-		SaveMassFlowRate = Node( InletNode ).MassFlowRate;
-		if ( ! FirstHVACIteration && PTUnit( PTUnitNum ).OpMode == CycFanCycCoil && ( QZnReq < ( -1.0 * SmallLoad ) || TotalZoneLatentLoad > SmallLoad ) ) {
-			// for cycling fan, cooling load, check whether furnace can meet load with compressor off
-			CompOp = Off;
-			ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-
-			if ( SpeedNum == PTUnit( PTUnitNum ).NumOfSpeedCooling && SpeedRatio == 1.0 ) {
-				// compressor on (reset inlet air mass flow rate to starting value)
-				Node( InletNode ).MassFlowRate = SaveMassFlowRate;
-				CompOp = On;
-				ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-			}
-		} else {
-			// compressor on
-			CompOp = On;
-			ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-		}
+		// compressor on
+		CompOp = On;
+		ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
 		if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 			SaveCompressorPLR = PartLoadFrac;
