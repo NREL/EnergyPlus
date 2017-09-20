@@ -523,8 +523,6 @@ namespace OutdoorAirUnit {
 
 			if ( lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFan = false;
-				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\": No input of " + cAlphaFields( 7 ) + "." );
-				ShowContinueError( "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced. Please reconsider your input." );
 				if ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
 					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFields( 7 ) + " is blank." );
 					ShowContinueError( "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced." );
@@ -1528,7 +1526,7 @@ namespace OutdoorAirUnit {
 			// Air mass balance check
 			if ( ( std::abs( OutAirUnit( OAUnitNum ).ExtAirMassFlow - OutAirUnit( OAUnitNum ).OutAirMassFlow ) > 0.001 )  && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
 				if ( !OutAirUnit( OAUnitNum ).FlowError ) {
-					ShowWarningError( "Air mass flow between zone supply and exhaust is not balanced" );
+					ShowWarningError( "Air mass flow between zone supply and exhaust is not balanced. Only the first occurence is reported." );
 					ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit( OAUnitNum ).Name );
 					ShowContinueError( "Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or other air flow control inputs." );
 					ShowContinueErrorTimeStamp( "The outdoor mass flow rate = " + General::RoundSigDigits( OutAirUnit( OAUnitNum ).OutAirMassFlow, 3 ) + " and the exhaust mass flow rate = " + General::RoundSigDigits( OutAirUnit( OAUnitNum ).ExtAirMassFlow, 3 ) + ".");
