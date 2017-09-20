@@ -439,11 +439,12 @@ namespace OutAirNodeManager {
 				// Note -- this setting is different than the DataEnvironment "AT" settings.
 				Node( NodeNum ).OutAirDryBulb = OutDryBulbTemp;
 				Node( NodeNum ).OutAirWetBulb = OutWetBulbTemp;
+				Node( NodeNum ).OutAirWindSpeed = WindSpeed;
 			} else {
 				Node( NodeNum ).OutAirDryBulb = OutDryBulbTempAt( Node( NodeNum ).Height );
 				Node( NodeNum ).OutAirWetBulb = OutWetBulbTempAt( Node( NodeNum ).Height );
+				Node( NodeNum ).OutAirWindSpeed = WindSpeedAt( Node( NodeNum ).Height );
 			}
-			Node( NodeNum ).OutAirWindSpeed = WindSpeed;
 			Node( NodeNum ).OutAirWindDir = WindDir;
 
 			// Set node data to local air node values if defined

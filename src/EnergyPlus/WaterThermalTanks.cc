@@ -4477,128 +4477,128 @@ namespace WaterThermalTanks {
 					if ( ( WaterThermalTank( WaterThermalTankNum ).TypeNum != MixedChilledWaterStorage ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum != StratifiedChilledWaterStorage ) ) {
 						// Setup report variables for WaterHeater:Mixed
 						// CurrentModuleObject='WaterHeater:Mixed'
-						SetupOutputVariable( "Water Heater Tank Temperature [C]", WaterThermalTank( WaterThermalTankNum ).TankTempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Tank Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).TankTempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Final Tank Temperature [C]", WaterThermalTank( WaterThermalTankNum ).TankTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Final Tank Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).TankTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Heat Loss Rate [W]", WaterThermalTank( WaterThermalTankNum ).LossRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Heat Loss Energy [J]", WaterThermalTank( WaterThermalTankNum ).LossEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Heat Loss Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).LossRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Heat Loss Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).LossEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Use Side Mass Flow Rate [kg/s]", WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Use Side Mass Flow Rate", OutputProcessor::Unit::kg_s, WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Use Side Inlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).UseInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Use Side Inlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).UseInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Use Side Outlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).UseOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Use Side Outlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).UseOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Use Side Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).UseRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Use Side Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).UseEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Use Side Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).UseRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Use Side Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).UseEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Source Side Mass Flow Rate [kg/s]", WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Source Side Inlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).SourceInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Source Side Inlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).SourceInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Source Side Outlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Source Side Outlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Source Side Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).SourceRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Source Side Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).SourceEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater Source Side Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).SourceRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Source Side Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).SourceEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 
-						SetupOutputVariable( "Water Heater Off Cycle Parasitic Tank Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).OffCycParaRateToTank, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Off Cycle Parasitic Tank Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).OffCycParaEnergyToTank, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Off Cycle Parasitic Tank Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OffCycParaRateToTank, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Off Cycle Parasitic Tank Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).OffCycParaEnergyToTank, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater On Cycle Parasitic Tank Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).OnCycParaRateToTank, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater On Cycle Parasitic Tank Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).OnCycParaEnergyToTank, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater On Cycle Parasitic Tank Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OnCycParaRateToTank, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater On Cycle Parasitic Tank Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).OnCycParaEnergyToTank, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Total Demand Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).TotalDemandRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Total Demand Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).TotalDemandEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Total Demand Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).TotalDemandRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Total Demand Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).TotalDemandEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Heating Rate [W]", WaterThermalTank( WaterThermalTankNum ).HeaterRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Heating Energy [J]", WaterThermalTank( WaterThermalTankNum ).HeaterEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Heating Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).HeaterRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Heating Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).HeaterEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Unmet Demand Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).UnmetRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Unmet Demand Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).UnmetEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Unmet Demand Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).UnmetRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Unmet Demand Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).UnmetEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Venting Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).VentRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Venting Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).VentEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Venting Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).VentRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Venting Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).VentEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Net Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).NetHeatTransferRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Net Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).NetHeatTransferEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Net Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).NetHeatTransferRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Net Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).NetHeatTransferEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Water Heater Cycle On Count []", WaterThermalTank( WaterThermalTankNum ).CycleOnCount, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Runtime Fraction []", WaterThermalTank( WaterThermalTankNum ).RuntimeFraction, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Part Load Ratio []", WaterThermalTank( WaterThermalTankNum ).PartLoadRatio, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Cycle On Count", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).CycleOnCount, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Runtime Fraction", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).RuntimeFraction, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Part Load Ratio", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).PartLoadRatio, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							SetupOutputVariable( "Water Heater Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Electric Power", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						} else {
-							SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
-						SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).FuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).FuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).FuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).FuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "Electric" ) ) {
-							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Power", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						} else {
-							SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
-						SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "Electric" ) ) {
-							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Power", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						} else {
-							SetupOutputVariable( "Water Heater On Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType + " Rate [W]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater On Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType + " Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
 
-						SetupOutputVariable( "Water Heater On Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater On Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType + " Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 
-						SetupOutputVariable( "Water Heater Water Volume Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).VolFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Water Heater Water Volume [m3]", WaterThermalTank( WaterThermalTankNum ).VolumeConsumed, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "Water", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
-						SetupOutputVariable( "Water Heater Mains Water Volume [m3]", WaterThermalTank( WaterThermalTankNum ).VolumeConsumed, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "MainsWater", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater Water Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterThermalTank( WaterThermalTankNum ).VolFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Water Heater Water Volume", OutputProcessor::Unit::m3, WaterThermalTank( WaterThermalTankNum ).VolumeConsumed, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "Water", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
+						SetupOutputVariable( "Water Heater Mains Water Volume", OutputProcessor::Unit::m3, WaterThermalTank( WaterThermalTankNum ).VolumeConsumed, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "MainsWater", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 
 						if ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
 							//CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
 							HeatPumpWaterHeaterData & HPWH = HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum );
-							SetupOutputVariable( "Water Heater Compressor Part Load Ratio []", HPWH.HeatingPLR, "System", "Average", HPWH.Name );
-							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Power [W]", HPWH.OffCycParaFuelRate, "System", "Average", HPWH.Name );
-							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Energy [J]", HPWH.OffCycParaFuelEnergy, "System", "Sum", HPWH.Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
-							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Power [W]", HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name );
-							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Energy [J]", HPWH.OnCycParaFuelEnergy, "System", "Sum", HPWH.Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
-							SetupOutputVariable( "Water Heater Heat Pump Control Tank Temperature [C]", HPWH.ControlTempAvg, "System", "Average", HPWH.Name );
-							SetupOutputVariable( "Water Heater Heat Pump Control Tank Final Temperature [C]", HPWH.ControlTempFinal, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater Compressor Part Load Ratio", OutputProcessor::Unit::None, HPWH.HeatingPLR, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Power", OutputProcessor::Unit::W, HPWH.OffCycParaFuelRate, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Energy", OutputProcessor::Unit::J, HPWH.OffCycParaFuelEnergy, "System", "Sum", HPWH.Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
+							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Power", OutputProcessor::Unit::W, HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater On Cycle Ancillary Electric Energy", OutputProcessor::Unit::J, HPWH.OnCycParaFuelEnergy, "System", "Sum", HPWH.Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
+							SetupOutputVariable( "Water Heater Heat Pump Control Tank Temperature", OutputProcessor::Unit::C, HPWH.ControlTempAvg, "System", "Average", HPWH.Name );
+							SetupOutputVariable( "Water Heater Heat Pump Control Tank Final Temperature", OutputProcessor::Unit::C, HPWH.ControlTempFinal, "System", "Average", HPWH.Name );
 						}
 
 						if ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum > 0 ) {
 							//CurrentModuleObject='Coil:WaterHeating:Desuperheater'
-							SetupOutputVariable( "Water Heater Part Load Ratio []", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).DesuperheaterPLR, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
-							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Power [W]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OnCycParaFuelRate, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
-							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Energy [J]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OnCycParaFuelEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
-							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Power [W]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OffCycParaFuelRate, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
-							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Energy [J]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OffCycParaFuelEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
-							SetupOutputVariable( "Water Heater Heat Reclaim Efficiency Modifier Multiplier []", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).HEffFTempOutput, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
-							SetupOutputVariable( "Water Heater Pump Electric Power [W]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).PumpPower, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
-							SetupOutputVariable( "Water Heater Pump Electric Energy [J]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).PumpEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "Electric", "DHW", "Desuperheater Pump", "Plant" );
-							SetupOutputVariable( "Water Heater Heating Rate [W]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).HeaterRate, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
-							SetupOutputVariable( "Water Heater Heating Energy [J]", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).HeaterEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "EnergyTransfer", "DHW", "Water Heater", "Plant" );
+							SetupOutputVariable( "Water Heater Part Load Ratio", OutputProcessor::Unit::None, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).DesuperheaterPLR, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
+							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Power", OutputProcessor::Unit::W, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OnCycParaFuelRate, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
+							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Energy", OutputProcessor::Unit::J, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OnCycParaFuelEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
+							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Power", OutputProcessor::Unit::W, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OffCycParaFuelRate, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
+							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Energy", OutputProcessor::Unit::J, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).OffCycParaFuelEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );
+							SetupOutputVariable( "Water Heater Heat Reclaim Efficiency Modifier Multiplier", OutputProcessor::Unit::None, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).HEffFTempOutput, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
+							SetupOutputVariable( "Water Heater Pump Electric Power", OutputProcessor::Unit::W, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).PumpPower, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
+							SetupOutputVariable( "Water Heater Pump Electric Energy", OutputProcessor::Unit::J, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).PumpEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "Electric", "DHW", "Desuperheater Pump", "Plant" );
+							SetupOutputVariable( "Water Heater Heating Rate", OutputProcessor::Unit::W, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).HeaterRate, "System", "Average", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name );
+							SetupOutputVariable( "Water Heater Heating Energy", OutputProcessor::Unit::J, WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).HeaterEnergy, "System", "Sum", WaterHeaterDesuperheater( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum ).Name, _, "EnergyTransfer", "DHW", "Water Heater", "Plant" );
 						}
 
 						// Setup report variables for WaterHeater:Stratified
 						// CurrentModuleObject='WaterHeater:Stratified'
 						if ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) {
 
-							SetupOutputVariable( "Water Heater Heater 1 Heating Rate [W]", WaterThermalTank( WaterThermalTankNum ).HeaterRate1, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-							SetupOutputVariable( "Water Heater Heater 2 Heating Rate [W]", WaterThermalTank( WaterThermalTankNum ).HeaterRate2, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 1 Heating Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).HeaterRate1, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 2 Heating Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).HeaterRate2, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-							SetupOutputVariable( "Water Heater Heater 1 Heating Energy [J]", WaterThermalTank( WaterThermalTankNum ).HeaterEnergy1, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
-							SetupOutputVariable( "Water Heater Heater 2 Heating Energy [J]", WaterThermalTank( WaterThermalTankNum ).HeaterEnergy2, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 1 Heating Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).HeaterEnergy1, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 2 Heating Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).HeaterEnergy2, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-							SetupOutputVariable( "Water Heater Heater 1 Cycle On Count []", WaterThermalTank( WaterThermalTankNum ).CycleOnCount1, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
-							SetupOutputVariable( "Water Heater Heater 2 Cycle On Count  []", WaterThermalTank( WaterThermalTankNum ).CycleOnCount2, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 1 Cycle On Count", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).CycleOnCount1, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 2 Cycle On Count", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).CycleOnCount2, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-							SetupOutputVariable( "Water Heater Heater 1 Runtime Fraction []", WaterThermalTank( WaterThermalTankNum ).RuntimeFraction1, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-							SetupOutputVariable( "Water Heater Heater 2 Runtime Fraction []", WaterThermalTank( WaterThermalTankNum ).RuntimeFraction2, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 1 Runtime Fraction", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).RuntimeFraction1, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+							SetupOutputVariable( "Water Heater Heater 2 Runtime Fraction", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).RuntimeFraction2, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Water Heater Temperature Node " + TrimSigDigits( NodeNum ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Water Heater Temperature Node " + TrimSigDigits( NodeNum ), OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Water Heater Final Temperature Node " + TrimSigDigits( NodeNum ) + "  [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Water Heater Final Temperature Node " + TrimSigDigits( NodeNum ), OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 						}
 
@@ -4612,39 +4612,39 @@ namespace WaterThermalTanks {
 
 					} else if ( ( WaterThermalTank( WaterThermalTankNum ).TypeNum == MixedChilledWaterStorage ) || ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedChilledWaterStorage ) ) {
 						// CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
-						SetupOutputVariable( "Chilled Water Thermal Storage Tank Temperature [C]", WaterThermalTank( WaterThermalTankNum ).TankTempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Tank Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).TankTempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Final Tank Temperature [C]", WaterThermalTank( WaterThermalTankNum ).TankTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Final Tank Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).TankTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Tank Heat Gain Rate [W]", WaterThermalTank( WaterThermalTankNum ).LossRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Chilled Water Thermal Storage Tank Heat Gain Energy [J]", WaterThermalTank( WaterThermalTankNum ).LossEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Tank Heat Gain Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).LossRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Tank Heat Gain Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).LossEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Mass Flow Rate [kg/s]", WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Mass Flow Rate", OutputProcessor::Unit::kg_s, WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Inlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).UseInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Inlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).UseInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Outlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).UseOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Outlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).UseOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).UseRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).UseEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).UseRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Use Side Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).UseEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Mass Flow Rate [kg/s]", WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Inlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).SourceInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Inlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).SourceInletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Outlet Temperature [C]", WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Outlet Temperature", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Heat Transfer Rate [W]", WaterThermalTank( WaterThermalTankNum ).SourceRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Heat Transfer Energy [J]", WaterThermalTank( WaterThermalTankNum ).SourceEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Heat Transfer Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).SourceRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+						SetupOutputVariable( "Chilled Water Thermal Storage Source Side Heat Transfer Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).SourceEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name );
 
 						if ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedChilledWaterStorage ) {
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Chilled Water Thermal Storage Temperature Node " + TrimSigDigits( NodeNum ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Chilled Water Thermal Storage Temperature Node " + TrimSigDigits( NodeNum ) + "", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).TempAvg, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 
 							for ( NodeNum = 1; NodeNum <= WaterThermalTank( WaterThermalTankNum ).Nodes; ++NodeNum ) {
-								SetupOutputVariable( "Chilled Water Thermal Storage Final Temperature Node " + TrimSigDigits( NodeNum ) + " [C]", WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
+								SetupOutputVariable( "Chilled Water Thermal Storage Final Temperature Node " + TrimSigDigits( NodeNum ) + "", OutputProcessor::Unit::C, WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 						}
 
@@ -5522,6 +5522,7 @@ namespace WaterThermalTanks {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
 				}
 				DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
+				HPWaterHeater( HPNum ).OperatingAirMassFlowRate = HPWaterHeater( HPNum ).OperatingAirFlowRate * DataEnvironment::StdRhoAir;
 				if ( CurZoneEqNum > 0 ) {
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = DataNonZoneNonAirloopValue;
@@ -5587,7 +5588,7 @@ namespace WaterThermalTanks {
 				assert( false );
 			}}
 
-			MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, HPInletDryBulbTemp, HPInletHumRat );
+			MdotAir = HPWaterHeater( HPNum ).OperatingAirMassFlowRate;
 
 			//   set up initial conditions on nodes
 			if ( InletAirMixerNode > 0 ) {
@@ -10919,7 +10920,7 @@ namespace WaterThermalTanks {
 
 					//       set the heat pump air- and water-side mass flow rate
 					MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( WaterThermalTank( WaterThermalTankNum ).TankTemp );
-					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat );
+					MdotAir = HPWaterHeater( HPNum ).OperatingAirMassFlowRate;
 
 					// ?? why is HPWH condenser inlet node temp reset inside the for loop? shouldn't it chnage with the tank temp throughout these iterations?
 					if ( HPWaterHeater( HPNum ).TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) {

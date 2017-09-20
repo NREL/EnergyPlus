@@ -2177,7 +2177,7 @@ namespace ExternalInterface {
 		int numKeys( 0 ); // Number of keys found
 		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
-		std::string varUnits; // Units sting, may be blank
+		OutputProcessor::Unit varUnits( OutputProcessor::Unit::None ); // Units sting, may be blank
 		Array1D_int keyIndexes; // Array index for
 		Array1D_string NamesOfKeys; // Specific key name
 		int Loop, iKey; // Loop counters

@@ -226,10 +226,6 @@
     0.6500000;               !- Visible Absorptance
 
   Construction,
-    R13WALL,                 !- Name
-    R13LAYER;                !- Outside Layer
-
-  Construction,
     FLOOR,                   !- Name
     C5 - 4 IN HW CONCRETE;   !- Outside Layer
 
@@ -687,8 +683,6 @@
   Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
 
   Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
-
-  Output:Variable,*,Surface Inside Face Heat Balance Calculation Iteration Count,hourly;
 
   Output:Variable,*,Other Equipment Total Heating Rate,hourly;
 

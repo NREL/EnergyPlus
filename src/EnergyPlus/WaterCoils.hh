@@ -263,6 +263,8 @@ namespace WaterCoils {
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
 		Real64 DesignWaterDeltaTemp; // water deltaT for coil sizing [K]
 		bool UseDesignWaterDeltaTemp; // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
+		std::string ControllerName; // controller name used by water coil
+		int ControllerIndex; // controller index used by water coil
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -375,8 +377,10 @@ namespace WaterCoils {
 			DesiccantRegenerationCoil( false ),
 			DesiccantDehumNum( 0 ),
 			DesignWaterDeltaTemp( 0.0 ),
-			UseDesignWaterDeltaTemp( false )
-		{}
+			UseDesignWaterDeltaTemp( false ),
+			ControllerName( "" ),
+			ControllerIndex( 0 )
+			{}
 
 	};
 

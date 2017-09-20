@@ -116,14 +116,12 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-  RunPeriod:CustomRange,
-    Windsor-1956-1957,       !- Name
+  RunPeriod,
+    Windsor,                 !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    1956,                    !- Begin Year
     12,                      !- End Month
     31,                      !- End Day of Month
-    1957,                    !- End Year
     Thursday,                !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period

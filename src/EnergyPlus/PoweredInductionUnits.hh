@@ -115,6 +115,7 @@ namespace PoweredInductionUnits {
 		std::string FanName; // name of fan component
 		int Fan_Num; // index for fan type
 		int Fan_Index; // store index for this fan
+		int FanAvailSchedPtr; // index to fan availability schedule
 		std::string HCoilType; // type of heating coil component
 		int HCoilType_Num; // index for heating coil type
 		int HCoil_PlantTypeNum;
@@ -167,6 +168,7 @@ namespace PoweredInductionUnits {
 			Mixer_Num( 0 ),
 			Fan_Num( 0 ),
 			Fan_Index( 0 ),
+			FanAvailSchedPtr( 0 ),
 			HCoilType_Num( 0 ),
 			HCoil_PlantTypeNum( 0 ),
 			HCoil_Index( 0 ),

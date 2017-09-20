@@ -678,6 +678,12 @@
     yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
 
+  ConvergenceLimits ,
+    0, !- Minimum System Timestep (0 = same as zone timestep)
+    25, !- Maximum HVAC Iterations
+    3, !- Minimum Plant Iterations
+    9; !- Maximum Plant Iterations
+
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
@@ -2380,59 +2386,8 @@
 ! **** Interior Constructions  ****
 
   Construction,
-    insul_frame,             !- Name
-    Beige_ptd_st:0.00300,    !- Outside Layer
-    EPS:0.02500,             !- Layer 2
-    Beige_ptd_st:0.00300;    !- Layer 3
-
-  Construction,
     susp_ceil,               !- Name
     Ceiling__min:0.00999;    !- Outside Layer
-
-  Construction,
-    susp_floor_rev,          !- Name
-    Grey_cord_sy:0.00600,    !- Outside Layer
-    Heavy_mix_co:0.10160,    !- Layer 2
-    Steel:0.00300;           !- Layer 3
-
-  Construction,
-    susp_floor,              !- Name
-    Steel:0.00300,           !- Outside Layer
-    Heavy_mix_co:0.10160,    !- Layer 2
-    Grey_cord_sy:0.00600;    !- Layer 3
-
-  Construction,
-    ceiling,                 !- Name
-    Glasswool:0.00200,       !- Outside Layer
-    Ceiling__min:0.00999;    !- Layer 2
-
-  Construction,
-    ceiling_rev,             !- Name
-    Ceiling__min:0.00999,    !- Outside Layer
-    Glasswool:0.00200;       !- Layer 2
-
-  Construction:InternalSource,
-    RadCeilingPanel,         !- Name
-    1,                       !- Source Present After Layer Number
-    1,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.0015,                  !- Tube Spacing {m}
-    Glasswool:0.00200,       !- Outside Layer
-    White_ptd_Gy:0.01300;    !- Layer 2
-
-  Construction,
-    gyp_blk_ptn,             !- Name
-    White_ptd_Gy:0.01300,    !- Outside Layer
-    Air-gap:0.17000,         !- Layer 2
-    Block_inner_:0.10000,    !- Layer 3
-    Air-gap:0.17000,         !- Layer 4
-    White_ptd_Gy:0.01300;    !- Layer 5
-
-  Construction,
-    gyp_gyp_ptn,             !- Name
-    White_ptd_Gy:0.01200,    !- Outside Layer
-    Air-gap:0.17000,         !- Layer 2
-    White_ptd_Gy:0.01200;    !- Layer 3
 
   Construction,
     IntWall,                 !- Name
@@ -2445,17 +2400,6 @@
     Std Wood 6inch;          !- Outside Layer
 
 ! **** Envelope Constructions  ****
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05,                !- Layer 2
-    Roof Insulation 3;       !- Layer 3
-
-  Construction,
-    GableWall,               !- Name
-    Std PW05,                !- Outside Layer
-    Roof Insulation 3;       !- Layer 2
 
   Construction,
     ExtWall,                 !- Name
