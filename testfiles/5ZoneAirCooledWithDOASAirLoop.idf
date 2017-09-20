@@ -3615,22 +3615,6 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Humidity Ratio,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Humidity Ratio,hourly;
-
   Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
@@ -3639,17 +3623,7 @@
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
 
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
   Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Main Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 

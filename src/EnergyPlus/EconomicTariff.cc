@@ -390,7 +390,7 @@ namespace EconomicTariff {
 		int TypeVar;
 		int AvgSumVar;
 		int StepTypeVar;
-		std::string UnitsVar; // Units sting, may be blank
+		OutputProcessor::Unit UnitsVar( OutputProcessor::Unit::None); // Units sting, may be blank
 		Array1D_string NamesOfKeys; // Specific key name
 		Array1D_int IndexesForKeyVar; // Array index
 		int jFld;

@@ -496,10 +496,10 @@ namespace HeatingCoils {
 
 			// Setup Report variables for the Electric Coils
 			// CurrentModuleObject = "Coil:Heating:Electric"
-			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Air Heating Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Rate", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 
 		}
 
@@ -571,10 +571,10 @@ namespace HeatingCoils {
 
 			// Setup Report variables for the Electric Coils
 			// CurrentModuleObject = "Coil:Heating:Electric:MultiStage"
-			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Air Heating Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Rate", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
 
 		}
 
@@ -652,15 +652,15 @@ namespace HeatingCoils {
 			// Setup Report variables for the Fuel Coils
 			// CurrentModuleObject = "Coil:Heating:OtherFuel"
 
-			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", coil.HeatingCoilLoad, "System", "Sum", coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", coil.HeatingCoilRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil " + FuelType + " Energy [J]", coil.FuelUseLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil " + FuelType + " Rate [W]", coil.FuelUseRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", coil.ElecUseLoad, "System", "Sum", coil.Name, _, "Electricity", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", coil.ElecUseRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", coil.RTF, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Rate [W]", coil.ParasiticFuelRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Energy [J]", coil.ParasiticFuelLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Energy", OutputProcessor::Unit::J, coil.HeatingCoilLoad, "System", "Sum", coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Rate", OutputProcessor::Unit::W, coil.HeatingCoilRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil " + FuelType + " Energy", OutputProcessor::Unit::J, coil.FuelUseLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, coil.ElecUseLoad, "System", "Sum", coil.Name, _, "Electricity", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, coil.ElecUseRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Rate", OutputProcessor::Unit::W, coil.ParasiticFuelRate, "System", "Average", coil.Name );
+			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Energy", OutputProcessor::Unit::J, coil.ParasiticFuelLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
 			
 		}
 
@@ -743,15 +743,15 @@ namespace HeatingCoils {
 
 			// Setup Report variables for the Gas Coils
 			// CurrentModuleObject = "Coil:Heating:Gas:MultiStage"
-			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Gas Energy [J]", HeatingCoil( CoilNum ).FuelUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Gas Rate [W]", HeatingCoil( CoilNum ).FuelUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", HeatingCoil( CoilNum ).RTF, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Ancillary Gas Rate [W]", HeatingCoil( CoilNum ).ParasiticFuelRate, "System", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Ancillary Gas Energy [J]", HeatingCoil( CoilNum ).ParasiticFuelLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).HeatingCoilLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Rate", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).HeatingCoilRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Gas Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).FuelUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Gas Rate", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).FuelUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).ElecUseLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).ElecUseRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, HeatingCoil( CoilNum ).RTF, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Ancillary Gas Rate", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).ParasiticFuelRate, "System", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Ancillary Gas Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).ParasiticFuelLoad, "System", "Sum", HeatingCoil( CoilNum ).Name, _, "Gas", "Heating", _, "System" );
 
 		}
 
@@ -891,11 +891,11 @@ namespace HeatingCoils {
 
 			// Setup Report variables for the Desuperheater Heating Coils
 			// CurrentModuleObject = "Coil:Heating:Desuperheater"
-			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", HeatingCoil( CoilNum ).HeatingCoilLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", HeatingCoil( CoilNum ).HeatingCoilRate, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", HeatingCoil( CoilNum ).ElecUseLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", HeatingCoil( CoilNum ).ElecUseRate, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", HeatingCoil( CoilNum ).RTF, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Air Heating Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).HeatingCoilLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Air Heating Rate", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).HeatingCoilRate, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, HeatingCoil( CoilNum ).ElecUseLoad, "HVAC", "Sum", HeatingCoil( CoilNum ).Name, _, "Electricity", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, HeatingCoil( CoilNum ).ElecUseRate, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, HeatingCoil( CoilNum ).RTF, "HVAC", "Average", HeatingCoil( CoilNum ).Name );
 
 		}
 

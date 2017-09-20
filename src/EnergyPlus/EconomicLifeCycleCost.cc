@@ -900,7 +900,6 @@ namespace EconomicLifeCycleCost {
 		// na
 
 		// USE STATEMENTS:
-		// na
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1459,6 +1458,14 @@ namespace EconomicLifeCycleCost {
 					}
 				}
 				CashFlow( jCost ).yrAmount( kYear ) = annualCost;
+			}
+		}
+		// generate a warning if resource referenced was not used
+		for ( int nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc ) {
+			int curResource = UsePriceEscalation( nUsePriceEsc ).resource - ResourceTypeInitialOffset;
+			if ( !resourceCostNotZero( curResource ) && DataGlobals::DoWeathSim ) {
+				ShowWarningError( "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation( nUsePriceEsc ).name + "\" has no energy cost. " );
+				ShowContinueError( "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff." );
 			}
 		}
 	}

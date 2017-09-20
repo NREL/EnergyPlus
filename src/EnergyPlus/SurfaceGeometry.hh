@@ -346,7 +346,6 @@ namespace SurfaceGeometry {
 
 	void
 	CalculateZoneVolume(
-		bool & ErrorsFound, // If errors found in input
 		Array1S_bool const CeilingHeightEntered
 	);
 

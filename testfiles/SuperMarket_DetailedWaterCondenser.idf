@@ -959,10 +959,6 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
   Construction,
-    IntFloorConstruction,    !- Name
-    ConcForIntFloor;         !- Outside Layer
-
-  Construction,
     FurnitureConstruction,   !- Name
     FurnitureMaterial;       !- Outside Layer
 

@@ -212,6 +212,7 @@ namespace DataAirLoop {
 		bool OASysComponentsSimulated; // - true after OA components have been simulated
 		Real64 ZoneExhMassFlow; // zone exhaust flow rate not accounted for by zone inlet flow
 		bool AirLoopDCVFlag; // TRUE if the air loop has OA Controller specifying a Mechanical controller with DCV
+		int AirLoopPass; // number of air loop passes during iteration
 		// - internal flag only
 
 		// Default Constructor
@@ -248,7 +249,8 @@ namespace DataAirLoop {
 			HeatingActiveFlag( false ),
 			OASysComponentsSimulated( false ),
 			ZoneExhMassFlow( 0.0 ),
-			AirLoopDCVFlag( true )
+			AirLoopDCVFlag( true ),
+			AirLoopPass( 0 )
 		{}
 
 	};

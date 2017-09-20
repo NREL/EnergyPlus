@@ -2392,7 +2392,7 @@ namespace SimulationManager {
 		Array1D_int VarIDs;
 		Array1D_int IndexTypes;
 		Array1D_int VarTypes;
-		Array1D_string UnitsStrings;
+		Array1D < OutputProcessor::Unit> unitsForVar; // units from enum for each variable
 		Array1D_string VarNames;
 		Array1D_int ResourceTypes;
 		Array1D_string EndUses;
@@ -2410,20 +2410,20 @@ namespace SimulationManager {
 			IndexTypes.dimension( NumVariables, 0 );
 			VarTypes.dimension( NumVariables, 0 );
 			VarNames.allocate( NumVariables );
-			UnitsStrings.allocate( NumVariables );
+			unitsForVar.allocate( NumVariables );
 			ResourceTypes.dimension( NumVariables, 0 );
 			EndUses.allocate( NumVariables );
 			Groups.allocate( NumVariables );
-			GetMeteredVariables( CompSets( Loop ).CType, CompSets( Loop ).CName, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, VarNames, _, VarIDs );
+			GetMeteredVariables( CompSets( Loop ).CType, CompSets( Loop ).CName, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, VarNames, _, VarIDs );
 			for ( Loop1 = 1; Loop1 <= NumVariables; ++Loop1 ) {
-				gio::write( OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)" ) << VarIndexes( Loop1 ) << VarIDs( Loop1 ) << VarNames( Loop1 ) << UnitsStrings( Loop1 ) << GetResourceTypeChar( ResourceTypes( Loop1 ) ) << EndUses( Loop1 ) << Groups( Loop1 ) << IndexTypes( Loop1 );
+				gio::write( OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)" ) << VarIndexes( Loop1 ) << VarIDs( Loop1 ) << VarNames( Loop1 ) << unitEnumToString( unitsForVar( Loop1 ) ) << GetResourceTypeChar( ResourceTypes( Loop1 ) ) << EndUses( Loop1 ) << Groups( Loop1 ) << IndexTypes( Loop1 );
 			}
 			VarIndexes.deallocate();
 			IndexTypes.deallocate();
 			VarTypes.deallocate();
 			VarIDs.deallocate();
 			VarNames.deallocate();
-			UnitsStrings.deallocate();
+			unitsForVar.deallocate();
 			ResourceTypes.deallocate();
 			EndUses.deallocate();
 			Groups.deallocate();
