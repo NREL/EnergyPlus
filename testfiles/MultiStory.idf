@@ -404,12 +404,6 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,
-    Int Wall,                !- Name
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
-    C2 - 4 IN LW CONCRETE BLOCK,  !- Layer 2
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
-
-  Construction,
     Floor,                   !- Name
     E5 - ACOUSTIC TILE,      !- Outside Layer
     E4 - CEILING AIRSPACE,   !- Layer 2

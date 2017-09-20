@@ -1772,7 +1772,6 @@ namespace HVACUnitarySystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Iter; // iteration count
-//		Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
 		int MSHPIndex; // Index to design Specification object
 		int BranchNum; // Index to branch on air loop
 		Real64 SystemFlow; // AirloopHVAC flow rate [m3/s]
