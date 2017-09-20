@@ -3555,6 +3555,114 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 
 }
 
+TEST_F( EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep )
+{
+	//Glazer - Sep 2017
+
+	displayDemandEndUse = true;
+	displayLEEDSummary = true;
+	DataGlobals::TimeStepZoneSec = 900.0;
+
+	int resourceNum = 1;
+	int totalMeterNum = 2;
+	int endUseMeterNum = 3;
+	int subEndUseMeterNum = 4;
+
+	int endUseNum = 1;
+	int subEndUseNum = 1;
+
+	meterNumEndUseSubBEPS.allocate( 10, 10, 10 );
+	gatherDemandEndUseSub.allocate( 10, 10, 10 );
+	gatherDemandIndEndUseSub.allocate( 10, 10, 10 );
+	EnergyMeters.allocate( 100 );
+
+	EndUseCategory.allocate( endUseNum );
+	EndUseCategory( endUseNum ).NumSubcategories = 1;
+
+	meterNumTotalsBEPS( resourceNum ) = totalMeterNum; // create a test meter number
+	gatherDemandTotal( resourceNum ) = 0.;
+
+	meterNumEndUseBEPS( resourceNum, endUseNum ) = endUseMeterNum;
+	gatherDemandEndUse( resourceNum, endUseNum ) = 0.;
+	gatherDemandIndEndUse( resourceNum, endUseNum ) = 0.;
+
+	meterNumEndUseSubBEPS( subEndUseNum, endUseNum, resourceNum ) = subEndUseMeterNum;
+	gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) = 0.;
+	gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) = 0.;
+
+	// first "timestep"
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 123.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 47.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 28.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 123., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 47., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 47., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 28., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 28., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+	// next "timestep" total higher
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 133.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 57.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 38.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 133., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 57., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 57., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 38., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 38., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+	// next "timestep" total lower but end use higher and sub end use higher
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 103.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 61.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 42.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 133., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 57., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 61., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 38., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 42., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+	// next "timestep" total higher but end use lower and sub end use lower
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 143.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 59.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 39.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 143., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 59., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 61., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 39., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 42., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+
+	meterNumEndUseSubBEPS.deallocate();
+	gatherDemandEndUseSub.deallocate();
+	gatherDemandIndEndUseSub.deallocate();
+
+
+}
+
+
 
 TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 {

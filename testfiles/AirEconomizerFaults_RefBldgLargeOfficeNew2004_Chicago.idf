@@ -425,10 +425,6 @@
     Std AC02;                !- Outside Layer
 
   Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  Construction,
     InteriorFurnishings,     !- Name
     Std Wood 6inch;          !- Outside Layer
 
@@ -9217,8 +9213,6 @@
   Output:Meter,Gas:Facility,HOURLY;
 
   Output:Meter,Heating:Gas,HOURLY;
-
-  Output:Meter,InteriorEquipment:Gas,HOURLY;
 
   Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
 

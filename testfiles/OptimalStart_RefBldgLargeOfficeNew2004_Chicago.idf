@@ -438,10 +438,6 @@
     Std AC02;                !- Outside Layer
 
   Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  Construction,
     InteriorFurnishings,     !- Name
     Std Wood 6inch;          !- Outside Layer
 
