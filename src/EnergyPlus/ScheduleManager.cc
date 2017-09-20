@@ -694,23 +694,12 @@ namespace ScheduleManager {
 			if ( Alphas( 3 ) != "NO" && Alphas( 3 ) != "YES" ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
 				ErrorsFound = true;
-			} else if ( Alphas( 3 ) != "YES" ) { // No validation done on the value of the interpolation field
-				DaySchedule( Count ).IntervalInterpolated = false;
+			} else {
+				DaySchedule( Count ).IntervalInterpolated = ( Alphas( 3 ) == "YES" );
 				for ( Hr = 1; Hr <= 24; ++Hr ) {
 					CurMinute = MinutesPerTimeStep;
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 						DaySchedule( Count ).TSValue( TS, Hr ) = MinuteValue( CurMinute, Hr );
-						CurMinute += MinutesPerTimeStep;
-					}
-				}
-			} else {
-				DaySchedule( Count ).IntervalInterpolated = true;
-				for ( Hr = 1; Hr <= 24; ++Hr ) {
-					SCount = 1;
-					CurMinute = MinutesPerTimeStep;
-					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						DaySchedule( Count ).TSValue( TS, Hr ) = sum( MinuteValue( {SCount,CurMinute}, Hr ) ) / double( MinutesPerTimeStep );
-						SCount = CurMinute + 1;
 						CurMinute += MinutesPerTimeStep;
 					}
 				}
@@ -2968,10 +2957,10 @@ namespace ScheduleManager {
 		int MMField;
 		int Hr;
 		int Min;
-		int SHr;
-		int SMin;
-		int EHr;
-		int EMin;
+		int SHr;    //starting hour
+		int SMin;   //starting minute
+		int EHr;    //ending hour
+		int EMin;   //ending minute
 		std::string::size_type sFld;
 
 		MinuteValue = 0.0;
@@ -2982,6 +2971,9 @@ namespace ScheduleManager {
 		EMin = 0;
 		sFld = 0;
 
+		Real64 StartValue = 0;
+		Real64 EndValue = 0;
+
 		if ( NumUntils != NumNumbers ) {
 			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, number of Time fields does not match number of value fields, " + ErrContext + '=' + DayScheduleName );
 			ErrorsFound = true;
@@ -2990,6 +2982,7 @@ namespace ScheduleManager {
 
 		for ( Count = 1; Count <= NumUntils; ++Count ) {
 			Pos = index( Untils( Count ), "UNTIL" );
+			std::string curUntil = Untils( Count ); //debugging line
 			if ( Pos == 0 ) {
 				if ( Untils( Count )[ 5 ] == ':' ) {
 					sFld = 6;
@@ -3048,17 +3041,48 @@ namespace ScheduleManager {
 				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 				ErrorsFound = true;
 			} else {
-				for ( Min = SMin; Min <= 60; ++Min ) {
-					MinuteValue( Min, SHr ) = Numbers( Count );
-					SetMinuteValue( Min, SHr ) = true;
-				}
-				for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {
-					MinuteValue( _, Hr ) = Numbers( Count );
-					SetMinuteValue( _, Hr ) = true;
-				}
-				for ( Min = 1; Min <= EMin; ++Min ) {
-					MinuteValue( Min, EHr ) = Numbers( Count );
-					SetMinuteValue( Min, EHr ) = true;
+				if ( useInterpolation ) {
+					int totalMinutes = (EHr - SHr) * 60 + (EMin - SMin);
+					if ( totalMinutes == 0 ) totalMinutes = 1; // protect future division
+					if ( Count == 1 ) {
+						StartValue = Numbers( Count ); //assume first period is flat
+						EndValue = Numbers( Count );
+					} else {
+						StartValue = EndValue;
+						EndValue = Numbers( Count );
+					}
+					Real64 incrementPerMinute = (EndValue - StartValue ) / totalMinutes;
+					Real64 curValue = StartValue;
+					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
+						MinuteValue( Min, SHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, SHr ) = true;
+					}
+					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+						for ( Min = 1; Min <= 60; ++Min ) {
+							MinuteValue( Min, SHr ) = curValue;
+							curValue += incrementPerMinute;
+							SetMinuteValue( Min, SHr ) = true;
+						}
+					}
+					for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
+						MinuteValue( Min, EHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, EHr ) = true;
+					}
+				} else { // no interpolation so set values to constant number
+					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
+						MinuteValue( Min, SHr ) = Numbers( Count );
+						SetMinuteValue( Min, SHr ) = true;
+					}
+					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+						MinuteValue( _, Hr ) = Numbers( Count );
+						SetMinuteValue( _, Hr ) = true;
+					}
+					for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
+						MinuteValue( Min, EHr ) = Numbers( Count );
+						SetMinuteValue( Min, EHr ) = true;
+					}
 				}
 				SHr = EHr;
 				SMin = EMin + 1;
