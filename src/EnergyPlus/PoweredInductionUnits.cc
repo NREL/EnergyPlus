@@ -1424,7 +1424,7 @@ namespace PoweredInductionUnits {
 			}
 		}
 		if ( GetCurrentScheduleValue( PIU( PIUNum ).SchedPtr ) <= 0.0 ) UnitOn = false;
-		if ( ( GetCurrentScheduleValue( PIU( PIUNum ).FanAvailSchedPtr ) <= 0.0 || DataHVACGlobals::TurnFansOff ) && ! DataHVACGlobals::TurnFansOn ) UnitOn = false;
+		if ( ( GetCurrentScheduleValue( PIU( PIUNum ).FanAvailSchedPtr ) <= 0.0 || PIUTurnFansOff ) && ! PIUTurnFansOn ) UnitOn = false;
 		if ( PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow ) PriOn = false;
 		// Set the mass flow rates
 		if ( UnitOn ) {
