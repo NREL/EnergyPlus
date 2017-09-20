@@ -347,6 +347,7 @@ namespace PoweredInductionUnits {
 		int ADUNum;
 		static std::string const RoutineName( "GetPIUs: " ); // include trailing blank space
 		bool SteamMessageNeeded;
+		int FanType_Num; // integer representation of fan type
 
 		// FLOW
 		// find the number of each type of fan coil unit
@@ -439,7 +440,7 @@ namespace PoweredInductionUnits {
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PIU( PIUNum ).FanName ) ); // call constructor
 				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
-
+				PIU( PIUNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->availSchedIndex;
 			} else {
 				bool isNotOkay( false );
 				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
@@ -448,6 +449,8 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 				}
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+				Fans::GetFanType( PIU( PIUNum ).FanName, FanType_Num, ErrorsFound );
+				PIU( PIUNum ).FanAvailSchedPtr = Fans::GetFanAvailSchPtr( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
 			}
 
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
@@ -602,6 +605,7 @@ namespace PoweredInductionUnits {
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PIU( PIUNum ).FanName ) ); // call constructor
 				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
+				PIU( PIUNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->availSchedIndex;
 			} else {
 				bool isNotOkay( false );
 				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
@@ -610,6 +614,8 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 				}
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+				Fans::GetFanType( PIU( PIUNum ).FanName, FanType_Num, ErrorsFound );
+				PIU( PIUNum ).FanAvailSchedPtr = Fans::GetFanAvailSchPtr( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
 			}
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
@@ -1418,6 +1424,7 @@ namespace PoweredInductionUnits {
 			}
 		}
 		if ( GetCurrentScheduleValue( PIU( PIUNum ).SchedPtr ) <= 0.0 ) UnitOn = false;
+		if ( ( GetCurrentScheduleValue( PIU( PIUNum ).FanAvailSchedPtr ) <= 0.0 || PIUTurnFansOff ) && ! PIUTurnFansOn ) UnitOn = false;
 		if ( PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow ) PriOn = false;
 		// Set the mass flow rates
 		if ( UnitOn ) {

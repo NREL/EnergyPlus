@@ -660,6 +660,7 @@ namespace WaterThermalTanks {
 		Real64 WHOffCycParaFracToTank; // tank's off-cycle parasitic frac to tank, disable for rating
 		int WHPLFCurve; // tank part-load fraction curve index, used for rating procedure
 		Real64 OperatingAirFlowRate; // Operating volumetric air flow rate (m3/s)
+		Real64 OperatingAirMassFlowRate; // Operating air mass flow rate (kg/s)
 		Real64 OperatingWaterFlowRate; // Operating volumetric water flow rate (m3/s)
 		Real64 COP; // Heat Pump coefficient of performance (W/W)
 		Real64 SHR; // Heat Pump air-side coil sensible heat ratio
