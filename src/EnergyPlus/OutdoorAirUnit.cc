@@ -1526,7 +1526,7 @@ namespace OutdoorAirUnit {
 			// Air mass balance check
 			if ( ( std::abs( OutAirUnit( OAUnitNum ).ExtAirMassFlow - OutAirUnit( OAUnitNum ).OutAirMassFlow ) > 0.001 )  && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
 				if ( !OutAirUnit( OAUnitNum ).FlowError ) {
-					ShowWarningError( "Air mass flow between zone supply and exhaust is not balanced. Only the first occurence is reported." );
+					ShowWarningError( "Air mass flow between zone supply and exhaust is not balanced. Only the first occurrence is reported." );
 					ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit( OAUnitNum ).Name );
 					ShowContinueError( "Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or other air flow control inputs." );
 					ShowContinueErrorTimeStamp( "The outdoor mass flow rate = " + General::RoundSigDigits( OutAirUnit( OAUnitNum ).OutAirMassFlow, 3 ) + " and the exhaust mass flow rate = " + General::RoundSigDigits( OutAirUnit( OAUnitNum ).ExtAirMassFlow, 3 ) + ".");
