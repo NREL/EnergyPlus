@@ -673,6 +673,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 
 }
 
+
 TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 {
 	std::string const idf_objects = delimited_string( {
@@ -687,11 +688,11 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 		"    ,                        !- Maximum Number of Warmup Days                        ",
 		"    6;                       !- Minimum Number of Warmup Days                        ",
 		"  ShadowCalculation,                                                                 ",
-		"    AverageOverDaysInFrequency, !- Calculation Method                                ",
-		"    1,                          !- Calculation Frequency                             ",
+		"    TimestepFrequency,          !- Calculation Method                                ",
+		"    ,                           !- Calculation Frequency                             ",
 		"    ,                           !- Maximum Figures in Shadow Overlap Calculations    ",
 		"    ,                           !- Polygon Clipping Algorithm                        ",
-		"    ,                           !- Sky Diffuse Modeling Algorithm                    ",
+		"    DetailedSkyDiffuseModeling, !- Sky Diffuse Modeling Algorithm                    ",
 		"    ScheduledShading,           !- External Shading Calculation Method               ",
 		"    Yes;                        !- Output External Shading Calculation Results       ",
 		"  SurfaceConvectionAlgorithm:Inside,TARP;                                            ",
@@ -1026,8 +1027,6 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 	SurfaceGeometry::GetGeometryParameters( FoundError );
 	EXPECT_FALSE( FoundError );
 
-	ScheduleManager::ProcessScheduleInput( );
-
 	SurfaceGeometry::CosZoneRelNorth.allocate( 1 );
 	SurfaceGeometry::SinZoneRelNorth.allocate( 1 );
 
@@ -1036,36 +1035,28 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 	SurfaceGeometry::CosBldgRelNorth = 1.0;
 	SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-	EXPECT_FALSE( AnyLocalEnvironmentsInModel );	
-
-	// Read the surface data, including the surface property
+	compare_err_stream( "" ); // just for debugging
 	SurfaceGeometry::SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
-	EXPECT_FALSE( FoundError );
-
-	SolarShading::GetShadowingInput();
-	EXPECT_FALSE( FoundError );
-
-	compare_err_stream(""); // just for debugging
-	EXPECT_TRUE( AnyLocalEnvironmentsInModel );
-
-	EXPECT_TRUE( DataSystemVariables::UseScheduledSunlitFrac );
-	EXPECT_TRUE( DataSystemVariables::ReportExtShadingSunlitFrac );
+	EXPECT_FALSE( FoundError );	
 
 	SolarShading::AllocateModuleArrays();
 	SolarShading::DetermineShadowingCombinations();
-
-	compare_err_stream( "" ); // just for debugging
-
-	SolarDistribution = FullExterior;
-
 	DataEnvironment::DayOfYear_Schedule = 168;
 	DataEnvironment::DayOfWeek = 6;
 	DataGlobals::TimeStep = 4;
 	DataGlobals::HourOfDay = 9;
+
+	compare_err_stream( "" ); // just for debugging
+
+	DataSurfaces::ShadingTransmittanceVaries = true;
+	DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
+	DataSystemVariables::UseScheduledSunlitFrac = true;
+	SolarDistribution = FullExterior;
+
 	CalcSkyDifShading = true;
 	SolarShading::InitSolarCalculations();
 	SolarShading::SkyDifSolarShading();
-	CalcSkyDifShading = false;	
+	CalcSkyDifShading = false;
 
 	ScheduleManager::UpdateScheduleValues();
 	FigureSolarBeamAtTimestep( DataGlobals::HourOfDay, DataGlobals::TimeStep );
