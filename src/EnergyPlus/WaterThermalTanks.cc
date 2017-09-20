@@ -5522,6 +5522,7 @@ namespace WaterThermalTanks {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
 				}
 				DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
+				HPWaterHeater( HPNum ).OperatingAirMassFlowRate = HPWaterHeater( HPNum ).OperatingAirFlowRate * DataEnvironment::StdRhoAir;
 				if ( CurZoneEqNum > 0 ) {
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
 					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = DataNonZoneNonAirloopValue;
@@ -5587,7 +5588,7 @@ namespace WaterThermalTanks {
 				assert( false );
 			}}
 
-			MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, HPInletDryBulbTemp, HPInletHumRat );
+			MdotAir = HPWaterHeater( HPNum ).OperatingAirMassFlowRate;
 
 			//   set up initial conditions on nodes
 			if ( InletAirMixerNode > 0 ) {
@@ -10919,7 +10920,7 @@ namespace WaterThermalTanks {
 
 					//       set the heat pump air- and water-side mass flow rate
 					MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( WaterThermalTank( WaterThermalTankNum ).TankTemp );
-					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat );
+					MdotAir = HPWaterHeater( HPNum ).OperatingAirMassFlowRate;
 
 					// ?? why is HPWH condenser inlet node temp reset inside the for loop? shouldn't it chnage with the tank temp throughout these iterations?
 					if ( HPWaterHeater( HPNum ).TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) {
