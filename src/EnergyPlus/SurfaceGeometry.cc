@@ -6238,7 +6238,7 @@ namespace SurfaceGeometry {
 
 				// A3: ground temp sch name
 				if ( !lAlphaFieldBlanks( 3 ) ) {
-					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 4 ) );
+					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 3 ) );
 				}
 
 				// The object requires at least one srd surface input, each surface requires a set of 3 fields (2 Alpha fields Name and Temp Sch Name and 1 Num fields View Factor)
