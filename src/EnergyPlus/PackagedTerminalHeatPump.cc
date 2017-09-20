@@ -5629,10 +5629,6 @@ namespace PackagedTerminalHeatPump {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataZoneEquipment::ZoneEquipConfig;
-		using DataAirLoop::AirLoopControlInfo;
-		using DataAirLoop::AirToZoneNodeInfo;
-		using DataAirSystems::PrimaryAirSystem;
 
 		// Locals
 		Real64 SupHeaterLoad; // supplement heater load
