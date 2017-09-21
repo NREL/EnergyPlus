@@ -2546,3 +2546,89 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 	DataHeatBalance::ZoneIntGain.deallocate( );
 
 }
+
+TEST_F( EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac ) {
+	std::string const idf_objects = delimited_string( {
+		"Version,8.4;",
+		"  Zone,",
+		"    Zone 1;                !- Name",
+		"ZoneHVAC:EquipmentConnections,",
+		"    Zone 1,                !- Zone Name",
+		"    Zone 1 Equipment,             !- Zone Conditioning Equipment List Name",
+		"    Zone 1 Supply Inlet,       !- Zone Air Inlet Node or NodeList Name",
+		"    ,      !- Zone Air Exhaust Node or NodeList Name",
+		"    Zone 1 Air Node,           !- Zone Air Node Name",
+		"    Zone 1 Return Node;       !- Zone Return Air Node Name",
+		"ZoneHVAC:EquipmentList,",
+		"    Zone 1 Equipment,             !- Name",
+		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		"    Zone 1 ADU,            !- Zone Equipment 1 Name",
+		"    1,                       !- Zone Equipment 1 Cooling Sequence",
+		"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+		"ZoneHVAC:AirDistributionUnit,",
+		"    Zone 1 ADU,    !- Name",
+		"    Zone 1 Supply Inlet,     !- Air Distribution Unit Outlet Node Name",
+		"    AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type",
+		"    Zone 1 VAV Reheat;           !- Air Terminal Name",
+		"AirTerminal:SingleDuct:VAV:Reheat,",
+		"    Zone 1 VAV Reheat,       !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    Zone 1 VAV Reheat Coil Air Inlet,  !- Damper Air Outlet Node Name",
+		"    Zone 1 Zone Equip Inlet, !- Air Inlet Node Name",
+		"    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+		"    Constant,                !- Zone Minimum Air Flow Input Method",
+		"    autosize,                !- Constant Minimum Air Flow Fraction",
+		"    ,                        !- Fixed Minimum Air Flow Rate{m3/s}",
+		"    ,                        !- Minimum Air Flow Fraction Schedule Name",
+		"    Coil:Heating:Electric,   !- Reheat Coil Object Type",
+		"    Zone 1 Reheat Coil,      !- Reheat Coil Name",
+		"    ,                        !- Maximum Hot Water or Steam Flow Rate{m3/s}",
+		"    ,                        !- Minimum Hot Water or Steam Flow Rate{m3/s}",
+		"    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+		"    0.001,                   !- Convergence Tolerance",
+		"    ,                        !- Damper Heating Action",
+		"    ,                        !- Maximum Flow per Zone Floor Area During Reheat",
+		"    ;                        !- Maximum Flow Fraction During Reheat",
+		"Coil:Heating:Electric,",
+		"    Zone 1 Reheat Coil,      !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    1,                       !- Efficiency",
+		"    100,                     !- Nominal Capacity of the Coil {W}",
+		"    Zone 1 VAV Reheat Coil Air Inlet,  !- Air Inlet Node Name",
+		"    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+		"    ;                        !- Temperature Setpoint Node Name",
+	} ) ;
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	bool ErrorsFound = false;
+	HeatBalanceManager::GetZoneData(ErrorsFound);
+	ASSERT_FALSE(ErrorsFound);
+	DataZoneEquipment::GetZoneEquipmentData1();
+	DataSizing::TermUnitFinalZoneSizing.allocate( 1 );
+	DataSizing::TermUnitSizing.allocate( 1 );
+	DataSizing::FinalZoneSizing.allocate( 1 );
+	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+	SingleDuct::GetSysInput();
+	EXPECT_TRUE( compare_err_stream( "" ) );
+
+	int SysNum = 1;
+
+	// First test -  design min flow < max flow
+	ZoneSizingRunDone = true;
+	CurZoneEqNum = 1;
+	CurTermUnitSizingNum = 1;
+	DataSizing::TermUnitFinalZoneSizing( 1 ).DesCoolVolFlowMin = 0.5;
+	SingleDuct::SizeSys( SysNum );
+	EXPECT_EQ( 0.5, SingleDuct::Sys( SysNum ).ZoneMinAirFrac );
+
+	// First test -  design min flow > max flow
+	ZoneSizingRunDone = true;
+	CurZoneEqNum = 1;
+	CurTermUnitSizingNum = 1;
+	SingleDuct::Sys( SysNum ).ZoneMinAirFrac = AutoSize; // need to reset this so it sizes again
+	DataSizing::TermUnitFinalZoneSizing( 1 ).DesCoolVolFlowMin = 1.5;
+	SingleDuct::SizeSys( SysNum );
+	EXPECT_EQ( 1.0, SingleDuct::Sys( SysNum ).ZoneMinAirFrac );
+}
+
