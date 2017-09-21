@@ -80,7 +80,7 @@ namespace DataSizing {
 	// MODULE PARAMETER DEFINITIONS:
 
 	// parameters for outside air flow method
-	int const NumOAFlowMethods( 6 );
+	int const NumOAFlowMethods( 9 );
 
 	int const OAFlowNone( 0 );
 	int const OAFlowPPer( 1 );
@@ -90,7 +90,7 @@ namespace DataSizing {
 	int const OAFlowSum( 5 );
 	int const OAFlowMax( 6 );
 
-	Array1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum" } );
+	Array1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum", "IndoorAirQualityProcedure", "ProportionalControlBasedonOccupancySchedule", "ProportionalControlBasedOnDesignOccupancy"  } );
 
 	// parameters for outside air
 	int const AllOA( 1 );
