@@ -3768,6 +3768,9 @@ namespace SizingManager {
 					thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
 				}
 				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+
+				// Make sure cooling min flow is at least the minOA flow, regardless of the term unit cooling sizing ratio applied above
+				thisTUFZSizing.DesCoolVolFlowMin = max( thisTUFZSizing.DesCoolVolFlowMin, thisTUFZSizing.MinOA );
 			}
 		}
 	}

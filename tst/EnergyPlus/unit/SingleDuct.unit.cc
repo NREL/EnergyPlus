@@ -2622,7 +2622,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac ) {
 	SingleDuct::SizeSys( SysNum );
 	EXPECT_EQ( 0.5, SingleDuct::Sys( SysNum ).ZoneMinAirFrac );
 
-	// First test -  design min flow > max flow
+	// Second test -  design min flow > max flow
 	ZoneSizingRunDone = true;
 	CurZoneEqNum = 1;
 	CurTermUnitSizingNum = 1;

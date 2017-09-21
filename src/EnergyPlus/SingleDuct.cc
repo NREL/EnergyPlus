@@ -2099,7 +2099,7 @@ namespace SingleDuct {
 		}
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
 			if ( ZoneSizingRunDone ) {
-				if ( CurZoneEqNum > 0 ) {
+				if ( CurTermUnitSizingNum > 0 ) {
 					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
 					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 						MinAirFlowFracDes = min( 1.0, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate );
@@ -2152,7 +2152,7 @@ namespace SingleDuct {
 		}
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
 			if ( ZoneSizingRunDone ) {
-				if ( CurZoneEqNum > 0 ) {
+				if ( CurTermUnitSizingNum > 0 ) {
 					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
 					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 						FixedMinAirDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlowMin;
@@ -2226,7 +2226,7 @@ namespace SingleDuct {
 
 		if ( Sys( SysNum ).DamperHeatingAction == ReverseActionWithLimits) {
 			if ( ZoneSizingRunDone ) {
-				if ( CurZoneEqNum > 0 ) {
+				if ( CurTermUnitSizingNum > 0 ) {
 					// if zone sizing run done, set the design max reheat air flow to the value from the design calcs
 					MaxAirVolFlowRateDuringReheatDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlowMax;
 				}

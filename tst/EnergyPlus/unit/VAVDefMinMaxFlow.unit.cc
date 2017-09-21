@@ -234,6 +234,7 @@ namespace EnergyPlus {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		FinalZoneSizing.allocate( 1 );
+		NumAirTerminalSizingSpec = 1;
 		TermUnitFinalZoneSizing.allocate( 1 );
 		CalcFinalZoneSizing.allocate( 1 );
 		TermUnitSizing.allocate( 1 );
@@ -251,8 +252,6 @@ namespace EnergyPlus {
 		CurZoneEqNum = 1;
 		CurTermUnitSizingNum = 1;
 		Zone( 1 ).FloorArea = 96.48;
-		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.21081;
-		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
@@ -282,6 +281,7 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.0 );
 		EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax, 0.084324, 0.000001 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
+		UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
 		SizeSys( 1 );
 		EXPECT_DOUBLE_EQ( Sys( CurZoneEqNum ).ZoneMinAirFrac, 0.22 );
 		EXPECT_NEAR( Sys( CurZoneEqNum ).MaxAirVolFlowRateDuringReheat, 0.084324, 0.000001 );
@@ -414,6 +414,7 @@ namespace EnergyPlus {
 
 		FinalZoneSizing.allocate( 1 );
 		TermUnitFinalZoneSizing.allocate( 1 );
+		NumAirTerminalSizingSpec = 1;
 		CalcFinalZoneSizing.allocate( 1 );
 		TermUnitSizing.allocate( 1 );
 		GetZoneData( ErrorsFound );
@@ -430,8 +431,6 @@ namespace EnergyPlus {
 		CurZoneEqNum = 1;
 		CurTermUnitSizingNum = 1;
 		Zone( 1 ).FloorArea = 96.48;
-		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.21081;
-		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
@@ -461,6 +460,7 @@ namespace EnergyPlus {
 		EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.196047, 0.000001 );
 		// EXPECT_NEAR( FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax, 0.084324, 0.000001 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
+		UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
 		SizeSys( 1 );
 		EXPECT_NEAR( Sys( CurZoneEqNum ).ZoneMinAirFrac, 0.348739, 0.000001 );
 		EXPECT_NEAR( Sys( CurZoneEqNum ).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001 );
@@ -921,6 +921,7 @@ namespace EnergyPlus {
 		ASSERT_FALSE( process_idf( idf_objects ) );
 
 		FinalZoneSizing.allocate( 1 );
+		NumAirTerminalSizingSpec = 1;
 		TermUnitFinalZoneSizing.allocate( 1 );
 		CalcFinalZoneSizing.allocate( 1 );
 		TermUnitSizing.allocate( 1 );
@@ -938,8 +939,6 @@ namespace EnergyPlus {
 		CurZoneEqNum = 1;
 		CurTermUnitSizingNum = 1;
 		Zone( 1 ).FloorArea = 96.48;
-		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.21081;
-		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.21081;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.11341;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
@@ -969,6 +968,7 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow2, 0.0 );
 		EXPECT_DOUBLE_EQ( FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax, 0.08 );
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;
+		UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
 		SizeSys( 1 );
 		EXPECT_DOUBLE_EQ( Sys( CurZoneEqNum ).ZoneMinAirFrac, 0.07351776 / 0.21081 );
 		EXPECT_DOUBLE_EQ( Sys( CurZoneEqNum ).MaxAirVolFlowRateDuringReheat, 0.08 );
