@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -98,6 +98,7 @@
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SimAirServingZones.hh>
+#include <SizingManager.hh>
 #include <SystemAvailabilityManager.hh>
 #include <SystemReports.hh>
 //#include <ThermalChimney.hh>
@@ -252,6 +253,7 @@ namespace HVACManager {
 
 		using NodeInputManager::CalcMoreNodeInfo;
 		using ZoneEquipmentManager::UpdateZoneSizing;
+		using SizingManager::UpdateFacilitySizing;
 		using OutputReportTabular::UpdateTabularReports; // added for writing tabular output reports
 		using OutputReportTabular::GatherComponentLoadsHVAC;
 		using DataGlobals::CompLoadReportIsReq;
@@ -272,6 +274,7 @@ namespace HVACManager {
 		using SystemAvailabilityManager::ManageHybridVentilation;
 		using DataHeatBalFanSys::SysDepZoneLoads;
 		using DataHeatBalFanSys::SysDepZoneLoadsLagged;
+		using DataHeatBalFanSys::QRadSurfAFNDuct;
 		using DataHeatBalFanSys::ZTAVComf;
 		using DataHeatBalFanSys::ZoneAirHumRatAvgComf;
 		using DataSystemVariables::ReportDuringWarmup; // added for FMI
@@ -357,7 +360,6 @@ namespace HVACManager {
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			ResetNodeData();
 			AirLoopsSimOnce = false;
 			MyEnvrnFlag = false;
 			InitVentReportFlag = true;
@@ -368,6 +370,7 @@ namespace HVACManager {
 			MyEnvrnFlag = true;
 		}
 
+		QRadSurfAFNDuct = 0.0;
 		SysTimeElapsed = 0.0;
 		TimeStepSys = TimeStepZone;
 		FirstTimeStepSysFlag = true;
@@ -525,6 +528,7 @@ namespace HVACManager {
 				}
 				if ( ZoneSizingCalc ) {
 					UpdateZoneSizing( DuringDay );
+					UpdateFacilitySizing( DuringDay );
 				}
 			} else if ( ! KickOffSimulation && DoOutputReporting && ReportDuringWarmup ) {
 				if ( BeginDayFlag && ! PrintEnvrnStampWarmupPrinted ) {
@@ -756,8 +760,8 @@ namespace HVACManager {
 		PlantManageHalfLoopCalls = 0;
 		SetAllPlantSimFlagsToValue( true );
 		if ( ! SimHVACIterSetup ) {
-			SetupOutputVariable( "HVAC System Solver Iteration Count []", HVACManageIteration, "HVAC", "Sum", "SimHVAC" );
-			SetupOutputVariable( "Air System Solver Iteration Count []", RepIterAir, "HVAC", "Sum", "SimHVAC" );
+			SetupOutputVariable( "HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC" );
+			SetupOutputVariable( "Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC" );
 			ManageSetPoints(); //need to call this before getting plant loop data so setpoint checks can complete okay
 			GetPlantLoopData();
 			GetPlantInput();
@@ -770,8 +774,8 @@ namespace HVACManager {
 			}
 
 			if ( TotNumLoops > 0 ) {
-				SetupOutputVariable( "Plant Solver Sub Iteration Count []", PlantManageSubIterations, "HVAC", "Sum", "SimHVAC" );
-				SetupOutputVariable( "Plant Solver Half Loop Calls Count []", PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC" );
+				SetupOutputVariable( "Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, PlantManageSubIterations, "HVAC", "Sum", "SimHVAC" );
+				SetupOutputVariable( "Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC" );
 				for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 					// init plant sizing numbers in main plant data structure
 					InitOneTimePlantSizingInfo( LoopNum );
@@ -843,7 +847,7 @@ namespace HVACManager {
 			++HVACManageIteration; // Increment the iteration counter
 
 			if ( anyEMSRan && HVACManageIteration <= 2 ) {
-				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice 
+				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
 				SimAirLoopsFlag = true;
 			}
 
@@ -1492,7 +1496,7 @@ namespace HVACManager {
 		bool & SimZoneEquipment, // True when zone equipment components need to be (re)simulated
 		bool & SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
 		bool & SimPlantLoops, // True when the main plant loops need to be (re)simulated
-		bool & SimElecCircuits, // True when electic circuits need to be (re)simulated
+		bool & SimElecCircuits, // True when electric circuits need to be (re)simulated
 		bool & FirstHVACIteration, // True when solution technique on first iteration
 		bool const LockPlantFlows
 	)

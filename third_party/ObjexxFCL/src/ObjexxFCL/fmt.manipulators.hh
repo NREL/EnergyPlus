@@ -3,13 +3,13 @@
 
 // Fortran-Compatible Formatted Input/Output Support Manipulators
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -265,9 +265,9 @@ private: // Methods
 		if ( v != T( 0 ) ) {
 			vexp = int( std::floor( std::log10( v ) ) ) + 1 - k_;
 			if ( -vexp < 309 ) {
-				v *= std::pow( 10, -vexp );
+				v = T( v * std::pow( 10, -vexp ) );
 			} else {
-				v *= std::pow( (long double) 10, (long double) -vexp ); // VC++ 2013 is missing C++11 pow template overload
+				v = T( v * std::pow( (long double) 10, (long double) -vexp ) ); // VC++ 2013 is missing C++11 pow template overload
 			}
 			if ( k_ >= 0 ) {
 				std::string const k_str( "1" + std::string( k_, '0' ) + "." );
@@ -435,7 +435,7 @@ private: // Methods
 		if ( v != T( 0 ) ) {
 			int const vl10( static_cast< int >( std::floor( std::log10( v ) ) ) );
 			vexp = ( vl10 >= 0 ? ( vl10 / 3 ) * 3 : ( ( -vl10 + 3 ) / 3 ) * ( -3 ) );
-			v *= std::pow( 10, -vexp );
+			v = T( v * std::pow( 10, -vexp ) );
 			std::ostringstream x;
 			x << std::fixed << v;
 			if ( x.str().substr( 0, 5 ) == std::string( "1000." ) ) { // Rounding adjustment
@@ -576,7 +576,7 @@ private: // Methods
 		int vexp( 0 );
 		if ( v != T( 0 ) ) {
 			vexp = static_cast< int >( std::floor( std::log10( v ) ) );
-			v *= std::pow( 10, -vexp );
+			v = T( v * std::pow( 10, -vexp ) );
 			std::ostringstream x;
 			x << std::fixed << v;
 			if ( x.str().substr( 0, 3 ) == std::string( "10." ) ) { // Rounding adjustment

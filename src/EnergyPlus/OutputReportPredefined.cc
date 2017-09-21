@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -283,8 +283,9 @@ namespace OutputReportPredefined {
 	int pdchExLtConsump;
 	int pdstDaylight;
 	int pdchDyLtZone;
+	int pdchDyLtCtrlName;
 	int pdchDyLtKind;
-	int pdchDyLtCtrl;
+	int pdchDyLtCtrlType;
 	int pdchDyLtFrac;
 	int pdchDyLtWInst;
 	int pdchDyLtWCtrl;
@@ -652,8 +653,12 @@ namespace OutputReportPredefined {
 	int pdchLeedPerfElDem;
 	int pdchLeedPerfGasEneUse;
 	int pdchLeedPerfGasDem;
-	int pdchLeedPerfOthEneUse;
-	int pdchLeedPerfOthDem;
+	int pdchLeedPerfAddFuelEneUse;
+	int pdchLeedPerfAddFuelDem;
+	int pdchLeedPerfDisClEneUse;
+	int pdchLeedPerfDisClDem;
+	int pdchLeedPerfDisHtEneUse;
+	int pdchLeedPerfDisHtDem;
 
 	int pdstLeedEneUseSum;
 	int pdchLeedEusUnt;
@@ -681,6 +686,18 @@ namespace OutputReportPredefined {
 
 	int pdstLeedEneUsePerc;
 	int pdchLeedEupPerc;
+
+	int pdstLeedEqFlLdHrs;
+	int pdchLeedEflhEflh;
+	int pdchLeedEflhNonZerHrs;
+
+	int pdstLeedSchedSetPts;
+	int pdChLeedSchStPtFirstObjUsed;
+	int pdChLeedSchStPtMonthUsed;
+	int pdchLeedSchStPt11amWednesday;
+	int pdchLeedSchStPt11amWedCnt;
+	int pdchLeedSchStPt11pmWednesday;
+	int pdchLeedSchStPt11pmWedCnt;
 
 	// Internal data structures to store information provided by calls
 
@@ -902,8 +919,9 @@ namespace OutputReportPredefined {
 		pdchExLtConsump = 0;
 		pdstDaylight = 0;
 		pdchDyLtZone = 0;
+		pdchDyLtCtrlName = 0;
 		pdchDyLtKind = 0;
-		pdchDyLtCtrl = 0;
+		pdchDyLtCtrlType = 0;
 		pdchDyLtFrac = 0;
 		pdchDyLtWInst = 0;
 		pdchDyLtWCtrl = 0;
@@ -1220,8 +1238,12 @@ namespace OutputReportPredefined {
 		pdchLeedPerfElDem = 0;
 		pdchLeedPerfGasEneUse = 0;
 		pdchLeedPerfGasDem = 0;
-		pdchLeedPerfOthEneUse = 0;
-		pdchLeedPerfOthDem = 0;
+		pdchLeedPerfAddFuelEneUse = 0;
+		pdchLeedPerfAddFuelDem = 0;
+		pdchLeedPerfDisClEneUse = 0;
+		pdchLeedPerfDisClDem = 0;
+		pdchLeedPerfDisHtEneUse = 0;
+		pdchLeedPerfDisHtDem = 0;
 		pdstLeedEneUseSum = 0;
 		pdchLeedEusUnt = 0;
 		pdchLeedEusProc = 0;
@@ -1428,8 +1450,9 @@ namespace OutputReportPredefined {
 		pdstDaylight = newPreDefSubTable( pdrLighting, "Daylighting" );
 
 		pdchDyLtZone = newPreDefColumn( pdstDaylight, "Zone" );
-		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Type" ); //detailed or DElight
-		pdchDyLtCtrl = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
+		pdchDyLtCtrlName = newPreDefColumn (pdstDaylight, "Control Name");
+		pdchDyLtKind = newPreDefColumn( pdstDaylight, "Daylighting Method" ); //detailed or DElight
+		pdchDyLtCtrlType = newPreDefColumn( pdstDaylight, "Control Type" ); //stepped or continuous
 		pdchDyLtFrac = newPreDefColumn( pdstDaylight, "Fraction Controlled" );
 		pdchDyLtWInst = newPreDefColumn( pdstDaylight, "Lighting Installed in Zone [W]" );
 		pdchDyLtWCtrl = newPreDefColumn( pdstDaylight, "Lighting Controlled [W]" );
@@ -2010,8 +2033,12 @@ namespace OutputReportPredefined {
 		pdchLeedPerfElDem = newPreDefColumn( pdstLeedPerf, "Electric Demand [W]" );
 		pdchLeedPerfGasEneUse = newPreDefColumn( pdstLeedPerf, "Natural Gas Energy Use [GJ]" );
 		pdchLeedPerfGasDem = newPreDefColumn( pdstLeedPerf, "Natural Gas Demand [W]" );
-		pdchLeedPerfOthEneUse = newPreDefColumn( pdstLeedPerf, "Additional Energy Use [GJ]" );
-		pdchLeedPerfOthDem = newPreDefColumn( pdstLeedPerf, "Additional Demand [W]" );
+		pdchLeedPerfAddFuelEneUse = newPreDefColumn( pdstLeedPerf, "Additional Fuel Use [GJ]" );
+		pdchLeedPerfAddFuelDem = newPreDefColumn( pdstLeedPerf, "Additional Fuel Demand [W]" );
+		pdchLeedPerfDisClEneUse = newPreDefColumn( pdstLeedPerf, "District Cooling Use [GJ]" );
+		pdchLeedPerfDisClDem = newPreDefColumn( pdstLeedPerf, "District Cooling Demand [W]" );
+		pdchLeedPerfDisHtEneUse = newPreDefColumn( pdstLeedPerf, "District Heating Use [GJ]" );
+		pdchLeedPerfDisHtDem = newPreDefColumn( pdstLeedPerf, "District Heating Demand [W]" );
 
 		pdstLeedEneUseSum = newPreDefSubTable( pdrLeed, "EAp2-6. Energy Use Summary" );
 		// Multiple columns with rows of:
@@ -2072,6 +2099,18 @@ namespace OutputReportPredefined {
 		//    Receptacle Equipment
 		//    Miscellaneous
 		pdchLeedEupPerc = newPreDefColumn( pdstLeedEneUsePerc, "Percent [%]" );
+
+		pdstLeedEqFlLdHrs = newPreDefSubTable( pdrLeed, "Schedules-Equivalent Full Load Hours (Schedule Type=Fraction)" );
+		pdchLeedEflhEflh = newPreDefColumn( pdstLeedEqFlLdHrs, "Equivalent Full Load Hours of Operation Per Year [hr]" );
+		pdchLeedEflhNonZerHrs = newPreDefColumn( pdstLeedEqFlLdHrs, "Hours > 1% [hr]" );
+
+		pdstLeedSchedSetPts = newPreDefSubTable( pdrLeed, "Schedules-SetPoints (Schedule Type=Temperature)" );
+		pdChLeedSchStPtFirstObjUsed = newPreDefColumn( pdstLeedSchedSetPts, "First Object Used" );
+		pdChLeedSchStPtMonthUsed = newPreDefColumn( pdstLeedSchedSetPts, "Month Assumed" );
+		pdchLeedSchStPt11amWednesday = newPreDefColumn( pdstLeedSchedSetPts, "11am First Wednesday [C]" );
+		pdchLeedSchStPt11amWedCnt = newPreDefColumn( pdstLeedSchedSetPts, "Days with Same 11am Value" );
+		pdchLeedSchStPt11pmWednesday = newPreDefColumn( pdstLeedSchedSetPts, "11pm First Wednesday [C]" );
+		pdchLeedSchStPt11pmWedCnt = newPreDefColumn( pdstLeedSchedSetPts, "Days with Same 11pm Value" );
 
 	}
 
@@ -2250,7 +2289,7 @@ namespace OutputReportPredefined {
 	{
 		for ( int iTableEntry = 1; iTableEntry <= numTableEntry; ++iTableEntry ) {
 			if ( tableEntry( iTableEntry ).indexColumn == columnIndex && tableEntry( iTableEntry ).objectName == objName ){
-				return trimmed( left_justified(tableEntry( iTableEntry ).charEntry) );
+				return trimmed( ljustified(tableEntry( iTableEntry ).charEntry) );
 				break;
 			}
 		}

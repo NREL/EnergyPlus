@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -46,7 +46,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <CommandLineInterface.hh>
@@ -560,7 +560,7 @@ namespace DataTimings {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Int32 icount;
 
-		SYSTEM_CLOCK32( icount );
+		SYSTEM_CLOCK( icount );
 
 		calctime = double( icount ) / clockrate; // clockrate is set by main program.
 

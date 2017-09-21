@@ -274,7 +274,7 @@ N = number of zones served by the air loop, which is provided in the input for a
 
 \subsection{Proportional Control}\label{proportional-control}
 
-The control has two choices: ProportionalControlBasedonOccupancySchedule and ProportionalControlBasedonDesignOccupancy. The difference is occupancy level. The former uses real time occupancy, while the latter uses design occupancy level. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO\(_{2}\)-based DCV with Proportional Control:
+The control has three choices: ProportionalControlBasedonOccupancySchedule,  ProportionalControlBasedonDesignOccupancy, and ProportionalControlBasedOnDesignOARate. The difference is occupancy level in the first two choices. The former uses real time occupancy, while the latter uses design occupancy level. The third choice is used to calculate the outdoor airflow rate based on design outdoor air flow rate, specified in the DesignSpecification:OutdoorAir object. Like Ventilation Rate Procedure and the Indoor Air Quality Procedure, the following three objects must be included in the input data file in order to model CO\(_{2}\)-based DCV with Proportional Control:
 
 \begin{itemize}
   \item \textbf{AirLoopHVAC:OutdoorAirSystem} to simulate the mixed air box of the air loop
@@ -290,17 +290,30 @@ For the i-th zone, the outdoor air mass flow rate provided by the air loop is ca
 {V_{ot - design,i}} = \frac{{\left( {{R_{p,i}}.{P_{z,i}} \times {SchedFrac_i}} \right) + ({R_{a,i}}.{A_{z,i}} \times {SchedFrac_i})}}{{{E_i}}}
 \end{equation}
 
+if ProportionalControlBasedOnDesignOARate is specified, the required intake flow rate will be revised as:
+
+ \begin{equation} {V_{ot - design,i}} = \frac{Design Outdoor Air Flow Rate_i} {E_i} \end{equation}
+
+The Design Outdoor Air Flow Rate is determined in the DesignSpecification:OutdoorAir object. 
+
 2)~~~The required intake flow of outdoor air when the zone is unoccupied i.e.~ \emph{P\(_{z,i}\)} = 0
 
 \begin{equation}
 {V_{ot - min,i}} = \frac{{({R_{a,i}}.{A_{z,i}} \times {SchedFrac_i})}}{{{E_i}}}
 \end{equation}
 
+if ProportionalControlBasedOnDesignOARate is specified, the required intake flow rate will be revised as:
+
+ \begin{equation} {V_{ot - min,i}} = \frac{ {Design Outdoor Air Flow Rate_i} \times {SchedPropMin_i} } {E_i} \end{equation}
+
+
 3)~~~The target indoor CO\(_{2}\) concentration at \({V_{ot - design,i}}\)
 
 \begin{equation}
 {C_{s - design,i}} = {C_o} + \frac{N}{{\left( {{V_{ot - design,i}}/{P_{z,i}}} \right)}}
 \end{equation}
+
+When the field of Maximum Carbon Dioxide Concentration Schedule Name is entered, the schedule value is used for {C_{s - design,i}} instead of the calculated value. 
 
 4)~~~The target indoor CO\(_{2}\) concentration at \({V_{ot - min}}\) ~is either a user input in the object ZoneControl:ContaminantController or equal to the outdoor CO\(_{2}\) concentration. The default is outdoor CO\(_{2}\) concentration.
 
@@ -323,6 +336,8 @@ Where,
 \({P_{z,i}}\) ~ = Design zone population, number of people
 
 \({SchedFrac_i}\) ~ = the Outdoor Air Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
+
+\({SchedPropMin_i}\) ~ = the Proportional Control Minimum Outdoor Air Flow Rate Schedule value for the zone, if specified in the corresponding DesignSpecification:OutdoorAir object (defaults to 1.0)
 
 When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy * current schedule value. When ProportionalControlBasedonDesignOccupancy is specified, number of people = design occupancy.
 

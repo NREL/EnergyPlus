@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -191,6 +191,9 @@ namespace ChillerReformulatedEIR {
 		int EIRFPLRTIterIndex; // Index for condenser outlet temperature EIRFPLR warning messages
 		int EIRFPLRPLRIter; // Iteration counter for part-load ratio EIRFPLR warning messages
 		int EIRFPLRPLRIterIndex; // Index for part-load ratio EIRFPLR warning messages
+		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
+		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
 		int IterLimitExceededNum; // Iteration limit exceeded for RegulaFalsi routine
 		int IterLimitErrIndex; // Index to iteration limit warning for RegulaFalsi routine
 		int IterFailed; // Iteration limit failed for RegulaFalsi routine
@@ -217,6 +220,11 @@ namespace ChillerReformulatedEIR {
 		//  INTEGER           :: MsgErrorCount = 0   ! number of occurrences of warning
 		//  INTEGER           :: ErrCount1     = 0   ! for recurring error messages
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
+		//Operational fault parameters
+		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		ReformulatedEIRChillerSpecs() :
@@ -296,6 +304,9 @@ namespace ChillerReformulatedEIR {
 			EIRFPLRTIterIndex( 0 ),
 			EIRFPLRPLRIter( 0 ),
 			EIRFPLRPLRIterIndex( 0 ),
+			FaultyChillerSWTFlag( false ),
+			FaultyChillerSWTIndex( 0 ),
+			FaultyChillerSWTOffset( 0.0 ),
 			IterLimitExceededNum( 0 ),
 			IterLimitErrIndex( 0 ),
 			IterFailed( 0 ),
@@ -315,7 +326,10 @@ namespace ChillerReformulatedEIR {
 			HRBranchNum( 0 ),
 			HRCompNum( 0 ),
 			CondMassFlowIndex( 0 ),
-			PossibleSubcooling( false )
+			PossibleSubcooling( false ),
+			FaultyChillerFoulingFlag( false ),
+			FaultyChillerFoulingIndex( 0 ),
+			FaultyChillerFoulingFactor( 1.0 )
 		{}
 	};
 

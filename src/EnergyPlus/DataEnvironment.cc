@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -216,6 +216,10 @@ namespace DataEnvironment {
 	std::string EnvironmentStartEnd; // Start/End dates for Environment
 	bool CurrentYearIsLeapYear( false ); // true when current year is leap year (convoluted logic dealing with
 	// whether weather file allows leap years, runperiod inputs.
+	
+	int varyingLocationSchedIndexLat( 0 );
+	int varyingLocationSchedIndexLong( 0 );
+	int varyingOrientationSchedIndex( 0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataEnvironment:
 	//PUBLIC OutBaroPressAt
@@ -335,6 +339,9 @@ namespace DataEnvironment {
 		RunPeriodEnvironment = false;
 		EnvironmentStartEnd = std::string();
 		CurrentYearIsLeapYear = false;
+		varyingLocationSchedIndexLat = 0;
+		varyingLocationSchedIndexLong = 0;
+		varyingOrientationSchedIndex = 0;
 	}
 
 	Real64

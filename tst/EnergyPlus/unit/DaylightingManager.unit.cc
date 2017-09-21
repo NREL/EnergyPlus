@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -68,6 +68,7 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DaylightingManager;
 using namespace EnergyPlus::DataDaylighting;
+using namespace EnergyPlus::DataSurfaces;
 
 TEST_F( EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test )
 {
@@ -706,4 +707,38 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test )
 	EXPECT_NEAR( 3.048, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 1, 1 ), 0.001 );
 	EXPECT_NEAR( -2.048, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 2, 1 ), 0.001 );
 	EXPECT_NEAR( 0.9, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 3, 1 ), 0.001 );
+}
+
+TEST_F (EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
+{
+
+	Surface.allocate(1);
+	Surface(1).Tilt = 90.0;
+	Surface(1).Azimuth = 180.0;
+	int horiz = 1;
+	int vert = 2;
+	Real64 ProfAng;
+	Vector3< Real64 > CosDirSun; // Solar direction cosines
+
+	CosDirSun (1) = 0.882397;
+	CosDirSun (2) = 0.470492;
+	CosDirSun (3) = 0.003513;
+
+	ProfileAngle(1, CosDirSun, horiz, ProfAng);
+	EXPECT_NEAR(0.00747,ProfAng, 0.00001);
+
+	ProfileAngle(1, CosDirSun, vert, ProfAng);
+	EXPECT_NEAR(2.06065, ProfAng, 0.00001);
+
+
+	CosDirSun(1) = 0.92318;
+	CosDirSun(2) = 0.36483;
+	CosDirSun(3) = 0.12094;
+
+	ProfileAngle(1, CosDirSun, horiz, ProfAng);
+	EXPECT_NEAR(0.32010, ProfAng, 0.00001);
+
+	ProfileAngle(1, CosDirSun, vert, ProfAng);
+	EXPECT_NEAR(1.94715, ProfAng, 0.00001);
+
 }

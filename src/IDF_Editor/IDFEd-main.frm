@@ -10,10 +10,17 @@ Begin VB.Form IDFEdit
    ClientWidth     =   10035
    Icon            =   "IDFEd-main.frx":0000
    LinkTopic       =   "Form1"
-   LockControls    =   -1  'True
    MDIChild        =   -1  'True
    ScaleHeight     =   7275
    ScaleWidth      =   10035
+   Begin VB.CommandButton cmdDuplicateObjectAndChange 
+      Caption         =   "Dup Obj + Chg"
+      Height          =   330
+      Left            =   3120
+      TabIndex        =   21
+      Top             =   60
+      Width           =   1260
+   End
    Begin VB.Timer timerJumpList 
       Interval        =   100
       Left            =   1680
@@ -111,7 +118,7 @@ Begin VB.Form IDFEdit
    Begin VB.CommandButton cmdCopyObject 
       Caption         =   "Copy Obj"
       Height          =   330
-      Left            =   4080
+      Left            =   5400
       TabIndex        =   7
       Top             =   60
       Width           =   900
@@ -120,7 +127,7 @@ Begin VB.Form IDFEdit
       Caption         =   "Paste Obj"
       Enabled         =   0   'False
       Height          =   330
-      Left            =   5040
+      Left            =   6360
       TabIndex        =   8
       Top             =   60
       Width           =   900
@@ -144,7 +151,7 @@ Begin VB.Form IDFEdit
    Begin VB.CommandButton cmdDeleteObject 
       Caption         =   "Del Obj"
       Height          =   330
-      Left            =   3120
+      Left            =   4440
       TabIndex        =   6
       Top             =   60
       Width           =   900
@@ -213,13 +220,13 @@ Begin VB.Form IDFEdit
    End
    Begin MSComctlLib.Toolbar Toolbar1 
       Align           =   1  'Align Top
-      Height          =   420
+      Height          =   336
       Left            =   0
       TabIndex        =   0
       Top             =   0
-      Width           =   10035
+      Width           =   10032
       _ExtentX        =   17701
-      _ExtentY        =   741
+      _ExtentY        =   582
       ButtonWidth     =   609
       ButtonHeight    =   582
       AllowCustomize  =   0   'False
@@ -389,7 +396,7 @@ Begin VB.Form IDFEdit
       Width           =   4575
    End
    Begin VB.ListBox lstObjectTypes 
-      Height          =   2400
+      Height          =   2205
       Left            =   120
       TabIndex        =   9
       Top             =   1725
@@ -573,6 +580,9 @@ Begin VB.Form IDFEdit
       End
       Begin VB.Menu mnuEditDuplicate 
          Caption         =   "Dup&licate Object"
+      End
+      Begin VB.Menu mnuEditDuplicateAndChange 
+         Caption         =   "Duplicate and Change Object"
       End
       Begin VB.Menu mnuEditDelete 
          Caption         =   "&Delete Object"
@@ -999,6 +1009,7 @@ End Sub
 
 
 
+
 '-----------------------------------------------------------------------------
 ' When the form is activated resize it.
 '-----------------------------------------------------------------------------
@@ -1129,11 +1140,13 @@ grdNew.ColWidth(-1) = defaultColumnWidth
 grdNew.ColWidth(0) = 4000
 grdNew.ColWidth(1) = 1000
 cmdDuplicateObject.Enabled = False
+cmdDuplicateObjectAndChange.Enabled = False
 cmdDeleteObject.Enabled = False
 cmdPasteObject.Enabled = doesClipContainObject()
 cmdCopyObject.Enabled = False
 mnuEditDelete.Enabled = False
 mnuEditDuplicate.Enabled = False
+mnuEditDuplicateAndChange.Enabled = False
 mnuEditPaste.Enabled = doesClipContainObject()
 currentFormLayoutOption = formLayoutOption
 saveOrderOption = saveOrderOptDefault
@@ -1967,10 +1980,12 @@ If IDDClassObjPt(actClass).objectCount > 0 Then
   grdNew.LeftCol = 2
   Call selectCell
   cmdDuplicateObject.Enabled = True
+  cmdDuplicateObjectAndChange.Enabled = True
   cmdDeleteObject.Enabled = True
   cmdCopyObject.Enabled = True
   mnuEditDelete.Enabled = True
   mnuEditDuplicate.Enabled = True
+  mnuEditDuplicateAndChange.Enabled = True
   mnuEditCopy.Enabled = True
 Else
   If IDDClassDat(actClass).memo <> "" Then
@@ -1979,10 +1994,12 @@ Else
     txtExplain.Text = ""
   End If
   cmdDuplicateObject.Enabled = False
+  cmdDuplicateObjectAndChange.Enabled = False
   cmdDeleteObject.Enabled = False
   cmdCopyObject.Enabled = False
   mnuEditDelete.Enabled = False
   mnuEditDuplicate.Enabled = False
+  mnuEditDuplicateAndChange.Enabled = False
   mnuEditCopy.Enabled = False
 End If
 End Sub
@@ -2037,6 +2054,7 @@ Private Sub mnuCreateRefObjListTxt_Click()
 Call dumpRefObjList
 MsgBox "RefObjList.txt file created in program directory.", vbInformation, "Create RefObjList.txt"
 End Sub
+
 
 Private Sub mnuEditFillRight_Click()
 Call fillGridToRight
@@ -2121,22 +2139,13 @@ End Sub
 ' EDIT MENU STUBS
 '-----------------------------------------------------------------------------
 Private Sub mnuEditDelete_Click()
-Call cmdDeleteObject_Click
+Call IDFDeleteObject
 End Sub
 Private Sub mnuEditDuplicate_Click()
-Dim li As Long
-li = lstObjectTypes.ListIndex
 Call IDFDuplicateObject
-Call FillList
-Call FillGrid
-If li > lstObjectTypes.ListCount - 1 Then
-  li = 0
-End If
-lstObjectTypes.ListIndex = li
-grdNew.Col = grdNew.Cols - 1
-grdNew.ShowCell grdNew.TopRow, grdNew.Cols - 1
-Call selectCell
-Call ShowFileAltered
+End Sub
+Private Sub mnuEditDuplicateAndChange_Click()
+Call IDFDuplicateObjectAndChange
 End Sub
 Private Sub mnuEditNew_Click()
 Dim li As Long
@@ -2537,39 +2546,13 @@ Select Case Button.Key
 End Select
 End Sub
 Private Sub cmdDeleteObject_Click()
-Dim li As Long
-Dim colPreserve As Long
-li = lstObjectTypes.ListIndex
-colPreserve = grdNew.Col
 Call IDFDeleteObject
-Call FillList
-Call FillGrid
-If li > lstObjectTypes.ListCount - 1 Then
-  li = 0
-End If
-lstObjectTypes.ListIndex = li
-Call lstObjectTypes_Click
-If colPreserve > 2 And colPreserve < grdNew.Cols Then
-  grdNew.Col = colPreserve
-  Call selectCell
-  grdNew.ShowCell grdNew.TopRow, grdNew.Col
-End If
-Call ShowFileAltered
 End Sub
 Private Sub cmdDuplicateObject_Click()
-Dim li As Long
-li = lstObjectTypes.ListIndex
 Call IDFDuplicateObject
-Call FillList
-Call FillGrid
-If li > lstObjectTypes.ListCount - 1 Then
-  li = 0
-End If
-lstObjectTypes.ListIndex = li
-grdNew.Col = grdNew.Cols - 1
-grdNew.ShowCell grdNew.TopRow, grdNew.Cols - 1
-Call selectCell
-Call ShowFileAltered
+End Sub
+Private Sub cmdDuplicateObjectAndChange_Click()
+Call IDFDuplicateObjectAndChange
 End Sub
 Private Sub cmdNewObject_Click()
 Dim li As Long
@@ -3028,7 +3011,7 @@ If IDDClassDat(IDDClassCur).specialMultiUnit Then
         If refFieldVal <> "" Then
           unitFound = 0
           For iUnit = 1 To maxUsedConvUnits
-            If refFieldVal = convUnits(iUnit).multiUnitName Then
+            If UCase(refFieldVal) = UCase(convUnits(iUnit).multiUnitName) Then
               unitFound = iUnit
               Exit For
             End If
@@ -4186,16 +4169,100 @@ End Sub
 ' selected object into the new object
 '-----------------------------------------------------------------------------
 Sub IDFDuplicateObject()
+Dim rowSt As Long, rowEnd As Long, colSt As Long, colEnd As Long
 Dim iVal As Long, i As Long, numFields As Long
+Dim li As Long
+Dim iCol As Long, iObj As Long
+li = lstObjectTypes.ListIndex
+grdNew.GetSelection rowSt, colSt, rowEnd, colEnd
 If actObject = 0 Then Exit Sub    'can't duplicate if not on a selected object
-iVal = IDFObject(actObject).valueStart
+For iCol = colSt To colEnd
+  iObj = grdNew.ColData(iCol)
+  iVal = IDFObject(iObj).valueStart
+  numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+  Call IDFNewObject 'first make a new object
+  ' now copy values into new object
+  For i = 0 To numFields - 1
+    IDFValue(maxUsedValue + i - numFields).entry = IDFValue(iVal + i).entry
+    Debug.Print "dup "; IDFValue(iVal + i).entry
+  Next i
+Next iCol
+Call FillList
+Call FillGrid
+If li > lstObjectTypes.ListCount - 1 Then
+  li = 0
+End If
+lstObjectTypes.ListIndex = li
+grdNew.Col = grdNew.Cols - 1
+grdNew.ShowCell grdNew.TopRow, grdNew.Cols - 1
+Call selectCell
+Call ShowFileAltered
+End Sub
+
+'-----------------------------------------------------------------------------
+' This routine creates a new object and duplicates the values from the currently
+' selected object into the new object and it allows the user to change text
+' that appears in one or more fields
+'-----------------------------------------------------------------------------
+Sub IDFDuplicateObjectAndChange()
+Dim rowSt As Long, rowEnd As Long, colSt As Long, colEnd As Long
+Dim curVal As Long, jField As Long, numFields As Long, iLength As Long
+Dim li As Long
+Dim curObj As Long
+Dim numChar As Long
+Dim found As Boolean
+Dim hintText As String
+li = lstObjectTypes.ListIndex
+grdNew.GetSelection rowSt, colSt, rowEnd, colEnd
+If actObject = 0 Then Exit Sub    'can't duplicate if not on a selected object
+If colEnd <> colEnd Then Exit Sub 'can't do changes across multiple objects
+' find the text suggestion for search box
+curObj = grdNew.ColData(colSt)
+curVal = IDFObject(curObj).valueStart
 numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
-Call IDFNewObject 'first make a new object
-' now copy values into new object
-For i = 0 To numFields - 1
-  IDFValue(maxUsedValue + i - numFields).entry = IDFValue(iVal + i).entry
-  Debug.Print "dup "; IDFValue(iVal + i).entry
-Next i
+numChar = 2 'assume that this is the minimum number of characters that must match
+For iLength = 1 To Len(IDFValue(curVal).entry)
+  found = False
+  hintText = Left(IDFValue(curVal).entry, numChar)
+  For jField = 1 To numFields - 1
+    If InStr(IDFValue(curVal + jField).entry, hintText) > 0 Then
+      found = True
+      Exit For
+    End If
+  Next jField
+  If found Then
+    numChar = numChar + 1
+  Else
+    Exit For
+  End If
+Next iLength
+numChar = numChar - 1 'shorten since last find did not work
+If numChar > 1 Then
+  searchTerm = Left(IDFValue(curVal).entry, numChar)
+Else
+  searchTerm = Left(IDFValue(curVal).entry, 5)
+End If
+' show the dialog
+frmDuplicateAndChange.Show vbModal
+' do the replacement text if not changed
+If replaceTerm <> "" Then
+  Call IDFNewObject 'first make a new object
+  ' now copy values into new object
+  For jField = 0 To numFields - 1
+    IDFValue(maxUsedValue + jField - numFields).entry = Replace(IDFValue(curVal + jField).entry, searchTerm, replaceTerm)
+    Debug.Print "dup "; IDFValue(curVal + jField).entry
+  Next jField
+  Call FillList
+  Call FillGrid
+  If li > lstObjectTypes.ListCount - 1 Then
+    li = 0
+  End If
+  lstObjectTypes.ListIndex = li
+  grdNew.Col = grdNew.Cols - 1
+  grdNew.ShowCell grdNew.TopRow, grdNew.Cols - 1
+  Call selectCell
+  Call ShowFileAltered
+End If
 End Sub
 
 '-----------------------------------------------------------------------------
@@ -4261,39 +4328,108 @@ End Sub
 ' This routine removes the currently selected object
 '-----------------------------------------------------------------------------
 Sub IDFDeleteObject()
+Dim rowSt As Long, rowEnd As Long, colSt As Long, colEnd As Long
+Dim li As Long
+Dim numColSelected As Long
+Dim iCol As Long
+Dim colPreserve As Long
 Dim objPoint As Long, lastObjectWithPt As Long
+Dim actObjSt As Long, actObjEnd As Long
+grdNew.GetSelection rowSt, colSt, rowEnd, colEnd
+li = lstObjectTypes.ListIndex
+numColSelected = 1 + colEnd - colSt
+colPreserve = colSt
 ' walk through pointers to find next empty class pointer
 If actCol < 0 Then Exit Sub 'if not a selected "data" column can't delete
 If actClass = 0 Then Exit Sub 'if not active can't delete
 If IDDClassObjPt(actClass).objectCount = 0 Then Exit Sub 'no more objects
 objPoint = IDDClassObjPt(actClass).objectStart
-If IDDClassObjPt(actClass).objectCount = 1 Then 'this is the case where only one object is defined and it should be deleted
-  IDDClassObjPt(actClass).objectStart = 0
-  IDDClassObjPt(actClass).objectCount = 0
-  IDFObject(objPoint).nextObjectInClass = isDeleted
-ElseIf objPoint = actObject Then    'if pointing to first object (remember objPoint is on first)
-  If objPoint = 0 Then Exit Sub
-  If IDFObject(objPoint).nextObjectInClass > 0 Then
-    IDDClassObjPt(actClass).objectStart = IDFObject(objPoint).nextObjectInClass
-    IDDClassObjPt(actClass).objectCount = IDDClassObjPt(actClass).objectCount - 1 'reduce the count on the objects
-    IDFObject(objPoint).nextObjectInClass = isDeleted 'flag that the object has been deleted
-  Else  'should never occur
-    MsgBox "Delete Object Error"
+If numColSelected = 1 Then
+  If IDDClassObjPt(actClass).objectCount = 1 Then 'this is the case where only one object is defined and it should be deleted and only one object is selected
+    IDDClassObjPt(actClass).objectStart = 0
+    IDDClassObjPt(actClass).objectCount = 0
+    IDFObject(objPoint).nextObjectInClass = isDeleted
+  ElseIf objPoint = actObject Then    'if pointing to first object (remember objPoint is on first) and only one object is selected
+    If objPoint = 0 Then Exit Sub
+    If IDFObject(objPoint).nextObjectInClass > 0 Then
+      IDDClassObjPt(actClass).objectStart = IDFObject(objPoint).nextObjectInClass
+      IDDClassObjPt(actClass).objectCount = IDDClassObjPt(actClass).objectCount - 1 'reduce the count on the objects
+      IDFObject(objPoint).nextObjectInClass = isDeleted 'flag that the object has been deleted
+    Else  'should never occur
+      MsgBox "Delete Object Error"
+    End If
+  Else 'the case when something other than the first object is selected but only one object is selected
+    If objPoint = 0 Then Exit Sub
+    Do While objPoint <> actObject
+      lastObjectWithPt = objPoint 'preserve previous pointer since that is where we need to write
+      If objPoint = 0 Then Exit Sub
+      objPoint = IDFObject(objPoint).nextObjectInClass 'follow chain of objects (linked list)
+    Loop
+    If lastObjectWithPt > 0 Then
+      If objPoint = 0 Then Exit Sub
+      IDFObject(lastObjectWithPt).nextObjectInClass = IDFObject(objPoint).nextObjectInClass   'remove link to current object
+      IDDClassObjPt(actClass).objectCount = IDDClassObjPt(actClass).objectCount - 1 'reduce the count on the objects
+      IDFObject(objPoint).nextObjectInClass = isDeleted 'flag that the object has been deleted
+    End If
   End If
-Else  'the case when something other than the first object is selected
-  If objPoint = 0 Then Exit Sub
-  Do While objPoint <> actObject
-    lastObjectWithPt = objPoint 'preserve previous pointer since that is where we need to write
-    If objPoint = 0 Then Exit Sub
-    objPoint = IDFObject(objPoint).nextObjectInClass 'follow chain of objects (linked list)
-  Loop
-  If lastObjectWithPt > 0 Then
-    If objPoint = 0 Then Exit Sub
-    IDFObject(lastObjectWithPt).nextObjectInClass = IDFObject(objPoint).nextObjectInClass   'remove link to current object
-    IDDClassObjPt(actClass).objectCount = IDDClassObjPt(actClass).objectCount - 1 'reduce the count on the objects
-    IDFObject(objPoint).nextObjectInClass = isDeleted 'flag that the object has been deleted
+Else  ' more than one object is selected
+  actObjSt = grdNew.ColData(colSt) ' first object selected
+  actObjEnd = grdNew.ColData(colEnd) ' last object selected
+  If actObjSt = 0 Or actObjEnd = 0 Then Exit Sub
+  If IDDClassObjPt(actClass).objectCount = numColSelected Then 'this is the case where all the objects for a class are selected
+    IDDClassObjPt(actClass).objectStart = 0
+    IDDClassObjPt(actClass).objectCount = 0
+    For iCol = colSt To colEnd
+      objPoint = grdNew.ColData(iCol)
+      If objPoint > 0 Then
+        IDFObject(objPoint).nextObjectInClass = isDeleted
+      End If
+    Next iCol
+  ElseIf objPoint = actObjSt Then    'if first object pointed to is first possible object
+    If IDFObject(actObjEnd).nextObjectInClass > 0 Then
+      IDDClassObjPt(actClass).objectStart = IDFObject(actObjEnd).nextObjectInClass
+      IDDClassObjPt(actClass).objectCount = IDDClassObjPt(actClass).objectCount - numColSelected 'reduce the count on the objects
+      For iCol = colSt To colEnd
+        objPoint = grdNew.ColData(iCol)
+        If objPoint > 0 Then
+          IDFObject(objPoint).nextObjectInClass = isDeleted
+        End If
+      Next iCol
+    Else  'should never occur
+      MsgBox "Delete Object Error"
+    End If
+  Else 'the case when something other than the first object is selected and a group of objects is selected
+    Do While objPoint <> actObjSt
+      lastObjectWithPt = objPoint 'preserve previous pointer since that is where we need to write
+      If objPoint = 0 Then Exit Sub
+      objPoint = IDFObject(objPoint).nextObjectInClass 'follow chain of objects (linked list)
+    Loop
+    If lastObjectWithPt > 0 Then
+      If objPoint = 0 Then Exit Sub
+      IDFObject(lastObjectWithPt).nextObjectInClass = IDFObject(actObjEnd).nextObjectInClass   'remove link to current object
+      IDDClassObjPt(actClass).objectCount = IDDClassObjPt(actClass).objectCount - numColSelected 'reduce the count on the objects
+      For iCol = colSt To colEnd
+        objPoint = grdNew.ColData(iCol)
+        If objPoint > 0 Then
+          IDFObject(objPoint).nextObjectInClass = isDeleted
+        End If
+      Next iCol
+    End If
   End If
 End If
+Call FillList
+Call FillGrid
+If li > lstObjectTypes.ListCount - 1 Then
+  li = 0
+End If
+lstObjectTypes.ListIndex = li
+Call lstObjectTypes_Click
+If colPreserve > 2 And colPreserve < grdNew.Cols Then
+  grdNew.Col = colPreserve
+  Call selectCell
+  grdNew.ShowCell grdNew.TopRow, grdNew.Col
+End If
+Call ShowFileAltered
 End Sub
 
 '-----------------------------------------------------------------------------
@@ -5354,6 +5490,14 @@ For iObject = 1 To maxUsedObject
             newMsg = "Invalid reference"
           End If
       End Select
+      ' if user wants macros to be ignored
+      If ignoreValidatingMacros Then
+        If InStr(IDFValue(valueIndx).entry, "[") > 0 Then newMsg = ""
+        If InStr(IDFValue(valueIndx).entry, "@") > 0 Then newMsg = ""
+        If InStr(IDFValue(valueIndx).entry, "$") > 0 Then newMsg = ""
+        If InStr(IDFValue(valueIndx).entry, "=") > 0 Then newMsg = ""
+        If InStr(IDFValue(valueIndx).entry, "#") > 0 Then newMsg = ""
+      End If
       If IDDField(fieldIndx).required And Trim(curAlphaValue) = "" And Not IDDField(fieldIndx).defSpecified Then
         newMsg = "Blank value for required field"
       End If

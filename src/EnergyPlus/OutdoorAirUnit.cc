@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -68,6 +68,7 @@
 #include <DXCoils.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -120,7 +121,6 @@ namespace OutdoorAirUnit {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallLoad;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
@@ -492,14 +492,23 @@ namespace OutdoorAirUnit {
 				if ( IsBlank ) cAlphaArgs( 5 ) = "xxxxx";
 			}
 			errFlag = false;
-			GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
-			OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
-			if( !errFlag ) {
-				OutAirUnit( OAUnitNum ).SFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
-				// get fan index
-				GetFanIndex( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFan_Index, ErrorsFound );
+			if ( HVACFan::checkIfFanNameIsAFanSystem( OutAirUnit( OAUnitNum ).SFanName ) ) { //no object type in input, so check if Fan:SystemModel
+				OutAirUnit( OAUnitNum ).SFanType = DataHVACGlobals::FanType_SystemModelObject;
+				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( OutAirUnit( OAUnitNum ).SFanName ) ); // call constructor
+				OutAirUnit( OAUnitNum ).SFan_Index = HVACFan::getFanObjectVectorIndex( OutAirUnit( OAUnitNum ).SFanName );
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
+				OutAirUnit( OAUnitNum ).SFanAvailSchedPtr = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->availSchedIndex;
 			} else {
-				ErrorsFound = true;
+				GetFanType( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
+
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
+				if( !errFlag ) {
+					OutAirUnit( OAUnitNum ).SFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, errFlag );
+					// get fan index
+					GetFanIndex( OutAirUnit( OAUnitNum ).SFanName, OutAirUnit( OAUnitNum ).SFan_Index, ErrorsFound );
+				} else {
+					ErrorsFound = true;
+				}
 			}
 			//A6 :Fan Place
 			if ( SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
@@ -514,6 +523,10 @@ namespace OutdoorAirUnit {
 
 			if ( lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFan = false;
+				if ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFields( 7 ) + " is blank." );
+					ShowContinueError( "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced." );
+				}
 			} else if ( ! lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFanName = cAlphaArgs( 7 );
 				VerifyName( cAlphaArgs( 7 ), OutAirUnit, &OAUnitData::ExtFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
@@ -522,28 +535,47 @@ namespace OutdoorAirUnit {
 					if ( IsBlank ) cAlphaArgs( 7 ) = "xxxxx";
 				}
 				errFlag = false;
-				GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
-				OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
-				if( !errFlag ) {
-					OutAirUnit( OAUnitNum ).ExtFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
-					// get fan index
-					GetFanIndex( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFan_Index, ErrorsFound );
+				if ( HVACFan::checkIfFanNameIsAFanSystem( OutAirUnit( OAUnitNum ).ExtFanName ) ) { //no object type in input, so check if Fan:SystemModel
+					OutAirUnit( OAUnitNum ).ExtFanType = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( OutAirUnit( OAUnitNum ).ExtFanName ) ); // call constructor
+					OutAirUnit( OAUnitNum ).ExtFan_Index = HVACFan::getFanObjectVectorIndex( OutAirUnit( OAUnitNum ).ExtFanName );
+					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
+					OutAirUnit( OAUnitNum ).ExtFanAvailSchedPtr = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->availSchedIndex;
 				} else {
-					ErrorsFound = true;
+					GetFanType( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFanType, errFlag, CurrentModuleObject, OutAirUnit( OAUnitNum ).Name );
+					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
+					if( !errFlag ) {
+						OutAirUnit( OAUnitNum ).ExtFanAvailSchedPtr = GetFanAvailSchPtr( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, errFlag );
+						// get fan index
+						GetFanIndex( OutAirUnit( OAUnitNum ).ExtFanName, OutAirUnit( OAUnitNum ).ExtFan_Index, ErrorsFound );
+					} else {
+						ErrorsFound = true;
+					}
 				}
 				OutAirUnit( OAUnitNum ).ExtFan = true;
 			}
 
 			//N2
 			OutAirUnit( OAUnitNum ).ExtAirVolFlow = NumArray( 2 );
+			if ( ( OutAirUnit( OAUnitNum ).ExtFan ) && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ){
+				if ( NumArray( 2 ) != NumArray( 1 ) ) {
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFields( 1 ) + " and " + cNumericFields( 2 ) + " are not equal. This may cause unbalanced flow." );
+					ShowContinueError( cNumericFields( 1 ) + "=" + General::RoundSigDigits( NumArray( 1 ), 3 ) + " and " + cNumericFields( 2 ) + "=" + General::RoundSigDigits( NumArray( 2 ), 3 ) );
+				}
+			}
 			//A8
 			OutAirUnit( OAUnitNum ).ExtAirSchedName = cAlphaArgs( 8 );
 			// convert schedule name to pointer
 			OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr = GetScheduleIndex( OutAirUnit( OAUnitNum ).ExtAirSchedName );
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 				if ( ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr == 0 ) || ( lNumericBlanks( 2 ) ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 					ErrorsFound = true;
+				} else {
+					if ( ( OutAirUnit( OAUnitNum ).ExtOutAirSchedPtr != OutAirUnit( OAUnitNum ).OutAirSchedPtr ) && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
+						ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", different schedule inputs for outdoor air and exhaust air schedules may cause unbalanced mass flow." );
+						ShowContinueError( cAlphaFields( 4 ) + "=" + cAlphaArgs( 4 ) + " and " + cAlphaFields( 8 ) + "=" + cAlphaArgs( 8 ) );
+					}
 				}
 			}
 
@@ -800,22 +832,22 @@ namespace OutdoorAirUnit {
 
 		// Setup Report variables for the zone outdoor air unit CurrentModuleObject='ZoneHVAC:OutdoorAirUnit'
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Rate [W]", OutAirUnit( OAUnitNum ).TotHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Energy [J]", OutAirUnit( OAUnitNum ).TotHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Rate [W]", OutAirUnit( OAUnitNum ).SensHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Energy [J]", OutAirUnit( OAUnitNum ).SensHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Rate [W]", OutAirUnit( OAUnitNum ).LatHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Energy [J]", OutAirUnit( OAUnitNum ).LatHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Rate [W]", OutAirUnit( OAUnitNum ).TotCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Energy [J]", OutAirUnit( OAUnitNum ).TotCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Rate [W]", OutAirUnit( OAUnitNum ).SensCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Energy [J]", OutAirUnit( OAUnitNum ).SensCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Rate [W]", OutAirUnit( OAUnitNum ).LatCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Energy [J]", OutAirUnit( OAUnitNum ).LatCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Air Mass Flow Rate [kg/s]", OutAirUnit( OAUnitNum ).AirMassFlow, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Power [W]", OutAirUnit( OAUnitNum ).ElecFanRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Energy [J]", OutAirUnit( OAUnitNum ).ElecFanEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Unit Fan Availability Status []", OutAirUnit( OAUnitNum ).AvailStatus, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).TotHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).TotHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).SensHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).SensHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).LatHeatingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Heating Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).LatHeatingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).TotCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Total Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).TotCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).SensCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Sensible Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).SensCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Rate", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).LatCoolingRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Latent Cooling Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).LatCoolingEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Air Mass Flow Rate", OutputProcessor::Unit::kg_s, OutAirUnit( OAUnitNum ).AirMassFlow, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Power", OutputProcessor::Unit::W, OutAirUnit( OAUnitNum ).ElecFanRate, "System", "Average", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Electric Energy", OutputProcessor::Unit::J, OutAirUnit( OAUnitNum ).ElecFanEnergy, "System", "Sum", OutAirUnit( OAUnitNum ).Name );
+			SetupOutputVariable( "Zone Outdoor Air Unit Fan Availability Status", OutputProcessor::Unit::None, OutAirUnit( OAUnitNum ).AvailStatus, "System", "Average", OutAirUnit( OAUnitNum ).Name );
 			//! Note that the outdoor air unit fan electric is NOT metered because this value is already metered through the fan component
 
 		}
@@ -1145,7 +1177,6 @@ namespace OutdoorAirUnit {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using ReportSizingManager::ReportSizingOutput;
-		using Fans::SimulateFanComponents;
 		using Fans::GetFanDesignVolumeFlowRate;
 		using General::RoundSigDigits;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -1267,13 +1298,26 @@ namespace OutdoorAirUnit {
 		ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = OutAirUnit( OAUnitNum ).OutAirVolFlow;
 
 		if( OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize ) {
-			SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, true, OutAirUnit( OAUnitNum ).SFan_Index, _, false, false );
-			OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );
+			if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+				Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, true, OutAirUnit( OAUnitNum ).SFan_Index, _, false, false );
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );			
+			
+			} else {
+				HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,_,_,_);
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
+			}
+
 		}
 		if( OutAirUnit( OAUnitNum ).ExtFan ) {
 			if( OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow == AutoSize ) {
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, true, OutAirUnit( OAUnitNum ).ExtFan_Index );
-				OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, ErrorsFound );
+				if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+
+					Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, true, OutAirUnit( OAUnitNum ).ExtFan_Index );
+					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).ExtFanType ), OutAirUnit( OAUnitNum ).ExtFanName, ErrorsFound );
+				} else {
+					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->simulate(_,_,_,_);
+					OutAirUnit( OAUnitNum ).EFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->designAirVolFlowRate;
+				}
 			}
 		}
 
@@ -1353,7 +1397,6 @@ namespace OutdoorAirUnit {
 		using WaterCoils::CheckWaterCoilSchedule;
 		using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
 		using SteamCoils::CheckSteamCoilSchedule;
-		using Fans::SimulateFanComponents;
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 
@@ -1396,7 +1439,6 @@ namespace OutdoorAirUnit {
 
 		// FLOW:
 
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;
@@ -1437,16 +1479,35 @@ namespace OutdoorAirUnit {
 			Node( OutletNode ).Temp = Node( SFanOutletNode ).Temp;
 
 			if ( OutAirUnit( OAUnitNum ).FanPlace == BlowThru ) {
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
+				if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+					Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				} else {
+					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn,ZoneCompTurnFansOff,_);
+				}
+				
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
+				if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+					if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+						Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );  // why not turn on/off flags here?
+					} else {
+						HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->simulate(_,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+					}
+				}
+
 			} else if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-			}
-			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
-				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
+				if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+					Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				} else {
+					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn,ZoneCompTurnFansOff,_);
+				}
+				if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+					if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+						Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+					} else {
+						HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->simulate(_,ZoneCompTurnFansOn,ZoneCompTurnFansOff,_);
+					}
+				}
 			}
 
 		} else { // System On
@@ -1462,28 +1523,23 @@ namespace OutdoorAirUnit {
 				Node( InletNode ).MassFlowRate = OutAirUnit( OAUnitNum ).ExtAirMassFlow;
 			}
 
-			//Air mass balance check (removed because exhaust and supply can be imbalanced
-			//    IF ((Node(InletNode)%MassFlowRate > Node(OutsideAirNode)%MassFlowRate) &
-			//             .OR.(Node(InletNode)%MassFlowRate < Node(OutsideAirNode)%MassFlowRate)) THEN
-			//      OutAirUnit(OAUnitNum)%UnBalancedErrCount = OutAirUnit(OAUnitNum)%UnBalancedErrCount + 1
-			//      IF (OutAirUnit(OAUnitNum)%UnBalancedErrCount .EQ. 1) THEN
-			//        CALL ShowWarningError('Air mass flow between zone supply and exhaust is not balanced')
-			//        CALL ShowContinueError('Occurs in ' // 'ZoneHVAC:OutdoorAirUnit' // ' Object=' &
-			//                               //TRIM(OutAirUnit(OAUnitNum)%Name))
-			//        CALL ShowContinueError('Air mass balance is required by other outdoor air units,'// &
-			//                                  'ZoneMixing, ZoneCrossMixing, or other air flow control inputs.')
-			//!
-			//!  CALL ShowContinueErrorTimeStamp('Air volume flow rate ratio = '//TRIM(RoundSigDigits(HXAirVolFlowRatio,3))//'.')
-			//!ELSE
-			//! CALL ShowRecurringWarningErrorAtEnd(TRIM(OutAirUnit(OAUnitNum)%Name)//&
-			//! ':  Air mass balance is required by other outdoor air units, ZoneMixing, ZoneCrossMixing, or other air flow control inputs.'&
-			//!   , OutAirUnit(OAUnitNum)%UnBalancedErrIndex)
-			//      END IF
-			//    END IF
+			// Air mass balance check
+			if ( ( std::abs( OutAirUnit( OAUnitNum ).ExtAirMassFlow - OutAirUnit( OAUnitNum ).OutAirMassFlow ) > 0.001 )  && ( !DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) ) {
+				if ( !OutAirUnit( OAUnitNum ).FlowError ) {
+					ShowWarningError( "Air mass flow between zone supply and exhaust is not balanced. Only the first occurrence is reported." );
+					ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit( OAUnitNum ).Name );
+					ShowContinueError( "Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or other air flow control inputs." );
+					ShowContinueErrorTimeStamp( "The outdoor mass flow rate = " + General::RoundSigDigits( OutAirUnit( OAUnitNum ).OutAirMassFlow, 3 ) + " and the exhaust mass flow rate = " + General::RoundSigDigits( OutAirUnit( OAUnitNum ).ExtAirMassFlow, 3 ) + ".");
+					OutAirUnit( OAUnitNum ).FlowError = true;
+				}
+			}
 
 			if ( OutAirUnit( OAUnitNum ).FanPlace == BlowThru ) {
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index );
-				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
+				if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+					Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				} else {
+					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				}
 				DesOATemp = Node( SFanOutletNode ).Temp;
 			} else if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
 				DesOATemp = Node( OutsideAirNode ).Temp;
@@ -1539,18 +1595,29 @@ namespace OutdoorAirUnit {
 
 			// Fan positioning
 			if ( OutAirUnit( OAUnitNum ).FanPlace == DrawThru ) {
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index );
+				if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+					Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				}  else {
+					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				}
+
 				OutAirUnit( OAUnitNum ).FanEffect = true; //RE-Simulation to take over the supply fan effect
 				OutAirUnit( OAUnitNum ).FanCorTemp = ( Node( OutletNode ).Temp - OutAirUnit( OAUnitNum ).CompOutSetTemp );
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index );
-				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
-
+				if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+					Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				}  else {
+					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				}
 				OutAirUnit( OAUnitNum ).FanEffect = false;
 			}
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
-				SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index );
-				OutAirUnit( OAUnitNum ).ElecFanRate += FanElecPower;
+				if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+					Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).ExtFanName, FirstHVACIteration, OutAirUnit( OAUnitNum ).ExtFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff  );
+				} else {
+					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->simulate(_,ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+				}
+
 			}
 		} // ...end of system ON/OFF IF-THEN block
 
@@ -1596,6 +1663,21 @@ namespace OutdoorAirUnit {
 		} else {
 			OutAirUnit( OAUnitNum ).LatCoolingRate = 0.0;
 			OutAirUnit( OAUnitNum ).LatHeatingRate = LatLoadMet;
+		}
+
+		//OutAirUnit( OAUnitNum ).ElecFanRate = FanElecPower;  //Issue #5524 this would only get the last fan called, not both if there are two
+		OutAirUnit( OAUnitNum ).ElecFanRate = 0.0;
+		if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+			OutAirUnit( OAUnitNum ).ElecFanRate += Fans::GetFanPower( OutAirUnit( OAUnitNum ).SFan_Index );
+		} else {
+			OutAirUnit( OAUnitNum ).ElecFanRate += HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->fanPower();
+		}
+		if ( OutAirUnit( OAUnitNum ).ExtFan ) {
+			if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {
+				OutAirUnit( OAUnitNum ).ElecFanRate += Fans::GetFanPower( OutAirUnit( OAUnitNum ).ExtFan_Index );
+			} else {
+				OutAirUnit( OAUnitNum ).ElecFanRate += HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).ExtFan_Index ]->fanPower();
+			}
 		}
 
 		PowerMet = QUnitOut;

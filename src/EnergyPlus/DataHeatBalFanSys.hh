@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -132,6 +132,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > MCPTM; // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
 	extern Array1D< Real64 > MCPE; // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
 	extern Array1D< Real64 > EAMFL; // OUTDOOR AIR MASS FLOW for EarthTube
+	extern Array1D< Real64 > EAMFLxHumRat; // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
 	extern Array1D< Real64 > MCPTE; // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
 	extern Array1D< Real64 > MCPC; // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
 	extern Array1D< Real64 > CTMFL; // OUTDOOR AIR MASS FLOW for cooltower
@@ -165,7 +166,7 @@ namespace DataHeatBalFanSys {
 	//REAL Variables for the Heat Balance Simulation
 
 	extern Array1D< Real64 > QRadSysSource; // Current source/sink for a particular surface (radiant sys)
-	extern Array1D< Real64 > TCondFDSourceNode; // Temperature of sourc/sink location in surface from CondFD algo
+	extern Array1D< Real64 > TCondFDSourceNode; // Temperature of source/sink location in surface from CondFD algo
 	extern Array1D< Real64 > QPVSysSource; // Current source/sink for a surface (integrated PV sys)
 
 	extern Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
@@ -182,6 +183,7 @@ namespace DataHeatBalFanSys {
 	// of electric baseboard heaters
 	extern Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
 	// of simple cooling panels
+	extern Array1D< Real64 > QRadSurfAFNDuct; // Current radiant heat flux at a surface due to radiation from AFN ducts
 	extern Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	extern Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	extern Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
@@ -198,6 +200,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > SumHmARaZ;
 
 	extern Array1D< Real64 > TempZoneThermostatSetPoint;
+	extern Array1D< Real64 > AdapComfortCoolingSetPoint;
 	extern Array1D< Real64 > ZoneThermostatSetPointHi;
 	extern Array1D< Real64 > ZoneThermostatSetPointLo;
 
@@ -207,6 +210,10 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	extern Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
 	extern Array1D< Real64 > ZTM3; // zone air temperature at previous T-3
+	// Hybrid Modeling
+	extern Array1D< Real64 > PreviousMeasuredZT1; // Measured zone air temperature at previous timestep1
+	extern Array1D< Real64 > PreviousMeasuredZT2; // Measured zone air temperature at previous timestep2
+	extern Array1D< Real64 > PreviousMeasuredZT3; // Measured zone air temperature at previous timestep3
 	// Exact and Euler solutions
 	extern Array1D< Real64 > ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	extern Array1D< Real64 > ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
@@ -214,17 +221,6 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	extern Array1D< Real64 > ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
 	extern Array1D< Real64 > ZoneW1; // Zone temperature at the previous time step used in Exact and Euler method
-
-	extern Real64 ZoneVolCapMultpSens; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone temp in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpMoist; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone humidity ratio in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpCO2; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone CO2 concentration in the predictor and corrector step
-	extern Real64 ZoneVolCapMultpGenContam; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone generic contaminant concentration in the predictor
-	// and corrector step
-
 	extern Array1D_int TempControlType;
 	extern Array1D_int ComfortControlType;
 

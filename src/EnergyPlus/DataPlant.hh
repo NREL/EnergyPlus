@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -57,6 +57,7 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <PlantComponent.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -954,6 +955,7 @@ namespace DataPlant {
 		Real64 MaxMassFlowRate; // Maximum flow rate allowed in the loop
 		Real64 Volume; // Volume of the fluid in the loop
 		bool VolumeWasAutoSized; //true if Volume was set to autocalculate
+		Real64 CirculationTime; // Loop circulation time [minutes] used to autocalculate loop volume, default is 2 minutes
 		Real64 Mass; // Mass of the fluid in the loop
 		bool EMSCtrl;
 		Real64 EMSValue;
@@ -1006,6 +1008,7 @@ namespace DataPlant {
 			MaxMassFlowRate( 0.0 ),
 			Volume( 0.0 ),
 			VolumeWasAutoSized ( false ), //true if Volume was set to autocalculate
+			CirculationTime( 2.0 ),
 			Mass( 0.0 ),
 			EMSCtrl( false ),
 			EMSValue( 0.0 ),
@@ -1164,7 +1167,7 @@ namespace DataPlant {
 	{
 		// Members
 		std::string ReportVarName;
-		std::string ReportVarUnits;
+		OutputProcessor::Unit ReportVarUnits;
 		int ResourceType;
 		std::string EndUse;
 		int EndUse_CompMode;
@@ -1176,6 +1179,7 @@ namespace DataPlant {
 
 		// Default Constructor
 		MeterData() :
+			ReportVarUnits( OutputProcessor::Unit::None ),
 			ResourceType( 0 ),
 			EndUse_CompMode( 0 ),
 			ReportVarIndex( 0 ),

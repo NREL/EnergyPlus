@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -2183,7 +2183,12 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ChW Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    Cooling Demand Side Branches,  !- Demand Side Branch List Name",
 		"    Cooling Demand Side Connectors,  !- Demand Side Connector List Name",
-		"    Optimal;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  PlantLoop,",
 		"    Hot Water Loop,          !- Name",
@@ -2204,7 +2209,12 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    HW Demand Outlet Node,   !- Demand Side Outlet Node Name",
 		"    Heating Demand Side Branches,  !- Demand Side Branch List Name",
 		"    Heating Demand Side Connectors,  !- Demand Side Connector List Name",
-		"    Optimal;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  Pipe:Adiabatic,",
 		"    Cooling Supply Side Bypass,  !- Name",

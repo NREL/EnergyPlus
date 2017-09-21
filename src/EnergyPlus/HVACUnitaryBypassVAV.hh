@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -65,15 +65,6 @@ namespace HVACUnitaryBypassVAV {
 	// Compressor operation
 	extern int const On; // Normal compressor operation
 	extern int const Off; // Signal DXCoil that compressor should not run
-
-	// DX Coils supported in this module
-	extern int const CoilDX_CoolingSingleSpeed; // Coil:DX:CoolingBypassFactorEmpirical
-	extern int const CoilDX_CoolingHXAssisted; // Coil:DX:HeatExchangerAssisted
-	extern int const CoilDX_CoolingTwoStageWHumControl; // Coil:Cooling:DX:TwoStageWithHumidityControlMode
-	// formerly (v3 and beyond) Coil:DX:MultiMode:CoolingEmpirical
-	extern int const CoilDX_HeatingEmpirical; // Coil:DX:HeatingEmpirical
-	extern int const Coil_HeatingGasOrOtherFuel; // Coil:Gas:Heating
-	extern int const Coil_HeatingElectric; // Coil:Electric:Heating
 
 	// Dehumidification control modes (DehumidControlMode) for Multimode units only
 	extern int const DehumidControl_None;
@@ -159,7 +150,7 @@ namespace HVACUnitaryBypassVAV {
 		Real64 NoHeatCoolSpeedRatio; // Fan speed ratio when no cooling or heating
 		bool CheckFanFlow; // Check fan volumetric flow versus system flow in init routine.
 		std::string DXCoolCoilName; // Name of DX cooling coil
-		std::string DXCoolCoilType; // Type of DX cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
+		std::string DXCoolCoilType; // Type of DX cooling coil, Coil:DX:Cooling:SingleSpeed or
 		//               CoilSystem:Cooling:DX:HeatExchangerAssisted
 		int DXCoolCoilType_Num; // Numeric equivalent for DX cooling coil type
 		int CoolCoilCompIndex; // cooling coil component index number
@@ -236,6 +227,18 @@ namespace HVACUnitaryBypassVAV {
 		int DXIterationExceededIndex; // Counter for DX coil messages
 		int DXIterationFailed; // Counter for DX coil messages
 		int DXIterationFailedIndex; // Counter for DX coil messages
+		int DXCyclingIterationExceeded; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+		int DXCyclingIterationExceededIndex; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+		int DXCyclingIterationFailed; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+		int DXCyclingIterationFailedIndex; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+		int DXHeatIterationExceeded; // Counter for DX coil messages
+		int DXHeatIterationExceededIndex; // Counter for DX coil messages
+		int DXHeatIterationFailed; // Counter for DX coil messages
+		int DXHeatIterationFailedIndex; // Counter for DX coil messages
+		int DXHeatCyclingIterationExceeded; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+		int DXHeatCyclingIterationExceededIndex; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+		int DXHeatCyclingIterationFailed; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
+		int DXHeatCyclingIterationFailedIndex; // Counter for VS DX coil messages, when on/off cycling between off and speed 1
 		int HXDXIterationExceeded; // Counter for HX assisted DX coil messages
 		int HXDXIterationExceededIndex; // Counter for HX assisted DX coil messages
 		int HXDXIterationFailed; // Counter for HX assisted DX coil messages
@@ -350,6 +353,18 @@ namespace HVACUnitaryBypassVAV {
 			DXIterationExceededIndex( 0 ),
 			DXIterationFailed( 0 ),
 			DXIterationFailedIndex( 0 ),
+			DXCyclingIterationExceeded( 0 ),
+			DXCyclingIterationExceededIndex( 0 ),
+			DXCyclingIterationFailed( 0 ),
+			DXCyclingIterationFailedIndex( 0 ),
+			DXHeatIterationExceeded( 0 ),
+			DXHeatIterationExceededIndex( 0 ),
+			DXHeatIterationFailed( 0 ),
+			DXHeatIterationFailedIndex( 0 ),
+			DXHeatCyclingIterationExceeded( 0 ),
+			DXHeatCyclingIterationExceededIndex( 0 ),
+			DXHeatCyclingIterationFailed( 0 ),
+			DXHeatCyclingIterationFailedIndex( 0 ),
 			HXDXIterationExceeded( 0 ),
 			HXDXIterationExceededIndex( 0 ),
 			HXDXIterationFailed( 0 ),

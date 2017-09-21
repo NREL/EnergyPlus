@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -70,7 +70,8 @@ SetupZoneInternalGain(
 	Optional< Real64 > LatentGainRate,
 	Optional< Real64 > ReturnAirLatentGainRate,
 	Optional< Real64 > CarbonDioxideGainRate,
-	Optional< Real64 > GenericContamGainRate
+	Optional< Real64 > GenericContamGainRate,
+	Optional< int > RetNodeNum // for return air heat gains
 )
 {
 
@@ -206,6 +207,9 @@ SetupZoneInternalGain(
 		ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).PtrGenericContamGainRate >>= ZeroPointerVal;
 	}
 
+	if ( present( RetNodeNum ) ) {
+		ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).ReturnAirNodeNum = RetNodeNum;
+	}
 }
 
 } // EnergyPlus

@@ -217,7 +217,7 @@ The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of hea
 
 \subsubsection{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
 
-The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see ZoneHVAC:EquipmentConnections input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers. The Zone Air Heat Balance System Air Transfer Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time. 
 
 \subsubsection{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
 
@@ -1617,7 +1617,9 @@ This value can be one of several things depending on the actual kind of surface.
   \item
     \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
   \item
-    \textbf{Ground} -- if this surface is exposed to the ground, then this is the usual choice. The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month. For more information on ground contact surfaces, reference the Auxiliary Programs document section on ``Ground Heat Transfer in EnergyPlus''.
+    \textbf{Foundation} - uses an alternative model (currently only the Kiva\textsuperscript{TM} model) to account for the multi-dimensional heat transfer of foundation surfaces. The Outside Boundary Condition Object will refer to the name of a Foundation:Kiva object (or be left blank to use the default foundation without extra insulation).
+  \item
+    \textbf{Ground} - The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month.
   \item
     \textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
   \item
@@ -1642,7 +1644,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-6}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -1728,7 +1730,7 @@ This value can be one of several things depending on the actual kind of surface.
   \item
     \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
   \item
-    \textbf{Ground} -- if this surface is exposed to the ground, then this is the choice. The temperature on the outside of this surface will be the Ground Temperature.
+    \textbf{Ground} -- The temperature on the outside of this surface will be the Ground Temperature.
   \item
     \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
   \item
@@ -1751,7 +1753,7 @@ This value can be one of several things depending on the actual kind of surface.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-7}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -1827,39 +1829,44 @@ This is the zone name to which the surface belongs.
 
 This value can be one of several things depending on the actual kind of surface.
 
-1)~~~\textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. The surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
-
-2)~~~\textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
-
-3)~~~\textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
-
-4)~~~\textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
-
-5)~~~\textbf{Ground} -- if this surface is exposed to the ground, then this is the usual choice. The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month. For more information on ground contact surfaces, reference the Auxiliary Programs document section on ``Ground Heat Transfer in EnergyPlus''.
-
-6)~~~\textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:FfactorGroundFloor}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
-
-7)~~~\textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
-
-8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
-
-9)~~~\textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
-
-10)\textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
-
-11)\textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
-
-12)\textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
-
-13)\textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
-
-14)\textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
-
-15)\textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\begin{enumerate}
+  \item
+    \textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. The surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
+  \item
+    \textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
+  \item
+    \textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
+  \item
+    \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
+  \item
+    \textbf{Foundation} - uses an alternative model (currently only the Kiva\textsuperscript{TM} model) to account for the multi-dimensional heat transfer of foundation surfaces. The Outside Boundary Condition Object will refer to the name of a Foundation:Kiva object (or be left blank to use the default foundation without extra insulation).
+  \item
+    \textbf{Ground} - The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month..
+  \item
+    \textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
+  \item
+    \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
+  \item
+    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
+  \item
+    \textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\end{enumerate}
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-8}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -1991,39 +1998,44 @@ This is the zone name to which the surface belongs.
 
 This value can be one of several things depending on the actual kind of surface.
 
-1)~~~\textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. In either case, the surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
-
-2)~~~\textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
-
-3)~~~\textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
-
-4)~~~\textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
-
-5)~~~\textbf{Ground} -- if this surface is exposed to the ground, then this is the usual choice. The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month. For more information on ground contact surfaces, reference the Auxiliary Programs document section on ``Ground Heat Transfer in EnergyPlus''.
-
-6)~~~\textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall} or \textbf{Construction:FfactorGroundFloor} (depending on surface type), then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
-
-7)~~~\textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
-
-8)~~~\textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
-
-9)~~~\textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
-
-10)\textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
-
-11)\textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
-
-12)\textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
-
-13)\textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
-
-14)\textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
-
-15)\textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\begin{enumerate}
+  \item
+    \textbf{Surface} -- if this surface is an internal surface, then this is the choice. The value will either be a surface in the base zone or a surface in another zone. The heat balance between two zones can be accurately simulated by specifying a surface in an adjacent zone. EnergyPlus will simulate a group of zones simultaneously and will include the heat transfer between zones. However, as this increases the complexity of the calculations, it is not necessary to specify the other zone unless the two zones will have a significant temperature difference. If the two zones will not be very different (temperature wise), then the surface should use itself as the outside environment or specify this field as \textbf{Adiabatic}. The surface name on the ``outside'' of this surface (adjacent to) is placed in the next field.
+  \item
+    \textbf{Adiabatic} -- an internal surface in the same Zone. This surface will not transfer heat out of the zone, but will still store heat in thermal mass. Only the inside face of the surface will exchange heat with the zone (i.e.~two adiabatic surfaces are required to model internal partitions where both sides of the surface are exchanging heat with the zone). The Outside Boundary Condition Object can be left blank.
+  \item
+    \textbf{Zone} -- this is similar to Surface but EnergyPlus will automatically create the required surface in the adjacent zone when this is entered for the surface. If there are windows or doors on the surface, EnergyPlus automatically creates appropriate sub-surfaces as well.
+  \item
+    \textbf{Outdoors} -- if this surface is exposed to outside temperature conditions, then this is the choice. See Sun Exposure and Wind Exposure below for further specifications on this kind of surface.
+  \item
+    \textbf{Foundation} - uses an alternative model (currently only the Kiva\textsuperscript{TM} model) to account for the multi-dimensional heat transfer of foundation surfaces. The Outside Boundary Condition Object will refer to the name of a Foundation:Kiva object (or be left blank to use the default foundation without extra insulation).
+  \item
+    \textbf{Ground} - The temperature on the outside of this surface will be the Site:GroundTemperature:Surface value for the month.
+  \item
+    \textbf{GroundFCfactorMethod} -- if this surface is exposed to the ground and using the \textbf{Construction:CfactorUndergroundWall}, then this is the choice. The temperature on the outside of this surface will be the Site:GroundTemperature:FcfactorMethod value for the month.
+  \item
+    \textbf{OtherSideCoefficients} -- if this surface has a custom, user specified temperature or other parameters (See SurfaceProperty:OtherSideCoefficients specification), then this is the choice. The outside boundary condition will be the name of the SurfaceProperty:OtherSideCoefficients specification.
+  \item
+    \textbf{OtherSideConditionsModel} -- if this surface has a specially-modeled multi-skin component, such as a transpired collector or vented photovoltaic panel, attached to the outside (See SurfaceProperty:OtherSideConditionsModel specification), then this the choice. The outside face environment will be the name of the SurfaceProperty:OtherSideConditionsModel specification.
+  \item
+    \textbf{GroundSlabPreprocessorAverage} -- uses the average results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorCore} -- uses the core results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundSlabPreprocessorPerimeter} -- uses the perimeter results from the Slab preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageWall} -- uses the average wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorAverageFloor} -- uses the average floor results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorUpperWall} -- uses the upper wall results from the Basement preprocessor calculations.
+  \item
+    \textbf{GroundBasementPreprocessorLowerWall} -- uses the lower wall results from the Basement preprocessor calculations.
+\end{enumerate}
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-9}
 
-If neither Surface, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
+If neither Surface, Zone, Foundation, OtherSideCoefficients, or OtherSideConditionsModel are specified for the Outside Boundary Condition (previous field), then this field should be left blank.
 
 As stated above, if the Outside Boundary Condition is ``Surface'', then this field's value must be the surface name whose inside face temperature will be forced on the outside face of the base surface. This permits heat exchange between adjacent zones (interzone heat transfer) when multiple zones are simulated, but can also be used to simulate middle zone behavior without modeling the adjacent zones. This is done by specifying a surface within the zone. For example, a middle floor zone can be modeled by making the floor the Outside Boundary Condition Object for the ceiling, and the ceiling the Outside Boundary Condition Object for the floor.
 
@@ -2389,6 +2401,7 @@ Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Ene
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]
+Zone,Average,Surface Construction Index []
 \end{lstlisting}
 
 Output variables applicable to all exterior heat transfer surfaces:
@@ -2713,6 +2726,18 @@ As of Version 2.1, diffuse solar transmitted through exterior and interior windo
 
 As of Version 2.1, the previous variable plus absorbed shortwave radiation from uniformly distributed initially-reflected diffuse solar, reflected beam solar, and shortwave radiation from lights. This sum is the power of all sources of solar and visible radiation absorbed by the surface at the inside face.
 
+\subsubsection{Surface Construction Index {[]}}\label{surface-construction-index}
+
+The variable reports an index that points to specific Construction. The variable is an additional output variable when Output:Diagnostics, DisplayAdvancedReportVariables; is given in an input file.
+
+In order to find a corresponding construction using the index, following steps are suggested:
+
+1. Find a surface name from Surface Construction Index in the .csv file
+
+2. Search the surface name in lines starting with HeatTransfer Surface in the .eio file
+
+3. The seventh item is the construction name with matched surface name. 
+ 
 \subsection{Surface Output Variables (exterior heat transfer surfaces)}\label{surface-output-variables-exterior-heat-transfer-surfaces}
 
 \subsubsection{Surface Outside Face Outdoor Air Drybulb Temperature {[}C{]}}\label{surface-outside-face-outdoor-air-drybulb-temperature-c}
@@ -3158,7 +3183,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the horizontal profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``horizontal profile angle'' is called ``vertical profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``horizontal profile angle'' is called ``vertical profile angle.''
 
 \subsubsection{Surface Window Solar Vertical Profile Angle {[}deg{]}}\label{surface-window-solar-vertical-profile-angle-deg}
 
@@ -3168,7 +3193,7 @@ For an exterior window of arbitrary tilt, it is defined as the angle between the
 
 If the sun is behind the window, the vertical profile angle is not defined and is reported as 0.0.
 
-Note that in most texts what we call ``vertical profile angle'' is called ``horizontal profile angle.''
+Note that in most texts and in window equivalent layer model what we call ``vertical profile angle'' is called ``horizontal profile angle.''
 
 \begin{figure}[hbtp] % fig 32
 \centering
@@ -3236,6 +3261,9 @@ For a time interval longer a timestep, this is the fraction of the time interval
 \subsubsection{Surface Window Blind Slat Angle {[}deg{]}}\label{surface-window-blind-slat-angle-deg}
 
 For an exterior window with a blind, this is the angle in degrees between the glazing outward normal and the blind slat angle outward normal, where the outward normal points away from the front face of the slat. The slat angle varies from 0 to 180 deg. If the slat angle is 0 deg or 180 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 90 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. See illustrations under WindowMaterial:Blind. For blinds with a fixed slat angle, the value reported here will be constant.
+
+For WindowMaterial:Blind:EquivalentLayer blinds the slat angle varies from -90 to 90 deg. If the slat angle is -90 deg or 90 deg, the slats are parallel to the glazing and the slats are said to be ``closed''. If the slat angle is 0 deg, the slats are perpendicular to the glazing and the slats are said to be ``fully open''. For blinds with a fixed slat angle, the value reported here will be constant.
+
 
 \subsubsection{Surface Window Blind Beam to Beam Solar Transmittance {[]}}\label{surface-window-blind-beam-to-beam-solar-transmittance}
 
@@ -4581,7 +4609,7 @@ This is where the gap air goes after passing through the window. The choices are
 
 \emph{OutdoorAir}: The gap air goes to the outside air.
 
-\emph{ReturnAir}. The gap air goes to the return air for the window's zone. This choice is allowed only if Airflow Source = InsideAir. If the return air flow is zero, the gap air goes to the indoor air of the window's zone. If the sum of the gap airflow for all of the windows in a zone with Airflow Destination = ReturnAir exceeds the return airflow, then the difference between this sum and the return airflow goes to the indoor air.
+\emph{ReturnAir}. The gap air goes to the return air for the window's zone. This choice is allowed only if Airflow Source = InsideAir. If the return air flow is zero, the gap air goes to the indoor air of the window's zone. If the sum of the gap airflow for all of the windows in a zone with Airflow Destination = ReturnAir exceeds the return airflow, then the difference between this sum and the return airflow goes to the indoor air. The name of the Return Air Node may be specified below.
 
 Figure~\ref{fig:gap-airflow-configurations-for-airflow} shows the allowed combinations of Airflow Source and Airflow Destination. The allowed combinations of Airflow Source and Airflow Destination are:
 
@@ -4627,6 +4655,10 @@ If Yes, Airflow Multiplier Schedule Name is required.
 
 The name of a schedule with values between 0.0 and 1.0. The timestep value of the airflow is Maximum Airflow times the schedule value. Required if Airflow Is Scheduled = Yes. Unused if Airflow Is Scheduled = No. This schedule should have a ScheduleType with Numeric Type = Continuous and Range = 0.0 : 1.0.
 
+\paragraph{Field: Airflow Return Air Node Name}\label{field-airflow-return-air-node-name}
+
+The name of the return air node for this airflow window if the Airflow Destination is ReturnAir. If left blank, this defaults to the first return air node for the zone containing the window surface.
+
 \begin{figure}[hbtp] % fig 39
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image065.png}
@@ -4636,14 +4668,15 @@ The name of a schedule with values between 0.0 and 1.0. The timestep value of th
 An IDF example: window with a constant airflow from inside to outside at 0.008 m\(^{3}\)/s-m.
 
 \begin{lstlisting}
-WindowProperty:AirflowControl,   !- Used to control forced airflow through a gap between glass layers
-      Zn001:Wall001:Win002,   !- Name of Associated Window
+WindowProperty:AirflowControl,
+      Zn001:Wall001:Win002,   !- Name
       InsideAir,              !- Airflow Source
       OutsideAir,             !- Airflow Destination
-      0.008,                  !- Maximum Airflow (m3/s per m of glazing width)
+      0.008,                  !- Maximum Flow Rate {m3/s-m}
       AlwaysOnAtMaxFlow,      !- Airflow Control Type
-      No,                     !- Airflow Has Multiplier Schedule?
-      ;                       !- Name of Airflow Multiplier Schedule
+      No,                     !- Airflow Is Scheduled
+      ;                       !- Airflow Multiplier Schedule Name
+      ,                       !- Airflow Return Air Node Name
 \end{lstlisting}
 
 \subsection{WindowProperty:StormWindow}\label{windowpropertystormwindow}
@@ -4841,11 +4874,11 @@ This field represents the sensible cooling energy in Joules that is actually sup
 
 \subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w-1}
 
-This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Heating Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
 \subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w-1}
 
-This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Cooling Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
 \subsubsection{Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratiokgwaterkgdryair}
 

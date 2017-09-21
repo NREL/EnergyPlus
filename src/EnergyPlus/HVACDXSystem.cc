@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -62,6 +62,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -596,6 +597,13 @@ namespace HVACDXSystem {
 			} else {
 				if ( SameString( Alphas( 11 ), "Yes" ) ) {
 					DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = true;
+					if ( DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+						ShowWarningError( CurrentModuleObject + " = " + DXCoolingSystem( DXCoolSysNum ).Name );
+						ShowContinueError( "Invalid entry for " + cAlphaFields( 11 ) + " :" + Alphas( 11 ) );
+						ShowContinueError( "Variable DX Cooling Coil is not supported as 100% DOAS DX coil." );
+						ShowContinueError( "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues." );
+						DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = false;
+					}
 				} else if ( SameString( Alphas( 11 ), "" ) ) {
 					DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil = false;
 				} else if ( SameString( Alphas( 11 ), "No" ) ) {
@@ -631,12 +639,12 @@ namespace HVACDXSystem {
 		for ( DXSystemNum = 1; DXSystemNum <= NumDXSystem; ++DXSystemNum ) {
 			// Setup Report variables for the DXCoolingSystem that is not reported in the components themselves
 			if ( SameString( DXCoolingSystem( DXSystemNum ).CoolingCoilType, "Coil:Cooling:DX:Twospeed" ) ) {
-				SetupOutputVariable( "Coil System Cycling Ratio []", DXCoolingSystem( DXSystemNum ).CycRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
-				SetupOutputVariable( "Coil System Compressor Speed Ratio []", DXCoolingSystem( DXSystemNum ).SpeedRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+				SetupOutputVariable( "Coil System Cycling Ratio", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).CycRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+				SetupOutputVariable( "Coil System Compressor Speed Ratio", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).SpeedRatio, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
 			} else {
-				SetupOutputVariable( "Coil System Part Load Ratio []", DXCoolingSystem( DXSystemNum ).PartLoadFrac, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+				SetupOutputVariable( "Coil System Part Load Ratio", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).PartLoadFrac, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
 			}
-			SetupOutputVariable( "Coil System Frost Control Status []", DXCoolingSystem( DXSystemNum ).FrostControlStatus, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
+			SetupOutputVariable( "Coil System Frost Control Status", OutputProcessor::Unit::None, DXCoolingSystem( DXSystemNum ).FrostControlStatus, "System", "Average", DXCoolingSystem( DXSystemNum ).Name );
 		}
 
 		Alphas.deallocate();
@@ -837,13 +845,12 @@ namespace HVACDXSystem {
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Liesen
-		//       DATE WRITTEN   Feb 2001
-		//       MODIFIED       Richard Raustad, FSEC Nov 2003
-		//                      Feb 2005 M. J. Witte, GARD Analytics, Inc.
-		//                        Add dehumidification controls and support for multimode DX coil
-		//                      Jan 2008 R. Raustad, FSEC. Added coolreheat to all coil types
-		//                      Feb 2013 Bo Shen, Oak Ridge National Lab
-		//                      Add Coil:Cooling:DX:VariableSpeed, capable of both sensible and latent cooling
+		//       DATE WRITTEN   Feb. 2001
+		//       MODIFIED       Nov. 2003, R. Raustad, FSEC 
+		//                      Feb. 2005, M. J. Witte, GARD. Add dehumidification controls and support for multimode DX coil
+		//                      Jan. 2008, R. Raustad, FSEC. Added coolreheat to all coil types
+		//                      Feb. 2013, B. Shen, ORNL. Add Coil:Cooling:DX:VariableSpeed, capable of both sensible and latent cooling
+		//                      Nov. 2016, R. Zhang, LBNL. Applied the coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -857,12 +864,16 @@ namespace HVACDXSystem {
 
 		// Using/Aliasing
 		using namespace ScheduleManager;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataEnvironment::OutBaroPress;
 		using DataHVACGlobals::TempControlTol;
+		using FaultsManager::FaultsCoilSATSensor;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DXCoils::SimDXCoil;
 		using DXCoils::SimDXCoilMultiSpeed;
@@ -966,6 +977,15 @@ namespace HVACDXSystem {
 		VSCoilIndex = 0;
 		I = 1;
 
+		//If there is a fault of coil SAT Sensor (zrp_Nov2016)
+		if( DXCoolingSystem( DXSystemNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = DXCoolingSystem( DXSystemNum ).FaultyCoilSATIndex;
+			DXCoolingSystem( DXSystemNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the DesOutTemp
+			DesOutTemp -= DXCoolingSystem( DXSystemNum ).FaultyCoilSATOffset;
+		}
+		
 		// If DXCoolingSystem is scheduled on and there is flow
 		if ( ( GetCurrentScheduleValue( DXCoolingSystem( DXSystemNum ).SchedPtr ) > 0.0 ) && ( Node( InletNode ).MassFlowRate > MinAirMassFlow ) ) {
 
@@ -998,7 +1018,7 @@ namespace HVACDXSystem {
 
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
 					//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) < Acc ) {
@@ -1018,7 +1038,7 @@ namespace HVACDXSystem {
 							Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutTemp;
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
@@ -1072,7 +1092,7 @@ namespace HVACDXSystem {
 							Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutHumRat;
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilHumRatResidual, 0.0, 1.0, Par );
+							SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilHumRatResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter < 1 ) {
@@ -1132,7 +1152,7 @@ namespace HVACDXSystem {
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 					FullLoadHumRatOut = DXCoilOutletHumRat( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
 					//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) < Acc ) {
@@ -1164,7 +1184,7 @@ namespace HVACDXSystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 
 								//               RegulaFalsi may not find sensible PLR when the latent degradation model is used.
@@ -1191,7 +1211,7 @@ namespace HVACDXSystem {
 								TempMinPLR = max( 0.0, ( TempMinPLR - 0.01 ) );
 								TempMaxPLR = min( 1.0, ( TempMaxPLR + 0.01 ) );
 								//               tighter boundary of solution has been found, call RegulaFalsi a second time
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).HXAssistedSensPLRIter < 1 ) {
@@ -1254,7 +1274,7 @@ namespace HVACDXSystem {
 						//           FullOutput will be different than the FullOutput determined above during sensible PLR calculations
 						FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
-						ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+						ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
 						//           Check to see if the system can meet the load with the compressor off
 						//           IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
@@ -1279,7 +1299,7 @@ namespace HVACDXSystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).HXAssistedLatPLRIter < 1 ) {
@@ -1335,7 +1355,7 @@ namespace HVACDXSystem {
 								Par( 4 ) = 0.0;
 							}
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par );
+							SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 
 								//               RegulaFalsi may not find latent PLR when the latent degradation model is used.
@@ -1358,7 +1378,7 @@ namespace HVACDXSystem {
 									OutletHumRatDXCoil = HXAssistedCoilOutletHumRat( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 								}
 								//               tighter boundary of solution has been found, call RegulaFalsi a second time
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).HXAssistedCRLatPLRIter < 1 ) {
@@ -1416,7 +1436,7 @@ namespace HVACDXSystem {
 						if ( OutletTempHS < DesOutTemp ) {
 							Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 							Par( 2 ) = DesOutTemp;
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).MSpdSensPLRIter < 1 ) {
@@ -1437,7 +1457,7 @@ namespace HVACDXSystem {
 						SpeedRatio = 0.0;
 						Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 						Par( 2 ) = DesOutTemp;
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par );
+						SolveRoot( Acc, MaxIte, SolFla, CycRatio, DXCoilCyclingResidual, 0.0, 1.0, Par );
 						if ( SolFla == -1 ) {
 							if ( ! WarmupFlag ) {
 								if ( DXCoolingSystem( DXSystemNum ).MSpdCycSensPLRIter < 1 ) {
@@ -1482,7 +1502,7 @@ namespace HVACDXSystem {
 								if ( OutletHumRatHS < DesOutHumRat ) {
 									Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 									Par( 2 ) = DesOutHumRat;
-									SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par );
+									SolveRoot( HumRatAcc, MaxIte, SolFla, SpeedRatio, DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par );
 									if ( SolFla == -1 ) {
 										if ( ! WarmupFlag ) {
 											if ( DXCoolingSystem( DXSystemNum ).MSpdLatPLRIter < 1 ) {
@@ -1503,7 +1523,7 @@ namespace HVACDXSystem {
 								SpeedRatio = 0.0;
 								Par( 1 ) = double( DXCoolingSystem( DXSystemNum ).CoolingCoilIndex );
 								Par( 2 ) = DesOutHumRat;
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, CycRatio, DXCoilCyclingHumRatResidual, 0.0, 1.0, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, CycRatio, DXCoilCyclingHumRatResidual, 0.0, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).MSpdCycLatPLRIter < 1 ) {
@@ -1539,7 +1559,7 @@ namespace HVACDXSystem {
 
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
 					//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) < Acc ) {
@@ -1559,7 +1579,7 @@ namespace HVACDXSystem {
 							// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 							Par( 3 ) = double( DehumidMode );
 							Par( 4 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).MModeSensPLRIter < 1 ) {
@@ -1596,7 +1616,7 @@ namespace HVACDXSystem {
 						SimDXCoilMultiMode( CompName, On, FirstHVACIteration, PartLoadFrac, DehumidMode, DXCoolingSystem( DXSystemNum ).CoolingCoilIndex, FanOpMode );
 						FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
-						ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+						ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
 						// Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
 						// Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
@@ -1618,7 +1638,7 @@ namespace HVACDXSystem {
 								// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 								Par( 3 ) = double( DehumidMode );
 								Par( 4 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).MModeLatPLRIter < 1 ) {
@@ -1649,7 +1669,7 @@ namespace HVACDXSystem {
 								// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 								Par( 3 ) = double( DehumidMode );
 								Par( 4 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).MModeLatPLRIter < 1 ) {
@@ -1700,7 +1720,7 @@ namespace HVACDXSystem {
 							// Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
 							Par( 3 ) = double( DehumidMode );
 							Par( 4 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilHumRatResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXCoolingSystem( DXSystemNum ).MModeLatPLRIter2 < 1 ) {
@@ -1758,7 +1778,7 @@ namespace HVACDXSystem {
 					FullLoadHumRatOut = VarSpeedCoil( VSCoilIndex ).OutletAirHumRat;
 					FullOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
-					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+					ReqOutput = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
 					//         IF NoOutput is lower than (more cooling than required) or very near the ReqOutput, do not run the compressor
 					if ( ( NoOutput - ReqOutput ) < Acc ) {
@@ -1788,7 +1808,7 @@ namespace HVACDXSystem {
 							SimVariableSpeedCoils( CompName, VSCoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 							TempSpeedOut = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-							TempSpeedReqst = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+							TempSpeedReqst = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
 							if ( ( TempSpeedOut - TempSpeedReqst ) > Acc ) {
 								// Check to see which speed to meet the load
@@ -1799,7 +1819,7 @@ namespace HVACDXSystem {
 									SimVariableSpeedCoils( CompName, VSCoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio );
 
 									TempSpeedOut = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
-									TempSpeedReqst = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
+									TempSpeedReqst = Node( InletNode ).MassFlowRate * ( PsyHFnTdbW( DesOutTemp, Node( OutletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( OutletNode ).HumRat ) );
 
 									if ( ( TempSpeedOut - TempSpeedReqst ) < Acc ) {
 										SpeedNum = I;
@@ -1810,7 +1830,7 @@ namespace HVACDXSystem {
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
 								Par( 3 ) = double( SpeedNum );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
 
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
@@ -1839,7 +1859,7 @@ namespace HVACDXSystem {
 								Par( 1 ) = double( VSCoilIndex );
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
@@ -1917,7 +1937,7 @@ namespace HVACDXSystem {
 								Par( 2 ) = DesOutHumRat;
 								Par( 5 ) = double( FanOpMode );
 								Par( 3 ) = double( SpeedNum );
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par );
 
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
@@ -1946,7 +1966,7 @@ namespace HVACDXSystem {
 								Par( 1 ) = double( VSCoilIndex );
 								Par( 2 ) = DesOutHumRat;
 								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( HumRatAcc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingHumResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( HumRatAcc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingHumResidual, 1.0e-10, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXCoolingSystem( DXSystemNum ).DXCoilLatPLRIter < 1 ) {
@@ -2002,6 +2022,7 @@ namespace HVACDXSystem {
 				}}
 			} // End of cooling load type (sensible or latent) if block
 		} // End of If DXCoolingSystem is scheduled on and there is flow
+		
 		//Set the final results
 		DXCoolingSystem( DXSystemNum ).PartLoadFrac = PartLoadFrac;
 		DXCoolingSystem( DXSystemNum ).SpeedRatio = SpeedRatio;

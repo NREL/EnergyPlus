@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -141,6 +141,11 @@ namespace Boilers {
 		int CalculatedEffError; // calculated efficiency >1.1 recurring warning error counter
 		int CalculatedEffIndex; // calculated efficiency >1.1 recurring warning error message index
 		bool IsThisSized; // TRUE if sizing is done
+		//Operational fault parameters
+		bool FaultyBoilerFoulingFlag; // True if the boiler has fouling fault
+		int FaultyBoilerFoulingIndex;  // Index of the fault object corresponding to the boiler
+		Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		BoilerSpecs() :
@@ -179,7 +184,10 @@ namespace Boilers {
 			EffCurveOutputIndex( 0 ),
 			CalculatedEffError( 0 ),
 			CalculatedEffIndex( 0 ),
-			IsThisSized( false )
+			IsThisSized( false ),
+			FaultyBoilerFoulingFlag( false ),
+			FaultyBoilerFoulingIndex( 0 ),
+			FaultyBoilerFoulingFactor( 1.0 )
 		{}
 
 	};

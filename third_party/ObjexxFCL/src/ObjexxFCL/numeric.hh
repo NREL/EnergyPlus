@@ -3,19 +3,23 @@
 
 // Numeric Support Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array.hh>
 
 // C++ Headers
 #include <cmath>
 #include <complex>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <string>
@@ -25,119 +29,119 @@ namespace ObjexxFCL {
 
 inline
 int
-kind( bool const & )
+KIND( bool const & )
 {
 	return 4; // Assumes bool is standing for LOGICAL
 }
 
 inline
 int
-kind( std::int8_t const & )
+KIND( std::int8_t const & )
 {
 	return 1;
 }
 
 inline
 int
-kind( std::int16_t const & )
+KIND( std::int16_t const & )
 {
 	return 2;
 }
 
 inline
 int
-kind( std::int32_t const & )
+KIND( std::int32_t const & )
 {
 	return 4;
 }
 
 inline
 int
-kind( std::int64_t const & )
+KIND( std::int64_t const & )
 {
 	return 8;
 }
 
 inline
 int
-kind( std::uint8_t const & )
+KIND( std::uint8_t const & )
 {
 	return 1;
 }
 
 inline
 int
-kind( std::uint16_t const & )
+KIND( std::uint16_t const & )
 {
 	return 2;
 }
 
 inline
 int
-kind( std::uint32_t const & )
+KIND( std::uint32_t const & )
 {
 	return 4;
 }
 
 inline
 int
-kind( std::uint64_t const & )
+KIND( std::uint64_t const & )
 {
 	return 8;
 }
 
 inline
 int
-kind( float const & )
+KIND( float const & )
 {
 	return 4;
 }
 
 inline
 int
-kind( double const & )
+KIND( double const & )
 {
 	return 8;
 }
 
 inline
 int
-kind( long double const & )
+KIND( long double const & )
 {
 	return 16; // Assumes long double standing in for REAL(16)
 }
 
 inline
 int
-kind( std::complex< float > const & )
+KIND( std::complex< float > const & )
 {
 	return 4;
 }
 
 inline
 int
-kind( std::complex< double > const & )
+KIND( std::complex< double > const & )
 {
 	return 8;
 }
 
 inline
 int
-kind( std::complex< long double > const & )
+KIND( std::complex< long double > const & )
 {
 	return 16;
 }
 
 inline
 int
-kind( char const & )
+KIND( char const & )
 {
 	return 1;
 }
 
 inline
 int
-kind( std::string const & )
+KIND( std::string const & )
 {
 	return 1;
 }
@@ -145,56 +149,51 @@ kind( std::string const & )
 template< typename T >
 inline
 int
-KIND( T const & x )
+KIND( T const & )
 {
-	return kind( x );
+	return static_cast< int >( sizeof( T ) );
 }
 
 int
-selected_int_kind( int const r );
-
-template< typename R >
-inline
-int
-SELECTED_INT_KIND( R const r )
-{
-	return selected_int_kind( r );
-}
+SELECTED_INT_KIND( int const r );
 
 int
-selected_real_kind( int const p = 0, int const r = 0 ); // Fortran 2008 variant with radix argument not supported
+SELECTED_REAL_KIND( int const p = 0, int const r = 0, int const radix = 2 );
 
 inline
 int
-SELECTED_REAL_KIND( int const p = 0, int const r = 0 ) // Fortran 2008 variant with radix argument not supported
-{
-	return selected_real_kind( p, r );
-}
-
-inline
-int
-selected_char_kind( char const & )
+SELECTED_CHAR_KIND( char const & )
 {
 	return -1;
 }
 
 int
-selected_char_kind( std::string const & s );
+SELECTED_CHAR_KIND( std::string const & s );
 
-template< typename S >
 inline
-int
-SELECTED_CHAR_KIND( S const & s )
+std::size_t
+SIZEOF( std::string const & x )
 {
-	return selected_char_kind( s );
+	return x.length();
 }
+
+std::size_t
+SIZEOF( char const * x );
 
 template< typename T >
 inline
-int
-radix( T const & )
+std::size_t
+SIZEOF( Array< T > const & x )
 {
-	return std::numeric_limits< T >::radix;
+	return x.size() * sizeof( T );
+}
+
+template< typename T, class = typename std::enable_if< ! std::is_base_of< BArray, T >::value >::type >
+inline
+std::size_t
+SIZEOF( T const & x )
+{
+	return sizeof( x );
 }
 
 template< typename T >
@@ -208,145 +207,19 @@ RADIX( T const & )
 template< typename T >
 inline
 int
-digits( T const & )
-{
-	return std::numeric_limits< T >::digits;
-}
-
-template< typename T >
-inline
-int
 DIGITS( T const & )
 {
 	return std::numeric_limits< T >::digits;
 }
 
-inline
-int
-range( std::int8_t const & )
-{
-	return 2;
-}
-
-inline
-int
-range( std::int16_t const & )
-{
-	return 4;
-}
-
-inline
-int
-range( std::int32_t const & )
-{
-	return 9;
-}
-
-inline
-int
-range( std::int64_t const & )
-{
-	return 18;
-}
-
-inline
-int
-range( std::uint8_t const & )
-{
-	return 2;
-}
-
-inline
-int
-range( std::uint16_t const & )
-{
-	return 4;
-}
-
-inline
-int
-range( std::uint32_t const & )
-{
-	return 9;
-}
-
-inline
-int
-range( std::uint64_t const & )
-{
-	return 18;
-}
-
-inline
-int
-range( float const & )
-{
-	return 37;
-}
-
-inline
-int
-range( double const & )
-{
-	return 307;
-}
-
-inline
-int
-range( long double const & )
-{
-	return 4931; // Assumes long double standing in for REAL(16)
-}
-
-inline
-int
-range( std::complex< float > const & )
-{
-	return 37;
-}
-
-inline
-int
-range( std::complex< double > const & )
-{
-	return 307;
-}
-
-inline
-int
-range( std::complex< long double > const & )
-{
-	return 4931;
-}
-
-template< typename T >
-inline
-int
-RANGE( T const & x )
-{
-	return range( x );
-}
-
-// Huge: Largest Number of the Type
 template< typename T >
 inline
 T
-huge( T const & )
+HUGE_( T const & )
 {
 	return std::numeric_limits< T >::max();
 }
 
-// Tiny: Smallest Number of the Type
-template< typename T >
-inline
-T
-tiny( T const & )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::numeric_limits< T >::min();
-}
-
-// Tiny: Smallest Number of the Type
 template< typename T >
 inline
 T
@@ -356,17 +229,6 @@ TINY( T const & )
 	return std::numeric_limits< T >::min();
 }
 
-// Epsilon: Smallest Number of the Type
-template< typename T >
-inline
-T
-epsilon( T const & )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::numeric_limits< T >::epsilon();
-}
-
-// Epsilon: Smallest Number of the Type
 template< typename T >
 inline
 T
@@ -379,41 +241,122 @@ EPSILON( T const & )
 template< typename T >
 inline
 int
-precision( T const & x )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return int( ( digits( x ) - 1 ) * std::log10( double( radix( x ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
-}
-
-template< typename T >
-inline
-int
-precision( std::complex< T > const & x )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return int( ( digits( x.real() ) - 1 ) * std::log10( double( radix( x.real() ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
-}
-
-template< typename T >
-inline
-int
 PRECISION( T const & x )
 {
-	return precision( x );
+	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
+	return int( ( DIGITS( x ) - 1 ) * std::log10( double( RADIX( x ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
 }
 
 template< typename T >
 inline
-T
-minexponent( T const & )
+int
+PRECISION( std::complex< T > const & x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::numeric_limits< T >::min_exponent;
+	return int( ( DIGITS( x.real() ) - 1 ) * std::log10( double( RADIX( x.real() ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
+}
+
+inline
+int
+EXPONENT_RANGE( std::int8_t const & )
+{
+	return 2;
+}
+
+inline
+int
+EXPONENT_RANGE( std::int16_t const & )
+{
+	return 4;
+}
+
+inline
+int
+EXPONENT_RANGE( std::int32_t const & )
+{
+	return 9;
+}
+
+inline
+int
+EXPONENT_RANGE( std::int64_t const & )
+{
+	return 18;
+}
+
+inline
+int
+EXPONENT_RANGE( std::uint8_t const & )
+{
+	return 2;
+}
+
+inline
+int
+EXPONENT_RANGE( std::uint16_t const & )
+{
+	return 4;
+}
+
+inline
+int
+EXPONENT_RANGE( std::uint32_t const & )
+{
+	return 9;
+}
+
+inline
+int
+EXPONENT_RANGE( std::uint64_t const & )
+{
+	return 18;
+}
+
+inline
+int
+EXPONENT_RANGE( float const & )
+{
+	return 37;
+}
+
+inline
+int
+EXPONENT_RANGE( double const & )
+{
+	return 307;
+}
+
+inline
+int
+EXPONENT_RANGE( long double const & )
+{
+	return 4931; // Assumes long double standing in for REAL(16)
+}
+
+inline
+int
+EXPONENT_RANGE( std::complex< float > const & )
+{
+	return 37;
+}
+
+inline
+int
+EXPONENT_RANGE( std::complex< double > const & )
+{
+	return 307;
+}
+
+inline
+int
+EXPONENT_RANGE( std::complex< long double > const & )
+{
+	return 4931;
 }
 
 template< typename T >
 inline
-T
+int
 MINEXPONENT( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
@@ -422,29 +365,11 @@ MINEXPONENT( T const & )
 
 template< typename T >
 inline
-T
-maxexponent( T const & )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::numeric_limits< T >::max_exponent;
-}
-
-template< typename T >
-inline
-T
+int
 MAXEXPONENT( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::max_exponent;
-}
-
-template< typename T >
-inline
-int
-exponent( T const x )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return ( x != T( 0 ) ? int( std::log2( std::abs( x ) ) ) + 1 : 0 );
 }
 
 template< typename T >
@@ -459,10 +384,19 @@ EXPONENT( T const x )
 template< typename T >
 inline
 T
-fraction( T const x )
+SET_EXPONENT( T const x, int const i )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return x * std::pow( T( radix( x ) ), T( -exponent( x ) ) );
+	return ( x != T( 0 ) ? x * std::pow( T( RADIX( x ) ), T( i - EXPONENT( x ) ) ) : T( 0 ) );
+}
+
+template< typename T >
+inline
+T
+SCALE( T const x, int const i )
+{
+	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
+	return ( x != T( 0 ) ? x * std::pow( T( RADIX( x ) ), T( i ) ) : T( 0 ) );
 }
 
 template< typename T >
@@ -471,25 +405,43 @@ T
 FRACTION( T const x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return x * std::pow( T( radix( x ) ), T( -exponent( x ) ) );
+	return x * std::pow( T( RADIX( x ) ), T( -EXPONENT( x ) ) );
 }
 
 template< typename T >
 inline
 T
-set_exponent( T const x, int const i )
+SPACING( T const x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return ( x != T( 0 ) ? x * std::pow( T( radix( x ) ), T( i - exponent( x ) ) ) : T( 0 ) );
+	if ( x == T( 0 ) ) return TINY( x );
+	try {
+		return std::pow( T( RADIX( x ) ), std::max( T( EXPONENT( x ) - DIGITS( x ) ), T( MINEXPONENT( x ) - 1 ) ) );
+	} catch (...) {
+		return TINY( x );
+	}
 }
 
 template< typename T >
 inline
 T
-SET_EXPONENT( T const x, int const i )
+RECIPROCAL_RELATIVE_SPACING( T const x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return ( x != T( 0 ) ? x * std::pow( T( radix( x ) ), T( i - exponent( x ) ) ) : T( 0 ) );
+	return std::abs( FRACTION( x ) ) * std::pow( double( RADIX( x ) ), DIGITS( x ) );
+}
+
+template< typename T, typename Y >
+inline
+T
+NEAREST( T const x, Y const y )
+{
+	assert( y != Y( 0 ) );
+	if ( y >= Y( 0 ) ) {
+		return std::nextafter( x, std::numeric_limits< T >::max() );
+	} else {
+		return std::nextafter( x, std::numeric_limits< T >::lowest() );
+	}
 }
 
 } // ObjexxFCL

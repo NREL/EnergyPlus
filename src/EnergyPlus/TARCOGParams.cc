@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -177,6 +177,22 @@ namespace TARCOGParams {
 	Real64 const AirflowRelaxationParameter( 0.9 );
 
 	Real64 const TemperatureQuessDiff( 1.0 ); // in case outside and inside temperatures are identical
+
+	// Coefficients for new airflow algorithm.
+	// Robert Hart, Howdy Goudey & D. Charlie Curcija (2017): Experimental
+	// validation and model development for thermal transmittances of porous window screens
+	// and horizontal louvred blind systems, Journal of Building Performance Simulation, DOI:
+	// 10.1080/19401493.2017.1323010
+
+	Real64 const C1_VENET( 0.016 );
+	Real64 const C2_VENET( -0.63 );
+	Real64 const C3_VENET( 0.53 );
+	Real64 const C4_VENET( 0.043 );
+
+	Real64 const C1_SHADE( 0.05 );
+	Real64 const C2_SHADE( 1.08 );
+	Real64 const C3_SHADE( 0.79 );
+	Real64 const C4_SHADE( 0.50 );
 
 } // TARCOGParams
 

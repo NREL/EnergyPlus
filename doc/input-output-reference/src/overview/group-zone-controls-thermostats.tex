@@ -8,9 +8,9 @@ Zone Control objects are used to control zone conditions to a specific setpoint.
 
 \textbf{Thermostat:ThermalComfort} - The object provides a method to control a zone to a dry-bulb temperature setpoint based on a thermal comfort model (e.g.~Fanger) and a user-specified thermal comfort setpoint schedule.
 
-\textbf{Thermostat:OperativeTemperature} - The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional ZoneControl:Thermostat and setpoint objects.
+\textbf{Thermostat:OperativeTemperature} - The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional ZoneControl:Thermostat and setpoint objects.
 
-\textbf{Thermostat:TemperatureAndHumidity} - This thermostat control works together with the traditional ZoneControl:Thermostat object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat s cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A ZoneControl:Thermostat:TemperatureAndHumidity object should be specified to indicate if a zone s traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional ZoneControl:Thermostat and setpoint objects.
+\textbf{Thermostat:TemperatureAndHumidity} - This thermostat control works together with the traditional ZoneControl:Thermostat object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat's cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A ZoneControl:Thermostat:TemperatureAndHumidity object should be specified to indicate if a zone's traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional ZoneControl:Thermostat and setpoint objects.
 
 \textbf{Thermostat}:\textbf{StagedDualSetpoint} - This thermostat control works alone with ``Dual Setpoint'' type only. The object provides heating and cooling setpoints, throttling range and offsets, so that zone temperature setpoint used for system load calculation is adjusted by the setpoint and throttling range based on the zone temperature at the previous time step. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object.
 
@@ -344,7 +344,9 @@ ThermostatSetpoint:SingleHeating, Heating Setpoint with SB, Heating Setpoints;
 
 \subsection{ZoneControl:Thermostat:OperativeTemperature}\label{zonecontrolthermostatoperativetemperature}
 
-This object is used to modify the program s behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related set point objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures).
+This object is used to modify the program's behavior for ZoneControl:Thermostat objects. One input object is used for each thermal zone to indicate if that zone's thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. Zone Control:Thermostatic and related setpoint objects also need to be included in the input file. When this object is used, the zone can be controlled by a weighted mixture of radiant and air temperatures (rather than just air temperatures). 
+
+When using this object, the setpoint temperature values (e.g. input in schedules named in ThermostatSetpoint:DualSetpoint objects) become targets for the desired operative temperatures. As of version 8.7 new options are added that allow automatically generating values for the setpoint temperature, as a function of outdoor air temperatures, using various adaptive comfort models based on ASHRAE Standard 55-2010 and CEN 15251-2007. The adaptive comfort model relates the zone operative temperature setpoint to the recent history of the outdoor air temperatures.  The adaptive comfort models only apply to cooling mode and generate a single setpoint value for each day. During summer time in hot climates, the zone thermostat setting can be higher than the traditional thermostat setting based on the adaptive thermal comfort model, which results in energy savings of HVAC systems. 
 
 This thermostatic operative temperature, \({T_{OP}}\) , is defined as:
 
@@ -379,7 +381,14 @@ Air Velocity (m/s) & <  0.2 & 0.2 to 0.6 & 0.6 to 1.0 \tabularnewline
 \bottomrule
 \end{longtable}
 
-Reference: J. Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210. ASHRAE. Atlanta, GA.
+When the adaptive comfort model is selected, the thermostat setpoint temperature schedule for space cooling will be overwritten with the calculated operative temperature based on the selected acceptability limits of the comfort model defined in ASHRAE 55-2010 or CEN 15251-2007. The ASHRAE adaptive comfort model is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 33.5°C; while the CEN 15251-2007 adaptive comfort model is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 30.0°C. The user can choose whether to overwrite the cooling setpoint temperature only when the adaptive setpoint is higher than the user input one for the purpose of energy saving.
+
+Reference: 
+\begin{itemize}
+\tightlist
+\item Niu and J. Burnett. 1998. Integrating Radiant/Operative Temperature Controls into Building Energy Simulations. ASHRAE Transactions Vol. 104. Part 2. page 210. ASHRAE. Atlanta, GA.
+\item ASHRAE Standard 55-2010. Thermal environment conditions for human occupancy. ASHRAE, Atlanta.
+\end{itemize}
 
 \subsubsection{Inputs}\label{inputs-5-034}
 
@@ -401,14 +410,30 @@ This field contains the name of a schedule, defined elsewhere, that determines t
 
 Note that by setting the values in this schedule separately for design days, the user can control how operative temperature control is applied during autosizing. (Operative temperature control tends to increase the equipment capacities calculated during sizing.)
 
+\paragraph{Field: Adaptive Comfort Model Type}\label{field-adaptive-comfort-mode-type}
+
+This field controls which of the seven adaptive comfort model is chosen, if any, listed as following: 
+\begin{itemize}
+\tightlist
+\item None. The adaptive comfort model is not applied and the setpoint temperatures are not adjusted from those input in the thermostat setpoints.
+\item AdaptiveASH55CentralLine. The central line of the acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
+\item AdaptiveASH5580PercentUpperLine. The upper line of the 80\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint.
+\item AdaptiveASH5590PercentUpperLine. The upper line of the 90\% acceptability limits of the ASHRAE Standard 55-2010 adaptive comfort model will be used to generate the zone operative temperature setpoint. 
+\item AdaptiveCEN15251CentralLine. The central line of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used to generate the zone operative temperature setpoint.
+\item AdaptiveCEN15251CategoryIUpperLine. The upper line of the Category I of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be used to generate the zone operative temperature setpoint.
+\item AdaptiveCEN15251CategoryIIUpperLine. The upper line of the Category II of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate to adjust the zone operative temperature setpoint; and 
+\item AdaptiveCEN15251CategoryIIIUpperLine. The upper line of the Category III of the acceptability limits of the CEN Standard 15251-2007 adaptive comfort model will be generate as the zone operative temperature setpoint.
+\end{itemize}
+
 An example of this object follows.
 
 \begin{lstlisting}
 ZoneControl:Thermostat:OperativeTemperature,
-  Zone 1 Thermostat,    !- ZoneControl:Thermostat Name
-  Constant,             !- Radiative Fraction Input Mode
-  0.5,                  !- Fixed Radiative Fraction
-  ;                     !- Radiative Fraction Schedule
+  Zone 1 Thermostat,          !- ZoneControl:Thermostat Name
+  Constant,                   !- Radiative Fraction Input Mode
+  0.5,                        !- Fixed Radiative Fraction
+  ,                           !- Radiative Fraction Schedule
+  AdaptiveASH55CentralLine;   !- Adaptive Comfort Model Type
 \end{lstlisting}
 
 Global operative temperature applied to all zones for a global thermostat:
@@ -926,7 +951,7 @@ This output variable defined in object Zone Control:Thermostatic. The Thermal Co
 
 \subsection{Thermal Comfort Setpoints}\label{thermal-comfort-setpoints}
 
-The syntax for the current set (4) of zone thermal comfort control types is given below. In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control type is a single or dual setpoint control). The schedule defines a Predicted Mean Vote (PMV) setpoint for the control type. The schedule would be defined through the standard schedule syntax described earlier in this document. For an uncontrolled thermal comfort zone, no Fanger thermal comfort object is specified or necessary. However, the \lstinline!Fanger thermal comfort output variables, Zone Thermal Comfort Fanger Model PMV and Zone Thermal Comfort Fanger Model PPD, are reported for thermal comfort uncontrolled conditions as well (e.i., free floating thermal comfort condition) just like a free floating temperature and humidity ratio.   These are indicative of the actual thermal comfort level in uncontrolled thermal comfort zone, and are outputs variables under!People objects\lstinline!.!
+The syntax for the current set (4) of zone thermal comfort control types is given below. In each case, the keyword is accompanied by an identifying name and either one or two schedule names (depending on whether the control type is a single or dual setpoint control). The schedule defines a Predicted Mean Vote (PMV) setpoint for the control type. The schedule would be defined through the standard schedule syntax described earlier in this document. For an uncontrolled thermal comfort zone, no Fanger thermal comfort object is specified or necessary. However, the Fanger thermal comfort output variables \lstinline!Zone Thermal Comfort Fanger Model PMV! and \lstinline!Zone Thermal Comfort Fanger Model PPD! are reported for thermal comfort uncontrolled conditions as well (e.i., free floating thermal comfort condition) just like a free floating temperature and humidity ratio.   These are indicative of the actual thermal comfort level in uncontrolled thermal comfort zone, and are outputs variables under \lstinline!People! objects.
 
 \subsection{ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating}\label{thermostatsetpointthermalcomfortfangersingleheating}
 
@@ -1022,10 +1047,21 @@ The ZoneControl:ContaminantController object is used for any of the following tw
 \item
   To control a zone to a specified indoor level of contaminants. When this zone is served by an AirLoopHVAC, the other zones served by the same AirLoopHVAC will have the same specified indoor level, if no objects in the other zones served by the same AirLoop are specified. Currently, the available contaminant controls are carbon dioxide and generic contaminant controls. The specified carbon dioxide setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure.The specified generic contaminant setpoint is used to calculate the required outdoor airflow rate through the HVAC system to reach the setpoint. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = IndoorAirQualityProcedure-GenericContaminant.
 \item
-  To specify minimum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. Carbon Dioxide Control Availability Schedule Name determines the availability of ProportionalControl .
+  To specify minimum or maximum CO2 concentration schedule name for a zone. The AirLoopHVAC system outdoor flow rate is realized by the Controller:MechanicalVentilation object with System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnDesignOARate. Carbon Dioxide Control Availability Schedule Name determines the availability of ProportionalControl .
 \end{enumerate}
 
 For the first purpose above, when multiple zones are served by an AirLoop, those zones that do not have a contaminant controller object specified in the input data file are automatically assigned a carbon dioxide setpoint. Zone objects entered in the input data file are internally assigned an index number from 1 to n (first defined Zone object = 1, next Zone object defined in the input file = 2, etc.). For zones served by an AirLoop that do not have a contaminant controller specified, the zone s carbon dioxide setpoint will be the same as the zone with the next highest zone index number that has a contaminant controller specified. If a zone with a higher index number and contaminant controller specified does not exist, then the zone with the next lowest zone index number that has a contaminant controller specified will be used. For example, assume an AirLoop serves zones 1 through 5, but one ZoneControl:ContaminantController object is specified for zone 2, a second ZoneControl:ContaminantController object is specified for zone 4, and no ZoneControl:ContaminantController objects are specified for zones 1, 3 and 5. In this case, zone 1 will be assigned the carbon dioxide setpoint schedule that was specified for zone 2, and zones 3 and 5 will be assigned the carbon dioxide setpoint schedule that was specified for zone 4.
+
+The ZoneControl:ContaminantController object is also used for any of the following two purposes based on the outdoor air method specified in the DesignSpecification:OutdoorAir.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  To control a zone to a specified indoor level of contaminants. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = IndoorAirQualityProcedure, so that the required outdoor airflow rate to reach the zone air setpoint can be assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC can reach the zone air CO2 setpoint precisely.
+\item
+  To specify minimum CO2 concentration schedule name for a zone. When this zone is served by a dedicated outdoor air system AirLoopHVAC through a terminal unit, some type of terminal units are able to call a DesignSpecification:OutdoorAir object with Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy. The outdoor airflow rate is determined by one of proportional control procedures. Then, the calculated outdoor airflow rate is assigned to the terminal unit. The total outdoor air flow in the AirLoopHVAC is a sum of all terminal units. In this way, each zone served by the same AirLoopHVAC will receive the outdoor airflow rate based on terminal unit request. 
+
+\end{enumerate}
 
 \subsubsection{Inputs}\label{inputs-14-017}
 
@@ -1047,7 +1083,11 @@ This field contains the name of a schedule that contains the zone carbon dioxide
 
 \paragraph{Field:Minimum Carbon Dioxide Concentration Schedule Name}\label{fieldminimum-carbon-dioxide-concentration-schedule-name}
 
-This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the Controller:MechanicalVentilation object.
+This field contains the name of a schedule that contains the minimum zone carbon dioxide concentration setpoint as a function of time. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the Controller:MechanicalVentilation object. This field is also used when the field Outdoor Air Method = ProportionalControlBasedonOccupancySchedule or ProportionalControlBasedOnDesignOccupancy in the DesignSpecification:OutdoorAir object.
+
+\paragraph{Field:Maximum Carbon Dioxide Concentration Schedule Name}\label{fieldmaximum-carbon-dioxide-concentration-schedule-name}
+
+This field contains the name of a schedule that contains the maximum zone carbon dioxide concentration as a function of time and is used to calculate design CO2 concentration level in the proportional ventilation control. The units for carbon dioxide setpoint are ppm. This field is used when the field System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, or ProportionalControlBasedOnDesignOccupancy, or ProportionalControlBasedOnDesignOARate in the Controller:MechanicalVentilation object.
 
 \paragraph{Field: Generic Contaminant Control Availability Schedule Name}\label{field-generic-contaminant-control-availability-schedule-name}
 
@@ -1067,6 +1107,7 @@ ZoneControl:ContaminantController,
   CO2AvailSchedule,               !- Carbon Dioxide Control Availability Schedule Name
   CO2SetpointSchedule,         !- Carbon Dioxide Setpoint Schedule Name
   ,                                               !- Minimum Carbon Dioxide Concentration Schedule Name
+  ,                                               !- Maximum Carbon Dioxide Concentration Schedule Name
   GCAvailSchedule,                 !- Generic Contaminant Control Availability Schedule Name
   GCSetpointSchedule;           !- Generic Contaminant Setpoint Schedule Name
 \end{lstlisting}

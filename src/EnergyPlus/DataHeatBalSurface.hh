@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -206,6 +206,7 @@ namespace DataHeatBalSurface {
 	// Variables that are used in both the Surface Heat Balance and the Moisture Balance
 	extern Array1D< Real64 > QRadSWOutAbs; // Short wave radiation absorbed on outside of opaque surface
 	extern Array1D< Real64 > QRadSWInAbs; // Short wave radiation absorbed on inside of opaque surface
+	extern Array1D< Real64 > QRadLWOutSrdSurfs;  // Long wave radiation absorbed on outside of exterior surface
 
 	extern Array1D< Real64 > InitialDifSolInAbs; // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
 	extern Array1D< Real64 > InitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -94,11 +94,11 @@ namespace DataAirLoop {
 	{
 		// Members
 		std::string AirLoopName; // Name of Primary Air System
-		int NumReturnNodes; // Number of return nodes connected to system
+		int NumReturnNodes; // Number of return nodes entering primary air system (currently limited to 1 node)
 		int NumSupplyNodes; // number of supply nodes exiting primary air system
 		int NumZonesCooled; // number of zones cooled by this primary air system
 		int NumZonesHeated; // number of zones heated by this primary air system
-		Array1D_int ZoneEquipReturnNodeNum; // Zone Equip side return air node numbers
+		Array1D_int ZoneEquipReturnNodeNum; // Zone Equip side return air node numbers (currently limited to 1 node)
 		Array1D_int ZoneEquipSupplyNodeNum; // Zone equip side supply air node numbers
 		Array1D_int AirLoopReturnNodeNum; // Air loop side return air node numbers
 		Array1D_int AirLoopSupplyNodeNum; // Air loop side supply air node numbers
@@ -108,6 +108,8 @@ namespace DataAirLoop {
 		Array1D_int HeatZoneInletNodes; // Zone inlet node numbers of zones heated by this air loop
 		Array1D_int TermUnitCoolInletNodes; // Air terminal unit cooling inlet node numbers for this air loop
 		Array1D_int TermUnitHeatInletNodes; // Air terminal unit heating inlet node numbers for this air loop
+		Array1D_int TermUnitCoolSizingIndex; // Air terminal sizing numbers for zones cooled by this air loop
+		Array1D_int TermUnitHeatSizingIndex; // Air terminal sizing numbers for zones heated by this air loop
 		Array1D_int SupplyDuctType; // 1=main, 2=cooling, 3=heating, 4=other
 
 		// Default Constructor
@@ -178,6 +180,7 @@ namespace DataAirLoop {
 		// Members
 		std::string OACtrlName; // name of OA controller
 		int OACtrlNum; // index of OA controller
+		int OASysNum; // index of OA System
 		bool CyclingFan; // TRUE if currently the air loop supply fan is cycling
 		bool AnyContFan; // TRUE if at any time supply fan is continuous
 		int CycFanSchedPtr; // index of schedule indicating whether fan is cycling or continuous in a unitary system
@@ -207,12 +210,15 @@ namespace DataAirLoop {
 		bool CoolingActiveFlag; // true whenever the air loop cooling coil is operating
 		bool HeatingActiveFlag; // true whenever the air loop heating coil is operating
 		bool OASysComponentsSimulated; // - true after OA components have been simulated
+		Real64 ZoneExhMassFlow; // zone exhaust flow rate not accounted for by zone inlet flow
 		bool AirLoopDCVFlag; // TRUE if the air loop has OA Controller specifying a Mechanical controller with DCV
+		int AirLoopPass; // number of air loop passes during iteration
 		// - internal flag only
 
 		// Default Constructor
 		AirLoopControlData() :
 			OACtrlNum( 0 ),
+			OASysNum( 0 ),
 			CyclingFan( false ),
 			AnyContFan( false ),
 			CycFanSchedPtr( 0 ),
@@ -242,7 +248,9 @@ namespace DataAirLoop {
 			CoolingActiveFlag( false ),
 			HeatingActiveFlag( false ),
 			OASysComponentsSimulated( false ),
-			AirLoopDCVFlag( true )
+			ZoneExhMassFlow( 0.0 ),
+			AirLoopDCVFlag( true ),
+			AirLoopPass( 0 )
 		{}
 
 	};
@@ -253,6 +261,7 @@ namespace DataAirLoop {
 		Real64 ZoneExhaust; // total of zone exhaust air mass flow rate for this loop [kg/s]
 		Real64 ZoneExhaustBalanced; // zone exhaust air that is balanced by simple air flow for loop [kg/s]
 		Real64 DesSupply; // design supply air mass flow rate for loop [kg/s]
+		Real64 DesReturnFrac; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
 		Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
 		Real64 ReqSupplyFrac; // required flow (as a fraction of DesSupply) set by a manager
 		Real64 MinOutAir; // minimum outside air mass flow rate [kg/s]
@@ -274,6 +283,7 @@ namespace DataAirLoop {
 			ZoneExhaust( 0.0 ),
 			ZoneExhaustBalanced( 0.0 ),
 			DesSupply( 0.0 ),
+			DesReturnFrac( 1.0 ),
 			SysToZoneDesFlowRatio( 0.0 ),
 			ReqSupplyFrac( 1.0 ),
 			MinOutAir( 0.0 ),

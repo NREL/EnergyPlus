@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -71,6 +71,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -121,7 +122,7 @@ namespace HeatRecovery {
 
 	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
-	using General::SolveRegulaFalsi;
+	using General::SolveRoot;
 	using General::RoundSigDigits;
 	using namespace Psychrometrics;
 
@@ -222,7 +223,8 @@ namespace HeatRecovery {
 		Optional_int_const CompanionCoilIndex, // index of companion cooling coil
 		Optional_bool_const RegenInletIsOANode, // flag to determine if supply inlet is OA node, if so air flow cycles
 		Optional_bool_const EconomizerFlag, // economizer operation flag passed by airloop or OA sys
-		Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
+		Optional_bool_const HighHumCtrlFlag, // high humidity control flag passed by airloop or OA sys
+		Optional_int_const CompanionCoilType_Num // cooling coil type of coil 
 	)
 	{
 
@@ -296,6 +298,13 @@ namespace HeatRecovery {
 			CompanionCoilNum = 0;
 		}
 
+		int companionCoilType( 0 );
+		if ( present( CompanionCoilType_Num ) ) {
+			companionCoilType = CompanionCoilType_Num;
+		} else {
+			companionCoilType = 0;
+		}
+
 		if ( present( HXUnitEnable ) ) {
 			HXUnitOn = HXUnitEnable;
 			//   When CalledFromParentObject is TRUE, this SIM routine was called by a parent object that passed in HXUnitEnable.
@@ -309,7 +318,7 @@ namespace HeatRecovery {
 			CalledFromParentObject = false;
 		}
 
-		InitHeatRecovery( HeatExchNum, CompanionCoilNum );
+		InitHeatRecovery( HeatExchNum, CompanionCoilNum, companionCoilType );
 
 		// call the correct heat exchanger calculation routine
 		{ auto const SELECT_CASE_var( ExchCond( HeatExchNum ).ExchTypeNum );
@@ -1067,21 +1076,21 @@ namespace HeatRecovery {
 		for ( ExchIndex = 1; ExchIndex <= NumHeatExchangers; ++ExchIndex ) {
 			ExchNum = ExchIndex;
 			// CurrentModuleObject='HeatExchanger:AirToAir:FlatPlate/AirToAir:SensibleAndLatent/Desiccant:BalancedFlow')
-			SetupOutputVariable( "Heat Exchanger Sensible Heating Rate [W]", ExchCond( ExchNum ).SensHeatingRate, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Sensible Heating Energy [J]", ExchCond( ExchNum ).SensHeatingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Latent Gain Rate [W]", ExchCond( ExchNum ).LatHeatingRate, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Latent Gain Energy [J]", ExchCond( ExchNum ).LatHeatingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Total Heating Rate [W]", ExchCond( ExchNum ).TotHeatingRate, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Total Heating Energy [J]", ExchCond( ExchNum ).TotHeatingEnergy, "System", "Sum", ExchCond( ExchNum ).Name, _, "ENERGYTRANSFER", "HEAT RECOVERY FOR HEATING", _, "System" );
-			SetupOutputVariable( "Heat Exchanger Sensible Cooling Rate [W]", ExchCond( ExchNum ).SensCoolingRate, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Sensible Cooling Energy [J]", ExchCond( ExchNum ).SensCoolingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Latent Cooling Rate [W]", ExchCond( ExchNum ).LatCoolingRate, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Latent Cooling Energy [J]", ExchCond( ExchNum ).LatCoolingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Total Cooling Rate [W]", ExchCond( ExchNum ).TotCoolingRate, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Total Cooling Energy [J]", ExchCond( ExchNum ).TotCoolingEnergy, "System", "Sum", ExchCond( ExchNum ).Name, _, "ENERGYTRANSFER", "HEAT RECOVERY FOR COOLING", _, "System" );
+			SetupOutputVariable( "Heat Exchanger Sensible Heating Rate", OutputProcessor::Unit::W, ExchCond( ExchNum ).SensHeatingRate, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Sensible Heating Energy", OutputProcessor::Unit::J, ExchCond( ExchNum ).SensHeatingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Latent Gain Rate", OutputProcessor::Unit::W, ExchCond( ExchNum ).LatHeatingRate, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Latent Gain Energy", OutputProcessor::Unit::J, ExchCond( ExchNum ).LatHeatingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Total Heating Rate", OutputProcessor::Unit::W, ExchCond( ExchNum ).TotHeatingRate, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Total Heating Energy", OutputProcessor::Unit::J, ExchCond( ExchNum ).TotHeatingEnergy, "System", "Sum", ExchCond( ExchNum ).Name, _, "ENERGYTRANSFER", "HEAT RECOVERY FOR HEATING", _, "System" );
+			SetupOutputVariable( "Heat Exchanger Sensible Cooling Rate", OutputProcessor::Unit::W, ExchCond( ExchNum ).SensCoolingRate, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Sensible Cooling Energy", OutputProcessor::Unit::J, ExchCond( ExchNum ).SensCoolingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Latent Cooling Rate", OutputProcessor::Unit::W, ExchCond( ExchNum ).LatCoolingRate, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Latent Cooling Energy", OutputProcessor::Unit::J, ExchCond( ExchNum ).LatCoolingEnergy, "System", "Sum", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Total Cooling Rate", OutputProcessor::Unit::W, ExchCond( ExchNum ).TotCoolingRate, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Total Cooling Energy", OutputProcessor::Unit::J, ExchCond( ExchNum ).TotCoolingEnergy, "System", "Sum", ExchCond( ExchNum ).Name, _, "ENERGYTRANSFER", "HEAT RECOVERY FOR COOLING", _, "System" );
 
-			SetupOutputVariable( "Heat Exchanger Electric Power [W]", ExchCond( ExchNum ).ElecUseRate, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Electric Energy [J]", ExchCond( ExchNum ).ElecUseEnergy, "System", "Sum", ExchCond( ExchNum ).Name, _, "ELECTRICITY", "HEATRECOVERY", _, "System" );
+			SetupOutputVariable( "Heat Exchanger Electric Power", OutputProcessor::Unit::W, ExchCond( ExchNum ).ElecUseRate, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Electric Energy", OutputProcessor::Unit::J, ExchCond( ExchNum ).ElecUseEnergy, "System", "Sum", ExchCond( ExchNum ).Name, _, "ELECTRICITY", "HEATRECOVERY", _, "System" );
 		}
 
 		// setup additional report variables for generic heat exchangers
@@ -1089,11 +1098,11 @@ namespace HeatRecovery {
 			// generic heat exchangers are read in after flat plate heat exchanger objects (index needs to be set correctly)
 			// CurrentModuleObject=HeatExchanger:AirToAir:SensibleAndLatent
 			ExchNum = ExchIndex + NumAirToAirPlateExchs;
-			SetupOutputVariable( "Heat Exchanger Sensible Effectiveness []", ExchCond( ExchNum ).SensEffectiveness, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Latent Effectiveness []", ExchCond( ExchNum ).LatEffectiveness, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Supply Air Bypass Mass Flow Rate [kg/s]", ExchCond( ExchNum ).SupBypassMassFlow, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Exhaust Air Bypass Mass Flow Rate [kg/s]", ExchCond( ExchNum ).SecBypassMassFlow, "System", "Average", ExchCond( ExchNum ).Name );
-			SetupOutputVariable( "Heat Exchanger Defrost Time Fraction []", ExchCond( ExchNum ).DefrostFraction, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Sensible Effectiveness", OutputProcessor::Unit::None, ExchCond( ExchNum ).SensEffectiveness, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Latent Effectiveness", OutputProcessor::Unit::None, ExchCond( ExchNum ).LatEffectiveness, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Supply Air Bypass Mass Flow Rate", OutputProcessor::Unit::kg_s, ExchCond( ExchNum ).SupBypassMassFlow, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Exhaust Air Bypass Mass Flow Rate", OutputProcessor::Unit::kg_s, ExchCond( ExchNum ).SecBypassMassFlow, "System", "Average", ExchCond( ExchNum ).Name );
+			SetupOutputVariable( "Heat Exchanger Defrost Time Fraction", OutputProcessor::Unit::None, ExchCond( ExchNum ).DefrostFraction, "System", "Average", ExchCond( ExchNum ).Name );
 
 		}
 
@@ -1106,7 +1115,8 @@ namespace HeatRecovery {
 	void
 	InitHeatRecovery(
 		int const ExchNum, // number of the current heat exchanger being simulated
-		int const CompanionCoilIndex
+		int const CompanionCoilIndex,
+		int const CompanionCoilType_Num
 	)
 	{
 
@@ -1403,15 +1413,22 @@ namespace HeatRecovery {
 
 			if ( CompanionCoilIndex > 0 ) {
 
-				if ( DXCoilFullLoadOutAirTemp( CompanionCoilIndex ) == 0.0 || DXCoilFullLoadOutAirHumRat( CompanionCoilIndex ) == 0.0 ) {
-					//       DX Coil is OFF, read actual inlet conditions
-					FullLoadOutAirTemp = ExchCond( ExchNum ).SecInTemp;
-					FullLoadOutAirHumRat = ExchCond( ExchNum ).SecInHumRat;
-				} else {
-					//       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
-					FullLoadOutAirTemp = DXCoilFullLoadOutAirTemp( CompanionCoilIndex );
-					FullLoadOutAirHumRat = DXCoilFullLoadOutAirHumRat( CompanionCoilIndex );
+				if ( CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed || CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) {
+					if ( DXCoilFullLoadOutAirTemp( CompanionCoilIndex ) == 0.0 || DXCoilFullLoadOutAirHumRat( CompanionCoilIndex ) == 0.0 ) {
+						//       DX Coil is OFF, read actual inlet conditions
+						FullLoadOutAirTemp = ExchCond( ExchNum ).SecInTemp;
+						FullLoadOutAirHumRat = ExchCond( ExchNum ).SecInHumRat;
+					} else {
+						//       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
+						FullLoadOutAirTemp = DXCoilFullLoadOutAirTemp( CompanionCoilIndex );
+						FullLoadOutAirHumRat = DXCoilFullLoadOutAirHumRat( CompanionCoilIndex );
+					}
+				} else if ( CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+					// how to support VS dx coil here?
+					FullLoadOutAirTemp =  VariableSpeedCoils::VarSpeedCoil( CompanionCoilIndex ). OutletAirDBTemp;
+					FullLoadOutAirHumRat = VariableSpeedCoils::VarSpeedCoil( CompanionCoilIndex ).OutletAirHumRat;
 				}
+
 
 			} else {
 
@@ -2492,6 +2509,7 @@ namespace HeatRecovery {
 					HXPartLoadRatio = min( 1.0, HXPartLoadRatio );
 
 				} else if ( CompanionCoilIndex > 0 ) {
+					//VS coil issue here?
 					HXPartLoadRatio = DXCoilPartLoadRatio( CompanionCoilIndex );
 				}
 
@@ -3265,7 +3283,7 @@ namespace HeatRecovery {
 		Par( 1 ) = Eps;
 		Par( 2 ) = Z;
 
-		SolveRegulaFalsi( Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par );
+		SolveRoot( Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par );
 
 		if ( SolFla == -2 ) {
 			ShowFatalError( "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed" );

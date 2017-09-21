@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -104,6 +104,7 @@ namespace DataSurfaces {
 	extern int const OtherSideCoefNoCalcExt;
 	extern int const OtherSideCoefCalcExt;
 	extern int const OtherSideCondModeledExt;
+	extern int const KivaFoundation;
 	extern int const GroundFCfactorMethod;
 
 	extern Array1D_string const cExtBoundCondition;
@@ -162,6 +163,7 @@ namespace DataSurfaces {
 	extern int const HeatTransferModel_Window5; // original detailed layer-by-layer based on window 4 and window 5
 	extern int const HeatTransferModel_ComplexFenestration; // BSDF
 	extern int const HeatTransferModel_TDD; // tubular daylighting device
+	extern int const HeatTransferModel_Kiva; // Kiva ground calculations
 
 	// Parameters for classification of outside face of surfaces
 	extern int const OutConvClass_WindwardVertWall;
@@ -330,6 +332,7 @@ namespace DataSurfaces {
 	extern int TotOSC; // Total number of Other Side Coefficient Blocks
 	extern int TotOSCM; // Total number of Other Side Conditions Model Blocks.
 	extern int TotExtVentCav;
+	extern int TotSurfLocalEnv; // Total number of surface level outdoor air node.
 	extern int TotSurfIncSolSSG; // Total number of scheduled surface gains for incident solar radiation on surface
 	extern int TotFenLayAbsSSG; // Total number of scheduled surface gains for absorbed solar radiation in window layers
 	extern int Corner; // Which corner is specified as the first vertice
@@ -543,7 +546,7 @@ namespace DataSurfaces {
 		{
 			auto const & v1 = a.vertices;
 			auto const & v2 = b.vertices;
-			return eq( v1, v2 );		
+			return eq( v1, v2 );
 		}
 
 		// Inequality
@@ -668,6 +671,7 @@ namespace DataSurfaces {
 		bool MovInsulIntPresent; // True when movable insulation is present
 		bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
 		// Vertices
+		Array1D< Vector > NewVertex;
 		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
@@ -712,6 +716,21 @@ namespace DataSurfaces {
 		Real64 WindSpeed; // Surface outside wind speed, for surface heat balance (m/s)
 		bool WindSpeedEMSOverrideOn;
 		Real64 WindSpeedEMSOverrideValue;
+
+		// XL added 7/19/2017
+		Real64 WindDir; // Surface outside wind direction, for surface heat balance and ventilation(degree) 
+		bool WindDirEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind direction
+		Real64 WindDirEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+
+		// XL added 7/25/2017
+		
+		bool SchedExternalShadingFrac; // true if the external shading is scheduled or calculated externally to be imported
+		int ExternalShadingSchInd; // Schedule for a the external shading
+		bool HasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
+		int SurroundingSurfacesNum; // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+		bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
+		int LinkedOutAirNode; // Index of the an OutdoorAir:Node
+
 		std::string UNomWOFilm; // Nominal U Value without films stored as string
 		std::string UNomFilm; // Nominal U Value with films stored as string
 		bool ExtEcoRoof; // True if the top outside construction material is of type Eco Roof
@@ -722,7 +741,7 @@ namespace DataSurfaces {
 		bool IsPool; // true if this is a pool
 		int ICSPtr; // Index to ICS collector
 		// TH added 3/26/2010
-		bool MirroredSurf; // Ture if it is a mirrored surface
+		bool MirroredSurf; // True if it is a mirrored surface
 		// additional attributes for convection correlations
 		int IntConvClassification; // current classification for inside face air flow regime and surface orientation
 		int IntConvHcModelEq; // current convection model for inside face
@@ -837,6 +856,19 @@ namespace DataSurfaces {
 			WindSpeed( 0.0 ),
 			WindSpeedEMSOverrideOn( false ),
 			WindSpeedEMSOverrideValue( 0.0 ),
+
+			WindDir( 0.0 ),
+			WindDirEMSOverrideOn( false ),
+			WindDirEMSOverrideValue( 0.0 ),
+
+
+			SchedExternalShadingFrac( false ), 
+			ExternalShadingSchInd( 0 ),
+			HasSurroundingSurfProperties( false ),
+			SurroundingSurfacesNum( 0 ),
+			HasLinkedOutAirNode ( false ),
+			LinkedOutAirNode( 0 ),
+
 			UNomWOFilm( "-              " ),
 			UNomFilm( "-              " ),
 			ExtEcoRoof( false ),
@@ -880,6 +912,10 @@ namespace DataSurfaces {
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+		void
+		SetWindDirAt( Real64 const fac );
+
 
 	private: // Methods
 
@@ -1101,6 +1137,7 @@ namespace DataSurfaces {
 		Real64 GlTsolDifDif; // Time-step value of glass diffuse-diffuse solar transmittance (-)
 		int AirflowSource; // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
 		int AirflowDestination; // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+		int AirflowReturnNodePtr; // Return node pointer for destination = ReturnAir
 		Real64 MaxAirflow; // Maximum gap airflow (m3/s per m of glazing width)
 		int AirflowControlType; // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
 		bool AirflowHasSchedule; // True if gap airflow is scheduled
@@ -1282,6 +1319,7 @@ namespace DataSurfaces {
 			GlTsolDifDif( 0.0 ),
 			AirflowSource( 0 ),
 			AirflowDestination( 0 ),
+			AirflowReturnNodePtr( 0 ),
 			MaxAirflow( 0.0 ),
 			AirflowControlType( 0 ),
 			AirflowHasSchedule( false ),
@@ -1796,6 +1834,63 @@ namespace DataSurfaces {
 
 	};
 
+	struct SurfaceLocalEnvironment
+	{
+		// Members
+		std::string Name;
+		int SurfPtr; // surface pointer
+		int ExtShadingSchedPtr; // schedule pointer
+		int SurroundingSurfsPtr; // schedule pointer
+		int OutdoorAirNodePtr; // schedule pointer
+
+		// Default Constructor
+		SurfaceLocalEnvironment() :
+			SurfPtr( 0 ),
+			ExtShadingSchedPtr( 0 ),
+			SurroundingSurfsPtr( 0 ),
+			OutdoorAirNodePtr( 0 )
+		{}
+
+	};
+
+
+	struct SurroundingSurfProperty
+	{
+		// Members
+		std::string Name;
+		Real64 ViewFactor;
+		int TempSchNum; // schedule pointer
+						// Default Constructor
+		SurroundingSurfProperty() :
+			ViewFactor( 0.0 ),
+			TempSchNum( 0 )
+		{}
+
+	};
+
+	struct SurroundingSurfacesProperty
+	{
+		// Members
+		std::string Name;
+		Real64 SkyViewFactor; 
+		int SkyTempSchNum; // schedule pointer
+		Real64 GroundViewFactor;
+		int GroundTempSchNum; // schedule pointer
+		int TotSurroundingSurface; // Total number of surrounding surfaces defined for an exterior surface
+		Array1D< SurroundingSurfProperty > SurroundingSurfs; 
+
+		// Default Constructor
+		SurroundingSurfacesProperty() :
+			SkyViewFactor( -1.0 ),
+			SkyTempSchNum( 0 ),
+			GroundViewFactor( -1.0 ),
+			GroundTempSchNum( 0 ),
+			TotSurroundingSurface( 0 )
+		{}
+
+	};
+
+
 	// Object Data
 	extern Array1D< SurfaceData > Surface;
 	extern Array1D< SurfaceWindowCalc > SurfaceWindow;
@@ -1810,6 +1905,8 @@ namespace DataSurfaces {
 	extern Array1D< ExtVentedCavityStruct > ExtVentedCavity;
 	extern Array1D< SurfaceSolarIncident > SurfIncSolSSG;
 	extern Array1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
+	extern Array1D< SurfaceLocalEnvironment > SurfLocalEnvironment;
+	extern Array1D< SurroundingSurfacesProperty > SurroundingSurfsProperty;
 
 	// Functions
 
@@ -1826,6 +1923,9 @@ namespace DataSurfaces {
 
 	void
 	SetSurfaceWindSpeedAt();
+
+	void
+	SetSurfaceWindDirAt();
 
 	std::string
 	cSurfaceClass( int const ClassNo );

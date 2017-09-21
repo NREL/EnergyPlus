@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -815,10 +815,9 @@ namespace Vectors {
 
 	}
 
-	void
+	Real64
 	CalcPolyhedronVolume(
-		Polyhedron const & Poly,
-		Real64 & Volume
+		Polyhedron const & Poly
 	)
 	{
 
@@ -860,14 +859,14 @@ namespace Vectors {
 		static Vector p0( 0.0, 0.0, 0.0 );
 		Vector p3FaceOrigin;
 
-		Volume = 0.0;
+		Real64 Volume = 0.0;
 
 		for ( int NFace = 1; NFace <= Poly.NumSurfaceFaces; ++NFace ) {
 			p3FaceOrigin = Poly.SurfaceFace( NFace ).FacePoints( 2 );
 			PyramidVolume = dot( Poly.SurfaceFace( NFace ).NewellAreaVector, ( p3FaceOrigin - p0 ) );
 			Volume += PyramidVolume / 3.0;
 		}
-
+		return Volume;
 	}
 
 } // Vectors

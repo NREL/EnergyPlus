@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -183,6 +183,10 @@ namespace HVACDXSystem {
 		int SpeedNum; // select speed number for variable-speed coil
 		// Packaged thermal energy storage coil
 		int TESOpMode;
+		// Fault model of coil SAT sensor
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		DXCoolingConditions() :
@@ -245,7 +249,10 @@ namespace HVACDXSystem {
 			DOASDXCoolingCoilMinTout( 0.0 ),
 			FrostControlStatus( 0 ),
 			SpeedNum( 0 ),
-			TESOpMode( 0 )
+			TESOpMode( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};

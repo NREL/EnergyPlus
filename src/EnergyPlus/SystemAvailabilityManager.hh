@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -69,6 +69,11 @@ namespace SystemAvailabilityManager {
 	extern int const CycleOnControlZone;
 	extern int const ZoneFansOnly;
 
+	// Cycling Run Time Control Type
+	extern int const FixedRunTime;
+	extern int const Thermostat;
+	extern int const ThermostatWithMinimumRunTime;
+
 	// Optimum start parameter definations
 	extern int const ControlZone;
 	extern int const MaximumOfZoneList;
@@ -84,6 +89,9 @@ namespace SystemAvailabilityManager {
 	extern int const HybridVentMode_Enth; // Enthalpy control
 	extern int const HybridVentMode_DewPoint; // Dew point control
 	extern int const HybridVentMode_OA; // Outdoor air control
+	extern int const HybridVentMode_OperT80; // Operative temperature control with 80% acceptability limits
+	extern int const HybridVentMode_OperT90; // Operative temperature control with 90% acceptability limits
+	extern int const HybridVentMode_CO2; // CO2 control
 
 	extern int const HybridVentCtrl_NoAction; // No hybrid ventilation control
 	extern int const HybridVentCtrl_Open; // Open windows or doors
@@ -192,6 +200,7 @@ namespace SystemAvailabilityManager {
 		int FanSchedPtr; // Fan schedule pointer
 		int CtrlType; // type of control: Stay Off, Cycle On Any,
 		//   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
+		int CycRunTimeCntrlType; // Cycling Run Time Control Type
 		Real64 TempTolRange; // range in degrees C of thermostat tolerance
 		int CyclingTimeSteps; // period (in Loads time steps) system will cycle on.
 		int AvailStatus; // reports status of availability manager
@@ -215,6 +224,7 @@ namespace SystemAvailabilityManager {
 			SchedPtr( 0 ),
 			FanSchedPtr( 0 ),
 			CtrlType( 0 ),
+			CycRunTimeCntrlType( 0 ),
 			TempTolRange( 1.0 ),
 			CyclingTimeSteps( 1 ),
 			AvailStatus( 0 ),
@@ -456,6 +466,14 @@ namespace SystemAvailabilityManager {
 		// manager is connected to air loop
 		bool SimHybridVentSysAvailMgr; // Set to false when a zone has two hybrid ventilation
 		// managers, one with air loop and one without
+		Real64 OperativeTemp; // Zone air operative temperature [C]
+		Real64 CO2; // Zone air CO2 [ppm]
+		Real64 MinOperTime; // Minimum HVAC Operation Time [minutes]
+		Real64 MinVentTime; // Minimum Ventilation Time [minutes]
+		Real64 TimeOperDuration; // Time duration with continuous HVAC operation [minutes]
+		Real64 TimeVentDuration; // Time duration with continuous ventilation [minutes]
+		Real64 minAdaTem; // minimum adaptive temperature for adaptive temperature control [C]
+		Real64 maxAdaTem; // maximum adaptive temperature for adaptive temperature control [C]
 
 		// Default Constructor
 		DefineHybridVentSysAvailManager() :
@@ -488,7 +506,15 @@ namespace SystemAvailabilityManager {
 			VentilationPtr( 0 ),
 			AvailStatus( 0 ),
 			HybridVentMgrConnectedToAirLoop( true ),
-			SimHybridVentSysAvailMgr( false )
+			SimHybridVentSysAvailMgr( false ),
+			OperativeTemp( 0.0 ),
+			CO2( 0.0 ),
+			MinOperTime( 0.0 ),
+			MinVentTime( 0.0 ),
+			TimeOperDuration( 0.0 ),
+			TimeVentDuration( 0.0 ),
+			minAdaTem( 0.0 ), 
+			maxAdaTem( 0.0 ) 
 		{}
 
 	};

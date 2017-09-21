@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -563,19 +563,19 @@ namespace DemandManager {
 				}
 
 				// Setup report variables
-				SetupOutputVariable( "Demand Manager Meter Demand Power [W]", DemandManagerList( ListNum ).MeterDemand, "Zone", "Average", DemandManagerList( ListNum ).Name );
+				SetupOutputVariable( "Demand Manager Meter Demand Power", OutputProcessor::Unit::W, DemandManagerList( ListNum ).MeterDemand, "Zone", "Average", DemandManagerList( ListNum ).Name );
 
-				SetupOutputVariable( "Demand Manager Average Demand Power [W]", DemandManagerList( ListNum ).AverageDemand, "Zone", "Average", DemandManagerList( ListNum ).Name );
+				SetupOutputVariable( "Demand Manager Average Demand Power", OutputProcessor::Unit::W, DemandManagerList( ListNum ).AverageDemand, "Zone", "Average", DemandManagerList( ListNum ).Name );
 
-				SetupOutputVariable( "Demand Manager Peak Demand Power [W]", DemandManagerList( ListNum ).PeakDemand, "Zone", "Average", DemandManagerList( ListNum ).Name );
+				SetupOutputVariable( "Demand Manager Peak Demand Power", OutputProcessor::Unit::W, DemandManagerList( ListNum ).PeakDemand, "Zone", "Average", DemandManagerList( ListNum ).Name );
 
-				SetupOutputVariable( "Demand Manager Scheduled Limit Power [W]", DemandManagerList( ListNum ).ScheduledLimit, "Zone", "Average", DemandManagerList( ListNum ).Name );
+				SetupOutputVariable( "Demand Manager Scheduled Limit Power", OutputProcessor::Unit::W, DemandManagerList( ListNum ).ScheduledLimit, "Zone", "Average", DemandManagerList( ListNum ).Name );
 
-				SetupOutputVariable( "Demand Manager Demand Limit Power [W]", DemandManagerList( ListNum ).DemandLimit, "Zone", "Average", DemandManagerList( ListNum ).Name );
+				SetupOutputVariable( "Demand Manager Demand Limit Power", OutputProcessor::Unit::W, DemandManagerList( ListNum ).DemandLimit, "Zone", "Average", DemandManagerList( ListNum ).Name );
 
-				SetupOutputVariable( "Demand Manager Over Limit Power [W]", DemandManagerList( ListNum ).OverLimit, "Zone", "Average", DemandManagerList( ListNum ).Name );
+				SetupOutputVariable( "Demand Manager Over Limit Power", OutputProcessor::Unit::W, DemandManagerList( ListNum ).OverLimit, "Zone", "Average", DemandManagerList( ListNum ).Name );
 
-				SetupOutputVariable( "Demand Manager Over Limit Time [hr]", DemandManagerList( ListNum ).OverLimitDuration, "Zone", "Sum", DemandManagerList( ListNum ).Name );
+				SetupOutputVariable( "Demand Manager Over Limit Time", OutputProcessor::Unit::hr, DemandManagerList( ListNum ).OverLimitDuration, "Zone", "Sum", DemandManagerList( ListNum ).Name );
 
 				if ( ErrorsFound ) {
 					ShowFatalError( "Errors found in processing input for " + CurrentModuleObject );
@@ -587,11 +587,11 @@ namespace DemandManager {
 			NumArray.deallocate();
 
 			// Iteration diagnostic reporting for all DEMAND MANAGER LISTs
-			SetupOutputVariable( "Demand Manager Exterior Energy Iteration Count []", DemandManagerExtIterations, "Zone", "Sum", "ManageDemand" );
+			SetupOutputVariable( "Demand Manager Exterior Energy Iteration Count", OutputProcessor::Unit::None, DemandManagerExtIterations, "Zone", "Sum", "ManageDemand" );
 
-			SetupOutputVariable( "Demand Manager Heat Balance Iteration Count []", DemandManagerHBIterations, "Zone", "Sum", "ManageDemand" );
+			SetupOutputVariable( "Demand Manager Heat Balance Iteration Count", OutputProcessor::Unit::None, DemandManagerHBIterations, "Zone", "Sum", "ManageDemand" );
 
-			SetupOutputVariable( "Demand Manager HVAC Iteration Count []", DemandManagerHVACIterations, "Zone", "Sum", "ManageDemand" );
+			SetupOutputVariable( "Demand Manager HVAC Iteration Count", OutputProcessor::Unit::None, DemandManagerHVACIterations, "Zone", "Sum", "ManageDemand" );
 
 		}
 

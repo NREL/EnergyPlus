@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -613,18 +613,18 @@ namespace SteamBaseboardRadiator {
 		// Setup Report variables for the Coils
 		for ( BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum ) {
 			// CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Steam'
-			SetupOutputVariable( "Baseboard Total Heating Rate [W]", SteamBaseboard( BaseboardNum ).TotPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).TotPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Convective Heating Rate [W]", SteamBaseboard( BaseboardNum ).ConvPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Rate [W]", SteamBaseboard( BaseboardNum ).RadPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Total Heating Energy [J]", SteamBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
-			SetupOutputVariable( "Baseboard Convective Heating Energy [J]", SteamBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Energy [J]", SteamBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Energy [J]", SteamBaseboard( BaseboardNum ).Energy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
-			SetupOutputVariable( "Baseboard Steam Rate [W]", SteamBaseboard( BaseboardNum ).Power, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Mass Flow Rate [kg/s]", SteamBaseboard( BaseboardNum ).SteamMassFlowRate, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Inlet Temperature [C]", SteamBaseboard( BaseboardNum ).SteamInletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Outlet Temperature [C]", SteamBaseboard( BaseboardNum ).SteamOutletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Convective Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).ConvPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).RadPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Convective Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).Energy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Steam Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).Power, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, SteamBaseboard( BaseboardNum ).SteamMassFlowRate, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Inlet Temperature", OutputProcessor::Unit::C, SteamBaseboard( BaseboardNum ).SteamInletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Outlet Temperature", OutputProcessor::Unit::C, SteamBaseboard( BaseboardNum ).SteamOutletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
 		}
 
 	}
@@ -896,7 +896,7 @@ namespace SteamBaseboardRadiator {
 							if ( SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 								CheckZoneSizing( CompType, CompName );
 								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							}
 							TempSize = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
@@ -908,7 +908,7 @@ namespace SteamBaseboardRadiator {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							DataFracOfAutosizedHeatingCapacity = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							TempSize = AutoSize;
 							DataScalableCapSizingON = true;
 						} else {
@@ -918,7 +918,7 @@ namespace SteamBaseboardRadiator {
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
 					} else {
-						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+						DesCoilLoad = 0.0; // FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
 					}
 
 

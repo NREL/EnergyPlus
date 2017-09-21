@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -69,6 +69,7 @@ namespace SimAirServingZones {
 	extern int const OAMixer_Num;
 	extern int const Fan_Simple_CV;
 	extern int const Fan_Simple_VAV;
+	extern int const Fan_System_Object;
 	extern int const WaterCoil_SimpleCool;
 	extern int const WaterCoil_Cooling;
 	extern int const WaterCoil_SimpleHeat;
@@ -159,7 +160,6 @@ namespace SimAirServingZones {
 	void
 	SolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,
@@ -168,9 +168,19 @@ namespace SimAirServingZones {
 	);
 
 	void
+	SolveWaterCoilController(
+		bool const FirstHVACIteration,
+		int const AirLoopNum,
+		std::string const & CompName,
+		int & CompIndex,
+		std::string const & ControllerName,
+		int ControllerIndex,
+		bool const HXAssistedWaterCoil
+	);
+
+	void
 	ReSolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,

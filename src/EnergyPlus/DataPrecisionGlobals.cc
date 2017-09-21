@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -81,10 +81,10 @@ namespace DataPrecisionGlobals {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	int const i32( selected_int_kind( 6 ) ); // 6 digits
-	int const i64( selected_int_kind( 12 ) ); // 12 digits
-	int const r32( kind( 1.0 ) );
-	int const r64( kind( 1.0 ) );
+	int const i32( SELECTED_INT_KIND( 6 ) ); // 6 digits
+	int const i64( SELECTED_INT_KIND( 12 ) ); // 12 digits
+	int const r32( KIND( 1.0 ) );
+	int const r64( KIND( 1.0 ) );
 	int const default_prec( r64 );
 	Real64 const constant_zero( 0.0 );
 	Real64 const constant_one( 1.0 );

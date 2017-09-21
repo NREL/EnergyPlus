@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -67,6 +67,7 @@ namespace SingleDuct {
 	extern int const ReverseAction;
 	extern int const ReverseActionWithLimits;
 	extern int const HeatingActionNotUsed;
+	extern int const NormalEnforceVavMinForHtg; //TRANE, special version of Normal where (re)heating flow rates are enforced.
 	// SysTypes represented here
 	extern int const SingleDuctVAVReheat;
 	extern int const SingleDuctConstVolReheat;
@@ -80,9 +81,7 @@ namespace SingleDuct {
 	extern int const HCoilType_Electric;
 	extern int const HCoilType_SimpleHeating;
 	extern int const HCoilType_SteamAirHeating;
-	// Fan types used here
-	extern int const FanType_None;
-	extern int const FanType_VS;
+
 	// Minimum Flow Fraction Input Method
 	extern int const ConstantMinFrac;
 	extern int const ScheduledMinFrac;
@@ -180,6 +179,7 @@ namespace SingleDuct {
 		int ErrCount2; // bad iterations limits in hot water flow calc
 		Real64 ZoneFloorArea; // Zone floor area
 		int CtrlZoneNum; // Pointer to CtrlZone data structure
+		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 		int ActualZoneNum; // Pointer to Zone data Structure
 		Real64 MaxAirVolFlowRateDuringReheat; // Maximum vol flow during reheat
 		Real64 MaxAirVolFractionDuringReheat; // Maximum vol flow fraction during reheat
@@ -250,7 +250,8 @@ namespace SingleDuct {
 			ErrCount2( 0 ),
 			ZoneFloorArea( 0.0 ),
 			CtrlZoneNum( 0 ),
-			ActualZoneNum( 0 ),
+			CtrlZoneInNodeIndex( 0 ),
+  			ActualZoneNum( 0 ),
 			MaxAirVolFlowRateDuringReheat( 0.0 ),
 			MaxAirVolFractionDuringReheat( 0.0 ),
 			AirMassFlowDuringReheatMax( 0.0 ),
@@ -281,6 +282,7 @@ namespace SingleDuct {
 		int SecInNode; // secondary air inlet node number
 		int PriInNode; // primary air inlet node number
 		int MixedAirOutNode; // mixed air outlet node number
+		int ZoneInletNode; // zone inlet node that ultimately receives air from this mixer
 		Real64 ZoneAirTemp; // zone air in temp
 		Real64 ZoneAirHumRat; // zone air in hum rat
 		Real64 ZoneAirEnthalpy; // zone air in enthalpy
@@ -296,8 +298,19 @@ namespace SingleDuct {
 		Real64 MixedAirEnthalpy; // mixed air in enthalpy
 		Real64 MixedAirPressure; // mixed air in pressure
 		Real64 MixedAirMassFlowRate; // mixed air in mass flow rate
-		Real64 MaxAirMassFlowRate; // maximum air mass flow rate allowed through component
-
+		Real64 MassFlowRateMaxAvail; // maximum air mass flow rate allowed through component
+		int ADUNum; // index of Air Distribution Unit
+		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+		bool OneTimeInitFlag; // true if one-time inits should be done
+		bool OneTimeInitFlag2; // true if more one-time inits should be done
+		int ZoneEqNum;
+		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+		int ZoneNum;
+		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
+		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
+		int AirLoopNum; //System sizing adjustments
+		Real64 DesignPrimaryAirVolRate; //System sizing adjustments, filled from design OA spec using sizing mode flags.
+		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
 		// Default Constructor
 		AirTerminalMixerData() :
 			MixerType( 0 ),
@@ -305,6 +318,7 @@ namespace SingleDuct {
 			SecInNode( 0 ),
 			PriInNode( 0 ),
 			MixedAirOutNode( 0 ),
+			ZoneInletNode( 0 ),
 			ZoneAirTemp( 0.0 ),
 			ZoneAirHumRat( 0.0 ),
 			ZoneAirEnthalpy( 0.0 ),
@@ -320,8 +334,25 @@ namespace SingleDuct {
 			MixedAirEnthalpy( 0.0 ),
 			MixedAirPressure( 0.0 ),
 			MixedAirMassFlowRate( 0.0 ),
-			MaxAirMassFlowRate( 0.0 )
+			MassFlowRateMaxAvail( 0.0 ),
+			ADUNum( 0 ),
+			TermUnitSizingIndex( 0 ),
+			OneTimeInitFlag( true ),
+			OneTimeInitFlag2( true ),
+			ZoneEqNum( 0 ), 
+			CtrlZoneInNodeIndex( 0 ),
+			ZoneNum( 0 ), 
+			NoOAFlowInputFromUser( true ), 
+			OARequirementsPtr( 0 ), 
+			AirLoopNum( 0 ), 
+			DesignPrimaryAirVolRate( 0.0 ),
+			OAPerPersonMode( 0 )
 		{}
+
+		void
+		InitATMixer(
+			bool const FirstHVACIteration
+		);
 
 	};
 
@@ -511,34 +542,10 @@ namespace SingleDuct {
 	GetATMixers();
 
 	void
-	InitATMixer(
-		int const ATMixerNum,
-		bool const FirstHVACIteration
-	);
-
-	void
 	CalcATMixer( int const SysNum );
 
 	void
 	UpdateATMixer( int const SysNum );
-
-	void
-	GetATMixerPriNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerPriNode
-	);
-
-	void
-	GetATMixerSecNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerSecNode
-	);
-
-	void
-	GetATMixerOutNode(
-		std::string const & ZoneEquipName,
-		int & ATMixerOutNode
-	);
 
 	void
 	GetATMixer(
@@ -548,7 +555,8 @@ namespace SingleDuct {
 		int & ATMixerType, // air teminal mixer type
 		int & ATMixerPriNode, // air terminal mixer primary air node number
 		int & ATMixerSecNode, // air terminal mixer secondary air node number
-		int & ATMixerOutNode // air terminal mixer outlet air node number
+		int & ATMixerOutNode, // air terminal mixer outlet air node number
+		int const & ZoneEquipOutletNode // zone equipment outlet node (used with inlet side mixers)
 	);
 
 	void
@@ -557,11 +565,6 @@ namespace SingleDuct {
 		Optional< Real64 const > PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
 	);
 
-	void
-	GetATMixerTypeNum(
-		std::string const & ZoneEquipName,
-		int & ATMixerTypeNum
-	);
 	//        End of Reporting subroutines for the Sys Module
 	// *****************************************************************************
 

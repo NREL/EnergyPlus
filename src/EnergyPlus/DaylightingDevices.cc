@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -357,15 +357,15 @@ namespace DaylightingDevices {
 				TDDPipe( PipeNum ).ExtLength = TDDPipe( PipeNum ).TotLength - SumTZoneLengths;
 
 				// Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
-				SetupOutputVariable( "Tubular Daylighting Device Transmitted Solar Radiation Rate [W]", TDDPipe( PipeNum ).TransmittedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate [W]", TDDPipe( PipeNum ).PipeAbsorbedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Heat Gain Rate [W]", TDDPipe( PipeNum ).HeatGain, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Heat Loss Rate [W]", TDDPipe( PipeNum ).HeatLoss, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Transmitted Solar Radiation Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).TransmittedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).PipeAbsorbedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Heat Gain Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).HeatGain, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Heat Loss Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).HeatLoss, "Zone", "Average", TDDPipe( PipeNum ).Name );
 
-				SetupOutputVariable( "Tubular Daylighting Device Beam Solar Transmittance []", TDDPipe( PipeNum ).TransSolBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Beam Visible Transmittance []", TDDPipe( PipeNum ).TransVisBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Diffuse Solar Transmittance []", TDDPipe( PipeNum ).TransSolDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Diffuse Visible Transmittance []", TDDPipe( PipeNum ).TransVisDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Beam Solar Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransSolBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Beam Visible Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransVisBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Diffuse Solar Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransSolDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Diffuse Visible Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransVisDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
 
 			} // PipeNum
 
@@ -913,7 +913,7 @@ namespace DaylightingDevices {
 		Real64 const N( 100000.0 ); // Number of integration points
 		Real64 const xTol( 150.0 ); // Tolerance factor to skip iterations where dT is approximately 0
 		// Must be >= 1.0, increase this number to decrease the execution time
-		Real64 const myLocalTiny( tiny( 1.0 ) );
+		Real64 const myLocalTiny( TINY( 1.0 ) );
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 i; // Integration interval between points
@@ -992,28 +992,21 @@ namespace DaylightingDevices {
 		int const NPH( 1000 ); // Number of altitude integration points
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 FluxInc; // Incident solar flux
-		Real64 FluxTrans; // Transmitted solar flux
-		Real64 trans; // Total beam solar transmittance of TDD
-		int N; // Loop counter
-		Real64 PH; // Altitude angle of sky element
-		Real64 dPH; // Altitude angle increment
+		Real64 FluxInc = 0.0;    // Incident solar flux
+		Real64 FluxTrans = 0.0 ; // Transmitted solar flux
+		Real64 trans;            // Total beam solar transmittance of TDD
 		Real64 COSI; // Cosine of incident angle
 		Real64 SINI; // Sine of incident angle
-		Real64 P; // Angular distribution function
 
-		// FLOW:
-		FluxInc = 0.0;
-		FluxTrans = 0.0;
+		Real64 const dPH = 90.0 * DegToRadians / NPH; // Altitude angle of sky element
+		Real64 PH = 0.5 * dPH;                        // Altitude angle increment
 
 		// Integrate from 0 to Pi/2 altitude
-		dPH = 90.0 * DegToRadians / NPH;
-		PH = 0.5 * dPH;
-		for ( N = 1; N <= NPH; ++N ) {
+		for ( int N = 1; N <= NPH; ++N ) {
 			COSI = std::cos( PiOvr2 - PH );
 			SINI = std::sin( PiOvr2 - PH );
 
-			P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
+			Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
 			// Calculate total TDD transmittance for given angle
 			trans = TransTDD( PipeNum, COSI, SolarBeam );
@@ -1066,37 +1059,27 @@ namespace DaylightingDevices {
 		int const NTH( 18 ); // Number of azimuth integration points
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 FluxInc; // Incident solar flux
-		Real64 FluxTrans; // Transmitted solar flux
-		Real64 trans; // Total beam solar transmittance of TDD
-		int N; // Loop counter
-		Real64 TH; // Azimuth angle of sky horizon element
-		Real64 dTH; // Azimuth angle increment
-		Real64 THMIN; // Minimum azimuth integration limit
-		Real64 THMAX; // Maximum azimuth integration limit
+		Real64 FluxInc = 0.0;   // Incident solar flux
+		Real64 FluxTrans = 0.0; // Transmitted solar flux
 		Real64 CosPhi; // Cosine of TDD:DOME altitude angle
 		Real64 Theta; // TDD:DOME azimuth angle
-		Real64 COSI; // Cosine of the incident angle
-
-		// FLOW:
-		FluxInc = 0.0;
-		FluxTrans = 0.0;
 
 		CosPhi = std::cos( PiOvr2 - Surface( TDDPipe( PipeNum ).Dome ).Tilt * DegToRadians );
 		Theta = Surface( TDDPipe( PipeNum ).Dome ).Azimuth * DegToRadians;
 
 		if ( CosPhi > 0.01 ) { // Dome has a view of the horizon
 			// Integrate over the semicircle
-			THMIN = Theta - PiOvr2;
-			THMAX = Theta + PiOvr2;
-			dTH = 180.0 * DegToRadians / NTH;
-			TH = THMIN + 0.5 * dTH;
-			for ( N = 1; N <= NTH; ++N ) {
+			Real64 const THMIN = Theta - PiOvr2;            // Minimum azimuth integration limit
+			// Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
+			Real64 const dTH = 180.0 * DegToRadians / NTH;  // Azimuth angle increment
+			Real64 TH = THMIN + 0.5 * dTH;                  // Azimuth angle of sky horizon element
+
+			for ( int N = 1; N <= NTH; ++N ) {
 				// Calculate incident angle between dome outward normal and horizon element
-				COSI = CosPhi * std::cos( TH - Theta );
+				Real64 COSI = CosPhi * std::cos( TH - Theta );  // Cosine of the incident angle
 
 				// Calculate total TDD transmittance for given angle
-				trans = TransTDD( PipeNum, COSI, SolarBeam );
+				Real64 trans = TransTDD( PipeNum, COSI, SolarBeam ); // Total beam solar transmittance of TDD
 
 				FluxInc += COSI * dTH;
 				FluxTrans += trans * COSI * dTH;

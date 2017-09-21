@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -316,12 +316,12 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		for ( SourceNum = 1; SourceNum <= NumSources; ++SourceNum ) {
-			SetupOutputVariable( "Plant Temperature Source Component Mass Flow Rate [kg/s]", WaterSource( SourceNum ).MassFlowRate, "System", "Average", WaterSource( SourceNum ).Name );
-			SetupOutputVariable( "Plant Temperature Source Component Inlet Temperature [C]", WaterSource( SourceNum ).InletTemp, "System", "Average", WaterSource( SourceNum ).Name );
-			SetupOutputVariable( "Plant Temperature Source Component Outlet Temperature [C]", WaterSource( SourceNum ).OutletTemp, "System", "Average", WaterSource( SourceNum ).Name );
-			SetupOutputVariable( "Plant Temperature Source Component Source Temperature [C]", WaterSource( SourceNum ).BoundaryTemp, "System", "Average", WaterSource( SourceNum ).Name );
-			SetupOutputVariable( "Plant Temperature Source Component Heat Transfer Rate [W]", WaterSource( SourceNum ).HeatRate, "System", "Average", WaterSource( SourceNum ).Name );
-			SetupOutputVariable( "Plant Temperature Source Component Heat Transfer Energy [J]", WaterSource( SourceNum ).HeatEnergy, "System", "Sum", WaterSource( SourceNum ).Name );
+			SetupOutputVariable( "Plant Temperature Source Component Mass Flow Rate", OutputProcessor::Unit::kg_s, WaterSource( SourceNum ).MassFlowRate, "System", "Average", WaterSource( SourceNum ).Name );
+			SetupOutputVariable( "Plant Temperature Source Component Inlet Temperature", OutputProcessor::Unit::C, WaterSource( SourceNum ).InletTemp, "System", "Average", WaterSource( SourceNum ).Name );
+			SetupOutputVariable( "Plant Temperature Source Component Outlet Temperature", OutputProcessor::Unit::C, WaterSource( SourceNum ).OutletTemp, "System", "Average", WaterSource( SourceNum ).Name );
+			SetupOutputVariable( "Plant Temperature Source Component Source Temperature", OutputProcessor::Unit::C, WaterSource( SourceNum ).BoundaryTemp, "System", "Average", WaterSource( SourceNum ).Name );
+			SetupOutputVariable( "Plant Temperature Source Component Heat Transfer Rate", OutputProcessor::Unit::W, WaterSource( SourceNum ).HeatRate, "System", "Average", WaterSource( SourceNum ).Name );
+			SetupOutputVariable( "Plant Temperature Source Component Heat Transfer Energy", OutputProcessor::Unit::J, WaterSource( SourceNum ).HeatEnergy, "System", "Sum", WaterSource( SourceNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "PlantComponent:TemperatureSource", WaterSource( SourceNum ).Name, "Maximum Mass Flow Rate", "[kg/s]", WaterSource( SourceNum ).EMSOverrideOnMassFlowRateMax, WaterSource( SourceNum ).EMSOverrideValueMassFlowRateMax );
 			}

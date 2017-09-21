@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -93,6 +93,51 @@ TEST_F( EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions )
 	Node.deallocate();
 	ElectricEIRChiller.deallocate();
 	ElectricEIRChillerReport.deallocate();
+}
+
+TEST_F( EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest )
+{
+	// unit test for autosizing heat recovery in Chiller:Electric:EIR
+	ChillerElectricEIR::ElectricEIRChiller.allocate( 1 );
+
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).SizFac = 1.0;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).DesignHeatRecVolFlowRateWasAutoSized = true;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).HeatRecCapacityFraction = 0.5;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).HeatRecActive = true;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CondenserType = ChillerElectricEIR::WaterCooled;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CWLoopNum = 1;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CDLoopNum = 2;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).EvapVolFlowRate = 1.0;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).CondVolFlowRate = 1.0;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).RefCap = 10000;
+	ChillerElectricEIR::ElectricEIRChiller( 1 ).RefCOP = 3.0;
+
+	DataPlant::PlantLoop.allocate( 2 );
+	DataSizing::PlantSizData.allocate( 2 );
+	// chilled water loop
+	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
+	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+	DataPlant::PlantLoop( 1 ).FluidName = "WATER";
+	DataSizing::PlantSizData( 1 ).DesVolFlowRate = 1.0;
+	DataSizing::PlantSizData( 1 ).DeltaT = 5.0;
+	// condenser water loop
+	DataPlant::PlantLoop( 2 ).PlantSizNum = 2;
+	DataPlant::PlantLoop( 2 ).FluidIndex = 1;
+	DataPlant::PlantLoop( 2 ).FluidName = "WATER";
+	DataSizing::PlantSizData( 2 ).DesVolFlowRate = 1.0;
+	DataSizing::PlantSizData( 2 ).DeltaT = 5.0;
+
+	DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+	//now call sizing routine
+	ChillerElectricEIR::SizeElectricEIRChiller( 1 );
+	// see if heat recovery flow rate is as expected
+	EXPECT_NEAR( ChillerElectricEIR::ElectricEIRChiller( 1 ).DesignHeatRecVolFlowRate, 0.5, 0.00001 );
+
+	ChillerElectricEIR::ElectricEIRChiller.deallocate();
+	DataSizing::PlantSizData.deallocate();
+	DataPlant::PlantLoop.deallocate();
+
 }
 
 TEST_F( EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller )
@@ -202,6 +247,5 @@ TEST_F( EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller )
 		EXPECT_EQ( CalcCondVolFlow, ElectricEIRChiller( 1 ).CondVolFlowRate );
 		EXPECT_NEAR( ElectricEIRChiller( 1 ).CondVolFlowRate, 2.3925760323498, 0.0000001 );
 		EXPECT_NEAR( ElectricEIRChiller( 1 ).CondMassFlowRateMax, 2.7918772761695, 0.0000001 );
-
 
 }

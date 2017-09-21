@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -190,6 +190,57 @@ namespace OutputProcessor {
 	//PUBLIC  SetReportNow
 
 	// Types
+	enum class Unit {
+		kg_s,
+		C,
+		kgWater_kgDryAir,
+		ppm,
+		Pa,
+		m3_s,
+		None,
+		min,
+		W,
+		J,
+		m3,
+		kg,
+		ach,
+		W_W,
+		lux,
+		lum_W,
+		hr,
+		cd_m2,
+		J_kgWater,
+		m_s,
+		W_m2,
+		m,
+		Ah,
+		A,
+		V,
+		deltaC,
+		kmol_s,
+		rev_min,
+		Btu_h_W,
+		W_m2K,
+		J_kg,
+		kg_kg,
+		Perc,
+		deg, 
+		s,
+		kg_m3,
+		kg_m2s,
+		J_kgK,
+		L,
+		K_m,
+		m2,
+		W_m2C,
+		rad,
+		J_m2,
+		clo,
+		W_K,
+		kgWater_s,
+		unknown,
+		customEMS
+	};
 
 	struct TimeSteps
 	{
@@ -314,7 +365,8 @@ namespace OutputProcessor {
 		int Next; // Next variable of same name (different units)
 		bool ReportedOnDDFile; // true after written to .rdd/.mdd file
 		std::string VarNameOnly; // Name of Variable
-		std::string UnitsString; // Units for Variable (no brackets)
+		OutputProcessor::Unit units; // Units for Variable
+		std::string unitNameCustomEMS; //name of units when customEMS is used for EMS variables that are unusual
 
 		// Default Constructor
 		VariableTypeForDDOutput() :
@@ -322,7 +374,8 @@ namespace OutputProcessor {
 			StoreType( 0 ),
 			VariableType( VarType_NotFound ),
 			Next( 0 ),
-			ReportedOnDDFile( false )
+			ReportedOnDDFile( false ),
+			units( OutputProcessor::Unit::None )
 		{}
 
 	};
@@ -338,14 +391,16 @@ namespace OutputProcessor {
 		std::string VarNameOnly; // Name of Variable
 		std::string VarNameOnlyUC; // Name of Variable with out key in uppercase
 		std::string KeyNameOnlyUC; // Name of key only witht out variable in uppercase
-		std::string UnitsString; // Units for Variable (no brackets)
+		OutputProcessor::Unit units; // Units for Variable
+		std::string unitNameCustomEMS; //name of units when customEMS is used for EMS variables that are unusual
 		Reference< RealVariables > VarPtr; // Pointer used to real Variables structure
 
 		// Default Constructor
 		RealVariableType() :
 			IndexType( 0 ),
 			StoreType( 0 ),
-			ReportID( 0 )
+			ReportID( 0 ),
+			units( OutputProcessor::Unit::None )
 		{}
 
 	};
@@ -359,14 +414,15 @@ namespace OutputProcessor {
 		std::string VarName; // Name of Variable
 		std::string VarNameUC; // Name of Variable
 		std::string VarNameOnly; // Name of Variable
-		std::string UnitsString; // Units for Variable (no brackets)
+		OutputProcessor::Unit units; // Units for Variable
 		Reference< IntegerVariables > VarPtr; // Pointer used to integer Variables structure
 
 		// Default Constructor
 		IntegerVariableType() :
 			IndexType( 0 ),
 			StoreType( 0 ),
-			ReportID( 0 )
+			ReportID( 0 ),
+			units( OutputProcessor::Unit::None )
 		{}
 
 	};
@@ -417,7 +473,7 @@ namespace OutputProcessor {
 		std::string EndUse; // End Use of the meter
 		std::string EndUseSub; // End Use subcategory of the meter
 		std::string Group; // Group of the meter
-		std::string Units; // Units for the Meter
+		OutputProcessor::Unit Units; // Units for the Meter
 		int RT_forIPUnits; // Resource type number for IP Units (tabular) reporting
 		int TypeOfMeter; // type of meter
 		int SourceMeter; // for custom decrement meters, this is the meter number for the subtraction
@@ -493,6 +549,7 @@ namespace OutputProcessor {
 
 		// Default Constructor
 		MeterType() :
+			Units( OutputProcessor::Unit::None ),
 			RT_forIPUnits( 0 ),
 			TypeOfMeter( MeterType_Normal ),
 			SourceMeter( 0 ),
@@ -693,9 +750,6 @@ namespace OutputProcessor {
 	std::string
 	StandardVariableTypeKey( int const VariableType );
 
-	std::string
-	GetVariableUnitsString( std::string const & VariableName );
-
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.
 	// *****************************************************************************
@@ -716,7 +770,7 @@ namespace OutputProcessor {
 	void
 	AddMeter(
 		std::string const & Name, // Name for the meter
-		std::string const & MtrUnits, // Units for the meter
+		OutputProcessor::Unit const & MtrUnits, // Units for the meter
 		std::string const & ResourceType, // ResourceType for the meter
 		std::string const & EndUse, // EndUse for the meter
 		std::string const & EndUseSub, // EndUse subcategory for the meter
@@ -725,7 +779,7 @@ namespace OutputProcessor {
 
 	void
 	AttachMeters(
-		std::string const & MtrUnits, // Units for this meter
+		Unit const & MtrUnits, // Units for this meter
 		std::string & ResourceType, // Electricity, Gas, etc.
 		std::string & EndUse, // End-use category (Lights, Heating, etc.)
 		std::string & EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
@@ -738,16 +792,14 @@ namespace OutputProcessor {
 
 	void
 	AttachCustomMeters(
-		std::string const & MtrUnits, // Units for this meter
 		int const RepVarNum, // Number of this report variable
 		int & MeterArrayPtr, // Input/Output set of Pointers to Meters
-		int const MeterIndex, // Which meter this is
-		bool & ErrorsFound // True if errors in this call
+		int const MeterIndex // Which meter this is
 	);
 
 	void
 	ValidateNStandardizeMeterTitles(
-		std::string const & MtrUnits, // Units for the meter
+		OutputProcessor::Unit const & MtrUnits, // Units for the meter
 		std::string & ResourceType, // Electricity, Gas, etc.
 		std::string & EndUse, // End Use Type (Lights, Heating, etc.)
 		std::string & EndUseSub, // End Use Sub Type (General Lights, Task Lights, etc.)
@@ -760,7 +812,7 @@ namespace OutputProcessor {
 	DetermineMeterIPUnits(
 		int & CodeForIPUnits, // Output Code for IP Units
 		std::string const & ResourceType, // Resource Type
-		std::string const & MtrUnits, // Meter units
+		OutputProcessor::Unit const & MtrUnits, // Meter units
 		bool & ErrorsFound // true if errors found during subroutine
 	);
 
@@ -866,7 +918,8 @@ namespace OutputProcessor {
 		std::string const & keyedValue, // The key name for the data
 		std::string const & variableName, // The variable's actual name
 		int const indexType,
-		std::string const & UnitsString, // The variables units
+		OutputProcessor::Unit const & unitsForVar, // The variables units
+		Optional_string_const customUnitName = _,
 		Optional_string_const ScheduleName = _
 	);
 
@@ -879,7 +932,7 @@ namespace OutputProcessor {
 		std::string const & indexGroup, // The reporting group for the variable
 		std::string const & reportIDChr, // The reporting ID in for the variable
 		std::string const & meterName, // The variable's meter name
-		std::string const & UnitsString, // The variables units
+		OutputProcessor::Unit const & unit, // The variables units
 		bool const cumulativeMeterFlag, // A flag indicating cumulative data
 		bool const meterFileOnlyFlag // A flag indicating whether the data is to be written to standard output
 	);
@@ -978,6 +1031,26 @@ namespace OutputProcessor {
 		int const SetIntVal // integer value to set if type is integer
 	);
 
+	std::string
+	unitEnumToStringBrackets(
+		Unit const & unitIn
+	);
+
+	std::string
+	unitEnumToString(
+		OutputProcessor::Unit const & unitIn
+	);
+
+	OutputProcessor::Unit
+	unitStringToEnum(
+		std::string const & unitIn
+	);
+
+	std::string
+	unitStringFromDDitem(
+		int const ddItemPtr //index provided for DDVariableTypes
+	);
+
 } // OutputProcessor
 
 //==============================================================================================
@@ -988,9 +1061,12 @@ namespace OutputProcessor {
 // within the OutputProcessor.
 // *****************************************************************************
 
+
+
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable (with units)
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -1003,12 +1079,15 @@ SetupOutputVariable(
 	Optional_string_const ZoneKey = _, // Meter Zone Key (zone name)
 	Optional_int_const ZoneMult = _, // Zone Multiplier, defaults to 1
 	Optional_int_const ZoneListMult = _, // Zone List Multiplier, defaults to 1
-	Optional_int_const indexGroupKey = _ // Group identifier for SQL output
+	Optional_int_const indexGroupKey = _, // Group identifier for SQL output
+	Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
+
 
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	int & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -1020,6 +1099,7 @@ SetupOutputVariable(
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -1098,7 +1178,7 @@ GetMeteredVariables(
 	Array1S_int VarIndexes, // Variable Numbers
 	Array1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
 	Array1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
-	Array1S_string UnitsStrings, // UnitsStrings for each variable
+	Array1A < OutputProcessor::Unit> unitsForVar, // units from enum for each variable
 	Array1S_int ResourceTypes, // ResourceTypes for each variable
 	Optional< Array1S_string > EndUses = _, // EndUses for each variable
 	Optional< Array1S_string > Groups = _, // Groups for each variable
@@ -1114,7 +1194,7 @@ GetVariableKeyCountandType(
 	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
 	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
 	int & varStepType, // Variable time step is Zone=1 or HVAC=2
-	std::string & varUnits // Units sting, may be blank
+	OutputProcessor::Unit & varUnits // Units enumeration
 );
 
 void
@@ -1140,7 +1220,8 @@ AddToOutputVariableList(
 	int const IndexType,
 	int const StateType,
 	int const VariableType,
-	std::string const & UnitsString
+	OutputProcessor::Unit const unitsForVar,
+	Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
 
 

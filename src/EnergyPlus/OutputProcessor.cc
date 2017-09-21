@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -82,6 +82,7 @@
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -693,13 +694,13 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
+			if ( ReqRepVars( Loop ).Key.empty() ) continue;
 			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! SameString( ReqRepVars( Loop ).Key, KeyedValue ) ) continue;
+			if ( !RE2::FullMatch( KeyedValue, "(?i)" + ReqRepVars( Loop ).Key ) ) continue;
 
-			//   A match.  Make sure doesnt duplicate
+			//   A match.  Make sure doesn't duplicate
 
 			ReqRepVars( Loop ).Used = true;
 			Dup = false;
@@ -770,7 +771,6 @@ namespace OutputProcessor {
 		int Loop;
 		int Loop1;
 		bool Dup;
-		Array1D_int TmpReportList;
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;
@@ -1407,72 +1407,6 @@ namespace OutputProcessor {
 
 	}
 
-	std::string
-	GetVariableUnitsString( std::string const & VariableName )
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   October 2003
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function extracts the units from a Variable Name string supplied by
-		// the developer in the call to SetupOutputVariable(s).
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using General::TrimSigDigits;
-
-		// Return value
-		std::string ThisUnitsString;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		// Units are marked with a [
-
-		//!! Errors here are fatal because should only be encountered during development.
-		ThisUnitsString = BlankString;
-		std::string::size_type lbpos = index( VariableName, '[', true ); // from end of variable name
-		if ( lbpos != std::string::npos ) {
-			std::string::size_type rbpos = index( VariableName, ']', true );
-			if ( rbpos == std::string::npos || rbpos < lbpos ) {
-				ShowFatalError( "Ill formed Variable Name Units String, VariableName=" + VariableName );
-				ThisUnitsString = VariableName.substr( lbpos + 1 );
-			} else {
-				if ( ( rbpos - 1 ) - ( lbpos + 1 ) + 1 > UnitsStringLength ) {
-					ShowFatalError( "Units String too long for VariableName=" + VariableName + "; will be truncated to " + TrimSigDigits( UnitsStringLength ) + " characters." );
-				}
-				if ( lbpos + 1 <= rbpos - 1 ) {
-					ThisUnitsString = VariableName.substr( lbpos + 1, rbpos - lbpos - 1 );
-				} else {
-					ThisUnitsString = BlankString;
-				}
-			}
-		}
-
-		return ThisUnitsString;
-
-	}
-
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.
 	// *****************************************************************************
@@ -1632,8 +1566,8 @@ namespace OutputProcessor {
 		bool KeyIsStar;
 		Array1D_string NamesOfKeys; // Specific key name
 		Array1D_int IndexesForKeyVar; // Array index
-		std::string UnitsVar; // Units sting, may be blank
-		std::string MeterUnits; // Units sting, may be blank
+		OutputProcessor::Unit UnitsVar( OutputProcessor::Unit::None); // Units enumeration
+		OutputProcessor::Unit MeterUnits( OutputProcessor::Unit::None ); // Units enumeration
 		int KeyCount;
 		int TypeVar;
 		int AvgSumVar;
@@ -1744,7 +1678,7 @@ namespace OutputProcessor {
 				}
 				if ( UnitsVar != MeterUnits ) {
 					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", differing units in " + cAlphaFieldNames( fldIndex + 1 ) + "=\"" + cAlphaArgs( fldIndex + 1 ) + "\"." );
-					ShowContinueError( "...will not be shown with the Meter results; units for meter=" + MeterUnits + ", units for this variable=" + UnitsVar + '.' );
+					ShowContinueError( "...will not be shown with the Meter results; units for meter=" + unitEnumToString( MeterUnits ) + ", units for this variable=" + unitEnumToString( UnitsVar ) + '.' );
 					continue;
 				}
 				if ( ( TypeVar == VarType_Real || TypeVar == VarType_Integer ) && AvgSumVar == SummedVar ) {
@@ -1805,7 +1739,7 @@ namespace OutputProcessor {
 				if ( ! Tagged ) { // couldn't find place for this item on a meter
 					if ( AvgSumVar != SummedVar ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", variable not summed variable " + cAlphaFieldNames( fldIndex + 1 ) + "=\"" + cAlphaArgs( fldIndex + 1 ) + "\"." );
-						ShowContinueError( "...will not be shown with the Meter results; units for meter=" + MeterUnits + ", units for this variable=" + UnitsVar + '.' );
+						ShowContinueError( "...will not be shown with the Meter results; units for meter=" + unitEnumToString( MeterUnits ) + ", units for this variable=" + unitEnumToString( UnitsVar )  + '.' );
 					}
 				}
 			}
@@ -1823,7 +1757,7 @@ namespace OutputProcessor {
 			for ( iKey = 1; iKey <= NumVarsOnCustomMeter; ++iKey ) {
 				if ( VarsOnCustomMeter( iKey ) == 0 ) continue;
 				RVariable >>= RVariableTypes( VarsOnCustomMeter( iKey ) ).VarPtr;
-				AttachCustomMeters( MeterUnits, VarsOnCustomMeter( iKey ), RVariable().MeterArrayPtr, NumEnergyMeters, ErrorsFound );
+				AttachCustomMeters( VarsOnCustomMeter( iKey ), RVariable().MeterArrayPtr, NumEnergyMeters );
 			}
 			if ( NumVarsOnCustomMeter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", no items assigned " );
@@ -1935,7 +1869,7 @@ namespace OutputProcessor {
 				}
 				if ( UnitsVar != MeterUnits ) {
 					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", differing units in " + cAlphaFieldNames( fldIndex + 1 ) + "=\"" + cAlphaArgs( fldIndex + 1 ) + "\"." );
-					ShowContinueError( "...will not be shown with the Meter results; units for meter=" + MeterUnits + ", units for this variable=" + UnitsVar + '.' );
+					ShowContinueError( "...will not be shown with the Meter results; units for meter=" + unitEnumToString( MeterUnits ) + ", units for this variable=" + unitEnumToString( UnitsVar ) + '.' );
 					continue;
 				}
 				if ( ( TypeVar == VarType_Real || TypeVar == VarType_Integer ) && AvgSumVar == SummedVar ) {
@@ -2001,7 +1935,7 @@ namespace OutputProcessor {
 				if ( ! Tagged ) { // couldn't find place for this item on a meter
 					if ( AvgSumVar != SummedVar ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", variable not summed variable " + cAlphaFieldNames( fldIndex + 1 ) + "=\"" + cAlphaArgs( fldIndex + 1 ) + "\"." );
-						ShowContinueError( "...will not be shown with the Meter results; units for meter=" + MeterUnits + ", units for this variable=" + UnitsVar + '.' );
+						ShowContinueError( "...will not be shown with the Meter results; units for meter=" + unitEnumToString( MeterUnits ) + ", units for this variable=" + unitEnumToString( UnitsVar ) + '.' );
 					}
 				}
 			}
@@ -2019,7 +1953,7 @@ namespace OutputProcessor {
 			for ( iKey = 1; iKey <= NumVarsOnCustomMeter; ++iKey ) {
 				if ( VarsOnCustomMeter( iKey ) == 0 ) continue;
 				RVariable >>= RVariableTypes( VarsOnCustomMeter( iKey ) ).VarPtr;
-				AttachCustomMeters( MeterUnits, VarsOnCustomMeter( iKey ), RVariable().MeterArrayPtr, NumEnergyMeters, ErrorsFound );
+				AttachCustomMeters( VarsOnCustomMeter( iKey ), RVariable().MeterArrayPtr, NumEnergyMeters );
 			}
 
 			errFlag = false;
@@ -2247,7 +2181,7 @@ namespace OutputProcessor {
 	void
 	AddMeter(
 		std::string const & Name, // Name for the meter
-		std::string const & MtrUnits, // Units for the meter
+		OutputProcessor::Unit const & MtrUnits, // Units for the meter
 		std::string const & ResourceType, // ResourceType for the meter
 		std::string const & EndUse, // EndUse for the meter
 		std::string const & EndUseSub, // EndUse subcategory for the meter
@@ -2372,17 +2306,12 @@ namespace OutputProcessor {
 				ShowContinueError( "..on Meter=\"" + Name + "\"." );
 				ShowContinueError( "..requests for IP units from this meter will be ignored." );
 			}
-			//    EnergyMeters(NumEnergyMeters)%RT_forIPUnits=DetermineMeterIPUnits(ResourceType,MtrUnits)
 		}
-		//  write(outputfiledebug,'(A)') 'add meter=NM='//TRIM(Name)//'; '//  &
-		//     'RS='//TRIM(ResourceType)//'; EU='//TRIM(EndUse)//'; EUS='//  &
-		//        TRIM(EndUseSub)//'; GP='//TRIM(Group)//'; UT='//TRIM(MtrUnits)
-
 	}
 
 	void
 	AttachMeters(
-		std::string const & MtrUnits, // Units for this meter
+		OutputProcessor::Unit const & MtrUnits, // Units for this meter
 		std::string & ResourceType, // Electricity, Gas, etc.
 		std::string & EndUse, // End-use category (Lights, Heating, etc.)
 		std::string & EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
@@ -2499,11 +2428,9 @@ namespace OutputProcessor {
 
 	void
 	AttachCustomMeters(
-		std::string const & EP_UNUSED( MtrUnits ), // Units for this meter
 		int const RepVarNum, // Number of this report variable
 		int & MeterArrayPtr, // Input/Output set of Pointers to Meters
-		int const MeterIndex, // Which meter this is
-		bool & EP_UNUSED( ErrorsFound ) // True if errors in this call
+		int const MeterIndex // Which meter this is
 	)
 	{
 
@@ -2557,7 +2484,7 @@ namespace OutputProcessor {
 
 	void
 	ValidateNStandardizeMeterTitles(
-		std::string const & MtrUnits, // Units for the meter
+		OutputProcessor::Unit const & MtrUnits, // Units for the meter
 		std::string & ResourceType, // Electricity, Gas, etc.
 		std::string & EndUse, // End Use Type (Lights, Heating, etc.)
 		std::string & EndUseSub, // End Use Sub Type (General Lights, Task Lights, etc.)
@@ -2848,7 +2775,7 @@ namespace OutputProcessor {
 	DetermineMeterIPUnits(
 		int & CodeForIPUnits, // Output Code for IP Units
 		std::string const & ResourceType, // Resource Type
-		std::string const & MtrUnits, // Meter units
+		OutputProcessor::Unit const & MtrUnits, // Meter units
 		bool & ErrorsFound // true if errors found during subroutine
 	)
 	{
@@ -2905,21 +2832,21 @@ namespace OutputProcessor {
 		} else if ( has( UC_ResourceType, "COOL" ) ) {
 			CodeForIPUnits = RT_IPUnits_Cooling;
 		}
-		if ( SameString( MtrUnits, "m3" ) && has( UC_ResourceType, "WATER" ) ) {
+		if ( MtrUnits == OutputProcessor::Unit::m3 && has( UC_ResourceType, "WATER" ) ) {
 			CodeForIPUnits = RT_IPUnits_Water;
-		} else if ( SameString( MtrUnits, "m3" ) ) {
+		} else if ( MtrUnits == OutputProcessor::Unit::m3 ) {
 			CodeForIPUnits = RT_IPUnits_OtherM3;
 		}
-		if ( SameString( MtrUnits, "kg" ) ) {
+		if ( MtrUnits == OutputProcessor::Unit::kg ) {
 			CodeForIPUnits = RT_IPUnits_OtherKG;
 		}
-		if ( SameString( MtrUnits, "L" ) ) {
+		if ( MtrUnits == OutputProcessor::Unit::L ) {
 			CodeForIPUnits = RT_IPUnits_OtherL;
 		}
 		//  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
 		//  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
-		if ( ! SameString( MtrUnits, "kg" ) && ! SameString( MtrUnits, "J" ) && ! SameString( MtrUnits, "m3" ) && ! SameString( MtrUnits, "L" ) ) {
-			ShowWarningError( "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[" + MtrUnits + "]." );
+		if ( ! (MtrUnits == OutputProcessor::Unit::kg) && ! ( MtrUnits == OutputProcessor::Unit::J ) && ! ( MtrUnits == OutputProcessor::Unit::m3 )  && ! (MtrUnits == OutputProcessor::Unit::L )  ) {
+			ShowWarningError( "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[" + unitEnumToString( MtrUnits ) + "]." );
 			ErrorsFound = true;
 		}
 
@@ -3823,7 +3750,6 @@ namespace OutputProcessor {
 		int VarMeter;
 		int VarMeter1;
 		int Meter;
-		std::string MtrUnits; // Units for Meter
 		int I;
 		std::string String;
 		std::string Multipliers;
@@ -3833,7 +3759,7 @@ namespace OutputProcessor {
 
 		for ( VarMeter = 1; VarMeter <= NumVarMeterArrays; ++VarMeter ) {
 
-			MtrUnits = RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).UnitsString;
+			std::string mtrUnitString = unitEnumToStringBrackets( RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).units );
 
 			Multipliers = "";
 			ZoneMult = RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ZoneMult;
@@ -3848,19 +3774,19 @@ namespace OutputProcessor {
 				Multipliers += ", Zone List Multiplier = " + stripped( String ) + ')';
 			}
 
-			gio::write( OutputFileMeterDetails, "(/,A)" ) << " Meters for " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ReportIDChr + ',' + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + " [" + MtrUnits + ']' + Multipliers;
+			gio::write( OutputFileMeterDetails, "(/,A)" ) << " Meters for " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ReportIDChr + ',' + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + mtrUnitString + Multipliers;
 
 			for ( I = 1; I <= VarMeterArrays( VarMeter ).NumOnMeters; ++I ) {
-				gio::write( OutputFileMeterDetails, fmtA ) << "  OnMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnMeters( I ) ).Name + " [" + MtrUnits + ']';
+				gio::write( OutputFileMeterDetails, fmtA ) << "  OnMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnMeters( I ) ).Name + mtrUnitString;
 			}
 
 			for ( I = 1; I <= VarMeterArrays( VarMeter ).NumOnCustomMeters; ++I ) {
-				gio::write( OutputFileMeterDetails, fmtA ) << "  OnCustomMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnCustomMeters( I ) ).Name + " [" + MtrUnits + ']';
+				gio::write( OutputFileMeterDetails, fmtA ) << "  OnCustomMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnCustomMeters( I ) ).Name + mtrUnitString;
 			}
 		}
 
 		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, "(/,A)", flags ) << " For Meter=" + EnergyMeters( Meter ).Name + " [" + EnergyMeters( Meter ).Units + ']'; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, "(/,A)", flags ) << " For Meter=" + EnergyMeters( Meter ).Name + unitEnumToStringBrackets( EnergyMeters( Meter ).Units ); }
 			if ( EnergyMeters( Meter ).ResourceType != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", ResourceType=" + EnergyMeters( Meter ).ResourceType; };
 			if ( EnergyMeters( Meter ).EndUse != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", EndUse=" + EnergyMeters( Meter ).EndUse; };
 			if ( EnergyMeters( Meter ).Group != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", Group=" + EnergyMeters( Meter ).Group; };
@@ -4108,7 +4034,8 @@ namespace OutputProcessor {
 		std::string const & keyedValue, // The key name for the data
 		std::string const & variableName, // The variable's actual name
 		int const indexType,
-		std::string const & UnitsString, // The variables units
+		OutputProcessor::Unit const & unitsForVar, // The variables units
+		Optional_string_const customUnitName, 
 		Optional_string_const ScheduleName
 	)
 	{
@@ -4153,6 +4080,12 @@ namespace OutputProcessor {
 			FreqString += "," + ScheduleName;
 		}
 
+		std::string UnitsString;
+		if ( unitsForVar == OutputProcessor::Unit::customEMS && present( customUnitName )) {
+			UnitsString = customUnitName;
+		} else {
+			UnitsString = unitEnumToString( unitsForVar );
+		}
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) ) {
 			if ( eso_stream ) *eso_stream << reportIDChr << ",1," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
 		} else if ( reportingInterval == ReportHourly ) {
@@ -4184,7 +4117,7 @@ namespace OutputProcessor {
 		std::string const & indexGroup, // The reporting group for the variable
 		std::string const & reportIDChr, // The reporting ID in for the variable
 		std::string const & meterName, // The variable's meter name
-		std::string const & UnitsString, // The variables units
+		OutputProcessor::Unit const & unit, // The variables units
 		bool const cumulativeMeterFlag, // A flag indicating cumulative data
 		bool const meterFileOnlyFlag // A flag indicating whether the data is to be written to standard output
 	)
@@ -4227,6 +4160,8 @@ namespace OutputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string::size_type lenString;
+
+		std::string UnitsString = unitEnumToString( unit);
 
 		std::string const FreqString( FreqNotice( storeType, reportingInterval ) );
 
@@ -5046,6 +4981,292 @@ namespace OutputProcessor {
 
 	}
 
+	// returns the string corresponding to the OutputProcessor::Unit enum in brackets
+	std::string
+	unitEnumToStringBrackets(
+		Unit const & unitIn
+	)
+	{
+		// J.Glazer - August/September 2017
+		return " [" + unitEnumToString(unitIn) + "]";
+	}
+
+	// returns the unit string for a DDVariableTypes item and custom string when customEMS is used
+	std::string
+	unitStringFromDDitem(
+		int const ddItemPtr //index provided for DDVariableTypes
+	)
+	{
+		// J.Glazer - August/September 2017
+		OutputProcessor::Unit ddUnit = DDVariableTypes(ddItemPtr).units;
+		if ( ddUnit != OutputProcessor::Unit::customEMS ) {
+			return unitEnumToStringBrackets( ddUnit );
+		} else {
+			return " [" + DDVariableTypes(ddItemPtr).unitNameCustomEMS + "]";
+		}
+	}
+
+	// returns the string corresponding to the OutputProcessor::Unit enum
+	std::string
+		unitEnumToString(
+			Unit const & unitIn
+		)
+	{
+		// J.Glazer - August/September 2017
+		switch ( unitIn ) {
+			case OutputProcessor::Unit::J:
+				return "J";
+				break;
+			case OutputProcessor::Unit::W:
+				return "W";
+				break;
+			case OutputProcessor::Unit::C:
+				return "C";
+				break;
+			case OutputProcessor::Unit::None:
+				return "";
+				break;
+			case OutputProcessor::Unit::kg:
+				return "kg";
+				break;
+			case OutputProcessor::Unit::W_m2:
+				return "W/m2";
+				break;
+			case OutputProcessor::Unit::m3:
+				return "m3";
+				break;
+			case OutputProcessor::Unit::hr:
+				return "hr";
+				break;
+			case OutputProcessor::Unit::kg_s:
+				return "kg/s";
+				break;
+			case OutputProcessor::Unit::deg:
+				return "deg";
+				break;
+			case OutputProcessor::Unit::m3_s:
+				return "m3/s";
+				break;
+			case OutputProcessor::Unit::W_m2K:
+				return "W/m2-K";
+				break;
+			case OutputProcessor::Unit::kgWater_kgDryAir:
+				return "kgWater/kgDryAir";
+				break;
+			case OutputProcessor::Unit::Perc:
+				return "%";
+				break;
+			case OutputProcessor::Unit::m_s:
+				return "m/s";
+				break;
+			case OutputProcessor::Unit::lux:
+				return "lux";
+				break;
+			case OutputProcessor::Unit::kgWater_s:
+				return "kgWater/s";
+				break;
+			case OutputProcessor::Unit::rad:
+				return "rad";
+				break;
+			case OutputProcessor::Unit::Pa:
+				return "Pa";
+				break;
+			case OutputProcessor::Unit::J_kg:
+				return "J/kg";
+				break;
+			case OutputProcessor::Unit::m:
+				return "m";
+				break;
+			case OutputProcessor::Unit::lum_W:
+				return "lum/W";
+				break;
+			case OutputProcessor::Unit::kg_m3:
+				return "kg/m3";
+				break;
+			case OutputProcessor::Unit::L:
+				return "L";
+				break;
+			case OutputProcessor::Unit::ach:
+				return "ach";
+				break;
+			case OutputProcessor::Unit::m2:
+				return "m2";
+				break;
+			case OutputProcessor::Unit::deltaC:
+				return "deltaC";
+				break;
+			case OutputProcessor::Unit::J_kgK:
+				return "J/kg-K";
+				break;
+			case OutputProcessor::Unit::W_W:
+				return "W/W";
+				break;
+			case OutputProcessor::Unit::clo:
+				return "clo";
+				break;
+			case OutputProcessor::Unit::W_K:
+				return "W/K";
+				break;
+			case OutputProcessor::Unit::ppm:
+				return "ppm";
+				break;
+			case OutputProcessor::Unit::kg_kg:
+				return "kg/kg";
+				break;
+			case OutputProcessor::Unit::s:
+				return "s";
+				break;
+			case OutputProcessor::Unit::cd_m2:
+				return "cd/m2";
+				break;
+			case OutputProcessor::Unit::kmol_s:
+				return "kmol/s";
+				break;
+			case OutputProcessor::Unit::K_m:
+				return "K/m";
+				break;
+			case OutputProcessor::Unit::min:
+				return "min";
+				break;
+			case OutputProcessor::Unit::J_kgWater:
+				return "J/kgWater";
+				break;
+			case OutputProcessor::Unit::rev_min:
+				return "rev/min";
+				break;
+			case OutputProcessor::Unit::kg_m2s:
+				return "kg/m2-s";
+				break;
+			case OutputProcessor::Unit::J_m2:
+				return "J/m2";
+				break;
+			case OutputProcessor::Unit::A:
+				return "A";
+				break;
+			case OutputProcessor::Unit::V:
+				return "V";
+				break;
+			case OutputProcessor::Unit::W_m2C:
+				return "W/m2-C";
+				break;
+			case OutputProcessor::Unit::Ah:
+				return "Ah";
+				break;
+			case OutputProcessor::Unit::Btu_h_W:
+				return "Btu/h-W";
+				break;
+			default:
+				return "unknown";
+				break;
+		}
+	}
+
+	// returns the OutputProcessor::Unit enum value when a string containing the units is provided without brackets
+	OutputProcessor::Unit
+	unitStringToEnum(
+		std::string const & unitIn
+	)
+	{
+		// J.Glazer - August/September 2017
+		std::string unitUpper = InputProcessor::MakeUPPERCase(unitIn);
+		if ( unitUpper == "J" ) {
+			return OutputProcessor::Unit::J;
+		} else if ( unitUpper == "DELTAC" ) {
+			return OutputProcessor::Unit::deltaC;
+		} else if ( unitUpper == "" ) {
+			return OutputProcessor::Unit::None;
+		} else if ( unitUpper == "W" ) {
+			return OutputProcessor::Unit::W;
+		} else if ( unitUpper == "C" ) {
+			return OutputProcessor::Unit::C;
+		} else if ( unitUpper == "KG/S" ) {
+			return OutputProcessor::Unit::kg_s;
+		} else if ( unitUpper == "KGWATER/KGDRYAIR" ) {
+			return OutputProcessor::Unit::kgWater_kgDryAir;
+		} else if ( unitUpper == "PPM" ) {
+			return OutputProcessor::Unit::ppm;
+		} else if ( unitUpper == "PA" ) {
+			return OutputProcessor::Unit::Pa;
+		} else if ( unitUpper == "M3/S" ) {
+			return OutputProcessor::Unit::m3_s;
+		} else if ( unitUpper == "MIN" ) {
+			return OutputProcessor::Unit::min;
+		} else if ( unitUpper == "M3" ) {
+			return OutputProcessor::Unit::m3;
+		} else if ( unitUpper == "KG" ) {
+			return OutputProcessor::Unit::kg;
+		} else if ( unitUpper == "ACH" ) {
+			return OutputProcessor::Unit::ach;
+		} else if ( unitUpper == "W/W" ) {
+			return OutputProcessor::Unit::W_W;
+		} else if ( unitUpper == "LUX" ) {
+			return OutputProcessor::Unit::lux;
+		} else if ( unitUpper == "LUM/W" ) {
+			return OutputProcessor::Unit::lum_W;
+		} else if ( unitUpper == "HR" ) {
+			return OutputProcessor::Unit::hr;
+		} else if ( unitUpper == "CD/M2" ) {
+			return OutputProcessor::Unit::cd_m2;
+		} else if ( unitUpper == "J/KGWATER" ) {
+			return OutputProcessor::Unit::J_kgWater;
+		} else if ( unitUpper == "M/S" ) {
+			return OutputProcessor::Unit::m_s;
+		} else if ( unitUpper == "W/M2" ) {
+			return OutputProcessor::Unit::W_m2;
+		} else if ( unitUpper == "M" ) {
+			return OutputProcessor::Unit::m;
+		} else if ( unitUpper == "AH" ) {
+			return OutputProcessor::Unit::Ah;
+		} else if ( unitUpper == "A" ) {
+			return OutputProcessor::Unit::A;
+		} else if ( unitUpper == "V" ) {
+			return OutputProcessor::Unit::V;
+		} else if ( unitUpper == "KMOL/S" ) {
+			return OutputProcessor::Unit::kmol_s;
+		} else if ( unitUpper == "KG/S" ) {
+			return OutputProcessor::Unit::rev_min;
+		} else if ( unitUpper == "W/M2-K" ) {
+			return OutputProcessor::Unit::W_m2K;
+		} else if ( unitUpper == "J/KG" ) {
+			return OutputProcessor::Unit::J_kg;
+		} else if ( unitUpper == "KG/KG" ) {
+			return OutputProcessor::Unit::kg_kg;
+		} else if ( unitUpper == "%" ) {
+			return OutputProcessor::Unit::Perc;
+		} else if ( unitUpper == "DEG" ) { 
+			return OutputProcessor::Unit::deg;
+		} else if ( unitUpper == "S" ) {
+			return OutputProcessor::Unit::s;
+		} else if ( unitUpper == "KG/M3" ) {
+			return OutputProcessor::Unit::kg_m3;
+		} else if ( unitUpper == "KG/M2-S" ) {
+			return OutputProcessor::Unit::kg_m2s;
+		} else if ( unitUpper == "J/KG-K" ) {
+			return OutputProcessor::Unit::J_kgK;
+		} else if ( unitUpper == "L" ) {
+			return OutputProcessor::Unit::L;
+		} else if ( unitUpper == "K/M" ) {
+			return OutputProcessor::Unit::K_m;
+		} else if ( unitUpper == "M2" ) {
+			return OutputProcessor::Unit::m2;
+		} else if ( unitUpper == "W/M2-C" ) {
+			return OutputProcessor::Unit::W_m2C;
+		} else if ( unitUpper == "RAD" ) {
+			return OutputProcessor::Unit::rad;
+		} else if ( unitUpper == "J/M2" ) {
+			return OutputProcessor::Unit::J_m2;
+		} else if ( unitUpper == "CLO" ) {
+			return OutputProcessor::Unit::clo;
+		} else if ( unitUpper == "W/K" ) {
+			return OutputProcessor::Unit::W_K;
+		} else if ( unitUpper == "KGWATER/S" ) {
+			return OutputProcessor::Unit::kgWater_s;
+		} else {
+			return OutputProcessor::Unit::unknown;
+		}
+	}
+
+
 } // OutputProcessor
 
 //==============================================================================================
@@ -5059,6 +5280,7 @@ namespace OutputProcessor {
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable (with units)
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -5071,7 +5293,8 @@ SetupOutputVariable(
 	Optional_string_const ZoneKey, // Meter Zone Key (zone name)
 	Optional_int_const ZoneMult, // Zone Multiplier, defaults to 1
 	Optional_int_const ZoneListMult, // Zone List Multiplier, defaults to 1
-	Optional_int_const indexGroupKey // Group identifier for SQL output
+	Optional_int_const indexGroupKey, // Group identifier for SQL output
+	Optional_string_const customUnitName // the custom name for the units from EMS definition of units
 )
 {
 
@@ -5119,7 +5342,7 @@ SetupOutputVariable(
 	int IndexType; // 1=TimeStepZone, 2=TimeStepSys
 	int VariableType; // 1=Average, 2=Sum, 3=Min/Max
 	int Loop;
-	int RepFreq;
+	int RepFreq( ReportHourly );
 	bool OnMeter; // True if this variable is on a meter
 	std::string VarName; // Variable name without units
 	//  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
@@ -5129,47 +5352,12 @@ SetupOutputVariable(
 	std::string Group; // Will hold value of GroupKey
 	std::string ZoneName; // Will hold value of ZoneKey
 	static bool ErrorsFound( false ); // True if Errors Found
-	std::string::size_type Item;
-	std::string MtrUnits; // Units for Meter
 	bool ThisOneOnTheList;
-	static std::string UnitsString; // Units for Variable (no brackets)
 	int localIndexGroupKey;
-	bool invalidUnits;
 
 	if ( ! OutputInitialized ) InitializeOutput();
 
-	//! Errors are severe and fatal because should only be encountered during development.
-	Item = index( VariableName, '[' );
-	if ( Item != std::string::npos ) {
-		UnitsString = GetVariableUnitsString( VariableName );
-		strip( UnitsString );
-		VarName = stripped( VariableName.substr( 0, Item ) );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		// Check name length for variable name
-		invalidUnits = false;
-		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-		if ( SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name length (including units) [" + TrimSigDigits( len( stripped( VariableName ) ) ) + "] exceeds maximum=" + VariableName );
-			if ( invalidUnits ) ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-		if ( invalidUnits ) {
-			ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-	} else { // no units
-		UnitsString = BlankString;
-		VarName = stripped( VariableName );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name has no units in call=" + VariableName );
-			ShowSevereError( "Variable Name length exceeds maximum=" + VariableName );
-			ShowFatalError( "Program terminates." );
-		}
-		ShowSevereError( "Variable Name has no units in call=" + VariableName );
-		ShowFatalError( "Program terminates." );
-	}
+	VarName = VariableName;
 
 	// Determine whether to Report or not
 	CheckReportVariable( KeyedValue, VarName );
@@ -5230,7 +5418,11 @@ SetupOutputVariable(
 		IndexType = ValidateIndexType( IndexTypeKey, "SetupOutputVariable" );
 		VariableType = ValidateVariableType( VariableTypeKey );
 
-		AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Real, UnitsString );
+		if ( present( customUnitName ) ) {
+			AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Real, VariableUnit, customUnitName );
+		} else {
+			AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Real, VariableUnit );
+		}
 		++NumTotalRVariable;
 
 		if ( ! OnMeter && ! ThisOneOnTheList ) continue;
@@ -5253,7 +5445,10 @@ SetupOutputVariable(
 		RVariableTypes( CV ).VarNameOnlyUC = MakeUPPERCase( VarName );
 		RVariableTypes( CV ).VarNameUC = MakeUPPERCase( RVariableTypes( CV ).VarName );
 		RVariableTypes( CV ).KeyNameOnlyUC = MakeUPPERCase( KeyedValue );
-		RVariableTypes( CV ).UnitsString = UnitsString;
+		RVariableTypes( CV ).units = VariableUnit;
+		if ( VariableUnit == OutputProcessor::Unit::customEMS ) {
+			RVariableTypes( CV ).unitNameCustomEMS = customUnitName;
+		}
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
@@ -5293,9 +5488,9 @@ SetupOutputVariable(
 					ShowContinueError( "..reference variable=" + KeyedValue + ':' + VariableName );
 					ErrorsFound = true;
 				} else {
-					MtrUnits = RVariableTypes( CV ).UnitsString;
+					Unit mtrUnits = RVariableTypes( CV ).units;
 					ErrorsFound = false;
-					AttachMeters( MtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, RVariable().MeterArrayPtr, ErrorsFound );
+					AttachMeters( mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, RVariable().MeterArrayPtr, ErrorsFound );
 					if ( ErrorsFound ) {
 						ShowContinueError( "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName );
 						ErrorsLogged = true;
@@ -5324,9 +5519,9 @@ SetupOutputVariable(
 			}
 
 			if ( RVariable().SchedPtr != 0 ) {
-				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).UnitsString, ReqRepVars( ReportList( Loop ) ).SchedName );
+				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).units, RVariableTypes( CV ).unitNameCustomEMS, ReqRepVars( ReportList( Loop ) ).SchedName );
 			} else {
-				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).UnitsString );
+				WriteReportVariableDictionaryItem( RVariable().ReportFreq, RVariable().StoreType, RVariable().ReportID, localIndexGroupKey, IndexTypeKey, RVariable().ReportIDChr, KeyedValue, VarName, RVariableTypes( CV ).IndexType, RVariableTypes( CV ).units, RVariableTypes( CV ).unitNameCustomEMS );
 			}
 		}
 	}
@@ -5336,6 +5531,7 @@ SetupOutputVariable(
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	int & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -5384,7 +5580,6 @@ SetupOutputVariable(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int CV;
-	std::string::size_type Item;
 	std::string IDOut;
 	std::string VarName; // Variable without units
 	//  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
@@ -5392,45 +5587,12 @@ SetupOutputVariable(
 	int VariableType; // 1=Average, 2=Sum, 3=Min/Max
 	int localIndexGroupKey;
 	bool ThisOneOnTheList;
-	bool invalidUnits;
-	static std::string UnitsString; // Units for Variable (no brackets)
 	int Loop;
-	int RepFreq;
+	int RepFreq( ReportHourly );
 
 	if ( ! OutputInitialized ) InitializeOutput();
 
-	//! Errors are severe and fatal because should only be encountered during development.
-	Item = index( VariableName, '[' );
-	if ( Item != std::string::npos ) {
-		UnitsString = GetVariableUnitsString( VariableName );
-		strip( UnitsString );
-		invalidUnits = false;
-		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-		if ( SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
-		VarName = stripped( VariableName.substr( 0, Item ) );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		// Check name length for variable name
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name length (including units) [" + TrimSigDigits( len( stripped( VariableName ) ) ) + "] exceeds maximum=" + VariableName );
-			if ( invalidUnits ) ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-		if ( invalidUnits ) {
-			ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-	} else {
-		UnitsString = BlankString;
-		VarName = stripped( VariableName );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name has no units in call=" + VariableName );
-			ShowSevereError( "Variable Name length exceeds maximum=" + VariableName );
-			ShowFatalError( "Program terminates." );
-		}
-		ShowSevereError( "Variable Name has no units in call=" + VariableName );
-		ShowFatalError( "Program terminates." );
-	}
+	VarName = VariableName;
 
 	// Determine whether to Report or not
 	CheckReportVariable( KeyedValue, VarName );
@@ -5445,8 +5607,6 @@ SetupOutputVariable(
 		DetermineFrequency( ReportFreq, RepFreq );
 		NumExtraVars = 1;
 		ReportList = 0;
-	} else {
-		RepFreq = ReportHourly;
 	}
 
 	ThisOneOnTheList = FindItemInVariableList( KeyedValue, VarName );
@@ -5458,7 +5618,7 @@ SetupOutputVariable(
 		IndexType = ValidateIndexType( IndexTypeKey, "SetupOutputVariable" );
 		VariableType = ValidateVariableType( VariableTypeKey );
 
-		AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Integer, UnitsString );
+		AddToOutputVariableList( VarName, IndexType, VariableType, VarType_Integer, VariableUnit );
 		++NumTotalIVariable;
 
 		if ( ! ThisOneOnTheList ) continue;
@@ -5477,7 +5637,7 @@ SetupOutputVariable(
 		IVariableTypes( CV ).VarName = KeyedValue + ':' + VarName;
 		IVariableTypes( CV ).VarNameOnly = VarName;
 		IVariableTypes( CV ).VarNameUC = MakeUPPERCase( IVariableTypes( CV ).VarName );
-		IVariableTypes( CV ).UnitsString = UnitsString;
+		IVariableTypes( CV ).units = VariableUnit;
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
@@ -5524,9 +5684,9 @@ SetupOutputVariable(
 			}
 
 			if ( IVariable().SchedPtr != 0 ) {
-				WriteReportVariableDictionaryItem( IVariable().ReportFreq, IVariable().StoreType, IVariable().ReportID, localIndexGroupKey, IndexTypeKey, IVariable().ReportIDChr, KeyedValue, VarName, IVariableTypes( CV ).IndexType, IVariableTypes( CV ).UnitsString, ReqRepVars( ReportList( Loop ) ).SchedName );
+				WriteReportVariableDictionaryItem( IVariable().ReportFreq, IVariable().StoreType, IVariable().ReportID, localIndexGroupKey, IndexTypeKey, IVariable().ReportIDChr, KeyedValue, VarName, IVariableTypes( CV ).IndexType, IVariableTypes( CV ).units, ReqRepVars( ReportList( Loop ) ).SchedName );
 			} else {
-				WriteReportVariableDictionaryItem( IVariable().ReportFreq, IVariable().StoreType, IVariable().ReportID, localIndexGroupKey, IndexTypeKey, IVariable().ReportIDChr, KeyedValue, VarName, IVariableTypes( CV ).IndexType, IVariableTypes( CV ).UnitsString );
+				WriteReportVariableDictionaryItem( IVariable().ReportFreq, IVariable().StoreType, IVariable().ReportID, localIndexGroupKey, IndexTypeKey, IVariable().ReportIDChr, KeyedValue, VarName, IVariableTypes( CV ).IndexType, IVariableTypes( CV ).units );
 			}
 		}
 	}
@@ -5536,6 +5696,7 @@ SetupOutputVariable(
 void
 SetupOutputVariable(
 	std::string const & VariableName, // String Name of variable
+	OutputProcessor::Unit const & VariableUnit, // Actual units corresponding to the actual variable
 	Real64 & ActualVariable, // Actual Variable, used to set up pointer
 	std::string const & IndexTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
 	std::string const & VariableTypeKey, // State, Average=1, NonState, Sum=2
@@ -5591,7 +5752,7 @@ SetupOutputVariable(
 	gio::write( IDOut, fmtLD ) << KeyedValue;
 	strip( IDOut );
 
-	SetupOutputVariable( VariableName, ActualVariable, IndexTypeKey, VariableTypeKey, IDOut, ReportFreq, ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult, indexGroupKey );
+	SetupOutputVariable( VariableName, VariableUnit, ActualVariable, IndexTypeKey, VariableTypeKey, IDOut, ReportFreq, ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult, indexGroupKey );
 
 }
 
@@ -6184,8 +6345,9 @@ GenOutputVariablesAuditReport()
 			OpaqSurfWarned = true;
 		}
 		if ( ! Rept ) {
-			ShowWarningError( "The following Report Variables were requested but not generated" );
-			ShowContinueError( "because IDF did not contain these elements or misspelled variable name -- check .rdd file" );
+			ShowWarningError( "The following Report Variables were requested but not generated -- check.rdd file" );
+			ShowContinueError( "Either the IDF did not contain these elements, the variable name is misspelled," );
+			ShowContinueError( "or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;" );
 			Rept = true;
 		}
 		ShowMessage( "Key=" + ReqRepVars( Loop ).Key + ", VarName=" + ReqRepVars( Loop ).VarName + ", Frequency=" + ReportFrequency( ReqRepVars( Loop ).ReportFreq ) );
@@ -7270,7 +7432,7 @@ GetMeteredVariables(
 	Array1S_int VarIndexes, // Variable Numbers
 	Array1S_int VarTypes, // Variable Types (1=integer, 2=real, 3=meter)
 	Array1S_int IndexTypes, // Variable Index Types (1=Zone,2=HVAC)
-	Array1S_string UnitsStrings, // UnitsStrings for each variable
+	Array1A < OutputProcessor::Unit> unitsForVar, // units from enum for each variable
 	Array1S_int ResourceTypes, // ResourceTypes for each variable
 	Optional< Array1S_string > EndUses, // EndUses for each variable
 	Optional< Array1S_string > Groups, // Groups for each variable
@@ -7338,7 +7500,7 @@ GetMeteredVariables(
 			VarIndexes( NumVariables ) = Loop;
 			VarTypes( NumVariables ) = 2;
 			IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
-			UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
+			unitsForVar( NumVariables ) = RVariableTypes( Loop ).units;
 
 			ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
 			if ( present( Names ) ) {
@@ -7383,7 +7545,7 @@ GetVariableKeyCountandType(
 	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
 	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
 	int & varStepType, // Variable time step is Zone=1 or HVAC=2
-	std::string & varUnits // Units sting, may be blank
+	OutputProcessor::Unit & varUnits // Units enumeration
 )
 {
 
@@ -7495,7 +7657,7 @@ GetVariableKeyCountandType(
 	numKeys = 0;
 	varAvgSum = 0;
 	varStepType = 0;
-	varUnits = "";
+	varUnits = OutputProcessor::Unit::None;
 	Found = false;
 	Duplicate = false;
 	varNameUpper = varName;
@@ -7530,7 +7692,7 @@ GetVariableKeyCountandType(
 						keyVarIndexes( numKeys ) = Loop;
 						varAvgSum = DDVariableTypes( ivarNames( VFound ) ).StoreType;
 						varStepType = DDVariableTypes( ivarNames( VFound ) ).IndexType;
-						varUnits = DDVariableTypes( ivarNames( VFound ) ).UnitsString;
+						varUnits =  DDVariableTypes( ivarNames( VFound ) ).units ;
 					}
 				}
 			}
@@ -7557,7 +7719,7 @@ GetVariableKeyCountandType(
 					keyVarIndexes( numKeys ) = Loop;
 					varAvgSum = DDVariableTypes( ivarNames( VFound ) ).StoreType;
 					varStepType = DDVariableTypes( ivarNames( VFound ) ).IndexType;
-					varUnits = DDVariableTypes( ivarNames( VFound ) ).UnitsString;
+					varUnits = DDVariableTypes( ivarNames( VFound ) ).units;
 				}
 			}
 		}
@@ -7587,7 +7749,7 @@ GetVariableKeyCountandType(
 			Found = true;
 			numKeys = 1;
 			varType = VarType_Schedule;
-			varUnits = GetScheduleType( keyVarIndexes( 1 ) );
+			varUnits = unitStringToEnum( GetScheduleType( keyVarIndexes( 1 ) ) ) ;
 			varAvgSum = AveragedVar;
 			varStepType = ZoneVar;
 		}
@@ -8066,7 +8228,7 @@ ProduceRDDMDD()
 		if ( ProduceReportVDD == ReportVDD_Yes ) {
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
-				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
+				rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitStringFromDDitem( ItemPtr ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8074,14 +8236,14 @@ ProduceRDDMDD()
 					} else {
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
-					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
+					rdd_stream << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ',' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << ',' << VariableNames( Item ) << unitStringFromDDitem( ItemPtr ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
 		} else if ( ProduceReportVDD == ReportVDD_IDF ) {
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
-				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
+				rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitStringFromDDitem( ItemPtr ) << '\n';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8089,7 +8251,7 @@ ProduceRDDMDD()
 					} else {
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
-					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << " [" << DDVariableTypes( ItemPtr ).UnitsString << ']' << '\n';
+					rdd_stream << "Output:Variable,*," << VariableNames( Item ) << ",hourly; !- " << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) << ' ' << StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) << unitStringFromDDitem( ItemPtr ) << '\n';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
@@ -8115,10 +8277,10 @@ ProduceRDDMDD()
 	for ( Item = 1; Item <= NumEnergyMeters; ++Item ) {
 		ItemPtr = iVariableNames( Item );
 		if ( ProduceReportVDD == ReportVDD_Yes ) {
-			mdd_stream << "Zone,Meter," << EnergyMeters( ItemPtr ).Name << " [" << EnergyMeters( ItemPtr ).Units << ']' << '\n';
+			mdd_stream << "Zone,Meter," << EnergyMeters( ItemPtr ).Name << unitEnumToStringBrackets( EnergyMeters( ItemPtr ).Units ) << '\n';
 		} else if ( ProduceReportVDD == ReportVDD_IDF ) {
-			mdd_stream << "Output:Meter," << EnergyMeters( ItemPtr ).Name << ",hourly; !- [" << EnergyMeters( ItemPtr ).Units << ']' << '\n';
-			mdd_stream << "Output:Meter:Cumulative," << EnergyMeters( ItemPtr ).Name << ",hourly; !- [" << EnergyMeters( ItemPtr ).Units << ']' << '\n';
+			mdd_stream << "Output:Meter," << EnergyMeters( ItemPtr ).Name << ",hourly; !-" << unitEnumToStringBrackets( EnergyMeters( ItemPtr ).Units ) << '\n';
+			mdd_stream << "Output:Meter:Cumulative," << EnergyMeters( ItemPtr ).Name << ",hourly; !-" << unitEnumToStringBrackets( EnergyMeters( ItemPtr ).Units ) << '\n';
 		}
 	}
 	if ( mdd_stream.is_open() ) mdd_stream.close();
@@ -8131,7 +8293,8 @@ AddToOutputVariableList(
 	int const IndexType,
 	int const StateType,
 	int const VariableType,
-	std::string const & UnitsString
+	OutputProcessor::Unit const unitsForVar,
+	Optional_string_const customUnitName // the custom name for the units from EMS definition of units
 )
 {
 
@@ -8185,11 +8348,14 @@ AddToOutputVariableList(
 		DDVariableTypes( NumVariablesForOutput ).StoreType = StateType;
 		DDVariableTypes( NumVariablesForOutput ).VariableType = VariableType;
 		DDVariableTypes( NumVariablesForOutput ).VarNameOnly = VarName;
-		DDVariableTypes( NumVariablesForOutput ).UnitsString = UnitsString;
-	} else if ( UnitsString != DDVariableTypes( dup ).UnitsString ) { // not the same as first units
+		DDVariableTypes( NumVariablesForOutput ).units = unitsForVar;
+		if ( present( customUnitName ) && unitsForVar == OutputProcessor::Unit::customEMS ) {
+			DDVariableTypes( NumVariablesForOutput ).unitNameCustomEMS = customUnitName;
+		}
+	} else if ( unitsForVar != DDVariableTypes( dup ).units ) { // not the same as first units
 		int dup2 = 0;// for duplicate variable name
 		while ( DDVariableTypes( dup ).Next != 0 ) {
-			if ( UnitsString != DDVariableTypes( DDVariableTypes( dup ).Next ).UnitsString ) {
+			if ( unitsForVar != DDVariableTypes( DDVariableTypes( dup ).Next ).units ) {
 				dup = DDVariableTypes( dup ).Next;
 				continue;
 			}
@@ -8205,7 +8371,10 @@ AddToOutputVariableList(
 			DDVariableTypes( NumVariablesForOutput ).StoreType = StateType;
 			DDVariableTypes( NumVariablesForOutput ).VariableType = VariableType;
 			DDVariableTypes( NumVariablesForOutput ).VarNameOnly = VarName;
-			DDVariableTypes( NumVariablesForOutput ).UnitsString = UnitsString;
+			DDVariableTypes( NumVariablesForOutput ).units = unitsForVar;
+			if ( present( customUnitName ) && unitsForVar == OutputProcessor::Unit::customEMS ) {
+				DDVariableTypes( NumVariablesForOutput ).unitNameCustomEMS = customUnitName;
+			}
 			DDVariableTypes( dup ).Next = NumVariablesForOutput;
 		}
 	}

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -94,6 +94,7 @@ namespace HeatPumpWaterToWaterSimple {
 	{
 		// Members
 		std::string Name; // user identifier
+		bool checkEquipName; // name check flag
 		std::string WatertoWaterHPType; // Type of WatertoAirHP ie. Heating or Cooling
 		int WWHPPlantTypeOfNum; // equipment type num
 		bool Available; // need an array of logicals--load identifiers of available equipment
@@ -101,11 +102,17 @@ namespace HeatPumpWaterToWaterSimple {
 		bool IsOn; // flag that the heat pump is ON during current time step
 		bool MustRun; // flag that the heat pump is MUST RUN during current time step
 		Real64 SourceSideDesignMassFlow; // Design flow rate (kg/s)
+
 		Real64 LoadSideDesignMassFlow; // Design flow rate (kg/s)
+
 		Real64 RatedLoadVolFlowCool; // Rated Cooling Load Side Volumetric Flow Rate [m3/s]
+		bool ratedLoadVolFlowCoolWasAutoSized; // true if RatedSourceVolFlowCool was autosize on input
 		Real64 RatedSourceVolFlowCool; // Rated Cooling Source Side Volumetric Flow Rate [m3/s]
+		bool ratedSourceVolFlowCoolWasAutoSized; //true if RatedSourceVolFlowCool was autosize on input
 		Real64 RatedCapCool; // Rated Cooling Capacity [W]
+		bool ratedCapCoolWasAutoSized; //true if RatedCapCool was autosize on input
 		Real64 RatedPowerCool; // Rated Cooling Power Consumption[W]
+		bool ratedPowerCoolWasAutoSized; // ture if RatedPowerCool was autosize on input
 		Real64 CoolCap1; // 1st coefficient of the Cooling capacity performance curve
 		Real64 CoolCap2; // 2nd coefficient of the Cooling capacity performance curve
 		Real64 CoolCap3; // 3rd coefficient of the Cooling capacity performance curve
@@ -121,9 +128,13 @@ namespace HeatPumpWaterToWaterSimple {
 		int CoolPowerNegativeCounter; // Counter for number of times cooling power curve is <= 0.0
 		int CoolPowerNegativeIndex; // Index for recurring warning message regarding cooling power curve is <= 0.0
 		Real64 RatedLoadVolFlowHeat; // Rated Heating Load Side Volumetric Flow Rate [m3/s]
+		bool ratedLoadVolFlowHeatWasAutoSized; // true if RatedLoadVolFlowHeat was autosize on input
 		Real64 RatedSourceVolFlowHeat; // Rated Heating Source Side Volumetric Flow Rate [m3/s]
+		bool ratedSourceVolFlowHeatWasAutoSized; // true if RatedSourceVolFlowHeat was autosize on input
 		Real64 RatedCapHeat; // Rated Heating Capacity [W]
+		bool ratedCapHeatWasAutoSized; // true if RatedCapHeat was autosize on input
 		Real64 RatedPowerHeat; // Rated Heating Compressor Power[W]
+		bool ratedPowerHeatWasAutoSized; // true if RatedPowerHeat was autosize on input
 		Real64 HeatCap1; // 1st coefficient of the Heating capacity performance curve
 		Real64 HeatCap2; // 2nd coefficient of the Heating capacity performance curve
 		Real64 HeatCap3; // 3rd coefficient of the Heating capacity performance curve
@@ -152,9 +163,15 @@ namespace HeatPumpWaterToWaterSimple {
 		int LoadBranchNum; // load side plant loop branch index
 		int LoadCompNum; // load side plant loop component index
 		int CondMassFlowIndex; // index for criteria in PullCompInterconnectTrigger
+		Real64 refCOP; // reference COP used for sizing reference power, user input
+		Real64 sizFac; // component level sizing factor, user input
+		std::string companionName; // name of companion GSHP
+		int companionIndex; // index in GSHP structure for companion heat pump
+		bool companionIdentified; // true if this GSHP has found its companion heat pump
 
 		// Default Constructor
 		GshpSpecs() :
+			checkEquipName( true ),
 			WWHPPlantTypeOfNum( 0 ),
 			Available( false ),
 			ON( false ),
@@ -163,9 +180,13 @@ namespace HeatPumpWaterToWaterSimple {
 			SourceSideDesignMassFlow( 0.0 ),
 			LoadSideDesignMassFlow( 0.0 ),
 			RatedLoadVolFlowCool( 0.0 ),
+			ratedLoadVolFlowCoolWasAutoSized( false ),
 			RatedSourceVolFlowCool( 0.0 ),
+			ratedSourceVolFlowCoolWasAutoSized( false ),
 			RatedCapCool( 0.0 ),
+			ratedCapCoolWasAutoSized( false ),
 			RatedPowerCool( 0.0 ),
+			ratedPowerCoolWasAutoSized( false ),
 			CoolCap1( 0.0 ),
 			CoolCap2( 0.0 ),
 			CoolCap3( 0.0 ),
@@ -181,9 +202,13 @@ namespace HeatPumpWaterToWaterSimple {
 			CoolPowerNegativeCounter( 0 ),
 			CoolPowerNegativeIndex( 0 ),
 			RatedLoadVolFlowHeat( 0.0 ),
+			ratedLoadVolFlowHeatWasAutoSized( false ),
 			RatedSourceVolFlowHeat( 0.0 ),
+			ratedSourceVolFlowHeatWasAutoSized( false ),
 			RatedCapHeat( 0.0 ),
+			ratedCapHeatWasAutoSized( false ),
 			RatedPowerHeat( 0.0 ),
+			ratedPowerHeatWasAutoSized( false ),
 			HeatCap1( 0.0 ),
 			HeatCap2( 0.0 ),
 			HeatCap3( 0.0 ),
@@ -210,7 +235,11 @@ namespace HeatPumpWaterToWaterSimple {
 			LoadLoopSideNum( 0 ),
 			LoadBranchNum( 0 ),
 			LoadCompNum( 0 ),
-			CondMassFlowIndex( 0 )
+			CondMassFlowIndex( 0 ),
+			refCOP( 0.0 ),
+			sizFac( 0.0 ),
+			companionIndex( 0 ),
+			companionIdentified( false )
 		{}
 
 	};
@@ -269,7 +298,9 @@ namespace HeatPumpWaterToWaterSimple {
 		Real64 & MaxCap, // Maximum operating capacity of GSHP [W]
 		Real64 & MinCap, // Minimum operating capacity of GSHP [W]
 		Real64 & OptCap, // Optimal operating capacity of GSHP [W]
-		int const LoopNum // The calling loop number
+		int const LoopNum, // The calling loop number
+		bool const getCompSizFac, // true if calling to get component sizing factor
+		Real64 & sizingFac // component level sizing factor
 	);
 
 	void
@@ -283,6 +314,12 @@ namespace HeatPumpWaterToWaterSimple {
 		bool const FirstHVACIteration,
 		Real64 const MyLoad // Demand Load
 	);
+
+	void
+	sizeCoolingWaterToWaterHP( int const GSHPNum ); // GSHP Number
+
+	void
+	sizeHeatingWaterToWaterHP( int const GSHPNum ); // GSHP Number
 
 	void
 	CalcWatertoWaterHPCooling(

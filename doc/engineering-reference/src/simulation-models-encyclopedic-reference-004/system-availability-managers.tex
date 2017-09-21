@@ -39,6 +39,8 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 \item  Thermostat on/off tolerance \emph{T\(_{tol}\)} (degrees C);
 
+\item  Cycling run time control type: \emph{FixedRunTime}, \emph{Thermostat}, or \emph{ThermostatWithMinimumRunTime};
+
 \item  Cycling run time in seconds; used to calculate a stop time (in time steps since the start of the current run period) once the status has become \emph{Cycle On}.
 
 \item  A control zone or zone list name.
@@ -51,16 +53,18 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 \end{itemize}
 
-If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) ~0 or if the program is in warmup, \emph{AvailStatus = NoAction}.
+If the fan schedule current value is \textgreater{} 0 or the applicability schedule value is \(\le\) ~0 , \emph{AvailStatus = NoAction}.
+
+If the program is in warmup,the start time stop time are reset to the current time.
 
 Otherwise:
 
 \begin{enumerate}
-\item  If current time (in time steps since the start of the run period) is greater than the start time and less than the stop time, \emph{AvailStatus = CycleOn} (or \emph{CycleOnZoneFansOnly} if the control type is \emph{Cycle On Any -- Zone Fans only}).
+\item  If current time (in time steps since the start of the run period) is greater than the start time and less than the stop time, \emph{AvailStatus = CycleOn} (or \emph{CycleOnZoneFansOnly} if the control type is \emph{Cycle On Any -- Zone Fans only}) for CyclingRunTimeControlType = \emph{CyclingRunTimeControlType = FixedRunTime}, or \emph{CyclingRunTimeControlType = ThermostatWithMinimumRunTime} but for \emph{CyclingRunTimeControlType = Thermostat} the availability status is determined based on the zone air and the thermostat setpoint temperature difference and the tolerance limits.  
 
-\item  If the current time equals the stop time, \emph{AvailStatus = NoAction} ~and the fan schedule will determine if the system is on.
+\item  If the current time equals the stop time and the CyclingRunTimeControlType = \emph{CyclingRunTimeControlType = FixedRunTime}, or \emph{CyclingRunTimeControlType = ThermostatWithMinimumRunTime}, \emph{AvailStatus = NoAction} ~and the fan schedule will determine if the system is on. For \emph{CyclingRunTimeControlType = Thermostat} the availability status is determined based on the zone air and the thermostat setpoint temperature difference and the tolerance limits, and the fan schedule will determine if the system is on.
 
-\item  If the current time is greater than the stop time, the manager can potentially cycle the system on.
+\item  If the current time is greater than the stop time, the manager can potentially cycle the system on for \emph{CyclingRunTimeControlType = FixedRunTime}, \emph{CyclingRunTimeControlType = Thermostat}, or \emph{CyclingRunTimeControlType = ThermostatWithMinimumRunTime}.
 
   \begin{enumerate}
   \item  For control types \emph{CycleOnAny} and \emph{CycleOnAnyZoneFansOnly} the manger looks at each zone served by the air loop and detects whether the zone temperature at the thermostat is greater than the cooling setpoint plus ½\emph{T\(_{tol}\)} or less than the heating setpoint minus ½\emph{T\(_{tol}\)}. If it is, \emph{AvailStatus} is set to \emph{CycleOn} (or \emph{CycleOnZoneFansOnly}). If not, \emph{AvailStatus} is set to \emph{NoAction}.
@@ -218,11 +222,11 @@ n~This availability manager has its own control schedule and does not work in ta
 
 n~AvailabilityManager:HybridVentilation works completely independent of the other system availability managers, so this manager is not a valid system availability manager type in the AvailabilityManagerAssignmentList object.
 
-\subsubsection{Control logic}\label{control-logic-000}
+\subsubsection{Control Logic}\label{control-logic-000}
 
 The control logic for each ventilation control mode is described below.
 
-\subsubsection{Temperature control}\label{temperature-control}
+\subsubsection{Temperature Control}\label{temperature-control}
 
 This control mode checks whether the outdoor air dry-bulb temperature is between the Minimum Outdoor Temperature and Maximum Outdoor Temperature specified. If the outdoor temperature is between the two values then natural ventilation is allowed, else natural ventilation is not allowed.
 
@@ -244,7 +248,7 @@ Since this temperature control type requires only a single setpoint, natural ven
 
 If the zone temperature is beyond the deadband, the initial decision is overridden and natural ventilation is not allowed. This is intended to avoid either overcooling a space, which could result in additional heating load when the zone temperature is below the heating setpoint, or overheating a space, which could result in additional cooling load when the zone temperature is above the cooling setpoint.
 
-\subsubsection{Enthalpy control}\label{enthalpy-control}
+\subsubsection{Enthalpy Control}\label{enthalpy-control}
 
 This control mode checks whether the outdoor air enthalpy is between the Minimum Outdoor Enthalpy and Maximum Outdoor Enthalpy specified. If the outdoor enthalpy is between the two values then natural ventilation is allowed, else natural ventilation is not allowed.
 
@@ -266,7 +270,7 @@ Since this temperature control type requires only a single setpoint, natural ven
 
 If the zone temperature is beyond the deadband, then the initial decision is overridden and natural ventilation is not allowed. This is intended to avoid either overcooling a space, which could result in additional heating load when the zone temperature is below the heating setpoint, or overheating a space, which could result in additional cooling load when the zone temperature is above the cooling setpoint.
 
-\subsubsection{Dew-Point control}\label{dew-point-control}
+\subsubsection{Dew-Point Control}\label{dew-point-control}
 
 This control mode checks whether the outdoor air dewpoint temperature is between the Minimum Outdoor Dew-Point and Maximum Outdoor Dew-Point specified. If the outdoor dewpoint temperature is between the two values then natural ventilation is allowed, else national ventilation is not allowed.
 
@@ -276,7 +280,19 @@ If the actual zone air humidity ratio is below the humidity ratio setpoint and t
 
 If the actual zone air humidity ratio is above the humidity ratio setpoint and the controlled zone needs dehumidification as the second scenario, then the initial decision is overridden and natural ventilation is not allowed. This is intended to avoid humidifying a space, which could result in additional dehumidification load.
 
-\subsubsection{Outdoor ventilation air control}\label{outdoor-ventilation-air-control}
+\subsubsection{Operative Temperature Control with 80 Percent Acceptability Limits}\label{operative-temperature-control-with-80-acceptability-limits}
+
+ This control mode checks whether the zone air operative temperature is between the lower and upper adaptive comfort 80\% acceptability limits or not. If the zone air operative temperature is between the lower and upper limits, then natural ventilation is allowed, else natural ventilation is not allowed. 
+
+\subsubsection{Operative Temperature Control with 90 Percent Acceptability Limits}\label{operative-temperature-control-with-90-acceptability-limits}
+
+ This control mode checks whether the zone air operative temperature is between the lower and upper adaptive comfort 90\% acceptability limits or not. If the zone air operative temperature is between the lower and upper limits, then natural ventilation is allowed, else natural ventilation is not allowed. 
+
+\subsubsection{CO2 Control}\label{co2-control} 
+
+ This control mode checks whether the zone air CO2 concentration level is above the CO2 setpoint or not. If the zone air CO2 concentration level is above the setpoint, the control checks availability of HVAC system. If available, The available status will be ForceOn. If not available, natural ventilation will be allowed. 
+
+\subsubsection{Outdoor Ventilation Air Control}\label{outdoor-ventilation-air-control}
 
 This control mode does not require any additional checks. The control only works with Airflow Network opening objects only, and is not allowed to work with ZoneVentilation and ZoneMixing objects.
 
@@ -292,7 +308,7 @@ Else
 
 \emph{AvailStatus = ForceOn}
 
-\subsection{\textbf{Optimum Start Controls}}\label{optimum-start-controls}
+\subsection{Optimum Start Controls}\label{optimum-start-controls}
 
 \subsubsection{Overview}\label{overview-1-008}
 

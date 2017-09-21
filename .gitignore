@@ -46,4 +46,3 @@ cmake-build-debug
 
 # py2app puts things inside dist/ and build/, build/ is already ignored, just add dist/
 dist
-

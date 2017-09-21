@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -74,7 +74,6 @@ namespace PoweredInductionUnits {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern Array1D_bool CheckEquipName;
-	extern bool GetPIUInputFlag; // First time, input is "gotten"
 
 	extern int NumPIUs;
 	extern int NumSeriesPIUs;
@@ -116,6 +115,7 @@ namespace PoweredInductionUnits {
 		std::string FanName; // name of fan component
 		int Fan_Num; // index for fan type
 		int Fan_Index; // store index for this fan
+		int FanAvailSchedPtr; // index to fan availability schedule
 		std::string HCoilType; // type of heating coil component
 		int HCoilType_Num; // index for heating coil type
 		int HCoil_PlantTypeNum;
@@ -168,6 +168,7 @@ namespace PoweredInductionUnits {
 			Mixer_Num( 0 ),
 			Fan_Num( 0 ),
 			Fan_Index( 0 ),
+			FanAvailSchedPtr( 0 ),
 			HCoilType_Num( 0 ),
 			HCoil_PlantTypeNum( 0 ),
 			HCoil_Index( 0 ),
@@ -249,6 +250,9 @@ namespace PoweredInductionUnits {
 
 	void
 	PIUInducesPlenumAir( int const NodeNum ); // induced air node number
+
+	void
+	clear_state();
 
 } // PoweredInductionUnits
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -86,6 +86,8 @@ namespace DirectAirManager {
 		Real64 InitMaxAvailMassFlow; // The Initial max mass Flow to set the Control Flow Fraction
 		Real64 AirMassFlowFraction;
 		int ZoneEquipAirInletNode;
+		int AirTerminalSizingSpecIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
+		int TermUnitSizingNum; // index to TermUnitSizing and TermUnitFinalZoneSizing for this terminal unit
 		// Simulation Data
 		Real64 SensOutputProvided;
 		bool EMSOverrideAirFlow; // if true, EMS is calling to override flow rate
@@ -99,6 +101,12 @@ namespace DirectAirManager {
 		int ZoneEqNum;
 		int ZoneNum;
 
+		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
+		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
+		int AirLoopNum; // air loop index 
+		int CtrlZoneNum;  // control zone index
+		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
+
 		// Default Constructor
 		DirectAirProps() :
 			ZoneSupplyAirNode( 0 ),
@@ -108,6 +116,7 @@ namespace DirectAirManager {
 			InitMaxAvailMassFlow( 0.0 ),
 			AirMassFlowFraction( 0.0 ),
 			ZoneEquipAirInletNode( 0 ),
+			AirTerminalSizingSpecIndex( 0 ),
 			SensOutputProvided( 0.0 ),
 			EMSOverrideAirFlow( false ),
 			EMSMassFlowRateValue( 0.0 ),
@@ -116,7 +125,12 @@ namespace DirectAirManager {
 			HeatEnergy( 0.0 ),
 			CoolEnergy( 0.0 ),
 			ZoneEqNum( 0 ),
-			ZoneNum( 0 )
+			ZoneNum( 0 ),
+			NoOAFlowInputFromUser( true ), 
+			OARequirementsPtr( 0 ), 
+			AirLoopNum( 0 ), 
+			CtrlZoneNum( 0 ),
+			OAPerPersonMode( 0 )
 		{}
 
 	};

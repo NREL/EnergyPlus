@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -274,8 +274,9 @@ namespace OutputReportPredefined {
 	extern int pdchExLtConsump;
 	extern int pdstDaylight;
 	extern int pdchDyLtZone;
+	extern int pdchDyLtCtrlName;
 	extern int pdchDyLtKind;
-	extern int pdchDyLtCtrl;
+	extern int pdchDyLtCtrlType;
 	extern int pdchDyLtFrac;
 	extern int pdchDyLtWInst;
 	extern int pdchDyLtWCtrl;
@@ -643,8 +644,12 @@ namespace OutputReportPredefined {
 	extern int pdchLeedPerfElDem;
 	extern int pdchLeedPerfGasEneUse;
 	extern int pdchLeedPerfGasDem;
-	extern int pdchLeedPerfOthEneUse;
-	extern int pdchLeedPerfOthDem;
+	extern int pdchLeedPerfAddFuelEneUse;
+	extern int pdchLeedPerfAddFuelDem;
+	extern int pdchLeedPerfDisClEneUse;
+	extern int pdchLeedPerfDisClDem;
+	extern int pdchLeedPerfDisHtEneUse;
+	extern int pdchLeedPerfDisHtDem;
 
 	extern int pdstLeedEneUseSum;
 	extern int pdchLeedEusUnt;
@@ -672,6 +677,18 @@ namespace OutputReportPredefined {
 
 	extern int pdstLeedEneUsePerc;
 	extern int pdchLeedEupPerc;
+
+	extern int pdstLeedEqFlLdHrs;
+	extern int pdchLeedEflhEflh;
+	extern int pdchLeedEflhNonZerHrs;
+
+	extern int pdstLeedSchedSetPts;
+	extern int pdChLeedSchStPtFirstObjUsed;
+	extern int pdChLeedSchStPtMonthUsed;
+	extern int pdchLeedSchStPt11amWednesday;
+	extern int pdchLeedSchStPt11amWedCnt;
+	extern int pdchLeedSchStPt11pmWednesday;
+	extern int pdchLeedSchStPt11pmWedCnt;
 
 	// Internal data structures to store information provided by calls
 

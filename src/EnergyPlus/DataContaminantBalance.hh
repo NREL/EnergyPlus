@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -189,6 +189,8 @@ namespace DataContaminantBalance {
 		Array1D_int ControlZoneNum; // Controlled zone number
 		std::string ZoneMinCO2SchedName; // Name of the schedule which determines minimum CO2 concentration
 		int ZoneMinCO2SchedIndex; // Index for this schedule
+		std::string ZoneMaxCO2SchedName; // Name of the schedule which determines maximum CO2 concentration
+		int ZoneMaxCO2SchedIndex; // Index for this schedule
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		std::string GCAvaiSchedule; // Availability Schedule name for generic contamiant
 		int GCAvaiSchedPtr; // Pointer to the correct generic contaminant availability schedule
@@ -206,6 +208,7 @@ namespace DataContaminantBalance {
 			EMSOverrideCO2SetPointValue( 0.0 ),
 			NumOfZones( 0 ),
 			ZoneMinCO2SchedIndex( 0 ),
+			ZoneMaxCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
 			GCAvaiSchedPtr( 0 ),
 			GCSPSchedIndex( 0 ),
@@ -400,6 +403,11 @@ namespace DataContaminantBalance {
 	extern Array1D< ZoneContamGenericDataBLDiff > ZoneContamGenericBLDiff;
 	extern Array1D< ZoneContamGenericDataDVS > ZoneContamGenericDVS;
 	extern Array1D< ZoneContamGenericDataDRS > ZoneContamGenericDRS;
+
+	// Clears the global data in DataContaminantBalance.
+	// Needed for unit tests, should not be normally called.
+	void
+		clear_state();
 
 } // DataContaminantBalance
 

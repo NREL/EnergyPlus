@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,6;
 
@@ -362,10 +362,6 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
     C6 - 8 IN CLAY TILE,     !- Layer 2
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
-
-  Construction,
-    FLOOR SLAB 8 IN,         !- Name
-    C10 - 8 IN HW CONCRETE;  !- Outside Layer
 
   Construction,
     ROOF34,                  !- Name
@@ -1940,8 +1936,8 @@
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
     Cooling,                 !- Loop Type
-    0.5,                     !- Design Loop Exit Temperature
-    2.0;                     !- Loop Design Temperature Difference
+    0.5,                     !- Design Loop Exit Temperature {C}
+    2.0;                     !- Loop Design Temperature Difference {deltaC}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -237,7 +237,8 @@ namespace EnergyPlus {
 				// if user input did not include an Electric Load center, create a simple default one here for reporting purposes
 			//   but only if there are any other electricity components set up (yet) for metering
 			int anyElectricityPresent = GetMeterIndex( "ELECTRICITY:FACILITY" );
-			if ( anyElectricityPresent > 0 ) {
+			int anyPlantLoadProfilePresent = InputProcessor::GetNumObjectsFound( "LoadProfile:Plant" );
+			if ( anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0 ) {
 				elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 0 ) );
 				numLoadCenters_ = 1;
 			}
@@ -287,22 +288,22 @@ namespace EnergyPlus {
 			}
 		} // if transformers
 
-		if ( numLoadCenters_ > 0 ) { 
-			SetupOutputVariable( "Facility Total Purchased Electric Power [W]", electPurchRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Facility Total Purchased Electric Energy [J]", electricityPurch_, "System", "Sum", name_, _, "ElectricityPurchased", "COGENERATION", _, "Plant" );
+		if ( numLoadCenters_ > 0 ) {
+			SetupOutputVariable( "Facility Total Purchased Electric Power", OutputProcessor::Unit::W, electPurchRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Facility Total Purchased Electric Energy", OutputProcessor::Unit::J, electricityPurch_, "System", "Sum", name_, _, "ElectricityPurchased", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Facility Total Surplus Electric Power [W]", electSurplusRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Facility Total Surplus Electric Energy [J]", electricitySurplus_, "System", "Sum", name_, _, "ElectricitySurplusSold", "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Facility Total Surplus Electric Power", OutputProcessor::Unit::W, electSurplusRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Facility Total Surplus Electric Energy", OutputProcessor::Unit::J, electricitySurplus_, "System", "Sum", name_, _, "ElectricitySurplusSold", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Facility Net Purchased Electric Power [W]", electricityNetRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Facility Net Purchased Electric Energy [J]", electricityNet_, "System", "Sum", name_, _, "ElectricityNet", "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Facility Net Purchased Electric Power", OutputProcessor::Unit::W, electricityNetRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Facility Net Purchased Electric Energy", OutputProcessor::Unit::J, electricityNet_, "System", "Sum", name_, _, "ElectricityNet", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Facility Total Building Electric Demand Power [W]", totalBldgElecDemand_, "System", "Average", name_ );
-			SetupOutputVariable( "Facility Total HVAC Electric Demand Power [W]", totalHVACElecDemand_, "System", "Average", name_ );
-			SetupOutputVariable( "Facility Total Electric Demand Power [W]", totalElectricDemand_, "System", "Average", name_ );
+			SetupOutputVariable( "Facility Total Building Electric Demand Power", OutputProcessor::Unit::W, totalBldgElecDemand_, "System", "Average", name_ );
+			SetupOutputVariable( "Facility Total HVAC Electric Demand Power", OutputProcessor::Unit::W, totalHVACElecDemand_, "System", "Average", name_ );
+			SetupOutputVariable( "Facility Total Electric Demand Power", OutputProcessor::Unit::W, totalElectricDemand_, "System", "Average", name_ );
 
-			SetupOutputVariable( "Facility Total Produced Electric Power [W]", electProdRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Facility Total Produced Electric Energy [J]", electricityProd_, "System", "Sum", name_ );
+			SetupOutputVariable( "Facility Total Produced Electric Power", OutputProcessor::Unit::W, electProdRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Facility Total Produced Electric Energy", OutputProcessor::Unit::J, electricityProd_, "System", "Sum", name_ );
 
 			reportPVandWindCapacity();
 
@@ -911,13 +912,13 @@ namespace EnergyPlus {
 		}
 
 		//Setup general output variables for reporting in the electric load center
-		SetupOutputVariable( "Electric Load Center Produced Electric Power [W]",genElectProdRate, "System", "Average", name_ );
-		SetupOutputVariable( "Electric Load Center Produced Electric Energy [J]",genElectricProd, "System", "Sum", name_ );
-		SetupOutputVariable( "Electric Load Center Supplied Electric Power [W]", subpanelFeedInRate, "System", "Average", name_ );
-		SetupOutputVariable( "Electric Load Center Drawn Electric Power [W]", subpanelDrawRate, "System", "Average", name_ );
-		SetupOutputVariable( "Electric Load Center Produced Thermal Rate [W]", thermalProdRate, "System", "Average", name_ );
-		SetupOutputVariable( "Electric Load Center Produced Thermal Energy [J]", thermalProd, "System", "Sum", name_ );
-		SetupOutputVariable( "Electric Load Center Requested Electric Power [W]", totalPowerRequest_, "System", "Average", name_ );
+		SetupOutputVariable( "Electric Load Center Produced Electric Power", OutputProcessor::Unit::W,genElectProdRate, "System", "Average", name_ );
+		SetupOutputVariable( "Electric Load Center Produced Electric Energy", OutputProcessor::Unit::J,genElectricProd, "System", "Sum", name_ );
+		SetupOutputVariable( "Electric Load Center Supplied Electric Power", OutputProcessor::Unit::W, subpanelFeedInRate, "System", "Average", name_ );
+		SetupOutputVariable( "Electric Load Center Drawn Electric Power", OutputProcessor::Unit::W, subpanelDrawRate, "System", "Average", name_ );
+		SetupOutputVariable( "Electric Load Center Produced Thermal Rate", OutputProcessor::Unit::W, thermalProdRate, "System", "Average", name_ );
+		SetupOutputVariable( "Electric Load Center Produced Thermal Energy", OutputProcessor::Unit::J, thermalProd, "System", "Sum", name_ );
+		SetupOutputVariable( "Electric Load Center Requested Electric Power", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_ );
 
 		if ( DataGlobals::AnyEnergyManagementSystemInModel && storagePresent_ ) {
 				SetupEMSActuator( "Electrical Storage", name_ , "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_ );
@@ -1971,7 +1972,7 @@ namespace EnergyPlus {
 		maxPowerOut            = ratedElecPowerOutput,
 		nominalThermElectRatio = thermalToElectRatio;
 
-		SetupOutputVariable( "Generator Requested Electric Power [W]", powerRequestThisTimestep, "System", "Average", objectName );
+		SetupOutputVariable( "Generator Requested Electric Power", OutputProcessor::Unit::W, powerRequestThisTimestep, "System", "Average", objectName );
 		if ( DataGlobals::AnyEnergyManagementSystemInModel ) {
 			SetupEMSInternalVariable( "Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut );
 			SetupEMSInternalVariable( "Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio );
@@ -2215,18 +2216,18 @@ namespace EnergyPlus {
 
 			} // end switch modelType
 		
-			SetupOutputVariable( "Inverter DC to AC Efficiency []", efficiency_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter DC Input Electric Power [W]", dCPowerIn_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter DC Input Electric Energy [J]", dCEnergyIn_, "System", "Sum", name_ );
-			SetupOutputVariable( "Inverter AC Output Electric Power [W]", aCPowerOut_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter AC Output Electric Energy [J]", aCEnergyOut_, "System", "Sum", name_ ); 
-			SetupOutputVariable( "Inverter Conversion Loss Power [W]", conversionLossPower_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter Conversion Loss Energy [J]", conversionLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Inverter Conversion Loss Decrement Energy [J]", conversionLossEnergyDecrement_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
-			SetupOutputVariable( "Inverter Thermal Loss Rate [W]", thermLossRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter Thermal Loss Energy [J]", thermLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Inverter Ancillary AC Electric Power [W]", ancillACuseRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", ancillACuseEnergy_, "System", "Sum", name_, _, "Electricity", "Cogeneration", "DCtoACInverter Ancillary", "Plant" ); // called cogeneration for end use table
+			SetupOutputVariable( "Inverter DC to AC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_ );
+			SetupOutputVariable( "Inverter DC Input Electric Power", OutputProcessor::Unit::W, dCPowerIn_, "System", "Average", name_ );
+			SetupOutputVariable( "Inverter DC Input Electric Energy", OutputProcessor::Unit::J, dCEnergyIn_, "System", "Sum", name_ );
+			SetupOutputVariable( "Inverter AC Output Electric Power", OutputProcessor::Unit::W, aCPowerOut_, "System", "Average", name_ );
+			SetupOutputVariable( "Inverter AC Output Electric Energy", OutputProcessor::Unit::J, aCEnergyOut_, "System", "Sum", name_ ); 
+			SetupOutputVariable( "Inverter Conversion Loss Power", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_ );
+			SetupOutputVariable( "Inverter Conversion Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_ );
+			SetupOutputVariable( "Inverter Conversion Loss Decrement Energy", OutputProcessor::Unit::J, conversionLossEnergyDecrement_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
+			SetupOutputVariable( "Inverter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Inverter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_ );
+			SetupOutputVariable( "Inverter Ancillary AC Electric Power", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Inverter Ancillary AC Electric Energy", OutputProcessor::Unit::J, ancillACuseEnergy_, "System", "Sum", name_, _, "Electricity", "Cogeneration", "DCtoACInverter Ancillary", "Plant" ); // called cogeneration for end use table
 			if ( zoneNum_ > 0 ) {
 				switch (modelType_ )
 				{
@@ -2518,18 +2519,18 @@ namespace EnergyPlus {
 			}
 			zoneRadFract_ = DataIPShortCuts::rNumericArgs( 4 );
 
-			SetupOutputVariable( "Converter AC to DC Efficiency []", efficiency_, "System", "Average", name_ );
-			SetupOutputVariable( "Converter AC Input Electric Power [W]", aCPowerIn_, "System", "Average", name_ );
-			SetupOutputVariable( "Converter AC Input Electric Energy [J]", aCEnergyIn_, "System", "Sum", name_ );
-			SetupOutputVariable( "Converter DC Output Electric Power [W]", dCPowerOut_, "System", "Average", name_ );
-			SetupOutputVariable( "Converter DC Output Electric Energy [J]", dCEnergyOut_, "System", "Sum", name_ );
-			SetupOutputVariable( "Converter Electric Loss Power [W]", conversionLossPower_, "System", "Average", name_ );
-			SetupOutputVariable( "Converter Electric Loss Energy [J]", conversionLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Converter Electric Loss Decrement Energy [J]", conversionLossEnergyDecrement_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
-			SetupOutputVariable( "Converter Thermal Loss Rate [W]", thermLossRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Converter Thermal Loss Energy [J]", thermLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Converter Ancillary AC Electric Power [W]", ancillACuseRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Converter Ancillary AC Electric Energy [J]", ancillACuseEnergy_, "System", "Sum", name_,  _, "Electricity", "Cogeneration", "ACtoDCConverter Ancillary", "Plant" ); // called cogeneration for end use table
+			SetupOutputVariable( "Converter AC to DC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_ );
+			SetupOutputVariable( "Converter AC Input Electric Power", OutputProcessor::Unit::W, aCPowerIn_, "System", "Average", name_ );
+			SetupOutputVariable( "Converter AC Input Electric Energy", OutputProcessor::Unit::J, aCEnergyIn_, "System", "Sum", name_ );
+			SetupOutputVariable( "Converter DC Output Electric Power", OutputProcessor::Unit::W, dCPowerOut_, "System", "Average", name_ );
+			SetupOutputVariable( "Converter DC Output Electric Energy", OutputProcessor::Unit::J, dCEnergyOut_, "System", "Sum", name_ );
+			SetupOutputVariable( "Converter Electric Loss Power", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_ );
+			SetupOutputVariable( "Converter Electric Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_ );
+			SetupOutputVariable( "Converter Electric Loss Decrement Energy", OutputProcessor::Unit::J, conversionLossEnergyDecrement_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
+			SetupOutputVariable( "Converter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Converter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_ );
+			SetupOutputVariable( "Converter Ancillary AC Electric Power", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Converter Ancillary AC Electric Energy", OutputProcessor::Unit::J, ancillACuseEnergy_, "System", "Sum", name_,  _, "Electricity", "Cogeneration", "ACtoDCConverter Ancillary", "Plant" ); // called cogeneration for end use table
 			if ( zoneNum_ > 0 ) {
 					SetupZoneInternalGain( zoneNum_, "ElectricLoadCenter:Storage:Converter", name_, DataHeatBalance::IntGainTypeOf_ElectricLoadCenterConverter, qdotConvZone_, _, qdotRadZone_ );
 			}
@@ -2792,7 +2793,7 @@ namespace EnergyPlus {
 				maxPowerDraw_            = DataIPShortCuts::rNumericArgs( 5 );
 				maxPowerStore_           = DataIPShortCuts::rNumericArgs( 6 );
 				startingEnergyStored_    = DataIPShortCuts::rNumericArgs( 7 );
-				SetupOutputVariable( "Electric Storage Simple Charge State [J]", electEnergyinStorage_, "System", "Average", name_ ); // issue #4921
+				SetupOutputVariable( "Electric Storage Simple Charge State", OutputProcessor::Unit::J, electEnergyinStorage_, "System", "Average", name_ ); // issue #4921
 				break;
 			}
 			
@@ -2881,14 +2882,14 @@ namespace EnergyPlus {
 				cutoffV_              = DataIPShortCuts::rNumericArgs( 12 );
 				maxChargeRate_        = DataIPShortCuts::rNumericArgs( 13 );
 
-				SetupOutputVariable( "Electric Storage Operating Mode Index []", storageMode_, "System", "Average", name_ );
-				SetupOutputVariable( "Electric Storage Battery Charge State [Ah]", absoluteSOC_, "System", "Average", name_ );  // issue #4921
-				SetupOutputVariable( "Electric Storage Charge Fraction []", fractionSOC_, "System", "Average", name_ );
-				SetupOutputVariable( "Electric Storage Total Current [A]", batteryCurrent_, "System", "Average", name_ );
-				SetupOutputVariable( "Electric Storage Total Voltage [V]", batteryVoltage_, "System", "Average", name_ );
+				SetupOutputVariable( "Electric Storage Operating Mode Index", OutputProcessor::Unit::None, storageMode_, "System", "Average", name_ );
+				SetupOutputVariable( "Electric Storage Battery Charge State", OutputProcessor::Unit::Ah, absoluteSOC_, "System", "Average", name_ );  // issue #4921
+				SetupOutputVariable( "Electric Storage Charge Fraction", OutputProcessor::Unit::None, fractionSOC_, "System", "Average", name_ );
+				SetupOutputVariable( "Electric Storage Total Current", OutputProcessor::Unit::A, batteryCurrent_, "System", "Average", name_ );
+				SetupOutputVariable( "Electric Storage Total Voltage", OutputProcessor::Unit::V, batteryVoltage_, "System", "Average", name_ );
 
 				if ( lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes ) {
-					SetupOutputVariable( "Electric Storage Degradation Fraction []", batteryDamage_, "System", "Average", name_ );
+					SetupOutputVariable( "Electric Storage Degradation Fraction", OutputProcessor::Unit::None, batteryDamage_, "System", "Average", name_ );
 				}
 				break;
 			}
@@ -2899,13 +2900,13 @@ namespace EnergyPlus {
 
 			} // switch storage model type
 
-			SetupOutputVariable( "Electric Storage Charge Power [W]", storedPower_, "System", "Average", name_  );
-			SetupOutputVariable( "Electric Storage Charge Energy [J]", storedEnergy_, "System", "Sum", name_  );
-			SetupOutputVariable( "Electric Storage Production Decrement Energy [J]", decrementedEnergyStored_, "System", "Sum", name_ , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
-			SetupOutputVariable( "Electric Storage Discharge Power [W]", drawnPower_, "System", "Average", name_  );
-			SetupOutputVariable( "Electric Storage Discharge Energy [J]", drawnEnergy_, "System", "Sum", name_ , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
-			SetupOutputVariable( "Electric Storage Thermal Loss Rate [W]", thermLossRate_, "System", "Average", name_  );
-			SetupOutputVariable( "Electric Storage Thermal Loss Energy [J]", thermLossEnergy_, "System", "Sum", name_  );
+			SetupOutputVariable( "Electric Storage Charge Power", OutputProcessor::Unit::W, storedPower_, "System", "Average", name_  );
+			SetupOutputVariable( "Electric Storage Charge Energy", OutputProcessor::Unit::J, storedEnergy_, "System", "Sum", name_  );
+			SetupOutputVariable( "Electric Storage Production Decrement Energy", OutputProcessor::Unit::J, decrementedEnergyStored_, "System", "Sum", name_ , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
+			SetupOutputVariable( "Electric Storage Discharge Power", OutputProcessor::Unit::W, drawnPower_, "System", "Average", name_  );
+			SetupOutputVariable( "Electric Storage Discharge Energy", OutputProcessor::Unit::J, drawnEnergy_, "System", "Sum", name_ , _, "ElectricityProduced", "ELECTRICSTORAGE", _, "Plant" );
+			SetupOutputVariable( "Electric Storage Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_  );
+			SetupOutputVariable( "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_  );
 			if ( DataGlobals::AnyEnergyManagementSystemInModel ) {
 				if ( storageModelMode_ == StorageModelType::simpleBucketStorage ) {
 					SetupEMSInternalVariable( "Electrical Storage Simple Maximum Capacity", name_ , "[J]", maxEnergyCapacity_ );
@@ -3817,25 +3818,25 @@ namespace EnergyPlus {
 					}
 				}
 			}
-			SetupOutputVariable( "Transformer Efficiency []", efficiency_, "System", "Average", name_ );
-			SetupOutputVariable( "Transformer Input Electric Power [W]", powerIn_, "System", "Average", name_ );
-			SetupOutputVariable( "Transformer Input Electric Energy [J]", energyIn_, "System", "Sum", name_ );
-			SetupOutputVariable( "Transformer Output Electric Power [W]", powerOut_, "System", "Average", name_ );
-			SetupOutputVariable( "Transformer Output Electric Energy [J]", energyOut_, "System", "Sum", name_ );
-			SetupOutputVariable( "Transformer No Load Loss Rate [W]", noLoadLossRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Transformer No Load Loss Energy [J]", noLoadLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Transformer Load Loss Rate [W]", loadLossRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Transformer Load Loss Energy [J]", loadLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Transformer Thermal Loss Rate [W]", thermalLossRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Transformer Thermal Loss Energy [J]", thermalLossEnergy_, "System", "Sum", name_ );
+			SetupOutputVariable( "Transformer Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_ );
+			SetupOutputVariable( "Transformer Input Electric Power", OutputProcessor::Unit::W, powerIn_, "System", "Average", name_ );
+			SetupOutputVariable( "Transformer Input Electric Energy", OutputProcessor::Unit::J, energyIn_, "System", "Sum", name_ );
+			SetupOutputVariable( "Transformer Output Electric Power", OutputProcessor::Unit::W, powerOut_, "System", "Average", name_ );
+			SetupOutputVariable( "Transformer Output Electric Energy", OutputProcessor::Unit::J, energyOut_, "System", "Sum", name_ );
+			SetupOutputVariable( "Transformer No Load Loss Rate", OutputProcessor::Unit::W, noLoadLossRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Transformer No Load Loss Energy", OutputProcessor::Unit::J, noLoadLossEnergy_, "System", "Sum", name_ );
+			SetupOutputVariable( "Transformer Load Loss Rate", OutputProcessor::Unit::W, loadLossRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Transformer Load Loss Energy", OutputProcessor::Unit::J, loadLossEnergy_, "System", "Sum", name_ );
+			SetupOutputVariable( "Transformer Thermal Loss Rate", OutputProcessor::Unit::W, thermalLossRate_, "System", "Average", name_ );
+			SetupOutputVariable( "Transformer Thermal Loss Energy", OutputProcessor::Unit::J, thermalLossEnergy_, "System", "Sum", name_ );
 			if ( usageMode_ == TransformerUse::powerInFromGrid ) { // power losses metered as an end use exterior equipment
-				SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", elecUseMeteredUtilityLosses_, "System", "Sum", name_, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
+				SetupOutputVariable( "Transformer Distribution Electric Loss Energy", OutputProcessor::Unit::J, elecUseMeteredUtilityLosses_, "System", "Sum", name_, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
 			}
 			if ( usageMode_ == TransformerUse::powerOutFromBldgToGrid ) { 
-				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
+				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy", OutputProcessor::Unit::J, powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
 			}
 			if ( usageMode_ == TransformerUse::powerBetweenLoadCenterAndBldg ) {
-				SetupOutputVariable( "Transformer Conversion Electric Loss Energy [J]", powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
+				SetupOutputVariable( "Transformer Conversion Electric Loss Energy", OutputProcessor::Unit::J, powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
 			}
 
 			if ( zoneNum_ > 0 ) {

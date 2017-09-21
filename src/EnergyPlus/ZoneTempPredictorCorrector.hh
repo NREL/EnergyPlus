@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -186,6 +186,25 @@ namespace ZoneTempPredictorCorrector {
 
 	};
 
+	struct AdaptiveComfortDailySetPointSchedule
+	{
+		// Members
+		bool initialized;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_90;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Upper_80;
+		Array1D< Real64 > ThermalComfortAdaptiveASH55_Central;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_I;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_II;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Upper_III;
+		Array1D< Real64 > ThermalComfortAdaptiveCEN15251_Central;
+
+		// Default Constructor
+		AdaptiveComfortDailySetPointSchedule() :
+			initialized( false )
+		{}
+	};
+
+
 	// Object Data
 	extern Array1D< ZoneTempControlType > SetPointSingleHeating;
 	extern Array1D< ZoneTempControlType > SetPointSingleCooling;
@@ -195,6 +214,8 @@ namespace ZoneTempPredictorCorrector {
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
 	extern Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	extern AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
+	extern Array1D< Real64 > AdapComfortSetPointSummerDesDay;
 
 	// Functions
 	void
@@ -224,6 +245,12 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	CalcZoneAirTempSetPoints();
+
+	void
+	CalculateMonthlyRunningAverageDryBulb( Array1D< Real64 > & runningAverageASH, Array1D< Real64 > & runningAverageCEN );
+
+	void
+	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > const & runningAverageASH, Array1D< Real64 > const & runningAverageCEN );
 
 	void
 	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
@@ -317,6 +344,12 @@ namespace ZoneTempPredictorCorrector {
 	);
 
 	void
+	AdjustOperativeSetPointsforAdapComfort(
+		int const TempControlledZoneID,
+		Real64 & ZoneAirSetPoint
+	);
+
+	void
 	CalcZoneAirComfortSetPoints();
 
 	void
@@ -337,6 +370,20 @@ namespace ZoneTempPredictorCorrector {
 	AdjustCoolingSetPointforTempAndHumidityControl(
 		int const TempControlledZoneID,
 		int const ActualZoneNum // controlled zone actual zone number
+	);
+
+	void
+	OverrideAirSetPointsforEMSCntrl();
+
+	void
+	FillPredefinedTableOnThermostatSetpoints();
+
+	std::tuple< Real64, int, std::string >
+	temperatureAndCountInSch(
+		int const & scheduleIndex,
+		bool const & isSummer,
+		int const & dayOfWeek,
+		int const & hourOfDay
 	);
 
 } // ZoneTempPredictorCorrector

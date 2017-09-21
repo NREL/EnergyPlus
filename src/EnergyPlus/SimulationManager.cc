@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -124,10 +124,12 @@ extern "C" {
 #include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
+#include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SizingManager.hh>
 #include <SolarShading.hh>
 #include <SQLiteProcedures.hh>
+#include <SurfaceGeometry.hh>
 #include <SystemReports.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
@@ -135,6 +137,7 @@ extern "C" {
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
+#include <Vectors.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -287,6 +290,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
+		using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 		using OutputProcessor::isFinalYear;
 
 		// Locals
@@ -305,11 +309,8 @@ namespace SimulationManager {
 		static bool TerminalError( false );
 		bool SimsDone;
 		bool ErrFound;
-		//  REAL(r64) :: t0,t1,st0,st1
-
-		//  CHARACTER(len=70) :: tdstring
-		//  CHARACTER(len=138) :: tdstringlong
-
+		bool oneTimeUnderwaterBoundaryCheck = true;
+		bool AnyUnderwaterBoundaries = false;
 		int EnvCount;
 
 		// Formats
@@ -359,8 +360,6 @@ namespace SimulationManager {
 		DoingSizing = true;
 		ManageSizing();
 
-		CheckAndReadFaults();
-
 		BeginFullSimFlag = true;
 		SimsDone = false;
 		if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
@@ -382,6 +381,9 @@ namespace SimulationManager {
 
 		ResetEnvironmentCounter();
 		SetupSimulation( ErrorsFound );
+
+		CheckAndReadFaults();
+
 		InitCurveReporting();
 
 		AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
@@ -445,7 +447,10 @@ namespace SimulationManager {
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
-
+		
+		// check for variable latitude/location/etc
+		WeatherManager::ReadVariableLocationOrientation();
+		
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
@@ -493,6 +498,8 @@ namespace SimulationManager {
 			if ( NumOfDayInEnvrn <= 365 ){
 				isFinalYear = true;
 			}
+
+			HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
 			bool anyEMSRan;
 			ManageEMS( emsCallFromBeginNewEvironment, anyEMSRan ); // calling point
@@ -542,6 +549,14 @@ namespace SimulationManager {
 							SimulateGroundDomains( false );
 						}
 
+						if ( AnyUnderwaterBoundaries ) {
+						    WeatherManager::UpdateUnderwaterBoundaries();
+						}
+
+						if ( DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 || DataEnvironment::varyingOrientationSchedIndex > 0 ) {
+							WeatherManager::UpdateLocationAndOrientation();
+						}
+
 						BeginTimeStepFlag = true;
 						ExternalInterfaceExchangeVariables();
 
@@ -573,6 +588,11 @@ namespace SimulationManager {
 							if ( GetNumRangeCheckErrorsFound() > 0 ) {
 								ShowFatalError( "Out of \"range\" values found in input" );
 							}
+						}
+
+						if ( oneTimeUnderwaterBoundaryCheck ) {
+						    AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+						    oneTimeUnderwaterBoundaryCheck = false;
 						}
 
 						BeginHourFlag = false;
@@ -1329,6 +1349,7 @@ namespace SimulationManager {
 		if ( write_stat != 0 ) {
 			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEioFileName+" for output (write)." );
 		}
+		eio_stream = gio::out_stream( OutputFileInits );
 		gio::write( OutputFileInits, fmtA ) << "Program Version," + VerString;
 
 		// Open the Meters Output File
@@ -1533,6 +1554,7 @@ namespace SimulationManager {
 		// Close the Initialization Output File
 		gio::write( OutputFileInits, EndOfDataFormat );
 		gio::close( OutputFileInits );
+		eio_stream = nullptr;
 
 		// Close the Meters Output File
 		gio::write( OutputFileMeters, EndOfDataFormat );
@@ -1544,6 +1566,11 @@ namespace SimulationManager {
 		}
 		mtr_stream = nullptr;
 
+		// Close the External Shading Output File
+
+		if ( OutputFileShadingFrac > 0 ) {
+			gio::close( OutputFileShadingFrac );
+		}
 	}
 
 	void
@@ -1677,7 +1704,7 @@ namespace SimulationManager {
 		}
 
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
-		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );
+		if ( ErrorsFound ) ShowFatalError( "Previous conditions cause program termination." );
 
 	}
 
@@ -2365,7 +2392,7 @@ namespace SimulationManager {
 		Array1D_int VarIDs;
 		Array1D_int IndexTypes;
 		Array1D_int VarTypes;
-		Array1D_string UnitsStrings;
+		Array1D < OutputProcessor::Unit> unitsForVar; // units from enum for each variable
 		Array1D_string VarNames;
 		Array1D_int ResourceTypes;
 		Array1D_string EndUses;
@@ -2383,20 +2410,20 @@ namespace SimulationManager {
 			IndexTypes.dimension( NumVariables, 0 );
 			VarTypes.dimension( NumVariables, 0 );
 			VarNames.allocate( NumVariables );
-			UnitsStrings.allocate( NumVariables );
+			unitsForVar.allocate( NumVariables );
 			ResourceTypes.dimension( NumVariables, 0 );
 			EndUses.allocate( NumVariables );
 			Groups.allocate( NumVariables );
-			GetMeteredVariables( CompSets( Loop ).CType, CompSets( Loop ).CName, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, VarNames, _, VarIDs );
+			GetMeteredVariables( CompSets( Loop ).CType, CompSets( Loop ).CName, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, VarNames, _, VarIDs );
 			for ( Loop1 = 1; Loop1 <= NumVariables; ++Loop1 ) {
-				gio::write( OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)" ) << VarIndexes( Loop1 ) << VarIDs( Loop1 ) << VarNames( Loop1 ) << UnitsStrings( Loop1 ) << GetResourceTypeChar( ResourceTypes( Loop1 ) ) << EndUses( Loop1 ) << Groups( Loop1 ) << IndexTypes( Loop1 );
+				gio::write( OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)" ) << VarIndexes( Loop1 ) << VarIDs( Loop1 ) << VarNames( Loop1 ) << unitEnumToString( unitsForVar( Loop1 ) ) << GetResourceTypeChar( ResourceTypes( Loop1 ) ) << EndUses( Loop1 ) << Groups( Loop1 ) << IndexTypes( Loop1 );
 			}
 			VarIndexes.deallocate();
 			IndexTypes.deallocate();
 			VarTypes.deallocate();
 			VarIDs.deallocate();
 			VarNames.deallocate();
-			UnitsStrings.deallocate();
+			unitsForVar.deallocate();
 			ResourceTypes.deallocate();
 			EndUses.deallocate();
 			Groups.deallocate();

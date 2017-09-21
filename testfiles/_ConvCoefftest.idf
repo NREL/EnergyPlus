@@ -9,9 +9,8 @@
 ! Plant:    None.
 ! Modified: Conforms with Beta 4 input
 ! 2 design days to facilitate reverse DD testing.
- Lead Input;
 
-  Version,8.6;
+  Version,8.8;
 
   Site:Location,
     ATLANTA,                 !- Name
@@ -149,9 +148,6 @@
     LAYER 1,                 !- Outside Layer
     LAYER 2,                 !- Layer 2
     LAYER 3;                 !- Layer 3
-
- End Lead Input;
- Simulation Data;
 
   Timestep,6;
 
@@ -547,6 +543,7 @@
     ,                        !- Availability Schedule Name
     NODE_1,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -613,8 +610,6 @@
   Output:Meter:MeterFileOnly,DistrictHeating:Facility,runperiod;
 
   Output:Meter:MeterFileOnly,DistrictCooling:Facility,runperiod;
-
- End Simulation Data;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

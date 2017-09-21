@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -104,6 +104,7 @@ namespace DataSurfaces {
 	int const OtherSideCoefCalcExt( -3 );
 	int const OtherSideCondModeledExt( -4 );
 	int const GroundFCfactorMethod( -5 );
+	int const KivaFoundation( -6 );
 
 	Array1D_string const cExtBoundCondition( {-5,0}, { "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment" } );
 
@@ -161,6 +162,7 @@ namespace DataSurfaces {
 	int const HeatTransferModel_Window5( 7 ); // original detailed layer-by-layer based on window 4 and window 5
 	int const HeatTransferModel_ComplexFenestration( 8 ); // BSDF
 	int const HeatTransferModel_TDD( 9 ); // tubular daylighting device
+	int const HeatTransferModel_Kiva( 10 ); // Kiva ground calculations
 
 	// Parameters for classification of outside face of surfaces
 	int const OutConvClass_WindwardVertWall( 101 );
@@ -331,6 +333,7 @@ namespace DataSurfaces {
 	int TotExtVentCav( 0 );
 	int TotSurfIncSolSSG( 0 ); // Total number of scheduled surface gains for incident solar radiation on surface
 	int TotFenLayAbsSSG( 0 ); // Total number of scheduled surface gains for absorbed solar radiation in window layers
+	int TotSurfLocalEnv( 0 ); // Total number of surface level outdoor air node.
 	int Corner( 0 ); // Which corner is specified as the first vertice
 	int MaxVerticesPerSurface( 4 ); // Maximum number of vertices allowed for a single surface (default -- can go higher)
 
@@ -479,6 +482,8 @@ namespace DataSurfaces {
 	Array1D< ExtVentedCavityStruct > ExtVentedCavity;
 	Array1D< SurfaceSolarIncident > SurfIncSolSSG;
 	Array1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
+	Array1D< SurfaceLocalEnvironment > SurfLocalEnvironment;
+	Array1D< SurroundingSurfacesProperty > SurroundingSurfsProperty;
 
 	// Class Methods
 
@@ -663,6 +668,24 @@ namespace DataSurfaces {
 			}
 		}
 
+		void
+		SurfaceData::
+		SetWindDirAt( Real64 const fac )
+		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         X Luo
+			//       DATE WRITTEN   June 2017
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Routine provides facility for doing bulk Set Windspeed locally.
+
+			// Using/Aliasing
+			WindDir = fac;
+		}
+
+
 		// Computed Shape Category
 		ShapeCat
 		SurfaceData::
@@ -791,6 +814,7 @@ namespace DataSurfaces {
 		TotExtVentCav = 0;
 		TotSurfIncSolSSG = 0;
 		TotFenLayAbsSSG = 0;
+		TotSurfLocalEnv = 0;
 		Corner = 0;
 		MaxVerticesPerSurface = 4;
 		BuildingShadingCount = 0;
@@ -882,6 +906,8 @@ namespace DataSurfaces {
 		ExtVentedCavity.deallocate();
 		SurfIncSolSSG.deallocate();
 		FenLayAbsSSG.deallocate();
+		SurfLocalEnvironment.deallocate();
+		SurroundingSurfsProperty.deallocate();
 	}
 
 	void
@@ -916,6 +942,16 @@ namespace DataSurfaces {
 		Real64 const fac( DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
 		for ( auto & surface : Surface ) {
 			surface.SetWindSpeedAt( fac );
+		}
+	}
+
+	void
+	SetSurfaceWindDirAt()
+	{
+		// Using/Aliasing
+		using DataEnvironment::WindDir;
+		for ( auto & surface : Surface ) {
+			surface.SetWindDirAt( WindDir );
 		}
 	}
 

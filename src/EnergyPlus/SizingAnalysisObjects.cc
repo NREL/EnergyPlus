@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -500,8 +500,6 @@ namespace EnergyPlus {
 	)
 	{
 		using DataGlobals::OutputFileInits;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
 		using DataSizing::NoSizingFactorMode;
 		using DataSizing::GlobalHeatingSizingFactorMode;
@@ -603,7 +601,8 @@ namespace EnergyPlus {
 				PlantLoop( plantLoopIndex ).MaxMassFlowRate =  newAdjustedMassFlowRate;
 			}
 			if ( PlantLoop( plantLoopIndex ).VolumeWasAutoSized ) {
-				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+				// Note this calculation also appears in PlantManager::SizePlantLoop and PlantManager::ResizePlantLoopLevelSizes
+				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * PlantLoop( plantLoopIndex ).CirculationTime * 60.0;
 				PlantLoop( plantLoopIndex ).Mass = PlantLoop( plantLoopIndex ).Volume* densityForSizing;
 			}
 

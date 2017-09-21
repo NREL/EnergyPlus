@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -183,9 +183,7 @@ ProcessArgs(int argc, const char * argv[])
 	if (!opt.isSet("-i") && !legacyMode)
 		inputIddFileName = exeDirectory + inputIddFileName;
 
-	std::string dirPathName;
-
-	opt.get("-d")->getString(dirPathName);
+	opt.get("-d")->getString(outDirPathName);
 
 	runReadVars = opt.isSet("-r");
 
@@ -216,7 +214,7 @@ ProcessArgs(int argc, const char * argv[])
 	makeNativePath(inputIdfFileName);
 	makeNativePath(inputWeatherFileName);
 	makeNativePath(inputIddFileName);
-	makeNativePath(dirPathName);
+	makeNativePath(outDirPathName);
 
 	std::vector<std::string> badOptions;
 	if (opt.lastArgs.size() > 1u) {
@@ -256,12 +254,12 @@ ProcessArgs(int argc, const char * argv[])
 
 	if (opt.isSet("-d") ) {
 		// Add the trailing path character if necessary
-		if (dirPathName[dirPathName.size()-1]!=pathChar) {
-			dirPathName+=pathChar;
+		if (outDirPathName[outDirPathName.size()-1]!=pathChar) {
+			outDirPathName+=pathChar;
 		}
 
 		// Create directory if it doesn't already exist
-		makeDirectory(dirPathName);
+		makeDirectory(outDirPathName);
 	}
 
 	// File naming scheme
@@ -270,9 +268,9 @@ ProcessArgs(int argc, const char * argv[])
 		std::string prefixOutName;
 		opt.get("-p")->getString(prefixOutName);
 		makeNativePath(prefixOutName);
-		outputFilePrefix = dirPathName + prefixOutName;
+		outputFilePrefix = outDirPathName + prefixOutName;
 	} else {
-		outputFilePrefix = dirPathName + "eplus";
+		outputFilePrefix = outDirPathName + "eplus";
 	}
 
 	std::string suffixType;
@@ -294,6 +292,7 @@ ProcessArgs(int argc, const char * argv[])
 	std::string sqliteSuffix;
 	std::string adsSuffix;
 	std::string screenSuffix;
+	std::string shdSuffix;
 
 	if (suffixType == "L" || suffixType == "l")	{
 
@@ -306,6 +305,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "sqlite";
 		adsSuffix = "ADS";
 		screenSuffix = "screen";
+		shdSuffix = "shading";
 
 	} else if (suffixType == "D" || suffixType == "d") {
 
@@ -318,6 +318,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "-sqlite";
 		adsSuffix = "-ads";
 		screenSuffix = "-screen";
+		shdSuffix = "-shading";
 
 	} else if (suffixType == "C" || suffixType == "c") {
 
@@ -330,6 +331,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "Sqlite";
 		adsSuffix = "Ads";
 		screenSuffix = "Screen";
+		shdSuffix = "Shading";
 
 	} else {
 		DisplayString("ERROR: Unrecognized argument for output suffix style: " + suffixType);
@@ -373,8 +375,9 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
+	outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
 	if (suffixType == "L" || suffixType == "l") {
-		outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+		outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
 	}
 	else {
 		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";

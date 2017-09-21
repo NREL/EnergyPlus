@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -192,6 +192,10 @@ namespace EvaporativeCoolers {
 		int IterationFailed; // Used for RegulaFalsi recurring error message error -2
 		// rather than wetbulb-depression approach
 		int EvapCoolerRDDOperatingMode; // the indirect evaporative cooler Research Special operating mode variable
+		//Operational fault parameters
+		bool FaultyEvapCoolerFoulingFlag; // True if the evaporative cooler has fouling fault
+		int FaultyEvapCoolerFoulingIndex; // Index of the fault object corresponding to the evaporative cooler
+		Real64 FaultyEvapCoolerFoulingFactor; // Evaporative cooler fouling factor
 
 		// Default Constructor
 		EvapConditions() :
@@ -281,7 +285,10 @@ namespace EvaporativeCoolers {
 			IECOperatingStatus( 0 ),
 			IterationLimit( 0 ),
 			IterationFailed( 0 ),
-			EvapCoolerRDDOperatingMode( 0 )
+			EvapCoolerRDDOperatingMode( 0 ),
+			FaultyEvapCoolerFoulingFlag( false ),
+			FaultyEvapCoolerFoulingIndex( 0 ),
+			FaultyEvapCoolerFoulingFactor( 1.0 )
 		{}
 
 	};

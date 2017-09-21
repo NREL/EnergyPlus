@@ -3,13 +3,13 @@
 
 // Array1: 1D Array Abstract Base Class
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -82,22 +82,25 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
+	typedef  void  iterator_category; // Prevent compile failure when std::distance is in scope
+
 	using Super::isize;
 	using Super::npos;
 	using Super::overlap;
-	using Super::shift_set;
 	using Super::size;
+
+protected: // Types
+
+	using Super::shift_set;
 	using Super::size_of;
 	using Super::slice_k;
 	using Super::swapB;
+
 	using Super::capacity_;
 	using Super::data_;
 	using Super::sdata_;
 	using Super::shift_;
 	using Super::size_;
-
-	// Types to prevent compile failure when std::distance is in scope
-	typedef  void  iterator_category;
 
 protected: // Creation
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -287,8 +287,9 @@ TEST_F( EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning )
 		"  ZoneHVAC:IdealLoadsAirSystem,",
 		"    SPACE4-1 AirSys, !- Name",
 		"    ,                        !- Availability Schedule Name",
-		"    IdealLoadInNode,        !- Zone Supply Air Node Name",
-		"    IdealLoadOutNode,                        !- Zone Exhaust Air Node Name",
+		"    IdealLoadInNode,         !- Zone Supply Air Node Name",
+		"    IdealLoadOutNode,        !- Zone Exhaust Air Node Name",
+		"    ,                        !- System Inlet Air Node Name",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}",
@@ -959,8 +960,9 @@ TEST_F( EnergyPlusFixture, HPWHSizing )
 		"  ZoneHVAC:IdealLoadsAirSystem,",
 		"    SPACE4-1 AirSys, !- Name",
 		"    ,                        !- Availability Schedule Name",
-		"    IdealLoadInNode,        !- Zone Supply Air Node Name",
-		"    IdealLoadOutNode,                        !- Zone Exhaust Air Node Name",
+		"    IdealLoadInNode,         !- Zone Supply Air Node Name",
+		"    IdealLoadOutNode,        !- Zone Exhaust Air Node Name",
+		"    ,                        !- System Inlet Air Node Name",
 		"    50,                      !- Maximum Heating Supply Air Temperature {C}",
 		"    13,                      !- Minimum Cooling Supply Air Temperature {C}",
 		"    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}",

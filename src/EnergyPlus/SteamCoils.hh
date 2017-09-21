@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -153,6 +153,9 @@ namespace SteamCoils {
 		Real64 OperatingCapacity; // capacity of steam coil at operating conditions (W)
 		bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
+		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
+		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
+		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
 		// Default Constructor
 		SteamCoilEquipConditions() :
@@ -207,7 +210,10 @@ namespace SteamCoils {
 			Coil_PlantTypeNum( 0 ),
 			OperatingCapacity( 0.0 ),
 			DesiccantRegenerationCoil( false ),
-			DesiccantDehumNum( 0 )
+			DesiccantDehumNum( 0 ),
+			FaultyCoilSATFlag( false ),
+			FaultyCoilSATIndex( 0 ),
+			FaultyCoilSATOffset( 0.0 )
 		{}
 
 	};

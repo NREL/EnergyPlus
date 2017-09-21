@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -205,6 +205,94 @@ namespace EnergyPlus {
 		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
 		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType );
 
+	}
+
+	TEST_F( EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest ) {
+		std::string const idf_objects = delimited_string( {
+		"  Version,8.6;",
+
+		"  Coil:Cooling:Water,",
+		"    Main Cooling Coil 1,     !- Name",
+		"    CoolingCoilAvailSched,   !- Availability Schedule Name",
+		"    autosize,                !- Design Water Flow Rate {m3/s}",
+		"    autosize,                !- Design Air Flow Rate {m3/s}",
+		"    autosize,                !- Design Inlet Water Temperature {C}",
+		"    autosize,                !- Design Inlet Air Temperature {C}",
+		"    autosize,                !- Design Outlet Air Temperature {C}",
+		"    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+		"    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+		"    CCoil Water Inlet Node,  !- Water Inlet Node Name",
+		"    CCoil Water Outlet Node, !- Water Outlet Node Name",
+		"    Mixed Air Node 1,        !- Air Inlet Node Name",
+		"    CCoil Air Outlet Node,   !- Air Outlet Node Name",
+		"    SimpleAnalysis,          !- Type of Analysis",
+		"    CrossFlow;               !- Heat Exchanger Configuration",
+
+		"  Schedule:Compact,",
+		"   CoolingCoilAvailSched,	  !- Name",
+		"	Fraction,			      !- Schedule Type Limits Name",
+		"	Through: 12/31,		      !- Field 1",
+		"	For: AllDays,		      !- Field 2",
+		"	Until: 24:00, 1.0;        !- Field 3",
+
+		"  Controller:WaterCoil,",
+		"    Cooling Coil Contoller,  !- Name",
+		"    HumidityRatio,           !- Control Variable",
+		"    Reverse,                 !- Action",
+		"    FLOW,                    !- Actuator Variable",
+		"    CCoil Air Outlet Node,   !- Sensor Node Name",
+		"    CCoil Water Inlet Node,  !- Actuator Node Name",
+		"    autosize,                !- Controller Convergence Tolerance {deltaC}",
+		"    autosize,                !- Maximum Actuated Flow {m3/s}",
+		"    0.0;                     !- Minimum Actuated Flow {m3/s}",
+
+		"  SetpointManager:Scheduled,",
+		"    CCoil Temp Setpoint Mgr, !- Name",
+		"    Temperature,             !- Control Variable",
+		"    Always 16,               !- Schedule Name",
+		"    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
+
+		"  Schedule:Compact,",
+		"    Always 16,               !- Name",
+		"    Temperature,             !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00,16;         !- Field 3",
+
+		"  SetpointManager:Scheduled,",
+		"    CCoil Hum Setpoint Mgr,  !- Name",
+		"    MaximumHumidityRatio,    !- Control Variable",
+		"    HumSetPt,                !- Schedule Name",
+		"    CCoil Air Outlet Node;   !- Setpoint Node or NodeList Name",
+
+		"  Schedule:Compact,",
+		"    HumSetPt,                !- Name",
+		"    AnyNumber,               !- Schedule Type Limits Name",
+		"    Through: 12/31,          !- Field 1",
+		"    For: AllDays,            !- Field 2",
+		"    Until: 24:00, 0.009;     !- Field 3",
+
+		"  AirLoopHVAC:ControllerList,",
+		"	CW Coil Controller,       !- Name",
+		"	Controller:WaterCoil,     !- Controller 1 Object Type",
+		"	Cooling Coil Contoller;   !- Controller 1 Name",
+		});
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetSetPointManagerInputs();
+		// There are two setpoint managers and are schedule type 	
+		ASSERT_EQ( 2, NumSchSetPtMgrs ); // 2 schedule set point managers
+		ASSERT_EQ( 2, NumAllSetPtMgrs );  // 2 all set point managers
+		// check specified control variable types 	
+		ASSERT_EQ( iTemperature, AllSetPtMgr( 1 ).CtrlTypeMode ); // is "Temperature"
+		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 2 ).CtrlTypeMode ); // is "MaximumHumidityRatio"
+
+		GetControllerInput();
+		// check ControllerProps control variable is set to "MaximumHumidityRatio"
+		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
+		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType ); // MaximumHumidityRatio
+			
 	}
 
 }

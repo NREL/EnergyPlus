@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -57,14 +57,15 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <DataAirSystems.hh>
 #include <DataSizing.hh>
 #include <SimAirServingZones.hh>
 #include <MixedAir.hh>
 #include <UtilityRoutines.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataAirSystems;
@@ -157,4 +158,149 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff ) {
+		int CtrlZoneNum = 1;
+		FinalZoneSizing.allocate( 1 );
+
+		// Test case 1, low OA, low zoneventilationeff, no change in SysCoolingEv
+		Real64 StartingDesCoolVolFlow = 1.0;
+		Real64 StartingDesCoolVolFlowMin = 0.2;
+		Real64 UncorrectedOAFlow = 0.1;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = StartingDesCoolVolFlow;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+		FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = 0.0;
+		FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.5;
+		Real64 Xs = 0.25; // uncorrected system outdoor air fraction
+		Real64 VozClg = UncorrectedOAFlow; // corrected (for ventilation efficiency) zone outside air flow rate [m3/s] 
+		Real64 ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
+
+		Real64 SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before call to LimitZoneVentEff)
+		Real64 StartingSysCoolingEv = SysCoolingEv;
+		LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+		EXPECT_EQ( StartingSysCoolingEv, SysCoolingEv );
+		EXPECT_EQ( StartingDesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
+		EXPECT_EQ( StartingDesCoolVolFlowMin, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin );
+
+		// Test case 2, low OA, high zoneventilationeff, increase SysCoolingEv and DesCoolVolFlowMin
+		StartingDesCoolVolFlow = 1.0;
+		StartingDesCoolVolFlowMin = 0.2;
+		UncorrectedOAFlow = 0.1;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = StartingDesCoolVolFlow;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+		FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = 0.0;
+		FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.9;
+		Xs = 0.25; // uncorrected system outdoor air fraction
+		VozClg = UncorrectedOAFlow; // corrected (for ventilation efficiency) zone outside air flow rate [m3/s] 
+		ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
+
+		SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before call to LimitZoneVentEff)
+		StartingSysCoolingEv = SysCoolingEv;
+		LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+		EXPECT_EQ( FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff, SysCoolingEv );
+		EXPECT_EQ( StartingDesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
+		EXPECT_NEAR( 0.2857, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 0.001 );
+
+		// Test case 3, high OA, high zoneventilationeff, increase SysCoolingEv, DesCoolVolFlowMin, and DesCoolVolFlow
+		StartingDesCoolVolFlow = 1.0;
+		StartingDesCoolVolFlowMin = 0.8;
+		UncorrectedOAFlow = 0.8;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = StartingDesCoolVolFlow;
+		FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = StartingDesCoolVolFlowMin;
+		FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation = 0.0;
+		FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.9;
+		Xs = 0.25; // uncorrected system outdoor air fraction
+		VozClg = UncorrectedOAFlow; // corrected (for ventilation efficiency) zone outside air flow rate [m3/s] 
+		ZoneOAFrac = UncorrectedOAFlow / StartingDesCoolVolFlowMin; // zone OA fraction
+
+		SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before call to LimitZoneVentEff)
+		StartingSysCoolingEv = SysCoolingEv;
+		LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+		EXPECT_EQ( FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff, SysCoolingEv );
+		EXPECT_NEAR( 2.2857, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, 0.001 );
+		EXPECT_NEAR( 2.2857, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 0.001 );
+
+
+	}
+
+	TEST_F( EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1 ) {
+		// this unit test is related to issue #5835
+		// when system capacit is hard sized user input
+		int AirLoopNum( 0 ); // index of air loops
+		Real64 ScaledCoolDesignFlowRate( 0.0 ); //system cooling design flow rate
+		Real64 ScaledHeatDesignFlowRate( 0.0 ); //system heating design flow rate
+
+		AirLoopNum = 1;
+		CalcSysSizing.allocate( AirLoopNum );
+		FinalSysSizing.allocate( AirLoopNum );
+		
+		// set system flow sizing method for cooling
+		FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+		FinalSysSizing( AirLoopNum ).CoolingCapMethod = CoolingDesignCapacity;
+		FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity = 12500.0;
+		FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity = 0.00006041;
+		// scale cooling flow rate using user input capacity
+		ScaledCoolDesignFlowRate = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.755125, ScaledCoolDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.755125, FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow );
+
+		// set system flow sizing method for heating
+		FinalSysSizing( AirLoopNum ).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+		FinalSysSizing( AirLoopNum ).HeatingCapMethod = HeatingDesignCapacity;
+		FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity = 14400.0;
+		FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity = 0.00006041;
+		// scale heating flow rate using user input capacity
+		ScaledHeatDesignFlowRate = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.869904, ScaledHeatDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.869904, FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow );
+
+	}
+
+	TEST_F( EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2 ) {
+		// this unit test is related to issue #5835
+		// when system capacity is scaled using floor area
+		int AirLoopNum( 0 ); // index of air loops
+		Real64 ScaledCoolDesignFlowRate( 0.0 ); // system cooling design flow rate
+		Real64 ScaledHeatDesignFlowRate( 0.0 ); // system heating design flow rate
+		Real64 ScaledCoolDesignCapacity( 0.0 ); // system cooling design capacity
+		Real64 ScaledHeatDesignCapacity( 0.0 ); // system heating design capacity
+
+		AirLoopNum = 1;
+		CalcSysSizing.allocate( AirLoopNum );
+		FinalSysSizing.allocate( AirLoopNum );
+
+		// set system flow sizing method for cooling
+		FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
+		FinalSysSizing( AirLoopNum ).CoolingCapMethod = CapacityPerFloorArea;
+		FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity = 10.4732; // Watts per m2 floor area
+		FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity = 0.00006041;
+		FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 61.450534421531373;
+		// scale cooling capacity using floor area
+		ScaledCoolDesignCapacity = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+		ScaledCoolDesignFlowRate = FinalSysSizing( AirLoopNum ).FlowPerCoolingCapacity * ScaledCoolDesignCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.038878893558427413, ScaledCoolDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.038878893558427413, FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow );
+
+		// set system flow sizing method for heating
+		FinalSysSizing( AirLoopNum ).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
+		FinalSysSizing( AirLoopNum ).HeatingCapMethod = CapacityPerFloorArea;
+		FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity = 32.0050; // Watts per m2 floor area
+		FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity = 0.00006041;
+		FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 61.450534421531373;
+		// scale heating capacity using floor area
+		ScaledHeatDesignCapacity = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
+		ScaledHeatDesignFlowRate = FinalSysSizing( AirLoopNum ).FlowPerHeatingCapacity * ScaledHeatDesignCapacity;
+		// do scaleable flow sizing
+		UpdateSysSizingForScalableInputs( AirLoopNum );
+		EXPECT_DOUBLE_EQ( 0.11880981823487276, ScaledHeatDesignFlowRate );
+		EXPECT_DOUBLE_EQ( 0.11880981823487276, FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow );
+
+	}
+
 }
+

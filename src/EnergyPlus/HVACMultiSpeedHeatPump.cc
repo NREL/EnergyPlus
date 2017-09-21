@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -144,7 +144,6 @@ namespace HVACMultiSpeedHeatPump {
 	using DataHVACGlobals::SmallLoad;
 	using DataHVACGlobals::DXElecCoolingPower;
 	using DataHVACGlobals::DXElecHeatingPower;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::ElecHeatingCoilPower;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
@@ -372,7 +371,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
-		FanElecPower = 0.0;
 		DXElecHeatingPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		SaveCompressorPLR = 0.0;
@@ -480,16 +478,18 @@ namespace HVACMultiSpeedHeatPump {
 		}
 
 		MSHeatPump( MSHeatPumpNum ).AuxElecPower = MSHeatPump( MSHeatPumpNum ).AuxOnCyclePower * SaveCompressorPLR + MSHeatPump( MSHeatPumpNum ).AuxOffCyclePower * ( 1.0 - SaveCompressorPLR );
+		Real64 locFanElecPower = 0.0;
+		locFanElecPower = Fans::GetFanPower( MSHeatPump( MSHeatPumpNum ).FanNum );
 		if ( MSHeatPump( MSHeatPumpNum ).HeatCoilType != MultiSpeedHeatingCoil ) {
 			{ auto const SELECT_CASE_var( MSHeatPump( MSHeatPumpNum ).HeatCoilType );
 			if ( ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) || ( SELECT_CASE_var == Coil_HeatingElectric_MultiStage ) ) {
-				MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
+				MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
 			} else if ( ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) {
-				MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower;
+				MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower;
 			} else {
 			}}
 		} else {
-			MSHeatPump( MSHeatPumpNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + MSHeatPump( MSHeatPumpNum ).AuxElecPower;
+			MSHeatPump( MSHeatPumpNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + MSHeatPump( MSHeatPumpNum ).AuxElecPower;
 		}
 
 	}
@@ -1493,28 +1493,28 @@ namespace HVACMultiSpeedHeatPump {
 
 		for ( MSHPNum = 1; MSHPNum <= NumMSHeatPumps; ++MSHPNum ) {
 			// Setup Report Variables for MSHP Equipment
-			SetupOutputVariable( "Unitary System Ancillary Electric Power [W]", MSHeatPump( MSHPNum ).AuxElecPower, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Cooling Ancillary Electric Energy [J]", MSHeatPumpReport( MSHPNum ).AuxElecCoolConsumption, "System", "Sum", MSHeatPump( MSHPNum ).Name, _, "Electric", "Cooling", _, "System" );
-			SetupOutputVariable( "Unitary System Heating Ancillary Electric Energy [J]", MSHeatPumpReport( MSHPNum ).AuxElecHeatConsumption, "System", "Sum", MSHeatPump( MSHPNum ).Name, _, "Electric", "Heating", _, "System" );
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", MSHeatPump( MSHPNum ).FanPartLoadRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Compressor Part Load Ratio []", MSHeatPump( MSHPNum ).CompPartLoadRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Electric Power [W]", MSHeatPump( MSHPNum ).ElecPower, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Electric Energy [J]", MSHeatPumpReport( MSHPNum ).ElecPowerConsumption, "System", "Sum", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System DX Coil Cycling Ratio []", MSHeatPumpReport( MSHPNum ).CycRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System DX Coil Speed Ratio []", MSHeatPumpReport( MSHPNum ).SpeedRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System DX Coil Speed Level []", MSHeatPumpReport( MSHPNum ).SpeedNum, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Total Cooling Rate [W]", MSHeatPump( MSHPNum ).TotCoolEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Total Heating Rate [W]", MSHeatPump( MSHPNum ).TotHeatEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Sensible Cooling Rate [W]", MSHeatPump( MSHPNum ).SensCoolEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Sensible Heating Rate [W]", MSHeatPump( MSHPNum ).SensHeatEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Latent Cooling Rate [W]", MSHeatPump( MSHPNum ).LatCoolEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
-			SetupOutputVariable( "Unitary System Latent Heating Rate [W]", MSHeatPump( MSHPNum ).LatHeatEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Ancillary Electric Power", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).AuxElecPower, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Cooling Ancillary Electric Energy", OutputProcessor::Unit::J, MSHeatPumpReport( MSHPNum ).AuxElecCoolConsumption, "System", "Sum", MSHeatPump( MSHPNum ).Name, _, "Electric", "Cooling", _, "System" );
+			SetupOutputVariable( "Unitary System Heating Ancillary Electric Energy", OutputProcessor::Unit::J, MSHeatPumpReport( MSHPNum ).AuxElecHeatConsumption, "System", "Sum", MSHeatPump( MSHPNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", OutputProcessor::Unit::None, MSHeatPump( MSHPNum ).FanPartLoadRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Compressor Part Load Ratio", OutputProcessor::Unit::None, MSHeatPump( MSHPNum ).CompPartLoadRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Electric Power", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).ElecPower, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Electric Energy", OutputProcessor::Unit::J, MSHeatPumpReport( MSHPNum ).ElecPowerConsumption, "System", "Sum", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System DX Coil Cycling Ratio", OutputProcessor::Unit::None, MSHeatPumpReport( MSHPNum ).CycRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System DX Coil Speed Ratio", OutputProcessor::Unit::None, MSHeatPumpReport( MSHPNum ).SpeedRatio, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System DX Coil Speed Level", OutputProcessor::Unit::None, MSHeatPumpReport( MSHPNum ).SpeedNum, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Total Cooling Rate", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).TotCoolEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Total Heating Rate", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).TotHeatEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Sensible Cooling Rate", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).SensCoolEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Sensible Heating Rate", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).SensHeatEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Latent Cooling Rate", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).LatCoolEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+			SetupOutputVariable( "Unitary System Latent Heating Rate", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).LatHeatEnergyRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
 			if ( MSHeatPump( MSHPNum ).HeatRecActive ) {
-				SetupOutputVariable( "Unitary System Heat Recovery Rate [W]", MSHeatPump( MSHPNum ).HeatRecoveryRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
-				SetupOutputVariable( "Unitary System Heat Recovery Inlet Temperature [C]", MSHeatPump( MSHPNum ).HeatRecoveryInletTemp, "System", "Average", MSHeatPump( MSHPNum ).Name );
-				SetupOutputVariable( "Unitary System Heat Recovery Outlet Temperature [C]", MSHeatPump( MSHPNum ).HeatRecoveryOutletTemp, "System", "Average", MSHeatPump( MSHPNum ).Name );
-				SetupOutputVariable( "Unitary System Heat Recovery Fluid Mass Flow Rate [kg/s]", MSHeatPump( MSHPNum ).HeatRecoveryMassFlowRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
-				SetupOutputVariable( "Unitary System Heat Recovery Energy [J]", MSHeatPumpReport( MSHPNum ).HeatRecoveryEnergy, "System", "Sum", MSHeatPump( MSHPNum ).Name );
+				SetupOutputVariable( "Unitary System Heat Recovery Rate", OutputProcessor::Unit::W, MSHeatPump( MSHPNum ).HeatRecoveryRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+				SetupOutputVariable( "Unitary System Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, MSHeatPump( MSHPNum ).HeatRecoveryInletTemp, "System", "Average", MSHeatPump( MSHPNum ).Name );
+				SetupOutputVariable( "Unitary System Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, MSHeatPump( MSHPNum ).HeatRecoveryOutletTemp, "System", "Average", MSHeatPump( MSHPNum ).Name );
+				SetupOutputVariable( "Unitary System Heat Recovery Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, MSHeatPump( MSHPNum ).HeatRecoveryMassFlowRate, "System", "Average", MSHeatPump( MSHPNum ).Name );
+				SetupOutputVariable( "Unitary System Heat Recovery Energy", OutputProcessor::Unit::J, MSHeatPumpReport( MSHPNum ).HeatRecoveryEnergy, "System", "Sum", MSHeatPump( MSHPNum ).Name );
 			}
 		}
 
@@ -2426,7 +2426,7 @@ namespace HVACMultiSpeedHeatPump {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using DataGlobals::WarmupFlag;
@@ -2556,7 +2556,7 @@ namespace HVACMultiSpeedHeatPump {
 			if ( ( QZnReq > 0.0 && QZnReq <= LowOutput ) || ( QZnReq < 0.0 && QZnReq >= LowOutput ) ) {
 				SpeedRatio = 0.0;
 				SpeedNum = 1;
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountCyc == 0 ) {
@@ -2593,7 +2593,7 @@ namespace HVACMultiSpeedHeatPump {
 					}
 				}
 				Par( 8 ) = SpeedNum;
-				SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
+				SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
 						if ( ErrCountVar == 0 ) {
@@ -2630,7 +2630,7 @@ namespace HVACMultiSpeedHeatPump {
 					CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 					SpeedRatio = 0.0;
 					if ( ( QZnReq > 0.0 && QZnReq <= LowOutput ) || ( QZnReq < 0.0 && QZnReq >= LowOutput ) ) {
-						SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
+						SolveRoot( ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par );
 						if ( SolFla == -1 ) {
 							if ( ! WarmupFlag ) {
 								if ( ErrCountCyc == 0 ) {
@@ -2660,7 +2660,7 @@ namespace HVACMultiSpeedHeatPump {
 						CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 1.0, 1.0, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 						if ( ( QZnReq > 0.0 && QZnReq <= FullOutput ) || ( QZnReq < 0.0 && QZnReq >= FullOutput ) ) {
 							Par( 8 ) = SpeedNum;
-							SolveRegulaFalsi( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
+							SolveRoot( ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( ErrCountVar == 0 ) {
@@ -3453,7 +3453,7 @@ namespace HVACMultiSpeedHeatPump {
 		using WaterCoils::SimulateWaterCoilComponents;
 		using SteamCoils::SimulateSteamCoilComponents;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::SmallLoad;
 
@@ -3553,7 +3553,7 @@ namespace HVACMultiSpeedHeatPump {
 							Par( 2 ) = 0.0;
 						}
 						Par( 3 ) = HeatingLoad;
-						SolveRegulaFalsi( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
+						SolveRoot( ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par );
 						if ( SolFlag == -1 ) {
 							if ( MSHeatPump( MSHeatPumpNum ).HotWaterCoilMaxIterIndex == 0 ) {
 								ShowWarningMessage( "CalcNonDXHeatingCoils: Hot water coil control failed for " + CurrentModuleObject + "=\"" + MSHeatPump( MSHeatPumpNum ).Name + "\"" );

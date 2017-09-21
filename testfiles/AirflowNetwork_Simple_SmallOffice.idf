@@ -132,7 +132,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -1937,7 +1937,6 @@
     AirflowNetwork_All,      !- Name
     MultizoneWithDistributionOnlyDuringFanOperation,  !- AirflowNetwork Control
     SurfaceAverageCalculation,  !- Wind Pressure Coefficient Type
-    ,                        !- AirflowNetwork Wind Pressure Coefficient Array Name
     ,                        !- Height Selection for Local Wind Pressure Calculation
     LowRise,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
@@ -2290,7 +2289,7 @@
     0.2827,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2300,7 +2299,7 @@
     0.2827,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     0.01,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2310,7 +2309,7 @@
     0.1256,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     4.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2320,7 +2319,7 @@
     0.1195,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     4.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2330,7 +2329,7 @@
     0.1521,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2340,7 +2339,7 @@
     0.1963,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2350,7 +2349,7 @@
     0.1809,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2360,7 +2359,7 @@
     0.2376,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
     1.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.772,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.772,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2370,7 +2369,7 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     30.00,                   !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.001,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Duct,
@@ -2380,7 +2379,7 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.001,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
 ! RETURN CONNECTION
@@ -2392,7 +2391,7 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.001,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
 ! SUPPLY CONNECTION
@@ -2404,7 +2403,7 @@
     0.7854,                  !- Cross Section Area {m2}
     0.0001,                  !- Surface Roughness {m}
     1.00,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
-    0.001,                   !- Overall Heat Transmittance Coefficient (U-Factor) from Air to Air {W/m2-K}
+    0.001,                   !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0001;                  !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
 
   AirflowNetwork:Distribution:Component:Fan,

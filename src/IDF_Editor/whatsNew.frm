@@ -90,6 +90,23 @@ End Sub
 Private Sub Form_Load()
 Dim t As String
 t = ""
+t = t & "New Features of IDF Editor Version 1.50" & vbCrLf
+t = t & "-------------------------------------------------------------------------------" & vbCrLf
+t = t & "New 'Duplicate Object and Change' menu item under Edit and 'Dup Obj + Chg' toolbar item. This will duplicate the currently selected object and for " _
+      & "each field in the object replace any text with new text. The original suggested text for change is based on the name of the object. This is " _
+      & "especially useful for HVAC related objects when the node names are based on some of the same text as the name of the object." & vbCrLf & vbCrLf
+
+t = t & "New Features of IDF Editor Version 1.49" & vbCrLf
+t = t & "-------------------------------------------------------------------------------" & vbCrLf
+t = t & "In EDIT .. VALIDITY CHECK now have an option to IGNORE MACROS which will not perform validity checking on fields that contain characters " _
+      & "typically used for macros:  # [ @ $ = " & vbCrLf & vbCrLf
+      
+t = t & "Allow multiple objects to be duplicated or deleted at the same time when multiple columns are selected." & vbCrLf & vbCrLf
+
+t = t & "New Features of IDF Editor Version 1.48" & vbCrLf
+t = t & "-------------------------------------------------------------------------------" & vbCrLf
+t = t & "Added warning when trying to open file with Unix file line endings." & vbCrLf & vbCrLf
+
 t = t & "New Features of IDF Editor Version 1.44" & vbCrLf
 t = t & "-------------------------------------------------------------------------------" & vbCrLf
 t = t & "The new JUMP menu allows you to easily navigate between fields in different objects that are using the same name. For example, it can be " _
@@ -151,15 +168,15 @@ End Sub
 
 '     NOTICE
 '
-'     The contents of this file are subject to the EnergyPlus Open Source License 
-'     Version 1.0 (the "License"); you may not use this file except in compliance 
-'     with the License. You may obtain a copy of the License at 
+'     The contents of this file are subject to the EnergyPlus Open Source License
+'     Version 1.0 (the "License"); you may not use this file except in compliance
+'     with the License. You may obtain a copy of the License at
 '
 '     http://apps1.eere.energy.gov/buildings/energyplus/energyplus_licensing.cfm
 '
-'     Software distributed under the License is distributed on an "AS IS" basis, 
-'     WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for 
-'     the specific language governing rights and limitations under the License. 
+'     Software distributed under the License is distributed on an "AS IS" basis,
+'     WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
+'     the specific language governing rights and limitations under the License.
 '
 '     Copyright © 1996-2014 GARD Analytics.  All rights reserved.
 '

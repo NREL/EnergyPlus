@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -47,6 +47,10 @@
 #ifndef FanCoilUnits_hh_INCLUDED
 #define FanCoilUnits_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+#include <string>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -54,6 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -209,13 +214,13 @@ namespace FanCoilUnits {
 		Real64 MinSATempCooling; // ASHRAE90.1 maximum supply air temperature in Cooling mode
 		Real64 MaxSATempHeating; // ASHRAE90.1 maximum supply air temperature in Heating mode
 		bool ASHRAETempControl; // ASHRAE90.1 control to temperature set point when true
-		Real64 QUnitOutNoHC; // unit output when no active heating or cooling [W]
+		Real64 QUnitOutNoHC; // unit output with coils off [W]
 		Real64 QUnitOutMaxH; // unit output at maximum heating [W]
 		Real64 QUnitOutMaxC; // unit output at maximum cooling [W]
-		int LimitErrCountH; // count of SolveRegulaFalsi limit errors
-		int LimitErrCountC; // count of SolveRegulaFalsi limit errors
-		int ConvgErrCountH; // count of SolveRegulaFalsi iteration limit errors
-		int ConvgErrCountC; // count of SolveRegulaFalsi iteration limit errors
+		int LimitErrCountH; // count of SolveRoot limit errors
+		int LimitErrCountC; // count of SolveRoot limit errors
+		int ConvgErrCountH; // count of SolveRoot iteration limit errors
+		int ConvgErrCountC; // count of SolveRoot iteration limit errors
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
 		Real64 HeatEnergy; // unit heating output in J

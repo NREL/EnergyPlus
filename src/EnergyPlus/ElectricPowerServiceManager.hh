@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -165,7 +165,7 @@ public: // Methods
 	ACtoDCConverter( std::string const & objectName );
 
 	void
-	simulate( Real64 const powerOutFromConverter ); 
+	simulate( Real64 const powerOutFromConverter );
 
 	void
 	reinitAtBeginEnvironment();
@@ -182,7 +182,7 @@ public: // Methods
 	Real64
 	dCEnergyOut() const;
 
-	Real64 
+	Real64
 	aCPowerIn() const;
 
 	Real64
@@ -225,7 +225,7 @@ private: // data
 	ThermalLossDestination heatLossesDestination_;
 	int zoneNum_; // destination zone for heat losses from inverter.
 	Real64 zoneRadFract_; // radiative fraction for thermal losses to zone
-	Real64 standbyPower_; 
+	Real64 standbyPower_;
 	Real64 maxPower_;
 
 };
@@ -301,7 +301,7 @@ public: //methods
 private: //methods
 
 	void
-	simulateSimpleBucketModel( // request charge discharge and 
+	simulateSimpleBucketModel( // request charge discharge and
 		Real64 & powerCharge,
 		Real64 & powerDischarge,
 		bool & charging,
@@ -539,7 +539,7 @@ public: // Method
 	simGeneratorGetPowerOutput(
 		bool const runFlag, //true if generator is on
 		Real64 const myElecLoadRequest, //target electric power production request
-		bool const FirstHVACIteration, // 
+		bool const FirstHVACIteration, //
 		Real64 & electricPowerOutput, // Actual generator electric power output
 		Real64 & thermalPowerOutput // Actual generator thermal power output
 	);
@@ -583,7 +583,7 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 	Real64 electProdRate; // Current AC Electric Production Rate from Equipment (W)
 	Real64 thermalProd; // Current Thermal energy Produced from Equipment (J)
 	Real64 thermProdRate; // Current Thermal energy Production Rate from Equipment (W)
-	
+
 private:
 
 	int errCountNegElectProd_; // error count for reccuring error when generators produce negative electric power
@@ -649,7 +649,7 @@ public: // data public for unit test
 		dCBussInverterDCStorage,
 		dCBussInverterACStorage
 	};
-	
+
 	std::unique_ptr< ElectricStorage > storageObj;
 	std::unique_ptr< ACtoDCConverter > converterObj;
 	std::unique_ptr< ElectricTransformer > transformerObj;
@@ -661,11 +661,11 @@ public: // data public for unit test
 	bool inverterPresent;
 	std::string inverterName; // hold name for verificaton and error messages
 	std::unique_ptr< DCtoACInverter > inverterObj;
-	Real64 subpanelFeedInRequest; 
+	Real64 subpanelFeedInRequest;
 	// subpanel terms, interact with main panel
 	Real64 subpanelFeedInRate; // Current AC electric power fed into main panel by load center, adjusted by inverter if any (W)
 	Real64 subpanelDrawRate; // Current AC electric power draw from main panel into load center (W)
-	// storage operation terms, 
+	// storage operation terms,
 	Real64 genElectricProd; // Current electric produced by generators in the load center, DC or AC (J)
 	Real64 genElectProdRate; // Current electric power produced by generators in the load center, DC or AC (W)
 	Real64 storOpCVGenRate; // power from generators (and maybe inverter) going into storage operation control volume, DC or AC ( W )
@@ -712,13 +712,13 @@ private: // data
 	Real64 dCpowerConditionLosses_; // current DC to AC inverter losses (W) (if DCbussInverter)
 	bool storagePresent_;
 	std::string storageName_; // hold name for verificaton and error messages
-	bool transformerPresent_; // should only be transformers for on-site load center, not facility service 
+	bool transformerPresent_; // should only be transformers for on-site load center, not facility service
 	std::string transformerName_; // hold name for verificaton and error messages
 	Real64 totalPowerRequest_; // Total electric power request from the load center (W)
 	Real64 totalThermalPowerRequest_; // Total thermal power request from the load center (W)
 	StorageOpScheme storageScheme_; // what options are available for charging storage.
 	std::string trackSorageOpMeterName_; // user name for a specific meter
-	int trackStorageOpMeterIndex_; // points to meter being 
+	int trackStorageOpMeterIndex_; // points to meter being
 	bool converterPresent_;
 	std::string converterName_;
 	Real64 maxStorageSOCFraction_; // Fraction of storage capacity used as upper limit for controlling charging (don't overcharge the batteries)

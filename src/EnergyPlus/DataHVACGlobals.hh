@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -63,6 +63,13 @@ namespace DataHVACGlobals {
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
+	enum class HVACSystemRootSolverAlgorithm : int {
+		RegulaFalsi = 0,
+		Bisection,
+		RegulaFalsiThenBisection,
+		BisectionThenRegulaFalsi,
+		Alternation
+	};
 
 	// MODULE PARAMETER DEFINITIONS:
 
@@ -76,6 +83,7 @@ namespace DataHVACGlobals {
 	extern Real64 const BlankNumeric; // indicates numeric input field was blank
 	extern Real64 const RetTempMax; // maximum return air temperature [deg C]
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
+	extern Real64 const DesCoilHWInletTempMin; // minimum heating water coil water inlet temp for UA sizing only. [deg C] 
 
 	extern int const NumOfSizingTypes; // request sizing for cooling air flow rate
 
@@ -106,8 +114,10 @@ namespace DataHVACGlobals {
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
 	extern int const ZoneCoolingLoadSizing; // zone cooling sensible load (zsz file)
 	extern int const ZoneHeatingLoadSizing; // zome heating sensible load (zsz file)
-	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
+	extern int const MinSATempCoolingSizing; // minimum SA temperature in cooling
+	extern int const MaxSATempHeatingSizing; // maximum SA temperature in heating
+	extern int const ASHRAEMinSATCoolingSizing; // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
+	extern int const ASHRAEMaxSATHeatingSizing; // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
 	extern int const HeatingCoilDesAirInletTempSizing; // design inlet air temperature for heating coil
 	extern int const HeatingCoilDesAirOutletTempSizing; // design outlet air temperature for heating coil
 	extern int const HeatingCoilDesAirInletHumRatSizing; // design inlet air humidity ratio for heating coil
@@ -144,6 +154,8 @@ namespace DataHVACGlobals {
 	extern int const FanType_SimpleOnOff;
 	extern int const FanType_ZoneExhaust;
 	extern int const FanType_ComponentModel; // cpw22Aug2010 (new)
+	extern int const FanType_SystemModelObject; // 
+
 	// Fan Minimum Flow Fraction Input Method
 	extern int const MinFrac;
 	extern int const FixedMin;
@@ -293,6 +305,8 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	extern Real64 const OscillateMagnitude;
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	extern int const Bisection;
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -315,7 +329,6 @@ namespace DataHVACGlobals {
 	extern int NumElecCircuits; // Number of electric circuits specified in simulation
 	extern int NumGasMeters; // Number of gas meters specified in simulation
 	extern int NumPrimaryAirSys; // Number of primary HVAC air systems
-	extern Real64 FanElecPower; // fan power from last fan simulation
 	extern Real64 OnOffFanPartLoadFraction; // fan part-load fraction (Fan:OnOff)
 	extern Real64 DXCoilTotalCapacity; // DX coil total cooling capacity (eio report var for HPWHs)
 	extern Real64 DXElecCoolingPower; // Electric power consumed by DX cooling coil last DX simulation
@@ -341,6 +354,7 @@ namespace DataHVACGlobals {
 	extern Real64 HPWHCrankcaseDBTemp; // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
 	extern bool AirLoopInit; // flag for whether InitAirLoops has been called
 	extern bool AirLoopsSimOnce; // True means that the air loops have been simulated once in this environment
+	extern bool GetAirPathDataDone; // True means that air loops inputs have been processed
 
 	// Hybrid ventilation control part
 	extern int NumHybridVentSysAvailMgrs; // Number of hybrid ventilation control
@@ -488,10 +502,26 @@ namespace DataHVACGlobals {
 
 	};
 
+	struct HVACSystemRootFindingAlgorithm
+	{
+		// Members
+		std::string Algorithm;           // Choice of algorithm
+		int NumOfIter;                   // Number of Iteration Before Algorith Switch
+		HVACSystemRootSolverAlgorithm HVACSystemRootSolver; //1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
+										 // Default Constructor
+		HVACSystemRootFindingAlgorithm( ) :
+			NumOfIter( 5 ),
+			HVACSystemRootSolver( HVACSystemRootSolverAlgorithm::RegulaFalsi )
+		{}
+
+	};
+
+
 	// Object Data
 	extern Array1D< ZoneCompTypeData > ZoneComp;
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
+	extern HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.

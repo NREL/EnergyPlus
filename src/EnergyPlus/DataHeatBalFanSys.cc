@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -140,6 +140,7 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > MCPTM; // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
 	Array1D< Real64 > MCPE; // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
 	Array1D< Real64 > EAMFL; // OUTDOOR AIR MASS FLOW for EarthTube
+	Array1D< Real64 > EAMFLxHumRat; // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
 	Array1D< Real64 > MCPTE; // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
 	Array1D< Real64 > MCPC; // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
 	Array1D< Real64 > CTMFL; // OUTDOOR AIR MASS FLOW for cooltower
@@ -173,7 +174,7 @@ namespace DataHeatBalFanSys {
 	//REAL Variables for the Heat Balance Simulation
 
 	Array1D< Real64 > QRadSysSource; // Current source/sink for a particular surface (radiant sys)
-	Array1D< Real64 > TCondFDSourceNode; // Temperature of sourc/sink location in surface from CondFD algo
+	Array1D< Real64 > TCondFDSourceNode; // Temperature of source/sink location in surface from CondFD algo
 	Array1D< Real64 > QPVSysSource; // Current source/sink for a surface (integrated PV sys)
 
 	Array1D< Real64 > CTFTsrcConstPart; // Constant Outside Portion of the CTF calculation of
@@ -190,6 +191,7 @@ namespace DataHeatBalFanSys {
 	// of electric baseboard heaters
 	Array1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
 	// of simple cooling panels
+	Array1D< Real64 > QRadSurfAFNDuct; // Current radiant heat flux at a surface due to radiation from AFN ducts
 	Array1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
 	Array1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	Array1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
@@ -206,6 +208,7 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > SumHmARaZ;
 
 	Array1D< Real64 > TempZoneThermostatSetPoint;
+	Array1D< Real64 > AdapComfortCoolingSetPoint;
 	Array1D< Real64 > ZoneThermostatSetPointHi;
 	Array1D< Real64 > ZoneThermostatSetPointLo;
 
@@ -215,6 +218,10 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > ZTM1; // zone air temperature at previous timestep
 	Array1D< Real64 > ZTM2; // zone air temperature at timestep T-2
 	Array1D< Real64 > ZTM3; // zone air temperature at previous T-3
+	// Hybrid Modeling
+	Array1D< Real64 > PreviousMeasuredZT1; // Hybrid model internal mass multiplier at previous timestep
+	Array1D< Real64 > PreviousMeasuredZT2; // Hybrid model internal mass multiplier at previous timestep
+	Array1D< Real64 > PreviousMeasuredZT3; // Hybrid model internal mass multiplier at previous timestep
 	// Exact and Euler solutions
 	Array1D< Real64 > ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	Array1D< Real64 > ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
@@ -222,16 +229,6 @@ namespace DataHeatBalFanSys {
 	Array1D< Real64 > ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
 	Array1D< Real64 > ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
 	Array1D< Real64 > ZoneW1; // Zone temperature at the previous time step used in Exact and Euler method
-
-	Real64 ZoneVolCapMultpSens; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone temp in the predictor and corrector step
-	Real64 ZoneVolCapMultpMoist; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone humidity ratio in the predictor and corrector step
-	Real64 ZoneVolCapMultpCO2; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone CO2 concentration in the predictor and corrector step
-	Real64 ZoneVolCapMultpGenContam; // This is a multiplier used on the zone volume to make the capacitance more realistic
-	// for the calculation of the zone generic contaminant concentration in the predictor
-	// and corrector step
 
 	Array1D_int TempControlType;
 	Array1D_int ComfortControlType;
@@ -242,111 +239,110 @@ namespace DataHeatBalFanSys {
 	void
 	clear_state()
 	{
-		SumConvHTRadSys.deallocate(); 
-		SumLatentHTRadSys.deallocate(); 
-		SumConvPool.deallocate(); 
-		SumLatentPool.deallocate(); 
-		QHTRadSysToPerson.deallocate(); 
-		QHWBaseboardToPerson.deallocate(); 
-		QSteamBaseboardToPerson.deallocate(); 
-		QElecBaseboardToPerson.deallocate(); 
-		ZTAV.deallocate(); 
-		MAT.deallocate(); 
-		TempTstatAir.deallocate(); 
+		SumConvHTRadSys.deallocate();
+		SumLatentHTRadSys.deallocate();
+		SumConvPool.deallocate();
+		SumLatentPool.deallocate();
+		QHTRadSysToPerson.deallocate();
+		QHWBaseboardToPerson.deallocate();
+		QSteamBaseboardToPerson.deallocate();
+		QElecBaseboardToPerson.deallocate();
+		ZTAV.deallocate();
+		MAT.deallocate();
+		TempTstatAir.deallocate();
 		ZT.deallocate();
-		XMAT.deallocate(); 
+		XMAT.deallocate();
 		XM2T.deallocate();
 		XM3T.deallocate();
 		XM4T.deallocate();
-		DSXMAT.deallocate(); 
-		DSXM2T.deallocate(); 
-		DSXM3T.deallocate(); 
-		DSXM4T.deallocate(); 
-		XMPT.deallocate(); 
-		ZTAVComf.deallocate(); 
-		ZoneAirHumRatAvgComf.deallocate(); 
-		ZoneAirHumRatAvg.deallocate(); 
-		ZoneAirHumRat.deallocate(); 
-		WZoneTimeMinus1.deallocate(); 
-		WZoneTimeMinus2.deallocate(); 
+		DSXMAT.deallocate();
+		DSXM2T.deallocate();
+		DSXM3T.deallocate();
+		DSXM4T.deallocate();
+		XMPT.deallocate();
+		ZTAVComf.deallocate();
+		ZoneAirHumRatAvgComf.deallocate();
+		ZoneAirHumRatAvg.deallocate();
+		ZoneAirHumRat.deallocate();
+		WZoneTimeMinus1.deallocate();
+		WZoneTimeMinus2.deallocate();
 		WZoneTimeMinus3.deallocate();
-		WZoneTimeMinus4.deallocate(); 
-		DSWZoneTimeMinus1.deallocate(); 
-		DSWZoneTimeMinus2.deallocate(); 
+		WZoneTimeMinus4.deallocate();
+		DSWZoneTimeMinus1.deallocate();
+		DSWZoneTimeMinus2.deallocate();
 		DSWZoneTimeMinus3.deallocate();
 		DSWZoneTimeMinus4.deallocate();
-		WZoneTimeMinusP.deallocate(); 
-		ZoneAirHumRatTemp.deallocate(); 
-		WZoneTimeMinus1Temp.deallocate(); 
+		WZoneTimeMinusP.deallocate();
+		ZoneAirHumRatTemp.deallocate();
+		WZoneTimeMinus1Temp.deallocate();
 		WZoneTimeMinus2Temp.deallocate();
-		WZoneTimeMinus3Temp.deallocate(); 
-		ZoneAirHumRatOld.deallocate(); 
-		MCPI.deallocate(); 
-		MCPTI.deallocate(); 
-		MCPV.deallocate(); 
-		MCPTV.deallocate(); 
-		MCPM.deallocate(); 
-		MCPTM.deallocate(); 
-		MCPE.deallocate(); 
-		EAMFL.deallocate(); 
-		MCPTE.deallocate(); 
-		MCPC.deallocate(); 
-		CTMFL.deallocate(); 
-		MCPTC.deallocate(); 
-		ThermChimAMFL.deallocate(); 
-		MCPTThermChim.deallocate(); 
-		MCPThermChim.deallocate(); 
-		ZoneLatentGain.deallocate(); 
-		OAMFL.deallocate(); 
-		VAMFL.deallocate(); 
-		NonAirSystemResponse.deallocate(); 
-		SysDepZoneLoads.deallocate(); 
-		SysDepZoneLoadsLagged.deallocate(); 
-		MDotCPOA.deallocate(); 
+		WZoneTimeMinus3Temp.deallocate();
+		ZoneAirHumRatOld.deallocate();
+		MCPI.deallocate();
+		MCPTI.deallocate();
+		MCPV.deallocate();
+		MCPTV.deallocate();
+		MCPM.deallocate();
+		MCPTM.deallocate();
+		MCPE.deallocate();
+		EAMFL.deallocate();
+		EAMFLxHumRat.deallocate();
+		MCPTE.deallocate();
+		MCPC.deallocate();
+		CTMFL.deallocate();
+		MCPTC.deallocate();
+		ThermChimAMFL.deallocate();
+		MCPTThermChim.deallocate();
+		MCPThermChim.deallocate();
+		ZoneLatentGain.deallocate();
+		OAMFL.deallocate();
+		VAMFL.deallocate();
+		NonAirSystemResponse.deallocate();
+		SysDepZoneLoads.deallocate();
+		SysDepZoneLoadsLagged.deallocate();
+		MDotCPOA.deallocate();
 		MDotOA.deallocate();
-		MixingMassFlowZone.deallocate(); 
-		MixingMassFlowXHumRat.deallocate(); 
-		ZoneMassBalanceFlag.deallocate(); 
-		ZoneInfiltrationFlag.deallocate(); 
-		ZoneReOrder.deallocate(); 
+		MixingMassFlowZone.deallocate();
+		MixingMassFlowXHumRat.deallocate();
+		ZoneMassBalanceFlag.deallocate();
+		ZoneInfiltrationFlag.deallocate();
+		ZoneReOrder.deallocate();
 		QRadSysSource.deallocate();
 		TCondFDSourceNode.deallocate();
-		QPVSysSource.deallocate(); 
-		CTFTsrcConstPart.deallocate(); 
+		QPVSysSource.deallocate();
+		CTFTsrcConstPart.deallocate();
 		CTFTuserConstPart.deallocate();
 		QHTRadSysSurf.deallocate();
-		QHWBaseboardSurf.deallocate(); 
-		QSteamBaseboardSurf.deallocate(); 
-		QElecBaseboardSurf.deallocate(); 
-		QPoolSurfNumerator.deallocate(); 
-		PoolHeatTransCoefs.deallocate(); 
-		RadSysTiHBConstCoef.deallocate(); 
-		RadSysTiHBToutCoef.deallocate(); 
-		RadSysTiHBQsrcCoef.deallocate(); 
-		RadSysToHBConstCoef.deallocate(); 
-		RadSysToHBTinCoef.deallocate(); 
-		RadSysToHBQsrcCoef.deallocate(); 
-		SumHmAW.deallocate(); 
+		QHWBaseboardSurf.deallocate();
+		QSteamBaseboardSurf.deallocate();
+		QElecBaseboardSurf.deallocate();
+		QPoolSurfNumerator.deallocate();
+		QRadSurfAFNDuct.deallocate();
+		PoolHeatTransCoefs.deallocate();
+		RadSysTiHBConstCoef.deallocate();
+		RadSysTiHBToutCoef.deallocate();
+		RadSysTiHBQsrcCoef.deallocate();
+		RadSysToHBConstCoef.deallocate();
+		RadSysToHBTinCoef.deallocate();
+		RadSysToHBQsrcCoef.deallocate();
+		SumHmAW.deallocate();
 		SumHmARa.deallocate();
-		SumHmARaW.deallocate(); 
+		SumHmARaW.deallocate();
 		TempZoneThermostatSetPoint.deallocate();
+		AdapComfortCoolingSetPoint.deallocate();
 		ZoneThermostatSetPointHi.deallocate();
 		ZoneThermostatSetPointLo.deallocate();
-		LoadCorrectionFactor.deallocate(); 
-		AIRRAT.deallocate(); 
-		ZTM1.deallocate(); 
-		ZTM2.deallocate(); 
-		ZTM3.deallocate(); 
-		ZoneTMX.deallocate(); 
-		ZoneTM2.deallocate(); 
-		ZoneT1.deallocate(); 
-		ZoneWMX.deallocate(); 
+		LoadCorrectionFactor.deallocate();
+		AIRRAT.deallocate();
+		ZTM1.deallocate();
+		ZTM2.deallocate();
+		ZTM3.deallocate();
+		ZoneTMX.deallocate();
+		ZoneTM2.deallocate();
+		ZoneT1.deallocate();
+		ZoneWMX.deallocate();
 		ZoneWM2.deallocate();
-		ZoneW1.deallocate(); 
-		ZoneVolCapMultpSens= 0.0; 
-		ZoneVolCapMultpMoist = 0.0; 
-		ZoneVolCapMultpCO2 = 0.0; 
-		ZoneVolCapMultpGenContam =0.0; 
+		ZoneW1.deallocate();
 		TempControlType.deallocate();
 		ComfortControlType.deallocate();
 		ZoneComfortControlsFanger.deallocate();

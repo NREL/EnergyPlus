@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -86,12 +86,12 @@ namespace MoistureBalanceEMPDManager {
 	// To calculate moisture adsorption and desorption at interior wall surfaces
 	// using EMPD model (Effective Moisture Penetration Depth) developed by
 	// Florida Solar Energy Center. Input consists of interior surface temperatures
-	// and sorption curve of interior layer materials. Output consists of mositure
+	// and sorption curve of interior layer materials. Output consists of moisture
 	// fluxes from wall interior surfaces, which will be used in zone moisture balance.
 
 	// METHODOLOGY EMPLOYED:
 	// Add something
-	// EMPD is a simplified method of analysing moisture transport in buildings and
+	// EMPD is a simplified method of analyzing moisture transport in buildings and
 	// is easy to incorporate into existing building energy analysis computer codes.
 	// The components of the moisture balance equation involving moisture adsorption
 	// and desorption are described in detail where the concept of EMPD is discussed.
@@ -125,6 +125,7 @@ namespace MoistureBalanceEMPDManager {
 	// Data
 	// MODULE VARIABLE and Function DECLARATIONs
 	Array1D< EMPDReportVarsData > EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
+	bool InitEnvrnFlag( true );
 
 	// SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
 	//******************************************************************************
@@ -135,6 +136,7 @@ namespace MoistureBalanceEMPDManager {
 	clear_state()
 	{
 		EMPDReportVars.deallocate();
+		InitEnvrnFlag = true;
 	}
 
 	Real64
@@ -386,7 +388,6 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
 		int SurfNum;
-		static bool InitEnvrnFlag( true );
 
 		if ( InitEnvrnFlag ) {
 			RVSurfaceOld.allocate( TotSurfaces );
@@ -422,15 +423,15 @@ namespace MoistureBalanceEMPDManager {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
 			EMPDReportVarsData & rvd = EMPDReportVars( SurfNum );
 			const std::string surf_name = Surface( SurfNum ).Name;
-			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m3]", rvd.rv_surface, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Moisture Content [kg/m3]", rvd.u_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Content [kg/m3]", rvd.u_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity [%]", rvd.RH_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity [%]", rvd.RH_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone [kg/m2-s]", rvd.mass_flux_zone, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Flux [kg/m2-s]", rvd.mass_flux_deep, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density", OutputProcessor::Unit::kg_m3, rvd.rv_surface, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, rvd.w_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, rvd.w_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_zone, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Flux", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_deep, "Zone", "State", surf_name );
 		}
 
 		if ( InitEnvrnFlag ) InitEnvrnFlag = false;
@@ -599,7 +600,7 @@ namespace MoistureBalanceEMPDManager {
 		}
 		// Calculate resistance between surface-layer/air interface and center of surface layer. [s/m]
 		// This is the physical surface of the material.
-		RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd - Rcoating;
+		RSurfaceLayer = 1.0 / hm_surf_layer - 1.0 / h_mass_conv_in_fd;
 
 		// Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
 		mass_flux_surf_deep_max = material.EMPDDeepDepth*material.Density*dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (TimeStepZone * 3600.0);

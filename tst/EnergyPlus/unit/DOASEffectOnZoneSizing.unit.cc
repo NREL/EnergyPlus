@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -213,6 +213,8 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 8;
 	ZoneEquipConfig( 1 ).ReturnAirNode = 0;
 	ZoneEquipConfig( 2 ).ReturnAirNode = 0;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 0;
+	ZoneEquipConfig( 2 ).NumReturnNodes = 0;
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 	ZoneEquipConfig( 2 ).ActualZoneNum = 2;
 	CalcZoneSizing( CurOverallSimDay, 1 ).DOASHighSetpoint = 14.4;

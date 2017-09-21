@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -109,6 +109,7 @@ namespace WaterThermalTanks {
 	extern int const COIL_DX_MULTISPEED; // reclaim heating source is DX multispeed coil
 	extern int const COIL_DX_MULTIMODE; // reclaim heating source is DX multimode coil
 	extern int const CONDENSER_REFRIGERATION; // reclaim heating source is detailed refrigeration system condenser
+	extern int const COIL_DX_VARIABLE_COOLING; // reclaim heating source is Variable Speed DX cooling coil
 
 	extern int const UseSide; // Indicates Use side of water heater
 	extern int const SourceSide; // Indicates Source side of water heater
@@ -659,6 +660,7 @@ namespace WaterThermalTanks {
 		Real64 WHOffCycParaFracToTank; // tank's off-cycle parasitic frac to tank, disable for rating
 		int WHPLFCurve; // tank part-load fraction curve index, used for rating procedure
 		Real64 OperatingAirFlowRate; // Operating volumetric air flow rate (m3/s)
+		Real64 OperatingAirMassFlowRate; // Operating air mass flow rate (kg/s)
 		Real64 OperatingWaterFlowRate; // Operating volumetric water flow rate (m3/s)
 		Real64 COP; // Heat Pump coefficient of performance (W/W)
 		Real64 SHR; // Heat Pump air-side coil sensible heat ratio

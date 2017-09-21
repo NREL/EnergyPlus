@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -169,7 +169,12 @@ namespace EnergyPlus {
 		"    Use Heat Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    Use Heat Demand Branches,!- Demand Side Branch List Name",
 		"    Use Heat Demand Connectors,  !- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    Use Heat Loop Setpoint Manager,  !- Name",
@@ -364,7 +369,12 @@ namespace EnergyPlus {
 		"    Use Cool Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    Use Cool Demand Branches,!- Demand Side Branch List Name",
 		"    Use Cool Demand Connectors,  !- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    Use Cool Loop Setpoint Manager,  !- Name",
@@ -561,7 +571,10 @@ namespace EnergyPlus {
 		"    TRANSFER Demand Connectors,  !- Demand Side Connector List Name",
 		"    OPTIMAL,                 !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    DualSetpointDeadband;    !- Plant Loop Demand Calculation Scheme",
+		"    DualSetpointDeadband,    !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled:dualSetpoint,",
 		"    TRANSFER Loop Dual Setpoint Manager,  !- Name",
@@ -760,7 +773,12 @@ namespace EnergyPlus {
 		"    SOURCE Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    SOURCE Demand Branches,  !- Demand Side Branch List Name",
 		"    SOURCE Demand Connectors,!- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    SOURCE Loop Setpoint Manager,  !- Name",
@@ -1247,7 +1265,12 @@ namespace EnergyPlus {
 		"    Use Heat Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    Use Heat Demand Branches,!- Demand Side Branch List Name",
 		"    Use Heat Demand Connectors,  !- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    Use Heat Loop Setpoint Manager,  !- Name",
@@ -1442,7 +1465,12 @@ namespace EnergyPlus {
 		"    Use Cool Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    Use Cool Demand Branches,!- Demand Side Branch List Name",
 		"    Use Cool Demand Connectors,  !- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    Use Cool Loop Setpoint Manager,  !- Name",
@@ -1639,7 +1667,10 @@ namespace EnergyPlus {
 		"    TRANSFER Demand Connectors,  !- Demand Side Connector List Name",
 		"    OPTIMAL,                 !- Load Distribution Scheme",
 		"    ,                        !- Availability Manager List Name",
-		"    DualSetpointDeadband;    !- Plant Loop Demand Calculation Scheme",
+		"    DualSetpointDeadband,    !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled:dualSetpoint,",
 		"    TRANSFER Loop Dual Setpoint Manager,  !- Name",
@@ -1838,7 +1869,12 @@ namespace EnergyPlus {
 		"    SOURCE Demand Outlet Node,  !- Demand Side Outlet Node Name",
 		"    SOURCE Demand Branches,  !- Demand Side Branch List Name",
 		"    SOURCE Demand Connectors,!- Demand Side Connector List Name",
-		"    OPTIMAL;                 !- Load Distribution Scheme",
+		"    Optimal,                 !- Load Distribution Scheme",
+		"    ,                        !- Availability Manager List Name",
+		"    ,                        !- Plant Loop Demand Calculation Scheme",
+		"    ,                        !- Common Pipe Simulation",
+		"    ,                        !- Pressure Simulation Type",
+		"    2.0;                     !- Loop Circulation Time {minutes}",
 
 		"  SetpointManager:Scheduled,",
 		"    SOURCE Loop Setpoint Manager,  !- Name",

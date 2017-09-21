@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -87,6 +87,7 @@ protected:
 	bool sqliteStepValidity( int const rc );
 	int sqliteStepCommand(sqlite3_stmt * stmt);
 	int sqliteResetCommand(sqlite3_stmt * stmt);
+	bool sqliteWithinTransaction();
 	// int sqliteClearBindings(sqlite3_stmt * stmt);
 	// int sqliteFinalizeCommand(sqlite3_stmt * stmt);
 
@@ -137,6 +138,9 @@ public:
 
 	// Commit a transaction
 	void sqliteCommit();
+
+	// Within a current transaction
+	bool sqliteWithinTransaction();
 
 	void createSQLiteReportDictionaryRecord(
 		int const reportVariableReportID,
@@ -192,10 +196,15 @@ public:
 		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
 	);
 
-	void addSQLiteSystemSizingRecord(
+	void addSQLiteSystemSizingRecord (
 		std::string const & SysName, // the name of the system
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
+		std::string const & LoadType, // either "Cooling" or "Heating"
+		std::string const & PeakLoadType, // either "Sensible" or "Total"
+		Real64 const & UserDesCap, // User  Design Capacity
+		Real64 const & CalcDesVolFlow, // Calculated Cooling Design Air Flow Rate
+		Real64 const & UserDesVolFlow, // User Cooling Design Air Flow Rate
+		std::string const & DesDayName, // the name of the design day that produced the peak
+		std::string const & PeakHrMin // time stamp of the peak
 	);
 
 	void addSQLiteComponentSizingRecord(

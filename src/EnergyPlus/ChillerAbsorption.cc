@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -63,6 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -138,6 +139,8 @@ namespace ChillerAbsorption {
 	Real64 EvaporatorEnergy( 0.0 ); // J - heat transfer to the evaporator coil
 	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
+	
+	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	static std::string const BlankString;
 	static std::string const fluidNameSteam( "STEAM" );
@@ -213,7 +216,6 @@ namespace ChillerAbsorption {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 		int ChillNum; // Chiller number pointer
 
 		//Get Absorber data from input file
@@ -515,34 +517,34 @@ namespace ChillerAbsorption {
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum ) {
-			SetupOutputVariable( "Chiller Electric Power [W]", BLASTAbsorberReport( AbsorberNum ).PumpingPower, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", BLASTAbsorberReport( AbsorberNum ).PumpingEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
-			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", BLASTAbsorberReport( AbsorberNum ).QEvap, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", BLASTAbsorberReport( AbsorberNum ).EvapEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
-			SetupOutputVariable( "Chiller Evaporator Inlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).EvapInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Outlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).EvapOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate [kg/s]", BLASTAbsorberReport( AbsorberNum ).Evapmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Electric Power", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).PumpingPower, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Electric Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).PumpingEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QEvap, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Cooling Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).EvapEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
+			SetupOutputVariable( "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).EvapInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).EvapOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, BLASTAbsorberReport( AbsorberNum ).Evapmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
 
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate [W]", BLASTAbsorberReport( AbsorberNum ).QCond, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy [J]", BLASTAbsorberReport( AbsorberNum ).CondEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
-			SetupOutputVariable( "Chiller Condenser Inlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).CondInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Outlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).CondOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Mass Flow Rate [kg/s]", BLASTAbsorberReport( AbsorberNum ).Condmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QCond, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).CondEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
+			SetupOutputVariable( "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).CondInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).CondOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, BLASTAbsorberReport( AbsorberNum ).Condmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
 
 			if ( BLASTAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
-				SetupOutputVariable( "Chiller Hot Water Consumption Rate [W]", BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-				SetupOutputVariable( "Chiller Source Hot Water Energy [J]", BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
+				SetupOutputVariable( "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+				SetupOutputVariable( "Chiller Source Hot Water Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
 			} else {
 				if ( GenInputOutputNodesUsed( AbsorberNum ) ) {
-					SetupOutputVariable( "Chiller Source Steam Rate [W]", BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-					SetupOutputVariable( "Chiller Source Steam Energy [J]", BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
+					SetupOutputVariable( "Chiller Source Steam Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+					SetupOutputVariable( "Chiller Source Steam Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
 				} else {
-					SetupOutputVariable( "Chiller Source Steam Rate [W]", BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-					SetupOutputVariable( "Chiller Source Steam Energy [J]", BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "Steam", "Cooling", _, "Plant" );
+					SetupOutputVariable( "Chiller Source Steam Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+					SetupOutputVariable( "Chiller Source Steam Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "Steam", "Cooling", _, "Plant" );
 				}
 			}
 
-			SetupOutputVariable( "Chiller COP [W/W]", BLASTAbsorberReport( AbsorberNum ).ActualCOP, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller COP", OutputProcessor::Unit::W_W, BLASTAbsorberReport( AbsorberNum ).ActualCOP, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Chiller Nominal Capacity", BLASTAbsorber( AbsorberNum ).Name, "[W]", BLASTAbsorber( AbsorberNum ).NomCap );
@@ -1245,8 +1247,9 @@ namespace ChillerAbsorption {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       April 1999, May 2000- Taecheol Kim
-		//                      May   2008 - R. Raustad, added generator nodes
+		//       MODIFIED       Apr. 1999, May 2000- Taecheol Kim
+		//                      May. 2008, R. Raustad, Added generator nodes
+		//                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1260,7 +1263,11 @@ namespace ChillerAbsorption {
 		// 2.  Absorber User Manual
 
 		// Using/Aliasing
+		using namespace FluidProperties;
 		using DataGlobals::BeginEnvrnFlag;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using DataPlant::DeltaTempTol;
@@ -1270,7 +1277,7 @@ namespace ChillerAbsorption {
 		using DataPlant::DualSetPointDeadBand;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
-		using namespace FluidProperties;
+		using FaultsManager::FaultsChillerSWTSensor;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
 
@@ -1373,6 +1380,19 @@ namespace ChillerAbsorption {
 		LoopSideNum = BLASTAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( BLASTAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset ));
+			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
 
 		// If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
 		// condenser side outlet temperature.
@@ -1425,6 +1445,20 @@ namespace ChillerAbsorption {
 					ShowRecurringWarningErrorAtEnd( "CalcBLASTAbsorberModel: Name=\"" + BLASTAbsorber( ChillNum ).Name + "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.", BLASTAbsorber( ChillNum ).ErrCount2 );
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( BLASTAbsorber( ChillNum ).FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				//PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				//PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				//ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -1476,6 +1510,7 @@ namespace ChillerAbsorption {
 					QEvaporator = EvapMassFlowRate * CpFluid * EvapDeltaTemp;
 				}
 			}
+
 			// Checks QEvaporator on the basis of the machine limits.
 			if ( QEvaporator > std::abs( MyLoad ) ) {
 				if ( EvapMassFlowRate > MassFlowTolerance ) {
@@ -1486,6 +1521,16 @@ namespace ChillerAbsorption {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 		} //This is the end of the FlowLock Block

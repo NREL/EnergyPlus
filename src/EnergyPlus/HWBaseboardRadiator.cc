@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -614,21 +614,21 @@ namespace HWBaseboardRadiator {
 		// Setup Report variables for the Coils
 		for ( BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum ) {
 			// CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Water'
-			SetupOutputVariable( "Baseboard Total Heating Rate [W]", HWBaseboard( BaseboardNum ).TotPower, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, HWBaseboard( BaseboardNum ).TotPower, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Convective Heating Rate [W]", HWBaseboard( BaseboardNum ).ConvPower, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Rate [W]", HWBaseboard( BaseboardNum ).RadPower, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Total Heating Energy [J]", HWBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Convective Heating Rate", OutputProcessor::Unit::W, HWBaseboard( BaseboardNum ).ConvPower, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, HWBaseboard( BaseboardNum ).RadPower, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, HWBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
 
-			SetupOutputVariable( "Baseboard Convective Heating Energy [J]", HWBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Energy [J]", HWBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Hot Water Energy [J]", HWBaseboard( BaseboardNum ).Energy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
-			SetupOutputVariable( "Baseboard Hot Water Mass Flow Rate [kg/s]", HWBaseboard( BaseboardNum ).WaterMassFlowRate, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Air Mass Flow Rate [kg/s]", HWBaseboard( BaseboardNum ).AirMassFlowRate, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Air Inlet Temperature [C]", HWBaseboard( BaseboardNum ).AirInletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Air Outlet Temperature [C]", HWBaseboard( BaseboardNum ).AirOutletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Water Inlet Temperature [C]", HWBaseboard( BaseboardNum ).WaterInletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Water Outlet Temperature [C]", HWBaseboard( BaseboardNum ).WaterOutletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Convective Heating Energy", OutputProcessor::Unit::J, HWBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, HWBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Hot Water Energy", OutputProcessor::Unit::J, HWBaseboard( BaseboardNum ).Energy, "System", "Sum", HWBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, HWBaseboard( BaseboardNum ).WaterMassFlowRate, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Mass Flow Rate", OutputProcessor::Unit::kg_s, HWBaseboard( BaseboardNum ).AirMassFlowRate, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Inlet Temperature", OutputProcessor::Unit::C, HWBaseboard( BaseboardNum ).AirInletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Outlet Temperature", OutputProcessor::Unit::C, HWBaseboard( BaseboardNum ).AirOutletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Water Inlet Temperature", OutputProcessor::Unit::C, HWBaseboard( BaseboardNum ).WaterInletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Water Outlet Temperature", OutputProcessor::Unit::C, HWBaseboard( BaseboardNum ).WaterOutletTemp, "System", "Average", HWBaseboard( BaseboardNum ).EquipID );
 		}
 
 	}
@@ -922,7 +922,7 @@ namespace HWBaseboardRadiator {
 					if ( HWBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 						CheckZoneSizing( CompType, CompName );
 						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 					}
 					TempSize = HWBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 
@@ -935,7 +935,7 @@ namespace HWBaseboardRadiator {
 					CheckZoneSizing( CompType, CompName );
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = HWBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 					TempSize = AutoSize;
 					DataScalableCapSizingON = true;
 				} else {

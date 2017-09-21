@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -344,7 +344,7 @@ namespace ExternalInterface {
 	extern bool haveExternalInterfaceFMUImport; //Flag for FMU-Import interface
 	extern bool haveExternalInterfaceFMUExport; //Flag for FMU-Export interface
 	extern int simulationStatus; // Status flag. Used to report during
-	// which phase an error occured.
+	// which phase an error occurred.
 	// (1=initialization, 2=time stepping)
 
 	extern Array1D< int > keyVarIndexes; // Array index for specific key name

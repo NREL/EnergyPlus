@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -205,6 +205,13 @@ namespace UnitVentilator {
 		Real64 PartLoadFrac; // unit ventilator part-load ratio for time step
 		int ZonePtr; // pointer to a zone served by a unit ventilator
 		int HVACSizingIndex; // index of a HVACSizing object for a unit ventilator
+		bool ATMixerExists; // True if there is an ATMixer
+		std::string ATMixerName; // name of air mixer
+		int ATMixerIndex; // index to the air mixer
+		int ATMixerType; // 1 = inlet side mixer, 2 = supply side mixer
+		int ATMixerPriNode; // primary inlet air node number for the mixer
+		int ATMixerSecNode; // secondary air inlet node number for the mixer
+		int ATMixerOutNode; // outlet air node number for the mixer	
 		// for unit ventilator object
 
 		// Default Constructor
@@ -285,7 +292,13 @@ namespace UnitVentilator {
 			FanPartLoadRatio( 0.0 ),
 			PartLoadFrac( 0.0 ),
 			ZonePtr( 0 ),
-			HVACSizingIndex( 0 )
+			HVACSizingIndex( 0 ),
+			ATMixerExists( false ),
+			ATMixerIndex( 0 ),
+			ATMixerType( 0 ),
+			ATMixerPriNode( 0 ),
+			ATMixerSecNode( 0 ),
+			ATMixerOutNode( 0 )
 		{}
 
 	};

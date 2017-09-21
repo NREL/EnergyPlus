@@ -181,7 +181,7 @@ This numeric field specifies the allowable smallest fraction of the design water
 
 This numeric field specifies the allowable largest fraction of the design water flow rate. If this field is left blank, the default value is 2.5.
 
-\textbf{\emph{Field: Sizing Factor}}
+\paragraph{Field: Sizing Factor}\label{sizing-factor-01}
 
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature. For this component the inputs that would be altered by the sizing factor are:
 
@@ -198,6 +198,11 @@ This optional numeric field allows the user to specify a sizing factor for this 
 6.~~~~U-Factor Times Area Value at Free Convection Air Flow Rate.
 
 Note that the U-Factor Times Area Value at Design Air Flow Rate is not \emph{multiplied} by the Sizing Factor. Instead the design tower load is multiplied by the sizing factor and the design UA then calculated as usual. The U-Factor Times Area Value at Free Convection Air Flow Rate is set to 10\% of the new design Tower UA.
+
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-01}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
+
 
 Three examples of an IDF specification for this object are shown below:
 
@@ -662,6 +667,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 
 Note that the U-Factor Times Area Value at High Fan Speed is not \emph{multiplied} by the Sizing Factor. Instead the design tower load is multiplied by the sizing factor and the design UA then calculated as usual. The U-Factor Times Area Value at Low Fan Speed is set to a fraction of the full load design UA determined by the field Low Fan Speed U-Factor Times Area Sizing Factor. The U-Factor Times Area Value at Free Convection Air Flow Rate is set to a fraction of the design Tower UA determined by the field Free Convection Air U-Factor Times Area Value Sizing Factor.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-02}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
+
 Four examples of an IDF specification for this object are shown below:
 
 \begin{lstlisting}
@@ -1090,6 +1099,10 @@ This numeric field specifies the allowable largest fraction of the design water 
 
 This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-03}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
+
 An example IDF specification follows.
 
 \begin{lstlisting}
@@ -1477,6 +1490,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 2.~~~~Design Air Flow Rate;
 
 3.~~~~Design Fan Power.
+
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-05}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the cooling tower will be assigned to the ``General'' end-use subcategory.
 
 An example IDF specification for this object is shown below:
 

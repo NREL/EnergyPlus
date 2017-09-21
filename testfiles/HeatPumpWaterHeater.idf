@@ -127,7 +127,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -193,7 +193,7 @@
     CONTINUOUS;              !- Numeric Type
 
   RunPeriod,
-    ,                        !- Name
+    Jan14,                   !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     1,                       !- End Month
@@ -206,7 +206,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    July7,                   !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     7,                       !- End Month
@@ -469,14 +469,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -572,26 +564,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
@@ -2166,7 +2140,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     HPWHFan,                 !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2244,16 +2218,22 @@
     ,                        !- Heating COP Function of Water Flow Fraction Curve Name
     HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     HPWHFan,                 !- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    100.0,                   !- Pressure Rise {Pa}
-    0.2685,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     HPWHDXCoilAirOutletNode, !- Air Inlet Node Name
-    HPWHOutletAirSplitterNode;  !- Air Outlet Node Name
+    HPWHOutletAirSplitterNode,  !- Air Outlet Node Name
+    0.2685,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
 !  Heating Capacity as a Function of Temperature Curve (Air Wet-bulb T, Condenser Water Inlet T)
 !  Colmac HPA 2000 Air Source Heat Pump Water Heater
@@ -2383,7 +2363,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     Zone4HPWHFan,            !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2458,16 +2438,22 @@
     ,                        !- Heating COP Function of Water Flow Fraction Curve Name
     HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     Zone4HPWHFan,            !- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    100.0,                   !- Pressure Rise {Pa}
-    0.2685,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     Zone4DXCoilAirOutletNode,!- Air Inlet Node Name
-    Zone4AirInletNode;       !- Air Outlet Node Name
+    Zone4AirInletNode,       !- Air Outlet Node Name
+    0.2685,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
 !*********** End of Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
 !*********** Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
@@ -2499,7 +2485,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Zone,                    !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     Zone4bHPWHFan,           !- Fan Name
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
@@ -2575,16 +2561,22 @@
     ,                        !- Heating COP Function of Water Flow Fraction Curve Name
     HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     Zone4bHPWHFan,           !- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    100.0,                   !- Pressure Rise {Pa}
-    0.2685,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     Zone4bDXCoilAirOutletNode,  !- Air Inlet Node Name
-    Zone4bAirInletNode;      !- Air Outlet Node Name
+    Zone4bAirInletNode,      !- Air Outlet Node Name
+    0.2685,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
 !*********** End of Indoor Heat Pump Water Heater Inputs (uses no outdoor air) in Zone 4 ******
 !*********** Outdoor Heat Pump Water Heater Inputs ***********************
@@ -2616,7 +2608,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     HPWHOutdoorFan,          !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -2694,16 +2686,22 @@
     ,                        !- Heating COP Function of Water Flow Fraction Curve Name
     HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     HPWHOutdoorFan,          !- Name
-    PlantHPWHSch,            !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    100.0,                   !- Pressure Rise {Pa}
-    0.2685,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
+    HeatPumpWaterHeaterSch,  !- Availability Schedule Name
     HPOutdoorAirInletNode,   !- Air Inlet Node Name
-    HPOutdoorFanAirOutletNode;  !- Air Outlet Node Name
+    HPOutdoorFanAirOutletNode,  !- Air Outlet Node Name
+    0.2685,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
 !*************** End of Outdoor Heat Pump Water Heater Inputs *****************
 !************** Scheduled Heat Pump Water Heater Inputs ***********************
@@ -2763,7 +2761,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Schedule,                !- Compressor Location
     ScheduledCompressorTemp, !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     HPWHScheduledFan,        !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -2838,16 +2836,22 @@
     ,                        !- Heating COP Function of Water Flow Fraction Curve Name
     HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     HPWHScheduledFan,        !- Name
     ScheduledHPWHSch,        !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    100.0,                   !- Pressure Rise {Pa}
-    0.2685,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     HPScheduledAirInletNode, !- Air Inlet Node Name
-    HPScheduledFanAirOutletNode;  !- Air Outlet Node Name
+    HPScheduledFanAirOutletNode,  !- Air Outlet Node Name
+    0.2685,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
 !*************** End of Scheduled Heat Pump Water Heater Inputs *****************
 !*************** Scheduled non-HP Water Heater (uses electric element for water heating) *********
@@ -3819,7 +3823,7 @@
     ,                        !- Maximum Inlet Air Temperature for Compressor Operation {C}
     Outdoors,                !- Compressor Location
     ,                        !- Compressor Ambient Temperature Schedule Name
-    Fan:OnOff,               !- Fan Object Type
+    Fan:SystemModel,         !- Fan Object Type
     HPWHPlantFan,            !- Fan Name
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
@@ -3898,16 +3902,22 @@
     ,                        !- Heating COP Function of Water Flow Fraction Curve Name
     HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     HPWHPlantFan,            !- Name
     PlantHPWHSch,            !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    100.0,                   !- Pressure Rise {Pa}
-    2.6852,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     HPPlantAirInletNode,     !- Air Inlet Node Name
-    HPPlantFanAirOutletNode; !- Air Outlet Node Name
+    HPPlantFanAirOutletNode, !- Air Outlet Node Name
+    2.6852,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    100.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   Schedule:Compact,
     PlantHPWHSch,            !- Name

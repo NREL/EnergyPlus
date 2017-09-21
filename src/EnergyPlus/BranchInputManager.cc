@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -281,7 +281,7 @@ namespace BranchInputManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Found; // Points to correct Branch List/Branch
-		bool ErrFound; // True when error has occured (cannot find Branch List)
+		bool ErrFound; // True when error has occurred (cannot find Branch List)
 
 		ErrFound = false;
 
@@ -656,7 +656,7 @@ namespace BranchInputManager {
 		} else {
 			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
 				for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
-					if ( SameString( "Fan:OnOff", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:ConstantVolume", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:VariableVolume", Branch( BranchNum ).Component( CompNum ).CType ) ) {
+					if ( SameString( "Fan:OnOff", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:ConstantVolume", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:VariableVolume", Branch( BranchNum ).Component( CompNum ).CType ) || SameString( "Fan:SystemModel", Branch( BranchNum ).Component( CompNum ).CType ) ) {
 						FanType = Branch( BranchNum ).Component( CompNum ).CType;
 						FanName = Branch( BranchNum ).Component( CompNum ).Name;
 						break;
@@ -1651,7 +1651,7 @@ namespace BranchInputManager {
 		int BCount; // Actual Branch List Count
 		int Loop; // Loop Counter
 		int Found; // Points to correct Branch List/Branch
-		bool ErrFound; // True when error has occured (cannot find Branch List)
+		bool ErrFound; // True when error has occurred (cannot find Branch List)
 		// Following are needed because routine calls GetBranchInput
 		// which would overwrite the module Alphas and NumAlphas
 		bool IsNotOK; // Flag for "VerifyName" routine

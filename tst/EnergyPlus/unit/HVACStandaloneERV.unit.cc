@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -59,7 +59,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 
 using namespace EnergyPlus;
@@ -131,10 +130,6 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
 }
 
 TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
-
-	int write_stat;
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	std::string const idf_objects = delimited_string( {
 		" Version,8.5;",
@@ -227,6 +222,4 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
 	EXPECT_EQ( 1.0, StandAloneERV( 1 ).DesignHXVolFlowRate );
 	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignSAFanVolFlowRate );
 	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignEAFanVolFlowRate );
-
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 }

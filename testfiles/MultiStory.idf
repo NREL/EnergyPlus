@@ -81,7 +81,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Multistory Example,      !- Name
@@ -401,12 +401,6 @@
     Ext Wall,                !- Name
     A1 - 1 IN STUCCO,        !- Outside Layer
     C4 - 4 IN COMMON BRICK,  !- Layer 2
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
-
-  Construction,
-    Int Wall,                !- Name
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
-    C2 - 4 IN LW CONCRETE BLOCK,  !- Layer 2
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,

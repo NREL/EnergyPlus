@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -96,6 +96,17 @@ namespace EnergyPlus {
 			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
 			"    0.0001;                  !- Convergence Tolerance",
 
+			"  Fan:ConstantVolume,",
+			"    SPACE1-1 PIU Fan,        !- Name",
+			"    ReheatCoilAvailSched,    !- Availability Schedule Name",
+			"    0.5,                     !- Fan Total Efficiency",
+			"    50.0,                    !- Pressure Rise {Pa}",
+			"    autosize,                !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    SPACE1-1 ATU Fan Inlet Node,  !- Air Inlet Node Name",
+			"    SPACE1-1 Zone Coil Air In Node;  !- Air Outlet Node Name",
+
 			"  Coil:Heating:Water,",
 			"    SPACE1-1 Zone Coil,      !- Name",
 			"    ReheatCoilAvailSched,    !- Availability Schedule Name",
@@ -179,6 +190,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( "SPACE1-1 ZONE COIL", PIU( 1 ).HCoil ); // heating coil name
 		EXPECT_EQ( "COIL:HEATING:WATER", PIU( 1 ).HCoilType ); // hot water heating coil
 		EXPECT_GT( PIU( 1 ).HotControlNode, 0 );  // none zero integer node index is expected
+
+		//PIU.deallocate();
 
 	}
 }

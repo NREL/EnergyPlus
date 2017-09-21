@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -53,6 +53,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <unordered_map>
+#include <vector>
+#include <cstddef>
+#include "re2/re2.h"
 
 namespace EnergyPlus {
 
@@ -79,25 +83,19 @@ namespace DataOutputs {
 	extern int iTotalAutoCalculatableFields; // number of fields that can be autocalculated
 
 	// Types
+	struct OutputReportingVariables {
+		OutputReportingVariables(
+			std::string const & KeyValue,
+			std::string const & VariableName
+		);
 
-	struct OutputReportingVariables // Linked list of variables and keys
-	{
-		// Members
-		std::string Key; // could be a key or "*"  (upper case)
-		std::string VarName; // variable name (upper case)
-		int Previous; // Pointer to Previous of same variable name
-		int Next; // Pointer to Next of same variable name
-
-		// Default Constructor
-		OutputReportingVariables() :
-			Previous( 0 ),
-			Next( 0 )
-		{}
-
+		std::string const key;
+		std::string const variableName;
+		bool is_simple_string = true;
+		std::unique_ptr< RE2 > pattern;
+		std::unique_ptr< RE2 > case_insensitive_pattern;
 	};
-
-	// Object Data
-	extern Array1D< OutputReportingVariables > OutputVariablesForSimulation;
+	extern std::unordered_map < std::string, std::unordered_map< std::string, OutputReportingVariables > > OutputVariablesForSimulation;
 
 	// Functions
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -131,9 +131,12 @@ namespace EnergyPlus {
 		}
 
 		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Deep>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Deep>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Deep";
-		for ( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->deepGroundTemps( i ); gio::write( OutputFileInits );
+		for ( int i = 1; i <= 12; ++i ) {
+			gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->deepGroundTemps( i );
+		}
+		gio::write( OutputFileInits );
 
 		found = true;
 

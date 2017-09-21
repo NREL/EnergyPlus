@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -95,11 +95,13 @@ namespace PurchasedAirManager {
 	// used to prevent dividing by near zero
 	extern Real64 const SmallDeltaHumRat;
 
+
 	// DERIVED TYPE DEFINITIONS:
 
 	//MODULE VARIABLE DECLARATIONS:
 
 	extern int NumPurchAir;
+	extern int NumPlenumArrays; // total number of plenum arrays
 	extern bool GetPurchAirInputFlag;
 	extern Array1D_bool CheckEquipName;
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
@@ -115,6 +117,11 @@ namespace PurchasedAirManager {
 		int AvailSchedPtr; // Index to system availability schedule
 		int ZoneSupplyAirNodeNum; // Node number of zone supply air node for purchased air
 		int ZoneExhaustAirNodeNum; // Node number of zone exhaust air node for purchased air
+		int PlenumExhaustAirNodeNum; // Node number of plenum exhaust air node
+		int ReturnPlenumIndex; // Index of return plenum
+		int PlenumArrayIndex; // Index to array that links to all ideal loads air systems connected to a plenum
+		int PurchAirArrayIndex; // Index to sub-array that links ideal loads air system to index of sub-array
+		std::string ReturnPlenumName;
 		int ZoneRecircAirNodeNum; // Node number of recirculation air node for purchased air
 		//   same as exhaust node if specified, otherwise zone return node
 		Real64 MaxHeatSuppAirTemp; // Maximum supply air temperature for heating [C]
@@ -244,6 +251,10 @@ namespace PurchasedAirManager {
 			AvailSchedPtr( 0 ),
 			ZoneSupplyAirNodeNum( 0 ),
 			ZoneExhaustAirNodeNum( 0 ),
+			PlenumExhaustAirNodeNum( 0 ),
+			ReturnPlenumIndex( 0 ),
+			PlenumArrayIndex( 0 ),
+			PurchAirArrayIndex( 0 ),
 			ZoneRecircAirNodeNum( 0 ),
 			MaxHeatSuppAirTemp( 0.0 ),
 			MinCoolSuppAirTemp( 0.0 ),
@@ -370,9 +381,25 @@ namespace PurchasedAirManager {
 
 	};
 
+	struct PurchAirPlenumArrayData {
+		// Members
+		int NumPurchAir;
+		int ReturnPlenumIndex;
+		Array1D_int PurchAirArray;
+		Array1D_bool IsSimulated;
+
+		// Default Constructor
+		PurchAirPlenumArrayData():
+		NumPurchAir( 0 ),
+		ReturnPlenumIndex( 0 )
+		{}
+
+	};
+
 	// Object Data
 	extern Array1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
-	extern Array1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
+	extern Array1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indices of scalable sizing object for zone HVAC
+	extern Array1D< PurchAirPlenumArrayData > PurchAirPlenumArrays; // Used to save the indices of scalable sizing object for zone HVAC
 
 	// Functions
 
@@ -429,7 +456,10 @@ namespace PurchasedAirManager {
 	);
 
 	void
-	UpdatePurchasedAir( int const PurchAirNum );
+	UpdatePurchasedAir(
+		int const PurchAirNum,
+		bool const FirstHVACIteration
+	);
 
 	void
 	ReportPurchasedAir( int const PurchAirNum );
@@ -448,6 +478,12 @@ namespace PurchasedAirManager {
 
 	Real64
 	GetPurchasedAirMixedAirHumRat( int const PurchAirNum );
+
+	bool
+	CheckPurchasedAirForReturnPlenum( int const & ReturnPlenumIndex );
+
+	void
+	InitializePlenumArrays( int const PurchAirNum );
 
 	void
 	clear_state();

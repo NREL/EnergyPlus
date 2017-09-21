@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -72,9 +72,9 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 using namespace EnergyPlus::BranchInputManager;
@@ -95,6 +95,7 @@ using namespace EnergyPlus::PackagedTerminalHeatPump;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SingleDuct;
+using namespace EnergyPlus::UnitVentilator;
 using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -349,10 +350,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -674,15 +671,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -1009,16 +1000,10 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -1094,7 +1079,6 @@ namespace EnergyPlus {
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
 			"    SPACE1-1 HP Heating Mode,     !- Heating Coil Name",
 			"    0.001,                   !- Heating Convergence Tolerance {dimensionless}",
-			"    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
 			"    SPACE1-1 HP Cooling Mode,     !- Cooling Coil Name",
 			"    0.001,                   !- Cooling Convergence Tolerance {dimensionless}",
@@ -1425,16 +1409,10 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -1512,7 +1490,6 @@ namespace EnergyPlus {
 			"    Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type",
 			"    SPACE1-1 HP Heating Mode,     !- Heating Coil Name",
 			"    0.001,                    !- Heating Convergence Tolerance {dimensionless}",
-			"    -5.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
 			"    SPACE1-1 HP Cooling Mode,     !- Cooling Coil Name",
 			"    0.001,                   !- Cooling Convergence Tolerance {dimensionless}",
@@ -1844,16 +1821,10 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -2522,15 +2493,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -3201,15 +3166,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -4957,15 +4916,9 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 5.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 5.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplySide ) {
-
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
@@ -6712,8 +6665,471 @@ namespace EnergyPlus {
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide ) {
+
+		bool ErrorsFound( false );
+		bool FirstHVACIteration( false );
+		Real64 HVACInletMassFlowRate( 0.0 );
+		Real64 PrimaryAirMassFlowRate( 0.0 );
+		Real64 SecondaryAirMassFlowRate( 0.0 );
+		Real64 LatOutputProvided( 0.0 );
+		Real64 QUnitOut( 0.0 );
+		Real64 QZnReq( 0.0 );
+		int ZoneNum( 1 );
+		int UnitVentNum( 1 );
+
+		std::string const idf_objects = delimited_string( {
+			"  Version, 8.6;",
+
+			"  AirTerminal:SingleDuct:Mixer,",
+			"    SPACE1-1 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:UnitVentilator,     !- ZoneHVAC Terminal Unit Object Type",
+			"    SPACE1-1 Unit Vent,          !- ZoneHVAC Terminal Unit Name",
+			"    SPACE1-1 Unit Vent Inlet,    !- Terminal Unit Outlet Node Name",
+			"    SPACE1-1 Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE1-1 Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name",
+			"    InletSide;                      !- Terminal Unit Connection Type",
+
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    SPACE1-1 DOAS ATU,           !- Name",
+			"    SPACE1-1 Unit Vent Inlet,    !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"  Schedule:Compact,",
+			"    FanAvailSched,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 16",
+			"    1.0;                     !- Field 17",
+
+			"  ZoneHVAC:EquipmentList,",
+			"    SPACE1-1 Equipment,      !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:UnitVentilator, !- Zone Equipment 2 Object Type",
+			"    SPACE1-1 Unit Vent,      !- Zone Equipment 2 Name",
+			"    2,                       !- Zone Equipment 2 Cooling Sequence",
+			"    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+
+			"  ZoneHVAC:UnitVentilator,",
+			"    SPACE1-1 Unit Vent,      !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.50,                    !- Maximum Supply Air Flow Rate {m3/s}",
+			"    VariablePercent,         !- Outdoor Air Control Type",
+			"    0.20,                    !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    U2MinOASched,            !- Minimum Outdoor Air Schedule Name",
+			"    0.50,                    !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    UnitVentMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name",
+			"    SPACE1-1 Unit Vent Inlet,!- Air Inlet Node Name",
+			"    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name",
+			"    ,                        !- Outdoor Air Node Name",
+			"    ,                        !- Exhaust Air Node Name",
+			"    ,                        !- Mixed Air Node Name",
+			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+			"    Zone1UnitVentFan,        !- Supply Air Fan Name",
+			"    HEATING,                 !- Coil Option",
+			"    ,                        !- Supply Air Fan Operating Mode Schedule Name",
+			"    Coil:Heating:Fuel,       !- Heating Coil Object Type",
+			"    Zone1UnitVentHeatingCoil,!- Heating Coil Name",
+			"    0.001;                   !- Heating Convergence Tolerance",
+
+			"  Schedule:Compact,",
+			"    UnitVentMaxOA,           !- Name",
+			"    Any Number,              !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,1.0;        !- Field 3",
+
+			"  Schedule:Compact,",
+			"    U2MinOASched,            !- Name",
+			"    Any Number,              !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00, 0.5;       !- Field 3",
+
+			"  Fan:ConstantVolume,",
+			"    Zone1UnitVentFan,        !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.5,                     !- Fan Total Efficiency",
+			"    0.0,                     !- Pressure Rise {Pa}",
+			"    0.50,                    !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    SPACE1-1 Unit Vent Inlet,!- Air Inlet Node Name",
+			"    SPACE1-1 Fan Outlet;     !- Air Outlet Node Name",
+
+			"  Coil:Heating:Fuel,",
+			"    Zone1UnitVentHeatingCoil,!- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type",
+			"    0.8,                     !- Gas Burner Efficiency",
+			"    10000.0,                 !- Nominal Capacity {W}",
+			"    SPACE1-1 Fan Outlet,     !- Air Inlet Node Name",
+			"    SPACE1-1 Supply Inlet;   !- Air Outlet Node Name",
+
+			"  Zone,",
+			"    SPACE1-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    239.247360229;           !- Volume {m3}",
+
+			"  ZoneHVAC:EquipmentConnections,",
+			"    SPACE1-1,                !- Zone Name",
+			"    SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE1-1 Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE1-1 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"  NodeList,",
+			"    SPACE1-1 Inlets,         !- Name",
+			"    SPACE1-1 Supply Inlet;   !- Node 1 Name",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+		ProcessScheduleInput(); // read schedules
+		InitializePsychRoutines();
+		OutputReportPredefined::SetPredefinedTables();
+
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound );
+
+		GetZoneEquipmentData1();
+		GetZoneAirLoopEquipment();
+		GetUnitVentilatorInput();
+		GetUnitVentilatorInputFlag = false;
+
+		// get input test for terminal air single duct mixer on inlet side of PTHP
+		ASSERT_EQ( 1, NumATMixers );
+		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
+
+		BeginEnvrnFlag = false;
+
+		// set input variables
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutDryBulbTemp = 10.0;
+		DataEnvironment::OutHumRat = 0.0070;
+		DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW( DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat );
+		DataEnvironment::StdRhoAir = 1.00;
+		HVACInletMassFlowRate = 0.50;
+		PrimaryAirMassFlowRate = 0.1;
+
+		// set zoneNode air condition
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat = 0.0070;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat );
+
+		DataHVACGlobals::ZoneCompTurnFansOff = false;
+		DataHVACGlobals::ZoneCompTurnFansOn = true;
+
+		UnitVentNum = 1;
+		// set the mass flow rates from the input volume flow rates
+		UnitVent( UnitVentNum ).MaxAirMassFlow = DataEnvironment::StdRhoAir * UnitVent( UnitVentNum ).MaxAirVolFlow;
+		UnitVent( UnitVentNum ).OutAirMassFlow = DataEnvironment::StdRhoAir * UnitVent( UnitVentNum ).OutAirVolFlow;
+		UnitVent( UnitVentNum ).MinOutAirMassFlow = DataEnvironment::StdRhoAir * UnitVent( UnitVentNum ).MinOutAirVolFlow;
+
+		UnitVent( UnitVentNum ).OpMode = CycFanCycCoil;
+		// initialize mass flow rates
+		Node( UnitVent( UnitVentNum ).AirInNode ).MassFlowRate = HVACInletMassFlowRate;
+		Node( UnitVent( UnitVentNum ).AirInNode ).MassFlowRateMax = HVACInletMassFlowRate;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+
+		// set fan parameters
+		Fan( 1 ).MaxAirMassFlowRate = HVACInletMassFlowRate;
+		Fan( 1 ).InletAirMassFlowRate = HVACInletMassFlowRate;
+		Fan( 1 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 1 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+		Node( Fan( 1 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate;
+
+		// primary air condition set at outdoor air condition
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+
+		// set secondary air (recirculating air) conditions to zone air node		
+		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
+		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
+		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
+
+		UnitVent( 1 ).ZonePtr = 1;
+		SysSizingRunDone = true;
+		ZoneSizingRunDone = true;
+		SysSizingCalc = true;
+	
+		CurDeadBandOrSetback.allocate( 1 );
+		CurDeadBandOrSetback( 1 ) = false;
+		ZoneSysEnergyDemand.allocate( 1 );
+		ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = 5000.0;
+		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputRequired;
+
+		Schedule( UnitVent( UnitVentNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( UnitVent( UnitVentNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
+		Schedule( UnitVent( UnitVentNum ).MinOASchedPtr ).CurrentValue = 0.5; // min OA fraction is always available
+
+		// set secondary air mass flow rate to zero 
+		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
+		// simulate Unit Ventilator zoneHVAC equipment 
+		SimUnitVentilator( UnitVent( UnitVentNum ).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum );
+		// apply mass conservation to determine secondary air mass flow rate
+		SecondaryAirMassFlowRate = Node( UnitVent( UnitVentNum ).AirInNode ).MassFlowRate - PrimaryAirMassFlowRate;
+		// check the air mixer secondary air mass flow rate 
+		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
+
+	}
+
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide ) {
+
+		bool ErrorsFound( false );
+		bool FirstHVACIteration( false );
+		Real64 HVACInletMassFlowRate( 0.0 );
+		Real64 PrimaryAirMassFlowRate( 0.0 );
+		Real64 SecondaryAirMassFlowRate( 0.0 );
+		Real64 ATMixerOutletMassFlowRate( 0.0 );
+		Real64 LatOutputProvided( 0.0 );
+		Real64 QUnitOut( 0.0 );
+		Real64 QZnReq( 0.0 );
+		int ZoneNum( 1 );
+		int UnitVentNum( 1 );
+
+		std::string const idf_objects = delimited_string( {
+			"  Version,8.6;",
+
+			"  AirTerminal:SingleDuct:Mixer,",
+			"    SPACE1-1 DOAS Air Terminal, !- Name",
+			"    ZoneHVAC:UnitVentilator,    !- ZoneHVAC Terminal Unit Object Type",
+			"    SPACE1-1 Unit Vent,         !- ZoneHVAC Terminal Unit Name",
+			"    SPACE1-1 Supply Inlet,      !- Terminal Unit Outlet Node Name",
+			"    SPACE1-1 Primary Air Inlet, !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE1-1 Unit Vent Outlet,  !- Terminal Unit Secondary Air Inlet Node Name",
+			"    SupplySide;                 !- Terminal Unit Connection Type",
+
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    SPACE1-1 DOAS ATU,       !- Name",
+			"    SPACE1-1 Supply Inlet,   !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"  Schedule:Compact,",
+			"    FanAvailSched,           !- Name",
+			"    Fraction,                !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,            !- Field 16",
+			"    1.0;                     !- Field 17",
+
+			"  ZoneHVAC:EquipmentList,",
+			"    SPACE1-1 Equipment,      !- Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+			"    ZoneHVAC:UnitVentilator, !- Zone Equipment 2 Object Type",
+			"    SPACE1-1 Unit Vent,      !- Zone Equipment 2 Name",
+			"    2,                       !- Zone Equipment 2 Cooling Sequence",
+			"    2;                       !- Zone Equipment 2 Heating or No-Load Sequence",
+
+			"  ZoneHVAC:UnitVentilator,",
+			"    SPACE1-1 Unit Vent,      !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.50,                    !- Maximum Supply Air Flow Rate {m3/s}",
+			"    VariablePercent,         !- Outdoor Air Control Type",
+			"    0.20,                    !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    U2MinOASched,            !- Minimum Outdoor Air Schedule Name",
+			"    0.50,                    !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    UnitVentMaxOA,           !- Maximum Outdoor Air Fraction or Temperature Schedule Name",
+			"    SPACE1-1 Unit Vent Inlet,  !- Air Inlet Node Name",
+			"    SPACE1-1 Unit Vent Outlet, !- Air Outlet Node Name",
+			"    ,                        !- Outdoor Air Node Name",
+			"    ,                        !- Exhaust Air Node Name",
+			"    ,                        !- Mixed Air Node Name",
+			"    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+			"    Zone1UnitVentFan,        !- Supply Air Fan Name",
+			"    HEATING,                 !- Coil Option",
+			"    ,                        !- Supply Air Fan Operating Mode Schedule Name",
+			"    Coil:Heating:Fuel,       !- Heating Coil Object Type",
+			"    Zone1UnitVentHeatingCoil,!- Heating Coil Name",
+			"    0.001;                   !- Heating Convergence Tolerance",
+
+			"  Schedule:Compact,",
+			"    UnitVentMaxOA,           !- Name",
+			"    Any Number,              !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,1.0;        !- Field 3",
+
+			"  Schedule:Compact,",
+			"    U2MinOASched,            !- Name",
+			"    Any Number,              !- Schedule Type Limits Name",
+			"    Through: 12/31,          !- Field 1",
+			"    For: AllDays,            !- Field 2",
+			"    Until: 24:00,0.5;        !- Field 3",
+
+			"  Fan:ConstantVolume,",
+			"    Zone1UnitVentFan,        !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.5,                     !- Fan Total Efficiency",
+			"    0.0,                     !- Pressure Rise {Pa}",
+			"    0.50,                    !- Maximum Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    SPACE1-1 Unit Vent Inlet,!- Air Inlet Node Name",
+			"    SPACE1-1 Fan Outlet;     !- Air Outlet Node Name",
+
+			"  Coil:Heating:Fuel,",
+			"    Zone1UnitVentHeatingCoil,!- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    Gas,                     !- Fuel Type,",
+			"    0.8,                     !- Gas Burner Efficiency",
+			"    10000.0,                 !- Nominal Capacity {W}",
+			"    SPACE1-1 Fan Outlet,     !- Air Inlet Node Name",
+			"    SPACE1-1 Unit Vent Outlet;  !- Air Outlet Node Name",
+
+			"  Zone,",
+			"    SPACE1-1,                !- Name",
+			"    0,                       !- Direction of Relative North {deg}",
+			"    0,                       !- X Origin {m}",
+			"    0,                       !- Y Origin {m}",
+			"    0,                       !- Z Origin {m}",
+			"    1,                       !- Type",
+			"    1,                       !- Multiplier",
+			"    2.438400269,             !- Ceiling Height {m}",
+			"    239.247360229;           !- Volume {m3}",
+
+			"  ZoneHVAC:EquipmentConnections,",
+			"    SPACE1-1,                !- Zone Name",
+			"    SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE1-1 Unit Vent Inlet,!- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE1-1 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"  NodeList,",
+			"    SPACE1-1 Inlets,         !- Name",
+			"    SPACE1-1 Supply Inlet;   !- Node 1 Name",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		DataGlobals::NumOfTimeStepInHour = 1;
+		DataGlobals::TimeStep = 1;
+		DataGlobals::MinutesPerTimeStep = 60;
+		ProcessScheduleInput(); // read schedules
+		InitializePsychRoutines();
+		OutputReportPredefined::SetPredefinedTables();
+
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound );
+
+		GetZoneEquipmentData1();
+		GetZoneAirLoopEquipment();
+		GetUnitVentilatorInput();
+		GetUnitVentilatorInputFlag = false;
+
+		// get input test for terminal air single duct mixer on supply side of PTHP
+		ASSERT_EQ( 1, NumATMixers );
+		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
+		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
+
+		// set input variables
+		DataEnvironment::OutBaroPress = 101325.0;
+		DataEnvironment::OutDryBulbTemp = 10.0;
+		DataEnvironment::OutHumRat = 0.0070;
+		DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW( DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat );
+		DataEnvironment::StdRhoAir = 1.00;
+		HVACInletMassFlowRate = 0.50;
+		PrimaryAirMassFlowRate = 0.1;
+
+		BeginEnvrnFlag = false;
+
+		// set zoneNode air condition
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp = 24.0;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat = 0.0070;
+		Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat );
+
+		DataHVACGlobals::ZoneCompTurnFansOff = false;
+		DataHVACGlobals::ZoneCompTurnFansOn = true;
+
+		UnitVentNum = 1;
+		// set the mass flow rates from the input volume flow rates
+		UnitVent( UnitVentNum ).MaxAirMassFlow = DataEnvironment::StdRhoAir * UnitVent( UnitVentNum ).MaxAirVolFlow;
+		UnitVent( UnitVentNum ).OutAirMassFlow = DataEnvironment::StdRhoAir * UnitVent( UnitVentNum ).OutAirVolFlow;
+		UnitVent( UnitVentNum ).MinOutAirMassFlow = DataEnvironment::StdRhoAir * UnitVent( UnitVentNum ).MinOutAirVolFlow;
+
+		UnitVent( UnitVentNum ).OpMode = CycFanCycCoil;
+		// initialize mass flow rates
+		Node( UnitVent( UnitVentNum ).AirInNode ).MassFlowRate = HVACInletMassFlowRate;
+		Node( UnitVent( UnitVentNum ).AirInNode ).MassFlowRateMax = HVACInletMassFlowRate;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).MassFlowRate = PrimaryAirMassFlowRate;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+
+		// set fan parameters
+		Fan( 1 ).MaxAirMassFlowRate = HVACInletMassFlowRate;
+		Fan( 1 ).InletAirMassFlowRate = HVACInletMassFlowRate;
+		Fan( 1 ).RhoAirStdInit = DataEnvironment::StdRhoAir;
+		Node( Fan( 1 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+		Node( Fan( 1 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate;
+
+		// primary air condition at outside air condition 
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
+		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
+
+		// set UnitVent inlet condition to zone air node	
+		Node( UnitVent( UnitVentNum ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
+		Node( UnitVent( UnitVentNum ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
+		Node( UnitVent( UnitVentNum ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
+
+		UnitVent( 1 ).ZonePtr = 1;
+		SysSizingRunDone = true;
+		ZoneSizingRunDone = true;
+		SysSizingCalc = true;
+
+		CurDeadBandOrSetback.allocate( 1 );
+		CurDeadBandOrSetback( 1 ) = false;
+		ZoneSysEnergyDemand.allocate( 1 );
+		ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired = 5000.0;
+		QZnReq = ZoneSysEnergyDemand( 1 ).RemainingOutputRequired;
+
+		Schedule( UnitVent( UnitVentNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
+		Schedule( UnitVent( UnitVentNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
+		Schedule( UnitVent( UnitVentNum ).MinOASchedPtr ).CurrentValue = 0.5; // min OA fraction is always available
+
+		// set secondary air mass flow rate to zero 
+		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
+		// simulate Unit Ventilator ZoneHVAC equipment 
+		SimUnitVentilator( UnitVent( UnitVentNum ).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum );
+		// apply mass conservation to determine secondary mass flow rate
+		SecondaryAirMassFlowRate = Node( SysATMixer( 1 ).SecInNode ).MassFlowRate;
+		// check the terminal air mixer secondary air mass flow rate 
+		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
+		// check the air mixer outlet air mass flow rate 
+		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
+		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
+
+	}
 }

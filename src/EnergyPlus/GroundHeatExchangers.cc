@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -514,28 +514,21 @@ namespace GroundHeatExchangers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the distance between any two points on any two loops
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 x;
-		Real64 y;
-		Real64 z;
-		Real64 xIn;
-		Real64 yIn;
-		Real64 zIn;
-		Real64 xOut;
-		Real64 yOut;
-		Real64 zOut;
-		Real64 pipeOuterRadius;
+		Real64 pipeOuterRadius = pipeOutDia / 2.0;
 
-		pipeOuterRadius = pipeOutDia / 2.0;
+		Real64 const cos_theta = std::cos( theta );
+		Real64 const sin_theta = std::sin( theta );
+		Real64 const cos_eta = std::cos( eta );
+		Real64 const sin_eta = std::sin( eta );
 
-		x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
-		y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
+		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
+		Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
 
-		xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-		yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 xIn = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
 
-		xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 xOut = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 		if ( ! verticalConfig ) {
 
@@ -544,10 +537,10 @@ namespace GroundHeatExchangers {
 
 		} else {
 
-			z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 );
+			Real64 z = Z0 + sin_theta * ( coilDiameter / 2.0 );
 
-			zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-			zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+			Real64 zIn = Z0 + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+			Real64 zOut = Z0 + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );
@@ -575,31 +568,24 @@ namespace GroundHeatExchangers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the distance between any two points between real and fictitious rings
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 x;
-		Real64 y;
-		Real64 z;
-		Real64 xIn;
-		Real64 yIn;
-		Real64 zIn;
-		Real64 xOut;
-		Real64 yOut;
-		Real64 zOut;
-		Real64 pipeOuterRadius;
+		Real64 pipeOuterRadius = pipeOutDia / 2.0;
 
-		pipeOuterRadius = pipeOutDia / 2.0;
+		Real64 const sin_theta = std::sin( theta );
+		Real64 const cos_theta = std::cos( theta );
+		Real64 const sin_eta = std::sin( eta );
+		Real64 const cos_eta = std::cos( eta );
 
-		x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
-		y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
-		z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 ) + 2 * coilDepth;
+		Real64 x = X0( n ) + cos_theta * ( coilDiameter / 2.0 );
+		// Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
+		Real64 z = Z0 + sin_theta * ( coilDiameter / 2.0 ) + 2 * coilDepth;
 
-		xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-		yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-		zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 xIn = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+		//Real64 yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
+		Real64 zIn = Z0 + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
 
-		xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-		zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 xOut = X0( n1 ) + cos_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
+		//Real64 yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
+		Real64 zOut = Z0 + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
 
 		return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) )
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );
@@ -1003,7 +989,7 @@ namespace GroundHeatExchangers {
 				// Find the total Sum of the Temperature difference due to all load blocks
 				sumTotal = sumQnSubHourly + sumQnHourly;
 
-				//Calulate the subhourly temperature due the Last Time steps Load
+				//Calculate the subhourly temperature due the Last Time steps Load
 				gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
 				RQSubHr = gFuncVal / ( kGroundFactor );
 
@@ -1078,7 +1064,7 @@ namespace GroundHeatExchangers {
 
 				sumTotal = sumQnMonthly + sumQnHourly + sumQnSubHourly;
 
-				// Calulate the subhourly temperature due the Last Time steps Load
+				// Calculate the subhourly temperature due the Last Time steps Load
 
 				gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
 				RQSubHr = gFuncVal / ( kGroundFactor );
@@ -1174,7 +1160,7 @@ namespace GroundHeatExchangers {
 
 		// METHODOLOGY EMPLOYED:
 		// The heat pulse histories need to be recorded over an extended period (months).
-		// To aid computational efficiency past pulses are continuously agregated into
+		// To aid computational efficiency past pulses are continuously aggregated into
 		// equivalent heat pulses of longer duration, as each pulse becomes less recent.
 		// Past sub-hourly loads are re-aggregated into equivalent hourly and monthly loads.
 
@@ -1434,12 +1420,12 @@ namespace GroundHeatExchangers {
 
 			//Set up report variables
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
 			}
 
 		}
@@ -1584,12 +1570,12 @@ namespace GroundHeatExchangers {
 
 			//Set up report variables
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).Name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
 			}
 		}
 

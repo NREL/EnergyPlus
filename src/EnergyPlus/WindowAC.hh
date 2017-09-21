@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -117,6 +117,7 @@ namespace WindowAC {
 		// 'CoilSystem:Cooling:DX:HeatExchangerAssisted'
 		int DXCoilType_Num; // Numeric Equivalent for DXCoil Type
 		int DXCoilIndex; // Index to DX cooling coil
+		int DXCoilNumOfSpeeds; // number of speed levels for variable speed DX coil
 		int CoilOutletNodeNum; // Outlet node number of DX cooling coil
 		int OpMode; // mode of operation; 1=cycling fan, cycling compressor,
 		// 2=continuous fan, cycling compresor
@@ -164,6 +165,7 @@ namespace WindowAC {
 			FanIndex( 0 ),
 			DXCoilType_Num( 0 ),
 			DXCoilIndex( 0 ),
+			DXCoilNumOfSpeeds( 0 ),
 			CoilOutletNodeNum( 0 ),
 			OpMode( 0 ),
 			FanPlace( 0 ),

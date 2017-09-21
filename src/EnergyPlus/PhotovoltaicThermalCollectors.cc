@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -506,17 +506,17 @@ namespace PhotovoltaicThermalCollectors {
 			// electrical production reporting under generator:photovoltaic....
 			//    only thermal side reported here,
 
-			SetupOutputVariable( "Generator Produced Thermal Rate [W]", PVT( Item ).Report.ThermPower, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, PVT( Item ).Report.ThermPower, "System", "Average", PVT( Item ).Name );
 			if ( PVT( Item ).WorkingFluidType == LiquidWorkingFluid ) {
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 			} else if ( PVT( Item ).WorkingFluidType == AirWorkingFluid ) {
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
-				SetupOutputVariable( "Generator PVT Fluid Bypass Status []", PVT( Item ).Report.BypassStatus, "System", "Average", PVT( Item ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
+				SetupOutputVariable( "Generator PVT Fluid Bypass Status", OutputProcessor::Unit::None, PVT( Item ).Report.BypassStatus, "System", "Average", PVT( Item ).Name );
 			}
 
-			SetupOutputVariable( "Generator PVT Fluid Inlet Temperature [C]", PVT( Item ).Report.TinletWorkFluid, "System", "Average", PVT( Item ).Name );
-			SetupOutputVariable( "Generator PVT Fluid Outlet Temperature [C]", PVT( Item ).Report.ToutletWorkFluid, "System", "Average", PVT( Item ).Name );
-			SetupOutputVariable( "Generator PVT Fluid Mass Flow Rate [kg/s]", PVT( Item ).Report.MdotWorkFluid, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator PVT Fluid Inlet Temperature", OutputProcessor::Unit::C, PVT( Item ).Report.TinletWorkFluid, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator PVT Fluid Outlet Temperature", OutputProcessor::Unit::C, PVT( Item ).Report.ToutletWorkFluid, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, PVT( Item ).Report.MdotWorkFluid, "System", "Average", PVT( Item ).Name );
 		}
 
 		if ( ErrorsFound ) {

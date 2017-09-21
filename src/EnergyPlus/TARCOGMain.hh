@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -171,7 +171,8 @@ namespace TARCOGMain {
 		Array1A< Real64 > ShadeGapKeffConv, // Vector of convective keff values for areas above/below
 		Real64 const SDScalar, // Factor of Venetian SD layer contribution to convection
 		int const SHGCCalc, // SHGC calculation switch:
-		int & NumOfIterations // Number of iterations for reacing solution
+		int & NumOfIterations, // Number of iterations for reacing solution
+		Real64 const edgeGlCorrFac // Edge of glass correction factor
 	);
 
 } // TARCOGMain

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -97,7 +97,12 @@ namespace ChillerElectricEIR {
 
 	extern Array1D_bool CheckEquipName;
 
+
 	extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
+	extern bool ChillerIPLVOneTimeFlag;
+	extern Array1D_bool ChillerIPLVFlagArr; // TRUE in order to calculate IPLV
+	extern bool getInputAllocatedFlag; // True when arrays are allocated
+	extern bool InitMyOneTimeFlag; // Flag used to execute code only once
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 	//PUBLIC     SimEIRChillerHeatRecovery
@@ -191,6 +196,14 @@ namespace ChillerElectricEIR {
 		int MsgErrorCount; // number of occurrences of warning
 		int ErrCount1; // for recurring error messages
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
+		//Operational fault parameters
+		bool FaultyChillerSWTFlag; // True if the chiller has SWT sensor fault
+		int FaultyChillerSWTIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
+		bool FaultyChillerFoulingFlag; // True if the chiller has fouling fault
+		int FaultyChillerFoulingIndex;  // Index of the fault object corresponding to the chiller
+		Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
+		std::string EndUseSubcategory; // identifier use for the end use subcategory
 
 		// Default Constructor
 		ElectricEIRChillerSpecs() :
@@ -266,7 +279,13 @@ namespace ChillerElectricEIR {
 			PrintMessage( false ),
 			MsgErrorCount( 0 ),
 			ErrCount1( 0 ),
-			PossibleSubcooling( false )
+			PossibleSubcooling( false ),
+			FaultyChillerSWTFlag( false ),
+			FaultyChillerSWTIndex( 0 ),
+			FaultyChillerSWTOffset( 0.0 ),
+			FaultyChillerFoulingFlag( false ),
+			FaultyChillerFoulingIndex( 0 ),
+			FaultyChillerFoulingFactor( 1.0 )
 		{}
 
 
@@ -349,6 +368,8 @@ namespace ChillerElectricEIR {
 	extern Array1D< ReportEIRVars > ElectricEIRChillerReport;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	SimElectricEIRChiller(

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -63,6 +63,7 @@ namespace InternalHeatGains {
 	// MODULE PARAMETER DEFINITIONS:
 
 	extern bool GetInternalHeatGainsInputFlag; // Controls the GET routine calling (limited to first time)
+	extern bool ErrorsFound; // if errors were found in the input
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE InternalHeatGains
 	//PUBLIC  SumInternalConvectionGainsByIndices
@@ -153,7 +154,8 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirConvectionGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumReturnAirGainRate
+		Real64 & SumReturnAirGainRate,
+		int const ReturnNodeNum // return air node number
 	);
 
 	void
@@ -192,7 +194,8 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirLatentGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumRetAirLatentGainRate
+		Real64 & SumRetAirLatentGainRate,
+		int const ReturnNodeNum // return air node number
 	);
 
 	void

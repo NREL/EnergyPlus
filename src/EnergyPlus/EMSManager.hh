@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -85,7 +85,7 @@ namespace EMSManager {
 	// Functions
 	void
 	clear_state();
-	
+
 	void
 	CheckIfAnyEMS();
 
@@ -94,7 +94,7 @@ namespace EMSManager {
 	void
 	ManageEMS(
 		int const iCalledFrom, // indicates where subroutine was called from, parameters in DataGlobals.
-		bool & anyProgramRan, // true if any Erl programs ran for this call 
+		bool & anyProgramRan, // true if any Erl programs ran for this call
 		Optional_int_const ProgramManagerToRun = _ // specific program manager to run
 	);
 
@@ -138,7 +138,7 @@ namespace EMSManager {
 	);
 
 	bool
-	CheckIfNodeMoreInfoSensedByEMS( 
+	CheckIfNodeMoreInfoSensedByEMS(
 		int const nodeNum, // index of node being checked.
 		std::string const & varName
 	);
@@ -160,6 +160,9 @@ namespace EMSManager {
 
 	void
 	SetupSurfaceOutdoorBoundaryConditionActuators();
+
+	void
+	SetupZoneOutdoorBoundaryConditionActuators();
 
 	void
 	SetupZoneInfoAsInternalDataAvail();

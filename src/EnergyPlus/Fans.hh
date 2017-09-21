@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -132,6 +132,7 @@ namespace Fans {
 		Real64 FanRuntimeFraction; // Fraction of the timestep that the fan operates
 		Real64 DeltaTemp; // Temp Rise across the Fan [C]
 		Real64 DeltaPress; // Delta Pressure Across the Fan [N/m2]
+		Real64 PowerLossToAir; // Fan heat gain to air stream [W]
 		bool EMSFanPressureOverrideOn; // if true, then EMS is calling to override
 		Real64 EMSFanPressureValue; // EMS value for Delta Pressure Across the Fan [Pa]
 		// cpw22Aug2010 Clarify meaning of "fan efficiency"
@@ -239,6 +240,7 @@ namespace Fans {
 			FanRuntimeFraction( 0.0 ),
 			DeltaTemp( 0.0 ),
 			DeltaPress( 0.0 ),
+			PowerLossToAir( 0.0 ),
 			EMSFanPressureOverrideOn( false ),
 			EMSFanPressureValue( 0.0 ),
 			FanEff( 0.0 ),
@@ -454,11 +456,8 @@ namespace Fans {
 		Real64 & FanVolFlow
 	);
 
-	void
-	GetFanPower(
-		int const FanIndex,
-		Real64 & FanPower
-	);
+	Real64
+	GetFanPower( int const FanIndex );
 
 	void
 	GetFanType(

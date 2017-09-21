@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -61,6 +61,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -97,7 +98,7 @@ namespace EnergyPlus {
 			m_variMeter( "" ),
 			m_colHead(""),
 			m_aggregate( sumOrAvg ),
-			m_varUnits(""),
+			m_varUnits(OutputProcessor::Unit::None),
 			m_typeOfVar(0),
 			m_keyCount(0),
 			m_varAvgSum(0),
@@ -122,7 +123,7 @@ namespace EnergyPlus {
 		};
 
 		int
-		getVariableKeyCountandTypeFromFldSt( int &typeVar, int &avgSumVar, int &stepTypeVar, std::string &unitsVar );
+		getVariableKeyCountandTypeFromFldSt( int &typeVar, int &avgSumVar, int &stepTypeVar, OutputProcessor::Unit &unitsVar );
 
 		void
 		getVariableKeysFromFldSt( int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int>  &indexesForKeyVar );
@@ -131,7 +132,7 @@ namespace EnergyPlus {
 		std::string m_colHead; // the column header to use instead of the variable name (only for predefined)
 		AggregationKind m_aggregate; // the type of aggregation for the variable (see aggType parameters)
 		int m_showDigits; // the number of digits to be shown
-		std::string m_varUnits; // Units sting, may be blank
+		OutputProcessor::Unit m_varUnits; // Units sting, may be blank
 		int m_typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int m_keyCount; 
 		int m_varAvgSum; // Variable  is Averaged=1 or Summed=2

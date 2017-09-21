@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -2800,7 +2800,7 @@ Label90: ;
 				DF( 1 ) = 0.5 * FT / PDROP;
 			}
 		}
-		// If damper, setup the airflows from nodal values calculated from teminal
+		// If damper, setup the airflows from nodal values calculated from terminal
 		if ( AirflowNetworkLinkageData( i ).VAVTermDamper ) {
 			F( 1 ) = Node( DisSysCompTermUnitData( CompNum ).DamperInletNode ).MassFlowRate;
 			if ( VAVTerminalRatio > 0.0 ) {

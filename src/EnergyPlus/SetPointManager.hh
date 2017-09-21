@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -272,7 +272,7 @@ namespace SetPointManager {
 		int NumCtrlNodes;
 		std::string CtrlNodeListName;
 		Array1D_int CtrlNodes;
-		Real64 SetPt;
+		Real64 SetPt; // current setpoint value
 
 		// Default Constructor
 		DefineOutsideAirSetPointManager() :
@@ -288,12 +288,10 @@ namespace SetPointManager {
 			OutHigh2( 0.0 ),
 			NumCtrlNodes( 0 ),
 			SetPt( 0.0 )
+
 		{}
 
-		void calculate(
-			Optional_int_const NodeNum = _, // When Init Calls this routine, it passes the cur node number
-			Optional_bool_const InitFlag = _ // When Init Calls this routine, it passes True
-		);
+		void calculate();
 
 		Real64
 		CalcSetPoint(

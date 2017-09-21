@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <DataIPShortCuts.hh>
 #include <CurveManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -61,6 +62,7 @@ using namespace EnergyPlus::CurveManager;
 
 TEST_F( EnergyPlusFixture, Tables_TwoIndVar_Malformed ) {
 
+	DataIPShortCuts::lAlphaFieldBlanks = true;
 	std::string const idf_objects = delimited_string( {
 		"Version,8.5;",
 		"                                                                      ",
@@ -78,6 +80,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndVar_Malformed ) {
 		"    Temperature,             !- Input Unit Type for Y                 ",
 		"    Dimensionless,           !- Output Unit Type                      ",
 		"    -15,                     !- Normalization Reference               ",
+		"    ,                        !- External File Name",
 		"    35,                      !- X Value #1                            ",
 		"    0.789473684210526,       !- Y Value #1                            ",
 		"    -15,                     !- Output Value #1                       ",
@@ -410,6 +413,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		"  Temperature,    !- Input Unit Type for Y",
 		"  Dimensionless,  !- Output Unit Type",
 		"  25000.0,        !- Normalization Reference",
+		"  ,               !- External File Name",
 		"  12.77778,       !- X Value #1",
 		"  36,             !- Y Value #1",
 		"  19524.15032,    !- Output Value #1",
@@ -443,6 +447,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		"  Temperature,    !- Input Unit Type for Y",
 		"  Dimensionless,  !- Output Unit Type",
 		"  25000.0,        !- Normalization Reference",
+		"  ,               !- External File Name",
 		"  12.77778,       !- X Value #1",
 		"  36,             !- Y Value #1",
 		"  19524.15032,    !- Output Value #1",
@@ -622,7 +627,8 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
         "Dimensionless,           !- Input Unit Type for Y",
         "Dimensionless,           !- Output Unit Type",
         ",                        !- Normalization Reference",
-        "0,                       !- X Value #1",
+		"  ,               !- External File Name",
+		"0,                       !- X Value #1",
         "1,                       !- Y Value #1",
         "0,                       !- Output Value #1",
         "1,                       !- X Value #2",
@@ -713,7 +719,8 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
         "Dimensionless,           !- Input Unit Type for Y",
         "Dimensionless,           !- Output Unit Type",
         ",                        !- Normalization Reference",
-        "0,                       !- X Value #1",
+		"  ,               !- External File Name",
+		"0,                       !- X Value #1",
         "1,                       !- Y Value #1",
         "0,                       !- Output Value #1",
         "1,                       !- X Value #2",
@@ -764,7 +771,8 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
         "Dimensionless,           !- Input Unit Type for Y",
         "Dimensionless,           !- Output Unit Type",
         ",                        !- Normalization Reference",
-        "0,                       !- X Value #1",
+		"  ,               !- External File Name",
+		"0,                       !- X Value #1",
         "1,                       !- Y Value #1",
         "0,                       !- Output Value #1",
         "1,                       !- X Value #2",

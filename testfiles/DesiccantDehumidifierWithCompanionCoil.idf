@@ -104,13 +104,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.5,                     !- Loads Convergence Tolerance Value
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     40,                      !- Maximum Number of Warmup Days
@@ -467,14 +467,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03,                    !- Outside Layer
     CP01;                    !- Layer 2
@@ -492,26 +484,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Zone,
     PLENUM-1,                !- Name
@@ -2778,6 +2752,7 @@
     HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name
     HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     4,                       !- Maximum Cycling Rate {cycles/hr}
@@ -2815,16 +2790,22 @@
     HX Process Outlet Node,  !- Air Inlet Node Name
     Desiccant Supply Fan Outlet Node;  !- Air Outlet Node Name
 
-  Fan:ConstantVolume,
+  Fan:SystemModel,
     Desiccant Regen Fan,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    205.5,                   !- Pressure Rise {Pa}
-    1.05,                    !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     HX Regen Outlet Node,    !- Air Inlet Node Name
-    Regen Fan Outlet Node;   !- Air Outlet Node Name
+    Regen Fan Outlet Node,   !- Air Outlet Node Name
+    1.05,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    205.5,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7;                     !- Fan Total Efficiency
 
 ! Modeling Munters HCU (humidity control unit)
 
@@ -2834,7 +2815,7 @@
     HeatExchanger:Desiccant:BalancedFlow,  !- Desiccant Heat Exchanger Object Type
     Desiccant Heat Exchanger 1,  !- Desiccant Heat Exchanger Name
     HX Process Outlet Node,  !- Sensor Node Name
-    Fan:ConstantVolume,      !- Regeneration Air Fan Object Type
+    Fan:SystemModel,         !- Regeneration Air Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
     Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type
@@ -2932,16 +2913,22 @@
     Relief Air Outlet Node,  !- Secondary Air Inlet Node Name
     OA Heat Recovery Secondary Outlet Node;  !- Secondary Air Outlet Node Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     OA Desiccant Regen Fan,  !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    205.5,                   !- Pressure Rise {Pa}
-    2.5893,                  !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     OA HX Regen Outlet Node, !- Air Inlet Node Name
-    OA Regen Fan Outlet Node;!- Air Outlet Node Name
+    OA Regen Fan Outlet Node,!- Air Outlet Node Name
+    2.5893,                  !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    205.5,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   Coil:Heating:Fuel,
     OA Desiccant Regen Coil, !- Name
@@ -2958,7 +2945,7 @@
     HeatExchanger:Desiccant:BalancedFlow,  !- Desiccant Heat Exchanger Object Type
     OA Desiccant Heat Exchanger,  !- Desiccant Heat Exchanger Name
     OA Desiccant Process Outlet Node,  !- Sensor Node Name
-    Fan:OnOff,               !- Regeneration Air Fan Object Type
+    Fan:SystemModel,         !- Regeneration Air Fan Object Type
     OA Desiccant Regen Fan,  !- Regeneration Air Fan Name
     DrawThrough,             !- Regeneration Air Fan Placement
     Coil:Heating:Fuel,       !- Regeneration Air Heater Object Type
@@ -3238,4 +3225,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-

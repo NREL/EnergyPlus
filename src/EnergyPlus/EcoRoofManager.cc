@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -364,25 +364,25 @@ namespace EcoRoofManager {
 
 			// DJS NOVEMBER 2010 - Make calls to SetupOutput Variable to allow for reporting of ecoroof variables
 
-			SetupOutputVariable( "Green Roof Soil Temperature [C]", Tg, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Temperature [C]", Tf, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Root Moisture Ratio []", MeanRootMoisture, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Near Surface Moisture Ratio []", Moisture, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Sensible Heat Transfer Rate per Area [W/m2]", sensibleg, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Sensible Heat Transfer Rate per Area [W/m2]", sensiblef, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Moisture Transfer Rate [m/s]", Vfluxf, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Moisture Transfer Rate [m/s]", Vfluxg, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Vegetation Latent Heat Transfer Rate per Area [W/m2]", Lf, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Green Roof Soil Latent Heat Transfer Rate per Area [W/m2]", Lg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Temperature", OutputProcessor::Unit::C, Tg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Temperature", OutputProcessor::Unit::C, Tf, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Root Moisture Ratio", OutputProcessor::Unit::None, MeanRootMoisture, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Near Surface Moisture Ratio", OutputProcessor::Unit::None, Moisture, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State", "Environment" );
 
-			SetupOutputVariable( "Green Roof Cumulative Precipitation Depth [m]", CumPrecip, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Cumulative Irrigation Depth [m]", CumIrrigation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Cumulative Runoff Depth [m]", CumRunoff, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Cumulative Evapotranspiration Depth [m]", CumET, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Precipitation Depth [m]", CurrentPrecipitation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Irrigation Depth [m]", CurrentIrrigation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Runoff Depth [m]", CurrentRunoff, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Green Roof Current Evapotranspiration Depth [m]", CurrentET, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Precipitation Depth", OutputProcessor::Unit::m, CumPrecip, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Irrigation Depth", OutputProcessor::Unit::m, CumIrrigation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, CumRunoff, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Cumulative Evapotranspiration Depth", OutputProcessor::Unit::m, CumET, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Precipitation Depth", OutputProcessor::Unit::m, CurrentPrecipitation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Irrigation Depth", OutputProcessor::Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Runoff Depth", OutputProcessor::Unit::m, CurrentRunoff, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Green Roof Current Evapotranspiration Depth", OutputProcessor::Unit::m, CurrentET, "Zone", "Sum", "Environment" );
 
 			// DJS NOVEMBER 2010 - end of calls to setup output of ecoroof variables
 
@@ -596,7 +596,7 @@ namespace EcoRoofManager {
 			if ( Vfluxf < 0.0 ) Vfluxf = 0.0; // According to FASST Veg. Models p. 11, eqn 26-27, if Qfsat > qaf the actual
 			if ( Vfluxg < 0.0 ) Vfluxg = 0.0; // evaporative fluxes should be set to zero (delta_c = 1 or 0).
 
-			// P1, P2, P3 corespond to first, second and third terms of equation 37 in the main report.
+			// P1, P2, P3 correspond to first, second and third terms of equation 37 in the main report.
 
 			//   Note: the FASST model has a term -gamma_p*(1.0-exp...) in first line for P1 (c1_f) where gamma_p is
 			//   a precipitation variable. So, if we assume no precip this term vanishes. We should
@@ -605,7 +605,7 @@ namespace EcoRoofManager {
 			//   Prior experience suggests that no more than 3 iterations are likely needed
 			LeafTK = Tf + KelvinConv;
 			SoilTK = Tg + KelvinConv;
-
+			
 			for ( EcoLoop = 1; EcoLoop <= 3; ++EcoLoop ) {
 				P1 = sigmaf * ( RS * ( 1.0 - Alphaf ) + epsilonf * Latm ) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * pow_4( SoilTK ) / EpsilonOne - 3.0 * ( -sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne ) * pow_4( LeafTK ) + sheatf * ( 1.0 - 0.7 * sigmaf ) * ( Ta + KelvinConv ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 1.0 - 0.7 * sigmaf ) / dOne ) * qa + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( ( 0.6 * sigmaf * rn ) / dOne ) - 1.0 ) * ( qsf - LeafTK * dqf ) + LAI * Rhoaf * Cf * Lef * Waf * rn * ( ( 0.1 * sigmaf * Mg ) / dOne ) * ( qsg - SoilTK * dqg );
 				P2 = 4.0 * ( sigmaf * epsilonf * epsilong * Sigma ) * pow_3( SoilTK ) / EpsilonOne + 0.1 * sigmaf * sheatf + LAI * Rhoaf * Cf * Lef * Waf * rn * ( 0.1 * sigmaf * Mg ) / dOne * dqg;
@@ -653,7 +653,7 @@ namespace EcoRoofManager {
 		Real64 const SoilThickness,
 		Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
 		Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-		int & ConstrNum, // Indicator for contruction index for the current surface
+		int & ConstrNum, // Indicator for construction index for the current surface
 		Real64 & Alphag,
 		int const EP_UNUSED( unit ), // unused1208
 		Real64 const EP_UNUSED( Tg ), // unused1208

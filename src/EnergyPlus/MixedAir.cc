@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
 // reserved.
@@ -75,11 +75,13 @@
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
+#include <HVACControllers.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -95,6 +97,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SimAirServingZones.hh>
 #include <SteamCoils.hh>
 #include <TranspiredCollector.hh>
 #include <UserDefinedComponents.hh>
@@ -200,6 +203,7 @@ namespace MixedAir {
 	int const Coil_UserDefined( 20 );
 	int const UnitarySystem( 21 );
 	int const Humidifier( 22 );
+	int const Fan_System_Object( 23 );
 
 	int const ControllerOutsideAir( 2 );
 	int const ControllerStandAloneERV( 3 );
@@ -253,6 +257,7 @@ namespace MixedAir {
 
 	Array1D_bool MyOneTimeErrorFlag;
 	Array1D_bool MyOneTimeCheckUnitarySysFlag;
+	Array1D_bool initOASysFlag;
 	bool GetOASysInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAMixerInputFlag( true ); // Flag set to make sure you get input once
 	bool GetOAControllerInputFlag( true ); // Flag set to make sure you get input once
@@ -351,6 +356,7 @@ namespace MixedAir {
 		NumVentMechControllers = 0;
 		MyOneTimeErrorFlag.deallocate();
 		MyOneTimeCheckUnitarySysFlag.deallocate();
+		initOASysFlag.deallocate();
 		GetOASysInputFlag = true;
 		GetOAMixerInputFlag = true;
 		GetOAControllerInputFlag = true;
@@ -419,10 +425,51 @@ namespace MixedAir {
 			}
 		}
 
-		InitOutsideAirSys( OASysNum, FirstHVACIteration );
+		InitOutsideAirSys( OASysNum, FirstHVACIteration, AirLoopNum );
 
 		SimOutsideAirSys( OASysNum, FirstHVACIteration, AirLoopNum );
 
+	}
+
+	void
+	SimOASysComponents(
+		int const OASysNum,
+		bool const FirstHVACIteration,
+		int const AirLoopNum
+	)
+	{
+		int CompNum;
+		static std::string CompType; //Tuned Made static
+		static std::string CompName; //Tuned Made static
+		static std::string CtrlName; //Tuned Made static
+		bool ReSim( false );
+		bool Sim( true );
+		bool OAHeatCoil( false );
+		bool OACoolCoil( false );
+		bool OAHX( false );
+
+		for( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+			CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+			CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+			SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			if( OAHX ) ReSim = true;
+		}
+		// if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
+		// in reverse order to propagate the air flow and conditions out the relief air path to the relief air
+		// exit node
+		if( ReSim ) {
+			for( CompNum = OutsideAirSys( OASysNum ).NumComponents - 1; CompNum >= 1; --CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			}
+			// now simulate again propogate current temps back through OA system
+			for( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
+				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
+				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
+			}
+		}
 	}
 
 	void
@@ -470,11 +517,6 @@ namespace MixedAir {
 		static std::string CompName; //Tuned Made static
 		static std::string CtrlName; //Tuned Made static
 		bool FatalErrorFlag( false );
-		bool Sim( true );
-		bool OAHeatCoil( false );
-		bool OACoolCoil( false );
-		bool OAHX( false );
-		bool ReSim( false );
 
 		// SimOutsideAirSys can handle only 1 controller right now.  This must be
 		// an Outside Air Controller.  This is because of the lack of iteration
@@ -486,29 +528,7 @@ namespace MixedAir {
 		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
 		CurOASysNum = OASysNum;
 		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
-
-		for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
-			CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
-			CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-			SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
-			if ( OAHX ) ReSim = true;
-		}
-		// if there were heat exchangers and/or desiccant wheel in the OA path, need to simulate again
-		// in reverse order to propagate the air flow and conditions out the relief air path to the relief air
-		// exit node
-		if ( ReSim ) {
-			for ( CompNum = OutsideAirSys( OASysNum ).NumComponents - 1; CompNum >= 1; --CompNum ) {
-				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
-				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
-			}
-			// now simulate again propogate current temps back through OA system
-			for( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
-				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
-				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
-				SimOAComponent( CompType, CompName, OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ), FirstHVACIteration, OutsideAirSys( OASysNum ).ComponentIndex( CompNum ), AirLoopNum, Sim, OASysNum, OAHeatCoil, OACoolCoil, OAHX );
-			}
-		}
+		SimOASysComponents( OASysNum, FirstHVACIteration, AirLoopNum );
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {
 			if ( OutsideAirSys( OASysNum ).NumControllers - OutsideAirSys( OASysNum ).NumSimpleControllers > 1 ) {
@@ -562,9 +582,9 @@ namespace MixedAir {
 		int const AirLoopNum, // air loop index for economizer lockout coordination
 		bool const Sim, // if TRUE, simulate component; if FALSE, just set the coil exisitence flags
 		int const OASysNum, // index to outside air system
-		Optional_bool OAHeatingCoil, // TRUE indicates a heating coil has been found
-		Optional_bool OACoolingCoil, // TRUE indicates a cooling coil has been found
-		Optional_bool OAHX // TRUE indicates a heat exchanger has been found
+		bool & OAHeatingCoil, // TRUE indicates a heating coil has been found
+		bool & OACoolingCoil, // TRUE indicates a cooling coil has been found
+		bool & OAHX // TRUE indicates a heat exchanger has been found
 	)
 	{
 
@@ -586,13 +606,13 @@ namespace MixedAir {
 
 		// USE Statements
 		// Using/Aliasing
-		using Fans::SimulateFanComponents;
 		using DataAirLoop::AirLoopInputsFilled;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using HeatingCoils::SimulateHeatingCoilComponents;
 		using HeatRecovery::SimHeatRecovery;
 		using DesiccantDehumidifiers::SimDesiccantDehumidifier;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+		using HVACHXAssistedCoolingCoil::HXAssistedCoil;
 		using HVACDXSystem::SimDXCoolingSystem;
 		using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
 		using SteamCoils::SimulateSteamCoilComponents;
@@ -605,6 +625,9 @@ namespace MixedAir {
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 		using Humidifiers::SimHumidifier;
+		using SimAirServingZones::SolveWaterCoilController;
+		using HVACControllers::ControllerProps;
+		using WaterCoils::WaterCoil;
 		// Locals
 		// SUBROUTINE ARGUMENTS:
 
@@ -632,27 +655,45 @@ namespace MixedAir {
 			// Fan Types
 		} else if ( SELECT_CASE_var == Fan_Simple_CV ) { // 'Fan:ConstantVolume'
 			if ( Sim ) {
-				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
 			if ( Sim ) {
-				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+			}
+
+		} else if ( SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
+			if ( CompIndex == 0 ) {// 0 means has not been filled because of 1-based arrays in old fortran
+				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+			}
+			if ( Sim ) {
+				HVACFan::fanObjs[ CompIndex - 1 ]->simulate(_,_,_,_); // vector is 0 based, but CompIndex is 1 based so shift 
 			}
 			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
 			if ( Sim ) {
-				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
+				Fans::SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 
 			// Coil Types
 		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water')
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == SteamCoil_AirHeat ) { // 'Coil:Heating:Steam'
@@ -662,7 +703,12 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == Coil_ElectricHeat ) { // 'Coil:Heating:Electric'
@@ -679,7 +725,12 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_CoolingHXAsst ) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
 			if ( Sim ) {
-				SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, HXAssistedCoil( CompIndex ).ControllerName, HXAssistedCoil( CompIndex ).ControllerIndex, true );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( HXAssistedCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == DXSystem ) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
@@ -893,7 +944,7 @@ namespace MixedAir {
 
 		InitOAController( OAControllerNum, FirstHVACIteration, AirLoopNum );
 
-		OAController( OAControllerNum ).CalcOAController( AirLoopNum );
+		OAController( OAControllerNum ).CalcOAController( AirLoopNum, FirstHVACIteration );
 
 		OAController( OAControllerNum ).UpdateOAController();
 
@@ -1047,6 +1098,7 @@ namespace MixedAir {
 		OASysEqSizing.allocate( NumOASystems );
 		MyOneTimeErrorFlag.dimension( NumOASystems, true );
 		MyOneTimeCheckUnitarySysFlag.dimension( NumOASystems,true );
+		initOASysFlag.dimension( NumOASystems, true );
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
@@ -1152,6 +1204,11 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_CV;
 				} else if ( SELECT_CASE_var == "FAN:VARIABLEVOLUME" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_VAV;
+				} else if (  SELECT_CASE_var == "FAN:SYSTEMMODEL" ) {
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_System_Object;
+					// construct fan object
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
+					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = HVACFan::fanObjs.size();
 					//cpw22Aug2010 Add Fan:ComponentModel (new)
 				} else if ( SELECT_CASE_var == "FAN:COMPONENTMODEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_ComponentModel;
@@ -1383,10 +1440,10 @@ namespace MixedAir {
 
 				// add applicable faults identifier to avoid string comparison at each time step
 				//  loop through each fault for each OA controller
-				for ( i = 1; i <= NumFaults; ++i ) {
-					if ( Faults( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
-					if ( SameString( OAController( OutAirNum ).Name, Faults( i ).ControllerName ) ) {
-						Faults( i ).ControllerID = OutAirNum;
+				for ( i = 1; i <= NumFaultyEconomizer; ++i ) {
+					if ( FaultsEconomizer( i ).ControllerTypeEnum != iController_AirEconomizer ) continue;
+					if ( SameString( OAController( OutAirNum ).Name, FaultsEconomizer( i ).ControllerName ) ) {
+						FaultsEconomizer( i ).ControllerID = OutAirNum;
 					}
 				}
 
@@ -1521,6 +1578,13 @@ namespace MixedAir {
 						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
+				} else if ( SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOARATE" ) { // Proportional Control based on design OA rate
+					thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOARate;
+					if ( !Contaminant.CO2Simulation ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires CO2 simulation." );
+						ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+						ErrorsFound = true;
+					}
 				} else if ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDUREGENERICCONTAMINANT" ) { // Indoor Air Quality Procedure based on generic contaminant setpoint
 					thisVentilationMechanical.SystemOAMethod = SOAM_IAQPGC;
 					if ( ! Contaminant.GenericContamSimulation ) {
@@ -1615,6 +1679,7 @@ namespace MixedAir {
 				thisVentilationMechanical.ZoneOAACHRate.dimension( MechVentZoneCount, 0.0 );
 				thisVentilationMechanical.ZoneOAFlowMethod.dimension( MechVentZoneCount, 0 );
 				thisVentilationMechanical.ZoneOASchPtr.dimension( MechVentZoneCount, 0 );
+				thisVentilationMechanical.OAPropCtlMinRateSchPtr.dimension( MechVentZoneCount, 0 );
 
 				// added for new DCV, 2/12/2009
 				thisVentilationMechanical.ZoneADEffCooling.dimension( MechVentZoneCount, 1.0 );
@@ -1737,6 +1802,14 @@ namespace MixedAir {
 						thisVentilationMechanical.ZoneOAACHRate( ventMechZoneNum ) = curOARequirements.OAFlowACH;
 						thisVentilationMechanical.ZoneOAFlowMethod( ventMechZoneNum ) = curOARequirements.OAFlowMethod;
 						thisVentilationMechanical.ZoneOASchPtr( ventMechZoneNum ) = curOARequirements.OAFlowFracSchPtr;
+						thisVentilationMechanical.OAPropCtlMinRateSchPtr( ventMechZoneNum ) = curOARequirements.OAPropCtlMinRateSchPtr;
+						if ( thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+							if ( thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) == 0.0 && thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) == 0.0 ) {
+								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid input with System Outdoor Air Method = ProportionalControlBasedOnDesignOARate." );
+								ShowContinueError( " The values of Outdoor Air Flow per Person and Outdoor Air Flow per Zone Floor Area in the same object can not be zero." );
+								ErrorsFound = true;
+							}
+						}
 					} else { // use defaults
 						thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) = 0.0;
 						// since this is case with no DesSpcOA object, cannot determine the method and default would be Flow/Person which should default to this flow rate
@@ -1881,6 +1954,8 @@ namespace MixedAir {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedonOccupancySchedule,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedOnDesignOccupancy,"; }
+				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControlBasedOnDesignOARate,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPGC ) {
 					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "IndoorAirQualityGenericContaminant,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPCOM ) {
@@ -2445,8 +2520,9 @@ namespace MixedAir {
 
 	void
 	InitOutsideAirSys(
-		int const EP_UNUSED( OASysNum ), // unused1208
-		bool const FirstHVACIteration
+		int const ( OASysNum ),
+		bool const FirstHVACIteration,
+		int const AirLoopNum
 	)
 	{
 
@@ -2479,10 +2555,15 @@ namespace MixedAir {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( BeginEnvrnFlag && FirstHVACIteration ) {
-		}
+//		if ( BeginEnvrnFlag && FirstHVACIteration ) {
+//		}
 
-		if ( BeginDayFlag ) {
+//		if ( BeginDayFlag ) {
+//		}
+
+		if ( initOASysFlag( OASysNum ) ) {
+			AirLoopControlInfo( AirLoopNum ).OASysNum = OASysNum;
+			initOASysFlag( OASysNum ) = false;
 		}
 
 		// Each time step
@@ -2982,25 +3063,25 @@ namespace MixedAir {
 
 					//    Note use of OAControllerLoop here to keep DO Loop index separate from InitOAController local variable
 					// CurrentModuleObject='AirLoopHVAC'
-					SetupOutputVariable( "Air System Outdoor Air Economizer Status []", loopOAController.EconomizerStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Economizer Status", OutputProcessor::Unit::None, loopOAController.EconomizerStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Status []", loopOAController.HeatRecoveryBypassStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Status", OutputProcessor::Unit::None, loopOAController.HeatRecoveryBypassStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status []", loopOAController.HRHeatingCoilActive, "System", "Average", airloopName );
-					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature [C]", loopOAController.MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status", OutputProcessor::Unit::None, loopOAController.HRHeatingCoilActive, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature", OutputProcessor::Unit::C, loopOAController.MixedAirTempAtMinOAFlow, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air High Humidity Control Status []", loopOAController.HighHumCtrlStatus, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air High Humidity Control Status", OutputProcessor::Unit::None, loopOAController.HighHumCtrlStatus, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Flow Fraction []", loopOAController.OAFractionRpt, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Flow Fraction", OutputProcessor::Unit::None, loopOAController.OAFractionRpt, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Minimum Flow Fraction []", loopOAController.MinOAFracLimit, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Minimum Flow Fraction", OutputProcessor::Unit::None, loopOAController.MinOAFracLimit, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Outdoor Air Mass Flow Rate [kg/s]", loopOAController.OAMassFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.OAMassFlow, "System", "Average", airloopName );
 
-					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate [kg/s]", loopOAController.MixMassFlow, "System", "Average", airloopName );
+					SetupOutputVariable( "Air System Mixed Air Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.MixMassFlow, "System", "Average", airloopName );
 
 					if ( loopOAController.MixedAirSPMNum > 0 ) {
-						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction []", loopOAController.MaxOAFracBySetPoint, "System", "Average", airloopName );
+						SetupOutputVariable( "Air System Outdoor Air Maximum Flow Fraction", OutputProcessor::Unit::None, loopOAController.MaxOAFracBySetPoint, "System", "Average", airloopName );
 					}
 
 					if ( AnyEnergyManagementSystemInModel ) {
@@ -3011,7 +3092,7 @@ namespace MixedAir {
 
 					VentMechObjectNum = loopOAController.VentMechObjectNum;
 					if ( VentMechObjectNum > 0 && thisAirLoop > 0){
-						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate  [kg/s]", loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
+						SetupOutputVariable( "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate", OutputProcessor::Unit::kg_s, loopOAController.MechVentOAMassFlowRequest, "System", "Average", airloopName );
 						if (!VentilationMechanical( VentMechObjectNum ).DCVFlag){
 							AirLoopControlInfo( thisAirLoop ).AirLoopDCVFlag = false;
 						}
@@ -3062,6 +3143,7 @@ namespace MixedAir {
 			if ( AirLoopNum > 0 ) {
 				//OAController(OAControllerNum)%ExhMassFlow = AirLoopFlow(AirLoopNum)%ZoneExhaust
 				thisOAController.ExhMassFlow = AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment;
+				AirLoopControlInfo( AirLoopNum ).ZoneExhMassFlow = thisOAController.ExhMassFlow;
 				if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet && ! FirstHVACIteration ) {
 					// if flow rate has been specified by a manager, set it to the specified value
 					thisOAController.MixMassFlow = AirLoopFlow( AirLoopNum ).ReqSupplyFrac * AirLoopFlow( AirLoopNum ).DesSupply;
@@ -3102,27 +3184,27 @@ namespace MixedAir {
 		// Check sensors faults for the air economizer
 		iEco = thisOAController.Econo;
 		if ( AnyFaultsInModel && ( iEco > NoEconomizer ) ) {
-			for ( i = 1; i <= NumFaults; ++i ) {
-				if ( ( Faults( i ).ControllerTypeEnum == iController_AirEconomizer ) && ( Faults( i ).ControllerID == OAControllerNum ) ) {
+			for ( i = 1; i <= NumFaultyEconomizer; ++i ) {
+				if ( ( FaultsEconomizer( i ).ControllerTypeEnum == iController_AirEconomizer ) && ( FaultsEconomizer( i ).ControllerID == OAControllerNum ) ) {
 
-					if ( GetCurrentScheduleValue( Faults( i ).AvaiSchedPtr ) > 0.0 ) {
+					if ( GetCurrentScheduleValue( FaultsEconomizer( i ).AvaiSchedPtr ) > 0.0 ) {
 						rSchVal = 1.0;
-						if ( Faults( i ).SeveritySchedPtr > 0 ) {
-							rSchVal = GetCurrentScheduleValue( Faults( i ).SeveritySchedPtr );
+						if ( FaultsEconomizer( i ).SeveritySchedPtr > 0 ) {
+							rSchVal = GetCurrentScheduleValue( FaultsEconomizer( i ).SeveritySchedPtr );
 						}
 					} else {
 						// no fault
 						continue;
 					}
 
-					rOffset = rSchVal * Faults( i ).Offset;
+					rOffset = rSchVal * FaultsEconomizer( i ).Offset;
 
 					if ( std::abs( rOffset ) < 0.000000001 ) continue;
 
 					// ECONOMIZER - outdoor air dry-bulb temperature sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedDryBulb ) || ( SELECT_CASE_var == DifferentialDryBulb ) || ( SELECT_CASE_var == FixedDewPointAndDryBulb ) || ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir ) {
 							// FaultModel:TemperatureSensorOffset:OutdoorAir
 							thisOAController.OATemp += rOffset;
 							thisOAController.InletTemp += rOffset;
@@ -3133,7 +3215,7 @@ namespace MixedAir {
 					// ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedDewPointAndDryBulb ) || ( SELECT_CASE_var == ElectronicEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir ) {
 							// FaultModel:HumiditySensorOffset:OutdoorAir
 							thisOAController.OAHumRat += rOffset;
 							thisOAController.InletHumRat += rOffset;
@@ -3144,7 +3226,7 @@ namespace MixedAir {
 					// ECONOMIZER - outdoor air enthalpy sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == FixedEnthalpy ) || ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir ) {
 							// FaultModel:EnthalpySensorOffset:OutdoorAir
 							thisOAController.OAEnth += rOffset;
 							thisOAController.InletEnth += rOffset;
@@ -3155,7 +3237,7 @@ namespace MixedAir {
 					// ECONOMIZER - return air dry-bulb temperature sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == DifferentialDryBulb ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir ) {
 							// FaultModel:TemperatureSensorOffset:ReturnAir
 							thisOAController.RetTemp += rOffset;
 						}
@@ -3165,7 +3247,7 @@ namespace MixedAir {
 					// ECONOMIZER - return air enthalpy sensor offset
 					{ auto const SELECT_CASE_var( iEco );
 					if ( ( SELECT_CASE_var == ElectronicEnthalpy ) || ( SELECT_CASE_var == DifferentialDryBulbAndEnthalpy ) ) {
-						if ( Faults( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir ) {
+						if ( FaultsEconomizer( i ).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir ) {
 							// FaultModel:EnthalpySensorOffset:ReturnAir
 							thisOAController.RetEnth += rOffset;
 						}
@@ -3260,7 +3342,8 @@ namespace MixedAir {
 
 	void
 	OAControllerProps::CalcOAController(
-		int const AirLoopNum
+		int const AirLoopNum,
+		bool const FirstHVACIteration
 	)
 	{
 
@@ -3435,7 +3518,7 @@ namespace MixedAir {
 		}
 
 		// Economizer
-		this->CalcOAEconomizer( AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag );
+		this->CalcOAEconomizer( AirLoopNum, OutAirMinFrac, OASignal, HighHumidityOperationFlag, FirstHVACIteration );
 
 		this->OAMassFlow = OASignal * this->MixMassFlow;
 
@@ -3714,7 +3797,7 @@ namespace MixedAir {
 				}
 
 				// get system supply air flow rate
-				if ( this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+				if ( this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 
 					// System supply air flow rate is always greater than or equal the system outdoor air flow rate
 					if ( ( SysSA > 0.0 ) && ( SysSA < ( SysOAuc * StdRhoAir ) ) ) SysSA = SysOAuc * StdRhoAir;
@@ -3810,7 +3893,7 @@ namespace MixedAir {
 							// the VRP case
 							ZoneOA = ZoneOABZ / ZoneEz;
 
-						} else if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+						} else if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 							// Check whether "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController is specified
 							if ( curZone.ZoneContamControllerSchedIndex > 0.0 ) {
 								// Check the availability schedule value for ZoneControl:ContaminantController
@@ -3818,6 +3901,26 @@ namespace MixedAir {
 								if ( ZoneContamControllerSched > 0.0 ) {
 									ZoneOAMin = ZoneOAArea / ZoneEz;
 									ZoneOAMax = ( ZoneOAArea + ZoneOAPeople ) / ZoneEz;
+									if ( this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+										ZoneOAMax = ZoneOABZ / ZoneEz;
+										if ( this->OAPropCtlMinRateSchPtr( ZoneIndex ) > 0 ) {
+											ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue( this->OAPropCtlMinRateSchPtr( ZoneIndex ) );
+										} else {
+											ZoneOAMin = ZoneOAMax;
+										}
+										if ( ZoneOAMax < ZoneOAMin ) {
+											ZoneOAMin = ZoneOAMax;
+											++this->OAMaxMinLimitErrorCount;
+											if ( this->OAMaxMinLimitErrorCount < 2 ) {
+												ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + this->Name + "\"." );
+												ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone outdoor air rate (" + RoundSigDigits( ZoneOAMax, 4 ) + "), is not greater than minimum zone outdoor air rate (" + RoundSigDigits( ZoneOAMin, 4 ) + ")." );
+												ShowContinueError( " The minimum zone outdoor air rate is set to the maximum zone outdoor air rate. Simulation continues..." );
+												ShowContinueErrorTimeStamp( "" );
+											} else {
+												ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + this->Name + "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone outdoor air rate is not greater than minimum zone outdoor air rate. Error continues...", this->OAMaxMinLimitErrorIndex );
+											}
+										}
+									}
 
 									if ( ZoneOAPeople > 0.0 ) {
 										if ( ZoneCO2GainFromPeople( ZoneNum ) > 0.0 ) {
@@ -3832,6 +3935,8 @@ namespace MixedAir {
 											// Calculate zone maximum target CO2 concentration in PPM
 											if ( this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
 												ZoneMaxCO2 = OutdoorCO2 + ( CO2PeopleGeneration * curZone.Multiplier * curZone.ListMultiplier * 1.0e6 ) / ZoneOAMax;
+											} else if ( curZone.ZoneMaxCO2SchedIndex > 0.0 ) {
+												ZoneMaxCO2 = GetCurrentScheduleValue( curZone.ZoneMaxCO2SchedIndex );
 											} else {
 												ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ZoneNum ) * curZone.Multiplier * curZone.ListMultiplier * 1.0e6 ) / ZoneOAMax;
 											}
@@ -3856,6 +3961,17 @@ namespace MixedAir {
 														ShowContinueErrorTimeStamp( "" );
 													} else {
 														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + this->Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", this->CO2MaxMinLimitErrorIndex );
+													}
+												}
+												if ( this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
+													if ( this->CO2MaxMinLimitErrorCount < 2 ) {
+														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + this->Name + "\"." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+														ShowContinueError( "\"ProportionalControlBasedOnDesignOARate\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueErrorTimeStamp( "" );
+													}
+													else {
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + this->Name + "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", this->CO2MaxMinLimitErrorIndex );
 													}
 												}
 
@@ -4008,7 +4124,7 @@ namespace MixedAir {
 					if ( SysEv <= 0.0 ) SysEv = 1.0;
 
 					// Calc system outdoor air requirement
-					if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ) {
+					if ( this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 						SysOA = SysOA / SysEv;
 					} else {
 						SysOA = SysOAuc / SysEv;
@@ -4030,11 +4146,14 @@ namespace MixedAir {
 		int const AirLoopNum,
 		Real64 const OutAirMinFrac,
 		Real64 & OASignal,
-		bool & HighHumidityOperationFlag
+		bool & HighHumidityOperationFlag,
+		bool const FirstHVACIteration
 		)
 	{
+		using DataAirLoop::OutsideAirSys;
+		using DataLoopNode::Node;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using SetPointManager::GetCoilFreezingCheckFlag;
 
 		static std::string const RoutineName("CalcOAEconomizer: ");
@@ -4047,11 +4166,16 @@ namespace MixedAir {
 		Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
 		Real64 MaximumOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 		Real64 OutAirSignal; // Used to set OA mass flow rate
-		static Array1D< Real64 > Par(4); // Par(1) = mixed air node number //Tuned Made static
+		static Array1D< Real64 > Par(6); // Par(1) = mixed air node number //Tuned Made static
 										 // Par(2) = return air node number
 										 // Par(3) = outside air node number
 										 // Par(4) = mixed air mass flow rate
+										 // Par(5) = FirstHVACIteration
+										 // Par(6) = AirLoopNum
 		int SolFla; // Flag of solver
+		Real64 lowFlowResiduum; // result of low OA flow calculation (Tmixedair_sp - Tmixedair)
+		Real64 highFlowResiduum; // result of high OA flow calculation (Tmixedair_sp - Tmixedair)
+		Real64 minOAFrac;
 
 		if ( AirLoopNum > 0 ) {
 			// Check lockout with heating for any airloop - will lockout economizer even on airloops without a unitary system
@@ -4220,14 +4344,72 @@ namespace MixedAir {
 		// it was calculated using the approximate method of sensible energy balance. Now we have to get the
 		// accurate result using a full mass, enthalpy and moisture balance and iteration.
 		if ( OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > VerySmallMassFlow && this->ControllerType_Num == ControllerOutsideAir && ! AirLoopNightVent ) {
-			Par( 1 ) = this->MixNode;
-			Par( 2 ) = this->RetNode;
-			Par( 3 ) = this->InletNode;
-			Par( 4 ) = this->MixMassFlow;
-			SolveRegulaFalsi( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
-			if ( SolFla < 0 ) {
-				OASignal = OutAirSignal;
+
+			if ( AirLoopNum > 0 ) {
+
+				if( OutsideAirSys( AirLoopControlInfo( AirLoopNum ).OASysNum ).NumComponents == 1 ) {
+					// no need to simulate OA System if only a mixer is used in the OutsideAirSystem
+
+					Par( 1 ) = this->MixNode;
+					Par( 2 ) = this->RetNode;
+					Par( 3 ) = this->InletNode;
+					Par( 4 ) = this->MixMassFlow;
+					SolveRoot( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+					if( SolFla < 0 ) {
+						OASignal = OutAirSignal;
+					}
+
+				} else {
+
+					// simulate OA System if equipment exists other than the mixer (e.g., heating/cooling coil, HX, ect.)
+
+					// 1 - check min OA flow result
+					Node( this->OANode ).MassFlowRate = max( this->ExhMassFlow, OutAirMinFrac * Node( this->MixNode ).MassFlowRate );
+					Node( this->RelNode ).MassFlowRate = max( Node( this->OANode ).MassFlowRate - this->ExhMassFlow, 0.0 );
+					// save actual OA flow frac for use as min value for RegulaFalsi call
+					minOAFrac = max( OutAirMinFrac, Node( this->OANode ).MassFlowRate / this->MixMassFlow );
+					SimOASysComponents( AirLoopControlInfo( AirLoopNum ).OASysNum, FirstHVACIteration, AirLoopNum );
+					lowFlowResiduum = Node( this->MixNode ).TempSetPoint - Node( this->MixNode ).Temp;
+
+					// 2 - check max OA flow result
+					Node( this->OANode ).MassFlowRate = max( this->ExhMassFlow, Node( this->MixNode ).MassFlowRate );
+					Node( this->RelNode ).MassFlowRate = max( Node( this->OANode ).MassFlowRate - this->ExhMassFlow, 0.0 );
+					SimOASysComponents( AirLoopControlInfo( AirLoopNum ).OASysNum, FirstHVACIteration, AirLoopNum );
+					highFlowResiduum = Node( this->MixNode ).TempSetPoint - Node( this->MixNode ).Temp;
+
+					// 3 - test to ensure RegulaFalsi can find an answer
+					if( ( sign( lowFlowResiduum ) == sign( highFlowResiduum ) ) ) {
+						OASignal = OutAirSignal;
+					} else {
+						// 4 - find result
+						Par( 1 ) = this->MixNode;
+						Par( 2 ) = this->RelNode;
+						Par( 3 ) = this->OANode;
+						Par( 4 ) = this->MixMassFlow;
+						Par( 5 ) = 0.0;
+						if( FirstHVACIteration ) Par( 5 ) = 1.0;
+						Par( 6 ) = double( AirLoopNum );
+
+						SolveRoot( ( Acc / 10.0 ), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par );
+						if( SolFla < 0 ) { // if RegulaFalsi fails to find a solution, returns -1 or -2, set to existing OutAirSignal
+							OASignal = OutAirSignal;
+						}
+					}
+				}
+
+			} else {
+
+				Par( 1 ) = this->MixNode;
+				Par( 2 ) = this->RetNode;
+				Par( 3 ) = this->InletNode;
+				Par( 4 ) = this->MixMassFlow;
+				SolveRoot( Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par );
+				if( SolFla < 0 ) {
+					OASignal = OutAirSignal;
+				}
+
 			}
+
 		} else {
 			OASignal = OutAirSignal;
 		}
@@ -4790,6 +4972,7 @@ namespace MixedAir {
 		RetNode = int( Par( 2 ) );
 		OANode = int( Par( 3 ) );
 		MixMassFlowRate = Par( 4 );
+
 		OAMassFlowRate = OASignal * MixMassFlowRate;
 		RecircMassFlowRate = max( MixMassFlowRate - OAMassFlowRate, 0.0 );
 		RecircEnth = Node( RetNode ).Enthalpy;
@@ -4798,6 +4981,86 @@ namespace MixedAir {
 		MixHumRat = ( RecircMassFlowRate * RecircHumRat + OAMassFlowRate * Node( OANode ).HumRat ) / MixMassFlowRate;
 		MixTemp = PsyTdbFnHW( MixEnth, MixHumRat );
 		Residuum = Node( MixNode ).TempSetPoint - MixTemp;
+
+		return Residuum;
+	}
+
+	Real64
+	MultiCompControlTempResidual(
+		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
+		Array1< Real64 > const & Par // par(1) = mixed node number
+		)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad
+		//       DATE WRITTEN   Nov, 2016
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		// Calculates residual function TMixSetPoint - TMix.
+		// Economizer damper position (OASignal) is being varied to zero the residual.
+
+		// METHODOLOGY EMPLOYED:
+		// Simulate the OA System to determine actual mixed air condition, calculates the
+		// mixed air temperature given the outside air damper position.
+
+		// REFERENCES:
+
+		// Using/Aliasing
+		using Psychrometrics::PsyTdbFnHW;
+
+		// Return value
+		Real64 Residuum; // residual to be minimized to zero
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// pao(1) = mixed air node number
+		// par(2) = relief air node number
+		// par(3) = outside air node number
+		// par(4) = mixed air flow rate
+		// par(5) = FirstHVACIteration
+		// par(6) = AirLoopNum index
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int MixNode; // mixed air node number
+		int RelNode; // return air node number
+		int OANode; // outside air node number
+		Real64 MixMassFlowRate; // mixed air mass flow rare [kg/s]
+		Real64 OAMassFlowRate; // outside air mass flow rate [kg/s]
+		Real64 ExhMassFlow;
+		bool FirstHVACIteration;
+		int AirloopNum;
+		int OASysNum;
+
+		MixNode = int( Par( 1 ) );
+		RelNode = int( Par( 2 ) );
+		OANode = int( Par( 3 ) );
+		MixMassFlowRate = Par( 4 );
+		FirstHVACIteration = ( Par( 5 ) == 1.0 );
+		AirloopNum = int( Par( 6 ) );
+		OASysNum = AirLoopControlInfo( AirloopNum ).OASysNum;
+		ExhMassFlow = AirLoopControlInfo( AirloopNum ).ZoneExhMassFlow;
+
+		OAMassFlowRate = max( ExhMassFlow, OASignal * MixMassFlowRate );
+		Node( OANode ).MassFlowRate = OAMassFlowRate; // set OA node mass flow rate
+		Node( RelNode ).MassFlowRate = max( OAMassFlowRate - ExhMassFlow, 0.0 ); // set relief node mass flow rate to maintain mixer continuity calcs
+
+		SimOASysComponents( OASysNum, FirstHVACIteration, AirloopNum );
+
+		Residuum = Node( MixNode ).TempSetPoint - Node( MixNode ).Temp;
 
 		return Residuum;
 	}

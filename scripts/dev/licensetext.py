@@ -66,11 +66,22 @@ _original = """// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of 
 """
 
 def previous():
-    '''Return the previous license text, changed December X, 2016.'''
+    '''Return the previous license text, last changed January 4, 2017.'''
     # Modify the year in the text
     originalYear = '2015'
     currentYear = '2016'
     txt = _original.replace(originalYear, currentYear)
+    # Modify and delete some lines with LBL IP permission
+    # Keep in mind that the line numbering here starts with 0
+    lines = txt.splitlines()
+    # On line 37, replace LBNL with USDOE
+    lines[37] = lines[37].replace('Lawrence Berkeley National Laboratory',
+                                  'the U.S. Department of Energy')
+    # Delete the last 9 lines
+    lines = lines[:-9]
+    # Delete lines 4-6
+    lines = lines[:4] + lines[7:]
+    txt = '\n'.join(lines)+'\n'
     return txt
 
 def current():
@@ -139,6 +150,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
              'message':'Non-year differences in license text, check entire license'})
 
 def mergeParagraphs(text):
+    '''Merge license text lines into a single line per paragraph.'''
     lines = []
     current = ''
     for line in text.splitlines():
