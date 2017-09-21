@@ -2651,20 +2651,18 @@ namespace HVACManager {
 				}
 			}
 		}
-		// set the zone level NoHeatToReturnAir flag and the ZoneEquip fan operation mode
-		// for now, if any air loop in the zone is cycling fan, then set NoHeatToReturnAir = true
+		// set the zone level NoHeatToReturnAir flag 
+		// if any air loop in the zone is continuous fan, then set NoHeatToReturnAir = false and sort it out node-by-node
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 			ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-			Zone( ZoneNum ).NoHeatToReturnAir = false;
-			if ( ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly ) {
-				Zone( ZoneNum ).NoHeatToReturnAir = true;
-			} else {
+			Zone( ZoneNum ).NoHeatToReturnAir = true;
+			if ( ! ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly ) {
 				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
 					AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
 					if ( AirLoopNum > 0 ) {
-						if ( AirLoopControlInfo( AirLoopNum ).FanOpMode == CycFanCycCoil ) {
-							Zone( ZoneNum ).NoHeatToReturnAir = true;
+						if ( AirLoopControlInfo( AirLoopNum ).FanOpMode == ContFanCycCoil ) {
+							Zone( ZoneNum ).NoHeatToReturnAir = false;
 							break;
 						}
 					}
