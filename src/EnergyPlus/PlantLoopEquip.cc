@@ -784,7 +784,7 @@ namespace PlantLoopEquip {
 
 		} else if ( GeneralEquipType == GenEquipTypes_GroundHeatExchanger ) {
 
-			if ( EquipTypeNum == TypeOf_GrndHtExchgVertical ) { // 'GROUND HEAT EXCHANGER:VERTICAL'
+			if ( EquipTypeNum == TypeOf_GrndHtExchgSystem ) { // 'GROUND HEAT EXCHANGER:SYSTEM'
 				sim_component.compPtr->simulate( sim_component_location, FirstHVACIteration, CurLoad, RunFlag );
 
 			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSurface ) { // 'GROUND HEAT EXCHANGER:SURFACE'

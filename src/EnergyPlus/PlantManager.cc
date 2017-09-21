@@ -1013,11 +1013,11 @@ namespace PlantManager {
 							this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 							this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory( CompNames( CompNum ) );
-						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Vertical" ) ) {
-							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
+						} else if ( SameString( this_comp_type, "GroundHeatExchanger:System" ) ) {
+							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSystem;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgVertical, CompNames( CompNum ) );
+							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgSystem, CompNames( CompNum ) );
 						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
@@ -1696,7 +1696,7 @@ namespace PlantManager {
 							GeneralEquipType = GenEquipTypes_Chiller;
 						} else if ( has_prefixi( this_comp.TypeOf, "District" ) ) {
 							GeneralEquipType = GenEquipTypes_Purchased;
-						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Vertical" ) ) {
+						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:System" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Surface" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
@@ -4186,7 +4186,7 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
-						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgVertical ) { //            = 45
+						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgSystem ) { //            = 45
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
 							this_component.HowLoadServed = HowMet_PassiveCap;

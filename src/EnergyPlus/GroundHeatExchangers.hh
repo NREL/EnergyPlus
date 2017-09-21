@@ -76,6 +76,126 @@ namespace GroundHeatExchangers {
 
 	// Types
 
+	struct  thermoPhysicialPropsStruct
+	{
+		// Destructor
+		virtual ~thermoPhysicialPropsStruct(){}
+
+		Real64 k;  // Thermal conductivity [W/m-K]
+		Real64 rho; // Density [kg/m3]
+		Real64 cp; // Specific heat [J/kg-K]
+		Real64 rhoCp; // Specific heat capacity [J/kg-K]
+		Real64 diffusivity; // Thermal diffusivity [m2/s]
+
+		thermoPhysicialPropsStruct() :
+			k( 0.0 ),
+			rho( 0.0 ),
+			cp( 0.0 ),
+			rhoCp( 0.0 ),
+			diffusivity( 0.0 )
+		{}
+	};
+
+	struct pipePropsStruct : thermoPhysicialPropsStruct
+	{
+		// Destructor
+		~pipePropsStruct(){}
+
+		// Members
+		Real64 outDia; // Outer diameter of the pipe [m]
+		Real64 thickness; // Thickness of the pipe wall [m]
+
+		pipePropsStruct() :
+			outDia( 0.0 ),
+			thickness( 0.0 )
+		{}
+	};
+
+	struct  GLHEVertPropsStruct
+	{
+		// Destructor
+		~GLHEVertPropsStruct(){}
+
+		// Members
+		std::string name; // Name
+		Real64 bhTopDepth; // Depth of top of borehole {m}
+		Real64 bhLength; // Length of borehole from top of borehole {m}
+		Real64 bhDiameter; // Diameter of borehole {m}
+		thermoPhysicialPropsStruct grout; // Grout properties
+		pipePropsStruct pipe; // Pipe properties
+		Real64 bhUTubeDist; // U-tube, shank-to-shank spacking {m}
+
+		GLHEVertPropsStruct () :
+			bhTopDepth( 0.0 ),
+			bhLength( 0.0 ),
+			bhDiameter( 0.0 ),
+			bhUTubeDist( 0.0 )
+		{}
+	};
+
+	struct GLHEVertArrayStruct
+	{
+		// Destructor
+		~GLHEVertArrayStruct(){}
+
+		// Members
+		std::string name; // Name
+		std::shared_ptr< GLHEVertPropsStruct > props; // Properties
+		int numBHinXDirection; // Number of boreholes in X direction
+		int numBHinYDirection; // Number of boreholes in Y direction
+		Real64 bhSpacing; // Borehole center-to-center spacing {m}
+
+		GLHEVertArrayStruct () :
+			numBHinXDirection( 0 ),
+			numBHinYDirection( 0 ),
+			bhSpacing( 0.0 )
+		{}
+	};
+
+	struct GLHEVertSingleStruct
+	{
+		// Destructor
+		~GLHEVertSingleStruct(){}
+
+		// Members
+		std::string name; // Name
+		std::shared_ptr< GLHEVertPropsStruct > props; // Properties
+		Real64 xLoc; // X-direction location {m}
+		Real64 yLoc; // Y-direction location {m}
+
+		GLHEVertSingleStruct () :
+			xLoc( 0.0 ),
+			yLoc( 0.0 )
+		{}
+	};
+
+	struct GLHEResponseFactorsStruct
+	{
+		// Destructor
+		~GLHEResponseFactorsStruct(){}
+
+		// Members
+		std::string name; // Name
+		Real64 gRefRatio; // Reference ratio of g-function set
+		Array1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
+		Array1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
+		std::shared_ptr< GLHEVertPropsStruct > props; // Properties
+		Real64 maxSimYears; // Maximum length of simulation in years
+		int numGFuncPairs; // Number of g-function pairs
+		bool loadedFromIDF; // True if response factors came from IDF file
+		bool loadedFromEplusout; // True if response factors came from factors saved to eplusout.ghe
+		bool calculatedByEplus; // True if response factors were calculated by EnergyPlus
+
+		GLHEResponseFactorsStruct() :
+			gRefRatio( 0.0 ),
+			maxSimYears( 0.0 ),
+			numGFuncPairs( 0 ),
+			loadedFromIDF( false ),
+			loadedFromEplusout( false ),
+			calculatedByEplus( false )
+		{}
+	};
+
 	struct GLHEBase : PlantComponent
 	{
 		// Destructor
@@ -86,39 +206,28 @@ namespace GroundHeatExchangers {
 		// Members
 		bool available; // need an array of logicals--load identifiers of available equipment
 		bool on; // simulate the machine at it's operating part load ratio
-		std::string Name; // user identifier
+		std::string name; // user identifier
 		int loopNum;
 		int loopSideNum;
 		int branchNum;
 		int compNum;
 		int inletNodeNum; // Node number on the inlet side of the plant
 		int outletNodeNum; // Node number on the outlet side of the plant
-		Real64 kGround; // Thermal conductivity of the ground		[W/(mK)]
-		Real64 cpRhoGround; // Specific heat capacity of ground		[J/Kg/K]
-		Real64 diffusivityGround; // Thermal diffisivity of the ground [m2/s]
-		Real64 kPipe; // Thermal Conductivity of the U tube			[W/(mK)]
-		Real64 cpPipe; // Specific heat of the U tube				[J/kg-K]
-		Real64 rhoPipe; // Density of the U tube					[kg/m3]
-		Real64 pipeOutDia; // Outer diameter of the Pipe			[m]
-		Real64 pipeThick; // Thickness of the pipe wall				[m]
+		thermoPhysicialPropsStruct soil;
+		pipePropsStruct pipe;
+		thermoPhysicialPropsStruct grout;
+		std::shared_ptr < GLHEResponseFactorsStruct > myRespFactors;
 		Real64 designFlow; // Design volumetric flow rate			[m3/s]
 		Real64 designMassFlow; // Design mass flow rate				[kg/s]
-		Real64 tempGround; // The far feild temperature of the ground   [°C]
+		Real64 tempGround; // The far field temperature of the ground   [°C]
 		Array1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
 		Array1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
-		Array1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalized
-		// by the total active length of bore holes  [W/m]
+		Array1D< Real64 > QnSubHr; // Contains the sub-hourly heat extraction/rejection rate normalized by the total active length of bore holes  [W/m]
 		int prevHour;
-		Real64 gReferenceRatio; // Reference ratio for developing g-functions [-]
-		int NPairs; // Number of pairs of Lntts and Gfunc
-		Array1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
-		Array1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
 		int AGG; // Minimum Hourly History required
-		int SubAGG; // Minimum subhourly History
-		Array1D_int LastHourN; // Stores the Previous hour's N for past hours
-		// until the minimum subhourly history
-		//loop topology variables
-		Real64 boreholeTemp; // [°C]
+		int SubAGG; // Minimum sub-hourly History
+		Array1D_int LastHourN; // Stores the Previous hour's N for past hours until the minimum sub-hourly history
+		Real64 bhTemp; // [°C]
 		Real64 massFlowRate; // [kg/s]
 		Real64 outletTemp; // [°C]
 		Real64 inletTemp; // [°C]
@@ -133,7 +242,6 @@ namespace GroundHeatExchangers {
 		Real64 timeSSFactor; // Steady state time factor for calculation
 		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
 
-		// Default Constructor
 		GLHEBase() :
 			available( false ),
 			on( false ),
@@ -143,22 +251,13 @@ namespace GroundHeatExchangers {
 			compNum( 0 ),
 			inletNodeNum( 0 ),
 			outletNodeNum( 0 ),
-			kGround( 0.0 ),
-			cpRhoGround( 0.0 ),
-			kPipe( 0.0 ),
-			cpPipe( 0.0 ),
-			rhoPipe( 0.0 ),
-			pipeOutDia( 0.0 ),
-			pipeThick( 0.0 ),
 			designFlow( 0.0 ),
 			designMassFlow( 0.0 ),
 			tempGround( 0.0 ),
 			prevHour( 1 ),
-			gReferenceRatio( 0.0 ),
-			NPairs( 0 ),
 			AGG( 0 ),
 			SubAGG( 0 ),
-			boreholeTemp( 0.0 ),
+			bhTemp( 0.0 ),
 			massFlowRate( 0.0 ),
 			outletTemp( 0.0 ),
 			inletTemp( 0.0 ),
@@ -207,31 +306,24 @@ namespace GroundHeatExchangers {
 
 	};
 
-	struct GLHEVert:GLHEBase
+	struct GLHEVert : GLHEBase
 	{
 		// Destructor
 		~GLHEVert(){}
 
 		// Members
-		Real64 maxFlowRate; // design nominal capacity of Pump
-		int maxSimYears; // maximum length of simulation (years)
-		int numBoreholes;
-		Real64 boreholeLength;
-		Real64 boreholeRadius;
-		Real64 kGrout; // Grout thermal conductivity                [W/(mK)]
-		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
-		bool runFlag;
+		int numBoreholes; // Number of boreholes
+		Real64 bhDiameter; // Diameter of borehole {m}
+		Real64 bhRadius; // Radius of borehole {m}
+		Real64 bhLength; // Length of borehole {m}
+		Real64 bhUTubeDist; // Distance between u-tube legs {m}
 
-		// Default Constructor
 		GLHEVert() :
-			maxFlowRate( 0.0 ),
-			maxSimYears( 0 ),
 			numBoreholes( 0 ),
-			boreholeLength( 0.0 ),
-			boreholeRadius( 0.0 ),
-			kGrout( 0.0 ),
-			UtubeDist( 0.0 ),
-			runFlag( false )
+			bhDiameter( 0.0 ),
+			bhRadius( 0.0 ),
+			bhLength( 0.0 ),
+			bhUTubeDist( 0.0 )
 		{}
 
 		void
@@ -253,7 +345,7 @@ namespace GroundHeatExchangers {
 
 	};
 
-	struct GLHESlinky:GLHEBase
+	struct GLHESlinky : GLHEBase
 	{
 
 		// Destructor
@@ -276,7 +368,6 @@ namespace GroundHeatExchangers {
 		Array1D< Real64 > Y0;
 		Real64 Z0;
 
-		// Default Constructor
 		GLHESlinky() :
 			verticalConfig( false ),
 			coilDiameter( 0.0 ),
@@ -303,11 +394,6 @@ namespace GroundHeatExchangers {
 
 		void
 		getAnnualTimeConstant();
-
-		//Real64
-		//interpGFunc(
-		//Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-		//);
 
 		Real64
 		doubleIntegral(
@@ -391,9 +477,23 @@ namespace GroundHeatExchangers {
 
 	};
 
+	std::shared_ptr < GLHEVertPropsStruct >
+	GetVertProps(
+		std::string const & name
+	);
+
+	std::shared_ptr < GLHEVertArrayStruct >
+	GetVertArray(
+		std::string const & name
+	);
+
 	// Object Data
-	extern Array1D< GLHEVert > verticalGLHE; // Vertical GLHEs
-	extern Array1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	extern std::vector< GLHEVert > verticalGLHE; // Vertical GLHEs
+	extern std::vector< GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	extern std::vector< std::shared_ptr < GLHEVertArrayStruct > > vertArraysVector; // Vertical Arrays
+	extern std::vector< std::shared_ptr < GLHEVertPropsStruct > > vertPropsVector; // Vertical Properties
+	extern std::vector< std::shared_ptr < GLHEResponseFactorsStruct > > responseFactorsVector; // Vertical Response Factors
+	extern std::vector< std::shared_ptr< GLHEVertSingleStruct > > singleBoreholesVector; // Vertical Single Boreholes
 
 	void
 	clear_state();

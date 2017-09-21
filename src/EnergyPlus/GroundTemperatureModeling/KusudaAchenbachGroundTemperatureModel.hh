@@ -69,9 +69,9 @@ namespace EnergyPlus{
 			Real64 aveGroundTempAmplitude;
 			Real64 phaseShiftInSecs;
 
-		static std::shared_ptr< KusudaGroundTempsModel > 
-		KusudaGTMFactory( 
-			int objectType, 
+		static std::shared_ptr< KusudaGroundTempsModel >
+		KusudaGTMFactory(
+			int objectType,
 			std::string objectName
 		);
 
