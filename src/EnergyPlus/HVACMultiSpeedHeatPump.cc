@@ -339,7 +339,6 @@ namespace HVACMultiSpeedHeatPump {
 		using namespace DataZoneEnergyDemands;
 		using DataHVACGlobals::SmallMassFlow;
 		using DataHVACGlobals::SmallLoad;
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataAirLoop::AirLoopControlInfo;
 
 		// Locals
