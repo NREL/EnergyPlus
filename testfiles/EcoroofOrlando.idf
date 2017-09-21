@@ -55,7 +55,7 @@
 ! Environmental Emissions:
 ! Utility Tariffs:
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     AutoBuilt Model,         !- Name
@@ -560,36 +560,6 @@
     MAT-CC05 4  MW CONCRETE; !- Layer 2
 
   Construction,
-    INT-FLOOR-SLAB,          !- Name
-    MAT-CC05 4  MW CONCRETE; !- Outside Layer
-
-  Construction,
-    DropCeiling,             !- Name
-    AC02;                    !- Outside Layer
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    1.5  MW CONCRETE,        !- Outside Layer
-    CP02 CARPET PAD;         !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    CP02 CARPET PAD,         !- Outside Layer
-    1.5  MW CONCRETE;        !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Clear Acrylic Plastic;   !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Diffusing Acrylic Plastic;  !- Outside Layer
-
-  Construction,
     ASHRAE 90.1-2004_Sec 5.5-2_Roof,  !- Name
     BaseEco,                 !- Outside Layer
     ASHRAE 90.1-2004_Sec 5.5-2_Roof Insulation_1,  !- Layer 2
@@ -626,10 +596,6 @@
   Construction,
     ASHRAE 90.1-2004_Sec 5.5-2_west_window,  !- Name
     ASHRAE 90.1-2004_Sec 5.5-2_Theoretical Glass 6;  !- Outside Layer
-
-  Construction,
-    ASHRAE 90.1-2004_Sec 5.5-2_skylight_window,  !- Name
-    ASHRAE 90.1-2004_Sec 5.5-2_Theoretical Glass 0;  !- Outside Layer
 
   Zone,
     ZN1_S_Space_1,           !- Name
@@ -6915,28 +6881,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     15;                      !- Cost per Area {$/m2}
-
-! Cost per Area
-
-  ComponentCost:LineItem,
-    Interior Floor Slab,     !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-SLAB,          !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    35;                      !- Cost per Area {$/m2}
-
-! Cost per Area
-
-  ComponentCost:LineItem,
-    Drop Ceiling,            !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    DropCeiling,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    10;                      !- Cost per Area {$/m2}
 
 ! Cost per Area
 

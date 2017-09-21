@@ -112,7 +112,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -2328,14 +2328,13 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-
 !*** OPERATIONAL FAULTS ***
-  
+
   FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
     Fault_SWT_CoolTower,     !- Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    CoolingTower:TwoSpeed,!- Cooling Tower Object Type
+    CoolingTower:TwoSpeed,   !- Cooling Tower Object Type
     Big Tower2,              !- Cooling Tower Object Name
     5.0;                     !- Reference Sensor Offset {deltaC}
 

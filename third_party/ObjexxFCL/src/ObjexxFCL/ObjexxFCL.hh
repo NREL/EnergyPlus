@@ -1,11 +1,11 @@
 #ifndef ObjexxFCL_ObjexxFCL_hh_INCLUDED
 #define ObjexxFCL_ObjexxFCL_hh_INCLUDED
 
-// Objexx Fortran Compatibility Library Declarations
+// Objexx Fortran-C++ Library Declarations
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //

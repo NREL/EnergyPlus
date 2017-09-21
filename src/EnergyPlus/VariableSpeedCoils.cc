@@ -69,6 +69,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACFan.hh>
+#include <HVACUnitarySystem.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -302,6 +303,7 @@ namespace VariableSpeedCoils {
 		CompanionCoolingCoilNum( 0 ),
 		CompanionHeatingCoilNum( 0 ),
 		FanDelayTime( 0.0 ),
+		MSHPDesignSpecIndex( 0 ),
 		MSErrIndex( MaxSpedLevels, 0 ),
 		MSRatedPercentTotCap( MaxSpedLevels, 0.0 ),
 		MSRatedTotCap( MaxSpedLevels, 0.0 ),
@@ -428,7 +430,7 @@ namespace VariableSpeedCoils {
 		using InputProcessor::FindItemInList;
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -968,11 +970,11 @@ namespace VariableSpeedCoils {
 			}
 
 			// CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", _, "System" );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySensible, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLatent, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", _, "System" );
+			SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySensible, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLatent, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 
 			//for table output, being consistent with outher water-to-air coils
 			//        IF (VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal /= AutoSize) THEN
@@ -1119,6 +1121,9 @@ namespace VariableSpeedCoils {
 			//Set crankcase heater cutout temperature
 			VarSpeedCoil( DXCoilNum ).MaxOATCrankcaseHeater = NumArray( 9 );
 
+			//Set crankcase heater cutout temperature
+			VarSpeedCoil( DXCoilNum ).MinOATCompressor = NumArray( 10 );
+
 			// Get Water System tank connections
 			//  A7, \field Name of Water Storage Tank for Supply
 			VarSpeedCoil( DXCoilNum ).EvapWaterSupplyName = AlphArray( 7 );
@@ -1139,20 +1144,20 @@ namespace VariableSpeedCoils {
 			}
 
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
-			VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = NumArray( 10 );
-			if ( NumArray( 10 ) < 0.0 ) {
+			VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff = NumArray( 11 );
+			if ( NumArray( 11 ) < 0.0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
-				ShowContinueError( "..." + cNumericFields( 10 ) + " must be >= 0.0." );
-				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 10 ), 2 ) + "]." );
+				ShowContinueError( "..." + cNumericFields( 11 ) + " must be >= 0.0." );
+				ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 11 ), 2 ) + "]." );
 				ErrorsFound = true;
 			}
 
-			VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp = NumArray( 11 );
+			VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp = NumArray( 12 );
 			if ( VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
 				if ( VarSpeedCoil( DXCoilNum ).BasinHeaterSetPointTemp < 2.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", freeze possible" );
-					ShowContinueError( "..." + cNumericFields( 11 ) + " is < 2 {C}. Freezing could occur." );
-					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 11 ), 2 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 12 ) + " is < 2 {C}. Freezing could occur." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 12 ), 2 ) + "]." );
 				}
 			}
 
@@ -1166,17 +1171,17 @@ namespace VariableSpeedCoils {
 			}
 
 			for ( I = 1; I <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds; ++I ) {
-				VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I ) = NumArray( 12 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).MSRatedSHR( I ) = NumArray( 13 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).MSRatedCOP( I ) = NumArray( 14 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) = NumArray( 15 + ( I - 1 ) * 6 );
-				VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( I ) = NumArray( 16 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedTotCap( I ) = NumArray( 13 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedSHR( I ) = NumArray( 14 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedCOP( I ) = NumArray( 15 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( I ) = NumArray( 16 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( I ) = NumArray( 17 + ( I - 1 ) * 6 );
 
-				VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) = NumArray( 17 + ( I - 1 ) * 6 );
+				VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) = NumArray( 18 + ( I - 1 ) * 6 );
 				if ( VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) < 0.0 || VarSpeedCoil( DXCoilNum ).EvapCondEffect( I ) > 1.0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil( DXCoilNum ).Name + "\", invalid" );
-					ShowContinueError( "..." + cNumericFields( 17 + ( I - 1 ) * 6 ) + " cannot be < 0.0 or > 1.0." );
-					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 17 + ( I - 1 ) * 6 ), 2 ) + "]." );
+					ShowContinueError( "..." + cNumericFields( 18 + ( I - 1 ) * 6 ) + " cannot be < 0.0 or > 1.0." );
+					ShowContinueError( "...entered value=[" + TrimSigDigits( NumArray( 18 + ( I - 1 ) * 6 ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 
@@ -1328,11 +1333,11 @@ namespace VariableSpeedCoils {
 			}
 
 			// CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed"
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", _, "System" );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySensible, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLatent, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Cooling", _, "System" );
+			SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySensible, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLatent, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
 
 			VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = AutoSize; //always auto-sized, to be determined in the sizing calculation
 
@@ -1693,9 +1698,9 @@ namespace VariableSpeedCoils {
 			}
 
 			// CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit"
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Heating Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 
 			//create predefined report entries
 			PreDefTableEntry( pdchHeatCoilType, VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject );
@@ -2018,9 +2023,9 @@ namespace VariableSpeedCoils {
 			}
 
 			// CurrentModuleObject = "Coil:Heating:DX:Variablespeed "
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Heating Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 
 			//create predefined report entries
 			PreDefTableEntry( pdchHeatCoilType, VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject );
@@ -2468,15 +2473,15 @@ namespace VariableSpeedCoils {
 			}
 
 			// CurrentModuleObject = "Coil:Waterheating:Airtowaterheatpump:Variablespeed"
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySensible, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLatent, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Water Side Heat Transfer Energy [J]", VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySensible, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLatent, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Water Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
 
 			if ( VarSpeedCoil( DXCoilNum ).IsDXCoilInZone ) {
-				SetupOutputVariable( "Cooling Coil Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+				SetupOutputVariable( "Cooling Coil Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			} else {
-				SetupOutputVariable( "Cooling Coil Cooling Energy [J]", VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
+				SetupOutputVariable( "Cooling Coil Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
 			}
 
 			VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = AutoSize; //always auto-sized, to be determined in the sizing calculation
@@ -2504,61 +2509,61 @@ namespace VariableSpeedCoils {
 				//cooling and heating coils separately
 				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) {
 					// air source cooling coils
-					SetupOutputVariable( "Cooling Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLatent, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Part Load Ratio []", VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Electric Power [W]", VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Runtime Fraction []", VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Upper Speed Level []", VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLatent, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Part Load Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Upper Speed Level", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
 					if ( VarSpeedCoil( DXCoilNum ).CondensateCollectMode == CondensateToTank ) {
-						SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", VarSpeedCoil( DXCoilNum ).CondensateVdot, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-						SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", VarSpeedCoil( DXCoilNum ).CondensateVol, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
+						SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, VarSpeedCoil( DXCoilNum ).CondensateVdot, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+						SetupOutputVariable( "Cooling Coil Condensate Volume", OutputProcessor::Unit::m3, VarSpeedCoil( DXCoilNum ).CondensateVol, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
 					}
 
 					if ( VarSpeedCoil( DXCoilNum ).ReportEvapCondVars ) {
-						SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).CondInletTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-						SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", VarSpeedCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Water", "Cooling", _, "System" );
-						SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Water Volume [m3]", VarSpeedCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "MainsWater", "Cooling", _, "System" );
-						SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", VarSpeedCoil( DXCoilNum ).EvapCondPumpElecPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-						SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+						SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).CondInletTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+						SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume", OutputProcessor::Unit::m3, VarSpeedCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Water", "Cooling", _, "System" );
+						SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Water Volume", OutputProcessor::Unit::m3, VarSpeedCoil( DXCoilNum ).EvapWaterConsump, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "MainsWater", "Cooling", _, "System" );
+						SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).EvapCondPumpElecPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+						SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
 						if ( VarSpeedCoil( DXCoilNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-							SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).BasinHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-							SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+							SetupOutputVariable( "Cooling Coil Basin Heater Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).BasinHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+							SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).BasinHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
 						}
 					}
 
-					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "COOLING", _, "System" );
 				} else {
 					// air source heating coils
-					SetupOutputVariable( "Heating Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Sensible Heating Rate [W]", VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Heating Rate [W]", VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Part Load Ratio []", VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Electric Power [W]", VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Runtime Fraction []", VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Sensible Heating Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Part Load Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Heating Coil Source Side Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Upper Speed Level []", VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Source Side Heat Transfer Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Upper Speed Level", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Heating Coil Defrost Electric Power [W]", VarSpeedCoil( DXCoilNum ).DefrostPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Defrost Electric Energy [J]", VarSpeedCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
-					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Heating Coil Defrost Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).DefrostPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Defrost Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).DefrostConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Crankcase Heater Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
 
 				}
 			} else {
@@ -2566,76 +2571,76 @@ namespace VariableSpeedCoils {
 				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) {
 					// cooling WAHP coil
 					// Setup Report variables for water source Heat Pump
-					SetupOutputVariable( "Cooling Coil Electric Power [W]", VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLatent, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Part Load Ratio []", VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Runtime Fraction []", VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLatent, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Part Load Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Cooling Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Source Side Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Source Side Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Source Side Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Source Side Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Source Side Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Cooling Coil Upper Speed Level []", VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Recoverable Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QWasteHeat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Upper Speed Level", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Recoverable Heat Transfer Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QWasteHeat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 				} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) {
 					// heating WAHP coil
 					// Setup Report variables for water source Heat Pump
-					SetupOutputVariable( "Heating Coil Electric Power [W]", VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Heating Rate [W]", VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Sensible Heating Rate [W]", VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Sensible Heating Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Heating Coil Source Side Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Part Load Ratio []", VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Runtime Fraction []", VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Source Side Heat Transfer Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSource, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Part Load Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Heating Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Source Side Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Source Side Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Source Side Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Source Side Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Source Side Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Heating Coil Upper Speed Level []", VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Heating Coil Recoverable Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QWasteHeat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Upper Speed Level", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Heating Coil Recoverable Heat Transfer Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QWasteHeat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 				} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed ) {
 					// air source water heating coil
-					SetupOutputVariable( "Cooling Coil Water Heating Electric Power [W]", VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLatent, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Total Water Heating Rate [W]", VarSpeedCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Part Load Ratio []", VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Runtime Fraction []", VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Heating Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QLatent, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Total Water Heating Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Part Load Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Cooling Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Water Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Water Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Water Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Mass Flow Rate", OutputProcessor::Unit::kg_s, VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Inlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).InletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Outlet Temperature", OutputProcessor::Unit::C, VarSpeedCoil( DXCoilNum ).OutletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
 
-					SetupOutputVariable( "Cooling Coil Upper Speed Level []", VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Upper Speed Level", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 
-					SetupOutputVariable( "Cooling Coil Water Heating Pump Electric Power [W]", VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-					SetupOutputVariable( "Cooling Coil Water Heating Pump Electric Energy [J]", VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+					SetupOutputVariable( "Cooling Coil Water Heating Pump Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Heating Pump Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
 				}
 			}
 		}
@@ -3065,6 +3070,7 @@ namespace VariableSpeedCoils {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using CurveManager::CurveValue;
+		using HVACUnitarySystem::DesignSpecMSHP;
 
 		// Locals
 		Real64 QLoadTotal; // placeholder for calculating SHR
@@ -3541,9 +3547,33 @@ namespace VariableSpeedCoils {
 		} else {
 			rhoA = PsyRhoAirFnPbTdbW( OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 			//HPWH, the mass flow rate will be updated by a revised entering air density
+
+			if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 && allocated( HVACUnitarySystem::DesignSpecMSHP ) ) {
+				if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
+					if ( HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).NumOfSpeedCooling != VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
+						ShowFatalError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil( DXCoilNum ).Name + " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object." );
+					}
+				} else {
+					if ( HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).NumOfSpeedHeating != VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
+						ShowFatalError( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil( DXCoilNum ).Name + " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object." );
+					}
+				}
+			}
+
 			for ( Mode = VarSpeedCoil( DXCoilNum ).NumOfSpeeds; Mode >= 1; --Mode ) {
-				VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) * VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( Mode );
-				VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+
+				if ( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex > 0 && VarSpeedCoil( DXCoilNum ).CoolHeatType != "WATERHEATING" ) {
+					if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
+						VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).CoolingVolFlowRatio( Mode );
+					} else {
+						VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * HVACUnitarySystem::DesignSpecMSHP( VarSpeedCoil( DXCoilNum ).MSHPDesignSpecIndex ).HeatingVolFlowRatio( Mode );
+					}
+					VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) / VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+				} else {
+					VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) * VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( Mode );
+					VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowPerRatedTotCap( Mode );
+				}
+
 				VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) * rhoA;
 				// EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
 				VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedEvapCondVolFlowPerRatedTotCap( Mode );
@@ -4193,6 +4223,11 @@ namespace VariableSpeedCoils {
 			return;
 		}
 
+		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) && ( CondInletTemp < VarSpeedCoil( DXCoilNum ).MinOATCompressor ) ) {
+			VarSpeedCoil( DXCoilNum ).SimFlag = false;
+			return;
+		}
+
 		//Loop the calculation at least once depending whether the latent degradation model
 		//is enabled. 1st iteration to calculate the QLatent(rated) at (TDB,TWB)indoorair=(26.7C,19.4C)
 		//and 2nd iteration to calculate the  QLatent(actual)
@@ -4534,7 +4569,7 @@ namespace VariableSpeedCoils {
 		//       DATE WRITTEN   12/2014
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Calculates the gross cooling capacity of a varaible-speed heat pump water heater evaporator and
+		// Calculates the gross cooling capacity of a variable-speed heat pump water heater evaporator and
 		// heating capacity of the condenser coil given the rated heating capacity and COP.
 
 		// METHODOLOGY EMPLOYED:
@@ -5769,6 +5804,46 @@ namespace VariableSpeedCoils {
 	}
 
 	int
+	GetVSCoilCapFTCurveIndex(
+		int const & CoilIndex, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   7/2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up the given coil and returns CapFT curve index.  If
+		// incorrect coil index is given, ErrorsFound is returned as true and value is returned
+		// as zero.
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		int CapFTIndex; // returned CapFT curve index of matched coil
+
+		// Obtains and Allocates WatertoAirHP related parameters from input file
+		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
+			GetVarSpeedCoilInput();
+			GetCoilsInputFlag = false;
+		}
+
+		if ( CoilIndex == 0 ) {
+			ShowSevereError( "GetVSCoilCapFTCurveIndex: Could not find Coil" );
+			ErrorsFound = true;
+			CapFTIndex = 0;
+		} else {
+			CapFTIndex = VarSpeedCoil( CoilIndex ).MSCCapFTemp( VarSpeedCoil( CoilIndex ).NumOfSpeeds );
+		}
+
+		return CapFTIndex;
+
+	}
+
+	int
 	GetCoilInletNodeVariableSpeed(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
@@ -5948,7 +6023,7 @@ namespace VariableSpeedCoils {
 		if ( WhichCoil != 0 ) {
 			MinOAT = VarSpeedCoil( WhichCoil ).MinOATCompressor;
 		} else {
-			ShowSevereError( "GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + CoilName + "\"" );
+			ShowSevereError( "GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Coil Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			MinOAT = -1000.0;
 		}
@@ -5993,7 +6068,7 @@ namespace VariableSpeedCoils {
 		if ( WhichCoil != 0 ) {
 			Speeds = VarSpeedCoil( WhichCoil ).NumOfSpeeds;
 		} else {
-			ShowSevereError( "GetVSCoilNumOfSpeeds: Invalid VS DX Coil, Type= VS DX Cooling Name=\"" + CoilName + "\"" );
+			ShowSevereError( "GetVSCoilNumOfSpeeds: Invalid VS DX Coil, Type= VS DX Coil Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
 			Speeds = 0;
 		}
@@ -6006,7 +6081,8 @@ namespace VariableSpeedCoils {
 		int const WSHPNum, // Number of OA Controller
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
-		Optional_int CompanionHeatingCoilNum // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int CompanionHeatingCoilNum, // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int MSHPDesignSpecIndex // index to UnitarySystemPerformance:Multispeed object
 	) {
 
 		// SUBROUTINE INFORMATION:
@@ -6048,6 +6124,10 @@ namespace VariableSpeedCoils {
 		if ( present( CompanionHeatingCoilNum ) ) {
 			VarSpeedCoil( WSHPNum ).CompanionHeatingCoilNum = CompanionHeatingCoilNum;
 			VarSpeedCoil( CompanionHeatingCoilNum ).CompanionCoolingCoilNum = WSHPNum;
+		}
+
+		if ( present( MSHPDesignSpecIndex ) ) {
+			VarSpeedCoil( WSHPNum ).MSHPDesignSpecIndex = MSHPDesignSpecIndex;
 		}
 
 	}

@@ -54,7 +54,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                Yes, circa 2004, Reliant , TX
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -851,125 +851,6 @@
     ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    Std MAT-CC05 4  MW CONCRETE,  !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std MAT-CC05 4  MW CONCRETE;  !- Layer 2
-
-  ComponentCost:LineItem,
-    Interior Floor,          !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-UNDERSIDE,     !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    15,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    Std MAT-CC05 4  MW CONCRETE;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Interior Floor Slab,     !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-SLAB,          !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    35,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Drop Ceiling,            !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    DropCeiling,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    10,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    Std 1.5  MW CONCRETE,    !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std 1.5  MW CONCRETE;    !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Std Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Std Clear Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Std Diffusing Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05;                !- Layer 2
-
-  ComponentCost:LineItem,
-    Sloped Metal Roof,       !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Sloped_Metal_Roof,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Gable_Wall,              !- Name
-    Std PW05;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Gable Wall,              !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Gable_Wall,              !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
     ASHRAE 90.1-2004_Sec 5.5-3ab_0_0.1_fixed_south_window,  !- Name
     Theoretical Glass [23],  !- Outside Layer
     AIR 6MM,                 !- Layer 2
@@ -1054,25 +935,6 @@
     ;                        !- Quantity {dimensionless}
 
   Construction,
-    ASHRAE 90.1-2004_Sec 5.5-3ab_0_0.02_All Skylights without Curb_Skylight,  !- Name
-    Theoretical Glass [8];   !- Outside Layer
-
-  ComponentCost:LineItem,
-    SkylightConst:ASHRAE 90.1-2004_Sec 5.5-3ab_0_0.02_All Skylights without Curb_Skylight,  !- Name
-    ,                        !- Type
-    CONSTRUCTION,            !- Line Item Type
-    ASHRAE 90.1-2004_Sec 5.5-3ab_0_0.02_All Skylights without Curb_Skylight,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000,                  !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
     ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Name
     Roof Membrane,           !- Outside Layer
     Roof Insulation,         !- Layer 2
@@ -1147,48 +1009,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     24.8600,                 !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    ASHRAE 90.1-2004_Sec 5.5-3ab_Mass_ExposedFloor,  !- Name
-    Floor Insulation [2],    !- Outside Layer
-    MAT-CC05 8 HW CONCRETE,  !- Layer 2
-    CP02 CARPET PAD;         !- Layer 3
-
-  ComponentCost:LineItem,
-    exposed-floor:ASHRAE 90.1-2004_Sec 5.5-3ab_Mass_ExposedFloor,  !- Name
-    ,                        !- Type
-    CONSTRUCTION,            !- Line Item Type
-    ASHRAE 90.1-2004_Sec 5.5-3ab_Mass_ExposedFloor,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000,                  !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    ASHRAE 90.1-2004_Sec 5.5-3ab_Attic Floor_AtticFloor,  !- Name
-    1/2IN Gypsum Top,        !- Outside Layer
-    AtticFloor Insulation,   !- Layer 2
-    1/2IN Gypsum Bottom;     !- Layer 3
-
-  ComponentCost:LineItem,
-    attic-floor:ASHRAE 90.1-2004_Sec 5.5-3ab_Attic Floor_AtticFloor,  !- Name
-    ,                        !- Type
-    CONSTRUCTION,            !- Line Item Type
-    ASHRAE 90.1-2004_Sec 5.5-3ab_Attic Floor_AtticFloor,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    18.6000,                 !- Cost per Area {$/m2}
     ,                        !- Cost per Unit of Output Capacity {$/kW}
     ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
     ,                        !- Cost per Volume {$/m3}
@@ -3044,6 +2864,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -3321,6 +3142,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -3598,6 +3420,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -3875,6 +3698,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -4152,6 +3976,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200;                    !- Cycling Run Time {s}
 
   BranchList,

@@ -67,6 +67,7 @@
 #include <NodeInputManager.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>
+#include <PurchasedAirManager.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -312,6 +313,7 @@ namespace ZonePlenum {
 		using DataZoneEquipment::EquipConfiguration;
 		using namespace DataIPShortCuts;
 		using PoweredInductionUnits::PIUInducesPlenumAir;
+		using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -458,12 +460,14 @@ namespace ZonePlenum {
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) = NodeNums( NodeNum );
 					UniqueNodeError = false;
-					CheckUniqueNodes( "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ) );
-					if ( UniqueNodeError ) {
-						ShowContinueError( "Occurs for ReturnPlenum = " + AlphArray( 1 ) );
-						ErrorsFound = true;
+					if ( ! CheckPurchasedAirForReturnPlenum( ZonePlenumNum ) ) {
+						CheckUniqueNodes( "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ) );
+						if ( UniqueNodeError ) {
+							ShowContinueError( "Occurs for ReturnPlenum = " + AlphArray( 1 ) );
+							ErrorsFound = true;
+						}
+						PIUInducesPlenumAir( ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) );
 					}
-					PIUInducesPlenumAir( ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) );
 				}
 			} else {
 				ShowContinueError( "Invalid Induced Air Outlet Node or NodeList name in AirLoopHVAC:ReturnPlenum object = " + ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName );
@@ -762,6 +766,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			InitAirZoneReturnPlenumEnvrnFlag = false;
@@ -877,6 +891,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			MyEnvrnFlag = false;
@@ -1429,6 +1453,66 @@ namespace ZonePlenum {
 
 	//        End of Reporting subroutines for the ZonePlenum Module
 	// *****************************************************************************
+
+	int
+	GetReturnPlenumIndex(
+		int const & ExNodeNum
+	)
+	{
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int PlenumNum; // loop counter
+		int InducedNodeNum; // loop counter
+		int WhichPlenum; // index to return plenum
+
+						 // Obtains and Allocates ZonePlenum related parameters from input file
+		if ( GetInputFlag ) { // First time subroutine has been entered
+			GetZonePlenumInput();
+			GetInputFlag = false;
+		}
+
+		WhichPlenum = 0;
+		if ( NumZoneReturnPlenums > 0 ) {
+			for ( PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum ) {
+				if ( ExNodeNum != ZoneRetPlenCond( PlenumNum ).OutletNode ) continue;
+				WhichPlenum = PlenumNum;
+				break;
+			}
+			if ( WhichPlenum == 0 ) {
+				for ( PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum ) {
+					for ( InducedNodeNum = 1; InducedNodeNum <= ZoneRetPlenCond( PlenumNum ).NumInducedNodes; ++InducedNodeNum ) {
+						if ( ExNodeNum != ZoneRetPlenCond( PlenumNum ).InducedNode( InducedNodeNum ) ) continue;
+						WhichPlenum = PlenumNum;
+						break;
+					}
+					if ( WhichPlenum > 0 ) break;
+				}
+			}
+		}
+
+		return WhichPlenum;
+
+	}
+
+	void
+	GetReturnPlenumName(
+		int const & ReturnPlenumIndex,
+		std::string & ReturnPlenumName
+	)
+	{
+
+		// Obtains and Allocates ZonePlenum related parameters from input file
+		if ( GetInputFlag ) { // First time subroutine has been entered
+			GetZonePlenumInput();
+			GetInputFlag = false;
+		}
+
+		ReturnPlenumName = " ";
+		if ( NumZoneReturnPlenums > 0 ) {
+			ReturnPlenumName = ZoneRetPlenCond( ReturnPlenumIndex ).ZonePlenumName;
+		}
+
+	}
 
 } // ZonePlenum
 

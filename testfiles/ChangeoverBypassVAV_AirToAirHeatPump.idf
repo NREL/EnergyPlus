@@ -97,8 +97,11 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 !
-  output:Sqlite, simple;
-  Version,8.7;
+
+  output:Sqlite,
+    simple;                  !- Option Type
+
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -106,8 +109,8 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                      !- Run Simulation for Sizing Periods
-    No;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1175,7 +1178,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:SYSTEM ===========
 
   Sizing:System,
-    Changeover Bypass VAV Heat Pump,       !- AirLoop Name
+    Changeover Bypass VAV Heat Pump,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
     0.3,                     !- Central Heating Maximum System Air Flow Ratio
@@ -1366,7 +1369,6 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-
   Coil:Heating:Electric,
     Reheat Coil Zone 1,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
@@ -1383,11 +1385,10 @@
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS ===========
 
   AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
-    CBVAV Heat Pump System,    !- Name
+    CBVAV Heat Pump System,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     autosize,                !- Heating Supply Air Flow Rate {m3/s}
@@ -1407,8 +1408,8 @@
     BlowThrough,             !- Supply Air Fan Placement
     Fan OpMode Schedule,     !- Supply Air Fan Operating Mode Schedule Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
-    Main Cooling Coil 1,              !- Cooling Coil Name
-    Coil:Heating:DX:VariableSpeed,       !- Heating Coil Object Type
+    Main Cooling Coil 1,     !- Cooling Coil Name
+    Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Main DX Heating Coil 1,  !- Heating Coil Name
     CoolingPriority,         !- Priority Control Mode
     10.0,                    !- Minimum Outlet Air Temperature During Cooling Operation {C}
@@ -1416,7 +1417,7 @@
     None;                    !- Dehumidification Control Type
 
   AirLoopHVAC,
-    Changeover Bypass VAV Heat Pump,       !- Name
+    Changeover Bypass VAV Heat Pump,  !- Name
     ,                        !- Controller List Name
     Furnace 1 Avail List,    !- Availability Manager List Name
     1.75,                    !- Design Supply Air Flow Rate {m3/s}
@@ -1464,7 +1465,7 @@
     Air Loop Main Branch,    !- Name
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,  !- Component 1 Object Type
-    CBVAV Heat Pump System,    !- Component 1 Name
+    CBVAV Heat Pump System,  !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
     Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
@@ -1603,8 +1604,8 @@
     ;                        !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Coil:Cooling:DX:VariableSpeed,
-    Main Cooling Coil 1,    !- Name
-     DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
+    Main Cooling Coil 1,     !- Name
+    DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     4.0,                     !- Number of Speeds {dimensionless}
     4.0,                     !- Nominal Speed Level {dimensionless}
@@ -1616,8 +1617,9 @@
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
-    0.0,                   !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
@@ -1664,16 +1666,14 @@
     HPCoolingEIRFTemp4,      !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF;                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
-
-   
-   Curve:Quadratic,
+  Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
-    1.0,                    !- Coefficient1 Constant
-    0.0,                    !- Coefficient2 x
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.5,                     !- Minimum Value of x
-    1.5;                     !- Maximum Value of x  
-   
+    1.5;                     !- Maximum Value of x
+
   Curve:Cubic,
     HPACFFF,                 !- Name
     1.0,                     !- Coefficient1 Constant
@@ -1682,7 +1682,7 @@
     0.0,                     !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
-    
+
   Curve:Biquadratic,
     HPHeatingCAPFTemp1,      !- Name
     0.8406506803,            !- Coefficient1 Constant
@@ -1841,7 +1841,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
   Curve:Biquadratic,
     HPCoolingCAPFTemp1,      !- Name
     1.6253449506,            !- Coefficient1 Constant
@@ -1985,6 +1984,7 @@
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
+
   Curve:Biquadratic,
     HPHeatingCAPFTemp5,      !- Name
     0.8593017622,            !- Coefficient1 Constant
@@ -2022,7 +2022,6 @@
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-
 
   OutdoorAir:Node,
     Main Cooling Coil 1 Condenser Node,  !- Name
@@ -2114,13 +2113,20 @@
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Upper Speed Level,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,hourly; !- HVAC Average []
+  Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly;
+
+  Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Electric Power,hourly;
+
+  Output:Variable,*,Cooling Coil Upper Speed Level,hourly;
+
+  Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,hourly;
+
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
@@ -2162,22 +2168,38 @@ Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,hourly; !- HVAC Av
   Output:Variable,Zone 1 Reheat Air Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,Zone 1 Reheat Air Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
-Output:Variable,*,Heating Coil Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,*,Heating Coil Air Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Heating Coil Air Inlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Heating Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Heating Coil Air Outlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Heating Coil Sensible Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Source Side Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Upper Speed Level,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Neighboring Speed Levels Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Defrost Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Defrost Electric Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Heating Coil Crankcase Heater Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly; !- HVAC Sum [J]
+
+  Output:Variable,*,Heating Coil Air Mass Flow Rate,hourly;
+
+  Output:Variable,*,Heating Coil Air Inlet Temperature,hourly;
+
+  Output:Variable,*,Heating Coil Air Inlet Humidity Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Air Outlet Temperature,hourly;
+
+  Output:Variable,*,Heating Coil Air Outlet Humidity Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Sensible Heating Rate,hourly;
+
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
+
+  Output:Variable,*,Heating Coil Part Load Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Runtime Fraction,hourly;
+
+  Output:Variable,*,Heating Coil Source Side Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Heating Coil Upper Speed Level,hourly;
+
+  Output:Variable,*,Heating Coil Neighboring Speed Levels Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Defrost Electric Power,hourly;
+
+  Output:Variable,*,Heating Coil Defrost Electric Energy,hourly;
+
+  Output:Variable,*,Heating Coil Crankcase Heater Electric Power,hourly;
+
+  Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
@@ -2196,7 +2218,6 @@ Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly; !- HVAC 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DEBUGGINGDATA ===========
 

@@ -134,7 +134,7 @@ namespace ExternalInterface {
 	bool haveExternalInterfaceFMUImport( false ); // Flag for FMU-Import interface
 	bool haveExternalInterfaceFMUExport( false ); // Flag for FMU-Export interface
 	int simulationStatus( 1 ); // Status flag. Used to report during
-	// which phase an error occured.
+	// which phase an error occurred.
 	// (1=initialization, 2=time stepping)
 
 	Array1D_int keyVarIndexes; // Array index for specific key name
@@ -2177,7 +2177,7 @@ namespace ExternalInterface {
 		int numKeys( 0 ); // Number of keys found
 		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
-		std::string varUnits; // Units sting, may be blank
+		OutputProcessor::Unit varUnits( OutputProcessor::Unit::None ); // Units sting, may be blank
 		Array1D_int keyIndexes; // Array index for
 		Array1D_string NamesOfKeys; // Specific key name
 		int Loop, iKey; // Loop counters

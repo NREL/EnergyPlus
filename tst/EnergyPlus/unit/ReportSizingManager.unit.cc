@@ -49,9 +49,6 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
 
@@ -59,11 +56,12 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 
@@ -193,11 +191,6 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT )
 }
 TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingSystem ) {
 
-	int write_stat;
-	// Open the Initialization Output File
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-
 	std::string CompName; // component name
 	std::string CompType; // component type
 	std::string SizingString; // input field sizing description
@@ -263,8 +256,209 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingSystem ) {
 	ReportSizingManager::RequestSizing( CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine );
 	EXPECT_NEAR( 19234.6, SizingResult, 0.1 );
 
-	// close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+	// clean
+	DataSizing::NumSysSizInput = 0;
+	FinalSysSizing.deallocate();
+	PrimaryAirSystem.deallocate();
+	SysSizInput.deallocate();
+	UnitarySysEqSizing.deallocate();
+	OASysEqSizing.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans) {
+
+// Add three fans to this model - one Fan:ConstantVolume, and three Fan:SystemModel in order to make the SupFanIndex=2
+	std::string const idf_objects = delimited_string({
+
+		"  Fan:SystemModel,",
+		"    Test Fan 1 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFanAirInletNode,         !- Air Inlet Node Name",
+		"    TestFanOutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    50.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  ",
+		"  Fan:SystemModel,",
+		"    Test Fan 2 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFan2AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan2OutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    100.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  Fan:SystemModel,",
+		"    Test Fan 3 ,                   !- Name",
+		"    ,                            !- Availability Schedule Name",
+		"    TestFan3AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan3OutletNode,           !- Air Outlet Node Name",
+		"    1.0 ,                        !- Design Maximum Air Flow Rate",
+		"    Discrete ,                   !- Speed Control Method",
+		"    0.0,                         !- Electric Power Minimum Flow Rate Fraction",
+		"    200.0,                       !- Design Pressure Rise",
+		"    0.9 ,                        !- Motor Efficiency",
+		"    1.0 ,                        !- Motor In Air Stream Fraction",
+		"    AUTOSIZE,                    !- Design Electric Power Consumption",
+		"    TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+		"    ,                            !- Electric Power Per Unit Flow Rate",
+		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
+		"    0.50;                        !- Fan Total Efficiency",
+		"  Fan:ConstantVolume,",
+		"    Test Fan 4,            !- Name",
+		"    ,    !- Availability Schedule Name",
+		"    0.5,                     !- Fan Total Efficiency",
+		"    25.0,                   !- Pressure Rise {Pa}",
+		"    1.0,                  !- Maximum Flow Rate {m3/s}",
+		"    0.9,                     !- Motor Efficiency",
+		"    1.0,                     !- Motor In Airstream Fraction",
+		"    TestFan4AirInletNode,         !- Air Inlet Node Name",
+		"    TestFan4OutletNode;           !- Air Outlet Node Name",
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	std::string fanName = "TEST FAN 1";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	DataSizing::CurZoneEqNum = 0;
+	DataSizing::CurSysNum = 0;
+	DataSizing::CurOASysNum = 0;
+	DataEnvironment::StdRhoAir = 1.2;
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); // triggers sizing call
+	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate; // get function
+	Real64 locDesignHeatGain1 = HVACFan::fanObjs[ 0 ]->getFanDesignHeatGain( locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain1, 100.0, 0.1 );
+
+	fanName = "TEST FAN 2";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	HVACFan::fanObjs[ 1 ]->simulate( _,_,_,_ ); // triggers sizing call
+	locFanSizeVdot = HVACFan::fanObjs[ 1 ]->designAirVolFlowRate; // get function
+	Real64 locDesignHeatGain2 = HVACFan::fanObjs[ 1 ]->getFanDesignHeatGain( locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain2, 200.0, 0.1 );
+
+	fanName = "TEST FAN 3";
+	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
+	DataEnvironment::StdRhoAir = 1.2;
+	HVACFan::fanObjs[ 2 ]->simulate( _,_,_,_ ); // triggers sizing call
+	locFanSizeVdot = HVACFan::fanObjs[ 2 ]->designAirVolFlowRate; // get function
+	Real64 locDesignHeatGain3 = HVACFan::fanObjs[ 2 ]->getFanDesignHeatGain( locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain3, 400.0, 0.1 );
+
+	GetFanInput();
+	Real64 locDesignHeatGain4 = FanDesHeatGain( 1, locFanSizeVdot );
+	EXPECT_NEAR( locDesignHeatGain4, 50.0, 0.1 );
+
+	std::string CompName; // component name
+	std::string CompType; // component type
+	std::string SizingString; // input field sizing description
+	int SizingType; // integer type of sizing requested
+	Real64 SizingResult; // autosized value of coil input field
+	bool PrintWarning; // true when sizing information is reported in the eio file
+	std::string CallingRoutine; // calling routine
+
+	DataConstantUsedForSizing = 1.0;
+	DataFractionUsedForSizing = 1.0;
+	DataTotCapCurveIndex = 0;
+	DataDesOutletAirTemp = 0.0;
+
+	CurZoneEqNum = 0;
+	CurOASysNum = 0;
+	CurSysNum = 1;
+	FinalSysSizing.allocate( 1 );
+	FinalSysSizing( CurSysNum ).CoolSupTemp = 12.0;
+	FinalSysSizing( CurSysNum ).CoolSupHumRat = 0.0085;
+	FinalSysSizing( CurSysNum ).MixTempAtCoolPeak = 28.0;
+	FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak = 0.0075;
+	FinalSysSizing( CurSysNum ).DesCoolVolFlow = 1.00;
+	FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
+
+	PrimaryAirSystem.allocate( 1 );
+	PrimaryAirSystem( CurSysNum ).NumOACoolCoils = 0;
+	PrimaryAirSystem( CurSysNum ).SupFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).RetFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+
+	SysSizingRunDone = true;
+	SysSizInput.allocate( 1 );
+	SysSizInput( 1 ).AirLoopNum = CurSysNum;
+	DataSizing::NumSysSizInput = 1;
+
+	StdBaroPress = 101325.0;
+	InitializePsychRoutines();
+
+	DataFlowUsedForSizing = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+	// Need this to prevent crash in RequestSizing
+	UnitarySysEqSizing.allocate( 1 );
+	OASysEqSizing.allocate( 1 );
+
+	// Without fan heat
+	CompType = "COIL:COOLING:DX:SINGLESPEED";
+	CompName = "Single Speed DX Cooling Coil";
+	SizingType = DataHVACGlobals::CoolingCapacitySizing;
+	SizingString = "Nominal Capacity";
+	SizingResult = DataSizing::AutoSize;
+	PrintWarning = true;
+	CallingRoutine = "RequestSizing";
+	DataIsDXCoil = true;
+
+	// dx cooling coil capacity sizing
+	ReportSizingManager::RequestSizing( CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine );
+	EXPECT_NEAR( 18882.0, SizingResult, 0.1 );
+	Real64 dxCoilSizeNoFan = SizingResult;
+
+	// With Test Fan 4 fan heat
+	PrimaryAirSystem( CurSysNum ).SupFanNum = 1;
+	PrimaryAirSystem( CurSysNum ).RetFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+	CompType = "COIL:COOLING:DX:SINGLESPEED";
+	CompName = "Single Speed DX Cooling Coil";
+	SizingType = DataHVACGlobals::CoolingCapacitySizing;
+	SizingString = "Nominal Capacity";
+	SizingResult = DataSizing::AutoSize;
+	PrintWarning = true;
+	CallingRoutine = "RequestSizing";
+	DataIsDXCoil = true;
+	// Expect coil size to increase by fan heat for fan 4
+	Real64 expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain4;
+
+	// dx cooling coil capacity sizing
+	ReportSizingManager::RequestSizing( CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine );
+	EXPECT_NEAR( expectedDXCoilSize, SizingResult, 0.1 );
+
+	// With Test Fan 3 fan heat - this fails before the #6126 fix in ReportSizingManager
+	PrimaryAirSystem( CurSysNum ).SupFanNum = 2;
+	PrimaryAirSystem( CurSysNum ).supFanVecIndex = 2;
+	PrimaryAirSystem( CurSysNum ).RetFanNum = 0;
+	PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+	CompType = "COIL:COOLING:DX:SINGLESPEED";
+	CompName = "Single Speed DX Cooling Coil";
+	SizingType = DataHVACGlobals::CoolingCapacitySizing;
+	SizingString = "Nominal Capacity";
+	SizingResult = DataSizing::AutoSize;
+	PrintWarning = true;
+	CallingRoutine = "RequestSizing";
+	DataIsDXCoil = true;
+	// Expect coil size to increase by fan heat for fan 3
+	expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain3;
+
+	// dx cooling coil capacity sizing
+	ReportSizingManager::RequestSizing( CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine );
+	EXPECT_NEAR( expectedDXCoilSize, SizingResult, 0.1 );
 
 	// clean
 	DataSizing::NumSysSizInput = 0;
@@ -277,11 +471,6 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingSystem ) {
 
 TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingZone ) {
 	ShowMessage( "Begin Test: ReportSizingManager, RequestSizingZone" );
-
-	int write_stat;
-	// Open the Initialization Output File
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	int const ZoneNum = 1;
 	std::string CompName; // component name
@@ -343,9 +532,6 @@ TEST_F( EnergyPlusFixture, ReportSizingManager_RequestSizingZone ) {
 	// chilled water cooling coil capacity sizing
 	ReportSizingManager::RequestSizing( CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine );
 	EXPECT_NEAR( 5770.4, SizingResult, 0.1 );
-
-	// close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 	// clean
 	DataSizing::NumZoneSizingInput = 0;

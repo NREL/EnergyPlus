@@ -120,6 +120,9 @@ namespace SizingManager {
 	GetZoneHVACSizing();
 
 	void
+	GetAirTerminalSizing();
+
+	void
 	GetSizingParams();
 
 	void
@@ -164,9 +167,27 @@ namespace SizingManager {
 	void
 	ReportSysSizing(
 		std::string const & SysName, // the name of the zone
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
+		std::string const & LoadType, // either "Cooling" or "Heating"
+		std::string const & PeakLoadType, // either "Sensible" or "Total"
+		Real64 const & UserDesCap, // User  Design Capacity
+		Real64 const & CalcDesVolFlow, // Calculated  Design Air Flow Rate
+		Real64 const & UserDesVolFlow, // User Design Air Flow Rate
+		std::string const & DesDayName, // the name of the design day that produced the peak
+		std::string const & DesDayDate, // the date that produced the peak
+		int const & TimeStepIndex // time step of the peak
 	);
+
+	std::string TimeIndexToHrMinString (
+		int timeIndex
+	);
+
+	void
+	UpdateFacilitySizing(
+		int const CallIndicator
+	);
+
+	void
+	UpdateTermUnitFinalZoneSizing();
 
 } // SizingManager
 

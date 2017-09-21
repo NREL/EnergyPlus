@@ -451,23 +451,23 @@ namespace BaseboardRadiator {
 
 			// Setup Report variables for the unit
 			// CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Water'
-			SetupOutputVariable( "Baseboard Total Heating Energy [J]", Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
 
-			SetupOutputVariable( "Baseboard Hot Water Energy [J]", Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Hot Water Energy", OutputProcessor::Unit::J, Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
 
-			SetupOutputVariable( "Baseboard Total Heating Rate [W]", Baseboard( BaseboardNum ).Power, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, Baseboard( BaseboardNum ).Power, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Hot Water Mass Flow Rate [kg/s]", Baseboard( BaseboardNum ).WaterMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, Baseboard( BaseboardNum ).WaterMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Air Mass Flow Rate [kg/s]", Baseboard( BaseboardNum ).AirMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Mass Flow Rate", OutputProcessor::Unit::kg_s, Baseboard( BaseboardNum ).AirMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Air Inlet Temperature [C]", Baseboard( BaseboardNum ).AirInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Inlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).AirInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Air Outlet Temperature [C]", Baseboard( BaseboardNum ).AirOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Outlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).AirOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Water Inlet Temperature [C]", Baseboard( BaseboardNum ).WaterInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Water Inlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).WaterInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Water Outlet Temperature [C]", Baseboard( BaseboardNum ).WaterOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Water Outlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).WaterOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 		}
 
 	}
@@ -622,7 +622,7 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -834,7 +834,7 @@ namespace BaseboardRadiator {
 						UA1 = DesCoilLoad;
 						// Invert the baseboard model: given the design inlet conditions and the design load,
 						// find the design UA.
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
+						SolveRoot( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
 						// if the numerical inversion failed, issue error messages.
 						if ( SolFla == -1 ) {
 							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );

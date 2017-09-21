@@ -50,12 +50,20 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <InternalHeatGains.hh>
-#include <HeatBalanceManager.hh>
-#include <ScheduleManager.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataLoopNode.hh>
+#include <DataSizing.hh>
+#include <DisplacementVentMgr.hh>
 #include <ExteriorEnergyUse.hh>
+#include <HeatBalanceManager.hh>
+#include <HeatBalanceInternalHeatGains.hh>
+#include <HVACManager.hh>
+#include <InternalHeatGains.hh>
+#include <OutputReportTabular.hh>
+#include <ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -302,3 +310,206 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortM
 	EXPECT_FALSE( InternalHeatGains::ErrorsFound );
 
 }
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentReset) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+
+		"Zone,Zone1;",
+
+		"ElectricEquipment:ITE:AirCooled,",
+		"  Data Center Servers,     !- Name",
+		"  Zone1,                   !- Zone Name",
+		"  Watts/Unit,              !- Design Power Input Calculation Method",
+		"  500,                     !- Watts per Unit {W}",
+		"  100,                     !- Number of Units",
+		"  ,                        !- Watts per Zone Floor Area {W/m2}",
+		"  ,  !- Design Power Input Schedule Name",
+		"  ,  !- CPU Loading  Schedule Name",
+		"  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+		"  0.4,                     !- Design Fan Power Input Fraction",
+		"  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+		"  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+		"  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+		"  15,                      !- Design Entering Air Temperature {C}",
+		"  A3,                      !- Environmental Class",
+		"  AdjustedSupply,          !- Air Inlet Connection Type",
+		"  ,                        !- Air Inlet Room Air Model Node Name",
+		"  ,                        !- Air Outlet Room Air Model Node Name",
+		"  Main Zone Inlet Node,    !- Supply Air Node Name",
+		"  0.1,                     !- Design Recirculation Fraction",
+		"  Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
+		"  0.9,                     !- Design Electric Power Supply Efficiency",
+		"  UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+		"  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+		"  ITE-CPU,                 !- CPU End-Use Subcategory",
+		"  ITE-Fans,                !- Fan End-Use Subcategory",
+		"  ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
+		"",
+		"Curve:Quadratic,",
+		"  ECM FanPower fFlow,      !- Name",
+		"  0.0,                     !- Coefficient1 Constant",
+		"  1.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Minimum Value of x",
+		"  99.0;                    !- Maximum Value of x",
+		"",
+		"Curve:Quadratic,",
+		"  UPS Efficiency fPLR,     !- Name",
+		"  1.0,                     !- Coefficient1 Constant",
+		"  0.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Minimum Value of x",
+		"  99.0;                    !- Maximum Value of x",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Servers Power fLoadTemp,  !- Name",
+		"  -1.0,                    !- Coefficient1 Constant",
+		"  1.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.06667,                 !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Servers Airflow fLoadTemp,  !- Name",
+		"  -1.4,                    !- Coefficient1 Constant",
+		"  0.9,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.1,                     !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+		"",
+		"Curve:Biquadratic,",
+		"  Data Center Recirculation fLoadTemp,  !- Name",
+		"  1.0,                     !- Coefficient1 Constant",
+		"  0.0,                     !- Coefficient2 x",
+		"  0.0,                     !- Coefficient3 x**2",
+		"  0.0,                     !- Coefficient4 y",
+		"  0.0,                     !- Coefficient5 y**2",
+		"  0.0,                     !- Coefficient6 x*y",
+		"  0.0,                     !- Minimum Value of x",
+		"  1.5,                     !- Maximum Value of x",
+		"  -10,                     !- Minimum Value of y",
+		"  99.0,                    !- Maximum Value of y",
+		"  0.0,                     !- Minimum Curve Output",
+		"  99.0,                    !- Maximum Curve Output",
+		"  Dimensionless,           !- Input Unit Type for X",
+		"  Temperature,             !- Input Unit Type for Y",
+		"  Dimensionless;           !- Output Unit Type",
+	
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
+
+	bool ErrorsFound( false );
+
+	HeatBalanceManager::GetZoneData( ErrorsFound );
+	ASSERT_FALSE( ErrorsFound );
+	DataHeatBalFanSys::MAT.allocate( 1 );
+	DataHeatBalFanSys::ZoneAirHumRat.allocate( 1 );
+
+	DataHeatBalFanSys::MAT( 1 ) = 24.0;
+	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.008;
+
+	InternalHeatGains::GetInternalHeatGainsInput();
+	InternalHeatGains::CalcZoneITEq();
+	Real64 InitialPower = DataHeatBalance::ZoneITEq( 1 ).CPUPower + DataHeatBalance::ZoneITEq( 1 ).FanPower + DataHeatBalance::ZoneITEq( 1 ).UPSPower;
+
+	DataLoopNode::Node( 1 ).Temp = 45.0;
+	InternalHeatGains::CalcZoneITEq();
+	Real64 NewPower = DataHeatBalance::ZoneITEq( 1 ).CPUPower + DataHeatBalance::ZoneITEq( 1 ).FanPower + DataHeatBalance::ZoneITEq( 1 ).UPSPower;
+	ASSERT_NE( InitialPower, NewPower );
+	HVACManager::ResetNodeData();
+
+	InternalHeatGains::CalcZoneITEq();
+	NewPower = DataHeatBalance::ZoneITEq( 1 ).CPUPower + DataHeatBalance::ZoneITEq( 1 ).FanPower + DataHeatBalance::ZoneITEq( 1 ).UPSPower;
+	ASSERT_EQ( InitialPower, NewPower );
+}
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Zone,Zone1;",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
+
+	bool ErrorsFound( false );
+	HeatBalanceManager::GetZoneData( ErrorsFound );
+	ASSERT_FALSE( ErrorsFound );
+	InternalHeatGains::GetInternalHeatGainsInput();
+
+	// Set up a simple convective gain for each gain type
+	int zoneNum = 1;
+	int numGainTypes = DataHeatBalance::NumZoneIntGainDeviceTypes;
+	Array1D< Real64 > convGains;
+	convGains.allocate( numGainTypes );
+	convGains = 0.0;
+	Real64 totConvGains = 0.0;
+	Real64 expectedTotConvGains = 0.0;
+
+	for (int gainType = 1; gainType <= numGainTypes; ++gainType ) {
+		convGains( gainType ) = 100 * gainType;
+		expectedTotConvGains += convGains( gainType );
+		SetupZoneInternalGain( zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes( gainType ), "Gain", gainType, convGains( gainType ) );
+	}
+
+	InternalHeatGains::UpdateInternalGainValues();
+
+	// Check total of all convective gains
+	InternalHeatGains::SumAllInternalConvectionGains( zoneNum, totConvGains );
+	EXPECT_EQ( totConvGains, expectedTotConvGains );
+
+	// Check subtotals used in zone component loads
+	DataEnvironment::TotDesDays = 1;
+	DataEnvironment::TotRunDesPersDays = 0;
+	DataSizing::CurOverallSimDay = 1;
+	DataGlobals::HourOfDay = 1;
+	DataGlobals::NumOfTimeStepInHour = 10;
+	DataGlobals::TimeStep = 1;
+	OutputReportTabular::AllocateLoadComponentArrays();
+	int timeStepInDay = ( DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
+		
+	DataGlobals::CompLoadReportIsReq = true;
+	DataGlobals::isPulseZoneSizing = false;
+	InternalHeatGains::GatherComponentLoadsIntGain();
+	totConvGains = OutputReportTabular::peopleInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::lightInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::equipInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::refrigInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::waterUseInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::hvacLossInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::powerGenInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum );
+
+	// Legitimate gain types excluded from this total
+	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide ); // this is only used for CO2
+	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam ); // this is only used for generic contaminants
+	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular ); // this is included in Fenestration Conduction - Sensible Instant
+
+	// ** NOTE: If this unit test fails, the likely cause is that a new internal gain type was added, but it was not added to one of the subtotal types in InternalHeatGains::GatherComponentLoadsIntGain()
+	// this also means that the new type may be missing from other places that collect internal gains by subgroups, such as the room air models and output reporting for zone-level gains
+	// search for IntGainTypeOf_Lights for places where these types of subtotals occur and add the new type as appropriate
+	EXPECT_EQ( totConvGains, expectedTotConvGains );
+
+
+	// cleanup
+	convGains.deallocate();
+}
+

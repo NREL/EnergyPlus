@@ -30,7 +30,7 @@
 !        ZN15_Shop_1 is a floating zone
 !
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,4;
 
@@ -822,22 +822,8 @@
     Ceiling Tiles 3/4 office;!- Outside Layer
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    MAT-CC05 4  MW CONCRETE, !- Outside Layer
-    CP02 CARPET PAD;         !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    CP02 CARPET PAD,         !- Outside Layer
-    MAT-CC05 4  MW CONCRETE; !- Layer 2
-
-  Construction,
     InteriorFurnishings,     !- Name
     Wood 6inch;              !- Outside Layer
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    MAT-CC05 4  MW CONCRETE; !- Outside Layer
 
   Zone,
     ZN1_S_Space_1,           !- Name
@@ -3320,6 +3306,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN1_S_Space_1 ;
@@ -3609,6 +3596,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN2_E_Space_1 ;
@@ -3898,6 +3886,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN3_N_Space_1 ;
@@ -4187,6 +4176,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN4_W_Space_1 ;
@@ -4476,6 +4466,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN5_Core_Space_1 ;

@@ -98,6 +98,7 @@
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SimAirServingZones.hh>
+#include <SizingManager.hh>
 #include <SystemAvailabilityManager.hh>
 #include <SystemReports.hh>
 //#include <ThermalChimney.hh>
@@ -252,6 +253,7 @@ namespace HVACManager {
 
 		using NodeInputManager::CalcMoreNodeInfo;
 		using ZoneEquipmentManager::UpdateZoneSizing;
+		using SizingManager::UpdateFacilitySizing;
 		using OutputReportTabular::UpdateTabularReports; // added for writing tabular output reports
 		using OutputReportTabular::GatherComponentLoadsHVAC;
 		using DataGlobals::CompLoadReportIsReq;
@@ -358,7 +360,6 @@ namespace HVACManager {
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
-			ResetNodeData();
 			AirLoopsSimOnce = false;
 			MyEnvrnFlag = false;
 			InitVentReportFlag = true;
@@ -527,6 +528,7 @@ namespace HVACManager {
 				}
 				if ( ZoneSizingCalc ) {
 					UpdateZoneSizing( DuringDay );
+					UpdateFacilitySizing( DuringDay );
 				}
 			} else if ( ! KickOffSimulation && DoOutputReporting && ReportDuringWarmup ) {
 				if ( BeginDayFlag && ! PrintEnvrnStampWarmupPrinted ) {
@@ -758,8 +760,8 @@ namespace HVACManager {
 		PlantManageHalfLoopCalls = 0;
 		SetAllPlantSimFlagsToValue( true );
 		if ( ! SimHVACIterSetup ) {
-			SetupOutputVariable( "HVAC System Solver Iteration Count []", HVACManageIteration, "HVAC", "Sum", "SimHVAC" );
-			SetupOutputVariable( "Air System Solver Iteration Count []", RepIterAir, "HVAC", "Sum", "SimHVAC" );
+			SetupOutputVariable( "HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC" );
+			SetupOutputVariable( "Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC" );
 			ManageSetPoints(); //need to call this before getting plant loop data so setpoint checks can complete okay
 			GetPlantLoopData();
 			GetPlantInput();
@@ -772,8 +774,8 @@ namespace HVACManager {
 			}
 
 			if ( TotNumLoops > 0 ) {
-				SetupOutputVariable( "Plant Solver Sub Iteration Count []", PlantManageSubIterations, "HVAC", "Sum", "SimHVAC" );
-				SetupOutputVariable( "Plant Solver Half Loop Calls Count []", PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC" );
+				SetupOutputVariable( "Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, PlantManageSubIterations, "HVAC", "Sum", "SimHVAC" );
+				SetupOutputVariable( "Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC" );
 				for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 					// init plant sizing numbers in main plant data structure
 					InitOneTimePlantSizingInfo( LoopNum );

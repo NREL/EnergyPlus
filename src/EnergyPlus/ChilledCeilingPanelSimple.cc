@@ -631,19 +631,19 @@ namespace CoolingPanelSimple {
 		// Setup Report variables for the Coils
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 			// CurrentModuleObject='ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-			SetupOutputVariable( "Cooling Panel Total Cooling Rate [W]", CoolingPanel( CoolingPanelNum ).Power, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Total System Cooling Rate [W]", CoolingPanel( CoolingPanelNum ).TotPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Convective Cooling Rate [W]", CoolingPanel( CoolingPanelNum ).ConvPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Radiant Cooling Rate [W]", CoolingPanel( CoolingPanelNum ).RadPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Total Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).Power, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Total System Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).TotPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Convective Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).ConvPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Radiant Cooling Rate", OutputProcessor::Unit::W, CoolingPanel( CoolingPanelNum ).RadPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 
-			SetupOutputVariable( "Cooling Panel Total Cooling Energy [J]", CoolingPanel( CoolingPanelNum ).Energy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
-			SetupOutputVariable( "Cooling Panel Total System Cooling Energy [J]", CoolingPanel( CoolingPanelNum ).TotEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
-			SetupOutputVariable( "Cooling Panel Convective Cooling Energy [J]", CoolingPanel( CoolingPanelNum ).ConvEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Radiant Cooling Energy [J]", CoolingPanel( CoolingPanelNum ).RadEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Total Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).Energy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
+			SetupOutputVariable( "Cooling Panel Total System Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).TotEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
+			SetupOutputVariable( "Cooling Panel Convective Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).ConvEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Radiant Cooling Energy", OutputProcessor::Unit::J, CoolingPanel( CoolingPanelNum ).RadEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
 
-			SetupOutputVariable( "Cooling Panel Water Mass Flow Rate [kg/s]", CoolingPanel( CoolingPanelNum ).WaterMassFlowRate, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Water Inlet Temperature [C]", CoolingPanel( CoolingPanelNum ).WaterInletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Water Outlet Temperature [C]", CoolingPanel( CoolingPanelNum ).WaterOutletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Water Mass Flow Rate", OutputProcessor::Unit::kg_s, CoolingPanel( CoolingPanelNum ).WaterMassFlowRate, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Water Inlet Temperature", OutputProcessor::Unit::C, CoolingPanel( CoolingPanelNum ).WaterInletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+			SetupOutputVariable( "Cooling Panel Water Outlet Temperature", OutputProcessor::Unit::C, CoolingPanel( CoolingPanelNum ).WaterOutletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 		}
 
 	}
@@ -1015,34 +1015,81 @@ namespace CoolingPanelSimple {
 		
 		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
 
+		bool SizeCoolingPanelUASuccess;
+		SizeCoolingPanelUASuccess = SizeCoolingPanelUA( CoolingPanelNum );
+		if ( ! SizeCoolingPanelUASuccess ) ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
+
+	}
+
+	bool
+	SizeCoolingPanelUA(
+		int const CoolingPanelNum
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   June 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sizes UA value for the simple chilled ceiling panel.
+
+		// Return value
+		bool SizeCoolingPanelUA;
+		
 		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
+		Real64 Cp;
 		Real64 MDot;
 		Real64 MDotXCp;
 		Real64 Qrated;
 		Real64 Tinletr;
 		Real64 Tzoner;
+		Real64 RatCapToTheoMax; // Ratio of unit capacity to theoretical maximum output based on rated parameters
+
+		SizeCoolingPanelUA = true;
 		Cp = 4120.0; // Just an approximation, don't need to get an exact number
 		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
 		MDotXCp = Cp * MDot;
 		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
 		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
 		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+		if ( std::abs( Tinletr - Tzoner ) < 0.5 ) {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * 0.5 ); // Avoid a divide by zero error
+		} else {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) );
+		}
+		if ( ( RatCapToTheoMax < 1.1 ) && ( RatCapToTheoMax > 0.9999 ) ) {
+			// close to unity with some graciousness given in case the approximation of Cp causes a problem
+			RatCapToTheoMax = 0.9999;
+		} else if (RatCapToTheoMax >= 1.1 ) {
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a cooling capacity that is greater than the maximum possible value." );
+			ShowContinueError( "The result of this is that a UA value is impossible to calculate." );
+			ShowContinueError( "Check the rated input for temperatures, flow, and capacity for this unit." );
+			ShowContinueError( "The ratio of the capacity to the rated theoretical maximum must be less than unity." );
+			ShowContinueError( "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high, the rated flow being too low, rated temperatures being too close to each other, or all of those reasons." );
+			ShowContinueError( "Compare the rated capacity in your input to the product of the rated mass flow rate, Cp of water, and the difference between the rated temperatures." );
+			ShowContinueError( "If the rated capacity is higher than this product, then the cooling panel would violate the Second Law of Thermodynamics." );
+			SizeCoolingPanelUA = false;
+			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+		}
 		if ( Tinletr >= Tzoner ) {
-			ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
 			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-			ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			SizeCoolingPanelUA = false;
 			CoolingPanel( CoolingPanelNum ).UA = 1.0;
 		} else {
-			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
+			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - RatCapToTheoMax );
 			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-				ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+				ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
 				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-				ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+				SizeCoolingPanelUA = false;
 			}
 		}
-		
+
+		return SizeCoolingPanelUA;
+
 	}
-	
+
 	void
 	CalcCoolingPanel(
 		int & CoolingPanelNum

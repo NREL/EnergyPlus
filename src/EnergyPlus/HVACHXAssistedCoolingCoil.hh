@@ -122,6 +122,8 @@ namespace HVACHXAssistedCoolingCoil {
 		Real64 MassFlowRate; // Mass flow rate through HXAssistedCoolingCoil compound object
 		int MaxIterCounter; // used in warning messages
 		int MaxIterIndex; // used in warning messages
+		int ControllerIndex; // index to water coil controller
+		std::string ControllerName; // name of water coil controller
 
 		// Default Constructor
 		HXAssistedCoilParameters() :
@@ -136,7 +138,8 @@ namespace HVACHXAssistedCoolingCoil {
 			HXExhaustAirInletNodeNum( 0 ),
 			MassFlowRate( 0.0 ),
 			MaxIterCounter( 0 ),
-			MaxIterIndex( 0 )
+			MaxIterIndex( 0 ),
+			ControllerIndex( 0 )
 		{}
 
 	};

@@ -57,6 +57,7 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <PlantComponent.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -1166,7 +1167,7 @@ namespace DataPlant {
 	{
 		// Members
 		std::string ReportVarName;
-		std::string ReportVarUnits;
+		OutputProcessor::Unit ReportVarUnits;
 		int ResourceType;
 		std::string EndUse;
 		int EndUse_CompMode;
@@ -1178,6 +1179,7 @@ namespace DataPlant {
 
 		// Default Constructor
 		MeterData() :
+			ReportVarUnits( OutputProcessor::Unit::None ),
 			ResourceType( 0 ),
 			EndUse_CompMode( 0 ),
 			ReportVarIndex( 0 ),

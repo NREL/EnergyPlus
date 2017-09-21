@@ -1,9 +1,9 @@
 ! 5Zone_Unitary_VSDesuperheater.idf
-! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum. 
+! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !                          file derived from 5ZoneAutoDXVAV.idf
 !
 ! Highlights:              packaged VAV system with setpoint-based Unitary system using variable speed air to air cooling coil model
-!                          desuperheater for supplemental coil used for humidity control. 
+!                          desuperheater for supplemental coil used for humidity control.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -157,7 +157,7 @@
     CONTINUOUS;              !- Numeric Type
 
   RunPeriod,
-    Feb 1 to 5,                        !- Name
+    Feb 1 to 5,              !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
     2,                       !- End Month
@@ -170,7 +170,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    June 1 to 5,                        !- Name
+    June 1 to 5,             !- Name
     6,                       !- Begin Month
     1,                       !- Begin Day of Month
     6,                       !- End Month
@@ -193,8 +193,8 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    yes,                      !- Run Simulation for Sizing Periods
-    no;                     !- Run Simulation for Weather File Run Periods
+    yes,                     !- Run Simulation for Sizing Periods
+    no;                      !- Run Simulation for Weather File Run Periods
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -427,14 +427,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03,                    !- Outside Layer
     CP01;                    !- Layer 2
@@ -531,26 +523,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
@@ -1727,8 +1701,8 @@
     3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   Sizing:Parameters,
-    1.25,                     !- Heating Sizing Factor
-    1.15,                     !- Cooling Sizing Factor
+    1.25,                    !- Heating Sizing Factor
+    1.15,                    !- Cooling Sizing Factor
     ;                        !- Timesteps in Averaging Window
 
   Sizing:Zone,
@@ -1741,7 +1715,7 @@
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
     0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ZoneMinOARequirements,        !- Design Specification Outdoor Air Object Name
+    ZoneMinOARequirements,   !- Design Specification Outdoor Air Object Name
     0.0,                     !- Zone Heating Sizing Factor
     0.0,                     !- Zone Cooling Sizing Factor
     DesignDay,               !- Cooling Design Air Flow Method
@@ -1765,7 +1739,7 @@
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
     0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ZoneMinOARequirements,        !- Design Specification Outdoor Air Object Name
+    ZoneMinOARequirements,   !- Design Specification Outdoor Air Object Name
     0.0,                     !- Zone Heating Sizing Factor
     0.0,                     !- Zone Cooling Sizing Factor
     DesignDay,               !- Cooling Design Air Flow Method
@@ -1789,7 +1763,7 @@
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
     0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ZoneMinOARequirements,        !- Design Specification Outdoor Air Object Name
+    ZoneMinOARequirements,   !- Design Specification Outdoor Air Object Name
     0.0,                     !- Zone Heating Sizing Factor
     0.0,                     !- Zone Cooling Sizing Factor
     DesignDay,               !- Cooling Design Air Flow Method
@@ -1813,7 +1787,7 @@
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
     0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ZoneMinOARequirements,        !- Design Specification Outdoor Air Object Name
+    ZoneMinOARequirements,   !- Design Specification Outdoor Air Object Name
     0.0,                     !- Zone Heating Sizing Factor
     0.0,                     !- Zone Cooling Sizing Factor
     DesignDay,               !- Cooling Design Air Flow Method
@@ -1837,7 +1811,7 @@
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
     0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ZoneMinOARequirements,        !- Design Specification Outdoor Air Object Name
+    ZoneMinOARequirements,   !- Design Specification Outdoor Air Object Name
     0.0,                     !- Zone Heating Sizing Factor
     0.0,                     !- Zone Cooling Sizing Factor
     DesignDay,               !- Cooling Design Air Flow Method
@@ -1962,15 +1936,15 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 6:00,0.3,        !- Field 3
+    Until: 6:00,0.3,         !- Field 3
     Until: 18:00,1.0,        !- Field 5
-    Until: 24:00,0.3,       !- Field 7
-    For: SummerDesignDay,    !- Field 2
-    Until: 24:00,1.0,          !- Field 3
-    For: WinterDesignDay,    !- Field 5
-    Until: 24:00,1.0,          !- Field 6   
-    For: AllOtherDays,       !- Field 9
-    Until: 24:00,0.3;       !- Field 10
+    Until: 24:00,0.3,        !- Field 7
+    For: SummerDesignDay,    !- Field 9
+    Until: 24:00,1.0,        !- Field 10
+    For: WinterDesignDay,    !- Field 12
+    Until: 24:00,1.0,        !- Field 13
+    For: AllOtherDays,       !- Field 15
+    Until: 24:00,0.3;        !- Field 16
 
   Schedule:Compact,
     FanAvailSched,           !- Name
@@ -2396,10 +2370,10 @@
     ZoneMinOARequirements,   !- Name
     Sum,                     !- Outdoor Air Method
     0.00472,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.001,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.001,                   !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Outdoor Air Flow per Zone {m3/s}
     ,                        !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    Min OARequirements Sched;!- Outdoor Air Flow Rate Fraction Schedule Name
+    Min OARequirements Sched;!- Outdoor Air Schedule Name
 
   Schedule:Compact,
     Min OARequirements Sched,!- Name
@@ -2608,12 +2582,11 @@
     OA Sys 1,                !- Component 1 Name
     VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name
     Mixed Air Node 1,        !- Component 1 Outlet Node Name
-    AirLoopHVAC:UnitarySystem,
-    GasHeat DXAC Furnace 1,
-    Mixed Air Node 1,
-    VAV Sys 1 Outlet Node;
-    
-    
+    AirLoopHVAC:UnitarySystem,  !- Component 2 Object Type
+    GasHeat DXAC Furnace 1,  !- Component 2 Name
+    Mixed Air Node 1,        !- Component 2 Inlet Node Name
+    VAV Sys 1 Outlet Node;   !- Component 2 Outlet Node Name
+
 !    CoilSystem:Cooling:DX,   !- Component 2 Object Type
 !    DX Cooling Coil System 1,!- Component 2 Name
 !    Mixed Air Node 1,        !- Component 2 Inlet Node Name
@@ -2630,38 +2603,38 @@
 
   AirLoopHVAC:UnitarySystem,
     GasHeat DXAC Furnace 1,  !- Name
-    Setpoint,                    !- Control Type
-    ,               !- Controlling Zone or Thermostat Location
+    Setpoint,                !- Control Type
+    ,                        !- Controlling Zone or Thermostat Location
     CoolReheat,              !- Dehumidification Control Type
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    Mixed Air Node 1,          !- Air Inlet Node Name
-    VAV Sys 1 Outlet Node,    !- Air Outlet Node Name
-    Fan:VariableVolume,               !- Supply Fan Object Type
+    Mixed Air Node 1,        !- Air Inlet Node Name
+    VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
+    Fan:VariableVolume,      !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    ,   !- Supply Air Fan Operating Mode Schedule Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
-    Main Heating Coil 1,  !- Heating Coil Name
+    Main Heating Coil 1,     !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
-    Main Cooling Coil 1,      !- Cooling Coil Name
+    Main Cooling Coil 1,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
-    Coil:Heating:Desuperheater,       !- Supplemental Heating Coil Object Type
+    Coil:Heating:Desuperheater,  !- Supplemental Heating Coil Object Type
     Humidistat Reheat Coil 1,!- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
-    autosize,                     !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
     ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
     SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
-    autosize,                 !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
     SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
-    autosize,              !- No Load Supply Air Flow Rate {m3/s}
+    autosize,                !- No Load Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
@@ -2672,27 +2645,27 @@
   Coil:Heating:Desuperheater,
     Humidistat Reheat Coil 1,!- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    0.3,              !- Heat Reclaim Recovery Efficiency
+    0.3,                     !- Heat Reclaim Recovery Efficiency
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
-    VAV Sys 1 Outlet Node,    !- Air Outlet Node Name
-    Coil:Cooling:DX:VariableSpeed, !- Heating Source Object Type
-    Main Cooling Coil 1,      !- Heating Source Name
-    VAV Sys 1 Outlet Node,    !- Temperature Setpoint Node Name
-    5.0;  ! Parasitic Electric Load
+    VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
+    Coil:Cooling:DX:VariableSpeed,  !- Heating Source Object Type
+    Main Cooling Coil 1,     !- Heating Source Name
+    VAV Sys 1 Outlet Node,   !- Temperature Setpoint Node Name
+    5.0;                     !- Parasitic Electric Load {W}
 
   SetpointManager:Scheduled,
     Supply Air Hum Rate Manager 1,  !- Name
-    MaximumHumidityRatio,             !- Control Variable
+    MaximumHumidityRatio,    !- Control Variable
     Supply Air Hum Rate Schedule,  !- Schedule Name
-    VAV Sys 1 Outlet Node; !- Setpoint Node or NodeList Name
+    VAV Sys 1 Outlet Node;   !- Setpoint Node or NodeList Name
 
   SetpointManager:Scheduled,
     Supply Air Hum Rate Manager 2,  !- Name
-    MaximumHumidityRatio,             !- Control Variable
+    MaximumHumidityRatio,    !- Control Variable
     Supply Air Hum Rate Schedule,  !- Schedule Name
-    Main Heating Coil 1 Inlet Node; !- Setpoint Node or NodeList Name
-    
-  Schedule:Constant, Supply Air Hum Rate Schedule, , 0.006  ;
+    Main Heating Coil 1 Inlet Node;  !- Setpoint Node or NodeList Name
+
+  Schedule:Constant,Supply Air Hum Rate Schedule,,0.006;
 
 ! end changes
 
@@ -2720,7 +2693,7 @@
     VAV Sys 1 Inlet Node;    !- Return Air Stream Node Name
 
   Coil:Cooling:DX:VariableSpeed,
-    Main Cooling Coil 1,    !- Name
+    Main Cooling Coil 1,     !- Name
     Main Cooling Coil 1 Inlet Node,  !- Indoor Air Inlet Node Name
     Main Heating Coil 1 Inlet Node,  !- Indoor Air Outlet Node Name
     1.0,                     !- Number of Speeds {dimensionless}
@@ -2733,8 +2706,9 @@
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
-    0.0,                   !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
@@ -2750,15 +2724,15 @@
     HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-   
-   Curve:Quadratic,
+
+  Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
-    1.0,                    !- Coefficient1 Constant
-    0.0,                    !- Coefficient2 x
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.5,                     !- Minimum Value of x
-    1.5;                     !- Maximum Value of x  
-   
+    1.5;                     !- Maximum Value of x
+
   Curve:Cubic,
     HPACFFF,                 !- Name
     1.0,                     !- Coefficient1 Constant
@@ -2767,7 +2741,7 @@
     0.0,                     !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
-    
+
   Curve:Biquadratic,
     HPCoolingEIRFTemp4,      !- Name
     0.0001514017,            !- Coefficient1 Constant
@@ -2804,7 +2778,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
   OutdoorAir:Node,
     Main Cooling Coil 1 Condenser Node,  !- Name
     -1.0;                    !- Height Above Ground {m}
@@ -2817,7 +2790,7 @@
     autosize,                !- Nominal Capacity {W}
     Main Heating Coil 1 Inlet Node,  !- Air Inlet Node Name
     Reheat Coil Air Inlet Node,  !- Air Outlet Node Name
-    ;  !- Temperature Setpoint Node Name
+    ;                        !- Temperature Setpoint Node Name
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
@@ -2835,8 +2808,8 @@
     1.1086242,               !- Fan Power Coefficient 3
     -0.11635563,             !- Fan Power Coefficient 4
     0.000,                   !- Fan Power Coefficient 5
-    Mixed Air Node 1,  !- Air Inlet Node Name
-    Main Cooling Coil 1 Inlet Node;   !- Air Outlet Node Name
+    Mixed Air Node 1,        !- Air Inlet Node Name
+    Main Cooling Coil 1 Inlet Node;  !- Air Outlet Node Name
 
   Controller:OutdoorAir,
     OA Controller 1,         !- Name
@@ -2854,7 +2827,7 @@
     ,                        !- Electronic Enthalpy Limit Curve Name
     4.,                      !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
-    FixedMinimum,     !- Minimum Limit Type
+    FixedMinimum,            !- Minimum Limit Type
     Min OA Sched;            !- Minimum Outdoor Air Schedule Name
 
   SetpointManager:Scheduled,
@@ -2863,14 +2836,11 @@
     Seasonal Reset Supply Air Temp Sch,  !- Schedule Name
     Supply Air Temp Nodes 1; !- Setpoint Node or NodeList Name
 
-
   NodeList,
     Supply Air Temp Nodes 1, !- Name
-    Main Heating Coil 1 Inlet Node,  !- Node 2 Name
-    Reheat Coil Air Inlet Node,  !- Node 3 Name  
-    VAV Sys 1 Outlet Node;   !- Node 1 Name
-
-
+    Main Heating Coil 1 Inlet Node,  !- Node 1 Name
+    Reheat Coil Air Inlet Node,  !- Node 2 Name
+    VAV Sys 1 Outlet Node;   !- Node 3 Name
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
@@ -2880,20 +2850,29 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
+  Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly;
 
+  Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly;
 
-Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Inlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Outlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Cooling Coil Air Inlet Humidity Ratio,hourly;
+
+  Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly;
+
+  Output:Variable,*,Cooling Coil Air Outlet Humidity Ratio,hourly;
+
+  Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Part Load Ratio,hourly;
+
+  Output:Variable,*,Cooling Coil Electric Power,hourly;
+
+  Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
+
+  Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly;
 
   Output:Variable,*,Cooling Coil Electric Power,hourly;
 
@@ -2904,7 +2883,9 @@ Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly; !- HVAC Av
   Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
 
   Output:Variable,*,Fan Electric Power,hourly;
-Output:Variable,*,Heating Coil Air Heating Rate,hourly; !- HVAC Average [W]
+
+  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+
   Output:Variable,*,Heating Coil Gas Rate,hourly;
 
   Output:Variable,*,People Occupant Count,hourly;
@@ -2933,22 +2914,21 @@ Output:Variable,*,Heating Coil Air Heating Rate,hourly; !- HVAC Average [W]
 
   Output:Variable,*,Air System Outdoor Air Flow Fraction,hourly;
 
-  Output:Variable,*,Air System Outdoor Air Mass Flow Rate ,hourly;
-  Output:Variable,*,Air System Mixed Air Mass Flow Rate ,hourly;
+  Output:Variable,*,Air System Outdoor Air Mass Flow Rate,hourly;
+
+  Output:Variable,*,Air System Mixed Air Mass Flow Rate,hourly;
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
-  
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly; !- HVAC Average [C]
 
-Output:Variable,VAV Sys 1 Outlet Node,System Node Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
+  Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
+
+  Output:Variable,VAV Sys 1 Outlet Node,System Node Humidity Ratio,hourly;
 
   Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf;
-
-
 
   OutputControl:Table:Style,
     HTML,                    !- Column Separator
@@ -2957,24 +2937,44 @@ Output:Variable,VAV Sys 1 Outlet Node,System Node Humidity Ratio,hourly; !- HVAC
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-  Output:SQlite, simple;
-Output:Variable,*,Unitary System Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Unitary System Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Sensible Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Latent Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Total Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Sensible Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Latent Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Ancillary Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Dehumidification Induced Heating Demand Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Unitary System Fan Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Unitary System Compressor Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Unitary System Frost Control Status,hourly; !- HVAC Average []
-Output:Variable,*,Unitary System Heating Ancillary Electric Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Unitary System Cycling Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average []
+  Output:SQlite,
+    simple;                  !- Option Type
 
-Output:Variable,*,Zone Operative Temperature,hourly; !- Zone Average [C]
-Output:Variable,*,Zone Mean Air Dewpoint Temperature,hourly; !- Zone Average [C]
-Output:Variable,*,Zone Mean Air Humidity Ratio,hourly; !- Zone Average [kgWater/kgDryAir]
-Output:Variable,*,Zone Air Relative Humidity,hourly; !- HVAC Average [%]
+  Output:Variable,*,Unitary System Part Load Ratio,hourly;
+
+  Output:Variable,*,Unitary System Total Cooling Rate,hourly;
+
+  Output:Variable,*,Unitary System Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Unitary System Latent Cooling Rate,hourly;
+
+  Output:Variable,*,Unitary System Total Heating Rate,hourly;
+
+  Output:Variable,*,Unitary System Sensible Heating Rate,hourly;
+
+  Output:Variable,*,Unitary System Latent Heating Rate,hourly;
+
+  Output:Variable,*,Unitary System Ancillary Electric Power,hourly;
+
+  Output:Variable,*,Unitary System Dehumidification Induced Heating Demand Rate,hourly;
+
+  Output:Variable,*,Unitary System Fan Part Load Ratio,hourly;
+
+  Output:Variable,*,Unitary System Compressor Part Load Ratio,hourly;
+
+  Output:Variable,*,Unitary System Frost Control Status,hourly;
+
+  Output:Variable,*,Unitary System Heating Ancillary Electric Energy,hourly;
+
+  Output:Variable,*,Unitary System Cycling Ratio,hourly;
+
+  Output:Variable,*,Unitary System Compressor Speed Ratio,hourly;
+
+  Output:Variable,*,Zone Operative Temperature,hourly;
+
+  Output:Variable,*,Zone Mean Air Dewpoint Temperature,hourly;
+
+  Output:Variable,*,Zone Mean Air Humidity Ratio,hourly;
+
+  Output:Variable,*,Zone Air Relative Humidity,hourly;
+

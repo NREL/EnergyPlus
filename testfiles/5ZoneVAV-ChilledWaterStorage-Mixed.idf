@@ -71,7 +71,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,4;
 
@@ -952,152 +952,6 @@
     1;                       !- Cost per Area {$/m2}
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    Std MAT-CC05 4  MW CONCRETE,  !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std MAT-CC05 4  MW CONCRETE;  !- Layer 2
-
-  ComponentCost:LineItem,
-    Interior Floor,          !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-UNDERSIDE,     !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    15;                      !- Cost per Area {$/m2}
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    Std MAT-CC05 4  MW CONCRETE;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Interior Floor Slab,     !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-SLAB,          !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    35;                      !- Cost per Area {$/m2}
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Drop Ceiling,            !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    DropCeiling,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    10;                      !- Cost per Area {$/m2}
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    Std 1.5  MW CONCRETE,    !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std 1.5  MW CONCRETE;    !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Std Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Std Clear Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Std Diffusing Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05;                !- Layer 2
-
-  ComponentCost:LineItem,
-    Sloped Metal Roof,       !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Sloped_Metal_Roof,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Gable_Wall,              !- Name
-    Std PW05;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Gable Wall,              !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Gable_Wall,              !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  ComponentCost:LineItem,
-    Air Wall,                !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    AIR-WALL,                !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Swinging Door_con,   !- Name
-    Std Opaque Door panel_con;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_con,   !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Swinging Door_semi,  !- Name
-    Std Opaque Door panel_semi;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Semi-conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_semi,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Overhead Door,       !- Name
-    Std Overhead Door Panel; !- Outside Layer
-
-  ComponentCost:LineItem,
-    Overhead Door,           !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Overhead Door,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
     ASHRAE 30Perc Guide_Zone 5_0.3_0.4_fixed_south_window,  !- Name
     Theoretical Glass [183], !- Outside Layer
     AIR 6MM_1,               !- Layer 2
@@ -1227,19 +1081,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     560.7870;                !- Cost per Area {$/m2}
-
-  Construction,
-    ASHRAE 30Perc Guide_Zone 5Swinging_Door,  !- Name
-    DoorMaterial;            !- Outside Layer
-
-  ComponentCost:LineItem,
-    door:ASHRAE 30Perc Guide_Zone 5Swinging_Door,  !- Name
-    ,                        !- Type
-    CONSTRUCTION,            !- Line Item Type
-    ASHRAE 30Perc Guide_Zone 5Swinging_Door,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000;                  !- Cost per Area {$/m2}
 
   Zone,
     ZN_1_FLR_1_SEC_1,        !- Name
@@ -3798,6 +3639,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,

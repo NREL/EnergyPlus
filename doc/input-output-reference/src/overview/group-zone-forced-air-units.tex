@@ -5,13 +5,13 @@ Regarding component schedules, the general rule is don't schedule any components
 
 \subsection{ZoneHVAC:IdealLoadsAirSystem}\label{zonehvacidealloadsairsystem}
 
-The simplest piece of zone equipment is the ZoneHVAC:IdealLoadsAirSystem component. ZoneHVAC:IdealLoadsAirSystem is used in situations where the user wishes to study the performance of a building without modeling a full HVAC system. In such a case, the Ideal Loads Air System is usually the sole conditioning component: the user does not need to specify air loops, water loops, etc. All that is needed for the ideal system are zone controls, zone equipment configurations, and the ideal loads system component.
+The simplest piece of zone equipment is the ZoneHVAC:IdealLoadsAirSystem component. ZoneHVAC:IdealLoadsAirSystem is used in situations where the user wishes to study the performance of a building without modeling a full HVAC system. In such a case, the Ideal Loads Air System is usually the sole conditioning component: the user does not need to specify air loops, water loops, etc. All that is needed for the ideal system are zone controls, zone equipment configurations, and the ideal loads system component. The use of a return plenum is optional and will require use of the AirloopHVAC:ReturnPlenum object.
 
 This component can be operated with infinite or finite heating and cooling capacity. For either mode -- infinite or limited capacity -- the user can also specify on/off schedules for heating and cooling and outdoor air controls. There are also optional controls for dehumidification, humidification, economizer, and heat recovery. This component may be used in combination with other HVAC equipment serving the same zone.
 
-This component can be thought of as an ideal unit that mixes air at the zone exhaust condition with the specified amount of outdoor air and then adds or removes heat and moisture at 100\% efficiency in order to produce a supply air stream at the specified conditions. The energy required to condition the supply air is metered and reported as DistrictHeating and DistrictCooling.
+This component can be thought of as an ideal unit that mixes air at the zone exhaust condition (or plenum outlet condition when a plenum is attached) with the specified amount of outdoor air and then adds or removes heat and moisture at 100\% efficiency in order to produce a supply air stream at the specified conditions. The energy required to condition the supply air is metered and reported as DistrictHeating and DistrictCooling.
 
-\textbf{Notes:} The ideal loads system uses the zone return node or an optional zone exhaust node to extract air from the zone. Every zone served by an HVAC component must have a return air node, even though this node may not be connected to anything.
+\textbf{Notes:} The ideal loads system uses the zone return node or an optional zone exhaust node to extract air from the zone. When the AirloopHVAC:ReturnPlenum is used the inlet of the ideal loads system is connected to the plenum outlet air node while the outlet of the ideal loads system is connected to a zone inlet node. The node name connected between the zone exhaust air node and plenum inlet air node must match in the ZoneHVAC:EquipmentConnections and AirloopHVAC:ReturnPlenum objects. Every zone served by an HVAC component must have a return air node, even though this node may not be connected to anything. If more than one ideals loads air systems are connected to the same AirloopHVAC:ReturnPlenum then one of the ideal loads air systems will connect to the ZoneHVAC:ReturnPlenum outlet air node and the remaining ideal loads air systems connected to the same return plenum will connect to the ZoneHVAC:ReturnPlenum induced air outlet nodes.
 
 The ideal loads system was significantly expanded in version 7.0 (October 2011). As part of this upgrade, any change in the moisture content of the supply air stream results in a latent cooling (dehumidification) or latent heating (humidification) load which is metered as DistrictCooling and DistrictHeating energy consumption. Prior to version 7.0, when the ideal loads system was in heating mode, only the energy for sensible heating was metered. This results in significant changes in reported energy use compared to earlier versions, especially when using the \textbf{\emph{ConstantSupplyHumidityRatio}} option for Humidification Control Type.
 
@@ -34,6 +34,10 @@ The name of the outlet air node of the ideal loads object. This should be the sa
 \paragraph{Field: Zone Exhaust Air Node Name}\label{field-zone-exhaust-air-node-name}
 
 The name of the zone exhaust air node of the ideal loads object. This should be the same as one of the zone air exhaust nodes for the zone this component is serving. This node name is required if ZoneHVAC:IdealLoadsAirSystem is used in a zone which also has other forced air HVAC equipment. Otherwise this node name is optional but recommended.
+
+\paragraph{Field: System Inlet Air Node Name}\label{system-inlet-air-node-name}
+
+The optional name of the return plenum outlet node (or induced air outlet node) connected to the ideal loads object. When a return plenum is used, the previous fields for Zone Supply Air Node Name and Zone Exhaust Air Node Name are also required. When an AirloopHVAC:ReturnPlenum is connected to the Ideal Loads Air System the Zone Supply Air Node Name must match a zone air inlet node name and the Zone Exhaust Air Node Name must match a zone air exhaust node (see ZoneHAVC:EquipmentConnections object). The Zone Exhaust Air Node Name must also match an AirloopHVAC:ReturnPlenum inlet node name. In the AirloopHVAC:ReturnPlenum object, when more than one ideal loads air systems are connected to the same return plenum, the System Inlet Air Node Name for one of the ideal loads air systems must match the return plenum Outlet Node Name while all remaining ideal loads air systems, if more than one are connected, would enter the System Inlet Air Node Name in the return plenum Induced Air Outlet Node or NodeList Name field (see Engineering Reference for schematic).
 
 \paragraph{Field: Maximum Heating Supply Air Temperature}\label{field-maximum-heating-supply-air-temperature-000}
 
@@ -1466,7 +1470,7 @@ This alpha input field defines the user-defined name of the fan used by this coo
 
 \paragraph{Field: Design Supply Air Flow Rate {[}m\(^{3}\)/s{]}}\label{field-design-supply-air-flow-rate-m3s}
 
-This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value is typically consistent with the maximum air flow rate of the fan, but it can be less if desired.
+This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value must be less than or equal to the maximum air flow rate of the fan.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-001}
 
@@ -1612,7 +1616,7 @@ The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to
 \caption{Zone Outdoor Air Unit Schematic \protect \label{fig:zone-outdoor-air-unit-schematic}}
 \end{figure}
 
-Zones may contain one or more zone outdoor air units.~ The user can choose to have each unit have its own exhaust fan or may choose to have only one unit have a exhaust fan that will handle the flow of all of the zone outdoor air units.~ Note that the user will need to account for any flow balance among the zone outdoor air units on the supply and exhaust sides.
+When an AirloopHVAC serves the same zone, it is strongly recommended that the outdoor and exhaust air flow rates are balanced. In addition, the exhaust airflow rate and air schedule should be the same as outdoor air flow rate and outdoor air schedule, respectively. Otherwise, possible unbalanced flows will cause improper return airflow unless ZoneAirMassFlowConservation is active.  
 
 The full input for zone outdoor air units is described below using a variety of fields.
 
@@ -2537,10 +2541,6 @@ The heat pump is controlled by matching its sensible (temperature) heating outpu
 
 The maximum number of iterations is limited, with a warning message generated if the above equation is not satisfied within the maximum number of iterations.
 
-\paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-001}
-
-This numeric field defines the minimum outdoor dry-bulb temperature in degrees Celsius for PTHP compressor operation. The compressor will not operate (for DX heating or DX cooling) when outdoor dry-bulb temperatures fall below this value. The minimum value must be greater than or equal to -20 °C. If this field is left blank, the default value is -8°C. This temperature should match the minimum compressor operating temperature specified for the heat pump's DX heating coil (if they don't match, the highest of the two temperatures will be the cut-off temperature for compressor operation).
-
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4-000}
 
 This alpha field defines the type of DX cooling coil used by this PTHP. The input requirements for these DX cooling coil objects are described elsewhere in this document. Only allowable coil types are:
@@ -2651,7 +2651,6 @@ ZoneHVAC:PackagedTerminalHeatPump,
   Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
   Zone2PTHPDXHeatCoil,     !- Heating Coil Name
   0.001,                   !- Heating Convergence Tolerance {dimensionless}
-  2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
   Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
   0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -3863,9 +3862,11 @@ This is the availability status of the Stand Alone ERV~ fan. This status flag is
 
 \subsection{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}\label{zonehvacterminalunitvariablerefrigerantflow}
 
-Zone terminal units with variable refrigerant flow DX coils are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. AirConditioner:VariableRefrigerantFlow object). The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a ZoneHVAC:EquipmentConnections object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the ZoneHVAC:EquipmentList). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
+Zone terminal units with variable refrigerant flow DX coils are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. AirConditioner:VariableRefrigerantFlow objects). The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a ZoneHVAC:EquipmentConnections object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the ZoneHVAC:EquipmentList). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
 
-The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. A supply air fan is also required and can be modeled as either draw through or blow through.
+The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. 
+
+A supply air fan is also required and can be modeled as either draw through or blow through. The Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume if AirConditioner:VariableRefrigerantFlow is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
 
 \subsubsection{Inputs}\label{inputs-14-018}
 
@@ -3927,7 +3928,9 @@ The second choice stands for ``draw through fan''. This means that the unit cons
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-8}
 
-This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff} or \textit{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff}, \textit{Fan:ConstantVolume}, \textit{Fan:SystemModel} or \textit{Fan:VariableVolume}. The Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume if AirConditioner:VariableRefrigerantFlow is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
+
+Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0). The Fan:SystemModel may be used to model either of these fan operating characteristics.
 
 \paragraph{Field: Supply Air Fan Object Name}\label{field-supply-air-fan-object-name}
 

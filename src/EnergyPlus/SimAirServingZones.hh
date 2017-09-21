@@ -160,7 +160,6 @@ namespace SimAirServingZones {
 	void
 	SolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,
@@ -169,9 +168,19 @@ namespace SimAirServingZones {
 	);
 
 	void
+	SolveWaterCoilController(
+		bool const FirstHVACIteration,
+		int const AirLoopNum,
+		std::string const & CompName,
+		int & CompIndex,
+		std::string const & ControllerName,
+		int ControllerIndex,
+		bool const HXAssistedWaterCoil
+	);
+
+	void
 	ReSolveAirLoopControllers(
 		bool const FirstHVACIteration,
-		int const AirLoopPass,
 		int const AirLoopNum,
 		bool & AirLoopConvergedFlag,
 		int & IterMax,

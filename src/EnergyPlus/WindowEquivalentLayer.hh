@@ -824,7 +824,6 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	VB_CriticalSlatAngle(
-		CFSLAYER const & L, // VB layer
 		Real64 const OMEGA_DEG // incident profile angle (degrees)
 	);
 
