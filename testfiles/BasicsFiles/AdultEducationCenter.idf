@@ -343,12 +343,6 @@
     F05 Ceiling air space resistance,  !- Layer 2
     M14a 100mm heavyweight concrete;  !- Layer 3
 
-! use with InternalMass at 50% of floor area
-
-  Construction,
-    Medium Furnishings,      !- Name
-    G05 25mm wood;           !- Outside Layer
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 
   Zone,

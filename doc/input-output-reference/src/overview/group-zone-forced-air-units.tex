@@ -1470,7 +1470,7 @@ This alpha input field defines the user-defined name of the fan used by this coo
 
 \paragraph{Field: Design Supply Air Flow Rate {[}m\(^{3}\)/s{]}}\label{field-design-supply-air-flow-rate-m3s}
 
-This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value is typically consistent with the maximum air flow rate of the fan, but it can be less if desired.
+This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value must be less than or equal to the maximum air flow rate of the fan.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-001}
 
@@ -1616,7 +1616,7 @@ The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to
 \caption{Zone Outdoor Air Unit Schematic \protect \label{fig:zone-outdoor-air-unit-schematic}}
 \end{figure}
 
-Zones may contain one or more zone outdoor air units.~ The user can choose to have each unit have its own exhaust fan or may choose to have only one unit have a exhaust fan that will handle the flow of all of the zone outdoor air units.~ Note that the user will need to account for any flow balance among the zone outdoor air units on the supply and exhaust sides.
+When an AirloopHVAC serves the same zone, it is strongly recommended that the outdoor and exhaust air flow rates are balanced. In addition, the exhaust airflow rate and air schedule should be the same as outdoor air flow rate and outdoor air schedule, respectively. Otherwise, possible unbalanced flows will cause improper return airflow unless ZoneAirMassFlowConservation is active.  
 
 The full input for zone outdoor air units is described below using a variety of fields.
 

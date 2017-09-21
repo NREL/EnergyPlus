@@ -1252,6 +1252,101 @@ where the air mass flow rate in the gap is given by
 \dot m = \rho {A_{gap}}v{\rm{    (kg/s)}}
 \end{equation}
 
+\subsection{Improved Airflow Equations for Window Screens and Horizontal Louvered Blind Systems}
+Several different approaches to simulate windows with attachments have been studied and developed. The primary focus of these works has been the experimental measurement, simulation, and simplified model development of solar heat gain for horizontal louvered blinds (venetian blinds) located between-glass and room-side. Relatively little research has been done to characterize the night-time (zero solar load) U-factor impacts of attachment products other than venetian blinds, including in-plane products such as solar screens, roller shades, cellular shades, insect screens, and drapes.
+
+\begin{figure}[hbtp]
+	\centering
+	\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/WindowLayerAirflowOpennings.png}
+	\caption{Illustration of ISO 15099 ventilated shade layer opening locations. \protect \label{fig:Openness_ISO15099}}
+\end{figure}
+
+Surface openness of shade systems, $d_{surface}$ in Figure~\ref{fig:Openness_ISO15099}, has primarily been studied for highly porous surfaces such as insect screens.
+The inlet and outlet pressure loss of a cavity open to the indoor room, $\Delta P_z$, is calculated with Equations~\ref{eq:OpennesCalcs}, where the use of in/out and top/bot are dependent on the direction of flow, as determined by the glass surface temperature relative to the indoor temperature.
+
+\begin{equation}
+\begin{array}{rl}
+\Delta P_{z}  & = 0.5 \rho v^2(Z_{in}+Z_{out}) \\
+Z_{in/out} & = (\frac{A_s}{0.6A_{eq,in/out}}-1)^2 \\
+A_{eq,in/out} & = A_{top/bot} + \frac{1}{2} \frac{A_{bot/top}}{A_{bot} + A_{top}}(A_l + A_r + A_h) \\
+A_h & = d_{surface}WH \\
+A_s & = d_{gap}W
+\end{array}
+\label{eq:OpennesCalcs}
+\end{equation}
+
+Where $\rho$ is the fluid density, $v$ s the fluid velocity, $Z_{in/out}$ is the pressure loss factor of the cavity, As is the cross-section area of the cavity, $d_{gap}$ is the glass-to-shade cavity depth, $d_{surface}$ is the openness fraction (0 - 1), W is the window width, H is the window height, $A_{eq}$, is the equivalent inlet/outlet area of the cavity, and Al, Ar, Atop, Abot, Ah are the areas of the left, right, top, bottom, and front surface ventilation gaps respectively. 
+
+The set of equations~\ref{eq:OpennesCalcs} include an inherent minimum of pressure loss coefficient, Z, when the calculated inlet or outlet area, $A_{eq}$, equals 5/3 the cross section area, As. This limits the validity of the model to $A_{eq}$ less than 5/3 of As. Figure~\ref{fig:PressureLossFacor} illustrates this minimum with a surface map of calculated Z values (log(Z) plotted to show contours) over a range of $A_{eq}$ based on a 1m x 1m window. Figure~\ref{fig:PressureLossFacor} shows a slice of the surface plot at a typical $d_{gap} = 15 mm$. Window surface area, Aw, is typically one to two orders of magnitude larger than the cross-section area, As. This means that $A_{eq}$ exceeds As at relatively low surface openness. For a typical glass-to-shade gap, $d_{gap} = 15mm$, the local minimum in Z, and in turn valid openness range of the algorithm, occurs at an openness of $d_{surface} \cong 0.1$.
+
+\begin{figure}[hbtp]
+	\centering
+	\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/PressureLossFactor.png}
+	\caption{Pressure loss factor, Z, as a function of $A_{eq}$ at $A_s = 0.015m^2$; and (b) surface plot of Z as a function of $A_s$ and $A_{eq}$ for a 1m x 1m window. The minimum follows the predicted ratio of 5/3 between $A_{eq}$ and As. \protect \label{fig:PressureLossFacor}}
+\end{figure}
+
+\subsubsection{Screen Heat Flux}
+To improve the simulation correlation, correlation coefficients are proposed to the five ventilated layer opening parameters defined in ISO 15099; $A_h$, $A_{top}$, $A_{bot}$, $A_l$, and $A_r$. This model includes two correlation constants, C1 and C2 that are determined based on regression analysis of the measured dataset. An additional two constants, C3 and C4, are also optimized and used to correlate the to left/right and top/bottom gaps respectively as shown in Equations~\ref{eq:ScreenCorrelations}. 
+
+\begin{equation}
+\begin{array}{rl}
+A_h & = C_1 \cdot d_{surface}^{C_2} \cdot A_w \\
+A_{l,r}^* & = C_3 \cdot A_{l,r} \\
+A_{t,b}^* & = C_4 \cdot A_{t,b}
+\end{array}
+\label{eq:ScreenCorrelations}
+\end{equation}
+
+Where correlation constants are:
+
+\begin{tabular}{ l  r }
+	\hline	
+	Coefficient & Value \\
+	\hline
+	\hline
+	$C_1$ & 0.078 \\
+	$C_2$ & 1.20 \\
+	$C_3$ & 1 \\
+	$C_4$ & 1 \\
+	\hline  
+	
+\end{tabular}
+
+\subsubsection{Horizontal Louvered Blind}
+To improve the simulation correlation, correlation coefficients are proposed to the five ventilated layer opening parameters defined in ISO 15099; Ah, $A_{top}$, $A_{bot}$, $A_l$, and $A_r$. The proposed heat flux model includes parameters for the openness, $d_{surface}$, open area, $A_h$, tilt, $\phi$, and the layer conductivity, k.
+
+\begin{equation}
+\begin{array}{rl}
+A_h & = D_1 \cdot [d_{surface} (cos\phi)^{D_2}]^{D_3} \cdot A_s \\
+d_{surface} & = 1 - \frac{t}{cos(\phi)(p-t)} \\
+t^* & = D_4 \cdot w \cdot cos\phi \\
+k^* & = d_{surface} \cdot k_c + (1 - d_{surface})k_s \\
+d_{top} & = 0 \\
+d_{left, right} & = d_{gap} \textit{(for outside mount)} \\
+d_{left, right} & = 0 \textit{(for inside mount)} \\
+d_{bottom} & = d_{gap} \textit{(for outside mount)} \\
+d_{bottom} & = 0 \textit{(for inside mount)} \\
+\end{array}
+\label{eq:VenetianCorrelations}
+\end{equation}
+
+where $t^*$ and $k^*$ are the revised layer thickness and equivalent conductivity and $k_c$ is the conductivity of the gas between slats at the average blind layer temperature.
+
+Where correlation constants are:
+
+\begin{tabular}{ l  r }
+	\hline	
+	Coefficient & Value \\
+	\hline
+	\hline
+	$D_1$ & 0.016 \\
+	$D_2$ & -0.63 \\
+	$D_3$ & 0.53 \\
+	$D_4$ & 0.043 \\
+	\hline  
+	
+\end{tabular}
+
 \subsection{Heat Balance Equations for Between-Glass Shading Device}\label{heat-balance-equations-for-between-glass-shading-device}
 
 In EnergyPlus shading devices are allowed between the two glass panes of double glazing and between the two inner glass panes of triple glazing. Figure~\ref{fig:glazing-system-with-two-glass-layers-and-a} shows the case of a between-glass shading device in double glazing.

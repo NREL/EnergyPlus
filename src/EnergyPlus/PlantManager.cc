@@ -453,7 +453,7 @@ namespace PlantManager {
 					}
 				}
 			} else {
-				ShowWarningError( "Input error: " + cAlphaFieldNames( 2 ) + '=' + Alpha( 2 ) + "entered, in " + CurrentModuleObject + '=' + Alpha( 1 ) );
+				ShowWarningError( "Input error: " + cAlphaFieldNames( 2 ) + '=' + Alpha( 2 ) + " entered, in " + CurrentModuleObject + '=' + Alpha( 1 ) );
 				ShowContinueError( "Will default to Water." );
 
 				this_loop.FluidType = NodeType_Water;

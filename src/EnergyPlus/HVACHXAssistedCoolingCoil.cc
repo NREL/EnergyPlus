@@ -60,6 +60,7 @@
 #include <DXCoils.hh>
 #include <General.hh>
 #include <HeatRecovery.hh>
+#include <HVACControllers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
@@ -290,23 +291,25 @@ namespace HVACHXAssistedCoolingCoil {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using BranchNodeConnections::SetUpCompSets;
+		using BranchNodeConnections::TestCompSet;
+		using DXCoils::GetDXCoilIndex;
+		using HeatRecovery::GetSupplyInletNode;
+		using HeatRecovery::GetSupplyOutletNode;
+		using HeatRecovery::GetSecondaryInletNode;
+		using HeatRecovery::GetSecondaryOutletNode;
+		using HVACControllers::GetControllerNameAndIndex;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::SetUpCompSets;
-		using BranchNodeConnections::TestCompSet;
+		using WaterCoils::GetCoilWaterInletNode;
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
 		auto & GetDXCoilOutletNode( DXCoils::GetCoilOutletNode );
-		using DXCoils::GetDXCoilIndex;
 		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
 		auto & GetWaterCoilOutletNode( WaterCoils::GetCoilOutletNode );
-		using HeatRecovery::GetSupplyInletNode;
-		using HeatRecovery::GetSupplyOutletNode;
-		using HeatRecovery::GetSecondaryInletNode;
-		using HeatRecovery::GetSecondaryOutletNode;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -338,8 +341,9 @@ namespace HVACHXAssistedCoolingCoil {
 		int SupplyAirOutletNode; // supply air outlet node number mined from heat exchanger object (ExchCond structure)
 		int SecondaryAirInletNode; // secondary air inlet node number mined from heat exchanger object (ExchCond structure)
 		int SecondaryAirOutletNode; // secondary air outlet node number mined from heat exchanger object (ExchCond structure)
-		int CoolingCoilInletNodeNum; // outlet node number of cooling coil, used for warning messages
-		int CoolingCoilOutletNodeNum; // outlet node number of cooling coil, used for warning messages
+		int CoolingCoilInletNodeNum; // air outlet node number of cooling coil, used for warning messages
+		int CoolingCoilWaterInletNodeNum; // water coil water inlet node number used to find controller index
+		int CoolingCoilOutletNodeNum; // air outlet node number of cooling coil, used for warning messages
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		Array1D_string AlphArray; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -612,6 +616,8 @@ namespace HVACHXAssistedCoolingCoil {
 				//         Check node names in heat exchanger and coil objects for consistency
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = GetWaterCoilInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				GetControllerNameAndIndex( CoolingCoilWaterInletNodeNum, HXAssistedCoil( HXAssistedCoilNum ).ControllerName, HXAssistedCoil( HXAssistedCoilNum ).ControllerIndex, CoolingCoilErrFlag );
 				if ( CoolingCoilErrFlag ) ShowContinueError( "...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				if ( SupplyAirOutletNode != CoolingCoilInletNodeNum ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
@@ -782,11 +788,13 @@ namespace HVACHXAssistedCoolingCoil {
 		static Real64 CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
 		Real64 AirMassFlow; // Inlet air mass flow rate
 		Real64 Error; // Error (exiting coil temp from last iteration minus current coil exiting temp)
+		Real64 ErrorLast; // check for oscillations
 		int Iter; // Number of iterations
 		int CompanionCoilIndexNum; // Index to DX coil
 
 		AirMassFlow = HXAssistedCoil( HXAssistedCoilNum ).MassFlowRate;
 		Error = 1.0; // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)
+		ErrorLast = Error; // initialize variable used to test loop termination
 		Iter = 0; // Initialize iteration counter to zero
 
 		if ( FirstHVACIteration ) CoilOutputTempLast = -99.0; // Initialize coil output temp
@@ -831,6 +839,10 @@ namespace HVACHXAssistedCoolingCoil {
 			}
 
 			Error = CoilOutputTempLast - Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).Temp;
+			if ( Iter > 40 ) { // check for oscillation (one of these being negative and one positive) before hitting max iteration limit
+				if ( Error + ErrorLast < 0.000001 ) Error = 0.0; // result bounced back and forth with same positive and negative result, no possible solution without this check
+			}
+			ErrorLast = Error;
 			CoilOutputTempLast = Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).Temp;
 			++Iter;
 
