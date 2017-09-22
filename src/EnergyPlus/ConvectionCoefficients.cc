@@ -570,10 +570,10 @@ namespace ConvectionCoefficients {
 		if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 			SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
 			if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum != 0 ) {
-				TSky = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum );
+				TSky = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SkyTempSchNum ) + KelvinConv;
 			}
 			if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum != 0 ) {
-				TGround = GetCurrentScheduleValue(SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum );
+				TGround = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).GroundTempSchNum ) + KelvinConv;
 			}
 		}
 

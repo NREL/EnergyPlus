@@ -5066,7 +5066,9 @@ namespace SingleDuct {
 				Node( this->PriInNode ).MassFlowRate = max( Node( this->PriInNode ).MassFlowRate, Node( this->PriInNode ).MassFlowRateMin );
 			}
 		}
-
+		if ( this->MixerType == ATMixer_InletSide ) {
+				Node( this->PriInNode ).MassFlowRate = min( Node( this->PriInNode ).MassFlowRate, Node( this->MixedAirOutNode ).MassFlowRate );
+		}
 	}
 
 	void
@@ -5135,6 +5137,11 @@ namespace SingleDuct {
 			MixedAirMassFlowRate = Node( SysATMixer( SysNum ).MixedAirOutNode ).MassFlowRate;
 			SecAirMassFlowRate = max( MixedAirMassFlowRate - PriMassFlowRate, 0.0 );
 			Node( SysATMixer( SysNum ).SecInNode ).MassFlowRate = SecAirMassFlowRate;
+			if ( abs( PriMassFlowRate + SecAirMassFlowRate - MixedAirMassFlowRate ) > SmallMassFlow ) {
+				ShowSevereError( "CalcATMixer: Invalid mass flow rates in AirTerminal:SingleDuct:Mixer=" + SysATMixer( SysNum ).Name );
+				ShowContinueErrorTimeStamp( "Primary mass flow rate=" + General::RoundSigDigits( PriMassFlowRate, 6 ) + "Secondary mass flow rate=" + General::RoundSigDigits( SecAirMassFlowRate, 6 ) + "Mixed mass flow rate=" + General::RoundSigDigits( MixedAirMassFlowRate, 6 ) );
+				ShowFatalError( "Simulation terminates." );
+			}
 		}
 		// now calculate the mixed (outlet) conditions
 		if ( MixedAirMassFlowRate > 0.0 ) {

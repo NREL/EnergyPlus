@@ -11856,10 +11856,18 @@ namespace OutputReportTabular {
 				zoneToAirLoopCool = 0;
 				zoneToAirLoopHeat = 0;
 				coolDesSelected = SysSizPeakDDNum( iAirLoop ).TotCoolPeakDD;
-				timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtTotCoolPk( coolDesSelected );
+				if ( coolDesSelected != 0 ) {
+					timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtTotCoolPk( coolDesSelected );
+				} else {
+					timeCoolMax = 0;
+				}
 				heatDesSelected = SysSizPeakDDNum( iAirLoop ).HeatPeakDD;
-				timeHeatMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtHeatPk( heatDesSelected );
-				int NumZonesCooled = AirToZoneNodeInfo( iAirLoop ).NumZonesCooled;
+				if ( heatDesSelected != 0 ) {
+					timeHeatMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtHeatPk( heatDesSelected );
+				} else {
+					timeHeatMax = 0;
+				}
+
 				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
 					int CtrlZoneNum = AirToZoneNodeInfo( iAirLoop ).CoolCtrlZoneNums( ZonesCooledNum );
 					zoneToAirLoopCool( CtrlZoneNum ) = iAirLoop;
