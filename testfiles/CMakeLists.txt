@@ -94,6 +94,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_HighRHControl.idf EPW_FILE USA_IL_
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_MultizoneAverageRHControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_MultizoneMinMaxRHControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterLoopHeatPump.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5Zone_IdealLoadsAirSystems_ReturnPlenum.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5Zone_Transformer.idf EPW_FILE CZ06RV2.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5Zone_Unitary_HXAssistedCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5Zone_Unitary_VSDesuperheater.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
