@@ -2546,6 +2546,88 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 	DataHeatBalance::ZoneIntGain.deallocate( );
 
 }
+TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest2 ) {
+
+	// Address #6205
+	// Address #6241
+
+	using SingleDuct::SysATMixer;
+	int ATMixerNum = 1;
+	SingleDuct::NumATMixers = 1;
+	DataHeatBalance::TotPeople = 1;
+
+	SysATMixer.allocate( ATMixerNum );
+	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
+	DataAirLoop::AirLoopFlow.allocate( 1 );
+	DataLoopNode::Node.allocate( 3 );
+	DataSizing::OARequirements.allocate( 1 );
+	Zone.allocate( 1 );
+	DataHeatBalance::ZoneIntGain.allocate( 1 );
+
+	SysATMixer( ATMixerNum ).SecInNode = 1;
+	SysATMixer( ATMixerNum ).PriInNode = 2;
+	SysATMixer( ATMixerNum ).MixedAirOutNode = 3;
+	SysATMixer( ATMixerNum ).AirLoopNum = 1;
+	SysATMixer( ATMixerNum ).ZoneNum = 1;
+	SysATMixer( ATMixerNum ).ZoneEqNum = 1;
+	SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false;
+	SysATMixer( ATMixerNum ).OARequirementsPtr = 1;
+
+	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
+
+	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 1.0;
+
+	Zone( 1 ).FloorArea = 10.0;
+	OARequirements( 1 ).OAFlowMethod = OAFlowSum;
+	OARequirements( 1 ).OAFlowPerZone = 0.5;
+	OARequirements( 1 ).OAFlowPerPerson = 0.0;
+	OARequirements( 1 ).OAFlowPerArea = 0.0;
+	OARequirements( 1 ).OAFlowACH = 0.0;
+
+	DataLoopNode::Node( 2 ).Press = 101325.0;
+	DataLoopNode::Node( 2 ).Temp = 23.0;
+	DataLoopNode::Node( 2 ).HumRat = 0.001;
+
+	DataHeatBalance::ZoneIntGain( 1 ).NOFOCC = 5.0;
+
+	DataEnvironment::StdRhoAir = 1.0;
+	SysATMixer( 1 ).MassFlowRateMaxAvail = 1.0;
+	// No airloop data exists, so skip these parts of the init
+	SysATMixer( 1 ).OneTimeInitFlag = false;
+	SysATMixer( 1 ).OneTimeInitFlag2 = false;
+	// Current occupancy
+	SysATMixer( 1 ).OAPerPersonMode = 1;
+
+	// InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
+	SysATMixer( 1 ).MixerType = DataHVACGlobals::ATMixer_InletSide;
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 1.0;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.5, 0.0001 );
+
+	// InletSideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal mixed air flow
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 0.10;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.10, 0.0001 );
+
+	// SupplySideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
+	SysATMixer( 1 ).MixerType = DataHVACGlobals::ATMixer_SupplySide;
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 1.0;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.5, 0.0001 );
+
+	// SupplySideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal OA requirement
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 0.10;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.5, 0.0001 );
+	SysATMixer.deallocate( );
+	DataZoneEquipment::ZoneEquipConfig.deallocate( );
+	DataAirLoop::AirLoopFlow.deallocate( );
+	DataLoopNode::Node.deallocate( );
+	DataSizing::OARequirements.deallocate( );
+	Zone.deallocate( );
+	DataHeatBalance::ZoneIntGain.deallocate( );
+
+}
 
 TEST_F( EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac ) {
 	std::string const idf_objects = delimited_string( {

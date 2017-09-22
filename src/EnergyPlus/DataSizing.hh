@@ -455,6 +455,7 @@ namespace DataSizing {
 		bool EMSOverrideDesHeatMassOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatMassFlow; // Value EMS directing to use for Design Heating air mass flow [kg/s]
 		Real64 DesCoolMassFlow; // zone design cooling air mass flow rate [kg/s]
+		Real64 DesCoolMassFlowNoOA; // zone design cooling air mass flow rate with applying MinOA as a limit [kg/s]
 		Real64 DesCoolOAFlowFrac; // zone design cooling OA air volume fraction [-]
 		bool EMSOverrideDesCoolMassOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolMassFlow; // Value EMS directing to use for Design Cooling air mass flow [kg/s]
@@ -473,6 +474,7 @@ namespace DataSizing {
 		bool EMSOverrideDesHeatVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatVolFlow; // Value EMS directing to use for Design Heating air volume flow [m3/s]
 		Real64 DesCoolVolFlow; // zone design cooling air volume flow rate [m3/s]
+		Real64 DesCoolVolFlowNoOA; // zone design cooling air volume flow rate without applying MinOA as a limit [m3/s]
 		Real64 NonAirSysDesCoolVolFlow; // base zone design cooling air volume flow rate including sizing factor [m3/s]
 		bool EMSOverrideDesCoolVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolVolFlow; // Value EMS directing to use for Design cooling air volume flow [m3/s]
@@ -527,8 +529,8 @@ namespace DataSizing {
 		//  DesHeatMaxAirFlowPerArea
 		Array1D< Real64 > HeatFlowSeq; // daily sequence of zone heating air mass flow rate
 		//  (zone time step)
-		Array1D< Real64 > CoolFlowSeq; // daily sequence of zone cooling air mass flow rate
-		//  (zone time step)
+		Array1D< Real64 > CoolFlowSeq; // daily sequence of zone cooling air mass flow rate (zone time step) [kg/s]
+		Array1D< Real64 > CoolFlowSeqNoOA; // daily sequence of zone cooling air mass flow rate (zone time step) without applying MinOA as a limit [kg/s]
 		Array1D< Real64 > HeatLoadSeq; // daily sequence of zone heating load (zone time step)
 		Array1D< Real64 > CoolLoadSeq; // daily sequence of zone cooling load (zone time step)
 		Array1D< Real64 > HeatZoneTempSeq; // daily sequence of zone temperatures (heating, zone time step)
@@ -619,6 +621,7 @@ namespace DataSizing {
 			EMSOverrideDesHeatMassOn( false ),
 			EMSValueDesHeatMassFlow( 0.0 ),
 			DesCoolMassFlow( 0.0 ),
+			DesCoolMassFlowNoOA( 0.0 ),
 			DesCoolOAFlowFrac( 0.0 ),
 			EMSOverrideDesCoolMassOn( false ),
 			EMSValueDesCoolMassFlow( 0.0 ),
@@ -637,6 +640,7 @@ namespace DataSizing {
 			EMSOverrideDesHeatVolOn( false ),
 			EMSValueDesHeatVolFlow( 0.0 ),
 			DesCoolVolFlow( 0.0 ),
+			DesCoolVolFlowNoOA( 0.0 ),
 			NonAirSysDesCoolVolFlow( 0.0 ),
 			EMSOverrideDesCoolVolOn( false ),
 			EMSValueDesCoolVolFlow( 0.0 ),

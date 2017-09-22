@@ -1438,6 +1438,7 @@ namespace ZoneEquipmentManager {
 			}
 			FinalZoneSizing( CtrlZoneNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
+			FinalZoneSizing( CtrlZoneNum ).CoolFlowSeqNoOA.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).CoolLoadSeq.allocate( NumOfTimeStepInDay );
 			FinalZoneSizing( CtrlZoneNum ).HeatZoneTempSeq.allocate( NumOfTimeStepInDay );
@@ -1487,6 +1488,7 @@ namespace ZoneEquipmentManager {
 			for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
 				FinalZoneSizing( CtrlZoneNum ).HeatFlowSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
+				FinalZoneSizing( CtrlZoneNum ).CoolFlowSeqNoOA( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
 				FinalZoneSizing( CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex ) = 0.0;
@@ -1931,6 +1933,7 @@ namespace ZoneEquipmentManager {
 				}
 				if ( allocated( FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq ) ) {
 					FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = 0.0;
+					FinalZoneSizing( CtrlZoneNum ).CoolFlowSeqNoOA( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).CoolLoadSeq( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex ) = 0.0;
 					FinalZoneSizing( CtrlZoneNum ).CoolOutTempSeq( TimeStepIndex ) = 0.0;
@@ -1955,12 +1958,14 @@ namespace ZoneEquipmentManager {
 
 			FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow = 0.0; // zone design heating air mass flow rate [kg/s]
 			FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow = 0.0; // zone design cooling air mass flow rate [kg/s]
+			FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlowNoOA = 0.0; // zone design cooling air mass flow rate [kg/s]
 			FinalZoneSizing( CtrlZoneNum ).DesHeatLoad = 0.0; // zone design heating load [W]
 			FinalZoneSizing( CtrlZoneNum ).DesCoolLoad = 0.0; // zone design cooling load [W]
 			FinalZoneSizing( CtrlZoneNum ).DesHeatDens = 0.0; // zone design heating air density [kg/m3]
 			FinalZoneSizing( CtrlZoneNum ).DesCoolDens = 0.0; // zone design cooling air density [kg/m3]
 			FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow = 0.0; // zone design heating air volume flow rate [m3/s]
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = 0.0; // zone design cooling air volume flow rate [m3/s]
+			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowNoOA = 0.0; // zone design cooling air volume flow rate [m3/s]
 			FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = 0.0; // zone design heating maximum air volume flow rate [m3/s]
 			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = 0.0; // zone design cooling minimum air volume flow rate [m3/s]
 			FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTemp = 0.0; // zone heating coil design air inlet temperature [C]
@@ -2159,8 +2164,6 @@ namespace ZoneEquipmentManager {
 		Real64 TotCoolSizMult; // combines user cooling design flow input with zone sizing multiplier
 		Real64 TotHeatSizMult; // combines user heating design flow input with zone sizing multiplier
 		Real64 MinOAMass; // zone minimum outside air mass flow rate kg/s
-		Real64 MaxOfMinCoolVolFlow; // max of the user specified design cooling minimum flows and min OA flow [m3/s]
-		Real64 MaxOfMinCoolMassFlow; // max of the user specified design cooling minimum flows and min OA flow [kg/s]
 		Real64 MaxHeatVolFlow; // max of user specified design heating max flow [m3/s]
 		std::string HrMinString; // store hour/minute string before assigning to peak string array
 		Real64 SupplyTemp; // supply air temperature [C]
@@ -2714,13 +2717,34 @@ namespace ZoneEquipmentManager {
 						}
 					}
 				}
-				// Now make sure that the design cooling air flow rates are greater than or equal to the specified minimums
+				// Save a set of design cooling air flow rates are greater than or equal to the specified minimums without MinOA 
+				// just in FinalZoneSizing to use for TermUnit sizing adjustments in SizingManager::UpdateTermUnitFinalZoneSizing
+				{ Real64 MaxOfMinCoolVolFlowNoOA = 0.0; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
+				if ( FinalZoneSizing( CtrlZoneNum ).CoolAirDesMethod == DesAirFlowWithLim ) {
+					MaxOfMinCoolVolFlowNoOA = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2 );
+				}
+				Real64 MaxOfMinCoolMassFlowNoOA = MaxOfMinCoolVolFlowNoOA * FinalZoneSizing( CtrlZoneNum ).DesCoolDens; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
+				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowNoOA = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+				FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlowNoOA = FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow;
+				if ( MaxOfMinCoolVolFlowNoOA > FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowNoOA ) {
+					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowNoOA = MaxOfMinCoolVolFlowNoOA;
+					FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
+				}
+				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
+					FinalZoneSizing( CtrlZoneNum ).CoolFlowSeqNoOA( TimeStepIndex ) = FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq( TimeStepIndex );
+					if ( MaxOfMinCoolMassFlowNoOA > FinalZoneSizing( CtrlZoneNum ).CoolFlowSeqNoOA( TimeStepIndex ) ) {
+						FinalZoneSizing( CtrlZoneNum ).CoolFlowSeqNoOA( TimeStepIndex ) = MaxOfMinCoolMassFlowNoOA;
+					}
+				}}
+
+				// Now make sure that the design cooling air flow rates are greater than or equal to the specified minimums including MinOA
+				{ Real64 MaxOfMinCoolVolFlow = 0.0; // max of the user specified design cooling minimum flows and min OA flow [m3/s]
 				if ( FinalZoneSizing( CtrlZoneNum ).CoolAirDesMethod == DesAirFlowWithLim ) {
 					MaxOfMinCoolVolFlow = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, FinalZoneSizing( CtrlZoneNum ).MinOA );
 				} else {
 					MaxOfMinCoolVolFlow = FinalZoneSizing( CtrlZoneNum ).MinOA;
 				}
-				MaxOfMinCoolMassFlow = MaxOfMinCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolDens;
+				Real64 MaxOfMinCoolMassFlow = MaxOfMinCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolDens; // max of the user specified design cooling minimum flows and min OA flow [kg/s]
 				if ( MaxOfMinCoolVolFlow > FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow ) {
 					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = MaxOfMinCoolVolFlow;
 					FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow = MaxOfMinCoolMassFlow;
@@ -2742,7 +2766,7 @@ namespace ZoneEquipmentManager {
 							ZoneSizing( DDNum, CtrlZoneNum ).CoolFlowSeq( TimeStepIndex ) = MaxOfMinCoolMassFlow;
 						}
 					}
-				}
+				}}
 				// IF cooling flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data (end of IF)
 				// check for flow rate having been set (by MinOA or other min) but no timestep at max
 				//        IF (FinalZoneSizing(CtrlZoneNum)%DesCoolMassFlow > 0.0d0 .AND. &
@@ -2929,14 +2953,10 @@ namespace ZoneEquipmentManager {
 
 				// set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
 				// minimum flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, 
-					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, 
-					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
+				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
 				// set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
 				// max heating flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, 
-					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) *
-					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
+				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) * FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
 				// Determine the design cooling supply air temperature if the supply air temperature difference is specified by user.
 				if ( FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod == TemperatureDifference ) {
 					FinalZoneSizing( CtrlZoneNum ).CoolDesTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak - std::abs( FinalZoneSizing( CtrlZoneNum ).CoolDesTempDiff );
