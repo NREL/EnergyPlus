@@ -1856,6 +1856,8 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
 				} else if ( SELECT_CASE_var == HeatTransferModel_HAMT ) {
 					AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
+				} else if ( SELECT_CASE_var == HeatTransferModel_Kiva ) {
+					AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
 				} else if ( SELECT_CASE_var == HeatTransferModel_Window5 ) {
 					AlgoName = "Window5 Detailed Fenestration";
 				} else if ( SELECT_CASE_var == HeatTransferModel_ComplexFenestration ) {
@@ -2011,6 +2013,8 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 							AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
 						} else if ( SELECT_CASE_var == HeatTransferModel_HAMT ) {
 							AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
+						} else if ( SELECT_CASE_var == HeatTransferModel_Kiva ) {
+							AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
 						} else if ( SELECT_CASE_var == HeatTransferModel_Window5 ) {
 							AlgoName = "Window5 Detailed Fenestration";
 						} else if ( SELECT_CASE_var == HeatTransferModel_ComplexFenestration ) {
@@ -2047,6 +2051,8 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
 				} else if ( SELECT_CASE_var == HeatTransferModel_HAMT ) {
 					AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
+				} else if ( SELECT_CASE_var == HeatTransferModel_Kiva ) {
+					AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
 				} else if ( SELECT_CASE_var == HeatTransferModel_Window5 ) {
 					AlgoName = "Window5 Detailed Fenestration";
 				} else if ( SELECT_CASE_var == HeatTransferModel_ComplexFenestration ) {

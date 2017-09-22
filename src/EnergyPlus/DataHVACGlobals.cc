@@ -309,6 +309,9 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	Real64 const OscillateMagnitude( 0.15 );
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	int const Bisection( 2 );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -356,6 +359,7 @@ namespace DataHVACGlobals {
 	Real64 HPWHCrankcaseDBTemp( 0.0 ); // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
 	bool AirLoopInit( false ); // flag for whether InitAirLoops has been called
 	bool AirLoopsSimOnce( false ); // True means that the air loops have been simulated once in this environment
+	bool GetAirPathDataDone( false ); // True means that air loops inputs have been processed
 
 	// Hybrid ventilation control part
 	int NumHybridVentSysAvailMgrs( 0 ); // Number of hybrid ventilation control
@@ -508,6 +512,7 @@ namespace DataHVACGlobals {
 	Array1D< ZoneCompTypeData > ZoneComp;
 	OptStartDataType OptStartData; // For optimum start
 	Array1D< ComponentSetPtData > CompSetPtEquip;
+	HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.
@@ -552,6 +557,7 @@ namespace DataHVACGlobals {
 		HPWHCrankcaseDBTemp = 0.0;
 		AirLoopInit = false;
 		AirLoopsSimOnce = false;
+		GetAirPathDataDone = false;
 		NumHybridVentSysAvailMgrs = 0;
 		HybridVentSysAvailAirLoopNum.deallocate();
 		HybridVentSysAvailVentCtrl.deallocate();

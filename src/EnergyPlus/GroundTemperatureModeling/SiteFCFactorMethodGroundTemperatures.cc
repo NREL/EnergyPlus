@@ -147,7 +147,10 @@ namespace EnergyPlus {
 		if ( FCGroundTemps ) {
 			gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:FCfactorMethod>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
 			gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:FCfactorMethod";
-			for	( int i = 1; i <= 12; ++i ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->fcFactorGroundTemps( i ); gio::write( OutputFileInits );
+			for	( int i = 1; i <= 12; ++i ) {
+				gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->fcFactorGroundTemps( i );
+			}
+			gio::write( OutputFileInits );
 		}
 
 		if ( found && !thisModel->errorsFound ) {

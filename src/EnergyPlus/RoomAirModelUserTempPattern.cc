@@ -624,7 +624,7 @@ namespace RoomAirModelUserTempPattern {
 		}
 
 		if ( SetupOutputFlag( ZoneNum ) ) {
-			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient [K/m]", AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
+			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient", OutputProcessor::Unit::K_m, AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
 
 			SetupOutputFlag( ZoneNum ) = false;
 		}
@@ -1082,7 +1082,7 @@ namespace RoomAirModelUserTempPattern {
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 			//RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
 			// Add sensible heat gain from refrigerated cases with under case returns
-			SumAllReturnAirConvectionGains( ZoneNum, QRetAir );
+			SumAllReturnAirConvectionGains( ZoneNum, QRetAir, ReturnNode );
 
 			CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 
@@ -1156,21 +1156,21 @@ namespace RoomAirModelUserTempPattern {
 			// humidity ratio
 			if ( ! Zone( ZoneNum ).NoHeatToReturnAir ) {
 				if ( MassFlowRA > 0 ) {
-					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, ReturnNode );
 					Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat + ( SumRetAirLatentGainRate / ( H2OHtOfVap * MassFlowRA ) );
 				} else {
 					// If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
 					Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat;
 					RefrigCaseCredit( ZoneNum ).LatCaseCreditToZone += RefrigCaseCredit( ZoneNum ).LatCaseCreditToHVAC;
 					// shouldn't the HVAC term be zeroed out then?
-					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, 0 );
 					ZoneLatentGain( ZoneNum ) += SumRetAirLatentGainRate;
 				}
 			} else {
 				Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat;
 				RefrigCaseCredit( ZoneNum ).LatCaseCreditToZone += RefrigCaseCredit( ZoneNum ).LatCaseCreditToHVAC;
 				// shouldn't the HVAC term be zeroed out then?
-				SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+				SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, ReturnNode );
 				ZoneLatentGain( ZoneNum ) += SumRetAirLatentGainRate;
 			}
 

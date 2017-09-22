@@ -278,6 +278,23 @@ namespace ZonePlenum {
 	//        End of Reporting subroutines for the ZonePlenum Module
 	// *****************************************************************************
 
+	// Beginning of mining functions for the ZonePlenum Module
+	// *****************************************************************************
+
+	int
+	GetReturnPlenumIndex(
+		int const & ExNodeNum
+	);
+
+	void
+	GetReturnPlenumName(
+		int const & ReturnPlenumIndex,
+		std::string & ReturnPlenumName
+	);
+		
+	//        End of mining functions for the ZonePlenum Module
+	// *****************************************************************************
+
 } // ZonePlenum
 
 } // EnergyPlus

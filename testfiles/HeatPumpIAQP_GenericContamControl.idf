@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     NONE,                    !- Name
@@ -1631,6 +1631,7 @@
     CO2AvailSchedule,        !- Carbon Dioxide Control Availability Schedule Name
     CO2SetpointSchedule,     !- Carbon Dioxide Setpoint Schedule Name
     ,                        !- Minimum Carbon Dioxide Concentration Schedule Name
+    ,                        !- Maximum Carbon Dioxide Concentration Schedule Name
     GCAvailSchedule,         !- Generic Contaminant Control Availability Schedule Name
     GCSetpointSchedule;      !- Generic Contaminant Setpoint Schedule Name
 

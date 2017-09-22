@@ -44,9 +44,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <cmath>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -87,7 +84,7 @@ namespace TARCOGMain {
 	//  Revision: 7.0.09  (November/15/2011), Simon Vidanovic
 	//   - imrovement: Added error message tolerance (This is necessary to handle error messages in correct way)
 	//  Revision: 7.0.08  (November/15/2011), Simon Vidanovic
-	//   - bug fix: Fixed program crashing when warrning message 1007 occured (output could not fit in string)
+	//   - bug fix: Fixed program crashing when warrning message 1007 occurred (output could not fit in string)
 	//   - feature: relaxation parameter changed
 	//  Revision: 7.0.07  (November/08/2011), Simon Vidanovic
 	//   - feature: Error message (as string) is now return from tarcog
@@ -464,7 +461,8 @@ namespace TARCOGMain {
 		Array1A< Real64 > ShadeGapKeffConv, // Vector of convective keff values for areas above/below
 		Real64 const SDScalar, // Factor of Venetian SD layer contribution to convection
 		int const SHGCCalc, // SHGC calculation switch:
-		int & NumOfIterations // Number of iterations for reacing solution
+		int & NumOfIterations, // Number of iterations for reacing solution
+		Real64 const edgeGlCorrFac // Edge of glass correction factor
 	)
 	{
 
@@ -707,7 +705,7 @@ namespace TARCOGMain {
 		if ( GoAhead( nperr ) ) {
 
 			if ( standard == ISO15099 ) {
-				Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CurGap, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations );
+				Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CurGap, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations, edgeGlCorrFac );
 			} else if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 				Calc_EN673( standard, nlayer, tout, tind, CurGap, thick, scon, emis, totsol, tilt, dir, asol, presure, iprop, frct, nmix, xgcon, xgvis, xgcp, xwght, theta, ufactor, hcin, hin, hout, shgc, nperr, ErrorMessage, ibc, hg, hr, hs, Ra, Nu );
 			} else {
@@ -745,7 +743,7 @@ namespace TARCOGMain {
 
 					//after performed deflection recalculate temperatures with new gap widths
 					if ( standard == ISO15099 ) {
-						Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, GapDefMean, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations );
+						Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, GapDefMean, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations, edgeGlCorrFac );
 					} else if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 						Calc_EN673( standard, nlayer, tout, tind, GapDefMean, thick, scon, emis, totsol, tilt, dir, asol, presure, iprop, frct, nmix, xgcon, xgvis, xgcp, xwght, theta, ufactor, hcin, hin, hout, shgc, nperr, ErrorMessage, ibc, hg, hr, hs, Ra, Nu );
 					} else {

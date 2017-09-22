@@ -76,6 +76,9 @@ namespace OutputReportTabularAnnual {
 	GetInputTabularAnnual();
 
 	void
+	checkAggregationOrderForAnnual();
+
+	void
 	GatherAnnualResultsForTimeStep( int kindOfTypeStep );
 
 	void
@@ -129,6 +132,9 @@ public:
 
 	void
 	setupGathering();
+
+	bool
+	invalidAggregationOrder();
 
 	void
 	gatherForTimestep( int kindOfTypeStep );

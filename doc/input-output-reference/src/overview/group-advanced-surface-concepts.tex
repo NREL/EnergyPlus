@@ -399,7 +399,9 @@ The boundary condition values are determined dynamically by the program using in
 
 It should be noted that when other side conditions models are used, solar effects are removed from the surface's outside face heat balance, but are used in modeling the component adjacent to that surface.
 
-In addition, the other side conditions model has been modified to include underground piping system interaction. The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
+The other side conditions model also includes underground piping system interaction. The PipingSystem:Underground:Domain object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
+
+The other side conditions model also includes an underwater boundary condition connection.  By specifying ``ConvectiveUnderwater'' as the boundary type, and including any number of ``SurfaceProperty:Underwater'' objects in the input, the user can connect sufaces to water such as for a moving vessel.
 
 \subsubsection{Inputs}\label{inputs-5}
 
@@ -409,7 +411,7 @@ This is the string referenced in the Surface statement that is using OtherSideMo
 
 \paragraph{Field: Type of Modeling}\label{field-type-of-modeling}
 
-This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ''GapConvectionRadiation,'' ``UndergroundPipingSystemSurface,'' and ``GroundCoupledSurface.''
+This is a string key selection used to identify the type of model that will be used to determine boundary conditions. The only available choices are ''GapConvectionRadiation,'' ``UndergroundPipingSystemSurface,'' ``GroundCoupledSurface,'' and ``ConvectiveUnderwater.''
 
 \begin{figure}[hbtp] % fig 42
 \centering
@@ -455,6 +457,52 @@ This is the effective temperature exposed to the other side of the surface for t
 
 This is the effective (Linearized) radiation heat transfer coefficient applied to the other side of the surface by the model.
 
+\subsection{SurfaceProperty:Underwater}\label{surfacepropertyunderwater}
+
+This object captures the inputs required to model a water-connected boundary condition for a surface.
+This model is useful for either statically positioned buildings with natural convection to the water boundary condition, or a moving building (vessel).
+
+\subsubsection{Inputs}\label{surfacepropertyunderwater-inputs}
+
+\paragraph{Field: Name}\label{surfacepropertyunderwater-inputs-name}
+
+This is the string referenced in the Surface statement that is using this OtherSideModel as the Exterior Environment.
+
+\paragraph{Field: Distance from Surface Centroid to Leading Edge of Boundary Layer}\label{surfacepropertyunderwater-inputs-boundarylayerdistance}
+
+This distance represents the distance from the centroid of this particular surface to leading edge of the boundary layer.
+For a surface with zero velocity, this field will be irrelevant, because there is no forced boundary layer, and convection will be buoyantly driven.
+For a moving vessel, this distance should be the nominal distance from the leading edge of the vessel, assuming a nearly flat surface along that path.
+
+\paragraph{Field: Free Stream Water Temperature Schedule}\label{surfacepropertyunderwater-inputs-temperatureschedule}
+
+This schedule defines the temperature of the free stream water used in the convection calculations.
+
+\paragraph{Field: Free Stream Water Velocity Schedule}\label{surfacepropertyunderwater-inputs-velocityschedule}
+
+This schedule defines the average velocity of the free stream water used in the convection calculations.
+This schedule could be the water velocity as it moves past stationary surface, the surface velocity as it moves past stationary water, or an effective velocity as a result of the combination.
+
+An example specification is:
+
+\begin{lstlisting}
+  SurfaceProperty:Underwater,
+    Underwater,              !- Name
+    140,                     !- Distance from Surface Centroid to Leading Edge of Boundary Layer
+    WaterTempSchedule,       !- Free Stream Water Temperature Schedule
+    VelocitySchedule;        !- Free Stream Water Velocity Schedule
+
+  Schedule:Constant,
+    WaterTempSchedule,
+    Any Number,
+    23;
+
+  Schedule:Constant,
+    VelocitySchedule,
+    Any Number,
+    10.2;
+\end{lstlisting}
+
 \subsection{Foundation:Kiva}\label{foundationkiva}
 
 Foundation:Kiva objects describe boundary conditions for ground-coupled
@@ -478,6 +526,10 @@ Limitations when using Foundation:Kiva objects include:
   All foundation wall surfaces must be quadrilateral.
 \end{itemize}
 
+For each floor surface with ``Foundation'' set as the ``Outside Boundary Condition''
+there must also be a corresponding ``SurfaceProperty:ExposedFoundationPerimeter''
+object to define how much of the floor perimeter is below exterior walls.
+
 The inputs from Foundation:Kiva objects are translated into Kiva's
 foundation heat transfer model. Kiva\textsuperscript{TM} generates a
 two-dimensional heat transfer calculation to represent heat flow between
@@ -494,9 +546,10 @@ the ceiling of the basement and the exterior wall of the zone above the
 basement refer to ``Surface'' (or ``Zone'') and ``Outdoors'',
 respectively. Note: Not all of the foundation wall surface needs to be
 below grade (see the ``Wall Height Above Grade'' field for this object).
-Any part above grade is modeled in Kiva's two-dimensional heat transfer
-calculations. The non-foundation surfaces are shown in Figure
-\ref{fig:context} for context, but are not part of the Kiva model.
+Any part of the foundation wall above grade is modeled in Kiva's
+two-dimensional heat transfer calculations. The non-foundation surfaces
+are shown in Figure \ref{fig:context} for context, but are not part of the
+Kiva model.
 
 \begin{figure}
 \centering
@@ -769,14 +822,21 @@ Grade}
 
 Distance from the exterior grade to the wall top, in m. Default: 0.2 m
 
-Figure \ref{fig:2d-w} illustrates the definition of both the ``Wall
+Figures \ref{fig:2d-w} and \ref{fig:2d-w-slab} illustrate the definition of both the ``Wall
 Height Above Grade'' and the following field, ``Wall Depth Below Slab''.
 
 \begin{figure}
 \centering
 \includegraphics{media/kiva-2d-wall.png}
 \caption{Definition of exterior grade and footing wall depth relative to
-the wall surface\label{fig:2d-w}}
+the wall surface (for a basement foundation context)\label{fig:2d-w}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{media/kiva-2d-wall-slab.png}
+\caption{Definition of exterior grade and footing wall depth relative to
+the wall surface (for a slab foundation context)\label{fig:2d-w-slab}}
 \end{figure}
 
 \paragraph{Field: Wall Depth Below
@@ -997,7 +1057,9 @@ Williamson, 1989):
 \[d_{wt}=0.1022\cdot d_{elev}\]
 
 If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied, otherwise
-a ZeroFlux boundary is applied at 40 m.
+a ZeroFlux boundary is applied at 40 m. If the calculated ground water depth is
+shallower than any element of the foundation construction, then the GroundWater
+is applied at 1 m below the lowest element.
 
 Default: Autoselect.
 
@@ -1036,8 +1098,7 @@ boundary conditions) defines the perimeter of a foundation floor that is
 exposed to the exterior environment through the floor. The user may
 either define the total exposed perimeter, the fraction of the total
 perimeter that is exposed, or individually define which segments of the
-floor surface perimeter are exposed. This object is optional. By default
-it is assumed that the entire perimeter of each foundation is exposed.
+floor surface perimeter are exposed. This object is required for any floor surface with a Foundation:Kiva boundary condition.
 
 Figure \ref{fig:ex} illustrates how the exposed perimeter is determined
 from a floor plan of the foundation level.
@@ -1068,6 +1129,19 @@ interior foundation wall using an Adiabatic Outside Boundary Condition.
 
 Name of foundation floor surface.
 
+\paragraph{Field: Exposed Perimeter Calculation Method}\label{field-exposed-perimeter-calculation-method}
+
+Required key/choice field that tells which method to use to calculate the exposed foundation perimeter. Choices are:
+
+\begin{itemize}
+\item TotalExposedPerimeter: Exposed perimeter is defined as an absolute distance in m. (The Total Exposed Perimeter field should be filled.)
+
+\item ExposedPerimeterFraction: Exposed perimeter is defined as a fraction of the total floor perimeter. (The Exposed Perimeter Fraction field should be filled.)
+
+\item BySegment: Each segment of the floor polygon (corresponding to distance between each set of vertices) is defined as exposed (``Yes'') or not exposed (``No'') in an extensible list corresponding to the number of vertices in the floor polygon. Exposed perimeter is defined as the sum of all exposed segement lengths. (The Surface Segment \textless{}x\textgreater{}
+Exposed fields should be filled.)
+\end{itemize}
+
 \paragraph{Field: Total Exposed
 Perimeter}
 
@@ -1083,9 +1157,7 @@ Exposed}
 
 Surface Segment \textless{}x\textgreater{} is the perimeter between the
 \textless{}x\textgreater{}th and (\textless{}x\textgreater{}+1)th
-vertices. The default is ``Yes'', so users may elect to only enter
-``No'' for segments that are not exposed and leave the others blank.
-Default: Yes
+vertices.
 
 \subsection{SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections}\label{surfaceconvectionalgorithminsideadaptivemodelselections}
 
@@ -2441,6 +2513,127 @@ This field specifies the aspect ratio of the building geometry described in the 
 \paragraph{Field: New Aspect Ratio}\label{field-new-aspect-ratio}
 
 This field specifies the aspect ratio that the building described in the rest of the input file will be changed to.
+
+\subsection{SurfaceProperty:SurroundingSurfaces}\label{surfacePropertysurroundingSurfaces}
+
+The object is used to calculate long wave radiation to an external surface from its surrounding surfaces, defining the properties of the surrounding surfaces. The property object declares a list of single surrounding surfaces which has a name, a field of view factor, and another field Temperature Schedule Name referencing a schedule containing the temperature of the surrounding surface, which can be overwritten at each time step in EnergyPlus run time through co-simulation. View factors are assumed to be constant values. At least one surrounding surface should be defined in this object.
+
+The object also defines the sky and ground temperature and view factors to the external surface. The sum of all defined view factors should not exceed 1.0. If only sky view is defined in this object, the ground view factor to this surface will be 1.0 subtracted with the ground view factor and all other defined surface view factors. If only ground view is defined in this object, the sky view factor to this surface will be 1.0 subtracted with the sky view factor and all other defined surface view factors. If neither of the sky and ground view factors are explicitly declared here, the sum of the sky and ground view factor would be 1.0 subtracted with all other defined surface view factors and the proportion will be set as the same with the global setting. 
+
+\subsubsection{Field: Name}\label{field-srd-surfs-name}
+
+This is the unique name of the surface property.
+
+\subsubsection{Field: Sky View Factor}\label{field-sky-view-factor}
+
+This field defines the constant sky view factor to an external surface. The sky view factor used in solar radiation calculation of the surface would be overwritten with the value of the fraction if defined here. If the field is left blank, the sky view factor of this surface will be calculated with the rules demonstrated above.
+
+\subsubsection{Field: Sky Temperature Schedule Name}\label{field-sky-temperature-schedule-name}
+
+This field is used to supply a schedule name of the sky temperature. The sky temperature used in solar radiation calculation of the surface would be overwritten with the value of the scheduled temperature if defined here. If the field is left blank, the global sky temperature would be used.
+
+\subsubsection{Field: Ground View Factor}\label{field-ground-view-factor}
+
+This field defines the constant ground view factor to an external surface. The ground view factor used in solar radiation calculation of the surface would be overwritten with the value of the fraction if defined here. If the field is left blank, the ground view factor of this surface will be calculated with the rules demonstrated above.
+
+\subsubsection{Field: Ground Temperature Schedule Name}\label{field-ground-temperature-schedule-name}
+
+This field is used to supply a schedule name of the ground temperature. The ground temperature used in solar radiation calculation of the surface would be overwritten with the value of the scheduled temperature if defined here. If the field is left blank, the global ground temperature would be used.
+
+\subsubsection{Field: Surrounding Surface 1 Name}\label{field-surrounding-surface-1-name}
+
+This field defines the name of a surrounding surface to the external surface. 
+
+\subsubsection{Field: Surrounding Surface 1 View Factor}\label{field-surrounding-surface-1-view-factor}
+
+This field defines the constant view factor of a surrounding surface to an external surface. 
+
+\subsubsection{Field: Surrounding Surface 1 Temperature Schedule Name}\label{field-surrounding-surface-1-temp-schedule-name}
+
+This field is used to supply a schedule name of the of a surrounding surface temperature. 
+
+The last three fields are extensible to define multiple surrounding surface name, temperature and view factor sets.
+
+An example IDF object follows.
+
+\begin{lstlisting}
+SurfaceProperty:SurroundingSurfaces,
+  SrdSurfs:Window,             !- Name
+  0.3,                         !- Sky View Factor
+  ,                            !- Sky Temperature Schedule Name
+  0.1,                         !- Ground View Factor
+  ,                            !- Ground Temperature Schedule Name
+  SurroundingSurface1,         !- Surrounding Surface 1 Name
+  0.6,                         !- Surrounding Surface 1 View Factor
+  Surrounding Temp Sch 1;      !- Surrounding Surface 1 Temperature Schedule Name
+  
+Schedule:Compact,
+  Surrounding Temp Sch 1,       !- Name
+  Any Number,                   !- Schedule Type Limits Name
+  Through: 12/31,               !- Field 1
+  For: AllDays,                 !- Field 2
+  Until: 24:00, 15.0;           !- Field 3  
+\end{lstlisting}
+
+\subsection{SurfaceProperty:LocalEnvironment}\label{surfacePropertylocalEnvironment}
+
+The object links to a surface object \textbf{Surface:Detailed} and is used when there is a need to calculate surface level environmental data externally and import them into the simulation to override existing environmental data, including external solar shading fractions, local air velocity, temperature and humidity, and surrounding surface temperatures and view factors. The object links to three optional objects including a schedule object declared by \textbf{Field: External Shading Fraction Schedule Name}, a \textbf{SurfaceProperty:SurroundingSurfaces} object declared by \textbf{Field: Surrounding Surfaces Object Name}, and an \textbf{OutdoorAir:Node} object declared by \textbf{Field: Outdoor Air Node Name}. The object provides inputs to calculate shading, solar radiation, zone air balance and surface exterior heat balance. 
+
+\subsubsection{Field: Name}\label{field-surf-localenv-name}
+
+This is the unique name of the surface property.
+
+\subsubsection{Field: Surface Name}\label{field-surface-name}
+
+This is the name of the surface that will be assigned to use the local environmental data defined in the next three fields.  This should be a name of a surface defined elsewhere.
+
+\subsubsection{Field: External Shading Fraction Schedule Name}\label{field-external-shading-fraction-schedule-name}
+
+This field is used to import external shading fraction data from external calculation. This should be a name of a schedule object with fraction input.
+
+\subsubsection{Field: Surrounding Surfaces Object Name}\label{field-surrounding-surfaces-object-name}
+
+This field is used to import surrounding surfaces properties (temperature and view factors to the external surface) from external calculation. This should be a name of a \textbf{SurfaceProperty:SurroundingSurfaces} object.
+
+\subsubsection{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name}
+
+This field is used to import local environmental data from local outdoor air nodes, including dry and wet bulb temperature, wind speed and wind direction. This should be a name of a \textbf{OutdoorAir:Node} object.
+
+An example IDF object follows.
+
+\begin{lstlisting}
+SurfaceProperty:LocalEnvironment,
+    LocEnv:Zn001:Wall001,         !- Name
+    Zn001:Wall001,                !- Exterior Surface Name
+    ExtShadingSch:Zn001:Wall001,  !- External Shading Fraction Schedule Name
+    SrdSurf:Zn001:Wall001,        !- Surrounding Surfaces Object Name
+    OutdoorAirNode:0001;          !- Outdoor Air Node Name    
+\end{lstlisting}
+
+\subsection{ZoneProperty:LocalEnvironment}\label{ZonePropertylocalEnvironment}
+
+The object links to a \textbf{Zone} object and is used when there is a need to calculate zone level environmental data externally and import them into the simulation to override existing environmental data, including local air temperature and humidity, wind velocity and direction. links to an \textbf{OutdoorAir:Node} object declared by \textbf{Field: Outdoor Air Node Name}. The reference local outdoor air node provides ambient conditions for the calculation of infiltration and ventilation at the zone level.
+
+\subsubsection{Field: Name}\label{field-zone-localenv-name}
+
+This is the unique name of the zone property.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name}
+
+This is the name of the zone that will be assigned to use the local environmental data defined in the next field. This should be a name of a surface defined elsewhere.
+
+\subsubsection{Field: Outdoor Air Node Name}\label{field-zone-outdoor-air-node-name}
+
+This field is used to import local environmental data from local outdoor air nodes, including dry and wet bulb temperature, wind speed and wind direction. This should be a name of a \textbf{OutdoorAir:Node} object.
+
+An example IDF object follows.
+
+\begin{lstlisting}
+ZoneProperty:LocalEnvironment,
+    LocEnv:Zn001,                 !- Name
+    Zn001,                        !- Exterior Surface Name
+    OutdoorAirNode:0001;          !- Outdoor Air Node Name    
+\end{lstlisting}
 
 \subsection{Zone Property View Factors}\label{zone-property-view-factors}
 

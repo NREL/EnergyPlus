@@ -44,6 +44,69 @@ Most examples in this document include the comment lines that illustrate each da
 Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26;
 \end{lstlisting}
 
+
+\subsection{Site:VariableLocation}\label{sitelocation}
+
+This variable location class describes the parameters for a moving and/or rotating building's location.
+The applications for this include:
+
+\begin{itemize}
+ \item a vehicle driving along the road, 
+ \item a rotating building, such as for experimental testing at different orientations, or
+ \item if combind with a ``SurfaceProperty:Underwater'' boundary condition, it could apply to ships and vessels.
+\end{itemize} 
+
+The latitude, longitude, and orientation are all defined according to the same conventions as in the regular ``Site:Location'' object.
+
+\subsubsection{Inputs}\label{inputs-026}
+
+\paragraph{Field: Name}\label{field-name-025}
+
+This alpha field is used as an identifying field in output reports.
+
+\paragraph{Field: Building Location Latitude Schedule}\label{field-latitude}
+
+This field represents the latitude (in degrees) of the facility. By convention, North Latitude is represented as positive; South Latitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
+
+\paragraph{Field: Building Location Longitude Schedule}\label{field-longitude}
+
+This field represents the longitude (in degrees) of the facility. By convention, East Longitude is represented as positive; West Longitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
+
+\paragraph{Field: Building Location Orientation Schedule}\label{field-time-zone}
+
+This field represents the time zone of the facility (relative to Greenwich Mean Time or the 0\(^{th}\) meridian). Time zones west of GMT (e.g. North America) are represented as negative; east of GMT as positive. Non-whole hours can be represented in decimal (e.g. 6:30 is 6.5).
+
+As shown in an IDF:
+
+\begin{lstlisting}
+Site:VariableLocation,
+  MovingAndRotatingBuilding, !- Name
+  LatitudeSchedule,          !- Building Location Latitude Schedule
+  LongitudeSchedule,         !- Building Location Longitude Schedule
+  OrientationSchedule;       !- Building Location Orientation Schedule
+ 
+Schedule:File,
+  LatitudeSchedule,          !- Name
+  ,                          !- Schedule Type Limits Name
+  TripLog.csv,               !- File Name
+  2,                         !- Column Number
+  1;                         !- Rows to Skip at Top
+
+Schedule:File,
+  LongitudeSchedule,          !- Name
+  ,                          !- Schedule Type Limits Name
+  TripLog.csv,               !- File Name
+  3,                         !- Column Number
+  1;                         !- Rows to Skip at Top
+
+Schedule:File,
+  OrientationSchedule,          !- Name
+  ,                          !- Schedule Type Limits Name
+  TripLog.csv,               !- File Name
+  4,                         !- Column Number
+  1;                         !- Rows to Skip at Top
+\end{lstlisting}
+
 \subsection{SizingPeriod:DesignDay}\label{sizingperioddesignday}
 
 The design day input describes the parameters to effect a ``design day'' simulation, often used for load calculations or sizing equipment. Using the values in these fields, EnergyPlus ``creates'' a complete days' worth of weather data (air temperatures, solar radiation, etc.) Normal operation uses the default range multipliers as shown in Figure~\ref{fig:default-daily-range-multiplier-for-design} though users may choose to input their own multiplier schedule. Likewise, normal operation specifies one ``humidity indicating condition'' which is used to calculate the humidity ratio at maximum temperature -- this is used as the constant humidity ratio for the entire day. Again, this can be overridden by specifying a relative humidity schedule or requesting generation of an hourly wet-bulb temperature profile. Multiple design days may be specified.

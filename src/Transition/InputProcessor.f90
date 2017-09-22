@@ -408,10 +408,10 @@ SUBROUTINE ProcessInput(IDDFileNameWithPath,NewIDDFileNameWithPath,InputFileName
        WRITE(EchoInputFile,*) ' Number of Object Definitions=',NumObjectDefs
        WRITE(EchoInputFile,*) ' Number of Section Definitions=',NumSectionDefs
      ENDIF
-     IF (.not. ALLOCATED(LineItem%Numbers)) ALLOCATE (LineItem%Numbers(MaxNumericArgsFound+20))
-     IF (.not. ALLOCATED(LineItem%NumBlank)) ALLOCATE (LineItem%NumBlank(MaxNumericArgsFound+20))
-     IF (.not. ALLOCATED(LineItem%Alphas)) ALLOCATE (LineItem%Alphas(MaxAlphaArgsFound+20))
-     IF (.not. ALLOCATED(LineItem%AlphBlank)) ALLOCATE (LineItem%AlphBlank(MaxAlphaArgsFound+20))
+     IF (.not. ALLOCATED(LineItem%Numbers)) ALLOCATE (LineItem%Numbers(MaxNumericArgsFound))
+     IF (.not. ALLOCATED(LineItem%NumBlank)) ALLOCATE (LineItem%NumBlank(MaxNumericArgsFound))
+     IF (.not. ALLOCATED(LineItem%Alphas)) ALLOCATE (LineItem%Alphas(MaxAlphaArgsFound))
+     IF (.not. ALLOCATED(LineItem%AlphBlank)) ALLOCATE (LineItem%AlphBlank(MaxAlphaArgsFound))
    ENDIF
 
 

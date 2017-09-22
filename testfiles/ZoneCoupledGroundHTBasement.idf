@@ -58,7 +58,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.7;
+  Version,8.8;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -206,10 +206,10 @@
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    10.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Wall 2,         !- Name
@@ -239,9 +239,9 @@
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
-    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
     10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    10.0,0.0,-3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Wall 4,         !- Name
@@ -255,9 +255,9 @@
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
     0.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0.0,10.0,-3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,0.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Floor,          !- Name
@@ -329,10 +329,10 @@
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0,10.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
-    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-    10.0,10.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,10.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 2,       !- Name
@@ -362,9 +362,9 @@
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     10.0,0.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    10.0,10.0,3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
     10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-    10.0,0.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 4,       !- Name
@@ -378,9 +378,9 @@
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     0.0,10.0,3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0,0.0,3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
     0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}
-    0.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,0.0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Roof,         !- Name
@@ -542,8 +542,8 @@
   Site:GroundDomain:Basement,
     CoupledBasement,         !- Name
     5,                       !- Ground Domain Depth {m}
-    1,                       !- Aspect ratio {m}
-    5,                       !- Perimeter offset {m}
+    1,                       !- Aspect Ratio
+    5,                       !- Perimeter Offset {m}
     1.8,                     !- Soil Thermal Conductivity {W/m-K}
     3200,                    !- Soil Density {kg/m3}
     836,                     !- Soil Specific Heat {J/kg-K}
@@ -662,6 +662,7 @@
     ,                        !- Availability Schedule Name
     Main Floor Ideal Loads Supply Inlet,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.0156,                  !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

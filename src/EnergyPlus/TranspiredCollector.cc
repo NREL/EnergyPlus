@@ -140,6 +140,13 @@ namespace TranspiredCollector {
 	Array1D< UTSCDataStruct > UTSC;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumUTSC = 0;
+		GetInputFlag = true;
+		UTSC.deallocate();
+	}
 
 	void
 	SimTranspiredCollector(
@@ -613,21 +620,21 @@ namespace TranspiredCollector {
 			tempHdeltaNPL = std::sin( TiltRads ) * UTSC( Item ).Height / 4.0;
 			UTSC( Item ).HdeltaNPL = max( tempHdeltaNPL, UTSC( Item ).PlenGapThick );
 
-			SetupOutputVariable( "Solar Collector Heat Exchanger Effectiveness []", UTSC( Item ).HXeff, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Leaving Air Temperature [C]", UTSC( Item ).TairHX, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Outside Face Suction Velocity [m/s]", UTSC( Item ).Vsuction, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Surface Temperature [C]", UTSC( Item ).Tcoll, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Plenum Air Temperature [C]", UTSC( Item ).Tplen, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Sensible Heating Rate [W]", UTSC( Item ).SensHeatingRate, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Sensible Heating Energy [J]", UTSC( Item ).SensHeatingEnergy, "System", "Sum", UTSC( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
+			SetupOutputVariable( "Solar Collector Heat Exchanger Effectiveness", OutputProcessor::Unit::None, UTSC( Item ).HXeff, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Leaving Air Temperature", OutputProcessor::Unit::C, UTSC( Item ).TairHX, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Outside Face Suction Velocity", OutputProcessor::Unit::m_s, UTSC( Item ).Vsuction, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Surface Temperature", OutputProcessor::Unit::C, UTSC( Item ).Tcoll, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Plenum Air Temperature", OutputProcessor::Unit::C, UTSC( Item ).Tplen, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Sensible Heating Rate", OutputProcessor::Unit::W, UTSC( Item ).SensHeatingRate, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Sensible Heating Energy", OutputProcessor::Unit::J, UTSC( Item ).SensHeatingEnergy, "System", "Sum", UTSC( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
 
-			SetupOutputVariable( "Solar Collector Natural Ventilation Air Change Rate [ACH]", UTSC( Item ).PassiveACH, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotVent, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Wind Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotWind, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotTherm, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Incident Solar Radiation [W/m2]", UTSC( Item ).Isc, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector System Efficiency []", UTSC( Item ).UTSCEfficiency, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Surface Efficiency []", UTSC( Item ).UTSCCollEff, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Natural Ventilation Air Change Rate", OutputProcessor::Unit::ach, UTSC( Item ).PassiveACH, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotVent, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Wind Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotWind, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotTherm, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Incident Solar Radiation", OutputProcessor::Unit::W_m2, UTSC( Item ).Isc, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector System Efficiency", OutputProcessor::Unit::None, UTSC( Item ).UTSCEfficiency, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Surface Efficiency", OutputProcessor::Unit::None, UTSC( Item ).UTSCCollEff, "System", "Average", UTSC( Item ).Name );
 
 		}
 
@@ -672,6 +679,8 @@ namespace TranspiredCollector {
 		using namespace DataLoopNode;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
+		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceData;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -694,6 +703,7 @@ namespace TranspiredCollector {
 		//unused  INTEGER             :: InletNode
 		int SplitBranch;
 		int thisUTSC;
+		Real64 Tamb;
 
 		if ( MyOneTimeFlag ) {
 			// do various one time setups and pitch adjustments across all UTSC
@@ -750,20 +760,29 @@ namespace TranspiredCollector {
 		if ( BeginEnvrnFlag && MyEnvrnFlag( UTSCNum ) ) {
 			UTSC( UTSCNum ).TplenLast = 22.5;
 			UTSC( UTSCNum ).TcollLast = 22.0;
+
 			MyEnvrnFlag( UTSCNum ) = false;
 		}
 		if ( ! BeginEnvrnFlag ) {
 			MyEnvrnFlag( UTSCNum ) = true;
+		}
+		
+		// determine average ambient temperature
+		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
+		if ( !DataEnvironment::IsRain ) {
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea;
+		} else { // when raining we use wet bulb not drybulb
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea;
 		}
 
 		//inits for each iteration
 //		UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 		UTSC( UTSCNum ).InletMDot = sum_sub( Node, &DataLoopNode::NodeData::MassFlowRate, UTSC( UTSCNum ).InletNode ); //Autodesk:F2C++ Functions handle array subscript usage
 		UTSC( UTSCNum ).IsOn = false; // intialize then turn on if appropriate
-		UTSC( UTSCNum ).Tplen = 0.0;
-		UTSC( UTSCNum ).Tcoll = 0.0;
+		UTSC( UTSCNum ).Tplen = UTSC( UTSCNum ).TplenLast;
+		UTSC( UTSCNum ).Tcoll = UTSC( UTSCNum ).TcollLast;
+		UTSC( UTSCNum ).TairHX = Tamb;
 		UTSC( UTSCNum ).MdotVent = 0.0;
-		UTSC( UTSCNum ).TairHX = 0.0;
 		UTSC( UTSCNum ).HXeff = 0.0;
 		UTSC( UTSCNum ).Isc = 0.0;
 
@@ -1113,14 +1132,11 @@ namespace TranspiredCollector {
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::OutEnthalpy;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using Psychrometrics::PsyCpAirFnWTdb;
+		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceData;
-		using DataHVACGlobals::TimeStepSys;
-		using ConvectionCoefficients::InitExteriorConvectionCoeff;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1172,14 +1188,14 @@ namespace TranspiredCollector {
 		UTSC( UTSCNum ).Tcoll = TmpTscoll;
 		UTSC( UTSCNum ).HrPlen = HrPlen;
 		UTSC( UTSCNum ).HcPlen = HcPlen;
-		UTSC( UTSCNum ).TairHX = 0.0;
+		UTSC( UTSCNum ).TairHX = Tamb;
 		UTSC( UTSCNum ).InletMDot = 0.0;
 		UTSC( UTSCNum ).InletTempDB = Tamb;
 		UTSC( UTSCNum ).Vsuction = 0.0;
 		UTSC( UTSCNum ).PlenumVelocity = 0.0;
-		UTSC( UTSCNum ).SupOutTemp = Tamb;
+		UTSC( UTSCNum ).SupOutTemp = TmpTaPlen;
 		UTSC( UTSCNum ).SupOutHumRat = OutHumRatAmb;
-		UTSC( UTSCNum ).SupOutEnth = OutEnthalpy;
+		UTSC( UTSCNum ).SupOutEnth = PsyHFnTdbW( TmpTaPlen, OutHumRatAmb );
 		UTSC( UTSCNum ).SupOutMassFlow = 0.0;
 		UTSC( UTSCNum ).SensHeatingRate = 0.0;
 		UTSC( UTSCNum ).SensHeatingEnergy = 0.0;

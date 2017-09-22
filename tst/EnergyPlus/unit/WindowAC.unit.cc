@@ -68,7 +68,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	// this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
 	// set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
 	std::string const idf_objects = delimited_string( {
-	" Version,8.7;",
+	" Version,8.8;",
 
 	"  Timestep,6;",
 
@@ -172,8 +172,9 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    ,                        !- Condenser Air Inlet Node Name",
 	"    AirCooled,               !- Condenser Type",
 	"    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
-	"    0.0,                   !- Crankcase Heater Capacity {W}",
+	"    0.0,                     !- Crankcase Heater Capacity {W}",
 	"    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+	"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 	"    ,                        !- Supply Water Storage Tank Name",
 	"    ,                        !- Condensate Collection Water Storage Tank Name",
 	"    ,                        !- Basin Heater Capacity {W/K}",
@@ -368,8 +369,8 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0,                       !- Z Origin {m}",
 	"    1,                       !- Type",
 	"    1,                       !- Multiplier",
-	"    autocalculate,           !- Ceiling Height {m}",
-	"    autocalculate;           !- Volume {m3}",
+	"    3.048,                   !- Ceiling Height {m}",
+	"    40.;                     !- Volume {m3}",
 
 	"  BuildingSurface:Detailed,",
 	"    Zn001:Wall001,           !- Name",

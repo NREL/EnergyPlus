@@ -56,7 +56,7 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <CommandLineInterface.hh>
@@ -67,6 +67,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataSurfaces.hh>
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
@@ -77,8 +78,10 @@
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SurfaceGeometry.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
+#include <Vectors.hh>
 
 namespace EnergyPlus {
 
@@ -346,6 +349,8 @@ namespace WeatherManager {
 	static gio::Fmt fmtA( "(A)" );
 	static gio::Fmt fmtAN( "(A,$)" );
 
+	std::vector< UnderwaterBoundary > underwaterBoundaries;
+	
 	// MODULE SUBROUTINES:
 
 	// Functions
@@ -518,6 +523,8 @@ namespace WeatherManager {
 		SpecialDays.deallocate();
 		DataPeriods.deallocate();
 
+		underwaterBoundaries.clear();
+
 	} //clear_state, for unit tests
 
 	void
@@ -586,32 +593,159 @@ namespace WeatherManager {
 		// counter (used by GetNextEnvironment) is reset before SetupSimulation or
 		// Simulating.  May not be necessary, but just in case.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		Envrn = 0;
 
+	}
+
+	bool
+	CheckIfAnyUnderwaterBoundaries()
+	{
+		bool errorsFound = false;
+		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
+		DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
+		int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+		for ( int i = 1; i <= Num; i++ ) {
+			InputProcessor::GetObjectItem(
+				DataIPShortCuts::cCurrentModuleObject, i, 
+				DataIPShortCuts::cAlphaArgs, 
+				NumAlpha, 
+				DataIPShortCuts::rNumericArgs, 
+				NumNumber, 
+				IOStat, 
+				DataIPShortCuts::lNumericFieldBlanks, 
+				DataIPShortCuts::lAlphaFieldBlanks, 
+				DataIPShortCuts::cAlphaFieldNames, 
+				DataIPShortCuts::cNumericFieldNames
+			);
+			underwaterBoundaries.push_back( UnderwaterBoundary() );
+			underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
+			underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
+			underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+			if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
+				ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
+				errorsFound = true;
+			}
+			underwaterBoundaries[ i-1 ].WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+			if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+				ShowSevereError( "Water temperature schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+				errorsFound = true;
+			}
+			if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
+				// that's OK, we can have a blank schedule, the water will just have no free stream velocity
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = 0;
+			} else {
+				underwaterBoundaries[ i-1 ].VelocityScheduleIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+				if ( underwaterBoundaries[ i-1 ].WaterTempScheduleIndex == 0 ) {
+					ShowSevereError( "Free streawm velocity schedule for \"SurfaceProperty:Underwater\" named \"" + underwaterBoundaries[ i-1 ].Name + "\" not found" );
+					errorsFound = true;
+				}
+			}
+			if ( errorsFound ) break;
+		}
+		if ( errorsFound ) {
+			ShowFatalError( "Previous input problems cause program termination" );
+		}
+		return ( Num > 0 );
+	}
+
+	Real64
+	calculateWaterBoundaryConvectionCoefficient(
+		Real64 const curWaterTemp,
+		Real64 const freeStreamVelocity,
+		Real64 const distanceFromLeadingEdge
+	) {
+		Real64 const waterKinematicViscosity = 1e-6; // m2/s
+		Real64 const waterPrandtlNumber = 6; // -
+		Real64 const waterThermalConductivity = 0.6; // W/mK
+		// do some calculation for forced convection from the leading edge of the ship
+		Real64 const localReynoldsNumber = freeStreamVelocity * distanceFromLeadingEdge / waterKinematicViscosity;
+		Real64 const localNusseltNumber = 0.0296 * pow( localReynoldsNumber, 0.8 ) * pow( waterPrandtlNumber, 1.0 / 3.0 );
+		Real64 const localConvectionCoeff = localNusseltNumber * waterThermalConductivity / distanceFromLeadingEdge;
+
+		// do some calculations for natural convection from the bottom of the ship
+		Real64 const distanceFromBottomOfHull = 12;   // meters, assumed for now
+		// this Prandtl correction is from Incropera & Dewitt, Intro to HT, eq 9.20
+		Real64 const prandtlCorrection = ( 0.75 * pow(waterPrandtlNumber, 0.5) ) / pow( 0.609 + 1.221 * pow( waterPrandtlNumber, 0.5 ) + 1.238 * waterPrandtlNumber, 0.25 );
+		// calculate the Grashof number
+		Real64 const gravity = 9.81; // m/s2
+		Real64 const beta = 0.000214;  // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
+		Real64 const assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
+		Real64 const localGrashofNumber = ( gravity * beta * ( assumedSurfaceTemp - curWaterTemp ) * pow( distanceFromBottomOfHull, 3 ) ) / pow( waterKinematicViscosity, 2 );
+		Real64 const localNusseltFreeConvection = pow( localGrashofNumber / 4, 0.25 ) * prandtlCorrection;
+		Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
+		return max( localConvectionCoeff, localConvectionCoeffFreeConv );
+	}
+
+	void
+	UpdateUnderwaterBoundaries()
+	{
+		for ( auto & thisBoundary : underwaterBoundaries ) {
+			Real64 const curWaterTemp = ScheduleManager::GetCurrentScheduleValue( thisBoundary.WaterTempScheduleIndex ); // C
+			Real64 freeStreamVelocity = 0;
+			if ( thisBoundary.VelocityScheduleIndex > 0 ) {
+				freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue( thisBoundary.VelocityScheduleIndex ); // m/s
+			}
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TConv = curWaterTemp;
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HConv = WeatherManager::calculateWaterBoundaryConvectionCoefficient(curWaterTemp, freeStreamVelocity, thisBoundary.distanceFromLeadingEdge);
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).TRad = curWaterTemp;
+			DataSurfaces::OSCM( thisBoundary.OSCMIndex ).HRad = 0.0;
+		}
+	}
+
+	void
+	ReadVariableLocationOrientation()
+	{
+		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
+		DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
+		if ( InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
+		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1, 
+			DataIPShortCuts::cAlphaArgs, 
+			NumAlpha, 
+			DataIPShortCuts::rNumericArgs, 
+			NumNumber, 
+			IOStat, 
+			DataIPShortCuts::lNumericFieldBlanks, 
+			DataIPShortCuts::lAlphaFieldBlanks, 
+			DataIPShortCuts::cAlphaFieldNames, 
+			DataIPShortCuts::cNumericFieldNames
+		);
+		DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 1 ) );
+		DataEnvironment::varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+		DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 3 ) );
+	}
+
+	void
+	UpdateLocationAndOrientation()
+	{
+		if ( DataEnvironment::varyingLocationSchedIndexLat > 0 ) {
+			DataEnvironment::Latitude = ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingLocationSchedIndexLat );
+		}
+		if ( DataEnvironment::varyingLocationSchedIndexLong > 0 ) {
+			DataEnvironment::Longitude = ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingLocationSchedIndexLong );
+		}
+		CheckLocationValidity();
+		if ( DataEnvironment::varyingOrientationSchedIndex > 0 ) {
+			DataHeatBalance::BuildingAzimuth = mod( ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingOrientationSchedIndex ), 360.0 );
+			SurfaceGeometry::CosBldgRelNorth = std::cos( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
+			SurfaceGeometry::SinBldgRelNorth = std::sin( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
+			for ( size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum ) {
+				for ( int n = 1; n <= DataSurfaces::Surface( SurfNum ).Sides; ++n ) {
+					Real64 Xb = DataSurfaces::Surface( SurfNum ).Vertex( n ).x;
+					Real64 Yb = DataSurfaces::Surface( SurfNum ).Vertex( n ).y;
+					DataSurfaces::Surface( SurfNum ).NewVertex( n ).x = Xb * SurfaceGeometry::CosBldgRelNorth - Yb * SurfaceGeometry::SinBldgRelNorth;
+					DataSurfaces::Surface( SurfNum ).NewVertex( n ).y = Xb * SurfaceGeometry::SinBldgRelNorth + Yb * SurfaceGeometry::CosBldgRelNorth;
+					DataSurfaces::Surface( SurfNum ).NewVertex( n ).z = DataSurfaces::Surface( SurfNum ).Vertex( n ).z;
+				}
+				Vectors::CreateNewellSurfaceNormalVector( DataSurfaces::Surface( SurfNum ).NewVertex, DataSurfaces::Surface( SurfNum ).Sides, DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector );
+				Real64 SurfWorldAz = 0.0;
+				Real64 SurfTilt = 0.0;
+				Vectors::DetermineAzimuthAndTilt( DataSurfaces::Surface( SurfNum ).NewVertex, DataSurfaces::Surface( SurfNum ).Sides, SurfWorldAz, SurfTilt, DataSurfaces::Surface( SurfNum ).lcsx, DataSurfaces::Surface( SurfNum ).lcsy, DataSurfaces::Surface( SurfNum ).lcsz, DataSurfaces::Surface( SurfNum ).GrossArea, DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector );
+				DataSurfaces::Surface( SurfNum ).Azimuth = SurfWorldAz;
+				DataSurfaces::Surface( SurfNum ).SinAzim = std::sin( SurfWorldAz * DegToRadians );
+				DataSurfaces::Surface( SurfNum ).CosAzim = std::cos( SurfWorldAz * DegToRadians );
+				DataSurfaces::Surface( SurfNum ).OutNormVec = DataSurfaces::Surface( SurfNum ).NewellSurfaceNormalVector;
+			}
+		}
 	}
 
 	void
@@ -712,41 +846,42 @@ namespace WeatherManager {
 
 			// SetupOutputVariables, CurrentModuleObject='All Simulations'
 
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", OutDryBulbTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Dewpoint Temperature [C]", OutDewPointTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Wetbulb Temperature [C]", OutWetBulbTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Humidity Ratio [kgWater/kgDryAir]", OutHumRat, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Relative Humidity [%]", OutRelHum, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Barometric Pressure [Pa]", OutBaroPress, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Wind Speed [m/s]", WindSpeed, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Wind Direction [deg]", WindDir, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Sky Temperature [C]", SkyTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Horizontal Infrared Radiation Rate per Area [W/m2]", HorizIRSky, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Diffuse Solar Radiation Rate per Area [W/m2]", DifSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Direct Solar Radiation Rate per Area [W/m2]", BeamSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Precipitation Depth [m]", LiquidPrecipitation, "Zone", "Sum", "Environment" );
-			SetupOutputVariable( "Site Ground Reflected Solar Radiation Rate per Area [W/m2]", GndSolarRad, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Ground Temperature [C]", GroundTemp, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Surface Ground Temperature [C]", GroundTemp_Surface, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Deep Ground Temperature [C]", GroundTemp_Deep, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Simple Factor Model Ground Temperature [C]", GroundTempFC, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Enthalpy [J/kg]", OutEnthalpy, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Outdoor Air Density [kg/m3]", OutAirDensity, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Azimuth Angle [deg]", SolarAzimuthAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Altitude Angle [deg]", SolarAltitudeAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Solar Hour Angle [deg]", HrAngle, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Rain Status []", RptIsRain, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Snow on Ground Status []", RptIsSnow, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Horizontal Sky Illuminance [lux]", HISKF, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Horizontal Beam Illuminance [lux]", HISUNF, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Exterior Beam Normal Illuminance [lux]", HISUNFnorm, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Sky Diffuse Solar Radiation Luminous Efficacy [lum/W]", PDIFLW, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Beam Solar Radiation Luminous Efficacy [lum/W]", PDIRLW, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylighting Model Sky Clearness []", SkyClearness, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylighting Model Sky Brightness []", SkyBrightness, "Zone", "Average", "Environment" );
-			SetupOutputVariable( "Site Daylight Saving Time Status []", DSTIndicator, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Site Day Type Index []", RptDayType, "Zone", "State", "Environment" );
-			SetupOutputVariable( "Site Mains Water Temperature [C]", WaterMainsTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, OutDryBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Dewpoint Temperature", OutputProcessor::Unit::C, OutDewPointTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, OutWetBulbTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, OutHumRat, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc, OutRelHum, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Barometric Pressure", OutputProcessor::Unit::Pa, OutBaroPress, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Wind Speed", OutputProcessor::Unit::m_s, WindSpeed, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Wind Direction", OutputProcessor::Unit::deg, WindDir, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Sky Temperature", OutputProcessor::Unit::C, SkyTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Horizontal Infrared Radiation Rate per Area", OutputProcessor::Unit::W_m2, HorizIRSky, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Diffuse Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, DifSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Direct Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, BeamSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Precipitation Depth", OutputProcessor::Unit::m, LiquidPrecipitation, "Zone", "Sum", "Environment" );
+			SetupOutputVariable( "Site Ground Reflected Solar Radiation Rate per Area", OutputProcessor::Unit::W_m2, GndSolarRad, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Ground Temperature", OutputProcessor::Unit::C, GroundTemp, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Surface Ground Temperature", OutputProcessor::Unit::C, GroundTemp_Surface, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Deep Ground Temperature", OutputProcessor::Unit::C, GroundTemp_Deep, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Simple Factor Model Ground Temperature", OutputProcessor::Unit::C, GroundTempFC, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, OutEnthalpy, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Outdoor Air Density", OutputProcessor::Unit::kg_m3, OutAirDensity, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Azimuth Angle", OutputProcessor::Unit::deg, SolarAzimuthAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Altitude Angle", OutputProcessor::Unit::deg, SolarAltitudeAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Solar Hour Angle", OutputProcessor::Unit::deg, HrAngle, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Rain Status", OutputProcessor::Unit::None, RptIsRain, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Snow on Ground Status", OutputProcessor::Unit::None, RptIsSnow, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Horizontal Sky Illuminance", OutputProcessor::Unit::lux, HISKF, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Horizontal Beam Illuminance", OutputProcessor::Unit::lux, HISUNF, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Exterior Beam Normal Illuminance", OutputProcessor::Unit::lux, HISUNFnorm, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Sky Diffuse Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIFLW, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Beam Solar Radiation Luminous Efficacy", OutputProcessor::Unit::lum_W, PDIRLW, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylighting Model Sky Clearness", OutputProcessor::Unit::None, SkyClearness, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylighting Model Sky Brightness", OutputProcessor::Unit::None, SkyBrightness, "Zone", "Average", "Environment" );
+			SetupOutputVariable( "Site Daylight Saving Time Status", OutputProcessor::Unit::None, DSTIndicator, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Site Day Type Index", OutputProcessor::Unit::None, RptDayType, "Zone", "State", "Environment" );
+			SetupOutputVariable( "Site Mains Water Temperature", OutputProcessor::Unit::C, WaterMainsTemp, "Zone", "Average", "Environment" );
+
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Weather Data", "Environment", "Outdoor Dry Bulb", "[C]", EMSOutDryBulbOverrideOn, EMSOutDryBulbOverrideValue );
@@ -2671,7 +2806,7 @@ namespace WeatherManager {
 					BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 					gio::write( ErrOut, fmtLD ) << ReadStatus;
 					strip( ErrOut );
-					ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+					ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 				}
 				if ( CurDayOfWeek <= 7 ) {
 					CurDayOfWeek = mod( CurDayOfWeek, 7 ) + 1;
@@ -2709,7 +2844,7 @@ namespace WeatherManager {
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
 					}
 					for ( Item = 1; Item <= 23 * NumIntervalsPerHour; ++Item ) {
@@ -2717,7 +2852,7 @@ namespace WeatherManager {
 						if ( ReadStatus != 0 ) {
 							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
+							ShowFatalError( "Error occurred on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
 					}
 				}
@@ -4940,7 +5075,9 @@ Label9999: ;
 		// different, notify the user.  If StdTimeMerid couldn't be calculated,
 		// produce an error message.
 
-		if ( StdTimeMerid >= -12.0 && StdTimeMerid <= 12.0 ) {
+		if ( DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ) {
+			// don't do any warnings, the building is moving
+		} else if ( StdTimeMerid >= -12.0 && StdTimeMerid <= 12.0 ) {
 			if ( TimeZoneNumber != StdTimeMerid ) {
 				DiffCalc = std::abs( TimeZoneNumber - StdTimeMerid );
 				if ( DiffCalc > 1.0 && DiffCalc < 24.0 ) {
@@ -6428,6 +6565,7 @@ Label9999: ;
 		int DDLoop;
 		std::string envTitle;
 		std::string units;
+		OutputProcessor::Unit unitType;
 		int schPtr;
 		bool MaxDryBulbEntered;
 		bool PressureEntered;
@@ -6546,10 +6684,12 @@ Label9999: ;
 				cAlphaArgs( 3 ) = "MultiplierSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Multiplier;
 				units = "[]";
+				unitType = OutputProcessor::Unit::None;
 			} else if ( SameString( cAlphaArgs( 3 ), "Difference" ) || SameString( cAlphaArgs( 3 ), "Delta" ) || SameString( cAlphaArgs( 3 ), "DifferenceSchedule" ) || SameString( cAlphaArgs( 3 ), "DeltaSchedule" ) ) {
 				cAlphaArgs( 3 ) = "DifferenceSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Difference;
 				units = "[deltaC]";
+				unitType = OutputProcessor::Unit::deltaC;
 			} else if ( SameString( cAlphaArgs( 3 ), "DefaultMultipliers" ) ) {
 				cAlphaArgs( 3 ) = "DefaultMultipliers";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Default;
@@ -6558,6 +6698,7 @@ Label9999: ;
 				cAlphaArgs( 3 ) = "TemperatureProfileSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Profile;
 				units = "[C]";
+				unitType = OutputProcessor::Unit::C;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
 				ShowContinueError( "..invalid field: " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -6598,12 +6739,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).TempRangeSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value " + units, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
+							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).TempRangeSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value " + units, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
+							SetupOutputVariable( "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value", unitType, SPSiteDryBulbRangeModScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 4 ) );
 						}
 						if ( cAlphaArgs( 3 ) == "MultiplierSchedule" ) {
 							if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).TempRangeSchPtr, 0.0, ">=", 1.0, "<=" ) ) {
@@ -6730,10 +6871,12 @@ Label9999: ;
 				cAlphaArgs( 5 ) = "RelativeHumiditySchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_RelHumSch;
 				units = "[%]";
+				unitType = OutputProcessor::Unit::Perc;
 			} else if ( SameString( cAlphaArgs( 5 ), "WetBulbProfileMultiplierSchedule" ) ) {
 				cAlphaArgs( 5 ) = "WetBulbProfileMultiplierSchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfMul;
 				units = "[]";
+				unitType = OutputProcessor::Unit::None;
 				if ( ! lNumericFieldBlanks( 5 ) ) {
 					DesDayInput( EnvrnNum ).HumIndValue = rNumericArgs( 5 ); // Humidity Indicating Conditions at Max Dry-Bulb
 				} else {
@@ -6746,6 +6889,7 @@ Label9999: ;
 				cAlphaArgs( 5 ) = "WetBulbProfileDifferenceSchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfDif;
 				units = "[]";
+				unitType = OutputProcessor::Unit::None;
 				if ( ! lNumericFieldBlanks( 5 ) ) {
 					DesDayInput( EnvrnNum ).HumIndValue = rNumericArgs( 5 ); // Humidity Indicating Conditions at Max Dry-Bulb
 				} else {
@@ -6798,12 +6942,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).HumIndSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value " + units, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
+							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).HumIndSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value " + units, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
+							SetupOutputVariable( "Sizing Period Site Humidity Condition Schedule Value", unitType, SPSiteHumidityConditionScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 6 ) );
 						}
 
 						{ auto const SELECT_CASE_var( DesDayInput( EnvrnNum ).HumIndType );
@@ -6897,16 +7041,17 @@ Label9999: ;
 						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).BeamSolarSchPtr, DDBeamSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).BeamSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
+						unitType = OutputProcessor::Unit::W_m2;
 						if ( schPtr == 0 ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).BeamSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value " + units, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
+							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).BeamSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value " + units, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
+							SetupOutputVariable( "Sizing Period Site Beam Solar Schedule Value", unitType, SPSiteBeamSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 11 ) );
 						}
 						if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).BeamSolarSchPtr, 0.0, ">=" ) ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -6932,16 +7077,17 @@ Label9999: ;
 						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, DDDiffuseSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
+						unitType = OutputProcessor::Unit::W_m2;
 						if ( schPtr == 0 ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).DiffuseSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value " + units, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
+							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = DesDayInput( EnvrnNum ).DiffuseSolarSchPtr;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value " + units, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
+							SetupOutputVariable( "Sizing Period Site Diffuse Solar Schedule Value", unitType, SPSiteDiffuseSolarScheduleValue( EnvrnNum ), "Zone", "Average", cAlphaArgs( 12 ) );
 						}
 						if ( ! CheckDayScheduleValueMinMax( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, 0.0, ">=" ) ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -7184,6 +7330,7 @@ Label9999: ;
 		int schPtr;
 		bool MultipleEnvironments;
 		std::string units;
+		OutputProcessor::Unit unitType;
 
 		cCurrentModuleObject = "WeatherProperty:SkyTemperature";
 		NumWPSkyTemperatures = GetNumObjectsFound( cCurrentModuleObject );
@@ -7254,14 +7401,17 @@ Label9999: ;
 				WPSkyTemperature( Item ).CalculationType = WP_ScheduleValue;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[C]";
+				unitType = OutputProcessor::Unit::C;
 			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDryBulbValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DryBulbDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";
+				unitType = OutputProcessor::Unit::deltaC;
 			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDewPointValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DewPointDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";
+				unitType = OutputProcessor::Unit::deltaC;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + '.' );
 				ShowContinueError( "...entered value=\"" + cAlphaArgs( 2 ) + "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue." );
@@ -7296,12 +7446,12 @@ Label9999: ;
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = Found;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value " + units, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
+							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
 						} else if ( SPSiteScheduleUnits( schPtr ) != units ) {
 							++NumSPSiteScheduleNamePtrs;
 							SPSiteScheduleNamePtr( NumSPSiteScheduleNamePtrs ) = Found;
 							SPSiteScheduleUnits( NumSPSiteScheduleNamePtrs ) = units;
-							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value " + units, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
+							SetupOutputVariable( "Sizing Period Site Sky Temperature Schedule Value", unitType, SPSiteSkyTemperatureScheduleValue( envFound ), "Zone", "Average", cAlphaArgs( 3 ) );
 						}
 						WPSkyTemperature( Item ).IsSchedule = true;
 						WPSkyTemperature( Item ).SchedulePtr = Found;
@@ -7459,7 +7609,10 @@ Label9999: ;
 		// Write Final Ground Reflectance Information to the initialization output file
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, "(' ',A,$)" ) << "Site:GroundReflectance";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I ); gio::write( OutputFileInits );
+		for ( I = 1; I <= 12; ++I ) {
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I );
+		}
+		gio::write( OutputFileInits );
 
 	}
 
@@ -7541,10 +7694,16 @@ Label9999: ;
 
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifier, 1.0 ), 0.0 ); gio::write( OutputFileInits );
+		for ( I = 1; I <= 12; ++I ) {
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifier, 1.0 ), 0.0 );
+		}
+		gio::write( OutputFileInits );
 		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow:Daylighting>,Jan{dimensionless},Feb{dimensionless},Mar{dimensionless},Apr{dimensionless},May{dimensionless},Jun{dimensionless},Jul{dimensionless},Aug{dimensionless},Sep{dimensionless},Oct{dimensionless},Nov{dimensionless},Dec{dimensionless}";
 		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow:Daylighting";
-		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifierForDayltg, 1.0 ), 0.0 ); gio::write( OutputFileInits );
+		for ( I = 1; I <= 12; ++I ) {
+			gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifierForDayltg, 1.0 ), 0.0 );
+		}
+		gio::write( OutputFileInits );
 
 	}
 
