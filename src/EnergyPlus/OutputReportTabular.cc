@@ -11868,6 +11868,7 @@ namespace OutputReportTabular {
 					timeHeatMax = 0;
 				}
 
+				int NumZonesCooled = AirToZoneNodeInfo( iAirLoop ).NumZonesCooled;
 				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
 					int CtrlZoneNum = AirToZoneNodeInfo( iAirLoop ).CoolCtrlZoneNums( ZonesCooledNum );
 					zoneToAirLoopCool( CtrlZoneNum ) = iAirLoop;

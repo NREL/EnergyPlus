@@ -1273,7 +1273,9 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
 		DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 3;
-		DataZoneEquipment::ZoneEquipConfig(1).ReturnAirNode = 4;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 		DataSizing::ZoneEqSizing.allocate(1);
 		DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -1855,7 +1857,9 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 		DataSizing::ZoneEqSizing.allocate( 1 );
 		DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 5;
