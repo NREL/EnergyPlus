@@ -66,10 +66,10 @@ _original = """// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of 
 """
 
 def previous():
-    '''Return the previous license text, last changed January 4, 2017.'''
+    '''Return the previous license text, last changed September 21, 2017.'''
     # Modify the year in the text
     originalYear = '2015'
-    currentYear = '2016'
+    currentYear = '2017'
     txt = _original.replace(originalYear, currentYear)
     # Modify and delete some lines with LBL IP permission
     # Keep in mind that the line numbering here starts with 0
@@ -100,7 +100,13 @@ def current():
     lines = lines[:-9]
     # Delete lines 4-6
     lines = lines[:4] + lines[7:]
+    # Modify the notice
+    lines[0] = lines[0].replace(' and', ',')
+    lines[2] = '// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge'
+    lines.insert(3, '// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other')
+    lines[4] = '// contributors. All rights reserved.'
     txt = '\n'.join(lines)+'\n'
+    
     return txt
 
 def original():

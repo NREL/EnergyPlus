@@ -6,7 +6,7 @@ import json
 import licensetext
 
 TOOL_NAME = 'license-update'
-dryrun = True
+dryrun = False
 
 #
 # Directories to check
