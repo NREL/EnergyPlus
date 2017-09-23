@@ -702,15 +702,15 @@ Construction,
   Concrete;                  !- Outside Layer Name
 \end{verbatim}
 
-\subsubsection{Input Description}\label{input-description}
+\subsubsection{Inputs}
 
-\paragraph{Field: Name}\label{field-name}
+\paragraph{Field: Name}
 
 The unique identifier of the Foundation:Kiva object. Referenced by a the
 ``Outside Boundary Condition Object'' field in a surface object.
 
 \paragraph{Field: Interior Horizontal Insulation Material
-Name}\label{field-interior-horizontal-insulation-material-name}
+Name}
 
 A reference to a material object associated with the interior horizontal
 insulation. If left blank, no interior horizontal insulation will be
@@ -727,21 +727,21 @@ Kiva's two-dimensional context and are illustrated in Figure
 \end{figure}
 
 \paragraph{Field: Interior Horizontal Insulation
-Depth}\label{field-interior-horizontal-insulation-depth}
+Depth}
 
 Distance from the wall top to the top of interior horizontal insulation,
 in m. Required if Interior Horizontal Insulation Material Name is
 defined.
 
 \paragraph{Field: Interior Horizontal Insulation
-Width}\label{field-interior-horizontal-insulation-width}
+Width}
 
 Extent of insulation as measured from the wall interior to the edge of
 interior horizontal insulation, in m. Required if Interior Horizontal
 Insulation Material Name is defined.
 
 \paragraph{Field: Interior Vertical Insulation Material
-Name}\label{field-interior-vertical-insulation-material-name}
+Name}
 
 A reference to a material object associated with the interior vertical
 insulation. If left blank, no interior vertical insulation will be used.
@@ -757,14 +757,14 @@ two-dimensional context and are illustrated in Figure \ref{fig:ivi}.
 \end{figure}
 
 \paragraph{Field: Interior Vertical Insulation
-Depth}\label{field-interior-vertical-insulation-depth}
+Depth}
 
 Extent of insulation as measured from the wall top to the bottom edge of
 the interior vertical insulation, in m. Required if Interior Vertical
 Insulation Material Name is defined.
 
 \paragraph{Field: Exterior Horizontal Insulation Material
-Name}\label{field-exterior-horizontal-insulation-material-name}
+Name}
 
 A reference to a material object associated with the exterior horizontal
 insulation. If left blank, no exterior horizontal insulation will be
@@ -781,21 +781,21 @@ Kiva's two-dimensional context and are illustrated in Figure
 \end{figure}
 
 \paragraph{Field: Exterior Horizontal Insulation
-Depth}\label{field-exterior-horizontal-insulation-depth}
+Depth}
 
 Distance from the wall top to the top of exterior horizontal insulation,
 in m. Required if Exterior Horizontal Insulation Material Name is
 defined.
 
 \paragraph{Field: Exterior Horizontal Insulation
-Width}\label{field-exterior-horizontal-insulation-width}
+Width}
 
 Extent of insulation as measured from the wall exterior to the edge of
 exterior horizontal insulation, in m. Required if Exterior Horizontal
 Insulation Material Name is defined.
 
 \paragraph{Field: Exterior Vertical Insulation Material
-Name}\label{field-exterior-vertical-insulation-material-name}
+Name}
 
 A reference to a material object associated with the exterior vertical
 insulation. If left blank, no exterior vertical insulation will be used.
@@ -811,14 +811,14 @@ two-dimensional context and are illustrated in Figure \ref{fig:evi}.
 \end{figure}
 
 \paragraph{Field: Exterior Vertical Insulation
-Depth}\label{field-exterior-vertical-insulation-depth}
+Depth}
 
 Extent of insulation as measured from the wall top to the bottom edge of
 the exterior vertical insulation, in m. Required if Exterior Vertical
 Insulation Material Name is defined.
 
 \paragraph{Field: Wall Height Above
-Grade}\label{field-wall-height-above-grade}
+Grade}
 
 Distance from the exterior grade to the wall top, in m. Default: 0.2 m
 
@@ -840,7 +840,7 @@ the wall surface (for a slab foundation context)\label{fig:2d-w-slab}}
 \end{figure}
 
 \paragraph{Field: Wall Depth Below
-Slab}\label{field-wall-depth-below-slab}
+Slab}
 
 Distance from the slab bottom to the bottom of the foundation wall, in
 m. Default: 0.0 m
@@ -852,7 +852,7 @@ Note, that explicit modeling of the footing requires a higher spatial
 discretization and, therefore, longer computation times.
 
 \paragraph{Field: Footing Wall Construction
-Name}\label{field-footing-wall-construction-name}
+Name}
 
 Defines the construction of the foundation footing wall for slab foundations where the foundation wall is not exposed
 to the zone (and has no zone surface to explicitly assign a
@@ -863,7 +863,7 @@ wall surfaces, or a 0.3 m wide poured concrete wall (conductivity = 1.95
 W/m-K, density = 2240 kg/m3, specific heat = 900 J/kg-K).
 
 \paragraph{Field: Footing Material
-Name}\label{field-footing-material-name}
+Name}
 
 A reference to a material object associated with the foundation footing
 (typically some form of concrete). The thickness of this material is
@@ -879,14 +879,14 @@ two-dimensional context and are illustrated in Figure \ref{fig:foot}.
 \caption{Placement of footing\label{fig:foot}}
 \end{figure}
 
-\paragraph{Field: Footing Depth}\label{field-footing-depth}
+\paragraph{Field: Footing Depth}
 
 Top-to-bottom dimension of the footing (not to be confused with its
 depth in the ground). The width of the footing is defined by the
 material's thickness. Default: 0.3 m.
 
 \paragraph{Field: Custom Block \textless{}x\textgreater{} Material
-Name}\label{field-custom-block-x-material-name}
+Name}
 
 A reference to a material object associated with a custom block in the
 two-dimensional foundation context. The thickness of this material
@@ -928,24 +928,24 @@ Kiva's two-dimensional context and are illustrated in Figure
 \end{figure}
 
 \paragraph{Field: Custom Block \textless{}x\textgreater{}
-Depth}\label{field-custom-block-x-depth}
+Depth}
 
 Top-to-bottom dimension of the block downward. The default is the depth
 from the wall top to the top of the slab to facilitate interior
 constructions. Default: Slab depth
 
 \paragraph{Field: Custom Block \textless{}x\textgreater{} X
-Position}\label{field-custom-block-x-x-position}
+Position}
 
 Position outward (+) or inward (-) relative to the foundation wall.
 
 \paragraph{Field: Custom Block \textless{}x\textgreater{} Z
-Position}\label{field-custom-block-x-z-position}
+Position}
 
 Position downward (+) relative to the foundation wall top. Default: Wall
 top
 
-\subsubsection{Output Description}\label{output-description}
+\subsubsection{Outputs}
 
 Output for surfaces with a Foundation boundary condition type will
 include all opaque surface output variables except:
@@ -962,59 +962,67 @@ include all opaque surface output variables except:
   internal sources yet, but this is a possible future enhancement)
 \end{itemize}
 
-\subsection{Foundation:Kiva:Settings}\label{foundationkivasettings}
+\subsection{Foundation:Kiva:Settings}
 
 This object defines settings applied across all Kiva foundation
 calculations. This object is not required. If it is not defined, all
 defaults will be applied.
 
-\subsubsection{Input Description}\label{input-description-1}
+\subsubsection{Inputs}
 
-\paragraph{Field: Soil Conductivity}\label{field-soil-conductivity}
+\paragraph{Field: Soil Conductivity}
 
 The thermal conductivity of the soil, in W/m-K. Default: 1.73 W/m-K.
 
-\paragraph{Field: Soil Density}\label{field-soil-density}
+\paragraph{Field: Soil Density}
 
 The bulk density of the soil, in kg/m3. Default: 1842 kg/m3.
 
-\paragraph{Field: Soil Specific Heat}\label{field-soil-specific-heat}
+\paragraph{Field: Soil Specific Heat}
 
 The specific heat of the soil, in J/kg-K. Default: 419 J/kg-K
 
 \paragraph{Field: Ground Solar
-Absorptivity}\label{field-ground-solar-absorptivity}
+Absorptivity}
 
 Solar absorptivity of the exterior grade surface. Default: 0.9.
 
 \paragraph{Field: Ground Thermal
-Absorptivity}\label{field-ground-thermal-absorptivity}
+Absorptivity}
 
 Long-wave absorptivity (emissivity) of the exterior grade surface.
 Default: 0.9.
 
 \paragraph{Field: Ground Surface
-Roughness}\label{field-ground-surface-roughness}
+Roughness}
 
 The relief roughness of the exterior ground surface in m. Default: 0.03
 m.
 
-Estimates of surface roughnesses in m are shown below:
+Estimates of surface roughnesses in m are shown in Table \ref{table:kiva-example-surface-and-roughness}.
 
-\begin{longtable}[]{@{}lc@{}}
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Example Surface and Roughness \label{table:kiva-example-surface-and-roughness}} \tabularnewline
 \toprule
-Example Surface & Roughness {[}m{]}\tabularnewline
+Example Surface & Roughness {[}m{]} \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Example Surface and Roughness} \tabularnewline
+\toprule
+Example Surface & Roughness {[}m{]} \tabularnewline
 \midrule
 \endhead
-Concrete & 0.002\tabularnewline
-Brick & 0.003\tabularnewline
-Soil & 0.005\tabularnewline
-Gravel & 0.012\tabularnewline
-Grass & 0.030\tabularnewline
+
+Concrete & 0.002 \tabularnewline
+Brick & 0.003 \tabularnewline
+Soil & 0.005 \tabularnewline
+Gravel & 0.012 \tabularnewline
+Grass & 0.030 \tabularnewline
 \bottomrule
 \end{longtable}
 
-\paragraph{Field: Far-Field Width}\label{field-far-field-width}
+\paragraph{Field: Far-Field Width}
 
 The distance from the wall interior to the zero horizontal heat flux
 (i.e., adiabatic) far-field boundary, in m. This distance represents
@@ -1024,7 +1032,7 @@ the foundation such that it is isolated from the effects of the boundary
 (typically \textgreater{}= 40 m). Default: 40 m.
 
 \paragraph{Field: Deep-Ground Boundary
-Condition}\label{field-deep-ground-boundary-condition}
+Condition}
 
 Defines the type of boundary condition to apply at the Deep-Ground
 Depth. Options are:
@@ -1055,7 +1063,7 @@ is applied at 1 m below the lowest element.
 
 Default: Autoselect.
 
-\paragraph{Field: Deep-Ground Depth}\label{field-deep-ground-depth}
+\paragraph{Field: Deep-Ground Depth}
 
 The distance from the exterior grade to the deep ground boundary, in m.
 This distance represents either the distance to the ground water level,
@@ -1065,25 +1073,25 @@ m). Default 40 m, or the distance determined by the ``Auto'' Deep-Ground
 Boundary Condition.
 
 \paragraph{Field: Minimum Cell
-Dimension}\label{field-minimum-cell-dimension}
+Dimension}
 
 The minimum cell dimension, in m, used in the Kiva discretization.
 Default: 0.02 m.
 
 \paragraph{Field: Maximum Cell Growth
-Coefficient}\label{field-maximum-cell-growth-coefficient}
+Coefficient}
 
 The maximum ratio of growth between neighboring cells in the direction
 away from the near-field area of interest. Default: 1.50.
 
-\paragraph{Field: Simulation Timestep}\label{field-simulation-timestep}
+\paragraph{Field: Simulation Timestep}
 
 This field allows the user to choose whether to calculate foundation
 loads on the zone timestep or at hourly intervals. Hourly intervals will
 allow for less overall computation time, but with less accuracy. Choices
 are ``Hourly'' and ``Timestep''. Default: Hourly
 
-\subsection{ExposedFoundationPerimeter}\label{surfacepropertyexposedfoundationperimeter}
+\subsection{SurfaceProperty:ExposedFoundationPerimeter}
 
 This object (currently only used in conjunction with Foundation:Kiva
 boundary conditions) defines the perimeter of a foundation floor that is
@@ -1115,9 +1123,9 @@ interior foundation wall using an Adiabatic Outside Boundary Condition.
 \caption{Interior foundation wall\label{fig:ifw}}
 \end{figure}
 
-\subsubsection{Input Description}\label{input-description-2}
+\subsubsection{Inputs}
 
-\paragraph{Field: Surface Name}\label{field-surface-name}
+\paragraph{Field: Surface Name}
 
 Name of foundation floor surface.
 
@@ -1135,17 +1143,17 @@ Exposed fields should be filled.)
 \end{itemize}
 
 \paragraph{Field: Total Exposed
-Perimeter}\label{field-total-exposed-perimeter}
+Perimeter}
 
 Total perimeter that is is exposed in m.
 
 \paragraph{Field: Exposed Perimeter
-Fraction}\label{field-exposed-perimeter-fraction}
+Fraction}
 
 Fraction of the total perimeter that is exposed. Default 1.0
 
 \paragraph{Field: Surface Segment \textless{}x\textgreater{}
-Exposed}\label{field-surface-segment-x-exposed}
+Exposed}
 
 Surface Segment \textless{}x\textgreater{} is the perimeter between the
 \textless{}x\textgreater{}th and (\textless{}x\textgreater{}+1)th
