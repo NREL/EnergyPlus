@@ -451,11 +451,12 @@ namespace DataSizing {
 		Real64 DOASHighSetpoint; // Dedicated Outside Air High Setpoint for Design [C]
 		int ActualZoneNum; // index into the Zone data array (in DataHeatBalance)
 		Real64 DesHeatMassFlow; // zone design heating air mass flow rate [kg/s]
+		Real64 DesHeatMassFlowNoOA; // zone design heating air mass flow rate without applying MinOA as a limit [kg/s]
 		Real64 DesHeatOAFlowFrac; // zone design heating OA air volume fraction [-]
 		bool EMSOverrideDesHeatMassOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatMassFlow; // Value EMS directing to use for Design Heating air mass flow [kg/s]
 		Real64 DesCoolMassFlow; // zone design cooling air mass flow rate [kg/s]
-		Real64 DesCoolMassFlowNoOA; // zone design cooling air mass flow rate with applying MinOA as a limit [kg/s]
+		Real64 DesCoolMassFlowNoOA; // zone design cooling air mass flow rate without applying MinOA as a limit [kg/s]
 		Real64 DesCoolOAFlowFrac; // zone design cooling OA air volume fraction [-]
 		bool EMSOverrideDesCoolMassOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesCoolMassFlow; // Value EMS directing to use for Design Cooling air mass flow [kg/s]
@@ -470,6 +471,7 @@ namespace DataSizing {
 		Real64 DesHeatDens; // zone design heating air density [kg/m3]
 		Real64 DesCoolDens; // zone design cooling air density [kg/m3]
 		Real64 DesHeatVolFlow; // zone design heating air volume flow rate including sizing factor and scaled to match airflow sizing [m3/s]
+		Real64 DesHeatVolFlowNoOA; // zone design heating air volume flow rate including sizing factor and scaled to match airflow sizing without MinOA limit [m3/s]
 		Real64 NonAirSysDesHeatVolFlow; // base zone design heating air volume flow rate including sizing factor [m3/s]
 		bool EMSOverrideDesHeatVolOn; // true if EMS is acting on this structure
 		Real64 EMSValueDesHeatVolFlow; // Value EMS directing to use for Design Heating air volume flow [m3/s]
@@ -527,10 +529,10 @@ namespace DataSizing {
 		//  DesCoolMinAirFlowPerArea
 		Real64 DesHeatMaxAirFlow2; // design heating maximum air flow rate [m3/s] derived from
 		//  DesHeatMaxAirFlowPerArea
-		Array1D< Real64 > HeatFlowSeq; // daily sequence of zone heating air mass flow rate
-		//  (zone time step)
+		Array1D< Real64 > HeatFlowSeq; // daily sequence of zone heating air mass flow rate (zone time step) [kg/s]
+		Array1D< Real64 > HeatFlowSeqNoOA; // daily sequence of zone heating air mass flow rate (zone time step) without MinOA limit [kg/s]
 		Array1D< Real64 > CoolFlowSeq; // daily sequence of zone cooling air mass flow rate (zone time step) [kg/s]
-		Array1D< Real64 > CoolFlowSeqNoOA; // daily sequence of zone cooling air mass flow rate (zone time step) without applying MinOA as a limit [kg/s]
+		Array1D< Real64 > CoolFlowSeqNoOA; // daily sequence of zone cooling air mass flow rate (zone time step) without MinOA limit [kg/s]
 		Array1D< Real64 > HeatLoadSeq; // daily sequence of zone heating load (zone time step)
 		Array1D< Real64 > CoolLoadSeq; // daily sequence of zone cooling load (zone time step)
 		Array1D< Real64 > HeatZoneTempSeq; // daily sequence of zone temperatures (heating, zone time step)
@@ -617,6 +619,7 @@ namespace DataSizing {
 			DOASHighSetpoint( 0.0 ),
 			ActualZoneNum( 0 ),
 			DesHeatMassFlow( 0.0 ),
+			DesHeatMassFlowNoOA( 0.0 ),
 			DesHeatOAFlowFrac( 0.0 ),
 			EMSOverrideDesHeatMassOn( false ),
 			EMSValueDesHeatMassFlow( 0.0 ),
@@ -636,6 +639,7 @@ namespace DataSizing {
 			DesHeatDens( 0.0 ),
 			DesCoolDens( 0.0 ),
 			DesHeatVolFlow( 0.0 ),
+			DesHeatVolFlowNoOA( 0.0 ),
 			NonAirSysDesHeatVolFlow( 0.0 ),
 			EMSOverrideDesHeatVolOn( false ),
 			EMSValueDesHeatVolFlow( 0.0 ),

@@ -2631,7 +2631,7 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest2 ) {
 
 TEST_F( EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac ) {
 	std::string const idf_objects = delimited_string( {
-		"Version,8.4;",
+		"Version,8.8;",
 		"  Zone,",
 		"    Zone 1;                !- Name",
 		"ZoneHVAC:EquipmentConnections,",

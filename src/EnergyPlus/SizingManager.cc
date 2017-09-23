@@ -517,6 +517,7 @@ namespace SizingManager {
 			if ( GetNumRangeCheckErrorsFound() > 0 ) {
 				ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
 			}
+			SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
 
 			ResetEnvironmentCounter();
 			CurEnvirNumSimDay = 0;
@@ -3725,10 +3726,8 @@ namespace SizingManager {
 				}
 				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
 				thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
-				thisTUFZSizing.CoolFlowSeq = thisFZSizing.CoolFlowSeqNoOA * coolFlowRatio + ( thisFZSizing.CoolFlowSeq - thisFZSizing.CoolFlowSeqNoOA ) * minOAFrac;
-				thisTUFZSizing.CoolFlowSeqNoOA = thisFZSizing.CoolFlowSeqNoOA * coolFlowRatio;
-				thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio;
-				thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio;
+				thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio; // this field in TUFSizing doesn't appear to be used
+				thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio; // this field in TUFSizing doesn't appear to be used
 				thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
 				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
 				// Adjust DesCoolVolFlow, DesCoolMassFlow, and CoolFlowSeq with cooling frac, SAT ratio, and minOA frac adjustments
@@ -3736,6 +3735,8 @@ namespace SizingManager {
 				thisTUFZSizing.DesCoolVolFlowNoOA = thisFZSizing.DesCoolVolFlowNoOA * coolFlowRatio;
 				thisTUFZSizing.DesCoolMassFlow = thisFZSizing.DesCoolMassFlowNoOA * coolFlowRatio + ( thisFZSizing.DesCoolMassFlow - thisFZSizing.DesCoolMassFlowNoOA ) * minOAFrac;
 				thisTUFZSizing.DesCoolMassFlowNoOA = thisFZSizing.DesCoolMassFlowNoOA * coolFlowRatio;
+				thisTUFZSizing.CoolFlowSeq = thisFZSizing.CoolFlowSeqNoOA * coolFlowRatio + ( thisFZSizing.CoolFlowSeq - thisFZSizing.CoolFlowSeqNoOA ) * minOAFrac;
+				thisTUFZSizing.CoolFlowSeqNoOA = thisFZSizing.CoolFlowSeqNoOA * coolFlowRatio;
 				// Adjust for possible MinOA impact on DesCoolVolFlowMin, with cooling frac adjustment but no SAT adjustment
 				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * thisTUSizing.SpecDesSensCoolingFrac; // no SAT adjustment, this is a straight flow rate input
 				thisTUFZSizing.DesCoolMinAirFlow2 = thisFZSizing.DesCoolMinAirFlow2 * thisTUSizing.SpecDesSensCoolingFrac; // no SAT adjustment, this is based on area
@@ -3750,13 +3751,17 @@ namespace SizingManager {
 				}
 				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
 				thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
-				thisTUFZSizing.DesHeatVolFlow = thisFZSizing.DesHeatVolFlow * heatFlowRatio;
-				thisTUFZSizing.DesHeatMassFlow = thisFZSizing.DesHeatMassFlow * heatFlowRatio;
-				thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio;
-				thisTUFZSizing.HeatFlowSeq = thisFZSizing.HeatFlowSeq * heatFlowRatio;
-				thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio;
+				thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio; // this field in TUFSizing doesn't appear to be used
+				thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio; // this field in TUFSizing doesn't appear to be used
 				thisTUFZSizing.NonAirSysDesHeatLoad = thisFZSizing.NonAirSysDesHeatLoad * heatLoadRatio;
 				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
+				// Adjust DesHeatVolFlow, DesHeatMassFlow, and HeatFlowSeq with Heating frac, SAT ratio, and minOA frac adjustments
+				thisTUFZSizing.DesHeatVolFlow = thisFZSizing.DesHeatVolFlowNoOA * heatFlowRatio + ( thisFZSizing.DesHeatVolFlow - thisFZSizing.DesHeatVolFlowNoOA ) * minOAFrac;
+				thisTUFZSizing.DesHeatVolFlowNoOA = thisFZSizing.DesHeatVolFlowNoOA * heatFlowRatio;
+				thisTUFZSizing.DesHeatMassFlow = thisFZSizing.DesHeatMassFlowNoOA * heatFlowRatio + ( thisFZSizing.DesHeatMassFlow - thisFZSizing.DesHeatMassFlowNoOA ) * minOAFrac;
+				thisTUFZSizing.DesHeatMassFlowNoOA = thisFZSizing.DesHeatMassFlowNoOA * heatFlowRatio;
+				thisTUFZSizing.HeatFlowSeq = thisFZSizing.HeatFlowSeqNoOA * heatFlowRatio + ( thisFZSizing.HeatFlowSeq - thisFZSizing.HeatFlowSeqNoOA ) * minOAFrac;
+				thisTUFZSizing.HeatFlowSeqNoOA = thisFZSizing.HeatFlowSeqNoOA * heatFlowRatio;
 				// DesHeatVolFlowMax is a mixed bag, so just repeat the original comparison from UpdateZoneSizing using the new flows
 				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * thisTUSizing.SpecDesSensHeatingFrac; // no SAT adjustment, this is a straight flow rate input
 				thisTUFZSizing.DesHeatMaxAirFlow2 = thisFZSizing.DesHeatMaxAirFlow2 * thisTUSizing.SpecDesSensHeatingFrac; // no SAT adjustment, this is based on area
