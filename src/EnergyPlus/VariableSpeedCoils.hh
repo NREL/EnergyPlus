@@ -557,24 +557,6 @@ namespace VariableSpeedCoils {
 		int const NumSpeeds // number of speeds for input
 	);
 
-	Real64
-	AdjustCBF(
-		Real64 const CBFNom, // nominal coil bypass factor
-		Real64 const AirMassFlowRateNom, // nominal air mass flow rate [kg/s]
-		Real64 const AirMassFlowRate // actual air mass flow rate [kg/s]
-	);
-
-	Real64
-	CalcCBF(
-		std::string const & UnitType,
-		std::string const & UnitName,
-		Real64 const InletAirTemp, // inlet air temperature [C]
-		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
-		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
-		Real64 const SHR // sensible heat ratio at the given capacity and flow rate
-	);
-
 	void
 	CalcVarSpeedHPWH(
 		int const DXCoilNum, // the number of the DX coil to be simulated
