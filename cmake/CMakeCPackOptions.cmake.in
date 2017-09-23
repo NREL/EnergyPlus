@@ -62,9 +62,64 @@ if(CPACK_GENERATOR MATCHES "NSIS")
       WriteRegStr HKCR \"IDFEditor.expidf\\shell\\open\" \"\" `Open with IDFEditor`
       WriteRegStr HKCR \"IDFEditor.expidf\\shell\\open\\command\" \"\" `$INSTDIR\\PreProcess\\IDFEditor\\IDFEditor.exe %1`
     FunctionEnd
+
+    !define LVM_GETITEMCOUNT 0x1004
+    !define LVM_GETITEMTEXT 0x102D
+ 
+    Function DumpLog
+      Exch $5
+      Push $0
+      Push $1
+      Push $2
+      Push $3
+      Push $4
+      Push $6
+     
+      FindWindow $0 \"#32770\" \"\" \$HWNDPARENT
+      GetDlgItem $0 $0 1016
+      StrCmp $0 0 exit
+      FileOpen $5 $5 \"w\"
+      StrCmp $5 \"\" exit
+        SendMessage $0 \${LVM_GETITEMCOUNT} 0 0 $6
+        System::Alloc \${NSIS_MAX_STRLEN}
+        Pop $3
+        StrCpy $2 0
+        System::Call \"*(i, i, i, i, i, i, i, i, i) i \\
+          (0, 0, 0, 0, 0, r3, \${NSIS_MAX_STRLEN}) .r1\"
+        loop: StrCmp $2 $6 done
+          System::Call \"User32::SendMessageA(i, i, i, i) i \\
+            ($0, \${LVM_GETITEMTEXT}, $2, r1)\"
+          System::Call \"*$3(&t\${NSIS_MAX_STRLEN} .r4)\"
+          FileWrite $5 \"$4$\\r$\\n\"
+          IntOp $2 $2 + 1
+          Goto loop
+        done:
+          FileClose $5
+          System::Free $1
+          System::Free $3
+      exit:
+        Pop $6
+        Pop $4
+        Pop $3
+        Pop $2
+        Pop $1
+        Pop $0
+        Exch $5
+    FunctionEnd
+       
+
+  ")
+
+  set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS "
+    StrCpy $0 \"$INSTDIR\\install.log\"
+    Push $0
+    Call DumpLog
+    LogSet on
+    SetDetailsPrint both
   ")
 
   set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+    LogSet on
     WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"AutoCheck\" \"True\"
     WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"CheckURL\" \"http://nrel.github.io/EnergyPlus/epupdate.htm\"
     StrCpy $0 \"#@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@-@CPACK_PACKAGE_VERSION_BUILD@\"
@@ -73,11 +128,15 @@ if(CPACK_GENERATOR MATCHES "NSIS")
       \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
         CopyFiles \"$INSTDIR\\temp\\MSCOMCTL.OCX\" \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
         RegDLL \"$WINDIR\\SysWOW64\\MSCOMCTL.OCX\"
+        IfErrors 0 +2
+        LogText \"Error MSCOMCTL.OCX 64\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
         CopyFiles \"$INSTDIR\\temp\\ComDlg32.OCX\" \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
         RegDLL \"$WINDIR\\SysWOW64\\ComDlg32.OCX\"
+        IfErrors 0 +2
+        LogText \"Error ComDlg32.OCX 64\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Msvcrtd.dll\"
@@ -99,31 +158,43 @@ if(CPACK_GENERATOR MATCHES "NSIS")
       \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Graph32.ocx\"
       	CopyFiles \"$INSTDIR\\temp\\Graph32.ocx\" \"$WINDIR\\SysWOW64\\Graph32.ocx\"
       	RegDLL \"$WINDIR\\SysWOW64\\Graph32.ocx\"
+        IfErrors 0 +2
+        LogText \"Error Graph32.ocx 64\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\MSINET.OCX\"
       	CopyFiles \"$INSTDIR\\temp\\MSINET.OCX\" \"$WINDIR\\SysWOW64\\MSINET.OCX\"
       	RegDLL \"$WINDIR\\SysWOW64\\MSINET.OCX\"
+        IfErrors 0 +2
+        LogText \"Error MSINET.OCX 64\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
       	CopyFiles \"$INSTDIR\\temp\\Vsflex7L.ocx\" \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
       	RegDLL \"$WINDIR\\SysWOW64\\Vsflex7L.ocx\"
+        IfErrors 0 +2
+        LogText \"Error Vsflex7L.ocx 64\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
       	CopyFiles \"$INSTDIR\\temp\\Msflxgrd.ocx\" \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
       	RegDLL \"$WINDIR\\SysWOW64\\Msflxgrd.ocx\"
+        IfErrors 0 +2
+        LogText \"Error Msflxgrd.ocx 64\"
       \${EndIf}
     \${Else}
       \${IfNot} \${FileExists} \"$WINDIR\\System32\\MSCOMCTL.OCX\"
         CopyFiles \"$INSTDIR\\temp\\MSCOMCTL.OCX\" \"$WINDIR\\System32\\MSCOMCTL.OCX\"
         RegDLL \"$WINDIR\\System32\\MSCOMCTL.OCX\"
+        IfErrors 0 +2
+        LogText \"Error MSCOMCTL.OCX 32\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\System32\\ComDlg32.OCX\"
         CopyFiles \"$INSTDIR\\temp\\ComDlg32.OCX\" \"$WINDIR\\System32\\ComDlg32.OCX\"
         RegDLL \"$WINDIR\\System32\\ComDlg32.OCX\"
+        IfErrors 0 +2
+        LogText \"Error ComDlg32.OCX 32\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\System32\\Msvcrtd.dll\"
@@ -145,26 +216,35 @@ if(CPACK_GENERATOR MATCHES "NSIS")
       \${IfNot} \${FileExists} \"$WINDIR\\System32\\Graph32.ocx\"
       	CopyFiles \"$INSTDIR\\temp\\Graph32.ocx\" \"$WINDIR\\System32\\Graph32.ocx\"
       	RegDLL \"$WINDIR\\System32\\Graph32.ocx\"
+        IfErrors 0 +2
+        LogText \"Error Graph32.ocx 32\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\System32\\MSINET.OCX\"
       	CopyFiles \"$INSTDIR\\temp\\MSINET.OCX\" \"$WINDIR\\System32\\MSINET.OCX\"
       	RegDLL \"$WINDIR\\System32\\MSINET.OCX\"
+        IfErrors 0 +2
+        LogText \"Error MSINET.OCX 32\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\System32\\Vsflex7L.ocx\"
       	CopyFiles \"$INSTDIR\\temp\\Vsflex7L.ocx\" \"$WINDIR\\System32\\Vsflex7L.ocx\"
       	RegDLL \"$WINDIR\\System32\\Vsflex7L.ocx\"
+        IfErrors 0 +2
+        LogText \"Error Vsflex7L.ocx 32\"
       \${EndIf}
 
       \${IfNot} \${FileExists} \"$WINDIR\\System32\\Msflxgrd.ocx\"
       	CopyFiles \"$INSTDIR\\temp\\Msflxgrd.ocx\" \"$WINDIR\\System32\\Msflxgrd.ocx\"
       	RegDLL \"$WINDIR\\System32\\Msflxgrd.ocx\"
+        IfErrors 0 +2
+        LogText \"Error Msflxgrd.ocx 32\"
       \${EndIf}
     \${EndIf}
     RMDir /r $INSTDIR\\temp
   ")
   set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+    LogSet on
     MessageBox MB_YESNO|MB_ICONEXCLAMATION \"The installer copied the following files to the system directory during installation:$\\r$\\n$\\r$\\nMSCOMCTL.OCX$\\r$\\nComDlg32.OCX$\\r$\\nMsvcrtd.dll$\\r$\\nDforrt.dll$\\r$\\nGswdll32.dll$\\r$\\nGsw32.exe$\\r$\\nGraph32.ocx$\\r$\\nMSINET.OCX$\\r$\\nVsflex7L.ocx$\\r$\\nMsflxgrd.ocx$\\r$\\n$\\r$\\nThese files may be in use by other programs. Click Yes to remove these files. If you are unsure, click No.\" IDYES true IDNO false
     true:
       \${If} \${RunningX64}
