@@ -719,6 +719,15 @@ namespace DataSizing {
 			DOASTotCoolLoad( 0.0 )
 		{}
 
+		void
+		scaleZoneCooling(
+			Real64 const ratio // Scaling ratio
+		);
+		void
+		scaleZoneHeating(
+			Real64 const ratio // Scaling ratio
+		);
+
 	};
 
 	struct TermUnitSizingData

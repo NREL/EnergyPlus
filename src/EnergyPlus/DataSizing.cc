@@ -493,6 +493,32 @@ namespace DataSizing {
 		return adjustedFlow;
 	}
 
+	void
+	ZoneSizingData::scaleZoneCooling(
+		Real64 const ratio // Scaling ratio
+	)
+	{
+		// Apply scaling ratio to TermUnitFinalZoneSizing cooling flow and load
+		this->DesCoolVolFlow = this->DesCoolVolFlow * ratio;
+		this->DesCoolMassFlow = this->DesCoolMassFlow * ratio;
+		this->DesCoolLoad = this->DesCoolLoad * ratio;
+		this->CoolFlowSeq = this->CoolFlowSeq * ratio;
+		this->CoolLoadSeq = this->CoolLoadSeq * ratio;
+	}
+
+	void
+	ZoneSizingData::scaleZoneHeating(
+		Real64 const ratio // Scaling ratio
+	)
+	{
+		// Apply scaling ratio to TermUnitFinalZoneSizing heating flow and load
+		this->DesHeatVolFlow = this->DesHeatVolFlow * ratio;
+		this->DesHeatMassFlow = this->DesHeatMassFlow * ratio;
+		this->DesHeatLoad = this->DesHeatLoad * ratio;
+		this->HeatFlowSeq = this->HeatFlowSeq * ratio;
+		this->HeatLoadSeq = this->HeatLoadSeq * ratio;
+	}
+
 } // DataSizing
 
 } // EnergyPlus
