@@ -6290,21 +6290,23 @@ namespace SimAirServingZones {
 						{ auto const & thisTUSizing( TermUnitSizing( TermUnitSizingIndex ) );
 						if ( ( SysCoolSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
 							// size on ventilation load
-							ZoneOARatio = FinalZoneSizing( CtrlZoneNum ).MinOA * thisTUSizing.SpecMinOAFrac / max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).MinOA );
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolLoad = FinalZoneSizing( CtrlZoneNum ).DesCoolLoad * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolFlowSeq = FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolLoadSeq = FinalZoneSizing( CtrlZoneNum ).CoolLoadSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+							if (TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) {
+								ZoneOARatio = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA / max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA );
+							} else {
+								ZoneOARatio = 0.0;
+							}
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolLoad = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolLoad * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolFlowSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolFlowSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolLoadSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolLoadSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
 						} else if ( ( SysCoolSizingRat > 1.0 ) || ( SysCoolSizingRat < 1.0 && FinalSysSizing( AirLoopNum ).SizingOption == NonCoincident ) ) {
 							// size on user input system design flows
-							Real64 coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
-							Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * coolFlowRatio * SysCoolSizingRat;
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow * coolFlowRatio * SysCoolSizingRat;
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolLoad = FinalZoneSizing( CtrlZoneNum ).DesCoolLoad * coolLoadRatio * SysCoolSizingRat;
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolFlowSeq = FinalZoneSizing( CtrlZoneNum ).CoolFlowSeq * coolFlowRatio * SysCoolSizingRat;
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolLoadSeq = FinalZoneSizing( CtrlZoneNum ).CoolLoadSeq * coolLoadRatio * SysCoolSizingRat;
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow * SysCoolSizingRat;
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow * SysCoolSizingRat;
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolLoad = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolLoad * SysCoolSizingRat;
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolFlowSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolFlowSeq * SysCoolSizingRat;
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolLoadSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolLoadSeq * SysCoolSizingRat;
 						}}
 					}
 
@@ -6359,21 +6361,23 @@ namespace SimAirServingZones {
 							{ auto const & thisTUSizing( TermUnitSizing( TermUnitSizingIndex ) );
 							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
 								// size on ventilation load
-								ZoneOARatio = FinalZoneSizing( CtrlZoneNum ).MinOA  * thisTUSizing.SpecMinOAFrac / max( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).MinOA );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = FinalZoneSizing( CtrlZoneNum ).DesHeatLoad * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = FinalZoneSizing( CtrlZoneNum ).HeatFlowSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								if (TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) {
+									ZoneOARatio = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA / max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA );
+								} else {
+									ZoneOARatio = 0.0;
+								}
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
 							} else if ( ( SysHeatSizingRat > 1.0 ) || ( SysHeatSizingRat < 1.0 && FinalSysSizing( AirLoopNum ).SizingOption == NonCoincident ) ) {
 								// size on user input system design flows
-								Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
-								Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * heatFlowRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * heatFlowRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = FinalZoneSizing( CtrlZoneNum ).DesHeatLoad * heatLoadRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = FinalZoneSizing( CtrlZoneNum ).HeatFlowSeq * heatFlowRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq * heatLoadRatio * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq * SysHeatSizingRat;
 							}}
 						}
 					} else { // No centrally heated zones: use cooled zones
@@ -6387,22 +6391,24 @@ namespace SimAirServingZones {
 							{ auto const & thisTUSizing( TermUnitSizing( TermUnitSizingIndex ) );
 							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
 								// size on ventilation load
-								ZoneOARatio = FinalZoneSizing( CtrlZoneNum ).MinOA * thisTUSizing.SpecMinOAFrac / max( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow, FinalZoneSizing( CtrlZoneNum ).MinOA );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = FinalZoneSizing( CtrlZoneNum ).DesHeatLoad * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = FinalZoneSizing( CtrlZoneNum ).HeatFlowSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								if (TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0) {
+									ZoneOARatio = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA / max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA );
+								} else {
+									ZoneOARatio = 0.0;
+								}
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq * ZoneOARatio * ( 1.0 + thisTUSizing.InducRat );
 							} else if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
 								// size on user input system design flows
-								Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
-								Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow * heatFlowRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * heatFlowRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = FinalZoneSizing( CtrlZoneNum ).DesHeatLoad * heatLoadRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = FinalZoneSizing( CtrlZoneNum ).HeatFlowSeq * heatFlowRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq * heatLoadRatio * SysHeatSizingRat;
-								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = FinalZoneSizing( CtrlZoneNum ).HeatLoadSeq * heatFlowRatio * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatLoad * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatFlowSeq * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq * SysHeatSizingRat;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatLoadSeq * SysHeatSizingRat;
 							}}
 						}
 					}
