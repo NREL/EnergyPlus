@@ -3060,9 +3060,9 @@ namespace ScheduleManager {
 					}
 					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
 						for ( Min = 1; Min <= 60; ++Min ) {
-							MinuteValue( Min, SHr ) = curValue;
+							MinuteValue( Min, Hr ) = curValue;
 							curValue += incrementPerMinute;
-							SetMinuteValue( Min, SHr ) = true;
+							SetMinuteValue( Min, Hr ) = true;
 						}
 					}
 					for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
