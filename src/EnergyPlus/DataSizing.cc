@@ -459,6 +459,40 @@ namespace DataSizing {
 		DataNomCapInpMeth = false;
 	}
 
+	Real64
+	TermUnitSizingData::applyTermUnitSizingCoolFlow(
+		Real64 const & coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+		Real64 const & coolFlowNoOA // Cooling flow rate without MinOA limit applied
+	)
+	{
+		// Apply DesignSpecification:AirTerminal:Sizing to cooling flow (could be vol flow or mass flow)
+		Real64 coolFlowRatio = 1.0;
+		if ( this->SpecDesCoolSATRatio > 0.0 ) {
+			coolFlowRatio = this->SpecDesSensCoolingFrac / this->SpecDesCoolSATRatio;
+		} else {
+			coolFlowRatio = this->SpecDesSensCoolingFrac;
+		}
+		Real64 adjustedFlow = coolFlowNoOA * coolFlowRatio + ( coolFlowWithOA - coolFlowNoOA ) * this->SpecMinOAFrac;
+		return adjustedFlow;
+	}
+
+	Real64
+	TermUnitSizingData::applyTermUnitSizingHeatFlow(
+		Real64 const & heatFlowWithOA, // Heating flow rate with MinOA limit applied
+		Real64 const & heatFlowNoOA // Heating flow rate without MinOA limit applied
+	)
+	{
+		// Apply DesignSpecification:AirTerminal:Sizing to heating flow (could be vol flow or mass flow)
+		Real64 heatFlowRatio = 1.0;
+		if ( this->SpecDesHeatSATRatio > 0.0 ) {
+			heatFlowRatio = this->SpecDesSensHeatingFrac / this->SpecDesHeatSATRatio;
+		} else {
+			heatFlowRatio = this->SpecDesSensHeatingFrac;
+		}
+		Real64 adjustedFlow = heatFlowNoOA * heatFlowRatio + ( heatFlowWithOA - heatFlowNoOA ) * this->SpecMinOAFrac;
+		return adjustedFlow;
+	}
+
 } // DataSizing
 
 } // EnergyPlus

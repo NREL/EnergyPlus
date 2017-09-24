@@ -763,6 +763,17 @@ namespace DataSizing {
 			SpecMinOAFrac ( 1.0 )
 		{}
 
+		Real64
+		applyTermUnitSizingCoolFlow(
+			Real64 const & coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+			Real64 const & coolFlowNoOA // Cooling flow rate without MinOA limit applied
+		);
+
+		Real64
+		applyTermUnitSizingHeatFlow(
+			Real64 const & heatFlowWithOA, // Heating flow rate with MinOA limit applied
+			Real64 const & heatFlowNoOA // Heating flow rate without MinOA limit applied
+		);
 	};
 
 	struct ZoneEqSizingData // data saved from zone eq component sizing and passed to subcomponents

@@ -4990,38 +4990,23 @@ namespace SimAirServingZones {
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
-					Real64 coolFlowRatio = 1.0;
-					if ( TermUnitSizing( TermUnitSizingIndex ).SpecDesCoolSATRatio > 0.0 ) {
-						coolFlowRatio = TermUnitSizing( TermUnitSizingIndex ).SpecDesSensCoolingFrac / TermUnitSizing( TermUnitSizingIndex ).SpecDesCoolSATRatio;
-					} else {
-						coolFlowRatio = TermUnitSizing( TermUnitSizingIndex ).SpecDesSensCoolingFrac;
-					}
-					SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinCoolMassFlow += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlow * coolFlowRatio / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+					Real64 adjCoolMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlow, ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlowNoOA );
+					SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinCoolMassFlow += adjCoolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 				} // end of loop over cooled zones
 
 				if ( NumZonesHeated > 0 ) { // if there are zones supplied with central hot air
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over heated zones
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
-						Real64 heatFlowRatio = 1.0;
-						if ( TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio > 0.0 ) {
-							heatFlowRatio = TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac / TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio;
-						} else {
-							heatFlowRatio = TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac;
-						}
-						SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow * heatFlowRatio / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						Real64 adjHeatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow, ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlowNoOA );
+						SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow += adjHeatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					} // end of loop over heated zones
 				} else { // otherwise use cool supply zones
 					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { //loop over cooled zones
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
-						Real64 heatFlowRatio = 1.0;
-						if ( TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio > 0.0 ) {
-							heatFlowRatio = TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac / TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio;
-						} else {
-							heatFlowRatio = TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac;
-						}
-						SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow * heatFlowRatio / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						Real64 adjHeatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow, ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlowNoOA );
+						SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow += adjHeatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					} // end of loop over cooled zones
 				} // End of heat / cool zone if - else
 
@@ -5081,7 +5066,8 @@ namespace SimAirServingZones {
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					// sum up the system mass flow rate for this time step
-					SysSizing( CurOverallSimDay, AirLoopNum ).CoolFlowSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+					Real64 adjCoolFlowSeq = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ), ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeqNoOA( TimeStepInDay ) );
+					SysSizing( CurOverallSimDay, AirLoopNum ).CoolFlowSeq( TimeStepInDay ) += adjCoolFlowSeq / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					// sum up the zone cooling load to be met by this system for this time step
 					SysSizing( CurOverallSimDay, AirLoopNum ).SumZoneCoolLoadSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolLoadSeq( TimeStepInDay );
 					// calculate the return air temperature for this time step
@@ -5180,7 +5166,8 @@ namespace SimAirServingZones {
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						// sum up the heating mass flow rate for this time step
-						SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						Real64 adjHeatFlowSeq = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ), ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeqNoOA( TimeStepInDay ) );
+						SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) += adjHeatFlowSeq / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						// sum up the zone cooling load to be met by this system for this time step
 						SysSizing( CurOverallSimDay, AirLoopNum ).SumZoneHeatLoadSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatLoadSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						// calculate the return air temperature for this time step
@@ -5237,7 +5224,8 @@ namespace SimAirServingZones {
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						// sum up the heating mass flow rate for this time step
-						SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						Real64 adjHeatFlowSeq = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ), ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeqNoOA( TimeStepInDay ) );
+						SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) += adjHeatFlowSeq / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						// calculate the return air temperature for this time step
 						SysHeatRetTemp += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetHumRat += ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatZoneHumRatSeq( TimeStepInDay ) * ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ) / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -5821,6 +5809,7 @@ namespace SimAirServingZones {
 					//            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtCoolPeak + RetTempRise * &
 					//           (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
 					FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
 				}
 				RetTempRise = FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak - FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
 				if ( RetTempRise > 0.01 ) {
@@ -5829,6 +5818,7 @@ namespace SimAirServingZones {
 					//            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtHeatPeak + RetTempRise * &
 					//            (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
 					FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak;
 				}
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
 					RetTempRise = FinalZoneSizing( CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) - FinalZoneSizing( CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex );
@@ -5981,15 +5971,12 @@ namespace SimAirServingZones {
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					// save the system cooling supply air temp
 					FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTempTU = CalcSysSizing( AirLoopNum ).CoolSupTemp;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTempTU;
 					// save the system cooling supply air hum rat
 					FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRatTU = CalcSysSizing( AirLoopNum ).CoolSupHumRat;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRatTU;
 					if ( FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow <= 0.0 ) continue;
-					Real64 coolMassFlow = 0.0;
-					if ( TermUnitSizing( TermUnitSizingIndex ).SpecDesCoolSATRatio > 0.0 ) {
-						coolMassFlow = FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow * TermUnitSizing( TermUnitSizingIndex ).SpecDesSensCoolingFrac / TermUnitSizing( TermUnitSizingIndex ).SpecDesCoolSATRatio;
-					} else {
-						coolMassFlow = FinalZoneSizing(CtrlZoneNum).DesCoolMassFlow * TermUnitSizing(TermUnitSizingIndex).SpecDesSensCoolingFrac;
-					}
+					Real64 coolMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlowNoOA );
 					CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow += coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					SysCoolRetTemp += FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					SysCoolRetHumRat += FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -6040,15 +6027,12 @@ namespace SimAirServingZones {
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						// save the system heating supply air temp
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
 						// save the system heating supply air hum rat
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
 						if ( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow <= 0.0 ) continue;
-						Real64 heatMassFlow = 0.0;
-						if ( TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio > 0.0 ) {
-							heatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac / TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio;
-						} else {
-							heatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac;
-						}
+						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlowNoOA );
 						CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow += heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetTemp += FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetHumRat += FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -6084,15 +6068,12 @@ namespace SimAirServingZones {
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						// save the system heating supply air temp
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
 						// save the system heating supply air hum rat
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
 						if ( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow <= 0.0 ) continue;
-						Real64 heatMassFlow = 0.0;
-						if ( TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio > 0.0 ) {
-							heatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac / TermUnitSizing( TermUnitSizingIndex ).SpecDesHeatSATRatio;
-						} else {
-							heatMassFlow = FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow * TermUnitSizing( TermUnitSizingIndex ).SpecDesSensHeatingFrac;
-						}
+						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlowNoOA );
 						CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow += heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetTemp += FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetHumRat += FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -6211,9 +6192,6 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).SysDOASLatAddSeq( TimeStepIndex ) = CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq( TimeStepIndex );
 				}
 			}
-
-			// Capture the changes to FinalZoneSizing in TermUnitFinalZoneSizing
-			SizingManager::UpdateTermUnitFinalZoneSizing();
 
 			// Check for user input design system flow rates. Set the sizing ratios.
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
@@ -6453,7 +6431,7 @@ namespace SimAirServingZones {
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
-							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
+						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
 						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
