@@ -783,7 +783,6 @@ namespace WindowEquivalentLayer {
 		using General::InterpSw;
 		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
-		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		using DataGlobals::StefanBoltzmann;
 		using DataEnvironment::SkyTempKelvin;
 		using DataEnvironment::IsRain;
@@ -855,6 +854,7 @@ namespace WindowEquivalentLayer {
 		int SrdSurfNum; // Surrounding surface number DO loop counter
 		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
 		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+		Real64 OutSrdIR;
 
 		// Flow
 
@@ -955,7 +955,7 @@ namespace WindowEquivalentLayer {
 
 			} else { // Exterior window (ExtBoundCond = 0)
 			    // Calculate LWR from surrounding surfaces if defined for an exterior window
-				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				OutSrdIR = 0;
 				if ( AnyLocalEnvironmentsInModel ) {
 					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
@@ -968,7 +968,7 @@ namespace WindowEquivalentLayer {
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-							QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+							OutSrdIR += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
 						}
 					}
 				}
@@ -984,7 +984,7 @@ namespace WindowEquivalentLayer {
 				tsky = SkyTempKelvin;
 				Ebout = StefanBoltzmann * pow_4( Tout );
 				// ASHWAT model may be slightly different
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + OutSrdIR;
 			}
 		}
 		// Outdoor conditions

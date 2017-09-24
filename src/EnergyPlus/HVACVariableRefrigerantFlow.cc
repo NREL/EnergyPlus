@@ -6354,7 +6354,7 @@ namespace HVACVariableRefrigerantFlow {
 				if ( OnOffAirFlowRatio > 0.0 ) {
 					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				} else {
-					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				}
 			} else {
 				Fans::SimulateFanComponents( "", FirstHVACIteration, VRFTU( VRFTUNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
@@ -6391,7 +6391,7 @@ namespace HVACVariableRefrigerantFlow {
 				if ( OnOffAirFlowRatio > 0.0 ) {
 					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0/OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
 				} else {
-					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_);
+					HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->simulate( PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 				}
 				
 			} else {

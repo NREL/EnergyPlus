@@ -1920,6 +1920,7 @@ namespace EnergyPlus {
 			EXPECT_NEAR( 5110, OUEvapHeatExtract, 1 );
 			EXPECT_NEAR( 1500, CompSpdActual, 1 );
 			EXPECT_NEAR( 2080, Ncomp, 1 );
+			EXPECT_EQ( Node( VRFTU( 1 ).VRFTUInletNodeNum ).MassFlowRate, 0.0 );
 		}
 
 	}

@@ -55,6 +55,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -6516,5 +6517,39 @@ TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
 
 }
 
+TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay )
+{
+	sqlite_test->sqliteBegin();
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	DataHVACGlobals::NumPrimaryAirSys = 1;
+	SysSizPeakDDNum.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	DataSizing::FinalSysSizing.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	DataSizing::CalcSysSizing.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	int numDesDays = 2;
+	DataAirLoop::AirToZoneNodeInfo.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	DataGlobals::NumOfZones = 0;
+	displayAirLoopComponentLoadSummary = true;
+	CompLoadReportIsReq = true;
+	SysSizPeakDDNum( DataHVACGlobals::NumPrimaryAirSys ).TimeStepAtTotCoolPk.allocate( numDesDays );
+
+	SysSizPeakDDNum( DataHVACGlobals::NumPrimaryAirSys ).TotCoolPeakDD = 0; //set to zero to indicate no design day chosen
+	SysSizPeakDDNum( DataHVACGlobals::NumPrimaryAirSys ).HeatPeakDD = 0;    //set to zero to indicate no design day chosen
+
+	WriteLoadComponentSummaryTables();
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto tabularData = queryResult( "SELECT * FROM TabularData;", "TabularData" );
+	auto strings = queryResult( "SELECT * FROM Strings;", "Strings" );
+	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
+	sqlite_test->sqliteCommit();
+
+	EXPECT_EQ( 460ul, tabularData.size() ); 
+	EXPECT_EQ( 76ul, strings.size() );
+	EXPECT_EQ( "AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
+
+}
 
 
