@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -716,10 +717,8 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "LIVING ZONE";
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-		std::vector< int > controlledZoneEquipConfigNums;
-		controlledZoneEquipConfigNums.push_back( 1 );
 		DataHeatBalance::Zone( 1 ).IsControlled = true;
-
+		DataHeatBalance::Zone( 1 ).ZoneEqNum = 1;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).NumInletNodes = 2;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;
@@ -727,7 +726,9 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 		DataSizing::ZoneEqSizing.allocate( 1 );
 		DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 5;
@@ -1273,7 +1274,9 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
 		DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 3;
-		DataZoneEquipment::ZoneEquipConfig(1).ReturnAirNode = 4;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 		DataSizing::ZoneEqSizing.allocate(1);
 		DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
@@ -1855,7 +1858,9 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 		DataSizing::ZoneEqSizing.allocate( 1 );
 		DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 5;

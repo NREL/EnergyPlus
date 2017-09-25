@@ -1,6 +1,6 @@
 \section{Zone Air Mass Flow Conservation}\label{zone-air-mass-flow-conservation}
 
-\subsubsection{Overiew}\label{overiew}
+\subsection{Overiew}\label{overiew}
 
 The zone air mass flow conservation object, ZoneAirMassFlowConservation, activates zone air mass flow balance calculations. This feature is available only for controlled zones (ZoneVAC:EquipmentConnections) which also have either a zone mixing or infiltration object. The user may specify that zone mixing, infiltration, or both can be overridden to balance the zone air mass flows. The following rules apply:
 
@@ -20,39 +20,125 @@ The zone air mass flow conservation object, ZoneAirMassFlowConservation, activat
 
 The zone air mass flow conservation equation always includes: supply air flow rates, return air flow rates, and zone exhaust fan flow rates. Zone mixing and infiltration object flow rates may be included depending upon the selected options. A particular zone can be a source zone, receiving zone, or both depending on the number of ZoneMixing objects specified for that zone.
 
-\subsubsection{Return Air Flow Rate Calculations}\label{return-air-flow-rate-calculations}
+\subsection{Return Air Flow Rate Calculations}\label{return-air-flow-rate-calculations}
 
-The return air flow rate is calculated one of two ways.
+The return air flow rate is calculated one of several ways, depending on whether ZoneAirMassFlowConservation is active, if there is more than one return node, and if Zone Return Air Node 1 Flow Rate Fraction Schedule Name or Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name has been specified.
 
-The default calculation is:
+
+\subsubsection{Base Zone Total Return Flow}\label{base-zone-total-return-flow}
+
+The total zone return flow calculation with no ZoneAirMassFlowConservation is the sum of the zone inlets less the sum of the zone exhausts adjusted for any balanced exhaust fan flow:
 
 \begin{equation}
-{\dot m_{R}} = ReturnFlowSchedule*MAX\left( {0.0,\,{{\dot m}_S} + {{\dot m}_{XR}} - {{\dot m}_{EX}} - {{\dot m}_{XS}}} \right)
+{\dot m_{R}} = MAX\left( {0.0,\,{{\dot m}_S} - [{{\dot m}_{EX,tot}} - {\dot m_{EXF,bal}}]} \right)
 \end{equation}
 
-If one or more Zone Return Air Flow Rate Basis Nodes are specified in the ZoneHVAC:EquipmentConnections object, then the base return flow rate is:
+If ZoneAirMassFlowConservation is active, then the total zone return air flow rate is 
+\begin{equation}
+{\dot m_{R}} = MAX\left( {0.0,\,{{\dot m}_S} - [{{\dot m}_{EX,tot}} - {\dot m_{EXF,bal}}] + [{{\dot m}_{XR}} - {{\dot m}_{XS}}]} \right)
+\end{equation}
+
+\subsubsection{Zone Return Air Node 1}\label{zone-return-air-node1}
+
+The first return air node is treated differently to maintain backward compatibility. If one or more Zone Return Air Node 1 Flow Rate Basis Nodes are specified in the ZoneHVAC:EquipmentConnections object, then the mass flow rate for the first return air node is:
 
 \begin{equation}
-{\dot m_{R}} = ReturnFlowSchedule*\sum\nolimits_j {{{\dot m}_{BasisNode,j}}}
+{\dot m_{R,1}} = ReturnFlowSchedule*\sum\nolimits_j {{{\dot m}_{BasisNode,j}}}
+\end{equation}
+
+If there is only one return node and no Zone Return Air Node 1 Flow Rate Basis Nodes, then:
+
+\begin{equation}
+{\dot m_{R,1}} = ReturnFlowSchedule*{\dot m_{R}}
+\end{equation}
+
+\subsubsection{Allocation to Multiple Return Nodes}\label{allocation-to-multiple-return-nodes}
+
+If there are multiple return air nodes in the zone, then each return air node is assumed to be paired with one supply air inlet node. The initial flow rate at a given return air node is based on the supply air inlet node for the same airloop and the AirloopHVAC Design Return Air Flow Fraction of Supply Air Flow:
+
+\begin{equation}
+{\dot m_{R,i}} = {DesignReturnFrac_i} * {\dot m_{S,i}}
+\end{equation}
+
+For any air loop without an outdoor air inlet:
+
+\begin{equation}
+{\dot m_{R,i}} = {\dot m_{R,i}}
+\end{equation}
+
+\subsubsection{Overall Return Air Balance}\label{overall-return-air-balance}
+
+Once the initial allocation to multiple return air nodes is complete, the total return node flow is compared with the expected total zone return air mass flow rate. If the sum of the zone return node flows is greater than expected, then the surplus return flow is:
+
+\begin{equation}
+{\dot m_{R,surplus}} = \sum\nolimits_i {{{\dot m}_{R,i}}} - {\dot m_{R}}
+\end{equation}
+
+Return nodes without an outdoor air inlet are not adjusted. The remaining return node flow rates are reduced if necessary to balance the zone air mass flow:
+
+\begin{equation}
+{\dot m_{R,i,}} = {\dot m_{R,i}} * \left( 1 - \frac{\dot m_{R,surplus}} {\sum\nolimits_{i,withOA} {{{\dot m}_{R,i}}}} \right) 
+\end{equation}
+
+\subsubsection{Allocation of Excess Exhaust Flow}\label{allocation-of-excess-exhaust-flow}
+
+If the total (unbalanced) exhaust fan flow exceeds the supply flow in a given zone, this exhaust flow can be made up with outdoor air by any air loop serving the zone and the return air in other zones on the same air loop(s) will be reduced proportionally. First, the amount of excess exhaust for all zones on a given air loop is totalled.  If a zone with excess exhuast is served by more than one air loop, the exhaust is shared by each air loop in proportion to the maximum available outdoor air for a given air loop.
+
+\begin{equation}
+{\dot m_{ExcessExh,i}} = {\sum\nolimits_{j} {\frac{\dot m_{ExcessExh,j} * \dot m_{MaxOA,i}} {\dot m_{TotOA,j}} }}
+\end{equation}
+
+The adjusted total return flow for each air loop is calculated by subtracting the excess exhaust from the total return flow calculated earlier.
+
+\begin{equation}
+{\dot m_{AdjReturn,i}} = MAX\left( {0.0,\,{\dot m_{OrigReturn,i} - \dot m_{ExcessExh,i} \right)
+\end{equation}
+
+Finally, the return flow for each return node on the air loop is proportioned to the adjusted total return flow.
+
+\begin{equation}
+{\dot m_{R,i}} = {\dot m_{R,i}} * \frac{\dot m_{AdjReturn,i}} {\dot m_{OrigReturn,i}}
 \end{equation}
 
 where,
 
-\({\dot m_{R}}\) = zone return air mass flow rate, (kg/s)
+\({\dot m_{R}}\) = total zone return air mass flow rate, (kg/s)
 
-\({\dot m_{Basis Node,j}}\) = zone return air flow basis node mass flow rate, (kg/s)
+\({\dot m_{R,i}}\) = return air node i mass flow rate, (kg/s)
 
-\({\dot m_{EX}}\) = zone exhaust air mass flow rate from exhaust fans, (kg/s)
+\({\dot m_{S}}\) = total zone supply air mass flow rate, (kg/s)
+
+\({\dot m_{S,i}}\) = zone supply air node i mass flow rate, (kg/s)
+
+\({\dot m_{Basis Node,j}}\) = return air flow basis node j mass flow rate, (kg/s)
+
+\({\dot m_{EX,tot}}\) = total zone exhaust air mass flow rate from all zone exhaust air nodes, (kg/s)
+
+\({\dot m_{EXF,bal}}\) = balanced zone exhaust fan air mass flow rate, (kg/s)
+
+\({\dot m_{EXF,tot}}\) = total (balanced+unbalanced) zone exhaust fan air mass flow rate, (kg/s)
 
 \({\dot m_{XR}}\) = zone mixing mass flow rate as a receiving zone, (kg/s)
 
 \({\dot m_{XS}}\) = zone mixing mass flow rate as a source zone, (kg/s)
 
-\({\dot m_S}\) = zone supply air mass flow rate, (kg/s)
+\(ReturnFlowSchedule\) = optional Zone Return Air Node 1 Flow Rate Fraction Schedule value
 
-ReturnFlowSchedule = optional Zone Return Air Flow Rate Fraction Schedule value
+\({DesignReturnFrac_i}\) = air loop Design Return Air Flow Fraction of Supply Air Flow for air loop i
 
-\subsubsection{Zone Mixing Flow Rate Calculations}\label{zone-mixing-flow-rate-calculations}
+\(\dot m_{ExcessExh,j}\) = excess exhaust flow for zone j
+
+\(\dot m_{ExcessExh,i}\) = total excess exhaust flow for air loop i
+
+\(\dot m_{MaxOA,i}\) = current max available outdoor air flow for air loop i
+
+\(\dot m_{TotOA,j}\) = total max available outdoor air flow for air loops serving zone j
+
+\(\dot m_{OrigReturn,i}\) = total original return flow for air loop i
+
+\(\dot m_{AdjReturn,i}\) = total adjusted return flow for air loop i
+
+\subsection{Zone Mixing Flow Rate Calculations}\label{zone-mixing-flow-rate-calculations}
 
 Figure~\ref{fig:illustration-of-zone-air-mass-flow-balance} illustrates the zone mass flow components for an air loop system providing conditioned air to the two zones connected with a zone mixing object. Since Zone 1 is a source zone only, infiltration object is defined for zone 1 only. The zone mixing object air flow rate depends on the user specified values and the zone air mass flow balance requirements. When required the zone mixing object flow rate is adjusted from the user specified value for balancing purpose.
 
@@ -80,7 +166,7 @@ This updated receiving zone mixing air mass flow rate is distributed to the mixi
 {\dot m_{XR,\,new,j}} = \left( {{{\dot m}_{XR,jDesign}}/{{\dot m}_{XR,Design}}} \right) \cdot {\dot m_{XR,\,new}}
 \end{equation}
 
-\subsubsection{Infiltration Flow Rate Adjustments}\label{infiltration-flow-rate-adjustments}
+\subsection{Infiltration Flow Rate Adjustments}\label{infiltration-flow-rate-adjustments}
 
 There are three options for the treatement of infiltration in the zone air mass balance: None, AddInfiltrationFlow, and AdjustInfiltrationFlow. There are also two options to specify which zones are included in the infiltration adjustments: AllZones or MixingSourceZonesOnly.
 
@@ -115,7 +201,5 @@ where,
 There is an additional constraint to the return air mass flow rate calculation. The sum of the return air mass flow rates of zones in air loop must satisfy the air loop return air mass flow balance. The above four sets of equations are iterated for each zone in an air loop until the convergence criterion is satisfied or until the maximum iteration limit is exceeded.
 
 The mass conservation calculations are performed in routine CalcZoneMassBalance in the ZoneEquipmentManager module. The latest ZoneMixing and Infiltration object flow rates are communicated back to the zone air heat balance terms. This is done by re-simulating the simple flow objects as zone equipment during each HVAC iteration. This requires calling the routine CalcAirFlowSimple in SimZoneEquipment routine as zone equipment. Both of these routines are also in the ZoneEquipmentManager module.
-
-\emph{Zone Mass Conservation Convergence}
 
 The zone mass conservation calculation convergence criterion is based on the absolute difference of the zone mixing objects mass flow rates between successive iteration. If the difference is above tolerance limits of 0.00001 then the HVAC Air loop is simulated again.

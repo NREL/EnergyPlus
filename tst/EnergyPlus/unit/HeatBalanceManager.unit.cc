@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -412,13 +413,22 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 1 ).ZoneNode = 1;
 		ZoneEquipConfig( 1 ).InletNode( 1 ) = 2;
 		ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-		ZoneEquipConfig( 1 ).ReturnAirNode = 4;
 		ZoneEquipConfig( 1 ).NumReturnNodes = 1;
 		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
 		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 		ZoneEquipConfig( 1 ).IsControlled = true;
-		ZoneEquipConfig( 1 ).AirLoopNum = 1;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+		ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).InletNodeADUNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).AirDistUnitCool.allocate( 1 );
+		ZoneEquipConfig( 1 ).AirDistUnitHeat.allocate( 1 );
+		ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 1 ).InletNodeADUNum( 1 ) = 0;
+		ZoneEquipConfig( 1 ).AirDistUnitCool( 1 ).InNode = 2;
+		ZoneEquipConfig( 1 ).ReturnNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).ReturnNodeInletNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).ReturnNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 1 ).ReturnNodeInletNum( 1 ) = 1;
 
 		ZoneEquipConfig( 2 ).ZoneName = "Zone 2";
 		ZoneEquipConfig( 2 ).ActualZoneNum = 2;
@@ -429,13 +439,22 @@ namespace EnergyPlus {
 		ZoneEquipConfig( 2 ).ZoneNode = 5;
 		ZoneEquipConfig( 2 ).InletNode( 1 ) = 6;
 		ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 7;
-		ZoneEquipConfig( 2 ).ReturnAirNode = 8;
 		ZoneEquipConfig( 2 ).NumReturnNodes = 1;
 		ZoneEquipConfig( 2 ).ReturnNode.allocate( 1 );
 		ZoneEquipConfig( 2 ).ReturnNode( 1 ) = 8;
 		ZoneEquipConfig( 2 ).IsControlled = true;
-		ZoneEquipConfig( 2 ).AirLoopNum = 1;
 		ZoneEquipConfig( 2 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+		ZoneEquipConfig( 2 ).InletNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 2 ).InletNodeADUNum.allocate( 1 );
+		ZoneEquipConfig( 2 ).AirDistUnitCool.allocate( 1 );
+		ZoneEquipConfig( 2 ).AirDistUnitHeat.allocate( 1 );
+		ZoneEquipConfig( 2 ).InletNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 2 ).InletNodeADUNum( 1 ) = 0;
+		ZoneEquipConfig( 2 ).AirDistUnitCool( 1 ).InNode = 6;
+		ZoneEquipConfig( 2 ).ReturnNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 2 ).ReturnNodeInletNum.allocate( 1 );
+		ZoneEquipConfig( 2 ).ReturnNodeAirLoopNum( 1 ) = 1;
+		ZoneEquipConfig( 2 ).ReturnNodeInletNum( 1 ) = 1;
 
 		ZoneEquipInputsFilled = true;
 		NumPrimaryAirSys = 1;
@@ -464,7 +483,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( Node( 4 ).MassFlowRate, 0.0 ); // Zone 1 return node (max(0.0, 1-2)
 		EXPECT_EQ( Infiltration( 1 ).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
 		EXPECT_EQ( Mixing( 1 ).MixingMassFlowRate, 0.1 ); // Zone 1 to Zone 2 mixing flow rate (unchanged)
-		EXPECT_EQ( Node( 8 ).MassFlowRate, 1.0 ); // Zone 2 return node (2 * (2+1-2)/2)
+		EXPECT_EQ( Node( 8 ).MassFlowRate, 2.0 ); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
 		ZoneReOrder.deallocate();
 		ZoneEquipConfig.deallocate();
@@ -1147,7 +1166,9 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
 		DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 3;
-		DataZoneEquipment::ZoneEquipConfig(1).ReturnAirNode = 4;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 		
 		DataHeatBalance::TempEffBulkAir.allocate(6);
 

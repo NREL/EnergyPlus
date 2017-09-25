@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -8757,13 +8758,16 @@ namespace AirflowNetworkBalanceManager {
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 				if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 				// Ensure all the zones served by this AirLoopHVAC to be controlled by the hybrid ventilation
-				if ( AirLoopNum > 0 ) {
-					if ( AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ) {
-						ActualZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-					}
-				} else {
-					if ( HybridVentSysAvailActualZoneNum( SysAvailNum ) == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
-						ActualZoneNum = HybridVentSysAvailActualZoneNum( SysAvailNum );
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					if ( AirLoopNum > 0 ) {
+						if ( AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) ) {
+							ActualZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
+							break;
+						}
+					} else {
+						if ( HybridVentSysAvailActualZoneNum( SysAvailNum ) == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
+							ActualZoneNum = HybridVentSysAvailActualZoneNum( SysAvailNum );
+						}
 					}
 				}
 				if ( ActualZoneNum > 0 ) {

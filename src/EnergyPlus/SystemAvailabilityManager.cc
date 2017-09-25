@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2625,11 +2626,15 @@ namespace SystemAvailabilityManager {
 			if ( FanStartTimeTmr == 0.0 ) FanStartTimeTmr = 24.0;
 
 			// Pass the start time to ZoneTempPredictorCorrector
-			for ( I = 1; I <= NumOfZones; ++I ) {
-				if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-					OptStartData.OccStartTime( ZoneEquipConfig( I ).ActualZoneNum ) = FanStartTime;
-					OptStartData.ActualZoneNum( ZoneEquipConfig( I ).ActualZoneNum ) = ZoneEquipConfig( I ).ActualZoneNum;
-				}
+			for ( int counter = 1; counter <= AirToZoneNodeInfo( PriAirSysNum ).NumZonesCooled; ++counter ) {
+				int actZoneNum = ZoneEquipConfig( AirToZoneNodeInfo( PriAirSysNum ).CoolCtrlZoneNums( counter ) ).ActualZoneNum;
+				OptStartData.OccStartTime( actZoneNum ) = FanStartTime;
+				OptStartData.ActualZoneNum( actZoneNum ) = actZoneNum;
+			}
+			for ( int counter = 1; counter <= AirToZoneNodeInfo( PriAirSysNum ).NumZonesHeated; ++counter ) {
+				int actZoneNum = ZoneEquipConfig( AirToZoneNodeInfo( PriAirSysNum ).HeatCtrlZoneNums( counter ) ).ActualZoneNum;
+				OptStartData.OccStartTime( actZoneNum ) = FanStartTime;
+				OptStartData.ActualZoneNum( actZoneNum ) = actZoneNum;
 			}
 
 			if ( DSTIndicator > 0 ) {
@@ -2665,11 +2670,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = false;
 							}
 							AvailStatus = CycleOn;
-							for ( I = 1; I <= NumOfZones; ++I ) {
-								if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-									OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-								}
-							}
+							OptStartMgr.SetOptStartFlag( PriAirSysNum );
 						} else {
 							AvailStatus = NoAction;
 							OSReportVarFlag = true;
@@ -2684,11 +2685,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = false;
 							}
 							AvailStatus = CycleOn;
-							for ( I = 1; I <= NumOfZones; ++I ) {
-								if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-									OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-								}
-							}
+							OptStartMgr.SetOptStartFlag( PriAirSysNum );
 						} else {
 							AvailStatus = NoAction;
 							OSReportVarFlag = true;
@@ -2736,11 +2733,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 								} else if ( PreStartTime < CurrentTime ) {
 									AvailStatus = CycleOn;
@@ -2749,11 +2742,7 @@ namespace SystemAvailabilityManager {
 										NumHoursBeforeOccupancy = DeltaTime;
 										OSReportVarFlag = false;
 									}
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -2766,11 +2755,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 								} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 									if ( OSReportVarFlag ) {
@@ -2779,11 +2764,7 @@ namespace SystemAvailabilityManager {
 									}
 									AvailStatus = CycleOn;
 									CycleOnFlag = true;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -2816,11 +2797,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -2828,11 +2805,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2845,11 +2818,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -2857,11 +2826,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2917,11 +2882,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
@@ -2930,11 +2891,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2947,11 +2904,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
@@ -2960,11 +2913,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2998,11 +2947,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3010,11 +2955,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3027,11 +2968,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3039,11 +2976,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3126,11 +3059,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 									// Calculate the current day actual temperature gradient --------------------------
 									if ( ! WarmupFlag ) {
@@ -3160,11 +3089,7 @@ namespace SystemAvailabilityManager {
 									CycleOnFlag = true;
 									ATGUpdateFlag1 = true;
 									ATGUpdateFlag2 = true;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -3177,11 +3102,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 									// Calculate the current day actual temperature gradient --------------------------
 									if ( ! WarmupFlag ) {
@@ -3211,11 +3132,7 @@ namespace SystemAvailabilityManager {
 									CycleOnFlag = true;
 									ATGUpdateFlag1 = true;
 									ATGUpdateFlag2 = true;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -3252,11 +3169,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = false;
 								}
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( ! WarmupFlag ) {
 									if ( ATGUpdateFlag1 ) {
 										ATGUpdateTime1 = CurrentTime;
@@ -3279,11 +3192,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3313,11 +3222,7 @@ namespace SystemAvailabilityManager {
 										}
 									}
 								}
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3327,11 +3232,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3425,11 +3326,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = false;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 								// Calculate the current day actual temperature gradient --------------------------
 								if ( ! WarmupFlag ) {
@@ -3459,11 +3356,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3495,11 +3388,7 @@ namespace SystemAvailabilityManager {
 									}
 								}
 								//---------------------------------------------------------------------------------
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
@@ -3510,11 +3399,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3568,11 +3453,7 @@ namespace SystemAvailabilityManager {
 									}
 								}
 								//---------------------------------------------------------------------------------
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3582,11 +3463,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3618,11 +3495,7 @@ namespace SystemAvailabilityManager {
 									}
 								}
 								//---------------------------------------------------------------------------------
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3632,11 +3505,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag2 = true;
 								ATGUpdateFlag1 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3681,6 +3550,22 @@ namespace SystemAvailabilityManager {
 
 	}
 
+	void
+	DefineOptStartSysAvailManager::SetOptStartFlag(
+		int const AirLoopNum
+	)
+	{
+		// Set the OptStartFlag true for all zones on the air loop
+		auto const & thisAirToZoneNodeInfo( DataAirLoop::AirToZoneNodeInfo( AirLoopNum ) );
+		for ( int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesCooled; ++counter ) {
+			int actZoneNum = DataZoneEquipment::ZoneEquipConfig(thisAirToZoneNodeInfo.CoolCtrlZoneNums( counter ) ).ActualZoneNum;
+			OptStartData.OptStartFlag( actZoneNum ) = true;
+		}
+		for ( int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesHeated; ++counter ) {
+			int actZoneNum = DataZoneEquipment::ZoneEquipConfig( thisAirToZoneNodeInfo.HeatCtrlZoneNums( counter ) ).ActualZoneNum;
+			OptStartData.OptStartFlag( actZoneNum ) = true;
+		}
+	}
 	void
 	CalcNVentSysAvailMgr(
 		int const SysAvailNum, // number of the current scheduled system availability manager
@@ -4679,9 +4564,16 @@ namespace SystemAvailabilityManager {
 				for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 					if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum ) {
 						HybridVentSysAvailMgrData( SysAvailNum ).ControlledZoneNum = ControlledZoneNum;
+						bool zoneFound = false;
 						if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
 							if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlledZoneNum > 0 ) {
-								if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum != HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum ) {
+								for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+									if ( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum ) {
+										zoneFound = true;
+										break;
+									}
+								}
+								if ( !zoneFound ) {
 									ShowSevereError( cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + ", The controlled zone =" + HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName + " is not served by this Air Loop=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 									ErrorsFound = true;
 								}
@@ -4690,15 +4582,17 @@ namespace SystemAvailabilityManager {
 						}
 					}
 					if ( std::any_of( HybridVentSysAvailMgrData.begin(), HybridVentSysAvailMgrData.end(), []( SystemAvailabilityManager::DefineHybridVentSysAvailManager const & e ){ return e.HybridVentMgrConnectedToAirLoop; } ) ) {
-						if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum && HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 ) {
-							for ( HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum ) {
-								if ( ! HybridVentSysAvailMgrData( HybridVentNum ).HybridVentMgrConnectedToAirLoop && ( HybridVentNum != SysAvailNum ) ) {
-									if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == HybridVentSysAvailMgrData( HybridVentNum ).ActualZoneNum && ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum > 0 ) {
-										ShowWarningError( "AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( HybridVentNum ).Name + "\" has the controlled zone name = \"" + HybridVentSysAvailMgrData( HybridVentNum ).ControlZoneName + "\"." );
-										ShowContinueError( "This controlled zone already has hybrid ventilation control through this air loop = \"" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + "\"." );
-										ShowContinueError( "Only AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( SysAvailNum ).Name + "\" will be simulated. Simulation continues..." );
-									} else {
-										HybridVentSysAvailMgrData( HybridVentNum ).SimHybridVentSysAvailMgr = true;
+						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+							if ( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode) == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum && HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 ) {
+								for ( HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum ) {
+									if ( ! HybridVentSysAvailMgrData( HybridVentNum ).HybridVentMgrConnectedToAirLoop && ( HybridVentNum != SysAvailNum ) ) {
+										if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == HybridVentSysAvailMgrData( HybridVentNum ).ActualZoneNum && ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum > 0 ) {
+											ShowWarningError( "AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( HybridVentNum ).Name + "\" has the controlled zone name = \"" + HybridVentSysAvailMgrData( HybridVentNum ).ControlZoneName + "\"." );
+											ShowContinueError( "This controlled zone already has hybrid ventilation control through this air loop = \"" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + "\"." );
+											ShowContinueError( "Only AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( SysAvailNum ).Name + "\" will be simulated. Simulation continues..." );
+										} else {
+											HybridVentSysAvailMgrData( HybridVentNum ).SimHybridVentSysAvailMgr = true;
+										}
 									}
 								}
 							}
@@ -5155,31 +5049,33 @@ namespace SystemAvailabilityManager {
 		if ( HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 && HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 ) {
 			SimpleControlType = GetCurrentScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr );
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-				if ( HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ) {
-					// Setup flag for ventilation objects
-					for ( i = 1; i <= TotVentilation; ++i ) {
-						if ( Ventilation( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
-							Ventilation( i ).HybridControlType = HybridControlTypeIndiv;
-							if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
-								Ventilation( i ).HybridControlType = HybridControlTypeClose;
-							} else {
-								if ( SimpleControlType == 1 ) {
-									Ventilation( i ).HybridControlType = HybridControlTypeGlobal;
-									Ventilation( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					if ( HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) ) {
+						// Setup flag for ventilation objects
+						for ( i = 1; i <= TotVentilation; ++i ) {
+							if ( Ventilation( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
+								Ventilation( i ).HybridControlType = HybridControlTypeIndiv;
+								if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
+									Ventilation( i ).HybridControlType = HybridControlTypeClose;
+								} else {
+									if ( SimpleControlType == 1 ) {
+										Ventilation( i ).HybridControlType = HybridControlTypeGlobal;
+										Ventilation( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+									}
 								}
 							}
 						}
-					}
-					// Setup flag for Mixing objects
-					for ( i = 1; i <= TotMixing; ++i ) {
-						if ( Mixing( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
-							Mixing( i ).HybridControlType = HybridControlTypeIndiv;
-							if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
-								Mixing( i ).HybridControlType = HybridControlTypeClose;
-							} else {
-								if ( SimpleControlType == 1 ) {
-									Mixing( i ).HybridControlType = HybridControlTypeGlobal;
-									Mixing( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+						// Setup flag for Mixing objects
+						for ( i = 1; i <= TotMixing; ++i ) {
+							if ( Mixing( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
+								Mixing( i ).HybridControlType = HybridControlTypeIndiv;
+								if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
+									Mixing( i ).HybridControlType = HybridControlTypeClose;
+								} else {
+									if ( SimpleControlType == 1 ) {
+										Mixing( i ).HybridControlType = HybridControlTypeGlobal;
+										Mixing( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+									}
 								}
 							}
 						}
