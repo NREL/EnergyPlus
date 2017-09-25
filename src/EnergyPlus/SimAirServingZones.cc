@@ -3889,7 +3889,6 @@ namespace SimAirServingZones {
 		Real64 MinOAFlow; // design minimum outside air flow for a system
 		int ZonesCooledNum; // loop index over zones cooled by a system
 		int ZonesHeatedNum; // loop index over zones heated by a system
-		int CtrlZoneNum; // loop index over all controlled zones
 		int MatchingCooledZoneNum; // the cooled zone index matching a heated zone in a system
 		int PrimAirIndex; // index of System Sizing primary air system name in primary air system array
 		int SysSizIndex; // system sizing do loop index
@@ -4400,9 +4399,9 @@ namespace SimAirServingZones {
 			if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
-					TotalPeople += FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone;
-					PeakPeople += FinalZoneSizing( CtrlZoneNum ).ZonePeakOccupancy;
+					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+					TotalPeople += TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotPeopleInZone;
+					PeakPeople += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePeakOccupancy;
 				}
 				if ( TotalPeople > 0.0 ) {
 					PopulationDiversity = PeakPeople / TotalPeople;
@@ -4419,7 +4418,7 @@ namespace SimAirServingZones {
 				DBySysHeat( AirLoopNum ) = PopulationDiversity;
 
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+					int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					if ( TermUnitSizingIndex == 0 ) {
 						ShowSevereError( "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + AirToZoneNodeInfo( AirLoopNum ).AirLoopName + ", Zone =" + Zone( AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum ) ).Name );
@@ -4427,12 +4426,12 @@ namespace SimAirServingZones {
 					}
 					if ( SysSizNum > 0 ) {
 						if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
-							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+							MinOAFlow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
 							ZoneOAFracCooling = 0.0;
-							SysOAUnc += FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
-							VbzByZone( CtrlZoneNum ) = FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+							SysOAUnc += TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+							VbzByZone( CtrlZoneNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
 						} else if( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
-							ZoneOAUnc = PopulationDiversity * FinalZoneSizing( CtrlZoneNum ).TotalOAFromPeople + FinalZoneSizing( CtrlZoneNum ).TotalOAFromArea;
+							ZoneOAUnc = PopulationDiversity * TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotalOAFromPeople + TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotalOAFromArea;
 
 							//save for Standard 62 tabular report
 							VbzByZone( CtrlZoneNum ) = ZoneOAUnc;
@@ -4441,21 +4440,21 @@ namespace SimAirServingZones {
 							// CR 8872 - check to see if uncorrected OA is calculated to be greater than 0
 							if ( ! ( ZoneOAUnc > 0.0 ) ) {
 								ShowSevereError( "Sizing:System - The system outdoor air method is set to VRP in " + FinalSysSizing( AirLoopNum ).AirPriLoopName );
-								ShowContinueError( "But zone \"" + FinalZoneSizing( CtrlZoneNum ).ZoneName + "\" associated with system does not have OA flow/person" );
+								ShowContinueError( "But zone \"" + TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName + "\" associated with system does not have OA flow/person" );
 								ShowContinueError( "or flow/area values specified in DesignSpecification:OutdoorAir object associated with the zone" );
 							}
 
 							//Save Std 62.1 cooling ventilation required by zone
-							FinalZoneSizing( CtrlZoneNum ).VozClgByZone = ZoneOAUnc / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
-							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone = ZoneOAUnc / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
+							MinOAFlow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
 
-							if ( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
-								if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 || FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin <= 0 ) {
+							if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow > 0.0 ) {
+								if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 || TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin <= 0 ) {
 									// multi-path system or VAV Minimum not defined
-									ZoneOAFracCooling = FinalZoneSizing( CtrlZoneNum ).VozClgByZone / FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+									ZoneOAFracCooling = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone / TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow;
 								} else {
 									// Single path; Use VAV Minimum as the Vpz in the Zp = Voz / Vpz equations
-									ZoneOAFracCooling = FinalZoneSizing( CtrlZoneNum ).VozClgByZone / FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin;
+									ZoneOAFracCooling = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone / TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin;
 								}
 							} else {
 								ZoneOAFracCooling = 0.0;
@@ -4463,7 +4462,7 @@ namespace SimAirServingZones {
 						} else { // error
 						}
 					} else { // ZoneSum Method
-						MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+						MinOAFlow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
 						ZoneOAFracCooling = 0.0;
 					}
 
@@ -4472,17 +4471,17 @@ namespace SimAirServingZones {
 					if ( FinalSysSizing( AirLoopNum ).MaxZoneOAFraction > 0 && ZoneOAFracCooling > FinalSysSizing( AirLoopNum ).MaxZoneOAFraction ) {
 						if ( FinalSysSizing( AirLoopNum ).CoolAirDesMethod == FromDDCalc ) { // DesignDay Method
 							ClgSupplyAirAdjustFactor = ZoneOAFracCooling / FinalSysSizing( AirLoopNum ).MaxZoneOAFraction;
-							if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 || FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin <= 0 ) {
+							if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 || TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin <= 0 ) {
 								//multi-path system or VAV Minimum not defined
-								FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow *= ClgSupplyAirAdjustFactor;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow *= ClgSupplyAirAdjustFactor;
 							} else {
 								//Single path; Use VAV Minimum as the Vpz in the Zp = Voz / Vpz equations
-								FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin *= ClgSupplyAirAdjustFactor;
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin *= ClgSupplyAirAdjustFactor;
 								//Don't allow the design cooling airflow to be less than the VAV minimum airflow
-								FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin );
+								TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin );
 							}
 							//Don't allow the design terminal airflow to be less than the design cooling airflow
-							TermUnitSizing( TermUnitSizingIndex ).AirVolFlow = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
+							TermUnitSizing( TermUnitSizingIndex ).AirVolFlow = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow );
 							ZoneOAFracCooling = FinalSysSizing( AirLoopNum ).MaxZoneOAFraction;
 						} else {
 							ClgSupplyAirAdjustFactor = 1.0;
@@ -4494,9 +4493,9 @@ namespace SimAirServingZones {
 					ZoneSA = 0.0;
 					ZonePA = 0.0;
 					Ep = 1.0;
-					if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
+					if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
 						//Vpz: "Primary" supply air from main air handler served by an oa mixer
-						ZonePA = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+						ZonePA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow;
 						//Vdz: "Discharge" supply air delivered to zone by terminal unit
 						ZoneSA = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, ZonePA );
 
@@ -4508,17 +4507,17 @@ namespace SimAirServingZones {
 
 					} else { // single path system
 						//Vdz: "Discharge" supply air delivered to zone by terminal unit
-						ZonePA = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+						ZonePA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow;
 						//Vpz: "Primary" supply air from main air handler served by an oa mixer
-						ZoneSA = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+						ZoneSA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow;
 
 						// Save VpzMin in case this is a single path VAV system.
 						// Std 62.1-2010, section 6.2.5.1: "For VAV-system design purposes, Vpz is the lowest zone primary
 						// airflow value expected at the design condition analyzed."
-						VpzMinClgByZone( CtrlZoneNum ) = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin;
+						VpzMinClgByZone( CtrlZoneNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin;
 
 						// In case for some reason the VAV minimum has not been defined, use the design primary airflow
-						if ( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin <= 0 ) VpzMinClgByZone( CtrlZoneNum ) = ZonePA;
+						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin <= 0 ) VpzMinClgByZone( CtrlZoneNum ) = ZonePA;
 					}
 
 					//save zone discharge supply airflow
@@ -4529,15 +4528,15 @@ namespace SimAirServingZones {
 					VpzClgSumBySys( AirLoopNum ) += ZonePA;
 
 					// Fraction of required zone ventilation to minimum primary airflow expected at condition analyzed
-					FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = 0.0;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone = 0.0;
 					if ( VpzMinClgByZone( CtrlZoneNum ) > 0 ) {
-						FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = min( 1.0, FinalZoneSizing( CtrlZoneNum ).VozClgByZone / VpzMinClgByZone( CtrlZoneNum ) );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone = min( 1.0, TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone / VpzMinClgByZone( CtrlZoneNum ) );
 					}
 
 					// calc zone primary air fraction
 					if ( ZoneSA > 0.0 ) Ep = ZonePA / ZoneSA;
 					if ( Ep > 1.0 ) Ep = 1.0;
-					FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction = Ep;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFraction = Ep;
 					FinalZoneSizing(CtrlZoneNum).ZoneOAFracCooling = ZoneOAFracCooling;
 
 					// determined cooled zone floor area in an airloop
@@ -4546,39 +4545,40 @@ namespace SimAirServingZones {
 							FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
 						}
 					}
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor = max( ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor );
 				}
 
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 				if ( NumZonesHeated > 0 ) {
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						MatchingCooledZoneNum = FindNumberInList( CtrlZoneNum, AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums, NumZonesCooled );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						if ( MatchingCooledZoneNum == 0 ) {
 							if ( SysSizNum > 0 ) {
 								if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
-									MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+									MinOAFlow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
 									ZoneOAFracHeating = 0.0;
-									SysOAUnc += FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
-									VbzByZone( CtrlZoneNum ) = FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+									SysOAUnc += TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+									VbzByZone( CtrlZoneNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
 								} else if( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
-									ZoneOAUnc = PopulationDiversity * FinalZoneSizing( CtrlZoneNum ).TotalOAFromPeople + FinalZoneSizing( CtrlZoneNum ).TotalOAFromArea;
+									ZoneOAUnc = PopulationDiversity * TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotalOAFromPeople + TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotalOAFromArea;
 
 									//save for Standard 62 tabular report
 									VbzByZone( CtrlZoneNum ) = ZoneOAUnc;
 									SysOAUnc += ZoneOAUnc;
 
 									// Save Std 62.1 heating ventilation required by zone
-									FinalZoneSizing( CtrlZoneNum ).VozHtgByZone = ZoneOAUnc / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
-									MinOAFlow += FinalZoneSizing( CtrlZoneNum ).VozHtgByZone;
+									TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone = ZoneOAUnc / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
+									MinOAFlow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
 
-									if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
-										if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
+									if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow > 0.0 ) {
+										if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
 											// multi-path system
-											ZoneOAFracHeating = FinalZoneSizing( CtrlZoneNum ).VozHtgByZone / TermUnitSizing( TermUnitSizingIndex ).AirVolFlow;
+											ZoneOAFracHeating = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / TermUnitSizing( TermUnitSizingIndex ).AirVolFlow;
 										} else {
 											// Single path system
-											ZoneOAFracHeating = FinalZoneSizing( CtrlZoneNum ).VozHtgByZone / FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
+											ZoneOAFracHeating = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 										}
 									} else {
 										ZoneOAFracHeating = 0.0;
@@ -4586,7 +4586,7 @@ namespace SimAirServingZones {
 								} else { // would be error
 								}
 							} else { // ZoneSum Method
-								MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
+								MinOAFlow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA * TermUnitSizing( TermUnitSizingIndex ).SpecMinOAFrac;
 								ZoneOAFracHeating = 0.0;
 							}
 						} else {
@@ -4598,14 +4598,14 @@ namespace SimAirServingZones {
 						if ( FinalSysSizing( AirLoopNum ).MaxZoneOAFraction > 0 && ZoneOAFracHeating > FinalSysSizing( AirLoopNum ).MaxZoneOAFraction ) {
 							if ( FinalSysSizing( AirLoopNum ).CoolAirDesMethod == FromDDCalc ) { // DesignDay Method
 								HtgSupplyAirAdjustFactor = ZoneOAFracHeating / FinalSysSizing( AirLoopNum ).MaxZoneOAFraction;
-								if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 || FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin <= 0 ) {
+								if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 || TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin <= 0 ) {
 									// multi-path system or VAV Heating airflow max not defined
 									TermUnitSizing( TermUnitSizingIndex ).AirVolFlow *= HtgSupplyAirAdjustFactor;
 								} else {
 									// Single path; Use VAV Heating airflow max as the Vpz in the Zp = Voz / Vpz equations
-									FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
+									TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
 									// Don't allow the design terminal airflow to be less than the design heating airflow
-									TermUnitSizing( TermUnitSizingIndex ).AirVolFlow = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow );
+									TermUnitSizing( TermUnitSizingIndex ).AirVolFlow = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow );
 								}
 								ZoneOAFracHeating = FinalSysSizing( AirLoopNum ).MaxZoneOAFraction;
 							} else {
@@ -4618,9 +4618,9 @@ namespace SimAirServingZones {
 						ZoneSA = 0.0;
 						ZonePA = 0.0;
 						Ep = 1.0;
-						if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
+						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
 							//Vpz: "Primary" supply air from main air handler served by an oa mixer
-							ZonePA = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
+							ZonePA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 							//Vdz: "Discharge" supply air delivered to zone by terminal unit
 							ZoneSA = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, ZonePA );
 
@@ -4631,8 +4631,8 @@ namespace SimAirServingZones {
 
 						} else { // single path system
 
-							ZonePA = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
-							ZoneSA = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
+							ZonePA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
+							ZoneSA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 
 							// We do not use the cooling VAV min for heating because the VAV-box heating maximum may be larger.
 							VpzMinHtgByZone( CtrlZoneNum ) = ZoneSA;
@@ -4646,16 +4646,16 @@ namespace SimAirServingZones {
 						VpzHtgSumBySys( AirLoopNum ) += ZonePA;
 
 						// Fraction of required zone ventilation to minimum primary airflow expected at condition analyzed
-						FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone = 0.0;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone = 0.0;
 						if ( VpzMinHtgByZone( CtrlZoneNum ) > 0 ) {
-							FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone = min( 1.0, FinalZoneSizing( CtrlZoneNum ).VozHtgByZone / VpzMinHtgByZone( CtrlZoneNum ) );
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone = min( 1.0, TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / VpzMinHtgByZone( CtrlZoneNum ) );
 						}
 
 						// calc zone primary air fraction
 						if ( ZoneSA > 0.0 ) Ep = ZonePA / ZoneSA;
 						if ( Ep > 1.0 ) Ep = 1.0;
-						FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg = Ep;
-						FinalZoneSizing( CtrlZoneNum ).ZoneOAFracHeating = ZoneOAFracHeating;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg = Ep;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneOAFracHeating = ZoneOAFracHeating;
 
 						// determined heated zone floor area in an airloop
 						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++zoneInNode ) {
@@ -4663,28 +4663,28 @@ namespace SimAirServingZones {
 								FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
 							}
 						}
-
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor = max( ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor );
 					}
 
 				} else { // getting heating flow based values for Std 62.1 report for single path systems
 					ZoneOAFracHeating = 0.0;
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 
 						// Voz ventilation airflow required during heating mode
-						FinalZoneSizing( CtrlZoneNum ).VozHtgByZone = VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone = VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 
-						if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
+						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow > 0.0 ) {
 							// ZoneOAFracHeating = FinalZoneSizing(CtrlZoneNum)%MinOA / FinalZoneSizing(CtrlZoneNum)%DesHeatVolFlow
-							if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
+							if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
 								// multi-path system
 								if ( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow != 0 ) {
-									ZoneOAFracHeating = FinalZoneSizing( CtrlZoneNum ).VozHtgByZone / TermUnitSizing( TermUnitSizingIndex ).AirVolFlow;
+									ZoneOAFracHeating = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / TermUnitSizing( TermUnitSizingIndex ).AirVolFlow;
 								}
 							} else {
 								// Single path system
-								ZoneOAFracHeating = FinalZoneSizing( CtrlZoneNum ).VozHtgByZone / FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
+								ZoneOAFracHeating = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 							}
 						} else {
 							ZoneOAFracHeating = 0.0;
@@ -4695,20 +4695,20 @@ namespace SimAirServingZones {
 						if ( FinalSysSizing( AirLoopNum ).MaxZoneOAFraction > 0 && ZoneOAFracHeating > FinalSysSizing( AirLoopNum ).MaxZoneOAFraction ) {
 							if ( FinalSysSizing( AirLoopNum ).HeatAirDesMethod == FromDDCalc ) { // DesignDay Method
 								HtgSupplyAirAdjustFactor = ZoneOAFracHeating / FinalSysSizing( AirLoopNum ).MaxZoneOAFraction;
-								if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 || FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin <= 0 ) {
+								if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 || TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin <= 0 ) {
 									// multi-path system or VAV Heating airflow max not defined
 									TermUnitSizing( TermUnitSizingIndex ).AirVolFlow *= HtgSupplyAirAdjustFactor;
 								} else {
 									// Single path; Use VAV Heating airflow max as the Vpz in the Zp = Voz / Vpz equations
-									FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
+									TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
 									// Don't allow the design terminal airflow to be less than the design heating airflow
-									TermUnitSizing( TermUnitSizingIndex ).AirVolFlow = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow );
+									TermUnitSizing( TermUnitSizingIndex ).AirVolFlow = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow );
 								}
 								ZoneOAFracHeating = FinalSysSizing( AirLoopNum ).MaxZoneOAFraction;
 							}
 						}
-						ZonePA = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
-						ZoneSA = FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
+						ZonePA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
+						ZoneSA = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 						//save Vdz zone discharge airflow for standard 62.1 report
 						VdzHtgByZone( CtrlZoneNum ) = ZoneSA;
 						//save Vpz zone primary airflow for standard 62.1 report
@@ -4719,23 +4719,23 @@ namespace SimAirServingZones {
 						VpzMinHtgByZone( CtrlZoneNum ) = ZoneSA;
 
 						// Save Std 62.1 heating ventilation required by zone
-						FinalZoneSizing( CtrlZoneNum ).VozHtgByZone = VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone = VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 
 						// Fraction of required zone ventilation to minimum primary airflow expected at condition analyzed
-						FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone = 0.0;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone = 0.0;
 						if ( VpzMinHtgByZone( CtrlZoneNum ) > 0 ) {
-							FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone = FinalZoneSizing( CtrlZoneNum ).VozHtgByZone / VpzMinHtgByZone( CtrlZoneNum );
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / VpzMinHtgByZone( CtrlZoneNum );
 						}
 
 						// calc zone primary air fraction
 						Ep = 1.0;
 						if ( ZoneSA > 0.0 ) Ep = ZonePA / ZoneSA;
 						if ( Ep > 1.0 ) Ep = 1.0;
-						FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg = Ep;
-						FinalZoneSizing( CtrlZoneNum ).ZoneOAFracHeating = ZoneOAFracHeating;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg = Ep;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneOAFracHeating = ZoneOAFracHeating;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor = max( ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor );
 					}
-					FinalZoneSizing( CtrlZoneNum ).SupplyAirAdjustFactor = max( ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor );
-					CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirAdjustFactor = FinalZoneSizing( CtrlZoneNum ).SupplyAirAdjustFactor;
+					//CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirAdjustFactor = TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor;
 					FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated = FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 				}
 
@@ -4781,39 +4781,40 @@ namespace SimAirServingZones {
 				VdzHtgSum = 0.0;
 				VpzMin = 0.0;
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
-					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+					int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					//Zone Ventilation Parameters
-					PreDefTableEntry( pdchS62zvpAlN, FinalZoneSizing( CtrlZoneNum ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
-					PreDefTableEntry( pdchS62zvpRp, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer, 6 ); //Rp
-					PreDefTableEntry( pdchS62zvpPz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone ); //Pz
-					PreDefTableEntry( pdchS62zvpRa, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).DesOAFlowPerArea, 6 ); //Ra
+					PreDefTableEntry( pdchS62zvpAlN, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
+					PreDefTableEntry( pdchS62zvpRp, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesOAFlowPPer, 6 ); //Rp
+					PreDefTableEntry( pdchS62zvpPz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotPeopleInZone ); //Pz
+					PreDefTableEntry( pdchS62zvpRa, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesOAFlowPerArea, 6 ); //Ra
 					//      ZoneIndex = FinalZoneSizing(CtrlZoneNum)%ActualZoneNum
-					PreDefTableEntry( pdchS62zvpAz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea ); // Az
-					PreDefTableEntry( pdchS62zvpVbz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VbzByZone( CtrlZoneNum ), 4 ); //Vbz
-					PreDefTableEntry( pdchS62zvpClEz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling, 3 ); //Ez-clg
-					if ( FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling != 0.0 ) {
-						PreDefTableEntry( pdchS62zvpClVoz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling, 4 ); //Voz-clg
-						PreDefTableEntry( pdchS62zcdVozclg, FinalZoneSizing( CtrlZoneNum ).ZoneName, VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling, 4 ); //Voz-clg
-						PreDefTableEntry( pdchS62zcdZpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone, 3 ); //Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
-						VozClgSum += VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+					PreDefTableEntry( pdchS62zvpAz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotalZoneFloorArea ); // Az
+					PreDefTableEntry( pdchS62zvpVbz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VbzByZone( CtrlZoneNum ), 4 ); //Vbz
+					PreDefTableEntry( pdchS62zvpClEz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling, 3 ); //Ez-clg
+					if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling != 0.0 ) {
+						PreDefTableEntry( pdchS62zvpClVoz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling, 4 ); //Voz-clg
+						PreDefTableEntry( pdchS62zcdVozclg, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling, 4 ); //Voz-clg
+						PreDefTableEntry( pdchS62zcdZpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone, 3 ); //Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
+						VozClgSum += VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
 					}
 					// accumulate values for system ventilation parameters report
-					if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ) {
-						RpPzSum += FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone;
+					if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).OADesMethod == OAFlowPPer || TermUnitFinalZoneSizing( TermUnitSizingIndex ).OADesMethod == OAFlowSum || TermUnitFinalZoneSizing( TermUnitSizingIndex ).OADesMethod == OAFlowMax ) {
+						RpPzSum += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesOAFlowPPer * TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotPeopleInZone;
 					}
-					RaAzSum += FinalZoneSizing( CtrlZoneNum ).DesOAFlowPerArea * FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
-					AzSum += FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
+					RaAzSum += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesOAFlowPerArea * TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotalZoneFloorArea;
+					AzSum += TermUnitFinalZoneSizing( TermUnitSizingIndex ).TotalZoneFloorArea;
 					VbzSum += VbzByZone( CtrlZoneNum );
 					//Zone Ventilation Calculations for Cooling Design
-					PreDefTableEntry( pdchS62zcdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzClgByZone( CtrlZoneNum ), 3 ); //Vpz LS:
+					PreDefTableEntry( pdchS62zcdVpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VpzClgByZone( CtrlZoneNum ), 3 ); //Vpz LS:
 					VpzMin += VpzMinClgByZone( CtrlZoneNum );
-					PreDefTableEntry( pdchS62zcdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzClgByZone( CtrlZoneNum ), 4 ); //Vdz
-					PreDefTableEntry( pdchS62zcdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzMinClgByZone( CtrlZoneNum ), 4 ); //Vpz-min
+					PreDefTableEntry( pdchS62zcdVdz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VdzClgByZone( CtrlZoneNum ), 4 ); //Vdz
+					PreDefTableEntry( pdchS62zcdVpzmin, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VpzMinClgByZone( CtrlZoneNum ), 4 ); //Vpz-min
 					VdzSum += VdzClgByZone( CtrlZoneNum );
 					//box type
 					for ( iAirDistUnit = 1; iAirDistUnit <= NumAirDistUnits; ++iAirDistUnit ) {
 						if ( AirDistUnit( iAirDistUnit ).ZoneEqNum == CtrlZoneNum ) {
-							PreDefTableEntry( pdchS62zcdBox, FinalZoneSizing( CtrlZoneNum ).ZoneName, AirDistUnit( iAirDistUnit ).EquipType( 1 ) ); //use first type of equipment listed
+							PreDefTableEntry( pdchS62zcdBox, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirDistUnit( iAirDistUnit ).EquipType( 1 ) ); //use first type of equipment listed
 							break; //if it has been found no more searching is needed
 						}
 					}
@@ -4824,57 +4825,59 @@ namespace SimAirServingZones {
 				VpzMin = 0.0;
 				if ( NumZonesHeated > 0 ) {
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						//Zone Ventilation Calculations for Heating Design
-						PreDefTableEntry( pdchS62zhdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 3 ); //Vpz
+						PreDefTableEntry( pdchS62zhdVpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 3 ); //Vpz
 						VpzMin += VpzMinHtgByZone( CtrlZoneNum );
 
-						PreDefTableEntry( pdchS62zhdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzHtgByZone( CtrlZoneNum ), 4 ); //Vdz
-						PreDefTableEntry( pdchS62zhdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzMinHtgByZone( CtrlZoneNum ), 4 ); //Vpz-min
+						PreDefTableEntry( pdchS62zhdVdz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VdzHtgByZone( CtrlZoneNum ), 4 ); //Vdz
+						PreDefTableEntry( pdchS62zhdVpzmin, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VpzMinHtgByZone( CtrlZoneNum ), 4 ); //Vpz-min
 
 						VdzHtgSum += VdzHtgByZone( CtrlZoneNum );
 						//box type
 						for ( iAirDistUnit = 1; iAirDistUnit <= NumAirDistUnits; ++iAirDistUnit ) {
 							if ( AirDistUnit( iAirDistUnit ).ZoneEqNum == CtrlZoneNum ) {
-								PreDefTableEntry( pdchS62zhdBox, FinalZoneSizing( CtrlZoneNum ).ZoneName, AirDistUnit( iAirDistUnit ).EquipType( 1 ) ); //use first type of equipment listed
+								PreDefTableEntry( pdchS62zhdBox, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirDistUnit( iAirDistUnit ).EquipType( 1 ) ); //use first type of equipment listed
 								break; //if it has been found no more searching is needed
 							}
 						}
 						//Zone Ventilation Parameters
-						PreDefTableEntry( pdchS62zvpHtEz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating, 3 ); //Ez-htg
-						if ( FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating != 0.0 ) {
-							PreDefTableEntry( pdchS62zvpHtVoz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating, 4 ); //Voz-htg
-							PreDefTableEntry( pdchS62zhdVozhtg, FinalZoneSizing( CtrlZoneNum ).ZoneName, VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating, 4 ); //Voz-htg
-							PreDefTableEntry( pdchS62zhdZpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone, 3 ); //Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
-							VozHtgSum += VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+						PreDefTableEntry( pdchS62zvpHtEz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating, 3 ); //Ez-htg
+						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating != 0.0 ) {
+							PreDefTableEntry( pdchS62zvpHtVoz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating, 4 ); //Voz-htg
+							PreDefTableEntry( pdchS62zhdVozhtg, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating, 4 ); //Voz-htg
+							PreDefTableEntry( pdchS62zhdZpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone, 3 ); //Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
+							VozHtgSum += VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
 					}
 				} else {
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) { // loop over the cooled zones if no centrally heated zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						//Zone Ventilation Calculations for Heating Design
-						PreDefTableEntry( pdchS62zhdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 3 ); //Vpz
+						PreDefTableEntry( pdchS62zhdVpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VpzHtgByZone( CtrlZoneNum ), 3 ); //Vpz
 						VpzMin += VpzMinHtgByZone( CtrlZoneNum );
-						PreDefTableEntry( pdchS62zhdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzHtgByZone( CtrlZoneNum ), 3 ); //Vdz
-						PreDefTableEntry( pdchS62zhdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzMinHtgByZone( CtrlZoneNum ), 3 ); //Vpz-min
+						PreDefTableEntry( pdchS62zhdVdz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VdzHtgByZone( CtrlZoneNum ), 3 ); //Vdz
+						PreDefTableEntry( pdchS62zhdVpzmin, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VpzMinHtgByZone( CtrlZoneNum ), 3 ); //Vpz-min
 						VdzHtgSum += VdzHtgByZone( CtrlZoneNum );
 						//box type
 						for ( iAirDistUnit = 1; iAirDistUnit <= NumAirDistUnits; ++iAirDistUnit ) {
 							if ( AirDistUnit( iAirDistUnit ).ZoneEqNum == CtrlZoneNum ) {
 								//use first type of equipment listed
-								PreDefTableEntry( pdchS62zhdBox, FinalZoneSizing( CtrlZoneNum ).ZoneName, AirDistUnit( iAirDistUnit ).EquipType( 1 ) );
+								PreDefTableEntry( pdchS62zhdBox, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirDistUnit( iAirDistUnit ).EquipType( 1 ) );
 								break; //if it has been found no more searching is needed
 							}
 						}
 						//Zone Ventilation Parameters
-						PreDefTableEntry( pdchS62zvpHtEz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating, 3 ); //Ez-htg
-						if ( FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating != 0.0 ) {
-							PreDefTableEntry( pdchS62zvpHtVoz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating, 4 ); //Voz-htg
-							PreDefTableEntry( pdchS62zhdVozhtg, FinalZoneSizing( CtrlZoneNum ).ZoneName, VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating, 4 ); //Voz-htg
+						PreDefTableEntry( pdchS62zvpHtEz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating, 3 ); //Ez-htg
+						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating != 0.0 ) {
+							PreDefTableEntry( pdchS62zvpHtVoz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating, 4 ); //Voz-htg
+							PreDefTableEntry( pdchS62zhdVozhtg, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating, 4 ); //Voz-htg
 							if ( VpzHtgByZone( CtrlZoneNum ) != 0.0 ) {
-								PreDefTableEntry( pdchS62zhdZpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, ( VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating ) / VpzHtgByZone( CtrlZoneNum ), 3 ); //Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
+								PreDefTableEntry( pdchS62zhdZpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, ( VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating ) / VpzHtgByZone( CtrlZoneNum ), 3 ); //Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
 							}
-							VozHtgSum += VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+							VozHtgSum += VbzByZone( CtrlZoneNum ) / TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
 					}
 				}
@@ -5444,12 +5447,14 @@ namespace SimAirServingZones {
 						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						for( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling;
-							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating;
+							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
 						for( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling;
-							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating;
+							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
 						if( SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow > 0 ) {
 							XsBySysCool( AirLoopNum ) = min( 1.0, FinalSysSizing( AirLoopNum ).SysUncOA / SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow );
@@ -5480,14 +5485,15 @@ namespace SimAirServingZones {
 							MinCoolingEvz = 1.0;
 							VozSumClgBySys( AirLoopNum ) = 0.0;
 							for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-								CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+								int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+								int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 
 								// Zone air secondary recirculation fraction
-								Er = FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation;
-								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
-								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
-								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
-								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
+								Er = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation;
+								Ep = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFraction;
+								ZoneOAFrac = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone;
+								ZoneEz = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
+								VozClg = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5509,12 +5515,12 @@ namespace SimAirServingZones {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
 									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
-									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+									LimitZoneVentEff( Xs, VozClg, TermUnitSizingIndex, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum ); // Save previous EvzByZoneCool
 								EvzByZoneCool( CtrlZoneNum ) = SysCoolingEv;
-								VozSumClgBySys( AirLoopNum ) += FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
+								VozSumClgBySys( AirLoopNum ) += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
 							}
 
 							if ( MinCoolingEvz > 0 ) {
@@ -5530,7 +5536,7 @@ namespace SimAirServingZones {
 								} else {
 									//Restore EvzByZoneCool() since it was reset by the current (but not highest Vot) design day
 									for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-										CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+										int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 										EvzByZoneCool( CtrlZoneNum ) = EvzByZoneCoolPrev( CtrlZoneNum );
 									}
 								}
@@ -5553,13 +5559,13 @@ namespace SimAirServingZones {
 							SysHtgPeakAirflow = 0.0;
 							if ( NumZonesHeated > 0 ) {
 								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-									CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
-									SysHtgPeakAirflow += FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
+									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
+									SysHtgPeakAirflow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 								}
 							} else {
 								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
-									CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
-									SysHtgPeakAirflow += FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow;
+									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
+									SysHtgPeakAirflow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 								}
 							}
 						} else {
@@ -5579,14 +5585,15 @@ namespace SimAirServingZones {
 							VozSumHtgBySys( AirLoopNum ) = 0.0;
 							if ( NumZonesHeated > 0 ) {
 								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-									CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 									MatchingCooledZoneNum = FindNumberInList( CtrlZoneNum, AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums, NumZonesCooled );
 									if ( MatchingCooledZoneNum == 0 ) {
 										// Zone air secondary recirculation fraction
-										Er = FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation;
-										Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg;
-										ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone;
-										ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+										Er = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation;
+										Ep = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg;
+										ZoneOAFrac = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone;
+										ZoneEz = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 										if ( Er > 0.0 ) {
 											// multi-path ventilation system using VRP
 											Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5610,17 +5617,18 @@ namespace SimAirServingZones {
 										if ( SysHeatingEv < MinHeatingEvz ) MinHeatingEvz = SysHeatingEv;
 										EvzByZoneHeatPrev( CtrlZoneNum ) = EvzByZoneHeat( CtrlZoneNum ); // Save previous EvzByZoneHeat
 										EvzByZoneHeat( CtrlZoneNum ) = SysHeatingEv;
-										VozSumHtgBySys( AirLoopNum ) += FinalZoneSizing( CtrlZoneNum ).VozHtgByZone;
+										VozSumHtgBySys( AirLoopNum ) += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
 									}
 								}
 							} else {
 								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
-									CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 									// Zone air secondary recirculation fraction
-									Er = FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation;
-									Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg;
-									ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone;
-									ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+									Er = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation;
+									Ep = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg;
+									ZoneOAFrac = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone;
+									ZoneEz = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 									if ( Er > 0.0 ) {
 										// multi-path ventilation system using VRP
 										Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5644,7 +5652,7 @@ namespace SimAirServingZones {
 									if ( SysHeatingEv < MinHeatingEvz ) MinHeatingEvz = SysHeatingEv;
 									EvzByZoneHeatPrev( CtrlZoneNum ) = EvzByZoneHeat( CtrlZoneNum ); // Save previous EvzByZoneHeat
 									EvzByZoneHeat( CtrlZoneNum ) = SysHeatingEv;
-									VozSumHtgBySys( AirLoopNum ) += FinalZoneSizing( CtrlZoneNum ).VozHtgByZone;
+									VozSumHtgBySys( AirLoopNum ) += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
 								}
 							}
 
@@ -5663,12 +5671,12 @@ namespace SimAirServingZones {
 									//Restore EvzByZoneHeat() since it was reset by the current (but not highest Vot) design day
 									if ( NumZonesHeated > 0 ) {
 										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-											CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
 									} else {
 										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
-											CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
 									}
@@ -5685,12 +5693,14 @@ namespace SimAirServingZones {
 						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						for( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffCooling;
-							if( FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesCooledNum ).ZoneADEffHeating;
+							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
 						for( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffCooling;
-							if( FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = FinalZoneSizing( ZonesHeatedNum ).ZoneADEffHeating;
+							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
+							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
 						if( SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow > 0 ) {
 							XsBySysCool( AirLoopNum ) = min( 1.0, FinalSysSizing( AirLoopNum ).SysUncOA / SysSizing( CurOverallSimDay, AirLoopNum ).DesCoolVolFlow );
@@ -5723,13 +5733,14 @@ namespace SimAirServingZones {
 							VozSumClgBySys( AirLoopNum ) = 0.0;
 							for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 								CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+								int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 
 								// Zone air secondary recirculation fraction
-								Er = FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation;
-								Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction;
-								ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone;
-								ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
-								VozClg = FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
+								Er = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation;
+								Ep = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFraction;
+								ZoneOAFrac = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone;
+								ZoneEz = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
+								VozClg = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
 								if ( Er > 0.0 ) {
 									// multi-path ventilation system using VRP
 									Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5750,12 +5761,12 @@ namespace SimAirServingZones {
 									// single-path ventilation system
 									SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
 									// Apply ventilation efficiency limit; reset SysCoolingEv if necessary
-									LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
+									LimitZoneVentEff( Xs, VozClg, TermUnitSizingIndex, SysCoolingEv );
 								}
 								if ( SysCoolingEv < MinCoolingEvz ) MinCoolingEvz = SysCoolingEv;
 								EvzByZoneCoolPrev( CtrlZoneNum ) = EvzByZoneCool( CtrlZoneNum );
 								EvzByZoneCool( CtrlZoneNum ) = SysCoolingEv;
-								VozSumClgBySys( AirLoopNum ) += FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
+								VozSumClgBySys( AirLoopNum ) += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
 							}
 
 							if ( MinCoolingEvz > 0 ) {
@@ -5799,14 +5810,15 @@ namespace SimAirServingZones {
 							VozSumHtgBySys( AirLoopNum ) = 0.0;
 							if ( NumZonesHeated > 0 ) {
 								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-									CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 									MatchingCooledZoneNum = FindNumberInList( CtrlZoneNum, AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums, NumZonesCooled );
 									if ( MatchingCooledZoneNum == 0 ) {
 										// Zone air secondary recirculation fraction
-										Er = FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation;
-										Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg;
-										ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone;
-										ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+										Er = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation;
+										Ep = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg;
+										ZoneOAFrac = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone;
+										ZoneEz = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 										if ( Er > 0.0 ) {
 											// multi-path ventilation system using VRP
 											Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5827,17 +5839,18 @@ namespace SimAirServingZones {
 									if ( SysHeatingEv < MinHeatingEvz ) MinHeatingEvz = SysHeatingEv;
 									EvzByZoneHeatPrev( CtrlZoneNum ) = EvzByZoneHeat( CtrlZoneNum ); // Save previous EvzByZoneHeat
 									EvzByZoneHeat( CtrlZoneNum ) = SysHeatingEv;
-									VozSumHtgBySys( AirLoopNum ) += FinalZoneSizing( CtrlZoneNum ).VozHtgByZone;
+									VozSumHtgBySys( AirLoopNum ) += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
 								}
 							} else {
 								NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
-									CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 									// Zone air secondary recirculation fraction
-									Er = FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation;
-									Ep = FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg;
-									ZoneOAFrac = FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone;
-									ZoneEz = FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+									Er = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation;
+									Ep = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg;
+									ZoneOAFrac = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone;
+									ZoneEz = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 									if ( Er > 0.0 ) {
 										// multi-path ventilation system using VRP
 										Fa = Ep + ( 1.0 - Ep ) * Er;
@@ -5857,7 +5870,7 @@ namespace SimAirServingZones {
 									if ( SysHeatingEv < MinHeatingEvz ) MinHeatingEvz = SysHeatingEv;
 									EvzByZoneHeatPrev( CtrlZoneNum ) = EvzByZoneHeat( CtrlZoneNum ); // Save previous EvzByZoneHeat
 									EvzByZoneHeat( CtrlZoneNum ) = SysHeatingEv;
-									VozSumHtgBySys( AirLoopNum ) += FinalZoneSizing( CtrlZoneNum ).VozHtgByZone;
+									VozSumHtgBySys( AirLoopNum ) += TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
 								}
 							}
 
@@ -5876,12 +5889,12 @@ namespace SimAirServingZones {
 									//Restore EvzByZoneHeat() since it was just reset by the current (but not highest Vot) design day
 									if ( NumZonesHeated > 0 ) {
 										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-											CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
 									} else {
 										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
-											CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
 									}
@@ -5910,8 +5923,8 @@ namespace SimAirServingZones {
 						Ratio = 1.0;
 						if ( VozSumClgBySys( AirLoopNum ) > 0 ) Ratio = VotClgBySys( AirLoopNum ) / VozSumClgBySys( AirLoopNum );
 						for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-							CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
-							FinalZoneSizing( CtrlZoneNum ).MinOA = Ratio * FinalZoneSizing( CtrlZoneNum ).VozClgByZone;
+							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = Ratio * TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
 							//int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						}
 					} else {
@@ -5926,12 +5939,14 @@ namespace SimAirServingZones {
 						Ratio = 1.0;
 						if ( VozSumHtgBySys( AirLoopNum ) > 0 ) Ratio = VotHtgBySys( AirLoopNum ) / VozSumHtgBySys( AirLoopNum );
 						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesForHtg; ++ZonesHeatedNum ) {
+							int TermUnitSizingIndex = 1;
 							if ( NumZonesHeated == 0 ) {
-								CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+								int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 							} else {
+								int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 								CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 							}
-							FinalZoneSizing( CtrlZoneNum ).MinOA = Ratio * FinalZoneSizing( CtrlZoneNum ).VozHtgByZone;
+							TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = Ratio * TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
 						}
 					}
 
@@ -5943,7 +5958,7 @@ namespace SimAirServingZones {
 
 			// Correct the zone return temperature in FinalZoneSizing for the case of induction units. The calc in
 			// ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
-			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+			for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				// Use first non-zero airdistunit for now, if there is one
 				termunitsizingtempfrac = 1.0;
@@ -5956,40 +5971,40 @@ namespace SimAirServingZones {
 					if ( TermUnitSizingIndex > 0 ) break;
 				}
 				if ( TermUnitSizingIndex == 0 ) continue; // Skip this if there are no terminal units
-				RetTempRise = FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak - FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
+				RetTempRise = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak - TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtCoolPeak;
 				if ( RetTempRise > 0.01 ) {
 					//avoid possible compiler bug
 					//          FinalZoneSizing(CtrlZoneNum)%ZoneRetTempAtCoolPeak = &
 					//            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtCoolPeak + RetTempRise * &
 					//           (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-					FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
-					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtCoolPeak;
 				}
-				RetTempRise = FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak - FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak;
+				RetTempRise = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak - TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtHeatPeak;
 				if ( RetTempRise > 0.01 ) {
 					//avoid possible compiler bug
 					//          FinalZoneSizing(CtrlZoneNum)%ZoneRetTempAtHeatPeak = &
 					//            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtHeatPeak + RetTempRise * &
 					//            (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-					FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
-					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak = FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak;
 				}
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
-					RetTempRise = FinalZoneSizing( CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) - FinalZoneSizing( CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex );
+					RetTempRise = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolZoneRetTempSeq( TimeStepIndex ) - TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolZoneTempSeq( TimeStepIndex );
 					if ( RetTempRise > 0.01 ) {
 						//avoid possible compiler bug
 						//            FinalZoneSizing(CtrlZoneNum)%CoolZoneRetTempSeq(TimeStepIndex) = &
 						//              FinalZoneSizing(CtrlZoneNum)%CoolZoneTempSeq(TimeStepIndex) + RetTempRise * &
 						//             (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-						FinalZoneSizing( CtrlZoneNum ).CoolZoneRetTempSeq( TimeStepIndex ) = FinalZoneSizing( CtrlZoneNum ).CoolZoneTempSeq( TimeStepIndex ) + RetTempRise * termunitsizingtempfrac;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolZoneRetTempSeq( TimeStepIndex ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolZoneTempSeq( TimeStepIndex ) + RetTempRise * termunitsizingtempfrac;
 					}
-					RetTempRise = FinalZoneSizing( CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex ) - FinalZoneSizing( CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex );
+					RetTempRise = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatZoneRetTempSeq( TimeStepIndex ) - TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatZoneTempSeq( TimeStepIndex );
 					if ( RetTempRise > 0.01 ) {
 						//avoid possible compiler bug
 						//            FinalZoneSizing(CtrlZoneNum)%HeatZoneRetTempSeq(TimeStepIndex) = &
 						//              FinalZoneSizing(CtrlZoneNum)%HeatZoneTempSeq(TimeStepIndex) + RetTempRise * &
 						//             (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-						FinalZoneSizing( CtrlZoneNum ).HeatZoneRetTempSeq( TimeStepIndex ) = FinalZoneSizing( CtrlZoneNum ).HeatZoneTempSeq( TimeStepIndex ) + RetTempRise * termunitsizingtempfrac;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatZoneRetTempSeq( TimeStepIndex ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatZoneTempSeq( TimeStepIndex ) + RetTempRise * termunitsizingtempfrac;
 					}
 				}
 			}
@@ -6124,18 +6139,18 @@ namespace SimAirServingZones {
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					// save the system cooling supply air temp
-					FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTempTU = CalcSysSizing( AirLoopNum ).CoolSupTemp;
-					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInTempTU;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInTempTU = CalcSysSizing( AirLoopNum ).CoolSupTemp;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInTempTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInTempTU;
 					// save the system cooling supply air hum rat
-					FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRatTU = CalcSysSizing( AirLoopNum ).CoolSupHumRat;
-					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesCoolCoilInHumRatTU;
-					if ( FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow <= 0.0 ) continue;
-					Real64 coolMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMassFlowNoOA );
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU = CalcSysSizing( AirLoopNum ).CoolSupHumRat;
+					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU;
+					if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow <= 0.0 ) continue;
+					Real64 coolMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlowNoOA );
 					CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow += coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-					SysCoolRetTemp += FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-					SysCoolRetHumRat += FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-					CoolDDNum = FinalZoneSizing( CtrlZoneNum ).CoolDDNum;
-					CoolTimeStepNum = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax;
+					SysCoolRetTemp += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+					SysCoolRetHumRat += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneHumRatAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+					CoolDDNum = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolDDNum;
+					CoolTimeStepNum = TermUnitFinalZoneSizing( TermUnitSizingIndex ).TimeStepNumAtCoolMax;
 					OutAirTemp += DesDayWeath( CoolDDNum ).Temp( CoolTimeStepNum ) * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					OutAirHumRat += DesDayWeath( CoolDDNum ).HumRat( CoolTimeStepNum ) * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 				}
@@ -6180,18 +6195,18 @@ namespace SimAirServingZones {
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						// save the system heating supply air temp
-						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU;
 						// save the system heating supply air hum rat
-						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
-						if ( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow <= 0.0 ) continue;
-						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlowNoOA );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU;
+						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow <= 0.0 ) continue;
+						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlowNoOA );
 						CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow += heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-						SysHeatRetTemp += FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-						SysHeatRetHumRat += FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-						HeatDDNum = FinalZoneSizing( CtrlZoneNum ).HeatDDNum;
-						HeatTimeStepNum = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
+						SysHeatRetTemp += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						SysHeatRetHumRat += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						HeatDDNum = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatDDNum;
+						HeatTimeStepNum = TermUnitFinalZoneSizing( TermUnitSizingIndex ).TimeStepNumAtHeatMax;
 						OutAirTemp += DesDayWeath( HeatDDNum ).Temp( HeatTimeStepNum ) * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						OutAirHumRat += DesDayWeath( HeatDDNum ).HumRat( HeatTimeStepNum ) * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					}
@@ -6221,18 +6236,18 @@ namespace SimAirServingZones {
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						// save the system heating supply air temp
-						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU;
 						// save the system heating supply air hum rat
-						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
-						if ( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow <= 0.0 ) continue;
-						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMassFlowNoOA );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU;
+						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow <= 0.0 ) continue;
+						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlowNoOA );
 						CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow += heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-						SysHeatRetTemp += FinalZoneSizing( CtrlZoneNum ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-						SysHeatRetHumRat += FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
-						HeatDDNum = FinalZoneSizing( CtrlZoneNum ).HeatDDNum;
-						HeatTimeStepNum = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
+						SysHeatRetTemp += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						SysHeatRetHumRat += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
+						HeatDDNum = TermUnitFinalZoneSizing( TermUnitSizingIndex ).HeatDDNum;
+						HeatTimeStepNum = TermUnitFinalZoneSizing( TermUnitSizingIndex ).TimeStepNumAtHeatMax;
 						OutAirTemp += DesDayWeath( HeatDDNum ).Temp( HeatTimeStepNum ) * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						OutAirHumRat += DesDayWeath( HeatDDNum ).HumRat( HeatTimeStepNum ) * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					}
@@ -6441,7 +6456,7 @@ namespace SimAirServingZones {
 					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
-						if ( ( SysCoolSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
+						if ( ( SysCoolSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) ) {
 							// size on ventilation load
 							if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) {
 								ZoneOARatio = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA / max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA );
@@ -6504,7 +6519,7 @@ namespace SimAirServingZones {
 						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
 							CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
-							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
+							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) ) {
 								// size on ventilation load
 								if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) {
 									ZoneOARatio = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA / max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA );
@@ -6522,11 +6537,11 @@ namespace SimAirServingZones {
 						for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over the cooled zones
 							CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
-							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA <= 0.0 ) ) {
+							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA <= 0.0 ) ) {
 								ShowWarningError( "FinalSystemSizing: AirLoop=\"" + AirToZoneNodeInfo( AirLoopNum ).AirLoopName + "\", Requested sizing on Ventilation," );
 								ShowContinueError( "but Zone has no design OA Flow. Zone=\"" + ZoneEquipConfig( CtrlZoneNum ).ZoneName + "\"." );
 							}
-							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
+							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) ) {
 								// size on ventilation load
 								if (TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0) {
 									ZoneOARatio = TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA / max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA );
@@ -6535,7 +6550,7 @@ namespace SimAirServingZones {
 									ZoneOARatio = 0.0;
 								}
 								TermUnitFinalZoneSizing( TermUnitSizingIndex ).scaleZoneHeating( ZoneOARatio );
-							} else if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( FinalZoneSizing( CtrlZoneNum ).MinOA > 0.0 ) ) {
+							} else if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) ) {
 								// size on user input system design flows
 								TermUnitFinalZoneSizing( TermUnitSizingIndex ).scaleZoneHeating( SysHeatSizingRat );
 							}
@@ -6549,8 +6564,8 @@ namespace SimAirServingZones {
 				// loop over the zones cooled by this system and sum up the min cooling flow rates to get the
 				// min system cooling flow rate
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
-					FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin += FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin;
+					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+					FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin;
 				}
 				if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin <= 0.0 )  {
 					FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow;
@@ -6565,14 +6580,13 @@ namespace SimAirServingZones {
 
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
 					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 
-						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
-						FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
 
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInTempTU;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = FinalZoneSizing( CtrlZoneNum ).DesHeatCoilInHumRatTU;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU;
 					}
 				}
 			}
@@ -6679,38 +6693,41 @@ namespace SimAirServingZones {
 					//zone cooling design table
 					NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
-						PreDefTableEntry( pdchS62zcdAlN, FinalZoneSizing( CtrlZoneNum ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
-						PreDefTableEntry( pdchS62zcdEvz, FinalZoneSizing( CtrlZoneNum ).ZoneName, EvzByZoneCool( CtrlZoneNum ), 3 ); //Evz
-						PreDefTableEntry( pdchS62zcdEr, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation, 3 ); //Er
-						PreDefTableEntry( pdchS62zcdFa, FinalZoneSizing( CtrlZoneNum ).ZoneName, FaByZoneCool( CtrlZoneNum ), 3 ); //Fa
-						PreDefTableEntry( pdchS62zcdFb, FinalZoneSizing( CtrlZoneNum ).ZoneName, FbByZoneCool( CtrlZoneNum ), 3 ); //Fb
-						PreDefTableEntry( pdchS62zcdFc, FinalZoneSizing( CtrlZoneNum ).ZoneName, FcByZoneCool( CtrlZoneNum ), 3 ); //Fc
-						PreDefTableEntry( pdchS62zcdEp, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction, 3 ); //Ep
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
+						PreDefTableEntry( pdchS62zcdAlN, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
+						PreDefTableEntry( pdchS62zcdEvz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, EvzByZoneCool( CtrlZoneNum ), 3 ); //Evz
+						PreDefTableEntry( pdchS62zcdEr, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation, 3 ); //Er
+						PreDefTableEntry( pdchS62zcdFa, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FaByZoneCool( CtrlZoneNum ), 3 ); //Fa
+						PreDefTableEntry( pdchS62zcdFb, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FbByZoneCool( CtrlZoneNum ), 3 ); //Fb
+						PreDefTableEntry( pdchS62zcdFc, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FcByZoneCool( CtrlZoneNum ), 3 ); //Fc
+						PreDefTableEntry( pdchS62zcdEp, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFraction, 3 ); //Ep
 					}
 					//zone heating design table
 					NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 					if ( NumZonesHeated > 0 ) {
 						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
-							CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
-							PreDefTableEntry( pdchS62zhdAlN, FinalZoneSizing( CtrlZoneNum ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
-							PreDefTableEntry( pdchS62zhdEvz, FinalZoneSizing( CtrlZoneNum ).ZoneName, EvzByZoneHeat( CtrlZoneNum ), 3 ); //Evz
-							PreDefTableEntry( pdchS62zhdEr, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation, 3 ); //Er
-							PreDefTableEntry( pdchS62zhdFa, FinalZoneSizing( CtrlZoneNum ).ZoneName, FaByZoneHeat( CtrlZoneNum ), 3 ); //Fa
-							PreDefTableEntry( pdchS62zhdFb, FinalZoneSizing( CtrlZoneNum ).ZoneName, FbByZoneHeat( CtrlZoneNum ), 3 ); //Fb
-							PreDefTableEntry( pdchS62zhdFc, FinalZoneSizing( CtrlZoneNum ).ZoneName, FcByZoneHeat( CtrlZoneNum ), 3 ); //Fc
-							PreDefTableEntry( pdchS62zhdEp, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg, 3 ); //Ep
+							int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
+							PreDefTableEntry( pdchS62zhdAlN, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
+							PreDefTableEntry( pdchS62zhdEvz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, EvzByZoneHeat( CtrlZoneNum ), 3 ); //Evz
+							PreDefTableEntry( pdchS62zhdEr, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation, 3 ); //Er
+							PreDefTableEntry( pdchS62zhdFa, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FaByZoneHeat( CtrlZoneNum ), 3 ); //Fa
+							PreDefTableEntry( pdchS62zhdFb, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FbByZoneHeat( CtrlZoneNum ), 3 ); //Fb
+							PreDefTableEntry( pdchS62zhdFc, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FcByZoneHeat( CtrlZoneNum ), 3 ); //Fc
+							PreDefTableEntry( pdchS62zhdEp, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg, 3 ); //Ep
 						}
 					} else {
 						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) { // loop over the heated zones
-							CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
-							PreDefTableEntry( pdchS62zhdAlN, FinalZoneSizing( CtrlZoneNum ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
-							PreDefTableEntry( pdchS62zhdEvz, FinalZoneSizing( CtrlZoneNum ).ZoneName, EvzByZoneHeat( CtrlZoneNum ), 3 ); //Evz
-							PreDefTableEntry( pdchS62zhdEr, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation, 3 ); //Er
-							PreDefTableEntry( pdchS62zhdFa, FinalZoneSizing( CtrlZoneNum ).ZoneName, FaByZoneHeat( CtrlZoneNum ), 3 ); //Fa
-							PreDefTableEntry( pdchS62zhdFb, FinalZoneSizing( CtrlZoneNum ).ZoneName, FbByZoneHeat( CtrlZoneNum ), 3 ); //Fb
-							PreDefTableEntry( pdchS62zhdFc, FinalZoneSizing( CtrlZoneNum ).ZoneName, FcByZoneHeat( CtrlZoneNum ), 3 ); //Fc
-							PreDefTableEntry( pdchS62zhdEp, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg, 3 ); //Ep
+							int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
+							PreDefTableEntry( pdchS62zhdAlN, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
+							PreDefTableEntry( pdchS62zhdEvz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, EvzByZoneHeat( CtrlZoneNum ), 3 ); //Evz
+							PreDefTableEntry( pdchS62zhdEr, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation, 3 ); //Er
+							PreDefTableEntry( pdchS62zhdFa, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FaByZoneHeat( CtrlZoneNum ), 3 ); //Fa
+							PreDefTableEntry( pdchS62zhdFb, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FbByZoneHeat( CtrlZoneNum ), 3 ); //Fb
+							PreDefTableEntry( pdchS62zhdFc, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, FcByZoneHeat( CtrlZoneNum ), 3 ); //Fc
+							PreDefTableEntry( pdchS62zhdEp, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg, 3 ); //Ep
 						}
 					}
 //				}  // end of if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) // commented line allows ZoneSum method to report tables to the html file
@@ -7125,7 +7142,7 @@ namespace SimAirServingZones {
 		LimitZoneVentEff(
 		Real64 Xs,  // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
 		Real64 Voz,  // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
-		int CtrlZoneNum, //controlled zone number
+		int TermUnitSizingIndex, // terminal unit sizing index
 		Real64 & SystemCoolingEv // system ventilation efficiency
 		)
 	{
@@ -7154,37 +7171,37 @@ namespace SimAirServingZones {
 		Real64 ZoneOAFrac( 0.0 ); // ratio of Voz to available zone supply air flow
 		Real64 AvailSAFlow( 0.0 ); // available zone supply air flow [m3/s]
 
-		if ( SystemCoolingEv < FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff ) {
+		if ( SystemCoolingEv < TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneVentilationEff ) {
 			// reset ZoneOAFrac
-			ZoneOAFrac = 1.0 + Xs - FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+			ZoneOAFrac = 1.0 + Xs - TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneVentilationEff;
 			// reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
 			AvailSAFlow = Voz/ZoneOAFrac;
 			// save ZoneOAFrac 
-			FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = ZoneOAFrac;
+			TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone = ZoneOAFrac;
 			// save new (increased) minimum flow rate
-			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = AvailSAFlow;
+			TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin = AvailSAFlow;
 			// make sure the max flow rate is >= the new minimum flow rate
-			FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow = max( AvailSAFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow );
+			TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow = max( AvailSAFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow );
 			// set the system ventilation efficiency to the user specified minimum
-			SystemCoolingEv = FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff;
+			SystemCoolingEv = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneVentilationEff;
 
 			//Vpz: "Primary" supply air from main air handler served by an oa mixer
-			Real64 VpzClgByZone = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+			Real64 VpzClgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow;
 
 			//Vdz: "Discharge" supply air delivered to zone by terminal unit
 			Real64 VdzClgByZone = 0.0;
 			// Taken from similar section in SetUpSysSizingArrays
-			if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
-				VdzClgByZone = max( TermUnitSizing( CtrlZoneNum ).AirVolFlow, VpzClgByZone );
+			if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
+				VdzClgByZone = max( TermUnitSizing( TermUnitSizingIndex ).AirVolFlow, VpzClgByZone );
 			} else { // single path system
-				VdzClgByZone = FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow;
+				VdzClgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlow;
 			}
 
 			// Update VRP table entries:
-			PreDefTableEntry( pdchS62zcdVpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VpzClgByZone, 4 ); //Vpz
-			PreDefTableEntry( pdchS62zcdVdz, FinalZoneSizing( CtrlZoneNum ).ZoneName, VdzClgByZone, 4 ); //Vdz
-			PreDefTableEntry( pdchS62zcdVpzmin, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 4 ); //Vpz-min
-			PreDefTableEntry( pdchS62zcdZpz, FinalZoneSizing( CtrlZoneNum ).ZoneName, FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone, 3 ); //Zpz = Voz/Vpz		}
+			PreDefTableEntry( pdchS62zcdVpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VpzClgByZone, 4 ); //Vpz
+			PreDefTableEntry( pdchS62zcdVdz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, VdzClgByZone, 4 ); //Vdz
+			PreDefTableEntry( pdchS62zcdVpzmin, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin, 4 ); //Vpz-min
+			PreDefTableEntry( pdchS62zcdZpz, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone, 3 ); //Zpz = Voz/Vpz		}
 		}
 	}
 
