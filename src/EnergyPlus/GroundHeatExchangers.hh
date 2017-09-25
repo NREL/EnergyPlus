@@ -133,6 +133,23 @@ namespace GroundHeatExchangers {
 		{}
 	};
 
+	struct GLHEVertSingleStruct
+	{
+		// Destructor
+		~GLHEVertSingleStruct(){}
+
+		// Members
+		std::string name; // Name
+		std::shared_ptr < GLHEVertPropsStruct > props; // Properties
+		Real64 xLoc; // X-direction location {m}
+		Real64 yLoc; // Y-direction location {m}
+
+		GLHEVertSingleStruct () :
+			xLoc( 0.0 ),
+			yLoc( 0.0 )
+		{}
+	};
+
 	struct GLHEVertArrayStruct
 	{
 		// Destructor
@@ -140,7 +157,7 @@ namespace GroundHeatExchangers {
 
 		// Members
 		std::string name; // Name
-		std::shared_ptr< GLHEVertPropsStruct > props; // Properties
+		std::shared_ptr < GLHEVertPropsStruct > props; // Properties
 		int numBHinXDirection; // Number of boreholes in X direction
 		int numBHinYDirection; // Number of boreholes in Y direction
 		Real64 bhSpacing; // Borehole center-to-center spacing {m}
@@ -149,23 +166,6 @@ namespace GroundHeatExchangers {
 			numBHinXDirection( 0 ),
 			numBHinYDirection( 0 ),
 			bhSpacing( 0.0 )
-		{}
-	};
-
-	struct GLHEVertSingleStruct
-	{
-		// Destructor
-		~GLHEVertSingleStruct(){}
-
-		// Members
-		std::string name; // Name
-		std::shared_ptr< GLHEVertPropsStruct > props; // Properties
-		Real64 xLoc; // X-direction location {m}
-		Real64 yLoc; // Y-direction location {m}
-
-		GLHEVertSingleStruct () :
-			xLoc( 0.0 ),
-			yLoc( 0.0 )
 		{}
 	};
 
@@ -179,20 +179,15 @@ namespace GroundHeatExchangers {
 		Real64 gRefRatio; // Reference ratio of g-function set
 		Array1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
 		Array1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
-		std::shared_ptr< GLHEVertPropsStruct > props; // Properties
+		std::shared_ptr < GLHEVertPropsStruct > props; // Properties
+		std::vector < std::shared_ptr < GLHEVertSingleStruct > > myBorholes; // Boreholes used by this response factors object
 		Real64 maxSimYears; // Maximum length of simulation in years
 		int numGFuncPairs; // Number of g-function pairs
-		bool loadedFromIDF; // True if response factors came from IDF file
-		bool loadedFromEplusout; // True if response factors came from factors saved to eplusout.ghe
-		bool calculatedByEplus; // True if response factors were calculated by EnergyPlus
 
 		GLHEResponseFactorsStruct() :
 			gRefRatio( 0.0 ),
 			maxSimYears( 0.0 ),
-			numGFuncPairs( 0 ),
-			loadedFromIDF( false ),
-			loadedFromEplusout( false ),
-			calculatedByEplus( false )
+			numGFuncPairs( 0 )
 		{}
 	};
 
@@ -488,18 +483,28 @@ namespace GroundHeatExchangers {
 	);
 
 	// Object Data
-	extern std::vector< GLHEVert > verticalGLHE; // Vertical GLHEs
-	extern std::vector< GLHESlinky > slinkyGLHE; // Slinky GLHEs
-	extern std::vector< std::shared_ptr < GLHEVertArrayStruct > > vertArraysVector; // Vertical Arrays
-	extern std::vector< std::shared_ptr < GLHEVertPropsStruct > > vertPropsVector; // Vertical Properties
-	extern std::vector< std::shared_ptr < GLHEResponseFactorsStruct > > responseFactorsVector; // Vertical Response Factors
-	extern std::vector< std::shared_ptr< GLHEVertSingleStruct > > singleBoreholesVector; // Vertical Single Boreholes
+	extern std::vector < GLHEVert > verticalGLHE; // Vertical GLHEs
+	extern std::vector < GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	extern std::vector < std::shared_ptr < GLHEVertArrayStruct > > vertArraysVector; // Vertical Arrays
+	extern std::vector < std::shared_ptr < GLHEVertPropsStruct > > vertPropsVector; // Vertical Properties
+	extern std::vector < std::shared_ptr < GLHEResponseFactorsStruct > > responseFactorsVector; // Vertical Response Factors
+	extern std::vector < std::shared_ptr< GLHEVertSingleStruct > > singleBoreholesVector; // Vertical Single Boreholes
 
 	void
 	clear_state();
 
 	void
 	GetGroundHeatExchangerInput();
+
+	std::shared_ptr < GLHEResponseFactorsStruct >
+	BuildAndGetResponseFactorObjectFromArray(
+		std::shared_ptr < GLHEVertArrayStruct > const & arrayObjectPtr
+	);
+
+	std::shared_ptr < GLHEResponseFactorsStruct >
+	BuildAndGetResponseFactorsObjectFromSingleBHs(
+		std::vector < std::shared_ptr < GLHEVertSingleStruct > > const & singleBHsForRFVect
+	);
 
 } // GroundHeatExchangers
 

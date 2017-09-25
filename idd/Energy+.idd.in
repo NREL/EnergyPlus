@@ -68625,8 +68625,305 @@ GroundHeatExchanger:System,
   A7,   \field GHE:Vertical:Array Object Name
         \type object-list
         \object-list GroundHeatExchangerVerticalArrayNames
-  A8;   \field GHE:Vertical:Single Object Name
-        \begin extensible
+  A8,   \field GHE:Vertical:Single Object Name 1
+        \begin-extensible
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A9,   \field GHE:Vertical:Single Object Name 2
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A10,  \field GHE:Vertical:Single Object Name 3
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A11,  \field GHE:Vertical:Single Object Name 4
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A12,  \field GHE:Vertical:Single Object Name 5
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A13,  \field GHE:Vertical:Single Object Name 6
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A14,  \field GHE:Vertical:Single Object Name 7
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A15,  \field GHE:Vertical:Single Object Name 8
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A16,  \field GHE:Vertical:Single Object Name 9
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A17,  \field GHE:Vertical:Single Object Name 10
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A18,  \field GHE:Vertical:Single Object Name 11
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A19,  \field GHE:Vertical:Single Object Name 12
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A20,  \field GHE:Vertical:Single Object Name 13
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A21,  \field GHE:Vertical:Single Object Name 14
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A22,  \field GHE:Vertical:Single Object Name 15
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A23,  \field GHE:Vertical:Single Object Name 16
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A24,  \field GHE:Vertical:Single Object Name 17
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A25,  \field GHE:Vertical:Single Object Name 18
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A26,  \field GHE:Vertical:Single Object Name 19
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A27,  \field GHE:Vertical:Single Object Name 20
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A28,  \field GHE:Vertical:Single Object Name 21
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A29,  \field GHE:Vertical:Single Object Name 22
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A30,  \field GHE:Vertical:Single Object Name 23
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A31,  \field GHE:Vertical:Single Object Name 24
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A32,  \field GHE:Vertical:Single Object Name 25
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A33,  \field GHE:Vertical:Single Object Name 26
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A34,  \field GHE:Vertical:Single Object Name 27
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A35,  \field GHE:Vertical:Single Object Name 28
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A36,  \field GHE:Vertical:Single Object Name 29
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A37,  \field GHE:Vertical:Single Object Name 30
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A38,  \field GHE:Vertical:Single Object Name 31
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A39,  \field GHE:Vertical:Single Object Name 32
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A40,  \field GHE:Vertical:Single Object Name 33
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A41,  \field GHE:Vertical:Single Object Name 34
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A42,  \field GHE:Vertical:Single Object Name 35
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A43,  \field GHE:Vertical:Single Object Name 36
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A44,  \field GHE:Vertical:Single Object Name 37
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A45,  \field GHE:Vertical:Single Object Name 38
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A46,  \field GHE:Vertical:Single Object Name 39
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A47,  \field GHE:Vertical:Single Object Name 40
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A48,  \field GHE:Vertical:Single Object Name 41
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A49,  \field GHE:Vertical:Single Object Name 42
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A50,  \field GHE:Vertical:Single Object Name 43
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A51,  \field GHE:Vertical:Single Object Name 44
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A52,  \field GHE:Vertical:Single Object Name 45
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A53,  \field GHE:Vertical:Single Object Name 46
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A54,  \field GHE:Vertical:Single Object Name 47
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A55,  \field GHE:Vertical:Single Object Name 48
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A56,  \field GHE:Vertical:Single Object Name 49
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A57,  \field GHE:Vertical:Single Object Name 50
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A58,  \field GHE:Vertical:Single Object Name 51
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A59,  \field GHE:Vertical:Single Object Name 52
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A60,  \field GHE:Vertical:Single Object Name 53
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A61,  \field GHE:Vertical:Single Object Name 54
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A62,  \field GHE:Vertical:Single Object Name 55
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A63,  \field GHE:Vertical:Single Object Name 56
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A64,  \field GHE:Vertical:Single Object Name 57
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A65,  \field GHE:Vertical:Single Object Name 58
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A66,  \field GHE:Vertical:Single Object Name 59
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A67,  \field GHE:Vertical:Single Object Name 60
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A68,  \field GHE:Vertical:Single Object Name 61
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A69,  \field GHE:Vertical:Single Object Name 62
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A70,  \field GHE:Vertical:Single Object Name 63
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A71,  \field GHE:Vertical:Single Object Name 64
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A72,  \field GHE:Vertical:Single Object Name 65
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A73,  \field GHE:Vertical:Single Object Name 66
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A74,  \field GHE:Vertical:Single Object Name 67
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A75,  \field GHE:Vertical:Single Object Name 68
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A76,  \field GHE:Vertical:Single Object Name 69
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A77,  \field GHE:Vertical:Single Object Name 70
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A78,  \field GHE:Vertical:Single Object Name 71
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A79,  \field GHE:Vertical:Single Object Name 72
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A80,  \field GHE:Vertical:Single Object Name 73
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A81,  \field GHE:Vertical:Single Object Name 74
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A82,  \field GHE:Vertical:Single Object Name 75
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A83,  \field GHE:Vertical:Single Object Name 76
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A84,  \field GHE:Vertical:Single Object Name 77
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A85,  \field GHE:Vertical:Single Object Name 78
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A86,  \field GHE:Vertical:Single Object Name 79
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A87,  \field GHE:Vertical:Single Object Name 80
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A88,  \field GHE:Vertical:Single Object Name 81
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A89,  \field GHE:Vertical:Single Object Name 82
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A90,  \field GHE:Vertical:Single Object Name 83
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A91,  \field GHE:Vertical:Single Object Name 84
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A92,  \field GHE:Vertical:Single Object Name 85
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A93,  \field GHE:Vertical:Single Object Name 86
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A94,  \field GHE:Vertical:Single Object Name 87
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A95,  \field GHE:Vertical:Single Object Name 88
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A96,  \field GHE:Vertical:Single Object Name 89
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A97,  \field GHE:Vertical:Single Object Name 90
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A98,  \field GHE:Vertical:Single Object Name 91
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A99,  \field GHE:Vertical:Single Object Name 92
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A100, \field GHE:Vertical:Single Object Name 93
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A101, \field GHE:Vertical:Single Object Name 94
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A102, \field GHE:Vertical:Single Object Name 95
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A103, \field GHE:Vertical:Single Object Name 96
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A104, \field GHE:Vertical:Single Object Name 97
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A105, \field GHE:Vertical:Single Object Name 98
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A106, \field GHE:Vertical:Single Object Name 99
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A107; \field GHE:Vertical:Single Object Name 100
         \type object-list
         \object-list GroundHeatExchangerVerticalSingleNames
 
