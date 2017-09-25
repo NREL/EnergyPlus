@@ -43,8 +43,6 @@ else()
   set(GIT_DIR "")
 endif()
 
-ADD_SUBDIRECTORY(alpine)
-
 ## Set a default build type if none was specified
 #if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 #  message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -165,6 +163,8 @@ ADD_SUBDIRECTORY(third_party/jsoncpp)
 option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging only)" OFF )
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
+
+ADD_SUBDIRECTORY(alpine)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
