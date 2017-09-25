@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1174,7 +1175,6 @@ namespace ZoneContaminantPredictorCorrector {
 		Real64 Sch; // Schedule value
 		Real64 Cs; // Surface concentration level for the Boundary Layer Diffusion Controlled Model
 		static bool MyConfigOneTimeFlag( true );
-		int AirLoopNum;
 		int ContZoneNum;
 		int I;
 		static bool ErrorsFound( false );
@@ -1345,27 +1345,35 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( allocated( ZoneEquipConfig ) && MyConfigOneTimeFlag ) {
 			for ( ContZoneNum = 1; ContZoneNum <= NumContControlledZones; ++ContZoneNum ) {
 				ZoneNum = ContaminantControlledZone( ContZoneNum ).ActualZoneNum;
-				AirLoopNum = ZoneEquipConfig( ZoneNum ).AirLoopNum;
-				ContaminantControlledZone( ContZoneNum ).NumOfZones = 0;
-				for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
-					if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
-					if ( AirLoopNum == ZoneEquipConfig( Loop ).AirLoopNum ) {
-						++ContaminantControlledZone( ContZoneNum ).NumOfZones;
-					}
-				}
-				if ( ContaminantControlledZone( ContZoneNum ).NumOfZones > 0 ) {
-					ContaminantControlledZone( ContZoneNum ).ControlZoneNum.allocate( ContaminantControlledZone( ContZoneNum ).NumOfZones );
-					I = 1;
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ContZoneNum ).NumInletNodes; ++zoneInNode ) {
+					int AirLoopNum = ZoneEquipConfig( ContZoneNum ).InletNodeAirLoopNum( zoneInNode );
+					ContaminantControlledZone( ContZoneNum ).NumOfZones = 0;
 					for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 						if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
-						if ( AirLoopNum == ZoneEquipConfig( Loop ).AirLoopNum ) {
-							ContaminantControlledZone( ContZoneNum ).ControlZoneNum( I ) = Loop;
-							++I;
+						for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig( Loop ).NumInletNodes; ++zoneInNode2 ) {
+							if ( AirLoopNum == ZoneEquipConfig( Loop ).InletNodeAirLoopNum( zoneInNode2 ) ) {
+								++ContaminantControlledZone( ContZoneNum ).NumOfZones;
+								break; // only count a zone once
+							}
 						}
 					}
-				} else {
-					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
-					ErrorsFound = true;
+					if ( ContaminantControlledZone( ContZoneNum ).NumOfZones > 0 ) {
+						ContaminantControlledZone( ContZoneNum ).ControlZoneNum.allocate( ContaminantControlledZone( ContZoneNum ).NumOfZones );
+						I = 1;
+						for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
+							if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
+							for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig( Loop ).NumInletNodes; ++zoneInNode2 ) {
+								if ( AirLoopNum == ZoneEquipConfig( Loop ).InletNodeAirLoopNum( zoneInNode2 ) ) {
+									ContaminantControlledZone( ContZoneNum ).ControlZoneNum( I ) = Loop;
+									++I;
+									break; // only count a zone once
+								}
+							}
+						}
+					} else {
+						ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
+						ErrorsFound = true;
+					}
 				}
 			}
 			MyConfigOneTimeFlag = false;
@@ -2159,8 +2167,11 @@ namespace ZoneContaminantPredictorCorrector {
 					ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 				} // NodeNum
 
-				if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
-					TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
+				TotExitMassFlowRate = ExhMassFlowRate;
+				if ( ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes > 0 ) {
+					for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes; ++retNode ) {
+						TotExitMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnNode( retNode ) ).MassFlowRate / ZoneMult;
+					}
 				}
 
 				// Do the calculations for the plenum zone

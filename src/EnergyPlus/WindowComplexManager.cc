@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2993,7 +2994,6 @@ namespace WindowComplexManager {
 		using General::InterpSw;
 		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
-		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		using DataGlobals::StefanBoltzmann;
 		using TARCOGGassesParams::maxgas;
 		using TARCOGParams::maxlay;
@@ -3292,6 +3292,7 @@ namespace WindowComplexManager {
 		int SrdSurfNum; // Surrounding surface number DO loop counter
 		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
 		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+		Real64 OutSrdIR;
 
 		// fill local vars
 
@@ -3426,7 +3427,7 @@ namespace WindowComplexManager {
 
 			} else { // Exterior window (ExtBoundCond = 0)
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
-				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				OutSrdIR = 0;
 				if ( AnyLocalEnvironmentsInModel ) {
 					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
@@ -3439,7 +3440,7 @@ namespace WindowComplexManager {
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-							QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+							OutSrdIR += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
 						}
 					}
 				}
@@ -3455,7 +3456,7 @@ namespace WindowComplexManager {
 				//tsky = SkyTemp + TKelvin
 				tsky = SkyTempKelvin;
 				Ebout = sigma * pow_4( tout );
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + OutSrdIR;
 
 			}
 

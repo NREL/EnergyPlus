@@ -535,6 +535,8 @@ This is the rate of generic air contaminant added (or subtracted) to a zone from
 
 This object is used to control some details of EnergyPlus's solar, shadowing and daylighting models. There are two basic methods available for the calculations. In order to speed up the calculations, shadowing calculations (sun position, etc.) for the default method are performed over a period of days. Note that this value may be very important for determining the amount of sun entering your building and by inference the amount of cooling or heating load needed for maintaining the building. Though termed ``shadowing'' calculations, it in affect determines the sun position for a particular day in a weather file period simulation. (Each design day will use the date of the design day object). Even though weather file data contains the amount of solar radiation, the internal calculation of sun position will govern how that affects various parts of the building. By default, the calculations are done for every 20 days throughout a weather run period; an average solar position is chosen and the solar factors (such as sunlit areas of surfaces) remain the same for that number of days. When more integrated calculations are needed for controlling dynamic windows or shades, a second method is available where solar calculations are performed at each zone timestep.
 
+This object also allows setting up global flags to import and export exterior shading calculations results. This enables importing pre-calculated results of the shading fractions for each exterior building surface from external simulation tools. This also enables reusing the shading results for parametric runs which usually do not change external shading.
+
 \subsubsection{Inputs}\label{inputs-10-019}
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method-000}
@@ -561,12 +563,23 @@ In general (and you should also read the previous field description), if shadowi
 
 This field applies to the method called ``AverageOverDaysInFrequency.'' When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
 
+\paragraph{Field: External Shading Calculation Method}\label{field-external-shading-calculation-method}
+
+The field has two options: \textbf{ScheduledShading} and \textbf{InternalCalculation}. The field indicates whether the external shading is pre-calculated and imported as schedules, which overwrite the EnergyPlus calculated array of the surface sunlit fraction. If \textbf{ScheduledShading} is chosen, all external shading calculation would be performed externally (EnergyPlus internal calculations of external shading will be turned off) and be imported during the initialization of an EnergyPlus run with the schedule object defined by the \textbf{SurfaceProperty:LocalEnvironment} object of this surface. If some exterior surfaces do not have their \textbf{SurfaceProperty:LocalEnvironment} objects, no shading is assigned on those exterior surfaces. The default choice is \textbf{InternalCalculation}, indicating EnergyPlus will do the external shading calculations and no external results will be used.
+
+The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
+
+\paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
+This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. If \textbf{Yes} is chosen, the calculated results will be exported as "eplusshading.csv" file. Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. The default choice is \textbf{No}.
+
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
 \begin{lstlisting}
 ShadowCalculation,AverageOverDaysInFrequency,1;
 
 ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
+
+ShadowCalculation, AverageOverDaysInFrequency, , , , , ScheduledShading, YES;
 \end{lstlisting}
 
 Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
