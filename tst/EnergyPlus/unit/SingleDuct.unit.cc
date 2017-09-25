@@ -1314,7 +1314,6 @@ TEST_F( EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir ) {
 	SingleDuct::Sys( 1 ).OARequirementsPtr = 1;
 	SingleDuct::Sys( 1 ).AirLoopNum = 1;
 
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
  	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;	
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 0.4;
@@ -2508,8 +2507,6 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 	SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false;
 	SysATMixer( ATMixerNum ).OARequirementsPtr = 1;
 
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
-
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 1.0;
 
 	Zone( 1 ).FloorArea = 10.0;
@@ -2574,7 +2571,8 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest2 ) {
 	SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false;
 	SysATMixer( ATMixerNum ).OARequirementsPtr = 1;
 
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+ 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;	
 
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 1.0;
 

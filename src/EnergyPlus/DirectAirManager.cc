@@ -130,6 +130,7 @@ namespace DirectAirManager {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyDirectAirInitFlag;
 	}
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
@@ -148,6 +149,7 @@ namespace DirectAirManager {
 		ZoneEquipmentListChecked = false;
 		MyEnvrnFlag.deallocate();
 		MySizeFlag.deallocate();
+		MyDirectAirInitFlag.deallocate();
 	}
 
 	// Functions
@@ -377,9 +379,10 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
-							thisZoneEqConfig.SDUNum = DirectAirNum;
+							thisZoneEqConfig.InletNodeSDUNum( SupAirIn ) = DirectAirNum;
 							DirectAir( DirectAirNum ).TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							DirectAir( DirectAirNum ).ZoneEqNum = CtrlZone;
+							DirectAir( DirectAirNum ).CtrlZoneInNodeIndex = SupAirIn;
 							// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit
 							if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex > 0 ) {
 								{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex ) );
@@ -468,9 +471,10 @@ namespace DirectAirManager {
 
 			MyEnvrnFlag.allocate( NumDirectAir );
 			MySizeFlag.allocate( NumDirectAir );
+			MyDirectAirInitFlag.allocate( NumDirectAir );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
-
+			MyDirectAirInitFlag = true;
 			MyOneTimeFlag = false;
 
 		}
@@ -483,19 +487,23 @@ namespace DirectAirManager {
 				ShowWarningError( "InitDirectAir: [" + DirectAir( DirectAirNum ).cObjectName + " = " + DirectAir( Loop ).EquipID + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
+		if ( MyDirectAirInitFlag( DirectAirNum ) ) {
+			if ( DirectAir( DirectAirNum ).AirLoopNum == 0 ) {
+				if ( ( ControlledZoneNum > 0 ) && ( DirectAir( DirectAirNum ).CtrlZoneInNodeIndex > 0 ) ){
+					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( DirectAir( DirectAirNum ).ZoneEqNum ).InletNodeAirLoopNum( DirectAir( DirectAirNum ).CtrlZoneInNodeIndex );
+				}
+			} else {
+				MyDirectAirInitFlag( DirectAirNum ) = false;
+			}
+		}
+
 		if ( ! SysSizingCalc && MySizeFlag( DirectAirNum ) ) {
 
 			SizeDirectAir( DirectAirNum );
 
 			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
 			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-			if ( ControlledZoneNum > 0 ) { 
-				if ( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum > 0  ) {  
-					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum; 
-					DirectAir( DirectAirNum ).CtrlZoneNum = ControlledZoneNum; 
-					MySizeFlag( DirectAirNum ) = false;
-				}
-			} 
+			MySizeFlag( DirectAirNum ) = false;
 		}
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( DirectAirNum ) ) {
@@ -521,9 +529,7 @@ namespace DirectAirManager {
 			mDotFromOARequirement = DirectAir( DirectAirNum ).AirMassFlowRateMax;
 			int airLoopNum( 0 );
 			Real64 airLoopOAFrac( 0.0 );
-			if ( DirectAir( DirectAirNum ).ZoneEqNum > 0) {
-				airLoopNum =ZoneEquipConfig( DirectAir( DirectAirNum ).ZoneEqNum ).AirLoopNum;
-			}
+			airLoopNum = DirectAir( DirectAirNum ).AirLoopNum;
 			if ( airLoopNum > 0 ) {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( airLoopNum ).OAFrac;
 				bool UseOccSchFlag = false;

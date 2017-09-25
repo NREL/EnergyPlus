@@ -208,6 +208,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneAirTempTest )
 	NumZoneSupplyPlenums = 0;
 	SimulateAirflowNetwork = 0;
 	Zone( 1 ).IsControlled = true;
+	Zone( 1 ).ZoneEqNum = 1;
 	Zone( 1 ).Multiplier = 1;
 	Zone( 1 ).SystemZoneNodeNumber = 1;
 	Zone( 1 ).SurfaceFirst = 1;
