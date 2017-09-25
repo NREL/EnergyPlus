@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1717,8 +1718,6 @@ TestReturnAirPathIntegrity(
 	// SUBROUTINE INFORMATION:
 	//       AUTHOR         Linda Lawrie
 	//       DATE WRITTEN   March 2003
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS SUBROUTINE:
 	// This subroutine tests return air path integrity and displays the loop for each branch.
@@ -1997,22 +1996,7 @@ TestReturnAirPathIntegrity(
 					WAirLoop = Count2;
 					ValRetAPaths( _, WAirLoop ) = 0;
 					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
-					for ( int RetPathNode = 1; RetPathNode <= CountNodes; ++RetPathNode ){
-						bool RetNodeFound = false;
-						for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
-							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-							for ( int ZoneOutNum = 1; ZoneOutNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++ZoneOutNum ) {
-								if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNode( ZoneOutNum ) == AllNodes( RetPathNode ) ) {
-									ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( ZoneOutNum ) = WAirLoop;
-									RetNodeFound = true;
-									break; // leave zone return node loop
-								}
-							if ( RetNodeFound ) break; // leave controlled zone loop
-							}
-						}
-
-					}
-					break; // leave air loops loop
+					break;
 				}
 			} else {
 				ShowWarningError( "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo( Count2 ).AirLoopName );
