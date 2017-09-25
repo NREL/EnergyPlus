@@ -8758,13 +8758,16 @@ namespace AirflowNetworkBalanceManager {
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 				if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 				// Ensure all the zones served by this AirLoopHVAC to be controlled by the hybrid ventilation
-				if ( AirLoopNum > 0 ) {
-					if ( AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ) {
-						ActualZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-					}
-				} else {
-					if ( HybridVentSysAvailActualZoneNum( SysAvailNum ) == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
-						ActualZoneNum = HybridVentSysAvailActualZoneNum( SysAvailNum );
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					if ( AirLoopNum > 0 ) {
+						if ( AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) ) {
+							ActualZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
+							break;
+						}
+					} else {
+						if ( HybridVentSysAvailActualZoneNum( SysAvailNum ) == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
+							ActualZoneNum = HybridVentSysAvailActualZoneNum( SysAvailNum );
+						}
 					}
 				}
 				if ( ActualZoneNum > 0 ) {

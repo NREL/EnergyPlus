@@ -116,7 +116,6 @@ namespace DualDuct {
 		int SchedPtr; // Pointer to the correct schedule
 		Real64 MaxAirVolFlowRate; // Max Specified Volume Flow Rate of Damper [m3/sec]
 		Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
-		int InletNodeNum;
 		int HotAirInletNodeNum;
 		int ColdAirInletNodeNum;
 		int OutletNodeNum;
@@ -149,7 +148,6 @@ namespace DualDuct {
 			SchedPtr( 0 ),
 			MaxAirVolFlowRate( 0.0 ),
 			MaxAirMassFlowRate( 0.0 ),
-			InletNodeNum( 0 ),
 			HotAirInletNodeNum( 0 ),
 			ColdAirInletNodeNum( 0 ),
 			OutletNodeNum( 0 ),

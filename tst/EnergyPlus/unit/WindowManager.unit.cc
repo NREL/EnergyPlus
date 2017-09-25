@@ -462,9 +462,8 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "Zone";
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
-
+	DataHeatBalance::Zone( 1 ).ZoneEqNum = 1;
+	DataHeatBalance::Zone( 1 ).IsControlled = true;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 1;
@@ -472,7 +471,9 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	DataLoopNode::Node.allocate( 4 );
 	DataHeatBalance::TempEffBulkAir.allocate( 3 );
@@ -2575,7 +2576,9 @@ TEST_F( EnergyPlusFixture, WindowManager_SrdLWRTest )
 	DataZoneEquipment::ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	DataLoopNode::Node.allocate( 4 );
 	DataHeatBalance::TempEffBulkAir.allocate( 3 );

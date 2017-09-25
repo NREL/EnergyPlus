@@ -343,10 +343,10 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
 				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
+					AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
 					for ( CompNum = 1; CompNum <= ZoneEquipList( ListNum ).NumOfEquipTypes; ++CompNum ) {
 						for ( NodeCount = 1; NodeCount <= ZoneEquipList( ListNum ).EquipData( CompNum ).NumOutlets; ++NodeCount ) {
 							if ( ZoneEquipList( ListNum ).EquipData( CompNum ).OutletNodeNums( NodeCount ) == ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInletNodeNum ).OutNode ) {
@@ -457,11 +457,11 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
 				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				//loop over the zone supply air path inlet nodes
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
+				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
 
 					// 1. Find HVAC component plant loop connections
 					MainBranchNum = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInletNodeNum ).MainBranchIndex;
@@ -3243,21 +3243,21 @@ namespace SystemReports {
 			//if system operating in deadband reset zone load
 			if ( DeadBandOrSetback( ActualZoneNum ) ) ZoneLoad = 0.0;
 
-			// retrieve air loop indexes
-			AirLoopNum = zecCtrlZone.AirLoopNum;
-			if ( AirLoopNum == 0 ) continue;
-
-			//Zone cooling load
-			if ( ZoneLoad < -SmallLoad ) {
-				SysTotZoneLoadCLNG( AirLoopNum ) += std::abs( ZoneLoad );
-
-				//Zone heating load
-			} else if ( ZoneLoad > SmallLoad ) {
-				SysTotZoneLoadHTNG( AirLoopNum ) += std::abs( ZoneLoad );
-			}
 
 			//loop over the zone supply air path inlet nodes
 			for ( ZoneInNum = 1; ZoneInNum <= zecCtrlZone.NumInletNodes; ++ZoneInNum ) {
+				// retrieve air loop indexes
+				AirLoopNum = zecCtrlZone.InletNodeAirLoopNum( ZoneInNum );
+				if ( AirLoopNum == 0 ) continue;
+
+				//Zone cooling load - this will double count if there is more than one airloop serving the same zone - but not sure how to apportion
+				if ( ZoneLoad < -SmallLoad ) {
+					SysTotZoneLoadCLNG( AirLoopNum ) += std::abs( ZoneLoad );
+
+					//Zone heating load
+				} else if ( ZoneLoad > SmallLoad ) {
+					SysTotZoneLoadHTNG( AirLoopNum ) += std::abs( ZoneLoad );
+				}
 				auto const & zecCtrlZoneCool = zecCtrlZone.AirDistUnitCool( ZoneInNum );
 				auto const & zecCtrlZoneHeat = zecCtrlZone.AirDistUnitHeat( ZoneInNum );
 
@@ -3993,14 +3993,6 @@ namespace SystemReports {
 		int AirDistCoolInletNodeNum; // Air distribution unit inlet node number
 		int AirDistHeatInletNodeNum; // Air distribution unit outlet node number
 
-		Real64 AirSysEnthReturnAir; // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
-		Real64 AirSysEnthMixedAir; // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
-		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system [J]
-		Real64 ADUCoolFlowrate; // Air distribution unit cooling air mass flow rate [kg/s]
-		Real64 ADUHeatFlowrate; // Air distribution unit heating air mass flow rate [kg/s]
-		Real64 AirSysTotalMixFlowRate; // Mixed air mass flow rate [kg/s]
-		Real64 AirSysOutAirFlow; // outside air flow rate for zone from primary air system [kg/s]
-
 		Real64 ZFAUEnthReturnAir; // Zone forced Air unit enthalpy of the return air [kJ/kgK]
 		Real64 ZFAUTempMixedAir; // Zone forced Air unit dry-bulb temperature of the mixed air [C]
 		Real64 ZFAUHumRatMixedAir; // Zone forced Air unit humidity ratio of the mixed air [kg/kg]
@@ -4044,14 +4036,9 @@ namespace SystemReports {
 
 		for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 			if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+			Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
+			Real64 ZAirSysOutAirFlow = 0.0; // outside air flow rate for zone from all primary air systems serving thezone [kg/s]
 			// first clear out working variables from previous zone.
-			AirDistCoolInletNodeNum = 0;
-			AirDistHeatInletNodeNum = 0;
-			ADUCoolFlowrate = 0.0;
-			ADUHeatFlowrate = 0.0;
-			AirSysTotalMixFlowRate = 0.0;
-			AirSysZoneVentLoad = 0.0;
-			AirSysOutAirFlow = 0.0;
 			ZFAUFlowRate = 0.0;
 			ZFAUZoneVentLoad = 0.0;
 			ZFAUOutAirFlow = 0.0;
@@ -4236,34 +4223,44 @@ namespace SystemReports {
 
 			}
 
-			// retrieve air loop indexes
-			AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-			if ( AirLoopNum != 0 ) { // deal with primary air system
-				//loop over the zone supply air path inlet nodes
-
-				for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
+			//loop over the zone supply air path inlet nodes
+			for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
+				Real64 AirSysEnthReturnAir = 0.0; // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
+				Real64 AirSysEnthMixedAir = 0.0; // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
+				Real64 AirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from primary air system [J]
+				Real64 ADUCoolFlowrate = 0.0; // Air distribution unit cooling air mass flow rate [kg/s]
+				Real64 ADUHeatFlowrate = 0.0; // Air distribution unit heating air mass flow rate [kg/s]
+				Real64 AirSysTotalMixFlowRate = 0.0; // Mixed air mass flow rate [kg/s]
+				Real64 AirSysOutAirFlow = 0.0; // outside air flow rate for zone from primary air system [kg/s]
+				// retrieve air loop index
+				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum );
+				MixedAirNode = 0;
+				ReturnAirNode = 0;
+				AirDistCoolInletNodeNum = 0;
+				AirDistHeatInletNodeNum = 0;
+				if ( AirLoopNum != 0 ) { // deal with primary air system
 					AirDistCoolInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode, 0 );
 					AirDistHeatInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode, 0 );
 					// Set for cooling or heating path
 					if ( AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum == 0 ) {
-						ADUCoolFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUCoolFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else if ( AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum == 0 ) {
-						ADUHeatFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUHeatFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else if ( AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum != AirDistHeatInletNodeNum ) {
 						// dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-						ADUHeatFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
-						ADUCoolFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUHeatFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUCoolFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else if ( AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0 ) {
 						// dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-						ADUCoolFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUCoolFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else {
 						// do nothing (already inits)
 					}
+					//Find the mixed air node and return air node of the system that supplies the zone
+					MixedAirNode = PrimaryAirSystem( AirLoopNum ).OASysOutletNodeNum;
+					ReturnAirNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
 				}
 
-				//Find the mixed air node and return air node of the system that supplies the zone
-				MixedAirNode = PrimaryAirSystem( AirLoopNum ).OASysOutletNodeNum;
-				ReturnAirNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
 				if ( MixedAirNode == 0 || ReturnAirNode == 0 ) {
 					AirSysZoneVentLoad = 0.0;
 					AirSysOutAirFlow = 0.0;
@@ -4291,11 +4288,12 @@ namespace SystemReports {
 					//Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
 					AirSysZoneVentLoad = ( ADUCoolFlowrate + ADUHeatFlowrate ) * ( AirSysEnthMixedAir - AirSysEnthReturnAir ) * TimeStepSys * SecInHour; //*KJperJ
 				}
-
+				ZAirSysZoneVentLoad += AirSysZoneVentLoad;
+				ZAirSysOutAirFlow += AirSysOutAirFlow;
 			} // primary air system present
 
 			//now combine OA flow from zone forced air units with primary air system
-			OutAirFlow = AirSysOutAirFlow + ZFAUOutAirFlow;
+			OutAirFlow = ZAirSysOutAirFlow + ZFAUOutAirFlow;
 			// assign report variables
 			ZoneOAMassFlow( CtrlZoneNum ) = OutAirFlow;
 			ZoneOAMass( CtrlZoneNum ) = ZoneOAMassFlow( CtrlZoneNum ) * TimeStepSys * SecInHour;
@@ -4332,7 +4330,7 @@ namespace SystemReports {
 			}
 
 			//now combine Vent load from zone forced air units with primary air system
-			ZoneVentLoad = AirSysZoneVentLoad + ZFAUZoneVentLoad;
+			ZoneVentLoad = ZAirSysZoneVentLoad + ZFAUZoneVentLoad;
 			//cycle if ZoneVentLoad is small
 			if ( std::abs( ZoneVentLoad ) < SmallLoad ) continue; // orig. had RETURN here, BG changed to CYCLE for next controlled zone in do loop.
 

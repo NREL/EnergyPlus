@@ -5630,10 +5630,6 @@ namespace PackagedTerminalHeatPump {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using DataZoneEquipment::ZoneEquipConfig;
-		using DataAirLoop::AirLoopControlInfo;
-		using DataAirLoop::AirToZoneNodeInfo;
-		using DataAirSystems::PrimaryAirSystem;
 
 		// Locals
 		Real64 SupHeaterLoad; // supplement heater load
@@ -5657,15 +5653,10 @@ namespace PackagedTerminalHeatPump {
 		Real64 AirMassFlow; // air mass flow rate [kg/s]
 		Real64 QTotUnitOut; // capacity output
 		static int SpeedNum( 1 ); // Speed number
-		int AirLoopNumber; // Index to air loop
-		Real64 SaveMassFlowRate; // saved inlet air mass flow rate [kg/s]
 		Real64 QSensUnitOut; // sensible capacity output
 		Real64 QLatUnitOut; // latent capacity output
 		int CompOp; // compressor operation; 1=on, 0=off
 		static Real64 TotalZoneLatentLoad; // Total ZONE heating load (not including outside air)
-		int TotBranchNum; // total outlet branch number
-		int ZoneSideNodeNum; // zone equip supply node
-		bool EconoActive; // TRUE if Economizer is active
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
 
@@ -5714,31 +5705,9 @@ namespace PackagedTerminalHeatPump {
 
 		OnOffFanPartLoadFraction = 1.0;
 
-		AirLoopNumber = ZoneEquipConfig( ZoneNum ).AirLoopNum;
-
-		if ( AirLoopNumber != 0 ) {
-			EconoActive = AirLoopControlInfo( AirLoopNumber ).EconoActive;
-		} else {
-			EconoActive = false;
-		}
-
-		SaveMassFlowRate = Node( InletNode ).MassFlowRate;
-		if ( ! FirstHVACIteration && PTUnit( PTUnitNum ).OpMode == CycFanCycCoil && ( QZnReq < ( -1.0 * SmallLoad ) || TotalZoneLatentLoad > SmallLoad ) && EconoActive ) {
-			// for cycling fan, cooling load, check whether furnace can meet load with compressor off
-			CompOp = Off;
-			ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-
-			if ( SpeedNum == PTUnit( PTUnitNum ).NumOfSpeedCooling && SpeedRatio == 1.0 ) {
-				// compressor on (reset inlet air mass flow rate to starting value)
-				Node( InletNode ).MassFlowRate = SaveMassFlowRate;
-				CompOp = On;
-				ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-			}
-		} else {
-			// compressor on
-			CompOp = On;
-			ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-		}
+		// compressor on
+		CompOp = On;
+		ControlVSHPOutput( PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
 		if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 			SaveCompressorPLR = PartLoadFrac;
@@ -5761,23 +5730,6 @@ namespace PackagedTerminalHeatPump {
 
 		Node( InletNode ).MassFlowRateMaxAvail = AirMassFlow;
 		Node( OutletNode ).MassFlowRateMaxAvail = AirMassFlow;
-
-		if ( ! FirstHVACIteration && AirMassFlow > 0.0 && AirLoopNumber > 0 ) {
-			TotBranchNum = PrimaryAirSystem( AirLoopNumber ).NumOutletBranches;
-			if ( TotBranchNum == 1 ) {
-				ZoneSideNodeNum = AirToZoneNodeInfo( AirLoopNumber ).ZoneEquipSupplyNodeNum( 1 );
-				// THE MASS FLOW PRECISION of the system solver is not enough for some small air flow rate iterations , BY DEBUGGING
-				// it may cause mass flow rate occilations between airloop and zoneequip
-				// specify the air flow rate directly for one-to-one system, when the iteration deviation is closing the solver precision level
-				// 0.02 is 2 * HVACFlowRateToler, in order to accomodate the system solver precision level
-				if ( std::abs( AirMassFlow - Node( ZoneSideNodeNum ).MassFlowRate ) < 0.02 ) Node( ZoneSideNodeNum ).MassFlowRateMaxAvail = AirMassFlow;
-				Node( ZoneSideNodeNum ).MassFlowRate = AirMassFlow;
-			}
-
-			// the below might be useful if more divergences occur
-			// Node(PrimaryAirSystem(AirLoopNumber)%Branch(1)%NodeNumIn)%MassFlowRateMaxAvail = AirMassFlow
-			// Node(PrimaryAirSystem(AirLoopNumber)%Branch(1)%NodeNumIn)%MassFlowRate = AirMassFlow
-		}
 
 		// report variables
 		PTUnit( PTUnitNum ).CompPartLoadRatio = SaveCompressorPLR;

@@ -450,6 +450,7 @@ namespace DataZoneEquipment {
 					continue;
 				}
 				Zone( ControlledZoneNum ).IsControlled = true;
+				Zone( ControlledZoneNum ).ZoneEqNum = ControlledZoneNum;
 				ZoneEquipConfig( ControlledZoneNum ).IsControlled = true;
 				ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum = ControlledZoneNum;
 			}
@@ -715,6 +716,8 @@ namespace DataZoneEquipment {
 
 				ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeSDUNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
 
@@ -726,6 +729,8 @@ namespace DataZoneEquipment {
 						GetZoneEquipmentDataErrorsFound = true;
 					}
 					ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( NodeNum ) = 0;
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum( NodeNum ) = 0;
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeSDUNum( NodeNum ) = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
@@ -769,12 +774,15 @@ namespace DataZoneEquipment {
 
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNode.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodePlenumNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNode = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodePlenumNum = 0; // initialize to zero here
 
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );
-					ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
-					// Save the first return air node number for now in ReturnAirNode (this wil be removed later)
-					if ( NodeNum == 1 ) ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = NodeNums( NodeNum );
 					UniqueNodeError = false;
 					CheckUniqueNodes( "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 					if ( UniqueNodeError ) {
@@ -1269,8 +1277,9 @@ namespace DataZoneEquipment {
 	int
 	GetReturnAirNodeForZone(
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
-		std::string const & NodeName  // Return air node name to match (may be blank)
-	) 
+		std::string const & NodeName,  // Return air node name to match (may be blank)
+		std::string const & calledFromDescription  // String identifying the calling function and object
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -1300,22 +1309,75 @@ namespace DataZoneEquipment {
 		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		ReturnAirNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
+			{ auto const & thisZoneEquip( ZoneEquipConfig( ControlledZoneIndex ) );
+			if ( thisZoneEquip.ActualZoneNum > 0 ) {
+				if ( NodeName == "" ) {
+					// If NodeName is blank, return first return node number, but warn if there are multiple return nodes for this zone
+					ReturnAirNodeNumber = thisZoneEquip.ReturnNode( 1 );
+					if ( thisZoneEquip.NumReturnNodes > 1 ){ 
+						ShowWarningError( "GetReturnAirNodeForZone: " + calledFromDescription + ", request for zone return node is ambiguous." );
+						ShowContinueError( "Zone=" + thisZoneEquip.ZoneName + " has "+ General::RoundSigDigits(thisZoneEquip.NumReturnNodes ) + " return nodes. First return node will be used." );
+					}
+				} else {
+					for ( int nodeCount = 1; nodeCount <= thisZoneEquip.NumReturnNodes; ++nodeCount ) {
+						int curNodeNum = thisZoneEquip.ReturnNode( nodeCount );
+						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
+							ReturnAirNodeNumber = curNodeNum;
+						}
+					}
+				}
+			}}
+		}
+
+		return ReturnAirNodeNumber;
+
+	}
+
+	int
+	GetReturnNumForZone(
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	) 
+	{
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function returns the zone return number (not the node number) for the indicated
+		// zone and node name.  If NodeName is blank, return 1 (the first return node)
+		// otherwise return the index of the matching return node name.  
+		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		int ReturnIndex; // Return number for the given zone (not the node number)
+
+		int ControlledZoneIndex;
+
+		if ( ! ZoneEquipInputsFilled ) {
+			GetZoneEquipmentData1();
+			ZoneEquipInputsFilled = true;
+		}
+
+		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ReturnIndex = 0; // default if not found
+		if ( ControlledZoneIndex > 0 ) {
 			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
 				if ( NodeName == "" ) {
 					// If NodeName is blank, return first return node number
-					ReturnAirNodeNumber = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( 1 );
+					ReturnIndex = 1;
 				} else {
 					for ( int nodeCount = 1; nodeCount <= ZoneEquipConfig( ControlledZoneIndex ).NumReturnNodes; ++nodeCount ) {
 						int curNodeNum = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( nodeCount );
 						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
-							ReturnAirNodeNumber = curNodeNum;
+							ReturnIndex = nodeCount;
 						}
 					}
 				}
 			}
 		}
 
-		return ReturnAirNodeNumber;
+		return ReturnIndex;
 
 	}
 

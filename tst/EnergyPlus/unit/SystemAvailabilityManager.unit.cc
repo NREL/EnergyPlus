@@ -205,27 +205,22 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = 1;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig( 2 ).ZoneName = "Zone 2";
 	DataZoneEquipment::ZoneEquipConfig( 2 ).ActualZoneNum = 2;
 	DataZoneEquipment::ZoneEquipConfig( 2 ).ZoneNode = 2;
-	DataZoneEquipment::ZoneEquipConfig( 2 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig( 3 ).ZoneName = "Zone 3";
 	DataZoneEquipment::ZoneEquipConfig( 3 ).ActualZoneNum = 3;
 	DataZoneEquipment::ZoneEquipConfig( 3 ).ZoneNode = 3;
-	DataZoneEquipment::ZoneEquipConfig( 3 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig( 4 ).ZoneName = "Zone 4";
 	DataZoneEquipment::ZoneEquipConfig( 4 ).ActualZoneNum = 4;
 	DataZoneEquipment::ZoneEquipConfig( 4 ).ZoneNode = 4;
-	DataZoneEquipment::ZoneEquipConfig( 4 ).AirLoopNum = 2;
 
 	DataZoneEquipment::ZoneEquipConfig( 5 ).ZoneName = "Zone 5";
 	DataZoneEquipment::ZoneEquipConfig( 5 ).ActualZoneNum = 5;
 	DataZoneEquipment::ZoneEquipConfig( 5 ).ZoneNode = 5;
-	DataZoneEquipment::ZoneEquipConfig( 5 ).AirLoopNum = 2;
 
 	DataZoneEquipment::ZoneEquipInputsFilled = true;
 
@@ -693,7 +688,6 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "SPACE1-1";
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = 1;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).Name = "System Avail";
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).CtrlType = SystemAvailabilityManager::CycleOnAny;

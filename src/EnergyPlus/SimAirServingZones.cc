@@ -98,7 +98,9 @@
 #include <HVACUnitarySystem.hh>
 #include <InputProcessor.hh>
 #include <MixedAir.hh>
+#include <MixerComponent.hh>
 #include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
@@ -566,6 +568,7 @@ namespace SimAirServingZones {
 			OASysContListNum = 0;
 			PackagedUnit( AirSysNum ) = false;
 			PrimaryAirSystem( AirSysNum ).OASysExists = false; // init Outside Air system connection data to none
+			PrimaryAirSystem( AirSysNum ).isAllOA = false;
 			PrimaryAirSystem( AirSysNum ).OASysInletNodeNum = 0;
 			PrimaryAirSystem( AirSysNum ).OASysOutletNodeNum = 0;
 			PrimaryAirSystem( AirSysNum ).NumOAHeatCoils = 0;
@@ -682,14 +685,17 @@ namespace SimAirServingZones {
 					break;
 				}
 			}
-			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) ) { // there, see if it's in the controlled zone info
+			if ( ( test == 0 ) && ( AirToZoneNodeInfo( AirSysNum ).NumReturnNodes > 0 ) ) { // there, see if it's in the controlled zone info
 				for ( count = 1; count <= NumOfZones; ++count ) {
-					if ( ZoneEquipConfig( count ).ReturnAirNode != AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) ) continue;
-					test = count;
-					break;
+					for ( int retNode = 1; retNode <= DataZoneEquipment::ZoneEquipConfig( count ).NumReturnNodes; ++retNode) {
+						if ( ZoneEquipConfig( count ).ReturnNode( retNode ) != AirToZoneNodeInfo( AirSysNum ).ZoneEquipReturnNodeNum( 1 ) ) continue;
+						test = count;
+						break;
+					}
+				if ( test == count ) break;
 				}
 			}
-			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) ) {
+			if ( ( test == 0 ) && ( AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0 ) &&  ! lAlphaBlanks( 7 ) ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid." );
 				ShowContinueError( cAlphaFields( 7 ) + " (Return Air Path or ZoneHVAC:EquipmentConnections) not valid = \"" + Alphas( 7 ) + "\"." );
 				ErrorsFound = true;
@@ -781,6 +787,18 @@ namespace SimAirServingZones {
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum.allocate( NumCompsOnBranch + 1 );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum( 1 ) = InletNodeNumbers( 1 );
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).DuctType = Main;
+
+				// If first node is an outdoor air node, then consider this to have a simple OA system (many places check for this)
+				if ( OutAirNodeManager::CheckOutAirNodeNumber( InletNodeNumbers( 1 ) ) ) {
+					PrimaryAirSystem( AirSysNum ).OASysExists = true;
+					PrimaryAirSystem( AirSysNum ).isAllOA = true;
+					PrimaryAirSystem( AirSysNum ).OASysInletNodeNum = InletNodeNumbers( 1 );
+					PrimaryAirSystem( AirSysNum ).OASysOutletNodeNum = InletNodeNumbers( 1 );
+					PrimaryAirSystem( AirSysNum ).OAMixOAInNodeNum = InletNodeNumbers( 1 );
+					AirToOANodeInfo( AirSysNum ).OASysExists = true;
+					AirToOANodeInfo( AirSysNum ).OASysInletNodeNum = InletNodeNumbers( 1 );
+					AirToOANodeInfo( AirSysNum ).OASysOutletNodeNum = InletNodeNumbers( 1 );
+				}
 				for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 
 					PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf = CompTypes( CompNum );
@@ -1662,8 +1680,6 @@ namespace SimAirServingZones {
 
 					// Now Loop over the Supply Air Path outlet nodes and find out which zone and which air terminal
 					// unit on that zone is connected to that supply air path.
-					// Need to be sure AirloopHVAC:UnitarySystem input has been gotten before this check executes
-					//HVACUnitarySystem::GetUnitarySystemInput();
 
 					for ( SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum ) {
 						FoundSupPathZoneConnect = false;
@@ -1692,7 +1708,11 @@ namespace SimAirServingZones {
 										ZoneInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 										TermInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode;
 										TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
-										ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
+										if ( AirLoopNum > 0 ) {
+											if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) {
+												ZoneEquipConfig( CtrlZoneNum ).ZoneHasAirLoopWithOASys = true;
+											}
+										}
 										ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									}
 									FoundSupPathZoneConnect = true;
@@ -1724,7 +1744,6 @@ namespace SimAirServingZones {
 										ZoneInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 										TermInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode;
 										TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
-										if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
 										if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									}
 									FoundSupPathZoneConnect = true;
@@ -1778,8 +1797,7 @@ namespace SimAirServingZones {
 									ZoneInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 									TermInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode;
 									TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
-									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
-									if (ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
+									if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									goto ControlledZoneLoop2_exit;
 
 								}
@@ -1794,8 +1812,7 @@ namespace SimAirServingZones {
 									ZoneInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
 									TermInletNodesHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode;
 									TermUnitSizingNumsHeat( NumZonesHeat ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).TermUnitSizingIndex;
-									if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == 0 ) ZoneEquipConfig( CtrlZoneNum ).AirLoopNum = AirLoopNum;
-									if (ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
+									if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) == 0 ) ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
 									goto ControlledZoneLoop2_exit;
 
 								}
@@ -1881,6 +1898,9 @@ namespace SimAirServingZones {
 				}
 			}
 
+			// now connect return nodes with airloops and corresponding inlet nodes
+			ConnectReturnNodes();
+
 			InitAirLoopsOneTimeFlag = false;
 
 			CtrlZoneNumsCool.deallocate();
@@ -1913,7 +1933,7 @@ namespace SimAirServingZones {
 							FoundOASys = true;
 						}
 						if ( CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel ) {
-							if ( PrimaryAirSystem(AirLoopNum).OASysExists ) {
+							if ( PrimaryAirSystem( AirLoopNum ).OASysExists && !PrimaryAirSystem( AirLoopNum ).isAllOA ) {
 								if ( FoundOASys ) {
 									if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3 ) {
 										GetFanIndex( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound );
@@ -1931,7 +1951,7 @@ namespace SimAirServingZones {
 							}
 						}
 						if ( CompTypeNum == Fan_System_Object ) {
-							if ( PrimaryAirSystem(AirLoopNum).OASysExists ) {
+							if ( PrimaryAirSystem( AirLoopNum ).OASysExists && !PrimaryAirSystem( AirLoopNum ).isAllOA ) {
 								if ( FoundOASys ) {
 									if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3 ) {
 										SupFanIndex = HVACFan::getFanObjectVectorIndex( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
@@ -2167,7 +2187,7 @@ namespace SimAirServingZones {
 				for ( InNum = 1; InNum <= PrimaryAirSystem( AirLoopNum ).NumInletBranches; ++InNum ) {
 					InBranchNum = PrimaryAirSystem( AirLoopNum ).InletBranchNum( InNum );
 					NodeNumIn = PrimaryAirSystem( AirLoopNum ).Branch( InBranchNum ).NodeNumIn;
-					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply * AirLoopFlow( AirLoopNum ).ReqSupplyFrac - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment );
+					Node( NodeNumIn ).MassFlowRate = AirLoopFlow( AirLoopNum ).DesSupply * AirLoopFlow( AirLoopNum ).ReqSupplyFrac - ( AirLoopFlow( AirLoopNum ).SupFlow - AirLoopFlow( AirLoopNum ).SysRetFlow );
 				}
 			}
 
@@ -2175,8 +2195,104 @@ namespace SimAirServingZones {
 
 	}
 
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
+	void
+	ConnectReturnNodes()
+	{
+		// This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
+		// Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone, same airloop)
+
+		if ( !ZoneEquipInputsFilled ) return;
+
+		bool returnPathFound = false;
+		// Loop over all controlled zones
+		for ( int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum ) {
+			auto & thisZoneEquip( DataZoneEquipment::ZoneEquipConfig( ctrlZoneNum ) );
+			if ( !thisZoneEquip.IsControlled ) continue;
+			// Loop over each return node for this zone
+			for ( int zoneOutNum = 1; zoneOutNum <= thisZoneEquip.NumReturnNodes; ++zoneOutNum ) {
+				returnPathFound = false;
+				int airLoopNum = 0;
+				int thisReturnNode = thisZoneEquip.ReturnNode( zoneOutNum );
+				// Loop over all return paths
+				for ( int retPathNum = 1; retPathNum <= NumReturnAirPaths; ++retPathNum ) {
+					auto const & thisRetPath( DataZoneEquipment::ReturnAirPath( retPathNum ) );
+					// Find which airloop this return path is on
+					for ( int sysNum = 1; sysNum <= NumPrimaryAirSys; ++sysNum ) {
+						if ( AirToZoneNodeInfo( sysNum ).NumReturnNodes > 0 ) {
+							if ( thisRetPath.OutletNodeNum == AirToZoneNodeInfo( sysNum ).ZoneEquipReturnNodeNum( 1 ) ) {
+								airLoopNum = sysNum;
+								break;
+							}
+						}
+					}
+					// Loop over components in return path and each component's inlet nodes
+					for ( int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum ) {
+						int compType = thisRetPath.ComponentType_Num( compNum );
+						if ( compType == ZoneMixer_Type ) {
+							auto const & thisMixer( MixerComponent::MixerCond( thisRetPath.ComponentIndex( compNum ) ) );
+							for( int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode ) {
+								if ( thisReturnNode == thisMixer.InletNode( inNode ) ) {
+									thisZoneEquip.ReturnNodeAirLoopNum( zoneOutNum ) = airLoopNum; // set the return node airloop num
+									returnPathFound = true;
+									break; // leave component inlet node loop
+								}
+							}
+						} else if ( compType == ZoneReturnPlenum_Type ) {
+							auto const & thisPlenum( ZonePlenum::ZoneRetPlenCond( thisRetPath.ComponentIndex( compNum ) ) );
+							for( int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode ) {
+								if ( thisReturnNode == thisPlenum.InletNode( inNode ) ) {
+									thisZoneEquip.ReturnNodeAirLoopNum( zoneOutNum ) = airLoopNum; // set the return node airloop num
+									returnPathFound = true;
+									break; // leave component inlet node loop
+								}
+							}
+						}
+						if ( returnPathFound ) break; // leave return path component loop
+					}
+					if ( returnPathFound ) break; // leave return path loop
+				}
+
+				if ( airLoopNum > 0 ) {
+					// Find matching inlet node connected to the same air loop
+					for ( int inletNum = 1; inletNum <= thisZoneEquip.NumInletNodes; ++inletNum ) {
+						if ( thisZoneEquip.InletNodeAirLoopNum( inletNum ) == airLoopNum ) {
+							thisZoneEquip.ReturnNodeInletNum( zoneOutNum ) = inletNum;
+							break;
+						}
+					}
+				}
+			} // return nodes loop
+		} // controlled zones loop
+
+		// Check for any air loops that may be connected directly to a zone return node
+		for ( int airLoopNum = 1; airLoopNum <= NumPrimaryAirSys; ++airLoopNum) {
+			bool returnFound = false;
+			if ( DataAirLoop::AirToZoneNodeInfo( airLoopNum ).NumReturnNodes > 0 ) {
+				int zeqReturnNodeNum = DataAirLoop::AirToZoneNodeInfo( airLoopNum ).ZoneEquipReturnNodeNum( 1 );
+				if ( zeqReturnNodeNum > 0 ) {
+					for ( int ctrlZoneNum = 1; ctrlZoneNum <= NumOfZones; ++ctrlZoneNum ) {
+						auto & thisZoneEquip( DataZoneEquipment::ZoneEquipConfig( ctrlZoneNum ) );
+						if ( !thisZoneEquip.IsControlled ) continue;
+						for ( int zoneOutNum = 1; zoneOutNum <= thisZoneEquip.NumReturnNodes; ++zoneOutNum ) {
+							if ( thisZoneEquip.ReturnNode( zoneOutNum ) == zeqReturnNodeNum ) {
+								thisZoneEquip.ReturnNodeAirLoopNum( zoneOutNum ) = airLoopNum;
+								returnFound = true;
+								// Find matching inlet node connected to the same air loop
+								for ( int inletNum = 1; inletNum <= thisZoneEquip.NumInletNodes; ++inletNum ) {
+									if ( thisZoneEquip.InletNodeAirLoopNum( inletNum ) == airLoopNum ) {
+										thisZoneEquip.ReturnNodeInletNum( zoneOutNum ) = inletNum;
+										break;
+									}
+								}
+								break; // leave zone return node loop
+							}
+							if ( returnFound ) break; // leave controlled zone loop
+						}
+					}
+				}
+			}
+		}
+	}
 
 	void
 	SimAirLoops(
@@ -3684,6 +3800,8 @@ namespace SimAirServingZones {
 						ScalableSM = "Design ";
 				}}
 				ReportSizingOutput("AirLoopHVAC", PrimaryAirSystem(AirLoopNum).Name, ScalableSM + "Supply Air Flow Rate [m3/s]", PrimaryAirSystem(AirLoopNum).DesignVolFlowRate);
+				// Initialize MaxOutAir for DOAS loops with no actual OASys, systems with an OA controller will overwrite this is CalcOAController
+				if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) AirLoopFlow( AirLoopNum ).MaxOutAir = PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate * DataEnvironment::StdRhoAir;
 			}
 
 			if ( PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate < SmallAirVolFlow ) {
@@ -3873,8 +3991,13 @@ namespace SimAirServingZones {
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolSupHumRat = SysSizInput( SysSizNum ).CoolSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatSupHumRat = SysSizInput( SysSizNum ).HeatSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).SizingOption = SysSizInput( SysSizNum ).SizingOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+					if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = AllOA;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = AllOA;
+					} else { 
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+					}
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolAirDesMethod = SysSizInput( SysSizNum ).CoolAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatAirDesMethod = SysSizInput( SysSizNum ).HeatAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( SysSizNum ).ScaleCoolSAFMethod;
@@ -3901,8 +4024,13 @@ namespace SimAirServingZones {
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolSupHumRat = SysSizInput( 1 ).CoolSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatSupHumRat = SysSizInput( 1 ).HeatSupHumRat;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).SizingOption = SysSizInput( 1 ).SizingOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
-					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+					if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = AllOA;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = AllOA;
+					} else { 
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
+						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+					}
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolAirDesMethod = SysSizInput( 1 ).CoolAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatAirDesMethod = SysSizInput( 1 ).HeatAirDesMethod;
 					SysSizing( DesDayEnvrnNum, AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( 1 ).ScaleCoolSAFMethod;
@@ -3957,8 +4085,13 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( SysSizNum ).CoolSupHumRat;
 				FinalSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( SysSizNum ).HeatSupHumRat;
 				FinalSysSizing( AirLoopNum ).SizingOption = SysSizInput( SysSizNum ).SizingOption;
-				FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
-				FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					FinalSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else { 
+					FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				}
 				FinalSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( SysSizNum ).CoolAirDesMethod;
 				FinalSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( SysSizNum ).HeatAirDesMethod;
 				FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( SysSizNum ).ScaleCoolSAFMethod;
@@ -3996,8 +4129,13 @@ namespace SimAirServingZones {
 				CalcSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( SysSizNum ).CoolSupHumRat;
 				CalcSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( SysSizNum ).HeatSupHumRat;
 				CalcSysSizing( AirLoopNum ).SizingOption = SysSizInput( SysSizNum ).SizingOption;
-				CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
-				CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
+				}
 				CalcSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( SysSizNum ).CoolAirDesMethod;
 				CalcSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( SysSizNum ).HeatAirDesMethod;
 				CalcSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( SysSizNum ).ScaleCoolSAFMethod;
@@ -4036,8 +4174,13 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( 1 ).CoolSupHumRat;
 				FinalSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( 1 ).HeatSupHumRat;
 				FinalSysSizing( AirLoopNum ).SizingOption = SysSizInput( 1 ).SizingOption;
-				FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
-				FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					FinalSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else {
+					FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
+					FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				}
 				FinalSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( 1 ).CoolAirDesMethod;
 				FinalSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( 1 ).HeatAirDesMethod;
 				FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( 1 ).ScaleCoolSAFMethod;
@@ -4074,8 +4217,13 @@ namespace SimAirServingZones {
 				CalcSysSizing( AirLoopNum ).CoolSupHumRat = SysSizInput( 1 ).CoolSupHumRat;
 				CalcSysSizing( AirLoopNum ).HeatSupHumRat = SysSizInput( 1 ).HeatSupHumRat;
 				CalcSysSizing( AirLoopNum ).SizingOption = SysSizInput( 1 ).SizingOption;
-				CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
-				CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = AllOA;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = AllOA;
+				} else {
+					CalcSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
+					CalcSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
+				}
 				CalcSysSizing( AirLoopNum ).CoolAirDesMethod = SysSizInput( 1 ).CoolAirDesMethod;
 				CalcSysSizing( AirLoopNum ).HeatAirDesMethod = SysSizInput( 1 ).HeatAirDesMethod;
 				CalcSysSizing( AirLoopNum ).ScaleCoolSAFMethod = SysSizInput( 1 ).ScaleCoolSAFMethod;
@@ -4393,8 +4541,10 @@ namespace SimAirServingZones {
 					FinalZoneSizing(CtrlZoneNum).ZoneOAFracCooling = ZoneOAFracCooling;
 
 					// determined cooled zone floor area in an airloop
-					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {
-						FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++zoneInNode ) {
+						if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( zoneInNode ) == AirLoopNum ) {
+							FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+						}
 					}
 				}
 
@@ -4508,8 +4658,10 @@ namespace SimAirServingZones {
 						FinalZoneSizing( CtrlZoneNum ).ZoneOAFracHeating = ZoneOAFracHeating;
 
 						// determined heated zone floor area in an airloop
-						if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum ) {
-							FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++zoneInNode ) {
+							if ( ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( zoneInNode ) == AirLoopNum ) {
+								FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+							}
 						}
 
 					}

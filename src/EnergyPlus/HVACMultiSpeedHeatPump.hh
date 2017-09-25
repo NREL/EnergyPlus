@@ -398,6 +398,7 @@ namespace HVACMultiSpeedHeatPump {
 	SimMSHP(
 		int const MSHeatPumpNum, // number of the current engine driven Heat Pump being simulated
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		int const AirLoopNum, // air loop index
 		Real64 & QSensUnitOut, // cooling/heating deliveded to zones [W]
 		Real64 const QZnReq, // required zone load
 		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep

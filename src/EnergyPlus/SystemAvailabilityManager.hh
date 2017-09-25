@@ -326,6 +326,11 @@ namespace SystemAvailabilityManager {
 			ATGUpdateTemp2( 0.0 )
 		{}
 
+		void
+		SetOptStartFlag(
+			int const AirLoopNum
+		);
+
 	};
 
 	struct DefineASHRAEAdaptiveOptimumStartCoeffs // Derived type for Differential Thermostat Sys Avail Managers

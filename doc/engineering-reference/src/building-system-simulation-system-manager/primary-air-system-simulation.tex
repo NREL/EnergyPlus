@@ -6,61 +6,43 @@ Note that ``air loop'' is used inconsistently in the program: sometimes it means
 
 Like the other manager routines in EnergyPlus, \emph{ManageAirLoops} has a very simple structure:
 
-Table 39.~ ManageAirLoop Code
-
 \begin{lstlisting}
-IF (GetInputFlag) THEN  !First time subroutine has been entered
-      CALL GetAirPathData ! Get air loop descriptions from input file
-      GetInputFlag = .false.
-  END IF
-\end{lstlisting}
+if ( GetAirLoopInputFlag ) { //First time subroutine has been entered
+	GetAirPathData(); // Get air loop descriptions from input file
+	GetAirLoopInputFlag = false;
+}
 
-\begin{lstlisting}
-    ! Initialize air loop related parameters
-  CALL InitAirLoops(FirstHVACIteration)
-\end{lstlisting}
+// Initialize air loop related parameters
+InitAirLoops( FirstHVACIteration );
 
-\begin{lstlisting}
-    ! Call the AirLoop Simulation
-  IF (SysSizingCalc) THEN
-    CALL SizeAirLoops
-  ELSE
-    CALL SimAirLoops(FirstHVACIteration,SimZoneEquipment)
-  END IF
-\end{lstlisting}
+// Call the AirLoop Simulation
+if ( SysSizingCalc ) {
+	SizeAirLoops();
+} else if ( !SysSizingCalc ) {
+	SimAirLoops( FirstHVACIteration, SimZoneEquipment );
+}
 
-\begin{lstlisting}
-  ! No Update
-\end{lstlisting}
-
-\begin{lstlisting}
-    ! Report information at the Manage Air Loop Level
-  CALL ReportAirLoops
+// This flag could be used to resimulate only the air loops that needed additional iterations.
+// This flag would have to be moved inside SimAirLoops to gain this flexibility.
+SimAir = std::any_of( AirLoopControlInfo.begin(), AirLoopControlInfo.end(), []( DataAirLoop::AirLoopControlData const & e ){ return e.ResimAirLoopFlag; } );
 \end{lstlisting}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
 \item
-  ~If the user input data has not been input, get the data and store it in the air loop data structures.
+  If the user input data has not been input, get the data and store it in the air loop data structures.
 \item
   Perform air loop initialization calculations:
-\end{enumerate}
 
-\begin{lstlisting}
-a.  at the beginning of the simulation (one time initializations);
-\end{lstlisting}
-
-\begin{lstlisting}
-b.  at the start of each environment (design day or simulation run period);
-\end{lstlisting}
-
-\begin{lstlisting}
-c.   before each air loop simulation.
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
+    \begin{enumerate}
+    \item
+      at the beginning of the simulation (one time initializations);
+    \item
+      at the start of each environment (design day or simulation run period);
+    \item
+      before each air loop simulation.
+    \end{enumerate}
 \item
   If automatic sizing of the loop flow rates is called for, do it.
 \item
@@ -73,38 +55,26 @@ The input data specifying an air loop consists of:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
 \tightlist
 \item
   the loop configuration;
-\end{enumerate}
+    \begin{enumerate}
+    \item
+      Splitters, Mixers, and Branches;
+    \item
+      Components on the Branches
+    \end{enumerate}
 
-\begin{lstlisting}
-a.  Splitters, Mixers, and Branches;
-\end{lstlisting}
-
-\begin{lstlisting}
-b.  Components on the Branches
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
 \item
   loop control;
-\end{enumerate}
 
-\begin{lstlisting}
-a.  Controllers;
-\end{lstlisting}
-
-\begin{lstlisting}
-b.  System Availability Managers;
-\end{lstlisting}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
+    \begin{enumerate}
+    \item
+    Controllers;
+    \item
+    System Availability Managers;
+    \end{enumerate}
 \item
   connection to zone equipment;
 \item

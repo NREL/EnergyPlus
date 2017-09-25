@@ -61,6 +61,7 @@
 #include <DataZoneEquipment.hh>
 #include <DataEnvironment.hh>
 #include <DataZoneEnergyDemands.hh>
+#include <HeatBalanceManager.hh>
 #include <Psychrometrics.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
@@ -166,7 +167,7 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	ZoneMassBalanceFlag.allocate( 2 );
 	NumOfZones = 2;
 	MassConservation.allocate( NumOfZones );
-
+	HeatBalanceManager::AllocateHeatBalArrays();
 	AirflowNetworkNumOfExhFan = 0;
 	TempControlType( 1 ) = 4;
 	TempControlType( 2 ) = 4;
@@ -212,8 +213,6 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	ZoneEquipConfig( 2 ).InletNode( 2 ) = 7;
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
 	ZoneEquipConfig( 2 ).ExhaustNode( 1 ) = 8;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 0;
-	ZoneEquipConfig( 2 ).ReturnAirNode = 0;
 	ZoneEquipConfig( 1 ).NumReturnNodes = 0;
 	ZoneEquipConfig( 2 ).NumReturnNodes = 0;
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
@@ -278,8 +277,6 @@ TEST_F( EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment )
 	Node( 8 ).MassFlowRateMinAvail = 0.0;
 	Node( 8 ).MassFlowRateMaxAvail = 0.0;
 	Node( 8 ).MassFlowRateMax = 0.0;
-	ZoneEquipConfig( 1 ).AirLoopNum = 0;
-	ZoneEquipConfig( 2 ).AirLoopNum = 0;
 	ZoneEquipConfig( 1 ).ZoneExh = 0.0;
 	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	ZoneEquipConfig( 1 ).PlenumMassFlow = 0.0;
