@@ -599,6 +599,13 @@ namespace DataZoneEquipment {
 		Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
 	);
 
+	void
+	GetSupplyAirPath();
+
+	void
+	GetReturnAirPath();
+
+
 } // DataZoneEquipment
 
 } // EnergyPlus

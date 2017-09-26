@@ -110,6 +110,9 @@ namespace MixedAir {
 	extern int const ControllerOutsideAir;
 	extern int const ControllerStandAloneERV;
 
+	extern int const RegularOASys;
+	extern int const DOASToMultAirSys;
+
 	//Zone Outdoor Air Method
 	//INTEGER, PARAMETER :: ZOAM_FlowPerPerson = 1  ! set the outdoor air flow rate based on number of people in the zone
 	//INTEGER, PARAMETER :: ZOAM_FlowPerZone = 2    ! sum the outdoor air flow rate per zone based on user input

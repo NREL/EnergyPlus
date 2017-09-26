@@ -45,6 +45,7 @@ set( test_src
   DesiccantDehumidifiers.unit.cc
   DisplacementVentMgr.unit.cc
   DOASEffectOnZoneSizing.unit.cc
+  DOASToMultAH.unit.cc
   DualDuct.unit.cc
   DXCoils.unit.cc
   EarthTube.unit.cc

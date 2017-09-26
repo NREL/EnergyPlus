@@ -58766,10 +58766,18 @@ AirLoopHVAC:OutdoorAirSystem,
        \required-field
        \type object-list
        \object-list AirLoopOAEquipmentLists
-   A4; \field Availability Manager List Name
+   A4, \field Availability Manager List Name
        \note Enter the name of an AvailabilityManagerAssignmentList object.
        \type object-list
        \object-list SystemAvailabilityManagerLists
+   A5, \field AirLoopHVAC:SupplyPath Name
+       \note used for DOAS supplying multiple air handlers (AirLoopHVACs)
+       \type object-list
+       \object-list SupplyAirPathNames
+   A6; \field AirLoopHVAC:ReturnPath Name
+       \note used for return from DOAS supplying multiple air handlers (AirLoopHVACs)
+       \type object-list
+       \object-list ReturnAirPathNames
 
 OutdoorAir:Mixer,
       \memo Outdoor air mixer. Node names cannot be duplicated within a single OutdoorAir:Mixer
@@ -59316,6 +59324,7 @@ AirLoopHVAC:SupplyPath,
        \memo which may be in series or parallel.
    A1, \field Name
        \required-field
+       \reference SupplyAirPathNames
    A2, \field Supply Air Path Inlet Node Name
        \required-field
        \type node
@@ -60022,6 +60031,7 @@ AirLoopHVAC:ReturnPath,
        \memo and one or more AirLoopHVAC:ReturnPlenum objects.
    A1, \field Name
        \required-field
+       \reference ReturnAirPathNames
    A2, \field Return Air Path Outlet Node Name
        \required-field
        \type node

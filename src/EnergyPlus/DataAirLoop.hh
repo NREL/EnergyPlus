@@ -305,9 +305,13 @@ namespace DataAirLoop {
 	struct OutsideAirSysProps
 	{
 		// Members
+		int Type; // 1 = regular OA Sys; 2 = DOAS to mult air handlers;
 		std::string Name;
 		std::string ControllerListName;
 		std::string ComponentListName;
+		std::string AvailMgrListName;
+		std::string SupPathName;
+		std::string RetPathName;
 		int ControllerListNum; // index of the Controller List
 		int NumComponents;
 		int NumControllers;
@@ -323,6 +327,7 @@ namespace DataAirLoop {
 
 		// Default Constructor
 		OutsideAirSysProps() :
+			Type( 0 ),
 			ControllerListNum( 0 ),
 			NumComponents( 0 ),
 			NumControllers( 0 ),

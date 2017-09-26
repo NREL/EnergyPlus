@@ -209,6 +209,9 @@ namespace MixedAir {
 	int const ControllerOutsideAir( 2 );
 	int const ControllerStandAloneERV( 3 );
 
+	int const RegularOASys( 1 );
+	int const DOASToMultAirSys( 2 );
+
 	//Zone Outdoor Air Method
 	//INTEGER, PARAMETER :: ZOAM_FlowPerPerson = 1  ! set the outdoor air flow rate based on number of people in the zone
 	//INTEGER, PARAMETER :: ZOAM_FlowPerZone = 2    ! sum the outdoor air flow rate per zone based on user input
@@ -1103,7 +1106,22 @@ namespace MixedAir {
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
-			GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GetObjectItem( CurrentModuleObject, OASysNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, 
+				cAlphaFields, cNumericFields );
+			if ( NumAlphas == 6 ) {
+				OutsideAirSys( OASysNum ).Type = DOASToMultAirSys;
+				OutsideAirSys( OASysNum ).SupPathName = AlphArray( 5 );
+				OutsideAirSys( OASysNum ).RetPathName = AlphArray( 6 );
+			} else if ( NumAlphas == 5 ) {
+				ShowSevereError( CurrentModuleObject + " both AirLoopHVAC:ReturnPath and AirLoopSupplyAirPath must be entered" );
+				ErrorsFound = true;
+			} else {
+				OutsideAirSys( OASysNum ).Type = RegularOASys;
+				OutsideAirSys( OASysNum ).SupPathName = "";
+				OutsideAirSys( OASysNum ).RetPathName = "";
+			}
+
+			
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( AlphArray( 1 ), OutsideAirSys, OASysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
