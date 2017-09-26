@@ -749,6 +749,24 @@ The \emph{Height Above Ground} field is used to adjust the weather file air cond
 
 \textbf{OutdoorAir:Node} and \textbf{OutdoorAir:NodeList} both set a node to outdoor air conditions. \textbf{OutdoorAir:Node} modifies the weather file conditions if a height has been specified. \textbf{OutdoorAir:NodeList} does not have a height input and always uses the weather file conditions without modification. The same node name may not be used with both of these objects.
 
+When declared in surface property objects \textbf{SurfaceProperty:LocalEnvironment}, in zone property objects \textbf{ZoneProperty:LocalEnvironment}, or as an external node in the airflow network calculation linking to a surface node \textbf{AirflowNetwork:Multizone:Surface}, the object can also be used to define local outdoor air conditions for surfaces, zones or air loop components. The local outdoor air conditions would be used in the EnergyPlus calculations for: 
+\begin{enumerate}
+\item Convection coefficients used in the exterior surface heat balance
+
+If the user declares a local surface outdoor air node to overwrite the surface level environmental data, the convection coefficients would be calculated based on the local outdoor air node data accordingly based on surface level outdoor dry-bulb temperature, humidity ratio and wind speed. 
+
+\item Zone air infiltration and simple ventilation
+
+If the user declares a local zone outdoor air node to overwrite zone level environmental data, global environmental variables used in the subroutines for infiltration and ventilation calculation, including outdoor air temperature, humidity ratio, enthalpy, wind speed and direction, would be overwritten accordingly with zone level data. 
+
+\item External air nodes used in the AirFlowNetwork
+
+When used in the airflow network for wind pressure calculation, global environmental variables used in the subroutines for wind pressure calculation, including outdoor air temperature, humidity ratio, air density, wind speed and direction, would be overwritten accordingly with local data. 
+
+\end{enumerate}
+
+When used in these cases, optional schedule inputs of local ambient air conditions, including dry-bulb temperature, wet-bulb temperature, wind velocity, and wind direction, can be defined in the optional fields. When used in the airflow network for wind pressure calculation, the wind pressure coefficient curve name and calculation details should also be defined.
+
 \subsubsection{Inputs}\label{inputs-5-001}
 
 \paragraph{Field: Name}\label{field-name-5-001}
@@ -761,25 +779,70 @@ The height {[}m{]} of the node above ground level. A value greater than zero all
 
 A blank entry or value less than zero indicates that the height will be ignored and the weather file conditions will be used.
 
+\paragraph{Field: Drybulb Temperature Schedule Name}\label{field-drybulb-temperature-schedule-name}
+
+This field is used to supply a schedule name of the local dry bulb temperature of this node. When the field is left blank, global values would be used in calculation.
+
+\paragraph{Field: Wetbulb Temperature Schedule Name}\label{field-wetbulb-temperature-schedule-name}
+
+This field is used to supply a schedule name of the local wet bulb temperature of this node. When the field is left blank, global values would be used in calculation.
+
+\paragraph{Field: Wind Speed Schedule Name}\label{field-wind-speed-schedule-name}
+
+This field is used to supply a schedule name of the local wind speed of this node. When the field is left blank, global values would be used in calculation.
+
+\paragraph{Field: Wind Direction Schedule Name}\label{field-wind-dir-schedule-name}
+
+This field is used to supply a schedule name of the local wind direction of this node. When the field is left blank, global values would be used in calculation.
+
+\paragraph{Field: Wind Pressure Coefficient Curve Name}\label{field-wind-pressure-coeff-curve-name}
+
+The name of a specific \textbf{AirflowNetwork:MultiZone:WindPressureCoefficientValues} object (which gives wind pressure coefficients for the façade as a function of angle of wind incident on the façade).
+
+\paragraph{Field: Symmetric Wind Pressure Coefficient Curve}\label{field-sym-windp-curve-name}
+
+This field is used to specify whether the pressure curve is symmetric or not. \textbf{Yes} for curves that should be evaluated from 0 to 180 degrees. \textbf{No} for curves that should be evaluated from 0 to 360 degrees.
+
+\paragraph{Field: Wind Angle Type}\label{field-wind-angle-type}
+
+This field is used to specify whether the angle used to compute the wind pressure coefficient is absolute or relative. \textbf{Relative} for computing the angle between the wind direction and the surface azimuth. \textbf{Absolute} for using the wind direction angle directly.
+
 An example IDF:
 
 \begin{lstlisting}
 
 OutdoorAir:Node,
-    OA Node 1;  !- Name
+  OA Node 1;  !- Name
 
-  OutdoorAir:Node,
-    Floor 10 Outdoor air Inlet Node,  !- Name
-    30.0;  !- Height Above Ground {m}
+OutdoorAir:Node,
+  Floor 10 Outdoor air Inlet Node,  !- Name
+  30.0;  !- Height Above Ground {m}
+
+OutdoorAir:Node,
+  LocalOutdoorAirNode:0001,     !- Name
+  ,                             !- Height Above Ground
+  OutdoorAirNodeDryBulb:0001,   !- Drybulb Temperature Schedule Name 
+  OutdoorAirNodeWetBulb:0001,   !- Wetbulb Temperature Schedule Name
+  OutdoorAirNodeWindSpeed:0001, !- Wind Speed Schedule Name
+  OutdoorAirNodeWindDir:0001;   !- Wind Direction Schedule Name 
+  NFacade_WPCValue,             !- Wind Pressure Coefficient Curve Name
+  No,                           !- Symmetric Wind Pressure Coefficient Curve
+  Absolute;                     !- Wind Angle Type
 \end{lstlisting}
 
 \subsection{Outdoor Air Node outputs:}\label{outdoor-air-node-outputs}
 
-The ambient dry-bulb air temperature and flow rate at the outdoor air node can be monitored using the system node output variables:
+The ambient dry-bulb, wet-bulb air temperature, wind speed and direction, and flow rate at the outdoor air node can be monitored using the system node output variables:
 
 \begin{itemize}
 \item
   HVAC,Average,System Node Temperature {[}C{]}
+\item
+  HVAC,Average,System Node Wetbulb Temperature {[}C{]}
+\item
+  HVAC,Average,System Node Wind Speed {[}m/s{]}
+\item
+  HVAC,Average,System Node Wind Direction {[}degree{]}
 \item
   HVAC,Average,System Node Mass Flow Rate {[}kg/s{]}
 \end{itemize}
@@ -793,6 +856,7 @@ Output:Variable,
   System Node Temperature,
   Hourly;
 \end{lstlisting}
+
 
 \subsection{OutdoorAir:NodeList}\label{outdoorairnodelist}
 

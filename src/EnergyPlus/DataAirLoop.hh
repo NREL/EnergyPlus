@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -212,6 +213,7 @@ namespace DataAirLoop {
 		bool OASysComponentsSimulated; // - true after OA components have been simulated
 		Real64 ZoneExhMassFlow; // zone exhaust flow rate not accounted for by zone inlet flow
 		bool AirLoopDCVFlag; // TRUE if the air loop has OA Controller specifying a Mechanical controller with DCV
+		int AirLoopPass; // number of air loop passes during iteration
 		// - internal flag only
 
 		// Default Constructor
@@ -248,7 +250,8 @@ namespace DataAirLoop {
 			HeatingActiveFlag( false ),
 			OASysComponentsSimulated( false ),
 			ZoneExhMassFlow( 0.0 ),
-			AirLoopDCVFlag( true )
+			AirLoopDCVFlag( true ),
+			AirLoopPass( 0 )
 		{}
 
 	};
@@ -256,8 +259,6 @@ namespace DataAirLoop {
 	struct AirLoopFlowData // Derived type for air loop flow information
 	{
 		// Members
-		Real64 ZoneExhaust; // total of zone exhaust air mass flow rate for this loop [kg/s]
-		Real64 ZoneExhaustBalanced; // zone exhaust air that is balanced by simple air flow for loop [kg/s]
 		Real64 DesSupply; // design supply air mass flow rate for loop [kg/s]
 		Real64 DesReturnFrac; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
 		Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
@@ -266,20 +267,19 @@ namespace DataAirLoop {
 		Real64 MaxOutAir; // maximum outside air mass flow rate [kg/s]
 		Real64 OAMinFrac; // minimum outside air flow fraction this time step
 		Real64 Previous; // Previous mass air flow rate for this loop [kg/s]
-		Real64 SupFlow; // supply air flow rate [kg/s]
-		Real64 RetFlow; // return air flow rate [kg/s]
-		Real64 RetFlow0; // sum of zone return flows before adjusting for total loop exhaust
-		Real64 RecircFlow; // sum of zone plenum recirculated flows
+		Real64 SupFlow; // supply air flow rate (includes LeakFlow) [kg/s]
+		Real64 ZoneRetFlow; // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
+		Real64 ZoneRetFlowRatio; // ratio for adjusting zone return flows for excess zone exhaust
+		Real64 SysRetFlow; // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
+		Real64 RecircFlow; // sum of zone plenum recirculated flows [kg/s]
+		Real64 LeakFlow; // sum of air distribution leak flows to return plenum [kg/s]
+		Real64 ExcessZoneExhFlow; // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
 		Real64 FanPLR; // Operating PLR of air loop fan
 		Real64 OAFrac; // fraction of outside air to mixed air mass flow rate
-		Real64 ZoneMixingFlow; // total zone mixing net flow used to cap the return flow
-		Real64 RetFlowAdjustment; // difference between user-specified return flow and default return flow
 		bool FlowError; // error flag for flow error message
 
 		// Default Constructor
 		AirLoopFlowData() :
-			ZoneExhaust( 0.0 ),
-			ZoneExhaustBalanced( 0.0 ),
 			DesSupply( 0.0 ),
 			DesReturnFrac( 1.0 ),
 			SysToZoneDesFlowRatio( 0.0 ),
@@ -289,13 +289,14 @@ namespace DataAirLoop {
 			OAMinFrac( 0.0 ),
 			Previous( 0.0 ),
 			SupFlow( 0.0 ),
-			RetFlow( 0.0 ),
-			RetFlow0( 0.0 ),
+			ZoneRetFlow( 0.0 ),
+			ZoneRetFlowRatio( 1.0 ),
+			SysRetFlow( 0.0 ),
 			RecircFlow( 0.0 ),
+			LeakFlow( 0.0 ),
+			ExcessZoneExhFlow( 0.0 ),
 			FanPLR( 0.0 ),
 			OAFrac( 0.0 ),
-			ZoneMixingFlow( 0.0 ),
-			RetFlowAdjustment( 0.0 ),
 			FlowError( false )
 		{}
 

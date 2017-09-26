@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2876,14 +2877,6 @@ namespace ZoneTempPredictorCorrector {
 			}
 		}
 
-		//Tuned Precompute controlled equip zone numbers for performance
-		std::vector< int > controlledZoneEquipConfigNums;
-		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
-				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
-			}
-		}
-
 		// Update zone temperatures
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -2960,7 +2953,7 @@ namespace ZoneTempPredictorCorrector {
 			// Calculate the various heat balance sums
 
 			// NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 
 			TempDepCoef = SumHA + SumMCp;
 			TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SysDepZoneLoadsLagged( ZoneNum );
@@ -4007,14 +4000,6 @@ namespace ZoneTempPredictorCorrector {
 		// Initializations
 		ZoneTempChange = constant_zero;
 
-		//Tuned Precompute controlled equip zone numbers for performance
-		std::vector< int > controlledZoneEquipConfigNums;
-		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
-				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
-			}
-		}
-
 		// Update zone temperatures
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -4071,7 +4056,7 @@ namespace ZoneTempPredictorCorrector {
 			ManageAirModel( ZoneNum );
 
 			// Calculate the various heat balance sums
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 			//    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
 			ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
 
@@ -4324,7 +4309,7 @@ namespace ZoneTempPredictorCorrector {
 			SNLoadCoolEnergy( ZoneNum ) = std::abs( min( SNLoad, 0.0 ) * TimeStepSys * SecInHour );
 
 			// Final humidity calcs
-			CorrectZoneHumRat( ZoneNum, controlledZoneEquipConfigNums );
+			CorrectZoneHumRat( ZoneNum );
 
 			ZoneAirHumRat( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
 			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, RoutineName );
@@ -4365,7 +4350,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 			}}
 
-			CalcZoneComponentLoadSums( ZoneNum, TempDepCoef, TempIndCoef, ZnAirRpt( ZoneNum ).SumIntGains, ZnAirRpt( ZoneNum ).SumHADTsurfs, ZnAirRpt( ZoneNum ).SumMCpDTzones, ZnAirRpt( ZoneNum ).SumMCpDtInfil, ZnAirRpt( ZoneNum ).SumMCpDTsystem, ZnAirRpt( ZoneNum ).SumNonAirSystem, ZnAirRpt( ZoneNum ).CzdTdt, ZnAirRpt( ZoneNum ).imBalance, controlledZoneEquipConfigNums ); // convection part of internal gains | surface convection heat transfer | interzone mixing | OA of various kinds except via system | air system | non air system | air mass energy storage term | measure of imbalance in zone air heat balance
+			CalcZoneComponentLoadSums( ZoneNum, TempDepCoef, TempIndCoef, ZnAirRpt( ZoneNum ).SumIntGains, ZnAirRpt( ZoneNum ).SumHADTsurfs, ZnAirRpt( ZoneNum ).SumMCpDTzones, ZnAirRpt( ZoneNum ).SumMCpDtInfil, ZnAirRpt( ZoneNum ).SumMCpDTsystem, ZnAirRpt( ZoneNum ).SumNonAirSystem, ZnAirRpt( ZoneNum ).CzdTdt, ZnAirRpt( ZoneNum ).imBalance ); // convection part of internal gains | surface convection heat transfer | interzone mixing | OA of various kinds except via system | air system | non air system | air mass energy storage term | measure of imbalance in zone air heat balance
 
 		} // ZoneNum
 
@@ -4638,8 +4623,7 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	CorrectZoneHumRat(
-		int const ZoneNum,
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		int const ZoneNum
 	)
 	{
 
@@ -4661,8 +4645,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_HAMT;
@@ -4709,32 +4691,14 @@ namespace ZoneTempPredictorCorrector {
 		ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 		// Check to see if this is a controlled zone
-		ZoneEquipConfigNum = 0;
-		ControlledZoneAirFlag = false;
-		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
-			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
-				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
-				ControlledZoneAirFlag = true;
-				break;
-			}
-		}
+		ControlledZoneAirFlag = Zone( ZoneNum ).IsControlled;
 
 		// Check to see if this is a plenum zone
-		ZoneRetPlenumAirFlag = false;
-		for ( ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum ) {
-			if ( ZoneRetPlenCond( ZoneRetPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneRetPlenumAirFlag = true;
-			break;
-		} // ZoneRetPlenumNum
-		ZoneSupPlenumAirFlag = false;
-		for ( ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum ) {
-			if ( ZoneSupPlenCond( ZoneSupPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneSupPlenumAirFlag = true;
-			break;
-		} // ZoneSupPlenumNum
+		ZoneRetPlenumAirFlag = Zone( ZoneNum ).IsReturnPlenum;
+		ZoneSupPlenumAirFlag = Zone( ZoneNum ).IsSupplyPlenum;
 
 		if ( ControlledZoneAirFlag ) { // If there is system flow then calculate the flow rates
-
+			ZoneEquipConfigNum = Zone( ZoneNum ).ZoneEqNum;
 			// Calculate moisture flow rate into each zone
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 
@@ -4746,12 +4710,16 @@ namespace ZoneTempPredictorCorrector {
 				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
 
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
-				TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
+			TotExitMassFlowRate = ExhMassFlowRate;
+			if ( ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes > 0 ) {
+				for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes; ++retNode ) {
+					TotExitMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnNode( retNode ) ).MassFlowRate / ZoneMult;
+				}
 			}
 
 			// Do the calculations for the plenum zone
 		} else if ( ZoneRetPlenumAirFlag ) {
+			ZoneRetPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
 
 				MoistureMassFlowRate += ( Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).MassFlowRate * Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).HumRat ) / ZoneMult;
@@ -4776,7 +4744,7 @@ namespace ZoneTempPredictorCorrector {
 			TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 
 		} else if ( ZoneSupPlenumAirFlag ) {
-
+			ZoneSupPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			MoistureMassFlowRate += ( Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate * Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).HumRat ) / ZoneMult;
 			ZoneMassFlowRate += Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate / ZoneMult;
 			// Do not allow exhaust mass flow for a plenum zone
@@ -4972,8 +4940,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		Real64 & SumSysMCpT // Zone sum of air system MassFlowRate*Cp*T
 	)
 	{
 
@@ -5006,8 +4973,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
 		using DataDefineEquip::AirDistUnit;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
@@ -5070,34 +5035,15 @@ namespace ZoneTempPredictorCorrector {
 
 		// Sum all system air flow: SumSysMCp, SumSysMCpT
 		// Check to see if this is a controlled zone
-
-		ZoneEquipConfigNum = 0;
-		ControlledZoneAirFlag = false;
-		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
-			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
-				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
-				ControlledZoneAirFlag = true;
-				break;
-			}
-		}
+		ControlledZoneAirFlag = Zone( ZoneNum ).IsControlled;
 
 		// Check to see if this is a plenum zone
-		// BG feb 2008 repeating this do loop every time seems crazy, store ControlledZoneAirFlag in Zone structure?
-		ZoneRetPlenumAirFlag = false;
-		for ( ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum ) {
-			if ( ZoneRetPlenCond( ZoneRetPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneRetPlenumAirFlag = true;
-			break;
-		} // ZoneRetPlenumNum
-		ZoneSupPlenumAirFlag = false;
-		for ( ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum ) {
-			if ( ZoneSupPlenCond( ZoneSupPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneSupPlenumAirFlag = true;
-			break;
-		} // ZoneSupPlenumNum
+		ZoneRetPlenumAirFlag = Zone( ZoneNum ).IsReturnPlenum;
+		ZoneSupPlenumAirFlag = Zone( ZoneNum ).IsSupplyPlenum;
 
 		// Plenum and controlled zones have a different set of inlet nodes which must be calculated.
 		if ( ControlledZoneAirFlag ) {
+			ZoneEquipConfigNum = Zone( ZoneNum ).ZoneEqNum;
 			auto const & zec( ZoneEquipConfig( ZoneEquipConfigNum ) );
 			for ( int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum ) {
 				// Get node conditions
@@ -5114,6 +5060,7 @@ namespace ZoneTempPredictorCorrector {
 			} // NodeNum
 
 		} else if ( ZoneRetPlenumAirFlag ) {
+			ZoneRetPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			auto const & zrpc( ZoneRetPlenCond( ZoneRetPlenumNum ) );
 			Real64 const air_hum_rat( ZoneAirHumRat( ZoneNum ) );
 			for ( int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum ) {
@@ -5151,6 +5098,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		} else if ( ZoneSupPlenumAirFlag ) {
+			ZoneSupPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			// Get node conditions
 			NodeTemp = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).Temp;
 			MassFlowRate = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate;
@@ -5278,8 +5226,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		Real64 & imBalance // put all terms in eq. 5 on RHS , should be zero
 	)
 	{
 
@@ -5314,8 +5261,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataDefineEquip::AirDistUnit;
 		using ZonePlenum::ZoneRetPlenCond;
 		using ZonePlenum::ZoneSupPlenCond;
-		using ZonePlenum::NumZoneReturnPlenums;
-		using ZonePlenum::NumZoneSupplyPlenums;
 		using General::RoundSigDigits;
 		using InternalHeatGains::SumAllInternalConvectionGains;
 		using InternalHeatGains::SumAllReturnAirConvectionGains;
@@ -5395,35 +5340,17 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		// Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums
-		// Check to see if this is a controlled zone
 
-		// CR 7384 continuation needed below.  eliminate do loop for speed and clarity
-		ZoneEquipConfigNum = 0;
-		ControlledZoneAirFlag = false;
-		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
-			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
-				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
-				ControlledZoneAirFlag = true;
-				break;
-			}
-		}
+		// Check to see if this is a controlled zone
+		ControlledZoneAirFlag = Zone( ZoneNum ).IsControlled;
 
 		// Check to see if this is a plenum zone
-		ZoneRetPlenumAirFlag = false;
-		for ( ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= NumZoneReturnPlenums; ++ZoneRetPlenumNum ) {
-			if ( ZoneRetPlenCond( ZoneRetPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneRetPlenumAirFlag = true;
-			break;
-		} // ZoneRetPlenumNum
-		ZoneSupPlenumAirFlag = false;
-		for ( ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= NumZoneSupplyPlenums; ++ZoneSupPlenumNum ) {
-			if ( ZoneSupPlenCond( ZoneSupPlenumNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneSupPlenumAirFlag = true;
-			break;
-		} // ZoneSupPlenumNum
+		ZoneRetPlenumAirFlag = Zone( ZoneNum ).IsReturnPlenum;
+		ZoneSupPlenumAirFlag = Zone( ZoneNum ).IsSupplyPlenum;
 
 		// Plenum and controlled zones have a different set of inlet nodes which must be calculated.
 		if ( ControlledZoneAirFlag ) {
+			ZoneEquipConfigNum = Zone( ZoneNum ).ZoneEqNum;
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
 				// Get node conditions
 				NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
@@ -5432,33 +5359,34 @@ namespace ZoneTempPredictorCorrector {
 
 				SumMCpDTsystem += MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
 
+				ADUNum = ZoneEquipConfig( ZoneEquipConfigNum ).InletNodeADUNum( NodeNum );
+				if ( ADUNum > 0 ) {
+					NodeTemp = Node( AirDistUnit( ADUNum ).OutletNodeNum ).Temp;
+					MassFlowRate = Node( AirDistUnit( ADUNum ).OutletNodeNum ).MassFlowRate;
+					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+					ADUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
+					AirDistUnit( ADUNum ).HeatRate = max( 0.0, ADUHeatAddRate );
+					AirDistUnit( ADUNum ).CoolRate = std::abs( min( 0.0, ADUHeatAddRate ) );
+					AirDistUnit( ADUNum ).HeatGain = AirDistUnit( ADUNum ).HeatRate * TimeStepSys * SecInHour;
+					AirDistUnit( ADUNum ).CoolGain = AirDistUnit( ADUNum ).CoolRate * TimeStepSys * SecInHour;
+				}
+
+				SDUNum = ZoneEquipConfig( ZoneEquipConfigNum ).InletNodeSDUNum( NodeNum );
+				if ( SDUNum > 0 ) {
+					NodeTemp = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).Temp;
+					MassFlowRate = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).MassFlowRate;
+					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+					SDUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
+					DirectAir( SDUNum ).HeatRate = max( SDUHeatAddRate, 0.0 );
+					DirectAir( SDUNum ).CoolRate = std::abs( min( SDUHeatAddRate, 0.0 ) );
+					DirectAir( SDUNum ).HeatEnergy = DirectAir( SDUNum ).HeatRate * TimeStepSys * SecInHour;
+					DirectAir( SDUNum ).CoolEnergy = DirectAir( SDUNum ).CoolRate * TimeStepSys * SecInHour;
+				}
+
 			} // NodeNum
 
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum > 0 ) {
-				ADUNum = ZoneEquipConfig( ZoneEquipConfigNum ).ADUNum;
-				NodeTemp = Node( AirDistUnit( ADUNum ).OutletNodeNum ).Temp;
-				MassFlowRate = Node( AirDistUnit( ADUNum ).OutletNodeNum ).MassFlowRate;
-				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
-				ADUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
-				AirDistUnit( ADUNum ).HeatRate = max( 0.0, ADUHeatAddRate );
-				AirDistUnit( ADUNum ).CoolRate = std::abs( min( 0.0, ADUHeatAddRate ) );
-				AirDistUnit( ADUNum ).HeatGain = AirDistUnit( ADUNum ).HeatRate * TimeStepSys * SecInHour;
-				AirDistUnit( ADUNum ).CoolGain = AirDistUnit( ADUNum ).CoolRate * TimeStepSys * SecInHour;
-			}
-
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum > 0 ) {
-				SDUNum = ZoneEquipConfig( ZoneEquipConfigNum ).SDUNum;
-				NodeTemp = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).Temp;
-				MassFlowRate = Node( DirectAir( SDUNum ).ZoneSupplyAirNode ).MassFlowRate;
-				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
-				SDUHeatAddRate = MassFlowRate * CpAir * ( NodeTemp - MAT( ZoneNum ) );
-				DirectAir( SDUNum ).HeatRate = max( SDUHeatAddRate, 0.0 );
-				DirectAir( SDUNum ).CoolRate = std::abs( min( SDUHeatAddRate, 0.0 ) );
-				DirectAir( SDUNum ).HeatEnergy = DirectAir( SDUNum ).HeatRate * TimeStepSys * SecInHour;
-				DirectAir( SDUNum ).CoolEnergy = DirectAir( SDUNum ).CoolRate * TimeStepSys * SecInHour;
-			}
-
 		} else if ( ZoneRetPlenumAirFlag ) {
+			ZoneRetPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
 				// Get node conditions
 				NodeTemp = Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).Temp;
@@ -5488,6 +5416,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		} else if ( ZoneSupPlenumAirFlag ) {
+			ZoneSupPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			// Get node conditions
 			NodeTemp = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).Temp;
 			MassFlowRate = Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate;

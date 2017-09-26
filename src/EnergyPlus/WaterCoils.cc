@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -72,6 +73,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACControllers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -866,6 +868,7 @@ namespace WaterCoils {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace FaultsManager;
 		using DataAirSystems::PrimaryAirSystem;
+		using HVACControllers::GetControllerNameAndIndex;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 ); // SmallNo number in place of zero
@@ -875,6 +878,7 @@ namespace WaterCoils {
 		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int tempCoilNum; // loop variable
 		Real64 DesInletAirEnth; // Entering air enthalpy at rating (J/kg)
 		Real64 DesOutletAirEnth; // Leaving air enthalpy at rating(J/kg)
 		Real64 DesAirApparatusDewPtEnth; // Air enthalpy at apparatus dew point at rating(J/kg)
@@ -980,6 +984,11 @@ namespace WaterCoils {
 			MyCoilReportFlag = true;
 			InitWaterCoilOneTimeFlag = false;
 			PlantLoopScanFlag = true;
+
+			for ( tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum ) {
+				GetControllerNameAndIndex( WaterCoil( tempCoilNum ).WaterInletNodeNum, WaterCoil( tempCoilNum ).ControllerName, WaterCoil( tempCoilNum ).ControllerIndex, errFlag );
+			}
+
 		}
 
 		if ( PlantLoopScanFlag( CoilNum ) && allocated( PlantLoop ) ) {

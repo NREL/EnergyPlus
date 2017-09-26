@@ -4504,7 +4504,7 @@
     autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9000,                  !- Dewpoint Effectiveness Factor
     SMstore5 Evap Cooler OA node,  !- Secondary Air Inlet Node Name
-    SMstore5 Evap Cooler OA Outlet Node,  !- Secondary Air Outlet Node Name
+    SMstore5 Evap Cooler OA Outlet Node, !- Secondary Air Outlet Node Name
     SMstore5 Inlet Node,     !- Sensor Node Name
     ,                        !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name
@@ -4698,7 +4698,7 @@
     autosize,                !- Primary Air Design Flow Rate {m3/s}
     0.9000,                  !- Dewpoint Effectiveness Factor
     SMstore8 Evap Cooler OA node,  !- Secondary Air Inlet Node Name
-    SMstore8 Evap Cooler OA Outlet Node,  !- Secondary Air Outlet Node Name
+    SMstore8 Evap Cooler OA Outlet Node,     !- Secondary Air Outlet Node Name
     SMstore8 Inlet Node,     !- Sensor Node Name
     ,                        !- Relief Air Inlet Node Name
     ,                        !- Water Supply Storage Tank Name

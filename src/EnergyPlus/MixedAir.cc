@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -81,6 +82,7 @@
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
+#include <HVACControllers.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
@@ -96,6 +98,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SimAirServingZones.hh>
 #include <SteamCoils.hh>
 #include <TranspiredCollector.hh>
 #include <UserDefinedComponents.hh>
@@ -610,6 +613,7 @@ namespace MixedAir {
 		using HeatRecovery::SimHeatRecovery;
 		using DesiccantDehumidifiers::SimDesiccantDehumidifier;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+		using HVACHXAssistedCoolingCoil::HXAssistedCoil;
 		using HVACDXSystem::SimDXCoolingSystem;
 		using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
 		using SteamCoils::SimulateSteamCoilComponents;
@@ -622,6 +626,9 @@ namespace MixedAir {
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 		using Humidifiers::SimHumidifier;
+		using SimAirServingZones::SolveWaterCoilController;
+		using HVACControllers::ControllerProps;
+		using WaterCoils::WaterCoil;
 		// Locals
 		// SUBROUTINE ARGUMENTS:
 
@@ -672,12 +679,22 @@ namespace MixedAir {
 			// Coil Types
 		} else if ( SELECT_CASE_var == WaterCoil_Cooling ) { // 'Coil:Cooling:Water'
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_SimpleHeat ) { // 'Coil:Heating:Water')
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == SteamCoil_AirHeat ) { // 'Coil:Heating:Steam'
@@ -687,7 +704,12 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_DetailedCool ) { // 'Coil:Cooling:Water:DetailedGeometry'
 			if ( Sim ) {
-				SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompIndex );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, WaterCoil( CompIndex ).ControllerName, WaterCoil( CompIndex ).ControllerIndex, false );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( WaterCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == Coil_ElectricHeat ) { // 'Coil:Heating:Electric'
@@ -704,7 +726,12 @@ namespace MixedAir {
 			OAHeatingCoil = true;
 		} else if ( SELECT_CASE_var == WaterCoil_CoolingHXAsst ) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
 			if ( Sim ) {
-				SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil );
+				// get water coil and controller data if not called previously
+				if ( CompIndex == 0 ) SimHXAssistedCoolingCoil( CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil );
+				// iterate on OA sys controller and water coil at the same time
+				SolveWaterCoilController( FirstHVACIteration, AirLoopNum, CompName, CompIndex, HXAssistedCoil( CompIndex ).ControllerName, HXAssistedCoil( CompIndex ).ControllerIndex, true );
+				// set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+				ControllerProps( HXAssistedCoil( CompIndex ).ControllerIndex ).BypassControllerCalc = true;
 			}
 			OACoolingCoil = true;
 		} else if ( SELECT_CASE_var == DXSystem ) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
@@ -2183,7 +2210,6 @@ namespace MixedAir {
 		int ControlledZoneNum; // Index to controlled zones
 		bool AirNodeFound; // Used to determine if control zone is valid
 		bool AirLoopFound; // Used to determine if control zone is served by furnace air loop
-		int AirLoopNumber; // Used to determine if control zone is served by furnace air loop
 		int BranchNum; // Used to determine if control zone is served by furnace air loop
 		int CompNum; // Used to determine if control zone is served by furnace air loop
 		int HStatZoneNum; // Used to determine if control zone has a humidistat object
@@ -2351,34 +2377,30 @@ namespace MixedAir {
 						}
 						if ( OASysFound ) break;
 					}
-					//           Determine if furnace is on air loop served by the humidistat location specified
-					AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					if ( AirLoopNumber > 0 && OASysIndex > 0 ) {
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, OutsideAirSys( OASysIndex ).Name ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirLoopHVAC:OutdoorAirSystem" ) ) continue;
-								AirLoopFound = true;
+					//           Determine if controller is on air loop served by the humidistat location specified
+					for ( int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+						int AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
+						if ( AirLoopNumber > 0 && OASysIndex > 0 ) {
+							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
+								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+									if ( ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, OutsideAirSys( OASysIndex ).Name ) || ! SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirLoopHVAC:OutdoorAirSystem" ) ) continue;
+									AirLoopFound = true;
+									break;
+								}
+								if ( AirLoopFound ) break;
+							}
+							for ( HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum ) {
+								if ( HumidityControlZone( HStatZoneNum ).ActualZoneNum != OAController( OutAirNum ).HumidistatZoneNum ) continue;
+								AirNodeFound = true;
 								break;
 							}
-							if ( AirLoopFound ) break;
-						}
-						for ( HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum ) {
-							if ( HumidityControlZone( HStatZoneNum ).ActualZoneNum != OAController( OutAirNum ).HumidistatZoneNum ) continue;
-							AirNodeFound = true;
-							break;
-						}
-					} else {
-						if ( AirLoopNumber == 0 ) {
-							ShowSevereError( "Did not find a Primary Air Loop for " + OAController( OutAirNum ).ControllerType + " = \"" + OAController( OutAirNum ).Name + "\"" );
-							ShowContinueError( "Specified " + cAlphaFields( 17 ) + " = " + AlphArray( 17 ) );
-							ErrorsFound = true;
-						}
-						if ( OASysIndex == 0 ) {
-							ShowSevereError( "Did not find an AirLoopHVAC:OutdoorAirSystem for " + OAController( OutAirNum ).ControllerType + " = \"" + OAController( OutAirNum ).Name + "\"" );
-							ErrorsFound = true;
+						} else {
+							if ( OASysIndex == 0 ) {
+								ShowSevereError( "Did not find an AirLoopHVAC:OutdoorAirSystem for " + OAController( OutAirNum ).ControllerType + " = \"" + OAController( OutAirNum ).Name + "\"" );
+								ErrorsFound = true;
+							}
 						}
 					}
-					break;
 				}
 				if ( ! AirNodeFound ) {
 					ShowSevereError( "Did not find Air Node (Zone with Humidistat), " + OAController( OutAirNum ).ControllerType + " = \"" + OAController( OutAirNum ).Name + "\"" );
@@ -3115,8 +3137,7 @@ namespace MixedAir {
 			// zone exhaust mass flow is saved in AirLoopFlow%ZoneExhaust
 			// the zone exhaust mass flow that is said to be balanced by simple air flows is saved in AirLoopFlow%ZoneExhaustBalanced
 			if ( AirLoopNum > 0 ) {
-				//OAController(OAControllerNum)%ExhMassFlow = AirLoopFlow(AirLoopNum)%ZoneExhaust
-				thisOAController.ExhMassFlow = AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced - AirLoopFlow( AirLoopNum ).RetFlowAdjustment;
+				thisOAController.ExhMassFlow = max ( 0.0, AirLoopFlow( AirLoopNum ).SupFlow - AirLoopFlow( AirLoopNum ).SysRetFlow );
 				AirLoopControlInfo( AirLoopNum ).ZoneExhMassFlow = thisOAController.ExhMassFlow;
 				if ( AirLoopControlInfo( AirLoopNum ).LoopFlowRateSet && ! FirstHVACIteration ) {
 					// if flow rate has been specified by a manager, set it to the specified value

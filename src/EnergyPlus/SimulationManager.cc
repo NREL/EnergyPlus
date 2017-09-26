@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2190,16 +2191,18 @@ namespace SimulationManager {
 		if ( NumOfControlledZones > 0 ) {
 			gio::write( OutputFileBNDetails, Format_713 ) << "! <# Controlled Zones>,<Number of Controlled Zones>";
 			gio::write( OutputFileBNDetails, Format_707 ) << "#Controlled Zones," + ChrOut;
-			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<Return Air Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>";
+			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>,<# Return Nodes>";
 			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>";
 			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>";
 			for ( Count = 1; Count <= NumOfZones; ++Count ) {
 				if ( ! ZoneEquipConfig( Count ).IsControlled ) continue;
 				gio::write( ChrOut, fmtLD ) << ZoneEquipConfig( Count ).NumInletNodes;
 				gio::write( ChrOut2, fmtLD ) << ZoneEquipConfig( Count ).NumExhaustNodes;
+				gio::write( ChrOut3, fmtLD ) << ZoneEquipConfig( Count ).NumReturnNodes;
 				strip( ChrOut );
 				strip( ChrOut2 );
-				gio::write( OutputFileBNDetails, Format_713 ) << " Controlled Zone," + ZoneEquipConfig( Count ).ZoneName + ',' + ZoneEquipConfig( Count ).EquipListName + ',' + ZoneEquipConfig( Count ).ControlListName + ',' + NodeID( ZoneEquipConfig( Count ).ZoneNode ) + ',' + NodeID( ZoneEquipConfig( Count ).ReturnAirNode ) + ',' + ChrOut + ',' + ChrOut2;
+				strip( ChrOut3 );
+				gio::write( OutputFileBNDetails, Format_713 ) << " Controlled Zone," + ZoneEquipConfig( Count ).ZoneName + ',' + ZoneEquipConfig( Count ).EquipListName + ',' + ZoneEquipConfig( Count ).ControlListName + ',' + NodeID( ZoneEquipConfig( Count ).ZoneNode ) + ',' + ChrOut + ',' + ChrOut2 + ',' + ChrOut3;
 				for ( Count1 = 1; Count1 <= ZoneEquipConfig( Count ).NumInletNodes; ++Count1 ) {
 					gio::write( ChrOut, fmtLD ) << Count1;
 					strip( ChrOut );
@@ -2211,6 +2214,11 @@ namespace SimulationManager {
 					gio::write( ChrOut, fmtLD ) << Count1;
 					strip( ChrOut );
 					gio::write( OutputFileBNDetails, Format_713 ) << "   Controlled Zone Exhaust," + ChrOut + ',' + ZoneEquipConfig( Count ).ZoneName + ',' + NodeID( ZoneEquipConfig( Count ).ExhaustNode( Count1 ) );
+				}
+				for ( Count1 = 1; Count1 <= ZoneEquipConfig( Count ).NumReturnNodes; ++Count1 ) {
+					gio::write( ChrOut, fmtLD ) << Count1;
+					strip( ChrOut );
+					gio::write( OutputFileBNDetails, Format_713 ) << "   Controlled Zone Return," + ChrOut + ',' + ZoneEquipConfig( Count ).ZoneName + ',' + NodeID( ZoneEquipConfig( Count ).ReturnNode( Count1 ) );
 				}
 			}
 

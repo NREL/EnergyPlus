@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2466,6 +2467,7 @@ namespace WindowManager {
 		int SrdSurfNum; // Surrounding surface number DO loop counter
 		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
 		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+		Real64 OutSrdIR; // LWR from surrouding srfs
 
 		// New variables for thermochromic windows calc
 		Real64 locTCSpecTemp; // The temperature corresponding to the specified optical properties of the TC layer
@@ -2862,11 +2864,10 @@ namespace WindowManager {
 
 			} else { // Exterior window (Ext BoundCond = 0)
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
-				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				OutSrdIR = 0;
 				if ( AnyLocalEnvironmentsInModel ) {
 					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-						// Real64 test = surface.ViewFactorSkyIR;
 						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 							surface.ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
 						}
@@ -2876,7 +2877,7 @@ namespace WindowManager {
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-							QRadLWOutSrdSurfs( SurfNum ) += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+							OutSrdIR += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
 						}
 					}
 				}
@@ -2890,9 +2891,7 @@ namespace WindowManager {
 					tout = surface.OutDryBulbTemp + TKelvin;
 				}
 				Ebout = sigma * pow_4( tout );
-				Outir = surface.ViewFactorSkyIR * 
-					( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + 
-					surface.ViewFactorGroundIR * Ebout;
+				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout + OutSrdIR;
 
 			}
 
@@ -2996,6 +2995,18 @@ namespace WindowManager {
 		QdotConvOutRep( SurfNum ) = -surface.Area * hcout * ( Tsout - tout );
 		QdotConvOutRepPerArea( SurfNum ) = -hcout * ( Tsout - tout );
 		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * TimeStepZoneSec;
+
+		QRadLWOutSrdSurfs( SurfNum ) = 0;
+		if ( AnyLocalEnvironmentsInModel ) {
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;					
+				for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+					SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+					SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+					QRadLWOutSrdSurfs( SurfNum ) += SurfOutsideEmiss * sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) - pow_4( Tsout ) );
+				}
+			}
+		}
 
 		Real64 const Tsout_4( pow_4( Tsout ) ); //Tuned To reduce pow calls and redundancies
 		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) + QRadLWOutSrdSurfs( SurfNum ) ) );

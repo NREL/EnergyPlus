@@ -335,10 +335,6 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,
-    FLOOR SLAB 8 IN,         !- Name
-    C10 - 8 IN HW CONCRETE;  !- Outside Layer
-
-  Construction,
     ROOF34,                  !- Name
     E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2

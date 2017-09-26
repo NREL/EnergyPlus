@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -6240,7 +6241,7 @@ namespace SurfaceGeometry {
 
 				// A3: ground temp sch name
 				if ( !lAlphaFieldBlanks( 3 ) ) {
-					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 4 ) );
+					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 3 ) );
 				}
 
 				// The object requires at least one srd surface input, each surface requires a set of 3 fields (2 Alpha fields Name and Temp Sch Name and 1 Num fields View Factor)
@@ -7941,7 +7942,8 @@ namespace SurfaceGeometry {
 					if ( !lAlphaFieldBlanks( 7 ) ) {
 						retNodeName = cAlphaArgs( 7 );
 					}
-					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName );
+					std::string callDescription = cCurrentModuleObject + "=" + Surface( SurfNum ).Name;
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName, callDescription );
 					if ( SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Surface( SurfNum ).Name + "\", airflow window return air node not found for " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 						if ( !lAlphaFieldBlanks( 7 ) ) ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" did not find a matching return air node." );

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -326,7 +327,6 @@ namespace DataZoneEquipment {
 		int EquipListIndex;
 		std::string ControlListName;
 		int ZoneNode;
-		int ReturnAirNode; // first return node number
 		int NumInletNodes; // number of inlet nodes
 		int NumExhaustNodes; // number of exhaust nodes
 		int NumReturnNodes; // number of return air nodes
@@ -335,20 +335,22 @@ namespace DataZoneEquipment {
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
 		Array1D_int InletNodeAirLoopNum; // air loop number connected to this inlet node (0 if not an airloop node)
+		Array1D_int InletNodeADUNum; // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
+		Array1D_int InletNodeSDUNum; // Single duct uncontrolled connected to this inlet node (0 if none, could be zone equip or ADU)
 		Array1D_int ExhaustNode; // zone air exhaust nodes
-		Array1D_int ReturnNode; // zone return air nodes
+		Array1D_int ReturnNode; // zone return air nodes (node numbers)
 		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
+		Array1D_int ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
+		Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
-		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
-		int AirLoopNum; // the air loop index for this controlled zone
-		int FanOpMode; // =0 if no central sys;
-		// -1 if central sys is in cycling fan mode;
-		// =2 if central sysis in constant fan mode.
+
 		bool ZonalSystemOnly; // TRUE if served by a zonal system (only)
 		bool IsControlled; // True when this is a controlled zone.
 		Real64 ZoneExh; // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
 		Real64 ZoneExhBalanced; // balanced zone exhaust mass flow rate [kg/s]
 		Real64 PlenumMassFlow; // zone air mass flow rate induced from plenum [kg/s]
+		Real64 ExcessZoneExh; // excess zone exhaust to be balanced by other zones (only used when !ZoneAirMassFlow.EnforceZoneMassBalance) [kg/s]
+		Real64 TotAvailAirLoopOA; // total airloop OA available for systems serving this zone (used to apportion excess exhaust) [kg/s}
 		// AirDistUnitCool and AirDistUnitHeat
 		// do not correspond with the AIR DISTRIBUTION UNIT object in the zone equipment list.
 		// AirDistUnitCool/AirDistUnitHeat, may represent a DIRECT AIR object,
@@ -357,15 +359,12 @@ namespace DataZoneEquipment {
 		// duct AIR DISTRIBUTION object in the ZoneEquipList.
 		Array1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
 		Array1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
-		bool SupLeakToRetPlen; // True if there is supply duct leak to the
-		// plenum (simple duct leakage model)
 		bool InFloorActiveElement; // Convection adapation, true if zone has in-floor HVAC
 		bool InWallActiveElement; // Convection adapation, true if zone has in-wall HVAC
 		bool InCeilingActiveElement; // Convection adapation,
 		// true when zone has in-ceiling HVAC
-		int ADUNum; // index of Air Distribution Unit
-		int SDUNum; // index of Single Duct Uncontrolled
 		bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
+		bool ZoneHasAirLoopWithOASys; // true if zone is served by one or more airloops with an outdoor air system
 
 		// Default Constructor
 		EquipConfiguration() :
@@ -373,28 +372,25 @@ namespace DataZoneEquipment {
 			ActualZoneNum( 0 ),
 			EquipListIndex( 0 ),
 			ZoneNode( 0 ),
-			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
 			NumExhaustNodes( 0 ),
 			NumReturnNodes( 0 ),
 			NumReturnFlowBasisNodes( 0 ),
 			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),
-			ReturnZonePlenumCondNum( 0 ),
-			AirLoopNum( 0 ),
-			FanOpMode( 0 ),
+
 			ZonalSystemOnly( false ),
 			IsControlled( false ),
 			ZoneExh( 0.0 ),
 			ZoneExhBalanced( 0.0 ),
 			PlenumMassFlow( 0.0 ),
-			SupLeakToRetPlen( false ),
+			ExcessZoneExh( 0.0 ),
+			TotAvailAirLoopOA( 0.0 ),
 			InFloorActiveElement( false ),
 			InWallActiveElement( false ),
 			InCeilingActiveElement( false ),
-			ADUNum( 0 ),
-			SDUNum( 0 ),
-			ZoneHasAirFlowWindowReturn( false )
+			ZoneHasAirFlowWindowReturn( false ),
+			ZoneHasAirLoopWithOASys( false )
 		{}
 
 	};
@@ -582,6 +578,13 @@ namespace DataZoneEquipment {
 
 	int
 	GetReturnAirNodeForZone( 
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName,  // Return air node name to match (may be blank)
+		std::string const & calledFromDescription  // String identifying the calling function and object
+	);
+
+	int
+	GetReturnNumForZone( 
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
 		std::string const & NodeName  // Return air node name to match (may be blank)
 	);

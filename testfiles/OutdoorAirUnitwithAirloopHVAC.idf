@@ -408,14 +408,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -432,26 +424,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Coil:Heating:Fuel,
     Zone2OAUHeatingCoil,     !- Name
@@ -649,9 +623,9 @@
     OAUnitOASched,           !- Outdoor Air Schedule Name
     Zone5OAUFan1,            !- Supply Fan Name
     BlowThrough,             !- Supply Fan Placement
-    ,                        !- Exhaust Fan Name
-    ,                        !- Exhaust Air Flow Rate {m3/s}
-    ,                        !- Exhaust Air Schedule Name
+    Zone5OAUExFan1,          !- Exhaust Fan Name
+    0.42,                    !- Exhaust Air Flow Rate {m3/s}
+    OAUnitOASched,           !- Exhaust Air Schedule Name
     TemperatureControl,      !- Unit Control Type
     OAUHitemp2,              !- High Air Control Temperature Schedule Name
     OAULotemp2,              !- Low Air Control Temperature Schedule Name
@@ -671,6 +645,17 @@
     1.0,                     !- Motor In Airstream Fraction
     Zone5OAUOANode,          !- Air Inlet Node Name
     Zone5OAUFanOutletNode;   !- Air Outlet Node Name
+
+  Fan:ConstantVolume,
+    Zone5OAUExFan1,          !- Name
+    OAUnitOASched,           !- Availability Schedule Name
+    0.5,                     !- Fan Total Efficiency
+    75.0,                    !- Pressure Rise {Pa}
+    0.84,                    !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Airstream Fraction
+    Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
+    OutAir6;                 !- Air Outlet Node Name
 
   ZoneHVAC:OutdoorAirUnit:EquipmentList,
     Zone5OAUEquip1,          !- Name
@@ -1594,9 +1579,9 @@
     OAUnitOASched,           !- Outdoor Air Schedule Name
     Zone2OAUFan,             !- Supply Fan Name
     BlowThrough,             !- Supply Fan Placement
-    ,                        !- Exhaust Fan Name
-    0,                       !- Exhaust Air Flow Rate {m3/s}
-    ,                        !- Exhaust Air Schedule Name
+    Zone2OAUExFan,           !- Exhaust Fan Name
+    0.42,                    !- Exhaust Air Flow Rate {m3/s}
+    OAUnitOASched,           !- Exhaust Air Schedule Name
     TemperatureControl,      !- Unit Control Type
     OAUHiCtrlTemp,           !- High Air Control Temperature Schedule Name
     OAULoCtrlTemp,           !- Low Air Control Temperature Schedule Name
@@ -1894,6 +1879,17 @@
     1.0,                     !- Motor In Airstream Fraction
     Zone2OAUOANode,          !- Air Inlet Node Name
     Zone2OAUFanOutletNode;   !- Air Outlet Node Name
+
+  Fan:ConstantVolume,
+    Zone2OAUExFan,           !- Name
+    OAUnitOASched,           !- Availability Schedule Name
+    0.5,                     !- Fan Total Efficiency
+    75.0,                    !- Pressure Rise {Pa}
+    0.42,                    !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Airstream Fraction
+    HXoutnode2,              !- Air Inlet Node Name
+    OutAir2;                 !- Air Outlet Node Name
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name

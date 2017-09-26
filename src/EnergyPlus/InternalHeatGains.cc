@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1134,7 +1135,7 @@ namespace InternalHeatGains {
 					}
 
 					// Set return air node number
-					Lights( Loop ).ReturnNodePtr = 0;
+					Lights( Loop ).ZoneReturnNum = 0;
 					std::string retNodeName = "";
 					if ( !lAlphaFieldBlanks( 7 ) ) {
 						if ( LightsObjects( Item ).ZoneListActive ) {
@@ -1145,9 +1146,14 @@ namespace InternalHeatGains {
 						}
 					}
 					if ( Lights( Loop ).ZonePtr > 0 ) {
-						Lights( Loop ).ReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Zone( Lights( Loop ).ZonePtr ).Name, retNodeName );
+						Lights( Loop ).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone( Zone( Lights( Loop ).ZonePtr ).Name, retNodeName );
 					}
 
+					if ( ( Lights( Loop ).ZoneReturnNum == 0 ) && ( Lights( Loop ).FractionReturnAir > 0.0 ) &&  ( !lAlphaFieldBlanks( 7 ) ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 7 ) + " =" + AlphaName( 7 ) );
+						ShowContinueError( "No matching Zone Return Air Node found." );
+						ErrorsFound = true;
+					}
 					if ( Lights( Loop ).ZonePtr <= 0 ) continue; // Error, will be caught and terminated later
 
 					// Object report variables
@@ -1187,7 +1193,11 @@ namespace InternalHeatGains {
 						SetupEMSInternalVariable( "Lighting Power Design Level", Lights( Loop ).Name, "[W]", Lights( Loop ).DesignLevel );
 					} // EMS
 					//setup internal gains
-					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, Lights(Loop).ReturnNodePtr );
+					int returnNodeNum = 0;
+					if ( ( Lights( Loop ).ZoneReturnNum > 0 ) && (  Lights( Loop ).ZoneReturnNum <= DataZoneEquipment::ZoneEquipConfig( Lights( Loop ).ZonePtr ).NumReturnNodes ) ) {
+						returnNodeNum = DataZoneEquipment::ZoneEquipConfig( Lights( Loop ).ZonePtr ).ReturnNode( Lights( Loop ).ZoneReturnNum );
+					}
+					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, returnNodeNum );
 
 					// send values to predefined lighting summary report
 					liteName = Lights( Loop ).Name;
@@ -3361,7 +3371,7 @@ namespace InternalHeatGains {
 		Real64 FractionConvected; // For general lighting, fraction of heat from lights convected to zone air
 		Real64 FractionReturnAir; // For general lighting, fraction of heat from lights convected to zone's return air
 		Real64 FractionRadiant; // For general lighting, fraction of heat from lights to zone that is long wave
-		int ReturnZonePlenumCondNum; // Number of ZoneRetPlenCond for a zone's return air plenum, if it exists
+
 		Real64 ReturnPlenumTemp; // Air temperature of a zone's return air plenum (C)
 		Real64 pulseMultipler; // use to create a pulse for the load component report computations
 		static Real64 curQL( 0.0 ); // radiant value prior to adjustment for pulse for load component report
@@ -3506,7 +3516,8 @@ namespace InternalHeatGains {
 			if ( Lights( Loop ).FractionReturnAirIsCalculated && ! ZoneSizingCalc && SimTimeSteps > 1 ) {
 				// Calculate FractionReturnAir based on conditions in the zone's return air plenum, if there is one.
 				if ( Zone( NZ ).IsControlled ) {
-					ReturnZonePlenumCondNum = ZoneEquipConfig( NZ ).ReturnZonePlenumCondNum;
+					int retNum = Lights( Loop ).ZoneReturnNum;
+					int ReturnZonePlenumCondNum = ZoneEquipConfig( NZ ).ReturnNodePlenumNum( retNum );
 					if ( ReturnZonePlenumCondNum > 0 ) {
 						ReturnPlenumTemp = ZoneRetPlenCond( ReturnZonePlenumCondNum ).ZoneTemp;
 						FractionReturnAir = Lights( Loop ).FractionReturnAirPlenTempCoeff1 - Lights( Loop ).FractionReturnAirPlenTempCoeff2 * ReturnPlenumTemp;
@@ -4127,7 +4138,7 @@ namespace InternalHeatGains {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
 		int ZoneLoop; // Counter for the # of zones (nz)
-		static Array1D_int TradIntGainTypes( 7, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int TradIntGainTypes( 8, { IntGainTypeOf_People, IntGainTypeOf_Lights, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_ElectricEquipmentITEAirCooled, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
 
 		// FLOW:
 		for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
@@ -5343,10 +5354,10 @@ namespace InternalHeatGains {
 		static int TimeStepInDay( 0 );
 		static Array1D_int IntGainTypesPeople( 1, { IntGainTypeOf_People } );
 		static Array1D_int IntGainTypesLight( 1, { IntGainTypeOf_Lights } );
-		static Array1D_int IntGainTypesEquip( 5, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
-		static Array1D_int IntGainTypesRefrig( 7, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesEquip( 6, { IntGainTypeOf_ElectricEquipment, IntGainTypeOf_ElectricEquipmentITEAirCooled, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment } );
+		static Array1D_int IntGainTypesRefrig( 10, { IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn, IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler, IntGainTypeOf_RefrigerationTransSysSuctionPipeMT, IntGainTypeOf_RefrigerationTransSysSuctionPipeLT } );
 		static Array1D_int IntGainTypesWaterUse( 3, { IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified } );
-		static Array1D_int IntGainTypesHvacLoss( 13, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined } );
+		static Array1D_int IntGainTypesHvacLoss( 20, { IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_PipeIndoor, IntGainTypeOf_Pump_VarSpeed, IntGainTypeOf_Pump_ConSpeed, IntGainTypeOf_Pump_Cond, IntGainTypeOf_PumpBank_VarSpeed, IntGainTypeOf_PumpBank_ConSpeed, IntGainTypeOf_PlantComponentUserDefined, IntGainTypeOf_CoilUserDefined, IntGainTypeOf_ZoneHVACForcedAirUserDefined, IntGainTypeOf_AirTerminalUserDefined, IntGainTypeOf_PackagedTESCoilTank, IntGainTypeOf_FanSystemModel, IntGainTypeOf_SecCoolingDXCoilSingleSpeed, IntGainTypeOf_SecHeatingDXCoilSingleSpeed, IntGainTypeOf_SecCoolingDXCoilTwoSpeed, IntGainTypeOf_SecCoolingDXCoilMultiSpeed, IntGainTypeOf_SecHeatingDXCoilMultiSpeed } );
 		static Array1D_int IntGainTypesPowerGen( 9, { IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_ElectricLoadCenterConverter } );
 
 		if ( CompLoadReportIsReq && ! isPulseZoneSizing ) {

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -390,7 +391,10 @@ namespace HeatBalanceSurfaceManager {
 		Real64 QIC; // Intermediate calculation variable
 		Real64 QOC; // Intermediate calculation variable
 		int SurfNum; // DO loop counter for surfaces
-		int SrdSurfsNum; // DO loop counter for surfaces
+		int SrdSurfsNum; // DO loop counter for srd surfaces
+		int SrdSurfNum;
+		Real64 SrdSurfsViewFactor;
+
 		int Term; // DO loop counter for conduction equation terms
 		Real64 TSC; // Intermediate calculation variable (temperature at source location)
 		Real64 TUC; // Intermediate calculation variable (temperature at user specified location)
@@ -449,31 +453,49 @@ namespace HeatBalanceSurfaceManager {
 		if ( AnyLocalEnvironmentsInModel) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).HasLinkedOutAirNode ) {
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
-						Surface( SurfNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
-						Surface( SurfNum ).OutWetBulbTemp = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
-						Surface( SurfNum ).WindSpeed = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
-					}
-					if ( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
-						Surface( SurfNum ).WindDir = GetCurrentScheduleValue( Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
-					}
+					Surface( SurfNum ).OutDryBulbTemp = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirDryBulb;
+					Surface( SurfNum ).OutWetBulbTemp = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWetBulb;
+					Surface( SurfNum ).WindSpeed = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindSpeed;
+					Surface( SurfNum ).WindDir = Node( Surface( SurfNum ).LinkedOutAirNode ).OutAirWindDir;
 				}
+
 				if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
-					SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
-						Surface( SurfNum ).ViewFactorSkyIR *= SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+					SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;				
+					SrdSurfsViewFactor = 0;
+					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor >= 0 ) {
+						SrdSurfsViewFactor += SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
 					}
-					if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor != -1 ) {
-						Surface( SurfNum ).ViewFactorGroundIR *= SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+					if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor >= 0 ) {
+						SrdSurfsViewFactor += SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
 					}
-				}
+					for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+						SrdSurfsViewFactor += SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+					}
+					// Check if the sum of all defined view factors > 1.0
+					if ( SrdSurfsViewFactor > 1.0 ) {
+						ShowSevereError( "Illegal surrounding surfaces view factors for " +  Surface( SurfNum ).Name + "." );
+						ShowContinueError( " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0." );
+					}
+					if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor >= 0 && SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor >= 0 ) {
+						// If both surface sky and ground view factor defined, overwrite with the defined value
+						Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;				
+					} else if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor >= 0 && SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor < 0 ) {
+						// If only sky view factor defined, gound view factor = 1 - all other defined view factors.
+						Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						Surface( SurfNum ).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
+					} else if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor < 0 && SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor >= 0 ) {
+						// If only ground view factor defined, sky view factor = 1 - all other defined view factors.
+						Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+						Surface( SurfNum ).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
+					} else {
+						// If neither ground or sky view factor define, continue to use the original proportion.
+						Surface( SurfNum ).ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
+						Surface( SurfNum ).ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
+					}
+				}	
 			}
 		}
-
 		// Overwriting surface and zone level environmental data with EMS override value 
 		if ( AnyEnergyManagementSystemInModel ) {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -491,8 +513,6 @@ namespace HeatBalanceSurfaceManager {
 				}
 			}
 		}
-
-
 
 		// Do the Begin Simulation initializations
 		if ( BeginSimFlag ) {
@@ -5076,12 +5096,13 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 			}
 			// Calculate LWR from surrounding surfaces if defined for an exterior surface
+			QRadLWOutSrdSurfs( SurfNum ) = 0;
 			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+				TSurf = TH( 1, 1, SurfNum ) + KelvinConv;
 				for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 					SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
-					SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-					TSurf = TempExt + KelvinConv;
+					SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;					
 					QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) - pow_4( TSurf ) );
 				}
 			}
@@ -6258,6 +6279,10 @@ CalcOutsideSurfTemp(
 	int SurfNum2; // TDD:DIFFUSER object number
 	int ZoneNum2; // TDD:DIFFUSER zone number
 	int SrdSurfsNum; // Counter
+	int SrdSurfNum; // Surrounding surface number DO loop counter
+	Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+	Real64 SrdSurfViewFac; // View factor of a surrounding surface
+
 	Real64 Ueff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
 	Real64 RadTemp; // local value for Effective radiation temperature for OtherSideConditions model
 	Real64 HRad; // local value for effective (linearized) radiation coefficient
@@ -6383,11 +6408,20 @@ CalcOutsideSurfTemp(
 
 	// multiply out linearized radiation coeffs for reporting
 	Real64 const HExtSurf_fac( -( HSkyExtSurf( SurfNum ) * ( TH11 - TSky ) + HAirExtSurf( SurfNum ) * ( TH11 - TempExt ) + HGrdExtSurf( SurfNum ) * ( TH11 - TGround ) ) );
-	QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac;
-	QdotRadOutRepPerArea( SurfNum ) = HExtSurf_fac;
-
-	//QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac + QRadLWOutSrdSurfs( SurfNum );	
-	//QdotRadOutRepPerArea( SurfNum ) = QdotRadOutRep( SurfNum ) / Surface( SurfNum ).Area;
+	Real64 QRadLWOutSrdSurfsRep;
+	QRadLWOutSrdSurfsRep = 0;
+	// Report LWR from surrounding surfaces for current exterior surf temp 
+	// Current exterior surf temp would be used for the next step LWR calculation.
+	if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+		SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+		for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+			SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+			SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;					
+			QRadLWOutSrdSurfsRep += StefanBoltzmann * Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) - pow_4( TH11 + KelvinConv) );
+		}
+	}
+	QdotRadOutRep( SurfNum ) = Surface( SurfNum ).Area * HExtSurf_fac + Surface( SurfNum ).Area * QRadLWOutSrdSurfsRep;
+	QdotRadOutRepPerArea( SurfNum ) = QdotRadOutRep( SurfNum ) / Surface( SurfNum ).Area;
 
 	QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;
 	// Set the radiant system heat balance coefficients if this surface is also a radiant system

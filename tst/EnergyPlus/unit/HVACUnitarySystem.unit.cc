@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -151,7 +152,9 @@ protected:
 		ZoneEquipConfig( 1 ).ZoneName = "EAST ZONE";
 		ZoneEquipConfig( 1 ).EquipListName = "ZONE2EQUIPMENT";
 		ZoneEquipConfig( 1 ).ZoneNode = 20;
-		ZoneEquipConfig( 1 ).ReturnAirNode = 21;
+		ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+		ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+		ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 21;
 		Zone( ZoneEquipConfig( 1 ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( 1 ).ZoneNode;
 		ZoneEquipConfig( 1 ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 		ZoneEquipList( 1 ).Name = "ZONE2EQUIPMENT";
@@ -4374,7 +4377,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
-	AirLoopNum = ZoneEquipConfig( 1 ).AirLoopNum;
+	AirLoopNum = 0;
 	HeatingLoad = false;
 	CoolingLoad = false;
 
@@ -5879,8 +5882,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
 	GetZoneEquipmentData1( ); // read zone equipment configuration and list objects
-
-	ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 	BranchInputManager::ManageBranchInput( ); // just gets input and returns.
 
