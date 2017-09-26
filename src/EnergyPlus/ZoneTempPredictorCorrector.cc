@@ -3578,10 +3578,10 @@ namespace ZoneTempPredictorCorrector {
 		ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP = LoadToHeatingSetPoint * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * LoadCorrectionFactor( ZoneNum );
 		ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP = LoadToCoolingSetPoint * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * LoadCorrectionFactor( ZoneNum );
 
-		//init each sequenced demand to the full output
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired; // array assignment
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP; // array assignment
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP; // array assignment
+		//DON'T need this here?  Same thing is done over in ZoneEquipmentManager::InitSystemOutputRequired // init each sequenced demand to the full output
+		//if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired; // array assignment
+		//if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP; // array assignment
+		//if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP; // array assignment
 
 	}
 

@@ -518,11 +518,26 @@ namespace DataZoneEquipment {
 
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
+				if (! lAlphaBlanks( 2 ) ){
+					if ( SameString( AlphArray( 2 ), "SequentialLoad" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::sequentialLoading;
+					} else if ( SameString( AlphArray( 2 ), "UniformLoad" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::uniformLoading;
+					} else if ( SameString( AlphArray( 2 ), "UniformPLR" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::uniformPLRLoading;
+					} else if ( SameString( AlphArray( 2 ), "SequentialUniformPLR" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::sequentialUniformPLRLoading;
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\", Invalid choice." );
+						ShowContinueError( "..." + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\"." );
+						GetZoneEquipmentDataErrorsFound = true;
+					}
+				}
 				maxEquipCount = 0;
-				numEquipCount = ( NumAlphas - 1 ) / 2;
-				if ( numEquipCount * 2 != ( NumAlphas - 1 ) ) ++numEquipCount;
+				numEquipCount = ( NumAlphas - 2 ) / 2;
+				if ( numEquipCount * 2 != ( NumAlphas - 2 ) ) ++numEquipCount;
 				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= numEquipCount; ++ZoneEquipTypeNum ) {
-					if ( ! lAlphaBlanks( 2 * ZoneEquipTypeNum ) && ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 1 ) ) {
+					if ( ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 1 ) && ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 2 ) ) {
 						++maxEquipCount;
 						continue;
 					}
@@ -549,8 +564,8 @@ namespace DataZoneEquipment {
 				IdealLoadsOnEquipmentList = false;
 
 				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
-					ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum );
-					ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 1 );
+					ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 1 );
+					ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 2 );
 					ValidateComponent( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ), ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ), IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + CurrentModuleObject + '=' + ZoneEquipList( ControlledZoneNum ).Name );

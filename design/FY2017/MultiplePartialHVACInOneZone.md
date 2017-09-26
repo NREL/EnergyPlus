@@ -5,6 +5,7 @@ Improve Control of Multiple HVAC in One Zone
 
  - November 30, 2016 - Original NFP
  - January 4, 2017 - Revised NFP and Initial Design
+ - September 25, 2017 - Draft Final Design
  
 Reviewers - Raustad, Griffith, Lee, Gu, Horowitz, Merket, Winkler, Sheier
 
@@ -140,9 +141,13 @@ Transition will be required for `ZoneHVAC:EquipmentList`.
 
 ## Design ##
 
-Not many details worked out here yet.
+1. Add an enum class to `DataZoneEquipment` to hold the load distribution types.
+2. Add a new field `LoadDistScheme` to `DataZoneEquipment::ZoneEquipList`.
+3. Modify `DataZoneEquipment::GetZoneEquipmentData1` to take the new input.
+4. Add logic for the new load distribution in a new function `ZoneEquipmentManager::DistributeSystemOutputRequired` called after `ZoneEquipmentManager::SetPrioritySimOrder`.
+5. Add logic in `ZoneEquipmentManager::UpdateSystemOutputRequired` to do the right thing with remaining loads depending on the load distribution scheme.
 
-The logical place to make the load assignements/adjustements is in
+The logical place to make the load assignments/adjustments is in
 ```
 Array1D< Real64 > SequencedOutputRequired;
 Array1D< Real64 > SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence

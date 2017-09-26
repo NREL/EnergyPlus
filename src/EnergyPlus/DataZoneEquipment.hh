@@ -143,6 +143,14 @@ namespace DataZoneEquipment {
 
 	// Types
 
+	enum class LoadDist 
+	{
+		sequentialLoading,
+		uniformLoading,
+		uniformPLRLoading,
+		sequentialUniformPLRLoading
+	};
+
 	struct EquipMeterData
 	{
 		// Members
@@ -424,7 +432,7 @@ namespace DataZoneEquipment {
 		Real64 TotPlantSupplyOther;
 		Real64 PlantSupplyOtherEff;
 		Real64 PeakPlantSupplyOtherEff;
-		Real64 Capacity;
+		//Real64 Capacity;
 		int OpMode;
 
 		// Default Constructor
@@ -449,7 +457,7 @@ namespace DataZoneEquipment {
 			TotPlantSupplyOther( 0.0 ),
 			PlantSupplyOtherEff( 0.0 ),
 			PeakPlantSupplyOtherEff( 0.0 ),
-			Capacity( 0.0 ),
+			//Capacity( 0.0 ),
 			OpMode( 0 )
 		{}
 
@@ -459,7 +467,10 @@ namespace DataZoneEquipment {
 	{
 		// Members
 		std::string Name; // Name of the equipment list
+		DataZoneEquipment::LoadDist LoadDistScheme; // load distribution scheme
 		int NumOfEquipTypes; // Number of items on this list
+		int NumAvailHeatEquip; // Number of pieces of equipment available for heating
+		int NumAvailCoolEquip; // Number of pieces of equipment available for cooling
 		Array1D_string EquipType;
 		Array1D_int EquipType_Num;
 		Array1D_string EquipName;
@@ -470,7 +481,10 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		EquipList() :
-			NumOfEquipTypes( 0 )
+			LoadDistScheme( DataZoneEquipment::LoadDist::sequentialLoading ),
+			NumOfEquipTypes( 0 ),
+			NumAvailHeatEquip( 0 ),
+			NumAvailCoolEquip( 0 )
 		{}
 
 	};

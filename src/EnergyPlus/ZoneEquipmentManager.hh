@@ -152,6 +152,11 @@ namespace ZoneEquipmentManager {
 	);
 
 	void
+	DistributeSystemOutputRequired(
+		int const ActualZoneNum
+	);
+
+	void
 	UpdateSystemOutputRequired(
 		int const ZoneNum,
 		Real64 const SysOutputProvided, // sensible output provided by zone equipment (W)

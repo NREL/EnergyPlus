@@ -41864,7 +41864,14 @@ ZoneHVAC:EquipmentList,
   A1 , \field Name
        \required-field
        \reference ZoneEquipmentLists
-  A2 , \field Zone Equipment 1 Object Type
+  A2 , \field Load Distribution Scheme
+       \type choice
+       \key SequentialLoad
+       \key UniformLoad
+       \key UniformPLR
+       \key SequentialUniformPLR
+       \default SequentialLoad
+  A3 , \field Zone Equipment 1 Object Type
        \begin-extensible
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
@@ -41901,7 +41908,7 @@ ZoneHVAC:EquipmentList,
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
        \required-field
-  A3 , \field Zone Equipment 1 Name
+  A4 , \field Zone Equipment 1 Name
        \required-field
        \type object-list
        \object-list ZoneEquipmentNames
@@ -41917,7 +41924,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A4 , \field Zone Equipment 2 Object Type
+  A5 , \field Zone Equipment 2 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -41952,7 +41959,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A5 , \field Zone Equipment 2 Name
+  A6 , \field Zone Equipment 2 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N3 , \field Zone Equipment 2 Cooling Sequence
@@ -41965,7 +41972,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A6 , \field Zone Equipment 3 Object Type
+  A7 , \field Zone Equipment 3 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42000,7 +42007,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A7 , \field Zone Equipment 3 Name
+  A8 , \field Zone Equipment 3 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N5 , \field Zone Equipment 3 Cooling Sequence
@@ -42013,7 +42020,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A8 , \field Zone Equipment 4 Object Type
+  A9 , \field Zone Equipment 4 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42048,7 +42055,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A9 , \field Zone Equipment 4 Name
+  A10, \field Zone Equipment 4 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N7 , \field Zone Equipment 4 Cooling Sequence
@@ -42061,7 +42068,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A10, \field Zone Equipment 5 Object Type
+  A11, \field Zone Equipment 5 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42096,7 +42103,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A11, \field Zone Equipment 5 Name
+  A12, \field Zone Equipment 5 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N9 , \field Zone Equipment 5 Cooling Sequence
@@ -42109,7 +42116,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A12, \field Zone Equipment 6 Object Type
+  A13, \field Zone Equipment 6 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42144,7 +42151,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A13, \field Zone Equipment 6 Name
+  A14, \field Zone Equipment 6 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N11, \field Zone Equipment 6 Cooling Sequence
@@ -42157,7 +42164,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A14, \field Zone Equipment 7 Object Type
+  A15, \field Zone Equipment 7 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42192,7 +42199,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A15, \field Zone Equipment 7 Name
+  A16, \field Zone Equipment 7 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N13, \field Zone Equipment 7 Cooling Sequence
@@ -42205,7 +42212,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A16, \field Zone Equipment 8 Object Type
+  A17, \field Zone Equipment 8 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42240,7 +42247,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A17, \field Zone Equipment 8 Name
+  A18, \field Zone Equipment 8 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N15, \field Zone Equipment 8 Cooling Sequence
@@ -42253,7 +42260,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A18, \field Zone Equipment 9 Object Type
+  A19, \field Zone Equipment 9 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42288,7 +42295,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A19, \field Zone Equipment 9 Name
+  A20, \field Zone Equipment 9 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N17, \field Zone Equipment 9 Cooling Sequence
@@ -42301,7 +42308,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A20, \field Zone Equipment 10 Object Type
+  A21, \field Zone Equipment 10 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42336,7 +42343,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A21, \field Zone Equipment 10 Name
+  A22, \field Zone Equipment 10 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N19, \field Zone Equipment 10 Cooling Sequence
@@ -42349,7 +42356,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A22, \field Zone Equipment 11 Object Type
+  A23, \field Zone Equipment 11 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42384,7 +42391,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A23, \field Zone Equipment 11 Name
+  A24, \field Zone Equipment 11 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N21, \field Zone Equipment 11 Cooling Sequence
@@ -42397,7 +42404,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A24, \field Zone Equipment 12 Object Type
+  A25, \field Zone Equipment 12 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42432,7 +42439,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A25, \field Zone Equipment 12 Name
+  A26, \field Zone Equipment 12 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N23, \field Zone Equipment 12 Cooling Sequence
@@ -42445,7 +42452,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A26, \field Zone Equipment 13 Object Type
+  A27, \field Zone Equipment 13 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42480,7 +42487,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A27, \field Zone Equipment 13 Name
+  A28, \field Zone Equipment 13 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N25, \field Zone Equipment 13 Cooling Sequence
@@ -42493,7 +42500,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A28, \field Zone Equipment 14 Object Type
+  A29, \field Zone Equipment 14 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42528,7 +42535,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A29, \field Zone Equipment 14 Name
+  A30, \field Zone Equipment 14 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N27, \field Zone Equipment 14 Cooling Sequence
@@ -42541,7 +42548,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A30, \field Zone Equipment 15 Object Type
+  A31, \field Zone Equipment 15 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42576,7 +42583,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A31, \field Zone Equipment 15 Name
+  A32, \field Zone Equipment 15 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N29, \field Zone Equipment 15 Cooling Sequence
@@ -42589,7 +42596,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A32, \field Zone Equipment 16 Object Type
+  A33, \field Zone Equipment 16 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42624,7 +42631,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A33, \field Zone Equipment 16 Name
+  A34, \field Zone Equipment 16 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N31, \field Zone Equipment 16 Cooling Sequence
@@ -42637,7 +42644,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A34, \field Zone Equipment 17 Object Type
+  A35, \field Zone Equipment 17 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42672,7 +42679,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A35, \field Zone Equipment 17 Name
+  A36, \field Zone Equipment 17 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N33, \field Zone Equipment 17 Cooling Sequence
@@ -42685,7 +42692,7 @@ ZoneHVAC:EquipmentList,
        \minimum 1
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A36, \field Zone Equipment 18 Object Type
+  A37, \field Zone Equipment 18 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42720,7 +42727,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A37, \field Zone Equipment 18 Name
+  A38, \field Zone Equipment 18 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N35, \field Zone Equipment 18 Cooling Sequence

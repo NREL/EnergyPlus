@@ -3132,6 +3132,8 @@ namespace ZoneEquipmentManager {
 
 			SetZoneEquipSimOrder( ControlledZoneNum, ActualZoneNum );
 
+			DistributeSystemOutputRequired( ActualZoneNum );
+
 			// Air loop system availability manager status only applies to PIU and exhaust fans
 			// Reset fan SAM operation flags for zone fans.
 			TurnFansOn = false;
@@ -3462,7 +3464,7 @@ namespace ZoneEquipmentManager {
 		int CurEqHeatingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
 		int CurEqCoolingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
 
-		auto const & zeq( ZoneEquipList( ControlledZoneNum ) );
+		auto & zeq( ZoneEquipList( ControlledZoneNum ) );
 		int const NumOfEquipTypes( zeq.NumOfEquipTypes );
 		for ( int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
 			auto & pso( PrioritySimOrder( EquipTypeNum ) );
@@ -3481,11 +3483,15 @@ namespace ZoneEquipmentManager {
 			pso.EquipPtr = 0;
 		}
 
+		int numAvailHeatingEquip = 0;
+		int numAvailCoolingEquip = 0;
 		for ( int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
 			auto & pso( PrioritySimOrder( EquipTypeNum ) );
 
 			CurEqHeatingPriority = pso.HeatingPriority;
 			CurEqCoolingPriority = pso.CoolingPriority;
+			if ( pso.HeatingPriority > 0 ) ++numAvailHeatingEquip;
+			if ( pso.CoolingPriority > 0 ) ++numAvailCoolingEquip;
 
 			for ( int ComparedEquipTypeNum = EquipTypeNum; ComparedEquipTypeNum <= NumOfEquipTypes; ++ComparedEquipTypeNum ) {
 				auto & psc( PrioritySimOrder( ComparedEquipTypeNum ) );
@@ -3508,7 +3514,8 @@ namespace ZoneEquipmentManager {
 			}
 
 		}
-
+		zeq.NumAvailHeatEquip = numAvailHeatingEquip; // do this here for initial prototype, but later will call all the equipment in a separate function to see who is on
+		zeq.NumAvailCoolEquip = numAvailCoolingEquip;
 	}
 
 	void
@@ -3576,6 +3583,78 @@ namespace ZoneEquipmentManager {
 
 		CurDeadBandOrSetback( ZoneNum ) = DeadBandOrSetback( ZoneNum );
 
+	}
+
+	void
+	DistributeSystemOutputRequired(
+		int const ActualZoneNum
+	)
+	{
+		// Distribute zone equipment loads according to load distribution scheme
+
+		using DataZoneEnergyDemands::DeadBandOrSetback;
+		using DataZoneEnergyDemands::CurDeadBandOrSetback;
+
+		int ctrlZoneNum = DataHeatBalance::Zone( ActualZoneNum ).ZoneEqNum;
+		auto & energy( DataZoneEnergyDemands::ZoneSysEnergyDemand( ActualZoneNum ) );
+		auto & moisture( DataZoneEnergyDemands::ZoneSysMoistureDemand( ActualZoneNum ) );
+		auto & thisZEqList( DataZoneEquipment::ZoneEquipList( ctrlZoneNum ) );
+		Real64 heatLoadRatio = 1.0;
+		Real64 coolLoadRatio = 1.0;
+		switch ( thisZEqList.LoadDistScheme ) {
+			case DataZoneEquipment::LoadDist::sequentialLoading:
+				// Nothing to do here for this case
+				break;
+			case DataZoneEquipment::LoadDist::uniformLoading:
+				// Distribute load uniformly across all active equipment
+				heatLoadRatio = 1.0 / thisZEqList.NumAvailHeatEquip;
+				coolLoadRatio = 1.0 / thisZEqList.NumAvailCoolEquip;
+				for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
+					if ( energy.TotalOutputRequired >= 0.0 ) {
+						if ( thisZEqList.HeatingPriority( equipNum ) > 0 ) {
+							energy.SequencedOutputRequired( equipNum ) = energy.TotalOutputRequired * heatLoadRatio;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = energy.OutputRequiredToHeatingSP * heatLoadRatio;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = energy.OutputRequiredToCoolingSP * heatLoadRatio;
+							moisture.SequencedOutputRequired( equipNum ) = moisture.TotalOutputRequired * heatLoadRatio;
+							moisture.SequencedOutputRequiredToHumidSP( equipNum ) = moisture.OutputRequiredToHumidifyingSP * heatLoadRatio;
+							moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = moisture.OutputRequiredToDehumidifyingSP * heatLoadRatio;
+						} else {
+							energy.SequencedOutputRequired( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequired( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToHumidSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = 0.0;
+						}
+					} else {
+						if ( thisZEqList.CoolingPriority( equipNum ) > 0 ) {
+							energy.SequencedOutputRequired( equipNum ) = energy.TotalOutputRequired * coolLoadRatio;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = energy.OutputRequiredToHeatingSP * coolLoadRatio;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = energy.OutputRequiredToCoolingSP * coolLoadRatio;
+							moisture.SequencedOutputRequired( equipNum ) = moisture.TotalOutputRequired * coolLoadRatio;
+							moisture.SequencedOutputRequiredToHumidSP( equipNum ) = moisture.OutputRequiredToHumidifyingSP * coolLoadRatio;
+							moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = moisture.OutputRequiredToDehumidifyingSP * coolLoadRatio;
+						} else {
+							energy.SequencedOutputRequired( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequired( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToHumidSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = 0.0;
+						}
+					}
+				}
+				break;
+			case DataZoneEquipment::LoadDist::uniformPLRLoading:
+				// Do nothing - not implemented yet
+				break;
+			case DataZoneEquipment::LoadDist::sequentialUniformPLRLoading:
+				// Do nothing - not implemented yet
+				break;
+			default:
+				ShowFatalError( "DistributeSystemOutputRequired: Illegal load distribution scheme type." );
+				break;
+		}
 	}
 
 	void
