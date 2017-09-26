@@ -320,7 +320,7 @@ TEST_F( EnergyPlusFixture, ScheduleHoursGT1perc_test )
 
 }
 
-TEST_F( EnergyPlusFixture, ScheduleDayInterval_Interp )
+TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpInterp )
 {
 	// J.Glazer - September 2017
 
@@ -333,7 +333,6 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_Interp )
 		"  1,         !- Start Day 1",
 		"  12,        !- End Month 1",
 		"  31;        !- End Day 1",
-		"",
 		"",
 		"Schedule:Week:Daily,",
 		"  SchWk_A1,  !- Name",
@@ -358,28 +357,14 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_Interp )
 		"  0.001,      !- Value Until Time 1",
 		"  08:00,      !- Time 2",
 		"  100.001,    !- Value Until Time 2",
-		"  09:00,      !- Time 3",
-		"  600.001,    !- Value Until Time 3",
 		"  10:00,      !- Time 4",
-		"  800.001,    !- Value Until Time 4",
-		"  11:00,      !- Time 5",
-		"  900.001,    !- Value Until Time 5",
-		"  12:00,      !- Time 6",
-		"  910.001,    !- Value Until Time 6",
-		"  13:00,      !- Time 7",
-		"  920.001,    !- Value Until Time 7",
+		"  300.001,    !- Value Until Time 4",
 		"  14:00,      !- Time 8",
-		"  910.001,    !- Value Until Time 8",
+		"  700.001,    !- Value Until Time 8",
 		"  15:00,      !- Time 9",
-		"  880.001,    !- Value Until Time 9",
-		"  16:00,      !- Time 10",
-		"  800.001,    !- Value Until Time 10",
-		"  17:00,      !- Time 11",
-		"  600.001,    !- Value Until Time 11",
-		"  18:00,      !- Time 12",
-		"  200.001,    !- Value Until Time 12",
+		"  600.001,    !- Value Until Time 9",
 		"  19:00,      !- Time 13",
-		"  0.001,      !- Value Until Time 13",
+		"  200.001,    !- Value Until Time 13",
 		"  24:00,      !- Time 14",
 		"  0.001;      !- Value Until Time 14",
 		"", } );
@@ -400,14 +385,53 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_Interp )
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
 
 
-	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );
+	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate YES
 	EXPECT_NEAR( 0.001, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 ); 
 
+	// interpolate over one hour
+
+	EXPECT_NEAR( 25.001, LookUpScheduleValue( ASchedIndex, 8, 1 ), 0.000001 ); 
+	EXPECT_NEAR( 50.001, LookUpScheduleValue( ASchedIndex, 8, 2 ), 0.000001 );
+	EXPECT_NEAR( 75.001, LookUpScheduleValue( ASchedIndex, 8, 3 ), 0.000001 );
 	EXPECT_NEAR( 100.001, LookUpScheduleValue( ASchedIndex, 8, 4 ), 0.000001 );
 
-	EXPECT_NEAR( 25.001, LookUpScheduleValue( ASchedIndex, 7, 1 ), 0.000001 ); //interpolated
-	EXPECT_NEAR( 50.001, LookUpScheduleValue( ASchedIndex, 7, 2 ), 0.000001 );
-	EXPECT_NEAR( 75.001, LookUpScheduleValue( ASchedIndex, 7, 3 ), 0.000001 );
+	// interpolate over two hours
+
+	EXPECT_NEAR( 125.001, LookUpScheduleValue( ASchedIndex, 9, 1 ), 0.000001 ); 
+	EXPECT_NEAR( 150.001, LookUpScheduleValue( ASchedIndex, 9, 2 ), 0.000001 );
+	EXPECT_NEAR( 175.001, LookUpScheduleValue( ASchedIndex, 9, 3 ), 0.000001 );
+	EXPECT_NEAR( 200.001, LookUpScheduleValue( ASchedIndex, 9, 4 ), 0.000001 );
+
+	EXPECT_NEAR( 225.001, LookUpScheduleValue( ASchedIndex, 10, 1 ), 0.000001 ); 
+	EXPECT_NEAR( 250.001, LookUpScheduleValue( ASchedIndex, 10, 2 ), 0.000001 );
+	EXPECT_NEAR( 275.001, LookUpScheduleValue( ASchedIndex, 10, 3 ), 0.000001 );
+	EXPECT_NEAR( 300.001, LookUpScheduleValue( ASchedIndex, 10, 4 ), 0.000001 );
+
+	// interpolate over four hours
+
+	EXPECT_NEAR( 325.001, LookUpScheduleValue( ASchedIndex, 11, 1 ), 0.000001 );
+	EXPECT_NEAR( 350.001, LookUpScheduleValue( ASchedIndex, 11, 2 ), 0.000001 );
+	EXPECT_NEAR( 375.001, LookUpScheduleValue( ASchedIndex, 11, 3 ), 0.000001 );
+	EXPECT_NEAR( 400.001, LookUpScheduleValue( ASchedIndex, 11, 4 ), 0.000001 );
+
+	EXPECT_NEAR( 525.001, LookUpScheduleValue( ASchedIndex, 13, 1 ), 0.000001 );
+	EXPECT_NEAR( 550.001, LookUpScheduleValue( ASchedIndex, 13, 2 ), 0.000001 );
+	EXPECT_NEAR( 575.001, LookUpScheduleValue( ASchedIndex, 13, 3 ), 0.000001 );
+	EXPECT_NEAR( 600.001, LookUpScheduleValue( ASchedIndex, 13, 4 ), 0.000001 );
+
+	// interpolate over one hour - decreasing
+
+	EXPECT_NEAR( 675.001, LookUpScheduleValue( ASchedIndex, 15, 1 ), 0.000001 );
+	EXPECT_NEAR( 650.001, LookUpScheduleValue( ASchedIndex, 15, 2 ), 0.000001 );
+	EXPECT_NEAR( 625.001, LookUpScheduleValue( ASchedIndex, 15, 3 ), 0.000001 );
+	EXPECT_NEAR( 600.001, LookUpScheduleValue( ASchedIndex, 15, 4 ), 0.000001 );
+
+	// interpolate over four hours - decreasing
+
+	EXPECT_NEAR( 375.001, LookUpScheduleValue( ASchedIndex, 18, 1 ), 0.000001 );
+	EXPECT_NEAR( 350.001, LookUpScheduleValue( ASchedIndex, 18, 2 ), 0.000001 );
+	EXPECT_NEAR( 325.001, LookUpScheduleValue( ASchedIndex, 18, 3 ), 0.000001 );
+	EXPECT_NEAR( 300.001, LookUpScheduleValue( ASchedIndex, 18, 4 ), 0.000001 );
 
 
 }

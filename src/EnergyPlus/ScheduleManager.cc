@@ -3043,7 +3043,7 @@ namespace ScheduleManager {
 				ErrorsFound = true;
 			} else {
 				if ( useInterpolation ) {
-					int totalMinutes = (EHr - SHr) * 60 + (EMin - SMin);
+					int totalMinutes = (EHr - SHr) * 60 + (EMin - SMin) + 1;
 					if ( totalMinutes == 0 ) totalMinutes = 1; // protect future division
 					if ( Count == 1 ) {
 						StartValue = Numbers( Count ); //assume first period is flat
@@ -3053,7 +3053,7 @@ namespace ScheduleManager {
 						EndValue = Numbers( Count );
 					}
 					Real64 incrementPerMinute = (EndValue - StartValue ) / totalMinutes;
-					Real64 curValue = StartValue;
+					Real64 curValue = StartValue + incrementPerMinute;
 					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
 						MinuteValue( Min, SHr ) = curValue;
 						curValue += incrementPerMinute;
