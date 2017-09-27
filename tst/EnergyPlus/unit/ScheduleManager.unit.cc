@@ -433,6 +433,86 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpInterp )
 	EXPECT_NEAR( 325.001, LookUpScheduleValue( ASchedIndex, 18, 3 ), 0.000001 );
 	EXPECT_NEAR( 300.001, LookUpScheduleValue( ASchedIndex, 18, 4 ), 0.000001 );
 
+	EXPECT_NEAR( 275.001, LookUpScheduleValue( ASchedIndex, 19, 1 ), 0.000001 );
+	EXPECT_NEAR( 250.001, LookUpScheduleValue( ASchedIndex, 19, 2 ), 0.000001 );
+	EXPECT_NEAR( 225.001, LookUpScheduleValue( ASchedIndex, 19, 3 ), 0.000001 );
+	EXPECT_NEAR( 200.001, LookUpScheduleValue( ASchedIndex, 19, 4 ), 0.000001 );
 
 }
+
+TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourInterp )
+{
+	// J.Glazer - September 2017
+
+	std::string const idf_objects = delimited_string( {
+		"Schedule:Year,",
+		"  SchYr_A,   !- Name",
+		"  AnyNumber, !- Schedule Type Limits Name",
+		"  SchWk_A1,  !- Schedule:Week Name 1",
+		"  1,         !- Start Month 1",
+		"  1,         !- Start Day 1",
+		"  12,        !- End Month 1",
+		"  31;        !- End Day 1",
+		"",
+		"Schedule:Week:Daily,",
+		"  SchWk_A1,  !- Name",
+		"  SchDy_A1a,  !- Sunday Schedule:Day Name",
+		"  SchDy_A1a,  !- Monday Schedule:Day Name",
+		"  SchDy_A1a,  !- Tuesday Schedule:Day Name",
+		"  SchDy_A1a,  !- Wednesday Schedule:Day Name",
+		"  SchDy_A1a,  !- Thursday Schedule:Day Name",
+		"  SchDy_A1a,  !- Friday Schedule:Day Name",
+		"  SchDy_A1a,  !- Saturday Schedule:Day Name",
+		"  SchDy_A1a,  !- Holiday Schedule:Day Name",
+		"  SchDy_A1a,  !- SummerDesignDay Schedule:Day Name",
+		"  SchDy_A1a,  !- WinterDesignDay Schedule:Day Name",
+		"  SchDy_A1a,  !- CustomDay1 Schedule:Day Name",
+		"  SchDy_A1a;  !- CustomDay2 Schedule:Day Name",
+		"  ",
+		"Schedule:Day:Interval,",
+		"  SchDy_A1a,  !- Name",
+		"  AnyNumber,  !- Schedule Type Limits Name",
+		"  Yes,        !- Interpolate to Timestep",
+		"  07:00,      !- Time 1",
+		"  0.001,      !- Value Until Time 1",
+		"  07:30,      !- Time 2",
+		"  50.001,    !- Value Until Time 2",
+		"  08:00,      !- Time 4",
+		"  100.001,    !- Value Until Time 2",
+		"  24:00,      !- Time 14",
+		"  0.001;      !- Value Until Time 14",
+		"", } );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 15;
+	DataGlobals::TimeStepZone = 0.25;
+
+	DataEnvironment::Month = 1;
+	DataEnvironment::DayOfMonth = 1;
+	DataGlobals::HourOfDay = 1;
+	DataGlobals::TimeStep = 1;
+	DataEnvironment::DSTIndicator = 0;
+	DataEnvironment::DayOfWeek = 2;
+	DataEnvironment::HolidayIndex = 0;
+	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
+
+
+	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate YES
+	EXPECT_NEAR( 0.001, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 );
+
+	// interpolate over first half hour
+
+	EXPECT_NEAR( 25.001, LookUpScheduleValue( ASchedIndex, 8, 1 ), 0.000001 );
+	EXPECT_NEAR( 50.001, LookUpScheduleValue( ASchedIndex, 8, 2 ), 0.000001 );
+
+	// interpolate over second half hour
+
+	EXPECT_NEAR( 75.001, LookUpScheduleValue( ASchedIndex, 8, 3 ), 0.000001 );
+	EXPECT_NEAR( 100.001, LookUpScheduleValue( ASchedIndex, 8, 4 ), 0.000001 );
+
+
+}
+
 
