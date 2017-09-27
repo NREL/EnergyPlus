@@ -969,7 +969,7 @@
     Bottom-Inlets,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Bottom-ZoneAirNode,      !- Zone Air Node Name
-    Bottom-ReturnAirNode;    !- Zone Return Air Node Name
+    Bottom-ReturnAirNode;    !- Zone Return Air Node or NodeList Name
 
 ! =========================
 
@@ -979,7 +979,7 @@
     SecondLevel-Inlets,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SecondLevel-ZoneAirNode, !- Zone Air Node Name
-    SecondLevel-ReturnAirNode;  !- Zone Return Air Node Name
+    SecondLevel-ReturnAirNode;  !- Zone Return Air Node or NodeList Name
 
 ! =========================
 
@@ -989,7 +989,7 @@
     ThirdLevel-Inlets,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ThirdLevel-ZoneAirNode,  !- Zone Air Node Name
-    ThirdLevel-ReturnAirNode;!- Zone Return Air Node Name
+    ThirdLevel-ReturnAirNode;!- Zone Return Air Node or NodeList Name
 
 ! =========================
 !Cooling Priority (Highest)
@@ -997,6 +997,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-Bottom,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Bottom-Air,              !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1008,6 +1009,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-SecondLevel,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     SecondLevel-Air,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1019,6 +1021,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-ThirdLevel,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ThirdLevel-Air,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

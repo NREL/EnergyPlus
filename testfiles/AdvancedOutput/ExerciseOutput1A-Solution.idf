@@ -971,7 +971,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     200.0,                   !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.000,                   !- Fraction Latent
     0.600,                   !- Fraction Radiant
     0.000;                   !- Fraction Lost
@@ -1197,12 +1197,13 @@
     ZONE ONE Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE ONE Zone Air Node,  !- Zone Air Node Name
-    ZONE ONE Return Outlet;  !- Zone Return Air Node Name
+    ZONE ONE Return Outlet;  !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE EQUIPMENT LIST ===========
 
   ZoneHVAC:EquipmentList,
     ZONE ONE Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZONE ONE Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1316,7 +1317,7 @@
     ,                        !- Temperature Setpoint Node Name
     0,                       !- Parasitic Electric Load {W}
     AHU 1 Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Gas Load {W}
+    0;                       !- Parasitic Fuel Load {W}
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:DX:COOLINGBYPASSFACTOREMPIRICAL ===========
 

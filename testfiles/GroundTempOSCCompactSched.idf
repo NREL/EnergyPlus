@@ -620,10 +620,11 @@
     OSCTest-Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     OSCTest-ZoneAirNode,     !- Zone Air Node Name
-    OSCTest-ReturnAirNode;   !- Zone Return Air Node Name
+    OSCTest-ReturnAirNode;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Equipment-OSCTest,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     OSCTest-Air,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

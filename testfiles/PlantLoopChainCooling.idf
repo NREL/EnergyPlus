@@ -231,7 +231,7 @@
     USE Supply Cooling Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CounterFlow,             !- Heat Exchange Model Type
-    10000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    10000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     CoolingSetpointModulated,!- Control Type
     Use Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -433,7 +433,7 @@
     TRANSFER Supply Cooling Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowBothMixed,      !- Heat Exchange Model Type
-    10000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    10000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     OperationSchemeModulated,!- Control Type
     TRANSFER Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}

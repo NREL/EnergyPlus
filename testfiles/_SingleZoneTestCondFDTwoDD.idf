@@ -2506,6 +2506,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-SouthZone,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     SouthZone-Air,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2520,7 +2521,7 @@
     SouthZone-Inlets,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SouthZone-ZoneAirNode,   !- Zone Air Node Name
-    SouthZone-ReturnAirNode; !- Zone Return Air Node Name
+    SouthZone-ReturnAirNode; !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: NODELIST ===========
 ! =========================

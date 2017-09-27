@@ -1635,7 +1635,7 @@
     Corner_Class_1_Pod_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Corner_Class_1_Pod_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_1_Pod_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_1_Pod_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_1_Pod_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corner_Class_1_Pod_1 Inlet Nodes,  !- Name
@@ -1648,6 +1648,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2515,7 +2516,7 @@
     Mult_Class_1_Pod_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Mult_Class_1_Pod_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_1_Pod_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_1_Pod_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_1_Pod_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Mult_Class_1_Pod_1 Inlet Nodes,  !- Name
@@ -2528,6 +2529,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2888,7 +2890,7 @@
     Corridor_Pod_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Corridor_Pod_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Corridor_Pod_1 Air Node, !- Zone Air Node Name
-    Corridor_Pod_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corridor_Pod_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_Pod_1 Inlet Nodes,  !- Name
@@ -2901,6 +2903,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3376,7 +3379,7 @@
     Corner_Class_2_Pod_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Corner_Class_2_Pod_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_2_Pod_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_2_Pod_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_2_Pod_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corner_Class_2_Pod_1 Inlet Nodes,  !- Name
@@ -3389,6 +3392,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4056,7 +4060,7 @@
     Mult_Class_2_Pod_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Mult_Class_2_Pod_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_2_Pod_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_2_Pod_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_2_Pod_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Mult_Class_2_Pod_1 Inlet Nodes,  !- Name
@@ -4069,6 +4073,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4605,7 +4610,7 @@
     Main_Corridor Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main_Corridor Air Node,  !- Zone Air Node Name
-    Main_Corridor Return Air Node Name;  !- Zone Return Air Node Name
+    Main_Corridor Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Main_Corridor Inlet Nodes,  !- Name
@@ -4613,6 +4618,7 @@
 
   ZoneHVAC:EquipmentList,
     Main_Corridor Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Main_Corridor Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5080,7 +5086,7 @@
     Lobby Inlet Nodes,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Lobby Air Node,          !- Zone Air Node Name
-    Lobby Return Air Node Name;  !- Zone Return Air Node Name
+    Lobby Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Lobby Inlet Nodes,       !- Name
@@ -5088,6 +5094,7 @@
 
   ZoneHVAC:EquipmentList,
     Lobby Equipment,         !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Lobby Dual Duct Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5523,7 +5530,7 @@
     Mech Inlet Nodes,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mech Air Node,           !- Zone Air Node Name
-    Mech Return Air Node Name;  !- Zone Return Air Node Name
+    Mech Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Mech Inlet Nodes,        !- Name
@@ -5531,6 +5538,7 @@
 
   ZoneHVAC:EquipmentList,
     Mech Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mech Dual Duct Box,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5918,7 +5926,7 @@
     Bathrooms Inlet Nodes,   !- Zone Air Inlet Node or NodeList Name
     Bathrooms Exhaust Nodes, !- Zone Air Exhaust Node or NodeList Name
     Bathrooms Air Node,      !- Zone Air Node Name
-    Bathrooms Return Air Node Name;  !- Zone Return Air Node Name
+    Bathrooms Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Bathrooms Inlet Nodes,   !- Name
@@ -5930,6 +5938,7 @@
 
   ZoneHVAC:EquipmentList,
     Bathrooms Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Bathrooms Dual Duct Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6799,7 +6808,7 @@
     Offices Inlet Nodes,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Offices Air Node,        !- Zone Air Node Name
-    Offices Return Air Node Name;  !- Zone Return Air Node Name
+    Offices Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Offices Inlet Nodes,     !- Name
@@ -6807,6 +6816,7 @@
 
   ZoneHVAC:EquipmentList,
     Offices Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Offices Dual Duct Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7470,7 +7480,7 @@
     Media_Center Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Media_Center Air Node,   !- Zone Air Node Name
-    Media_Center Return Air Node Name;  !- Zone Return Air Node Name
+    Media_Center Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Media_Center Inlet Nodes,!- Name
@@ -7478,6 +7488,7 @@
 
   ZoneHVAC:EquipmentList,
     Media_Center Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Media_Center Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

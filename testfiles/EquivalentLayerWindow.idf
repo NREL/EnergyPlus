@@ -652,10 +652,11 @@
     ZONE ONE INLET,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE ONE NODE,           !- Zone Air Node Name
-    ZONE ONE OUTLET;         !- Zone Return Air Node Name
+    ZONE ONE OUTLET;         !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE ONE EQ,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE ONE Ideal Loads,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

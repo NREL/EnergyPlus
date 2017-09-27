@@ -1514,6 +1514,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     Zone1PTAC,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1521,6 +1522,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     Zone2PTAC,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1528,6 +1530,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     Zone3PTAC,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1541,7 +1544,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1549,7 +1552,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone2Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1557,7 +1560,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone3Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   Fan:SystemModel,
     Zone1PTACFan,            !- Name

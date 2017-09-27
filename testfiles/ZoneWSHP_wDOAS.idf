@@ -3,7 +3,7 @@
 !                          Regular roof.  No Windows.
 !
 ! Highlights:              Example of zone HVAC system (WSHP) with dedicated outdoor air system (DOAS).
-!                          A AirTerminal:SingleDuct:Uncontrolled specifies outdoor air flow rate for the zone with OutDoor Air Method = Sum in 
+!                          A AirTerminal:SingleDuct:Uncontrolled specifies outdoor air flow rate for the zone with OutDoor Air Method = Sum in
 !                          DesignSpecification:OutdoorAir.
 !
 ! Simulation Location/Run: Denver Stapleton Intl Arpt CO USA WMO=724690, 2 design days, 1 run period,
@@ -368,8 +368,7 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 1 OA Inlet Node,    !- Zone Supply Air Node Name
     0.0625,                  !- Maximum Air Flow Rate {m3/s}
-    SZ DSOA SPACE1-1;  !- Design Specification Outdoor Air Object Name 3
-
+    SZ DSOA SPACE1-1;        !- Design Specification Outdoor Air Object Name
 
   Schedule:Compact,
     OAFractionSched,         !- Name
@@ -429,8 +428,8 @@
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
     SUM,                     !- Outdoor Air Method
-    0.00015,                  !- Outdoor Air Flow per Person {m3/s-person}
-    0.00005,                   !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.00015,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0.00005,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   People,
@@ -647,10 +646,11 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone 1 Outlet Node,      !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Return Node;      !- Zone Return Air Node Name
+    Zone 1 Return Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

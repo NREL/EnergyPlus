@@ -158,7 +158,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
@@ -174,7 +174,7 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -184,7 +184,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -194,7 +194,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -204,7 +204,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -214,7 +214,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -224,7 +224,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -234,7 +234,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -244,7 +244,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -254,7 +254,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -264,7 +264,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -281,7 +281,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
@@ -297,7 +297,7 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -307,7 +307,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -317,7 +317,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -327,7 +327,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -337,7 +337,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -347,7 +347,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -357,7 +357,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -367,7 +367,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -377,7 +377,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -387,7 +387,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -404,7 +404,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
@@ -420,7 +420,7 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -430,7 +430,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -440,7 +440,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -450,7 +450,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -460,7 +460,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -470,7 +470,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -480,7 +480,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -490,7 +490,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -500,7 +500,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -510,7 +510,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -527,7 +527,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
@@ -543,7 +543,7 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -553,7 +553,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -563,7 +563,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -573,7 +573,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -583,7 +583,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -593,7 +593,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -603,7 +603,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -613,7 +613,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -623,7 +623,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -633,7 +633,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -678,11 +678,11 @@
     yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
 
-  ConvergenceLimits ,
-    0, !- Minimum System Timestep (0 = same as zone timestep)
-    25, !- Maximum HVAC Iterations
-    3, !- Minimum Plant Iterations
-    9; !- Maximum Plant Iterations
+  ConvergenceLimits,
+    0,                       !- Minimum System Timestep {minutes}
+    25,                      !- Maximum HVAC Iterations
+    3,                       !- Minimum Plant Iterations
+    9;                       !- Maximum Plant Iterations
 
   RunPeriod,
     ,                        !- Name
@@ -3127,7 +3127,7 @@
     units_gr_lf Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     units_gr_lf Air Node,    !- Zone Air Node Name
-    units_gr_lf Return Air Node Name;  !- Zone Return Air Node Name
+    units_gr_lf Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     units_gr_lf Inlet Nodes, !- Name
@@ -3135,6 +3135,7 @@
 
   ZoneHVAC:EquipmentList,
     units_gr_lf Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     units_gr_lf Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3657,7 +3658,7 @@
     units_gr_rt Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     units_gr_rt Air Node,    !- Zone Air Node Name
-    units_gr_rt Return Air Node Name;  !- Zone Return Air Node Name
+    units_gr_rt Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     units_gr_rt Inlet Nodes, !- Name
@@ -3665,6 +3666,7 @@
 
   ZoneHVAC:EquipmentList,
     units_gr_rt Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     units_gr_rt Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4013,7 +4015,7 @@
     unit_s_g Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     unit_s_g Air Node,       !- Zone Air Node Name
-    unit_s_g Return Air Node Name;  !- Zone Return Air Node Name
+    unit_s_g Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     unit_s_g Inlet Nodes,    !- Name
@@ -4021,6 +4023,7 @@
 
   ZoneHVAC:EquipmentList,
     unit_s_g Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     unit_s_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4369,7 +4372,7 @@
     unit_n_g Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     unit_n_g Air Node,       !- Zone Air Node Name
-    unit_n_g Return Air Node Name;  !- Zone Return Air Node Name
+    unit_n_g Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     unit_n_g Inlet Nodes,    !- Name
@@ -4377,6 +4380,7 @@
 
   ZoneHVAC:EquipmentList,
     unit_n_g Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     unit_n_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

@@ -638,10 +638,11 @@
     ZONE 1 INLETS,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 1 NODE,             !- Zone Air Node Name
-    ZONE 1 OUTLET;           !- Zone Return Air Node Name
+    ZONE 1 OUTLET;           !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 1 EQUIPMENT,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 1 PURCHASED AIR,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

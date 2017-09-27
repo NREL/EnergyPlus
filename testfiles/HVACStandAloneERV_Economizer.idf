@@ -1352,6 +1352,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EnergyRecoveryVentilator,  !- Zone Equipment 1 Object Type
     Stand Alone ERV 1,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1367,6 +1368,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EnergyRecoveryVentilator,  !- Zone Equipment 1 Object Type
     Stand Alone ERV 2,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1382,6 +1384,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EnergyRecoveryVentilator,  !- Zone Equipment 1 Object Type
     Stand Alone ERV 3,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1403,7 +1406,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1411,7 +1414,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone2Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1419,7 +1422,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone3Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:CONSTANTVOLUME ===========
 

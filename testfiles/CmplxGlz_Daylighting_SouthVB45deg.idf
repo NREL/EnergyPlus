@@ -86148,10 +86148,11 @@
     COMFENZone Inlets,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     COMFENZone Zone Air Node,!- Zone Air Node Name
-    COMFENZone Return Outlet;!- Zone Return Air Node Name
+    COMFENZone Return Outlet;!- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     COMFENZone Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     COMFENZone Direct Air,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

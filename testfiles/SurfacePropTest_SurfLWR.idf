@@ -109,7 +109,7 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                      !- Run Simulation for Weather File Run Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     ,                        !- Name
@@ -2228,76 +2228,76 @@
     60.00000,60.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:SurroundingSurfaces,
-    SrdSurfs:Zn003:Roof001,       !- Name
-	0.0,
-	,
-	0.0,
-	,
-	SurroundingSurface1,
-	1.0,
-	Surrounding Temp Sch 1;
-	
+    SrdSurfs:Zn003:Roof001,  !- Name
+    0.0,                     !- Sky View Factor
+    ,                        !- Sky Temperature Schedule Name
+    0.0,                     !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
+    SurroundingSurface1,     !- Surrounding Surface 1 Name
+    1.0,                     !- Surrounding Surface 1 View Factor
+    Surrounding Temp Sch 1;  !- Surrounding Surface 1 Temperature Schedule Name
+
   SurfaceProperty:SurroundingSurfaces,
-    SrdSurfs:Zn005:Wall002,       !- Name
-	0.1,
-	,
-	0.0,
-	,
-	SurroundingSurface1,
-	0.5,
-	Surrounding Temp Sch 2,
-	SurroundingSurface2,
-	0.4,
-	Surrounding Temp Sch 2;
-	
+    SrdSurfs:Zn005:Wall002,  !- Name
+    0.1,                     !- Sky View Factor
+    ,                        !- Sky Temperature Schedule Name
+    0.0,                     !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
+    SurroundingSurface1,     !- Surrounding Surface 1 Name
+    0.5,                     !- Surrounding Surface 1 View Factor
+    Surrounding Temp Sch 2,  !- Surrounding Surface 1 Temperature Schedule Name
+    SurroundingSurface2,     !- Surrounding Surface 2 Name
+    0.4,                     !- Surrounding Surface 2 View Factor
+    Surrounding Temp Sch 2;  !- Surrounding Surface 2 Temperature Schedule Name
+
   SurfaceProperty:SurroundingSurfaces,
-    SrdSurfs:Zn005:Wall002:Win001,       !- Name
-	0.5,
-	,
-	0.3,
-	,
-	SurroundingSurface1,
-	0.2,
-	Surrounding Temp Sch 2;
-	
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn005:Wall002,       !- Name
-	Zn005:Wall002,              !- Exterior Surface Name
-    ,                           !- External Shading Fraction Schedule Name
-	SrdSurfs:Zn005:Wall002,     !- Surrounding Surfaces Object Name
-	;                           !- Outdoor Air Node Name
+    SrdSurfs:Zn005:Wall002:Win001,  !- Name
+    0.5,                     !- Sky View Factor
+    ,                        !- Sky Temperature Schedule Name
+    0.3,                     !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
+    SurroundingSurface1,     !- Surrounding Surface 1 Name
+    0.2,                     !- Surrounding Surface 1 View Factor
+    Surrounding Temp Sch 2;  !- Surrounding Surface 1 Temperature Schedule Name
 
   SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn005:Wall002:Win001,       !- Name
-	Zn005:Wall002:Win001,              !- Exterior Surface Name
-    ,                                  !- External Shading Fraction Schedule Name
-	SrdSurfs:Zn005:Wall002:Win001,     !- Surrounding Surfaces Object Name
-	;                                  !- Outdoor Air Node Name	
+    LocEnv:Zn005:Wall002,    !- Name
+    Zn005:Wall002,           !- Exterior Surface Name
+    ,                        !- External Shading Fraction Schedule Name
+    SrdSurfs:Zn005:Wall002,  !- Surrounding Surfaces Object Name
+    ;                        !- Outdoor Air Node Name
 
   SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn003:Roof001,       !- Name
-	Zn003:Roof001,              !- Exterior Surface Name
-    ,                           !- External Shading Fraction Schedule Name
-	SrdSurfs:Zn003:Roof001,     !- Surrounding Surfaces Object Name
-	;                           !- Outdoor Air Node Name
+    LocEnv:Zn005:Wall002:Win001,  !- Name
+    Zn005:Wall002:Win001,    !- Exterior Surface Name
+    ,                        !- External Shading Fraction Schedule Name
+    SrdSurfs:Zn005:Wall002:Win001,  !- Surrounding Surfaces Object Name
+    ;                        !- Outdoor Air Node Name
+
+  SurfaceProperty:LocalEnvironment,
+    LocEnv:Zn003:Roof001,    !- Name
+    Zn003:Roof001,           !- Exterior Surface Name
+    ,                        !- External Shading Fraction Schedule Name
+    SrdSurfs:Zn003:Roof001,  !- Surrounding Surfaces Object Name
+    ;                        !- Outdoor Air Node Name
 
   Schedule:File,
-    Surrounding Temp Sch 1,       !- Name
-    Any Number,                   !- ScheduleType
-    LocalEnvData.csv,             !- Name of File
-    2,                            !- Column Number
-    1;                            !- Rows to Skip at Top
-	
+    Surrounding Temp Sch 1,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    LocalEnvData.csv,        !- File Name
+    2,                       !- Column Number
+    1;                       !- Rows to Skip at Top
+
   Schedule:Compact,
     Surrounding Temp Sch 2,  !- Name
     Any Number,              !- Schedule Type Limits Name
-	Through: 06/30,          !- Field 1
+    Through: 06/30,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,10.0,      !- Field 3	
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,-10.0;     !- Field 3	
-	
+    Until: 24:00,10.0,       !- Field 3
+    Through: 12/31,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,-10.0;      !- Field 7
+
   Schedule:Compact,
     ShadingTransmittance:0001,  !- Name
     Fraction,                !- Schedule Type Limits Name
@@ -2318,27 +2318,27 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.1;        !- Field 3
-  
+
   Output:VariableDictionary,Regular;
-  
+
   Output:Variable,Zn005:Roof001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
-  
+
   Output:Variable,Zn005:Wall002,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
 
   Output:Variable,Zn005:Wall003,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
-  
+
   Output:Variable,Zn005:Wall002:Win001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
-  
+
   Output:Variable,Zn005:Roof001,Surface Outside Face Temperature,hourly;
 
-  Output:Variable,Zn005:Wall002,Surface Outside Face Temperature,hourly;  
-  
-  Output:Variable,Zn005:Wall003,Surface Outside Face Temperature,hourly;    
-    
-  Output:Variable,Zn005:Wall002:Win001,Surface Outside Face Temperature,hourly;  
-  
-  Output:Variable,Zn004:Wall002:Win001,Surface Outside Face Temperature,hourly;    
-  
+  Output:Variable,Zn005:Wall002,Surface Outside Face Temperature,hourly;
+
+  Output:Variable,Zn005:Wall003,Surface Outside Face Temperature,hourly;
+
+  Output:Variable,Zn005:Wall002:Win001,Surface Outside Face Temperature,hourly;
+
+  Output:Variable,Zn004:Wall002:Win001,Surface Outside Face Temperature,hourly;
+
   Output:Meter,Electricity:Building,hourly;
 
   Output:Surfaces:Drawing,dxf,Triangulate3DFace;

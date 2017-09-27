@@ -2814,7 +2814,7 @@
     SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE1-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2822,7 +2822,7 @@
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE2-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2830,7 +2830,7 @@
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE3-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE3-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2838,7 +2838,7 @@
     SPACE4-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE4-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE4-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2846,10 +2846,11 @@
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE5-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2857,6 +2858,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2864,6 +2866,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2871,6 +2874,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2878,6 +2882,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
