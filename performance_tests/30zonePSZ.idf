@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  VERSION,8.6;
+  Version,8.8;
 
   Timestep,4;
 
@@ -1984,7 +1984,7 @@
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_1 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Name
@@ -1992,6 +1992,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2361,7 +2362,7 @@
     ZN_1_FLR_2_SEC_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_1 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_1 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_1 Inlet Nodes,  !- Name
@@ -2369,6 +2370,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2738,7 +2740,7 @@
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_2 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Name
@@ -2746,6 +2748,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3115,7 +3118,7 @@
     ZN_1_FLR_2_SEC_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_2 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_2 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_2 Inlet Nodes,  !- Name
@@ -3123,6 +3126,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3492,7 +3496,7 @@
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_3 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Name
@@ -3500,6 +3504,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3869,7 +3874,7 @@
     ZN_1_FLR_2_SEC_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_3 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_3 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_3 Inlet Nodes,  !- Name
@@ -3877,6 +3882,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4246,7 +4252,7 @@
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_4 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Name
@@ -4254,6 +4260,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4623,7 +4630,7 @@
     ZN_1_FLR_2_SEC_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_4 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_4 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_4 Inlet Nodes,  !- Name
@@ -4631,6 +4638,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5000,7 +5008,7 @@
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_5 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Name
@@ -5008,6 +5016,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_5 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5377,7 +5386,7 @@
     ZN_1_FLR_2_SEC_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_5 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_5 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_5 Inlet Nodes,  !- Name
@@ -5385,6 +5394,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_5 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5754,7 +5764,7 @@
     ZN_1_FLR_1_SEC_6 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_6 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_6 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_6 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_6 Inlet Nodes,  !- Name
@@ -5762,6 +5772,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_6 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_6 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6131,7 +6142,7 @@
     ZN_1_FLR_2_SEC_6 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_6 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_6 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_6 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_6 Inlet Nodes,  !- Name
@@ -6139,6 +6150,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_6 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_6 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6508,7 +6520,7 @@
     ZN_1_FLR_1_SEC_7 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_7 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_7 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_7 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_7 Inlet Nodes,  !- Name
@@ -6516,6 +6528,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_7 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_7 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6885,7 +6898,7 @@
     ZN_1_FLR_2_SEC_7 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_7 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_7 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_7 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_7 Inlet Nodes,  !- Name
@@ -6893,6 +6906,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_7 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_7 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7262,7 +7276,7 @@
     ZN_1_FLR_1_SEC_8 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_8 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_8 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_8 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_8 Inlet Nodes,  !- Name
@@ -7270,6 +7284,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_8 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_8 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7639,7 +7654,7 @@
     ZN_1_FLR_2_SEC_8 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_8 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_8 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_8 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_8 Inlet Nodes,  !- Name
@@ -7647,6 +7662,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_8 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_8 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -8016,7 +8032,7 @@
     ZN_1_FLR_1_SEC_9 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_9 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_9 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_9 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_9 Inlet Nodes,  !- Name
@@ -8024,6 +8040,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_9 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_9 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -8393,7 +8410,7 @@
     ZN_1_FLR_2_SEC_9 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_9 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_9 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_9 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_9 Inlet Nodes,  !- Name
@@ -8401,6 +8418,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_9 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_9 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -8770,7 +8788,7 @@
     ZN_1_FLR_1_SEC_10 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_10 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_10 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_10 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_10 Inlet Nodes,  !- Name
@@ -8778,6 +8796,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_10 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_10 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9147,7 +9166,7 @@
     ZN_1_FLR_2_SEC_10 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_10 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_10 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_10 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_10 Inlet Nodes,  !- Name
@@ -9155,6 +9174,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_10 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_10 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9524,7 +9544,7 @@
     ZN_1_FLR_1_SEC_11 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_11 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_11 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_11 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_11 Inlet Nodes,  !- Name
@@ -9532,6 +9552,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_11 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_11 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9901,7 +9922,7 @@
     ZN_1_FLR_2_SEC_11 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_11 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_11 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_11 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_11 Inlet Nodes,  !- Name
@@ -9909,6 +9930,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_11 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_11 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -10278,7 +10300,7 @@
     ZN_1_FLR_1_SEC_12 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_12 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_12 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_12 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_12 Inlet Nodes,  !- Name
@@ -10286,6 +10308,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_12 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_12 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -10655,7 +10678,7 @@
     ZN_1_FLR_2_SEC_12 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_12 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_12 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_12 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_12 Inlet Nodes,  !- Name
@@ -10663,6 +10686,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_12 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_12 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -11008,7 +11032,7 @@
     ZN_1_FLR_1_SEC_13 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_13 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_13 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_13 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_13 Inlet Nodes,  !- Name
@@ -11016,6 +11040,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_13 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_13 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -11361,7 +11386,7 @@
     ZN_1_FLR_2_SEC_13 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_13 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_13 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_13 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_13 Inlet Nodes,  !- Name
@@ -11369,6 +11394,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_13 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_13 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -11682,7 +11708,7 @@
     ZN_1_FLR_1_SEC_14 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_14 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_14 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_14 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_14 Inlet Nodes,  !- Name
@@ -11690,6 +11716,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_14 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_14 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -12003,7 +12030,7 @@
     ZN_1_FLR_2_SEC_14 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_14 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_14 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_14 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_14 Inlet Nodes,  !- Name
@@ -12011,6 +12038,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_14 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_14 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -12356,7 +12384,7 @@
     ZN_1_FLR_1_SEC_15 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_15 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_15 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_15 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_15 Inlet Nodes,  !- Name
@@ -12364,6 +12392,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_15 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_15 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -12709,7 +12738,7 @@
     ZN_1_FLR_2_SEC_15 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_2_SEC_15 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_2_SEC_15 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_2_SEC_15 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_2_SEC_15 Inlet Nodes,  !- Name
@@ -12717,6 +12746,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_2_SEC_15 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_2_SEC_15 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -12819,7 +12849,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:1 Air Loop Branches,  !- Name
@@ -12925,7 +12956,8 @@
     PSZ-AC:1_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:1_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:1_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:1_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:1_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:1_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -13104,7 +13136,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:2 Air Loop Branches,  !- Name
@@ -13210,7 +13243,8 @@
     PSZ-AC:2_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:2_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:2_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:2_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:2_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:2_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -13389,7 +13423,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:3 Air Loop Branches,  !- Name
@@ -13495,7 +13530,8 @@
     PSZ-AC:3_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:3_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:3_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:3_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:3_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:3_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -13674,7 +13710,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:4 Air Loop Branches,  !- Name
@@ -13780,7 +13817,8 @@
     PSZ-AC:4_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:4_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:4_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:4_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:4_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:4_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -13959,7 +13997,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:5 Air Loop Branches,  !- Name
@@ -14065,7 +14104,8 @@
     PSZ-AC:5_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:5_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:5_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:5_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:5_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:5_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -14244,7 +14284,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:6 Air Loop Branches,  !- Name
@@ -14350,7 +14391,8 @@
     PSZ-AC:6_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:6_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:6_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:6_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:6_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:6_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -14529,7 +14571,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:7 Air Loop Branches,  !- Name
@@ -14635,7 +14678,8 @@
     PSZ-AC:7_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:7_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:7_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:7_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:7_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:7_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -14814,7 +14858,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:8 Air Loop Branches,  !- Name
@@ -14920,7 +14965,8 @@
     PSZ-AC:8_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:8_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:8_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:8_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:8_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:8_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -15099,7 +15145,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:9 Air Loop Branches,  !- Name
@@ -15205,7 +15252,8 @@
     PSZ-AC:9_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:9_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:9_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:9_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:9_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:9_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -15384,7 +15432,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:10 Air Loop Branches,  !- Name
@@ -15490,7 +15539,8 @@
     PSZ-AC:10_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:10_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:10_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:10_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:10_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:10_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -15669,7 +15719,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:11 Air Loop Branches,  !- Name
@@ -15775,7 +15826,8 @@
     PSZ-AC:11_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:11_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:11_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:11_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:11_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:11_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -15954,7 +16006,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:12 Air Loop Branches,  !- Name
@@ -16060,7 +16113,8 @@
     PSZ-AC:12_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:12_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:12_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:12_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:12_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:12_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -16239,7 +16293,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:13 Air Loop Branches,  !- Name
@@ -16345,7 +16400,8 @@
     PSZ-AC:13_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:13_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:13_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:13_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:13_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:13_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -16524,7 +16580,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:14 Air Loop Branches,  !- Name
@@ -16630,7 +16687,8 @@
     PSZ-AC:14_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:14_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:14_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:14_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:14_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:14_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -16809,7 +16867,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:15 Air Loop Branches,  !- Name
@@ -16915,7 +16974,8 @@
     PSZ-AC:15_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:15_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:15_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:15_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:15_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:15_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -17094,7 +17154,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:16 Air Loop Branches,  !- Name
@@ -17200,7 +17261,8 @@
     PSZ-AC:16_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:16_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:16_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:16_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:16_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:16_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -17379,7 +17441,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:17 Air Loop Branches,  !- Name
@@ -17485,7 +17548,8 @@
     PSZ-AC:17_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:17_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:17_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:17_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:17_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:17_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -17664,7 +17728,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:18 Air Loop Branches,  !- Name
@@ -17770,7 +17835,8 @@
     PSZ-AC:18_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:18_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:18_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:18_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:18_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:18_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -17949,7 +18015,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:19 Air Loop Branches,  !- Name
@@ -18055,7 +18122,8 @@
     PSZ-AC:19_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:19_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:19_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:19_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:19_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:19_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -18234,7 +18302,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:20 Air Loop Branches,  !- Name
@@ -18340,7 +18409,8 @@
     PSZ-AC:20_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:20_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:20_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:20_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:20_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:20_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -18519,7 +18589,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:21 Air Loop Branches,  !- Name
@@ -18625,7 +18696,8 @@
     PSZ-AC:21_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:21_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:21_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:21_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:21_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:21_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -18804,7 +18876,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:22 Air Loop Branches,  !- Name
@@ -18910,7 +18983,8 @@
     PSZ-AC:22_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:22_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:22_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:22_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:22_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:22_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -19089,7 +19163,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:23 Air Loop Branches,  !- Name
@@ -19195,7 +19270,8 @@
     PSZ-AC:23_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:23_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:23_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:23_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:23_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:23_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -19374,7 +19450,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:24 Air Loop Branches,  !- Name
@@ -19480,7 +19557,8 @@
     PSZ-AC:24_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:24_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:24_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:24_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:24_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:24_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -19659,7 +19737,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:25 Air Loop Branches,  !- Name
@@ -19765,7 +19844,8 @@
     PSZ-AC:25_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:25_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:25_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:25_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:25_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:25_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -19944,7 +20024,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:26 Air Loop Branches,  !- Name
@@ -20050,7 +20131,8 @@
     PSZ-AC:26_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:26_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:26_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:26_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:26_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:26_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -20229,7 +20311,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:27 Air Loop Branches,  !- Name
@@ -20335,7 +20418,8 @@
     PSZ-AC:27_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:27_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:27_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:27_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:27_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:27_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -20514,7 +20598,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:28 Air Loop Branches,  !- Name
@@ -20620,7 +20705,8 @@
     PSZ-AC:28_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:28_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:28_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:28_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:28_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:28_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -20799,7 +20885,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:29 Air Loop Branches,  !- Name
@@ -20905,7 +20992,8 @@
     PSZ-AC:29_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:29_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:29_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:29_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:29_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:29_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -21084,7 +21172,8 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    1800;                    !- Cycling Run Time {s}
+    FixedRunTime,            !- Cycling Run Time {s}
+    1800;                    !- Control Zone or Zone List Name
 
   BranchList,
     PSZ-AC:30 Air Loop Branches,  !- Name
@@ -21190,7 +21279,8 @@
     PSZ-AC:30_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:30_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:30_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:30_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
+    PSZ-AC:30_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
 
   Curve:Biquadratic,
     PSZ-AC:30_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -21349,7 +21439,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21366,7 +21456,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21381,7 +21471,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21389,7 +21479,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21397,7 +21487,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21405,7 +21495,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21413,7 +21503,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21421,7 +21511,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21429,7 +21519,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21437,7 +21527,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -21447,7 +21537,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -21473,7 +21563,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21490,7 +21580,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21498,7 +21588,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21506,7 +21596,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21514,7 +21604,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21522,7 +21612,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21530,7 +21620,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21538,7 +21628,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21546,7 +21636,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -21556,7 +21646,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -21580,7 +21670,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21604,7 +21694,7 @@
     7.83;                    !- November Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
