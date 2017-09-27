@@ -93,6 +93,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 
 		"ZoneHVAC:EquipmentList,",
 		" Space Equipment,          !- Name",
+		" SequentialLoad,           !- Load Distribution Scheme",
 		" Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
 		" Exhaust Fan,              !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -464,6 +465,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2 )
 
 		"ZoneHVAC:EquipmentList,",
 		" Space Equipment,          !- Name",
+		" SequentialLoad,           !- Load Distribution Scheme",
 		" Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
 		" Exhaust Fan,              !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
