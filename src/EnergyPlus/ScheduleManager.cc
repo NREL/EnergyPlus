@@ -2963,6 +2963,9 @@ namespace ScheduleManager {
 		int EHr;    //ending hour
 		int EMin;   //ending minute
 		std::string::size_type sFld;
+		int totalMinutes;
+		Real64 incrementPerMinute;
+		Real64 curValue;
 
 		MinuteValue = 0.0;
 		SetMinuteValue = false;
@@ -3023,6 +3026,20 @@ namespace ScheduleManager {
 				EMin = MMField;
 			}
 
+			if ( useInterpolation ) {
+				totalMinutes = ( EHr - SHr ) * 60 + ( EMin - SMin ) + 1;
+				if ( totalMinutes == 0 ) totalMinutes = 1; // protect future division
+				if ( Count == 1 ) {
+					StartValue = Numbers( Count ); //assume first period is flat
+					EndValue = Numbers( Count );
+				} else {
+					StartValue = EndValue;
+					EndValue = Numbers( Count );
+				}
+				incrementPerMinute = ( EndValue - StartValue ) / totalMinutes;
+				curValue = StartValue + incrementPerMinute;
+			}
+
 			if ( SHr == EHr ) {
 				for ( Min = SMin; Min <= EMin; ++Min ) {
 					if ( SetMinuteValue( Min, SHr ) ) {
@@ -3030,8 +3047,14 @@ namespace ScheduleManager {
 						ErrorsFound = true;
 						goto UntilLoop_exit;
 					}
-					MinuteValue( Min, SHr ) = Numbers( Count );
-					SetMinuteValue( Min, SHr ) = true;
+					if ( useInterpolation ) {
+						MinuteValue( Min, EHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, SHr ) = true;
+					} else {
+						MinuteValue( Min, SHr ) = Numbers( Count );
+						SetMinuteValue( Min, SHr ) = true;
+					}
 				}
 				SMin = EMin + 1;
 				if ( SMin > 60 ) {
@@ -3043,33 +3066,30 @@ namespace ScheduleManager {
 				ErrorsFound = true;
 			} else {
 				if ( useInterpolation ) {
-					int totalMinutes = (EHr - SHr) * 60 + (EMin - SMin) + 1;
-					if ( totalMinutes == 0 ) totalMinutes = 1; // protect future division
-					if ( Count == 1 ) {
-						StartValue = Numbers( Count ); //assume first period is flat
-						EndValue = Numbers( Count );
-					} else {
-						StartValue = EndValue;
-						EndValue = Numbers( Count );
-					}
-					Real64 incrementPerMinute = (EndValue - StartValue ) / totalMinutes;
-					Real64 curValue = StartValue + incrementPerMinute;
-					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
-						MinuteValue( Min, SHr ) = curValue;
-						curValue += incrementPerMinute;
-						SetMinuteValue( Min, SHr ) = true;
-					}
-					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
-						for ( Min = 1; Min <= 60; ++Min ) {
-							MinuteValue( Min, Hr ) = curValue;
+					if ( SHr + 1 == EHr && EMin > SMin) {
+						for ( Min = SMin; Min <= EMin; ++Min ) {           // for ending hour
+							MinuteValue( Min, EHr ) = curValue;
 							curValue += incrementPerMinute;
-							SetMinuteValue( Min, Hr ) = true;
+							SetMinuteValue( Min, EHr ) = true;
 						}
-					}
-					for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
-						MinuteValue( Min, EHr ) = curValue;
-						curValue += incrementPerMinute;
-						SetMinuteValue( Min, EHr ) = true;
+					} else {
+						for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
+							MinuteValue( Min, SHr ) = curValue;
+							curValue += incrementPerMinute;
+							SetMinuteValue( Min, SHr ) = true;
+						}
+						for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+							for ( Min = 1; Min <= 60; ++Min ) {
+								MinuteValue( Min, Hr ) = curValue;
+								curValue += incrementPerMinute;
+								SetMinuteValue( Min, Hr ) = true;
+							}
+						}
+						for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
+							MinuteValue( Min, EHr ) = curValue;
+							curValue += incrementPerMinute;
+							SetMinuteValue( Min, EHr ) = true;
+						}
 					}
 				} else { // no interpolation so set values to constant number
 					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
