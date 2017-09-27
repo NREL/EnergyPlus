@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,8.8;
+  VERSION,8.8;
 
   Timestep,4;
 
@@ -7722,8 +7722,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PACKAGED VAV WITH REHEAT Air Loop Branches,  !- Name
@@ -7836,8 +7835,7 @@
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
     PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolC Cond OA node,  !- Condenser Air Inlet Node Name
-    ;                        !- Condenser Type
+    PACKAGED VAV WITH REHEAT_CoolC Cond OA node;  !- Condenser Air Inlet Node Name
 
   OutdoorAir:Node,
     PACKAGED VAV WITH REHEAT_CoolC Cond OA node;  !- Name

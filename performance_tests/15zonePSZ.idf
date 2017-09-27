@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,8.8;
+  VERSION,8.8;
 
   Timestep,4;
 
@@ -7283,8 +7283,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:1 Air Loop Branches,  !- Name
@@ -7390,8 +7389,7 @@
     PSZ-AC:1_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:1_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:1_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:1_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:1_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:1_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -7570,8 +7568,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:2 Air Loop Branches,  !- Name
@@ -7677,8 +7674,7 @@
     PSZ-AC:2_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:2_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:2_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:2_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:2_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:2_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -7857,8 +7853,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:3 Air Loop Branches,  !- Name
@@ -7964,8 +7959,7 @@
     PSZ-AC:3_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:3_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:3_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:3_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:3_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:3_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -8144,8 +8138,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:4 Air Loop Branches,  !- Name
@@ -8251,8 +8244,7 @@
     PSZ-AC:4_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:4_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:4_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:4_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:4_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:4_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -8431,8 +8423,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:5 Air Loop Branches,  !- Name
@@ -8538,8 +8529,7 @@
     PSZ-AC:5_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:5_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:5_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:5_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:5_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:5_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -8718,8 +8708,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:6 Air Loop Branches,  !- Name
@@ -8825,8 +8814,7 @@
     PSZ-AC:6_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:6_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:6_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:6_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:6_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:6_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -9005,8 +8993,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:7 Air Loop Branches,  !- Name
@@ -9112,8 +9099,7 @@
     PSZ-AC:7_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:7_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:7_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:7_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:7_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:7_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -9292,8 +9278,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:8 Air Loop Branches,  !- Name
@@ -9399,8 +9384,7 @@
     PSZ-AC:8_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:8_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:8_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:8_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:8_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:8_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -9579,8 +9563,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:9 Air Loop Branches,  !- Name
@@ -9686,8 +9669,7 @@
     PSZ-AC:9_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:9_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:9_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:9_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:9_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:9_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -9866,8 +9848,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:10 Air Loop Branches,  !- Name
@@ -9973,8 +9954,7 @@
     PSZ-AC:10_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:10_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:10_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:10_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:10_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:10_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -10153,8 +10133,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:11 Air Loop Branches,  !- Name
@@ -10260,8 +10239,7 @@
     PSZ-AC:11_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:11_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:11_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:11_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:11_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:11_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -10440,8 +10418,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:12 Air Loop Branches,  !- Name
@@ -10547,8 +10524,7 @@
     PSZ-AC:12_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:12_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:12_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:12_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:12_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:12_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -10727,8 +10703,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:13 Air Loop Branches,  !- Name
@@ -10834,8 +10809,7 @@
     PSZ-AC:13_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:13_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:13_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:13_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:13_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:13_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -11014,8 +10988,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:14 Air Loop Branches,  !- Name
@@ -11121,8 +11094,7 @@
     PSZ-AC:14_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:14_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:14_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:14_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:14_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:14_CoolCCarrier48TM014_12tons_CapFT,  !- Name
@@ -11301,8 +11273,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     PSZ-AC:15 Air Loop Branches,  !- Name
@@ -11408,8 +11379,7 @@
     PSZ-AC:15_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC:15_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
     PSZ-AC:15_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    PSZ-AC:15_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ;                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    PSZ-AC:15_CoolCIEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     PSZ-AC:15_CoolCCarrier48TM014_12tons_CapFT,  !- Name

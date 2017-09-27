@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,8.8;
+  VERSION,8.8;
 
   Timestep,4;
 
@@ -19677,8 +19677,7 @@
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
     FixedRunTime,            !- Cycling Run Time Control Type
-    FixedRunTime,            !- Cycling Run Time {s}
-    1800;                    !- Control Zone or Zone List Name
+    1800;                    !- Cycling Run Time {s}
 
   BranchList,
     VAV WITH REHEAT Air Loop Branches,  !- Name
@@ -21028,11 +21027,7 @@
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
-    ,                        !- Free Convection Nominal Capacity Sizing Factor
-    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
-    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
-    ,                        !- Design Approach Temperature {deltaC}
-    ;                        !- Design Range Temperature {deltaC}
+    ;                        !- Free Convection Nominal Capacity Sizing Factor
 
   Branch,
     TowerWaterSys Supply Equipment Bypass Branch,  !- Name

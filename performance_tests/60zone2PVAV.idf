@@ -31304,11 +31304,10 @@
     rm1_1_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_1_C Zone Air Node,   !- Zone Air Node Name
-    rm1_1_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_1_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_1_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_1_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -31409,11 +31408,10 @@
     rm1_3_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_3_C Zone Air Node,   !- Zone Air Node Name
-    rm1_3_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_3_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_3_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_3_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -31514,11 +31512,10 @@
     rm1_4_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_4_C Zone Air Node,   !- Zone Air Node Name
-    rm1_4_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_4_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_4_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_4_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -31619,11 +31616,10 @@
     rm1_5_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_5_C Zone Air Node,   !- Zone Air Node Name
-    rm1_5_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_5_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_5_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_5_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -31724,11 +31720,10 @@
     rm1_6_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_6_C Zone Air Node,   !- Zone Air Node Name
-    rm1_6_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_6_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_6_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_6_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -31829,11 +31824,10 @@
     rm1_7_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_7_C Zone Air Node,   !- Zone Air Node Name
-    rm1_7_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_7_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_7_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_7_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -31934,11 +31928,10 @@
     rm1_8_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_8_C Zone Air Node,   !- Zone Air Node Name
-    rm1_8_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_8_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_8_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_8_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32039,11 +32032,10 @@
     rm1_9_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_9_C Zone Air Node,   !- Zone Air Node Name
-    rm1_9_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_9_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_9_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_9_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32144,11 +32136,10 @@
     rm1_10_C Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_10_C Zone Air Node,  !- Zone Air Node Name
-    rm1_10_C Return Outlet;  !- Zone Return Air Node or NodeList Name
+    rm1_10_C Return Outlet;  !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_10_C Equipment,      !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_10_C ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32249,11 +32240,10 @@
     rm1_2_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm1_2_C Zone Air Node,   !- Zone Air Node Name
-    rm1_2_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm1_2_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm1_2_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm1_2_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32354,11 +32344,10 @@
     rm2_1_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_1_C Zone Air Node,   !- Zone Air Node Name
-    rm2_1_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_1_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_1_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_1_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32459,11 +32448,10 @@
     rm2_2_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_2_C Zone Air Node,   !- Zone Air Node Name
-    rm2_2_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_2_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_2_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_2_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32564,11 +32552,10 @@
     rm2_3_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_3_C Zone Air Node,   !- Zone Air Node Name
-    rm2_3_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_3_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_3_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_3_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32669,11 +32656,10 @@
     rm2_4_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_4_C Zone Air Node,   !- Zone Air Node Name
-    rm2_4_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_4_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_4_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_4_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32774,11 +32760,10 @@
     rm2_5_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_5_C Zone Air Node,   !- Zone Air Node Name
-    rm2_5_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_5_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_5_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_5_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32879,11 +32864,10 @@
     rm2_6_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_6_C Zone Air Node,   !- Zone Air Node Name
-    rm2_6_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_6_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_6_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_6_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -32984,11 +32968,10 @@
     rm2_7_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_7_C Zone Air Node,   !- Zone Air Node Name
-    rm2_7_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_7_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_7_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_7_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33089,11 +33072,10 @@
     rm2_8_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_8_C Zone Air Node,   !- Zone Air Node Name
-    rm2_8_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_8_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_8_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_8_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33194,11 +33176,10 @@
     rm2_9_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_9_C Zone Air Node,   !- Zone Air Node Name
-    rm2_9_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm2_9_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_9_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_9_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33299,11 +33280,10 @@
     rm2_10_C Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm2_10_C Zone Air Node,  !- Zone Air Node Name
-    rm2_10_C Return Outlet;  !- Zone Return Air Node or NodeList Name
+    rm2_10_C Return Outlet;  !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm2_10_C Equipment,      !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm2_10_C ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33404,11 +33384,10 @@
     rm3_1_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_1_C Zone Air Node,   !- Zone Air Node Name
-    rm3_1_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_1_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_1_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_1_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33509,11 +33488,10 @@
     rm3_2_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_2_C Zone Air Node,   !- Zone Air Node Name
-    rm3_2_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_2_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_2_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_2_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33614,11 +33592,10 @@
     rm3_3_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_3_C Zone Air Node,   !- Zone Air Node Name
-    rm3_3_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_3_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_3_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_3_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33719,11 +33696,10 @@
     rm3_4_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_4_C Zone Air Node,   !- Zone Air Node Name
-    rm3_4_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_4_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_4_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_4_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33824,11 +33800,10 @@
     rm3_5_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_5_C Zone Air Node,   !- Zone Air Node Name
-    rm3_5_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_5_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_5_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_5_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -33929,11 +33904,10 @@
     rm3_6_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_6_C Zone Air Node,   !- Zone Air Node Name
-    rm3_6_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_6_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_6_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_6_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -34034,11 +34008,10 @@
     rm3_7_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_7_C Zone Air Node,   !- Zone Air Node Name
-    rm3_7_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_7_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_7_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_7_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -34139,11 +34112,10 @@
     rm3_8_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_8_C Zone Air Node,   !- Zone Air Node Name
-    rm3_8_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_8_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_8_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_8_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -34244,11 +34216,10 @@
     rm3_9_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_9_C Zone Air Node,   !- Zone Air Node Name
-    rm3_9_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm3_9_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_9_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_9_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -34349,11 +34320,10 @@
     rm3_10_C Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm3_10_C Zone Air Node,  !- Zone Air Node Name
-    rm3_10_C Return Outlet;  !- Zone Return Air Node or NodeList Name
+    rm3_10_C Return Outlet;  !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm3_10_C Equipment,      !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm3_10_C ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -35270,11 +35240,10 @@
     rm4_1_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_1_C Zone Air Node,   !- Zone Air Node Name
-    rm4_1_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_1_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_1_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_1_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -35375,11 +35344,10 @@
     rm4_2_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_2_C Zone Air Node,   !- Zone Air Node Name
-    rm4_2_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_2_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_2_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_2_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -35480,11 +35448,10 @@
     rm4_3_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_3_C Zone Air Node,   !- Zone Air Node Name
-    rm4_3_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_3_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_3_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_3_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -35585,11 +35552,10 @@
     rm4_4_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_4_C Zone Air Node,   !- Zone Air Node Name
-    rm4_4_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_4_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_4_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_4_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -35690,11 +35656,10 @@
     rm4_5_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_5_C Zone Air Node,   !- Zone Air Node Name
-    rm4_5_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_5_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_5_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_5_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -35795,11 +35760,10 @@
     rm4_6_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_6_C Zone Air Node,   !- Zone Air Node Name
-    rm4_6_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_6_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_6_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_6_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -35900,11 +35864,10 @@
     rm4_7_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_7_C Zone Air Node,   !- Zone Air Node Name
-    rm4_7_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_7_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_7_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_7_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36005,11 +35968,10 @@
     rm4_8_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_8_C Zone Air Node,   !- Zone Air Node Name
-    rm4_8_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_8_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_8_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_8_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36110,11 +36072,10 @@
     rm4_9_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_9_C Zone Air Node,   !- Zone Air Node Name
-    rm4_9_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm4_9_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_9_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_9_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36215,11 +36176,10 @@
     rm4_10_C Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm4_10_C Zone Air Node,  !- Zone Air Node Name
-    rm4_10_C Return Outlet;  !- Zone Return Air Node or NodeList Name
+    rm4_10_C Return Outlet;  !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm4_10_C Equipment,      !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm4_10_C ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36320,11 +36280,10 @@
     rm5_1_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_1_C Zone Air Node,   !- Zone Air Node Name
-    rm5_1_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_1_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_1_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_1_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36425,11 +36384,10 @@
     rm5_2_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_2_C Zone Air Node,   !- Zone Air Node Name
-    rm5_2_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_2_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_2_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_2_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36530,11 +36488,10 @@
     rm5_3_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_3_C Zone Air Node,   !- Zone Air Node Name
-    rm5_3_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_3_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_3_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_3_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36635,11 +36592,10 @@
     rm5_4_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_4_C Zone Air Node,   !- Zone Air Node Name
-    rm5_4_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_4_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_4_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_4_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36740,11 +36696,10 @@
     rm5_5_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_5_C Zone Air Node,   !- Zone Air Node Name
-    rm5_5_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_5_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_5_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_5_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36845,11 +36800,10 @@
     rm5_6_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_6_C Zone Air Node,   !- Zone Air Node Name
-    rm5_6_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_6_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_6_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_6_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -36950,11 +36904,10 @@
     rm5_7_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_7_C Zone Air Node,   !- Zone Air Node Name
-    rm5_7_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_7_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_7_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_7_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37055,11 +37008,10 @@
     rm5_8_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_8_C Zone Air Node,   !- Zone Air Node Name
-    rm5_8_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_8_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_8_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_8_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37160,11 +37112,10 @@
     rm5_9_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_9_C Zone Air Node,   !- Zone Air Node Name
-    rm5_9_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm5_9_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_9_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_9_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37265,11 +37216,10 @@
     rm5_10_C Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm5_10_C Zone Air Node,  !- Zone Air Node Name
-    rm5_10_C Return Outlet;  !- Zone Return Air Node or NodeList Name
+    rm5_10_C Return Outlet;  !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm5_10_C Equipment,      !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm5_10_C ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37370,11 +37320,10 @@
     rm6_1_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_1_C Zone Air Node,   !- Zone Air Node Name
-    rm6_1_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_1_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_1_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_1_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37475,11 +37424,10 @@
     rm6_2_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_2_C Zone Air Node,   !- Zone Air Node Name
-    rm6_2_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_2_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_2_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_2_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37580,11 +37528,10 @@
     rm6_3_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_3_C Zone Air Node,   !- Zone Air Node Name
-    rm6_3_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_3_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_3_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_3_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37685,11 +37632,10 @@
     rm6_4_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_4_C Zone Air Node,   !- Zone Air Node Name
-    rm6_4_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_4_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_4_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_4_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37790,11 +37736,10 @@
     rm6_5_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_5_C Zone Air Node,   !- Zone Air Node Name
-    rm6_5_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_5_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_5_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_5_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -37895,11 +37840,10 @@
     rm6_6_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_6_C Zone Air Node,   !- Zone Air Node Name
-    rm6_6_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_6_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_6_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_6_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -38000,11 +37944,10 @@
     rm6_7_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_7_C Zone Air Node,   !- Zone Air Node Name
-    rm6_7_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_7_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_7_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_7_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -38105,11 +38048,10 @@
     rm6_8_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_8_C Zone Air Node,   !- Zone Air Node Name
-    rm6_8_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_8_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_8_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_8_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -38210,11 +38152,10 @@
     rm6_9_C Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_9_C Zone Air Node,   !- Zone Air Node Name
-    rm6_9_C Return Outlet;   !- Zone Return Air Node or NodeList Name
+    rm6_9_C Return Outlet;   !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_9_C Equipment,       !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_9_C ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -38315,11 +38256,10 @@
     rm6_10_C Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     rm6_10_C Zone Air Node,  !- Zone Air Node Name
-    rm6_10_C Return Outlet;  !- Zone Return Air Node or NodeList Name
+    rm6_10_C Return Outlet;  !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentList,
     rm6_10_C Equipment,      !- Name
-    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     rm6_10_C ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
