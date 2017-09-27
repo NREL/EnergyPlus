@@ -248,7 +248,6 @@ TEST_F( RoomAirflowNetworkTest, RAFNTest )
 	ZoneEquipConfig( ZoneNum ).InletNode( 1 ) = 1;
 	NodeID.allocate( NumOfNodes );
 	Node.allocate( NumOfNodes );
-	ZoneEquipConfig( ZoneNum ).ReturnAirNode = 2;
 	ZoneEquipConfig( ZoneNum ).NumReturnNodes = 1;
 	ZoneEquipConfig( ZoneNum ).ReturnNode.allocate( 1 );
 	ZoneEquipConfig( ZoneNum ).ReturnNode( 1 ) = 2;

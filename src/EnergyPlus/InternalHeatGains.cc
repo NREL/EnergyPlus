@@ -1135,7 +1135,7 @@ namespace InternalHeatGains {
 					}
 
 					// Set return air node number
-					Lights( Loop ).ReturnNodePtr = 0;
+					Lights( Loop ).ZoneReturnNum = 0;
 					std::string retNodeName = "";
 					if ( !lAlphaFieldBlanks( 7 ) ) {
 						if ( LightsObjects( Item ).ZoneListActive ) {
@@ -1146,9 +1146,14 @@ namespace InternalHeatGains {
 						}
 					}
 					if ( Lights( Loop ).ZonePtr > 0 ) {
-						Lights( Loop ).ReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Zone( Lights( Loop ).ZonePtr ).Name, retNodeName );
+						Lights( Loop ).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone( Zone( Lights( Loop ).ZonePtr ).Name, retNodeName );
 					}
 
+					if ( ( Lights( Loop ).ZoneReturnNum == 0 ) && ( Lights( Loop ).FractionReturnAir > 0.0 ) &&  ( !lAlphaFieldBlanks( 7 ) ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 7 ) + " =" + AlphaName( 7 ) );
+						ShowContinueError( "No matching Zone Return Air Node found." );
+						ErrorsFound = true;
+					}
 					if ( Lights( Loop ).ZonePtr <= 0 ) continue; // Error, will be caught and terminated later
 
 					// Object report variables
@@ -1188,7 +1193,11 @@ namespace InternalHeatGains {
 						SetupEMSInternalVariable( "Lighting Power Design Level", Lights( Loop ).Name, "[W]", Lights( Loop ).DesignLevel );
 					} // EMS
 					//setup internal gains
-					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, Lights(Loop).ReturnNodePtr );
+					int returnNodeNum = 0;
+					if ( ( Lights( Loop ).ZoneReturnNum > 0 ) && (  Lights( Loop ).ZoneReturnNum <= DataZoneEquipment::ZoneEquipConfig( Lights( Loop ).ZonePtr ).NumReturnNodes ) ) {
+						returnNodeNum = DataZoneEquipment::ZoneEquipConfig( Lights( Loop ).ZonePtr ).ReturnNode( Lights( Loop ).ZoneReturnNum );
+					}
+					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, returnNodeNum );
 
 					// send values to predefined lighting summary report
 					liteName = Lights( Loop ).Name;
@@ -3362,7 +3371,7 @@ namespace InternalHeatGains {
 		Real64 FractionConvected; // For general lighting, fraction of heat from lights convected to zone air
 		Real64 FractionReturnAir; // For general lighting, fraction of heat from lights convected to zone's return air
 		Real64 FractionRadiant; // For general lighting, fraction of heat from lights to zone that is long wave
-		int ReturnZonePlenumCondNum; // Number of ZoneRetPlenCond for a zone's return air plenum, if it exists
+
 		Real64 ReturnPlenumTemp; // Air temperature of a zone's return air plenum (C)
 		Real64 pulseMultipler; // use to create a pulse for the load component report computations
 		static Real64 curQL( 0.0 ); // radiant value prior to adjustment for pulse for load component report
@@ -3507,7 +3516,8 @@ namespace InternalHeatGains {
 			if ( Lights( Loop ).FractionReturnAirIsCalculated && ! ZoneSizingCalc && SimTimeSteps > 1 ) {
 				// Calculate FractionReturnAir based on conditions in the zone's return air plenum, if there is one.
 				if ( Zone( NZ ).IsControlled ) {
-					ReturnZonePlenumCondNum = ZoneEquipConfig( NZ ).ReturnZonePlenumCondNum;
+					int retNum = Lights( Loop ).ZoneReturnNum;
+					int ReturnZonePlenumCondNum = ZoneEquipConfig( NZ ).ReturnNodePlenumNum( retNum );
 					if ( ReturnZonePlenumCondNum > 0 ) {
 						ReturnPlenumTemp = ZoneRetPlenCond( ReturnZonePlenumCondNum ).ZoneTemp;
 						FractionReturnAir = Lights( Loop ).FractionReturnAirPlenTempCoeff1 - Lights( Loop ).FractionReturnAirPlenTempCoeff2 * ReturnPlenumTemp;

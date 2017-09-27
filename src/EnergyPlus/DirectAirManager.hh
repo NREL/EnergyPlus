@@ -104,8 +104,8 @@ namespace DirectAirManager {
 
 		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
 		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
+		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 		int AirLoopNum; // air loop index 
-		int CtrlZoneNum;  // control zone index
 		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
 
 		// Default Constructor
@@ -129,8 +129,8 @@ namespace DirectAirManager {
 			ZoneNum( 0 ),
 			NoOAFlowInputFromUser( true ), 
 			OARequirementsPtr( 0 ), 
+			CtrlZoneInNodeIndex( 0 ),
 			AirLoopNum( 0 ), 
-			CtrlZoneNum( 0 ),
 			OAPerPersonMode( 0 )
 		{}
 

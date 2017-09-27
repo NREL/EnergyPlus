@@ -116,17 +116,20 @@ namespace DataDefineEquip {
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
 		Real64 MassFlowRateUpStrLk; // current air mass flow rate of the upstream leak [kg/s]
 		Real64 MassFlowRateDnStrLk; // current air mass flow rate of the downstream leak [kg/s]
-		Real64 MassFlowRateTU; // current air mass flow rate tjrough the terminal unit [kg/s]
+		Real64 MassFlowRateTU; // current air mass flow rate through the terminal unit [kg/s]
 		Real64 MassFlowRateZSup; // current air mass flow rate of zone supply air [kg/s]
 		Real64 MassFlowRateSup; // current air mass flow rate of supply air upstream of upstream leak [kg/s]
+		Real64 MassFlowRatePlenInd; // current air mass flow rate of induced air from plenum [kg/s]
 		Real64 MaxAvailDelta; // change in max avail mass low rate due to leaks [kg/s]
 		Real64 MinAvailDelta; // change in min avail mass low rate due to leaks [kg/s]
-		int InletNodeNum; // index of inlet node
+		int InletNodeNum; // index of inlet node 1
+		int InletNodeNum2; // index of inlet node 2 (used for dual duct airterminals)
 		int ZoneEqNum; // index of zone equipment object for this terminal unit
 		int AirLoopNum; // index to airloop that this terminal unit is connected to
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
 		bool UpStreamLeak; // if true, there is an upstream leak
 		bool DownStreamLeak; // if true, there is an downstream leak
+		int RetPlenumNum; // return plenum number that this ADU can leak to, zero if none
 		int ZoneNum; // index of the zone object for this terminal unit
 	 	bool AccountForDOAS; // if true user has asked for DOAS
 		Real64 HeatRate; // [W]
@@ -153,14 +156,17 @@ namespace DataDefineEquip {
 			MassFlowRateTU( 0.0 ),
 			MassFlowRateZSup( 0.0 ),
 			MassFlowRateSup( 0.0 ),
+			MassFlowRatePlenInd( 0.0 ),
 			MaxAvailDelta( 0.0 ),
 			MinAvailDelta( 0.0 ),
 			InletNodeNum( 0 ),
+			InletNodeNum2( 0 ),
 			ZoneEqNum( 0 ),
 			AirLoopNum( 0 ),
 			LeakLoadMult( 0.0 ),
 			UpStreamLeak( false ),
 			DownStreamLeak( false ),
+			RetPlenumNum( 0 ),
 			ZoneNum( 0 ),
 			AccountForDOAS( false ),
 			HeatRate( 0.0 ),

@@ -163,6 +163,13 @@ namespace ZoneEquipmentManager {
 	CalcZoneMassBalance();
 
 	void
+	CalcZoneReturnFlows(
+		int const ZoneNum,
+		Real64 & ExpTotalReturnMassFlow, // Expected total return air mass flow rate
+		Real64 & FinalTotalReturnMassFlow // Final total return air mass flow rate
+	);
+
+	void
 	CalcAirFlowSimple(
 		int const SysTimestepLoop = 0, // System time step index
 		bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
