@@ -3066,30 +3066,22 @@ namespace ScheduleManager {
 				ErrorsFound = true;
 			} else {
 				if ( useInterpolation ) {
-					if ( SHr + 1 == EHr && EMin > SMin) {
-						for ( Min = SMin; Min <= EMin; ++Min ) {           // for ending hour
-							MinuteValue( Min, EHr ) = curValue;
+					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
+						MinuteValue( Min, SHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, SHr ) = true;
+					}
+					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+						for ( Min = 1; Min <= 60; ++Min ) {
+							MinuteValue( Min, Hr ) = curValue;
 							curValue += incrementPerMinute;
-							SetMinuteValue( Min, EHr ) = true;
+							SetMinuteValue( Min, Hr ) = true;
 						}
-					} else {
-						for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
-							MinuteValue( Min, SHr ) = curValue;
-							curValue += incrementPerMinute;
-							SetMinuteValue( Min, SHr ) = true;
-						}
-						for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
-							for ( Min = 1; Min <= 60; ++Min ) {
-								MinuteValue( Min, Hr ) = curValue;
-								curValue += incrementPerMinute;
-								SetMinuteValue( Min, Hr ) = true;
-							}
-						}
-						for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
-							MinuteValue( Min, EHr ) = curValue;
-							curValue += incrementPerMinute;
-							SetMinuteValue( Min, EHr ) = true;
-						}
+					}
+					for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
+						MinuteValue( Min, EHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, EHr ) = true;
 					}
 				} else { // no interpolation so set values to constant number
 					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
