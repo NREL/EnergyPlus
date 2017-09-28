@@ -162,11 +162,8 @@ namespace GroundHeatExchangers {
 	std::vector < std::shared_ptr < GLHEResponseFactorsStruct > > responseFactorsVector;
 	std::vector < std::shared_ptr < GLHEVertSingleStruct > > singleBoreholesVector;
 
-	// MODULE SUBROUTINES:
-
 	//******************************************************************************
 
-	// Functions
 	void
 	clear_state(){
 		numVerticalGLHEs = 0;
@@ -191,6 +188,8 @@ namespace GroundHeatExchangers {
 		singleBoreholesVector.clear();
 	}
 
+	//******************************************************************************
+
 	std::shared_ptr < GLHEVertPropsStruct >
 	GetVertProps(
 		std::string const & objectName
@@ -210,6 +209,8 @@ namespace GroundHeatExchangers {
 
 		return nullptr;
 	}
+
+	//******************************************************************************
 
 	std::shared_ptr < GLHEVertSingleStruct >
 	GetSingleBH(
@@ -231,6 +232,8 @@ namespace GroundHeatExchangers {
 		return nullptr;
 	}
 
+	//******************************************************************************
+
 	std::shared_ptr < GLHEVertArrayStruct >
 	GetVertArray(
 		std::string const & objectName
@@ -251,6 +254,8 @@ namespace GroundHeatExchangers {
 		return nullptr;
 	}
 
+	//******************************************************************************
+
 	std::shared_ptr < GLHEResponseFactorsStruct >
 	GetResponseFactor(
 		std::string const & objectName
@@ -270,6 +275,8 @@ namespace GroundHeatExchangers {
 
 		return nullptr;
 	}
+
+	//******************************************************************************
 
 	std::shared_ptr < GLHEResponseFactorsStruct >
 	BuildAndGetResponseFactorObjectFromArray(
@@ -296,13 +303,17 @@ namespace GroundHeatExchangers {
 				thisRF->myBorholes.push_back( thisBH );
 				singleBoreholesVector.push_back( thisBH );
 				yLoc += arrayObjectPtr->bhSpacing;
+				thisRF->numBoreholes += 1;
 			}
 			xLoc += arrayObjectPtr->bhSpacing;
 		}
 
+		SetupBHPointsForResponseFactorsObject( thisRF );
 		responseFactorsVector.push_back( thisRF );
 		return thisRF;
 	}
+
+	//******************************************************************************
 
 	std::shared_ptr < GLHEResponseFactorsStruct >
 	BuildAndGetResponseFactorsObjectFromSingleBHs(
@@ -342,7 +353,10 @@ namespace GroundHeatExchangers {
 		}
 
 		thisRF->props = thisProps;
+		thisRF->numBoreholes = thisRF->myBorholes.size();
 		vertPropsVector.push_back( thisProps );
+
+		SetupBHPointsForResponseFactorsObject( thisRF );
 
 		responseFactorsVector.push_back( thisRF );
 
@@ -351,15 +365,67 @@ namespace GroundHeatExchangers {
 		return thisRF;
 	}
 
+	//******************************************************************************
+
+	void
+	SetupBHPointsForResponseFactorsObject(
+		std::shared_ptr < GLHEResponseFactorsStruct > & thisRF
+	)
+	{
+		for ( auto & thisBH : thisRF->myBorholes ) {
+
+			// Using Simpson's rule the number of points (n+1) must be odd, therefore an even number of panels is required
+			// Starting from i = 0 to i <= NumPanels produces an odd number of points
+			int numPanels_i = 50;
+			int numPanels_ii = 550;
+			int numPanels_j = 550;
+
+			thisBH->dl_i = thisBH->props->bhLength / numPanels_i;
+			for ( int i = 0; i <= numPanels_i; ++i ) {
+				MyCartesian newPoint;
+				newPoint.x = thisBH->xLoc;
+				newPoint.y = thisBH->yLoc;
+				newPoint.z = thisBH->props->bhTopDepth + ( i * thisBH->dl_i );
+				thisBH->pointLocations_i.push_back( newPoint );
+			}
+
+			thisBH->dl_ii = thisBH->props->bhLength / numPanels_ii;
+			for ( int i = 0; i <= numPanels_ii; ++i ) {
+				MyCartesian newPoint;
+				// For case when bh is being compared to itself, shift points by 1 radius in the horizontal plane
+				newPoint.x = thisBH->xLoc + thisBH->props->bhDiameter / 2.0;
+				newPoint.y = thisBH->yLoc;
+				newPoint.z = thisBH->props->bhTopDepth + ( i * thisBH->dl_ii );
+				thisBH->pointLocations_ii.push_back( newPoint );
+			}
+
+			thisBH->dl_j = thisBH->props->bhLength / numPanels_j;
+			for ( int i = 0; i <= numPanels_j; ++i ) {
+				MyCartesian newPoint;
+				newPoint.x = thisBH->xLoc;
+				newPoint.y = thisBH->yLoc;
+				newPoint.z = thisBH->props->bhTopDepth + ( i * thisBH->dl_j );
+				thisBH->pointLocations_j.push_back( newPoint );
+			}
+		}
+	}
+
+
+	//******************************************************************************
+
 	void GLHEBase::onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {
 		this->initGLHESimVars();
 	}
+
+	//******************************************************************************
 
 	void GLHEBase::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
 		this->initGLHESimVars();
 		this->calcGroundHeatExchanger();
 		this->updateGHX();
 	}
+
+	//******************************************************************************
 
 	PlantComponent * GLHEBase::factory( int const objectType, std::string objectName ) {
 		if ( GetInput ) {
@@ -387,11 +453,197 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
+	std::vector< Real64 >
+	GLHEVert::distances(
+		MyCartesian const & point_i,
+		MyCartesian const & point_j
+	)
+	{
+		std::vector< Real64 > sumVals;
+
+		// Calculate the distance between points
+		sumVals.push_back( pow_2( point_i.x - point_j.x ) );
+		sumVals.push_back( pow_2( point_i.y - point_j.y ) );
+		sumVals.push_back( pow_2( point_i.z - point_j.z ) );
+
+		Real64 sumTot = 0;
+		std::vector< Real64 > retVals;
+		std::for_each( sumVals.begin(), sumVals.end(), [&] ( Real64 n ) { sumTot += n; } );
+		retVals.push_back( std::sqrt( sumTot ) );
+
+		// Calculate distance to mirror point
+		sumVals.pop_back();
+		sumVals.push_back( pow_2( point_i.z - ( -point_j.z ) ) );
+
+		sumTot = 0;
+		std::for_each( sumVals.begin(), sumVals.end(), [&] ( Real64 n ) { sumTot += n; } );
+		retVals.push_back( std::sqrt( sumTot ) );
+
+		return retVals;
+	};
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcResponse(
+		std::vector< Real64 > const & dists,
+		Real64 const & currTime
+	)
+	{
+		Real64 pointToPointResponse = erfc( dists[0] / ( 2 * sqrt( soil.diffusivity * currTime ) ) ) / dists[0];
+		Real64 pointToReflectedResponse = erfc( dists[1] / ( 2 * sqrt( soil.diffusivity * currTime ) ) ) / dists[1];
+
+		return pointToPointResponse - pointToReflectedResponse;
+
+	};
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::integral(
+		MyCartesian const & point_i,
+		std::shared_ptr< GLHEVertSingleStruct > const & bh_i,
+		std::shared_ptr< GLHEVertSingleStruct > const & bh_j,
+		Real64 const & currTime
+	)
+	{
+		if ( bh_i == bh_j ) {
+
+			Real64 sum_f = 0;
+			int index = 0;
+			int lastIndex_ii = bh_j->pointLocations_ii.size() - 1;
+			for ( auto & point_j : bh_j->pointLocations_ii ) {
+				std::vector< Real64 > dists = distances( point_i, point_j );
+				Real64 f = calcResponse( dists, currTime );
+
+				// Integrate using Simpson's
+				if ( index == 0 || index == lastIndex_ii ) {
+					sum_f += f;
+				} else if ( isEven( index ) ) {
+					sum_f += 2 * f;
+				} else {
+					sum_f += 4 * f;
+				}
+
+				++index;
+			}
+
+			return ( bh_j->dl_ii / 3.0 ) * sum_f;
+
+		} else {
+
+			Real64 sum_f = 0;
+			int index = 0;
+			int lastIndex_j = bh_j->pointLocations_j.size() - 1;
+			for ( auto & point_j : bh_j->pointLocations_j) {
+				std::vector< Real64 > dists = distances( point_i, point_j );
+				Real64 f = calcResponse( dists, currTime );
+
+				// Integrate using Simpson's
+				if ( index == 0 || index == lastIndex_j ) {
+					sum_f += f;
+				} else if ( isEven( index ) ) {
+					sum_f += 2 * f;
+				} else {
+					sum_f += 4 * f;
+				}
+
+				++index;
+			}
+
+			return ( bh_j->dl_j / 3.0 ) * sum_f;
+		}
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::doubleIntegral(
+		std::shared_ptr< GLHEVertSingleStruct > const & bh_i,
+		std::shared_ptr< GLHEVertSingleStruct > const & bh_j,
+		Real64 const & currTime
+	)
+	{
+		Real64 sum_f = 0;
+		int index = 0;
+		int lastIndex = bh_i->pointLocations_i.size() - 1;
+		for ( auto & thisPoint : bh_i->pointLocations_i ) {
+
+			Real64 f = integral( thisPoint, bh_i, bh_j, currTime );
+
+			// Integrate using Simpson's
+			if ( index == 0 || index == lastIndex ) {
+				sum_f += f;
+			} else if ( isEven( index ) ) {
+				sum_f += 2 * f;
+			} else {
+				sum_f += 4 * f;
+			}
+
+			++index;
+		}
+
+		return ( bh_i->dl_i / 3.0 ) * sum_f;
+
+	}
+
+	//******************************************************************************
+
 	void
 	GLHEVert::calcGFunctions()
 	{
-		// Nothing to see here. Move along.
-		// Just a stub out for future work.
+
+		int const numDaysInYear( 365 );
+		using DataGlobals::HoursInDay;
+		using DataGlobals::SecInHour;
+
+		DisplayString( "Initializing GroundHeatExchanger:System: " + name );
+
+		// Minimum simulation time for witch finite line source method is applicable
+		Real64 minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
+
+		// Time scale constant
+		Real64 ts = pow_2( bhLength ) / ( 9 * soil.diffusivity ) ;
+
+		// Temporary vector for holding the LNTTS vals
+		std::vector < Real64 > tempLNTTS;
+		Real64 lnttsStepSize = 0.5;
+
+		tempLNTTS.push_back( log( minTimeForgFunctions / ts ) );
+
+		// Determine how many g-function pairs to generate based on user defined maximum simulation time
+		while( true ) {
+			Real64 maxPossibleSimTime = exp( tempLNTTS.back() ) * ts;
+			if( maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * HoursInDay * SecInHour ) {
+				tempLNTTS.push_back( tempLNTTS.back() + lnttsStepSize );
+			} else {
+				break;
+			}
+		}
+
+		// Setup the arrays
+		myRespFactors->time.dimension ( tempLNTTS.size(), 0.0 );
+		myRespFactors->LNTTS.dimension( tempLNTTS.size(), 0.0 );
+		myRespFactors->GFNC.dimension( tempLNTTS.size(), 0.0 );
+
+		int index = 1;
+		for ( auto & thisLNTTS : tempLNTTS ) {
+			myRespFactors->time( index ) = exp( thisLNTTS ) * ts;
+			myRespFactors->LNTTS( index ) = thisLNTTS;
+			++index;
+		}
+
+		// Calculate the g-functions
+		for( int lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index ) {
+			for( auto & bh_i : myRespFactors->myBorholes ) {
+				Real64 sum_T_ji = 0;
+				for( auto & bh_j : myRespFactors->myBorholes ) {
+					sum_T_ji += doubleIntegral( bh_i, bh_j, myRespFactors->time( lntts_index ) );
+				}
+				myRespFactors->GFNC( lntts_index ) += sum_T_ji;
+			}
+			myRespFactors->GFNC( lntts_index ) /= totalTubeLength;
+		}
 	}
 
 	//******************************************************************************
@@ -437,6 +689,8 @@ namespace GroundHeatExchangers {
 		int J0;
 		Real64 doubleIntegralVal;
 		Real64 midFieldVal;
+
+		DisplayString( "Initializing GroundHeatExchanger:Slinky: " + name );
 
 		X0.allocate( numCoils );
 		Y0.allocate( numTrenches );
@@ -580,6 +834,7 @@ namespace GroundHeatExchangers {
 
 		} // NT time
 	}
+
 	//******************************************************************************
 
 	Real64
@@ -632,6 +887,7 @@ namespace GroundHeatExchangers {
 			return errFunc1 / distance1 - errFunc2 / distance2;
 		}
 	}
+
 	//******************************************************************************
 
 	Real64
@@ -793,8 +1049,8 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
-	bool
-	GLHESlinky::isEven(
+	inline bool
+	GLHEBase::isEven(
 		int const val
 	)
 	{
@@ -871,6 +1127,7 @@ namespace GroundHeatExchangers {
 
 		return ( h / 3 ) * sumIntF;
 	}
+
 	//******************************************************************************
 
 	Real64
@@ -1460,6 +1717,7 @@ namespace GroundHeatExchangers {
 		}
 
 		if ( numVertProps > 0 ) {
+
 			DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Vertical:Properties";
 
 			for ( int propNum = 1; propNum <= numVertProps; ++ propNum ) {
@@ -1509,6 +1767,7 @@ namespace GroundHeatExchangers {
 		}
 
 		if ( numResponseFactors > 0 ) {
+
 			DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:ResponseFactors";
 
 			for ( int rfNum = 1; rfNum <= numResponseFactors; ++ rfNum ) {
@@ -1545,24 +1804,33 @@ namespace GroundHeatExchangers {
 				std::shared_ptr< GLHEResponseFactorsStruct > thisRF( new GLHEResponseFactorsStruct );
 				thisRF->name = DataIPShortCuts::cAlphaArgs( 1 );
 				thisRF->props = GetVertProps( DataIPShortCuts::cAlphaArgs( 2 ) );
-				thisRF->gRefRatio = DataIPShortCuts::rNumericArgs( 1 );
+				thisRF->numBoreholes = DataIPShortCuts::rNumericArgs( 1 );
+				thisRF->gRefRatio = DataIPShortCuts::rNumericArgs( 2 );
 
 				thisRF->maxSimYears = MaxNumberSimYears;
 
-				int i = 1;
+				int numPreviousFields = 2;
+				int numFields = 0;
 				for ( auto & isFieldBlank : DataIPShortCuts::lNumericFieldBlanks ) {
-					if ( !isFieldBlank && ( i % 2 == 0 ) ) {
-						thisRF->numGFuncPairs += 1;
+					if ( !isFieldBlank ) {
+						numFields += 1;
 					} else if ( isFieldBlank ) {
 						break;
 					}
-					++i;
+				}
+
+				if ( ( numFields - numPreviousFields ) % 2 == 0 ) {
+					thisRF->numGFuncPairs = ( numFields - numPreviousFields ) / 2;
+				} else {
+					errorsFound = true;
+					ShowSevereError( "Errors found processing response factor input for Response Factor= " + thisRF->name );
+					ShowSevereError( "Uneven number of g-function pairs" );
 				}
 
 				thisRF->LNTTS.dimension( thisRF->numGFuncPairs, 0.0 );
 				thisRF->GFNC.dimension( thisRF->numGFuncPairs, 0.0 );
 
-				int indexNum = 3;
+				int indexNum = 4;
 				for ( int pairNum = 1; pairNum <= thisRF->numGFuncPairs; ++pairNum ) {
 					thisRF->LNTTS( pairNum ) = DataIPShortCuts::rNumericArgs( indexNum );
 					thisRF->GFNC( pairNum ) = DataIPShortCuts::rNumericArgs( indexNum + 1 );
@@ -1574,6 +1842,7 @@ namespace GroundHeatExchangers {
 		}
 
 		if ( numVertArray > 0 ) {
+
 			DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Vertical:Array";
 
 			for ( int arrayNum = 1; arrayNum <= numVertArray; ++arrayNum ) {
@@ -1618,6 +1887,7 @@ namespace GroundHeatExchangers {
 		}
 
 		if ( numSingleBorehole > 0 ) {
+
 			DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Vertical:Single";
 
 			for ( int bhNum = 1; bhNum <= numSingleBorehole; ++bhNum ) {
@@ -1662,6 +1932,7 @@ namespace GroundHeatExchangers {
 		}
 
 		if ( numVerticalGLHEs > 0 ) {
+
 			DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:System";
 
 			for ( int GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
@@ -1714,12 +1985,6 @@ namespace GroundHeatExchangers {
 				thisGLHE.designFlow = DataIPShortCuts::rNumericArgs( 1 );
 				RegisterPlantCompDesignFlow( thisGLHE.inletNodeNum, thisGLHE.designFlow );
 
-				// Initialize ground temperature model and get pointer reference
-				thisGLHE.groundTempModel = GetGroundTempModelAndInit( DataIPShortCuts::cAlphaArgs( 4 ), DataIPShortCuts::cAlphaArgs( 5 ) );
-				if ( thisGLHE.groundTempModel ) {
-					errorsFound = thisGLHE.groundTempModel->errorsFound;
-				}
-
 				thisGLHE.soil.k = DataIPShortCuts::rNumericArgs( 2 );
 				thisGLHE.soil.rhoCp = DataIPShortCuts::rNumericArgs( 3 );
 
@@ -1767,11 +2032,16 @@ namespace GroundHeatExchangers {
 					}
 				}
 
+				thisGLHE.bhDiameter = thisGLHE.myRespFactors->props->bhDiameter;
+				thisGLHE.bhRadius = thisGLHE.bhDiameter / 2.0;
+				thisGLHE.bhLength = thisGLHE.myRespFactors->props->bhLength;
+				thisGLHE.bhUTubeDist = thisGLHE.myRespFactors->props->bhUTubeDist;
+
 				// Number of simulation years from RunPeriod
 				thisGLHE.myRespFactors->maxSimYears = MaxNumberSimYears;
 
 				// total tube length
-				thisGLHE.totalTubeLength = thisGLHE.numBoreholes * thisGLHE.bhLength;
+				thisGLHE.totalTubeLength = thisGLHE.myRespFactors->numBoreholes * thisGLHE.myRespFactors->props->bhLength;
 
 				// ground thermal diffusivity
 				thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
@@ -1787,6 +2057,12 @@ namespace GroundHeatExchangers {
 
 				prevTimeSteps.allocate( ( thisGLHE.SubAGG + 1 ) * maxTSinHr + 1 );
 				prevTimeSteps = 0.0;
+
+				// Initialize ground temperature model and get pointer reference
+				thisGLHE.groundTempModel = GetGroundTempModelAndInit( DataIPShortCuts::cAlphaArgs( 4 ), DataIPShortCuts::cAlphaArgs( 5 ) );
+				if ( thisGLHE.groundTempModel ) {
+					errorsFound = thisGLHE.groundTempModel->errorsFound;
+				}
 
 				// Check for Errors
 				if ( errorsFound ) {
@@ -2043,7 +2319,7 @@ namespace GroundHeatExchangers {
 		fluidViscosity = GetViscosityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
 		//calculate mass flow rate
-		BholeMdot = massFlowRate / numBoreholes;
+		BholeMdot = massFlowRate / myRespFactors->numBoreholes;
 
 		pipeOuterRad = pipe.outDia / 2.0;
 		pipeInnerRad = pipeOuterRad - pipe.thickness;
