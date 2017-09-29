@@ -5,7 +5,7 @@ Improve Control of Multiple HVAC in One Zone
 
  - November 30, 2016 - Original NFP
  - January 4, 2017 - Revised NFP and Initial Design
- - September 25, 2017 - Draft Final Design
+ - September 29, 2017 - Final Design
  
 Reviewers - Raustad, Griffith, Lee, Gu, Horowitz, Merket, Winkler, Sheier
 
@@ -170,10 +170,48 @@ So, the likely places to implement the load distribution options is in `ZoneEqui
 
 In order to establish a PLR, some kind of query needs to be done to find out what the equipment can do and if it is active (it could be scheduled off or an airloop or plant loop could be shut down) and how much output it can give.
 
-Then the initial allocation to the active equipment (sequenced output required) is done.
+Also, because the air loop equipment is simulated before the zone equipment, there must be an additional iteration so that the air loop equipment can respond to the modified sequenced loads.  The minimum number of HVAC iterations will be set be the highest number of zone equipment in any zone, plus the first HVAC iteration.  The overall sequence is as follows (draft engineering ref section):
 
-Then these need to be updated based on what the equipment actually delivers.
+The function `DistributeSystemOutputRequired` allocates the curent zone load among the available pieces of zone equipment for the current load type (cooling, heating, or no-load). Because some air loop components such as AirLoopHVAC:UnitarySystem may be controlled based on a control zone load, the sequenced loads must be known prior to the final iteration of the HVAC simulation so that the air loop equipment will adjust its output accordingly. When the zone equipment list is initially read, the maximum number of equipment across all zones is used to set the number of air loop iterations required after the initial iteration, `MinAirLoopIterationsAfterFirst`. The control sequence is shown below.
 
+1. Initial iteration (`FirstHVACIteration` is true)
+ 
+    a. Set all sequenced loads to the full load required.
+
+    b. Simulate air loops and zone equipment.
+
+    c. Store the sensible output (capacity) for each piece of equipment.
+
+
+2. Second iteration (`FirstHVACIteration` is false)
+
+    a. Set all sequenced loads according to the specified load distribution scheme:
+
+      * SequentialLoad - Initially all sequenced loads are set to the full load required.
+
+      * UniformLoad - The sequenced loads for all active equipment are set to the full load divided by the number of active pieces of equipment. All inactive sequenced loads are set to zero.
+ 
+      * UniformPLR - Using the current equipment capacities (stored during the initial iteration), distribute the load among the availalbe pieces of equipment, such that each one is operating at the same part load ratio (PLR).
+
+      * SequentialUniformPLR - Using the current equipment capacities (stored during the initial iteration), determine how many of the available pieces of equipment are required to meet the current full load.  Then distribute the load among those pieces of equipment, such that each one is operating at the same part load ratio (PLR).
+
+    b. Simulate air loops.
+
+    c. Simulate zone equipment.
+ 
+     * If the load distribution type is SequentialLoad, update each successive sequenced load to be the current remaining load. 
+
+      ( Otherwise, leave the sequenced loads as-is from the initial distribution.
+
+3. Third iteration and beyond (`FirstHVACIteration` is false)
+
+    a. Simulate air loops.
+
+    b. Simulate zone equipment.
+
+      * If the load distribution type is SequentialLoad, update each successive sequenced load to be the current remaining load. 
+
+      * Otherwise, leave the sequenced loads as-is from the initial distribution.
 
 ## Detailed Comments and Responses ##
 
