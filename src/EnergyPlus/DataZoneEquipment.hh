@@ -487,6 +487,12 @@ namespace DataZoneEquipment {
 			NumAvailCoolEquip( 0 )
 		{}
 
+		void
+		getPrioritiesforInletNode(
+			int const inletNodeNum, // Zone inlet node number to match
+			int & coolingPriority, // Cooling priority num for matching equipment
+			int & heatingPriority // Heating priority num for matching equipment
+		);
 	};
 
 	struct ControlList

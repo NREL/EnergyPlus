@@ -53,12 +53,14 @@
 #include <DataZoneEquipment.hh>
 #include <BranchNodeConnections.hh>
 #include <DataContaminantBalance.hh>
+#include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <DirectAirManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
@@ -593,9 +595,13 @@ namespace DataZoneEquipment {
 
 					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
+						// If there are two or more equipment types in a zone and one is an airloop terminal, then set minimum iterations to number of equipment
+						DataHVACGlobals::MinAirLoopIterationsAfterFirst = max ( MinAirLoopIterationsAfterFirst, ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 
 					} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = DirectAir_Num;
+						// If there are two or more equipment types in a zone and one is an airloop terminal, then set minimum iterations to number of equipment
+						DataHVACGlobals::MinAirLoopIterationsAfterFirst = max ( MinAirLoopIterationsAfterFirst, ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER" ) { // Window Air Conditioner
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = WindowAC_Num;
@@ -1741,6 +1747,32 @@ namespace DataZoneEquipment {
 		}
 
 		return OAVolumeFlowRate;
+	}
+
+	void
+	EquipList::getPrioritiesforInletNode(
+		int const inletNodeNum, // Zone inlet node number to match
+		int & coolingPriority, // Cooling priority num for matching equipment
+		int & heatingPriority // Heating priority num for matching equipment
+	)
+	{
+		bool equipFound = false;
+		for ( int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum ) {
+			if ( this->EquipType_Num( equipNum ) == AirDistUnit_Num ) {
+				if ( inletNodeNum == DataDefineEquip::AirDistUnit( this->EquipIndex( equipNum ) ).OutletNodeNum ) {
+					equipFound = true;
+				}
+			} else if (this->EquipType_Num( equipNum ) == DirectAir_Num ) {
+				if ( inletNodeNum == DirectAirManager::DirectAir( this->EquipIndex( equipNum ) ).ZoneSupplyAirNode ) {
+					equipFound = true;
+				}
+			}
+			if ( equipFound ) {
+				coolingPriority = this->CoolingPriority( equipNum );
+				heatingPriority = this->HeatingPriority( equipNum );
+				break;
+			}
+		}
 	}
 
 } // DataZoneEquipment

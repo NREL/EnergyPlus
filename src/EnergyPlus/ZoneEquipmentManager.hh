@@ -147,8 +147,7 @@ namespace ZoneEquipmentManager {
 	void
 	InitSystemOutputRequired(
 		int const ZoneNum,
-		Real64 & SysOutputProvided,
-		Real64 & LatOutputProvided
+		bool const FirstHVACIteration
 	);
 
 	void
@@ -187,13 +186,15 @@ namespace ZoneEquipmentManager {
 	CalcZoneMixingFlowRateOfReceivingZone(
 		int const ZoneNum,
 		Real64 & ZoneMixingAirMassFlowRate
-		);
+	);
 
 	void
 	CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum);
 
 	void
-	CalcZoneLeavingConditions();
+	CalcZoneLeavingConditions(
+		bool const FirstHVACIteration
+	);
 
 	void
 	UpdateZoneEquipment( bool & SimAir );

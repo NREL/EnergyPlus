@@ -656,7 +656,9 @@ namespace ZoneEquipmentManager {
 			ActualZoneNum = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ActualZoneNum;
 			NonAirSystemResponse( ActualZoneNum ) = 0.0;
 			SysDepZoneLoads( ActualZoneNum ) = 0.0;
-			InitSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
+			SysOutputProvided = 0.0; 
+			LatOutputProvided = 0.0;
+			InitSystemOutputRequired( ActualZoneNum, true );
 			ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 			SupplyAirNode = 0;
 			SupplyAirNode1 = 0;
@@ -808,7 +810,7 @@ namespace ZoneEquipmentManager {
 
 		CalcZoneMassBalance();
 
-		CalcZoneLeavingConditions();
+		CalcZoneLeavingConditions( true );
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
@@ -3128,7 +3130,7 @@ namespace ZoneEquipmentManager {
 			ZoneEquipConfig( ControlledZoneNum ).PlenumMassFlow = 0.0;
 			CurZoneEqNum = ControlledZoneNum;
 
-			InitSystemOutputRequired( ActualZoneNum, SysOutputProvided, LatOutputProvided );
+			InitSystemOutputRequired( ActualZoneNum, FirstHVACIteration );
 
 			SetZoneEquipSimOrder( ControlledZoneNum, ActualZoneNum );
 
@@ -3416,7 +3418,7 @@ namespace ZoneEquipmentManager {
 
 		CalcZoneMassBalance();
 
-		CalcZoneLeavingConditions();
+		CalcZoneLeavingConditions( FirstHVACIteration );
 
 		SimReturnAirPath();
 
@@ -3521,8 +3523,7 @@ namespace ZoneEquipmentManager {
 	void
 	InitSystemOutputRequired(
 		int const ZoneNum,
-		Real64 & SysOutputProvided,
-		Real64 & LatOutputProvided
+		bool const FirstHVACIteration
 	)
 	{
 
@@ -3565,21 +3566,29 @@ namespace ZoneEquipmentManager {
 		ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
 		ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP;
 		ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP;
-		//init each sequenced demand to the full output
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired; // array assignment
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP; // array assignment
-		if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP; // array assignment
 
 		ZoneSysMoistureDemand( ZoneNum ).RemainingOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired;
 		ZoneSysMoistureDemand( ZoneNum ).RemainingOutputReqToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP;
 		ZoneSysMoistureDemand( ZoneNum ).RemainingOutputReqToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP;
-		//init each sequenced demand to the full output
-		if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired; // array assignment
-		if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP; // array assignment
-		if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
-
-		SysOutputProvided = 0.0; // sensible provided by a piece of zone equipment
-		LatOutputProvided = 0.0; // latent provided by a piece of zone equipment
+		if ( FirstHVACIteration ) {
+			//init each sequenced demand to the full output
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired; // array assignment
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP; // array assignment
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP; // array assignment
+			//init each sequenced demand to the full output
+			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired; // array assignment
+			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP; // array assignment
+			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
+		} else {
+			//init first sequenced demand to the full output
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP;
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP;
+			//init each sequenced demand to the full output
+			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired;
+			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP( 1 ) = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP;
+			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP( 1 ) = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP;
+		}
 
 		CurDeadBandOrSetback( ZoneNum ) = DeadBandOrSetback( ZoneNum );
 
@@ -4217,7 +4226,9 @@ namespace ZoneEquipmentManager {
 	}
 
 	void
-	CalcZoneLeavingConditions()
+	CalcZoneLeavingConditions(
+		bool const FirstHVACIteration
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4417,15 +4428,9 @@ namespace ZoneEquipmentManager {
 			} //End of check for a return air node, which implies a return air system.
 
 			// Reset current deadband flags, remaining output required, so no impact beyond zone equipment
-			ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired = ZoneSysEnergyDemand( ActualZoneNum ).TotalOutputRequired;
-			ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputReqToHeatSP = ZoneSysEnergyDemand( ActualZoneNum ).OutputRequiredToHeatingSP;
-			ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputReqToCoolSP = ZoneSysEnergyDemand( ActualZoneNum ).OutputRequiredToCoolingSP;
+			InitSystemOutputRequired( ActualZoneNum, FirstHVACIteration );
 
-			ZoneSysMoistureDemand( ActualZoneNum ).RemainingOutputRequired = ZoneSysMoistureDemand( ActualZoneNum ).TotalOutputRequired;
-			ZoneSysMoistureDemand( ActualZoneNum ).RemainingOutputReqToHumidSP = ZoneSysMoistureDemand( ActualZoneNum ).OutputRequiredToHumidifyingSP;
-			ZoneSysMoistureDemand( ActualZoneNum ).RemainingOutputReqToDehumidSP = ZoneSysMoistureDemand( ActualZoneNum ).OutputRequiredToDehumidifyingSP;
 
-			CurDeadBandOrSetback( ActualZoneNum ) = DeadBandOrSetback( ActualZoneNum );
 
 		}
 

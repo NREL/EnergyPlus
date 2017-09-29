@@ -1745,22 +1745,19 @@ namespace HVACMultiSpeedHeatPump {
 		}
 
 		if ( allocated( ZoneEquipConfig ) && MyCheckFlag( MSHeatPumpNum ) ) {
-			for ( i = 1; i <= NumOfZones; ++i ) {
-				if ( MSHeatPump( MSHeatPumpNum ).ControlZoneNum == ZoneEquipConfig( i ).ActualZoneNum ) {
-					//setup furnace zone equipment sequence information based on finding an air terminal
-					if ( ZoneEquipConfig( i ).EquipListIndex > 0 ) {
-						for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
-							if ( ( ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).EquipType_Num( EquipNum ) == AirDistUnit_Num ) || ( ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).EquipType_Num( EquipNum ) == DirectAir_Num ) ) {
-								MSHeatPump( MSHeatPumpNum ).ZoneSequenceCoolingNum = ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).CoolingPriority( EquipNum );
-								MSHeatPump( MSHeatPumpNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).HeatingPriority( EquipNum );
-							}
-						}
-					}
-				}
+			int zoneNum = DataHeatBalance::Zone( MSHeatPump( MSHeatPumpNum ).ControlZoneNum ).ZoneEqNum;
+			int zoneInlet = MSHeatPump( MSHeatPumpNum ).ZoneInletNode;
+			int coolingPriority = 0;
+			int heatingPriority = 0;
+			//setup furnace zone equipment sequence information based on finding matching air terminal
+			if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
+				ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
+				MSHeatPump( MSHeatPumpNum ).ZoneSequenceCoolingNum = coolingPriority;
+				MSHeatPump( MSHeatPumpNum ).ZoneSequenceHeatingNum = heatingPriority;
 			}
 			MyCheckFlag( MSHeatPumpNum ) = false;
-			if ( MSHeatPump( MSHeatPumpNum ).ZoneInletNode == 0 ) {
-				ShowSevereError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, \"" + MSHeatPump( MSHeatPumpNum ).Name + "\", The zone inlet node in the controlled zone (" + MSHeatPump( MSHeatPumpNum ).ControlZoneName + ") is not found." );
+			if ( MSHeatPump( MSHeatPumpNum ).ZoneSequenceCoolingNum == 0 ) {
+				ShowSevereError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, \"" + MSHeatPump( MSHeatPumpNum ).Name + "\", No matching air terminal found in the zone equipment list for zone = " + MSHeatPump( MSHeatPumpNum ).ControlZoneName + "." );
 				ShowFatalError( "Subroutine InitMSHeatPump: Errors found in getting AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed input.  Preceding condition(s) causes termination." );
 			}
 		}

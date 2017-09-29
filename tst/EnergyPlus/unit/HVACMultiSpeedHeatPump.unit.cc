@@ -66,6 +66,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::BranchInputManager;
@@ -1234,8 +1235,10 @@ namespace EnergyPlus {
 			HeatBalanceManager::GetZoneData( ErrorsFound ); // read zone data
 			EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
-			// Get Zone Equipment Configuration ata
+			// Get Zone Equipment Configuration data
 			DataZoneEquipment::GetZoneEquipmentData();
+			DataZoneEquipment::ZoneEquipList( 1 ).EquipIndex( 1 ) = 2; // 1st zone is 402, so this is 2nd direct air unit
+			DataZoneEquipment::ZoneEquipList( 2 ).EquipIndex( 1 ) = 1; // 2nd zone is 401, so this is 1st direct air unit
 			MixedAir::GetOutsideAirSysInputs();
 			MixedAir::GetOAControllerInputs();
 			SplitterComponent::GetSplitterInput();
