@@ -612,8 +612,10 @@
     Interpolate:Yes,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:17,1,           !- Field 6
+    Until: 4:34,0,           !- Field 4
     Until: 14:00,0,          !- Field 8
     Until: 14:17,1,          !- Field 10
+    Until: 14:34,0,          !- Field 10
     Until: 24:00,0;          !- Field 12
 
   Schedule:Compact,
@@ -624,8 +626,10 @@
     Interpolate:Yes,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:22,1,           !- Field 6
+    Until: 4:43,0,           !- Field 6
     Until: 14:00,0,          !- Field 8
     Until: 14:22,1,          !- Field 10
+    Until: 14:43,0,           !- Field 6
     Until: 24:00,0;          !- Field 12
 
   Schedule:Compact,
@@ -636,8 +640,10 @@
     Interpolate:Yes,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:17,1,          !- Field 6
+    Until: 08:34,0,           !- Field 4
     Until: 18:00,0,          !- Field 8
     Until: 18:17,1,          !- Field 10
+    Until: 18:34,0,           !- Field 4
     Until: 24:00,0;          !- Field 12
 
   Schedule:Compact,
@@ -648,8 +654,10 @@
     Interpolate:Yes,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:22,1,          !- Field 6
+    Until: 08:43,0,           !- Field 6
     Until: 18:00,0,          !- Field 8
     Until: 18:22,1,          !- Field 10
+    Until: 18:43,0,           !- Field 6
     Until: 24:00,0;          !- Field 12
 
   Schedule:Compact,
@@ -660,8 +668,10 @@
     Interpolate:Yes,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
+    Until: 11:40,0,           !- Field 4
     Until: 23:00,0,          !- Field 8
     Until: 23:20,1,          !- Field 10
+    Until: 23:40,0,           !- Field 4
     Until: 24:00,0;          !- Field 12
 
   Schedule:Compact,
@@ -672,7 +682,8 @@
     Interpolate:Yes,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
-    Until: 23:00,0,          !- Field 8
+    Until: 12:00,0,           !- Field 4
+    Until: 23:00,0,           !- Field 4
     Until: 23:30,1,          !- Field 10
     Until: 24:00,0;          !- Field 12
 
