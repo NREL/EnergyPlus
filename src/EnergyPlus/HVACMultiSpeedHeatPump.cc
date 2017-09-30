@@ -1554,8 +1554,6 @@ namespace HVACMultiSpeedHeatPump {
 		using DataAirLoop::AirLoopControlInfo;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipList;
-		using DataZoneEquipment::AirDistUnit_Num;
-		using DataZoneEquipment::DirectAir_Num;
 		using DataAirLoop::AirToZoneNodeInfo;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_MultiSpeedHeatPumpRecovery;
@@ -1612,7 +1610,6 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 MdotHR; // local temporary for heat recovery fluid mass flow rate (kg/s)
 		Real64 ZoneLoadToCoolSPSequenced;
 		Real64 ZoneLoadToHeatSPSequenced;
-		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
 
 		static bool ErrorsFound( false ); // flag returned from mining call
 		static int SteamIndex( 0 ); // index of steam quality for steam heating coil

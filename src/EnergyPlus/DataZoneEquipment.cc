@@ -564,6 +564,7 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority = 0;
 
 				IdealLoadsOnEquipmentList = false;
+				int countAirTermsInZone = 0;
 
 				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
 					ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 1 );
@@ -595,13 +596,11 @@ namespace DataZoneEquipment {
 
 					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
-						// If there are two or more equipment types in a zone and one is an airloop terminal, then set minimum iterations to number of equipment
-						DataHVACGlobals::MinAirLoopIterationsAfterFirst = max ( MinAirLoopIterationsAfterFirst, ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+						++countAirTermsInZone;
 
 					} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = DirectAir_Num;
-						// If there are two or more equipment types in a zone and one is an airloop terminal, then set minimum iterations to number of equipment
-						DataHVACGlobals::MinAirLoopIterationsAfterFirst = max ( MinAirLoopIterationsAfterFirst, ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+						++countAirTermsInZone;
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER" ) { // Window Air Conditioner
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = WindowAC_Num;
@@ -702,6 +701,9 @@ namespace DataZoneEquipment {
 
 					}}
 				}
+				// If there are two or more air terminals in a zone, then set minimum iterations to number of air terminals
+				DataHVACGlobals::MinAirLoopIterationsAfterFirst = max ( MinAirLoopIterationsAfterFirst, countAirTermsInZone );
+
 				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
 					if ( count_eq( ZoneEquipList( ControlledZoneNum ).CoolingPriority, ZoneEquipTypeNum ) > 1 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );

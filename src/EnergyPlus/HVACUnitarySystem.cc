@@ -1265,10 +1265,8 @@ namespace HVACUnitarySystem {
 		Real64 MinHumRat; // Minimum humidity ratio for sensible capacity calculation (kg/kg)
 		Real64 DeltaMassRate; // DIFference of mass flow rate between
 		// inlet node and system outlet node
-		int i; // index to get the zone inlet node
 		Real64 MassFlowRate; // mass flow rate to calculate loss
 		Real64 MaxTemp; // Maximum temperature used in latent loss calculation
-		int EquipNum( 0 ); // local DO loop index for zone equipment
 		Real64 rho;
 		Real64 QZnReq;
 		Real64 QActual;
@@ -1408,7 +1406,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = heatingPriority;
 			}
 			MyCheckFlag( UnitarySysNum ) = false;
-			if ( UnitarySystem( UnitarySysNum ).ZoneInletNode == 0 ) {
+			if ( UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum == 0 ) {
 				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": No matching air terminal found in the zone equipment list for zone = " + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + "." );
 				ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  Preceding condition(s) causes termination." );
 			}

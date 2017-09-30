@@ -3584,7 +3584,7 @@ namespace ZoneEquipmentManager {
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP( 1 ) = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP;
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP( 1 ) = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToCoolingSP;
-			//init each sequenced demand to the full output
+			//init first sequenced demand to the full output
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired( 1 ) = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired;
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP( 1 ) = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP;
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP( 1 ) = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP;

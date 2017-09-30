@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -5888,7 +5889,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
-	GetZoneEquipmentData1( ); // read zone equipment configuration and list objects
+	GetZoneEquipmentData( ); // read zone equipment configuration and list objects
+	DirectAirManager::GetDirectAirInput();
 
 	BranchInputManager::ManageBranchInput( ); // just gets input and returns.
 
@@ -5905,8 +5907,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	TempControlledZone.allocate( NumTempControlledZones );
 	TempControlledZone( NumTempControlledZones ).ActualZoneNum = 1;
 
-	ZoneEquipList.allocate( 1 );
-	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
 
 	HVACUnitarySystem::GetInputFlag = true;
@@ -5946,7 +5946,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	AirLoopControlInfo.allocate( 1 );
 	DataGlobals::SysSizingCalc = true;
 
-	UnitarySystem( 1 ).ZoneInletNode = 3;
+	UnitarySystem( 1 ).ZoneInletNode = DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 );
 
 	Schedule( 1 ).CurrentValue = 1.0;
 
