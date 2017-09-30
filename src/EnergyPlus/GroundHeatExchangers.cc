@@ -202,7 +202,7 @@ namespace GroundHeatExchangers {
 		for ( int i = 0; i < numVertProps; ++i ) {
 			auto thisProp( vertPropsVector[i] );
 			// Check if the type and name match
-			if ( objectName == thisProp->name) {
+			if ( objectName == thisProp->name ) {
 				return vertPropsVector[i];
 			}
 		}
@@ -224,7 +224,7 @@ namespace GroundHeatExchangers {
 		for ( int i = 0; i < numBH; ++i ) {
 			auto thisBH( singleBoreholesVector[i] );
 			// Check if the type and name match
-			if ( objectName == thisBH->name) {
+			if ( objectName == thisBH->name ) {
 				return singleBoreholesVector[i];
 			}
 		}
@@ -268,7 +268,7 @@ namespace GroundHeatExchangers {
 		for ( int i = 0; i < numRF; ++i ) {
 			auto thisRF( responseFactorsVector[i] );
 			// Check if the type and name match
-			if ( objectName == thisRF->name) {
+			if ( objectName == thisRF->name ) {
 				return responseFactorsVector[i];
 			}
 		}
@@ -377,8 +377,8 @@ namespace GroundHeatExchangers {
 			// Using Simpson's rule the number of points (n+1) must be odd, therefore an even number of panels is required
 			// Starting from i = 0 to i <= NumPanels produces an odd number of points
 			int numPanels_i = 50;
-			int numPanels_ii = 550;
-			int numPanels_j = 550;
+			int numPanels_ii = 50;
+			int numPanels_j = 560;
 
 			thisBH->dl_i = thisBH->props->bhLength / numPanels_i;
 			for ( int i = 0; i <= numPanels_i; ++i ) {
@@ -393,8 +393,8 @@ namespace GroundHeatExchangers {
 			for ( int i = 0; i <= numPanels_ii; ++i ) {
 				MyCartesian newPoint;
 				// For case when bh is being compared to itself, shift points by 1 radius in the horizontal plane
-				newPoint.x = thisBH->xLoc + thisBH->props->bhDiameter / 2.0;
-				newPoint.y = thisBH->yLoc;
+				newPoint.x = thisBH->xLoc + ( thisBH->props->bhDiameter / 2.0 ) / sqrt( 2.0 );
+				newPoint.y = thisBH->yLoc + ( thisBH->props->bhDiameter / 2.0 ) / ( -sqrt( 2.0 ) );
 				newPoint.z = thisBH->props->bhTopDepth + ( i * thisBH->dl_ii );
 				thisBH->pointLocations_ii.push_back( newPoint );
 			}
@@ -420,9 +420,16 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void GLHEBase::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
-		this->initGLHESimVars();
-		this->calcGroundHeatExchanger();
-		this->updateGHX();
+
+		using DataGlobals::KickOffSimulation;
+
+		if ( KickOffSimulation ) {
+			this->initGLHESimVars();
+		} else {
+			this->initGLHESimVars();
+			this->calcGroundHeatExchanger();
+			this->updateGHX();
+		}
 	}
 
 	//******************************************************************************
@@ -507,52 +514,27 @@ namespace GroundHeatExchangers {
 		Real64 const & currTime
 	)
 	{
-		if ( bh_i == bh_j ) {
 
-			Real64 sum_f = 0;
-			int index = 0;
-			int lastIndex_ii = bh_j->pointLocations_ii.size() - 1;
-			for ( auto & point_j : bh_j->pointLocations_ii ) {
-				std::vector< Real64 > dists = distances( point_i, point_j );
-				Real64 f = calcResponse( dists, currTime );
+		Real64 sum_f = 0;
+		int index = 0;
+		int const lastIndex_j = bh_j->pointLocations_j.size() - 1;
+		for ( auto & point_j : bh_j->pointLocations_j ) {
+			std::vector< Real64 > dists = distances( point_i, point_j );
+			Real64 f = calcResponse( dists, currTime );
 
-				// Integrate using Simpson's
-				if ( index == 0 || index == lastIndex_ii ) {
-					sum_f += f;
-				} else if ( isEven( index ) ) {
-					sum_f += 2 * f;
-				} else {
-					sum_f += 4 * f;
-				}
-
-				++index;
+			// Integrate using Simpson's
+			if ( index == 0 || index == lastIndex_j ) {
+				sum_f += f;
+			} else if ( isEven( index ) ) {
+				sum_f += 2 * f;
+			} else {
+				sum_f += 4 * f;
 			}
 
-			return ( bh_j->dl_ii / 3.0 ) * sum_f;
-
-		} else {
-
-			Real64 sum_f = 0;
-			int index = 0;
-			int lastIndex_j = bh_j->pointLocations_j.size() - 1;
-			for ( auto & point_j : bh_j->pointLocations_j) {
-				std::vector< Real64 > dists = distances( point_i, point_j );
-				Real64 f = calcResponse( dists, currTime );
-
-				// Integrate using Simpson's
-				if ( index == 0 || index == lastIndex_j ) {
-					sum_f += f;
-				} else if ( isEven( index ) ) {
-					sum_f += 2 * f;
-				} else {
-					sum_f += 4 * f;
-				}
-
-				++index;
-			}
-
-			return ( bh_j->dl_j / 3.0 ) * sum_f;
+			++index;
 		}
+
+		return ( bh_j->dl_j / 3.0 ) * sum_f;
 	}
 
 	//******************************************************************************
@@ -564,27 +546,53 @@ namespace GroundHeatExchangers {
 		Real64 const & currTime
 	)
 	{
-		Real64 sum_f = 0;
-		int index = 0;
-		int lastIndex = bh_i->pointLocations_i.size() - 1;
-		for ( auto & thisPoint : bh_i->pointLocations_i ) {
 
-			Real64 f = integral( thisPoint, bh_i, bh_j, currTime );
+		if ( bh_i == bh_j ) {
 
-			// Integrate using Simpson's
-			if ( index == 0 || index == lastIndex ) {
-				sum_f += f;
-			} else if ( isEven( index ) ) {
-				sum_f += 2 * f;
-			} else {
-				sum_f += 4 * f;
+			Real64 sum_f = 0;
+			int index = 0;
+			int const lastIndex = bh_i->pointLocations_ii.size() - 1;
+			for( auto & thisPoint : bh_i->pointLocations_ii ) {
+
+				Real64 f = integral( thisPoint, bh_i, bh_j, currTime );
+
+				// Integrate using Simpson's
+				if( index == 0 || index == lastIndex ) {
+					sum_f += f;
+				} else if( isEven( index ) ) {
+					sum_f += 2 * f;
+				} else {
+					sum_f += 4 * f;
+				}
+
+				++index;
 			}
 
-			++index;
+			return ( bh_i->dl_ii / 3.0 ) * sum_f;
+
+		} else {
+
+			Real64 sum_f = 0;
+			int index = 0;
+			int const lastIndex = bh_i->pointLocations_i.size() - 1;
+			for( auto & thisPoint : bh_i->pointLocations_i ) {
+
+				Real64 f = integral( thisPoint, bh_i, bh_j, currTime );
+
+				// Integrate using Simpson's
+				if( index == 0 || index == lastIndex ) {
+					sum_f += f;
+				} else if( isEven( index ) ) {
+					sum_f += 2 * f;
+				} else {
+					sum_f += 4 * f;
+				}
+
+				++index;
+			}
+
+			return ( bh_i->dl_i / 3.0 ) * sum_f;
 		}
-
-		return ( bh_i->dl_i / 3.0 ) * sum_f;
-
 	}
 
 	//******************************************************************************
@@ -600,14 +608,14 @@ namespace GroundHeatExchangers {
 		DisplayString( "Initializing GroundHeatExchanger:System: " + name );
 
 		// Minimum simulation time for witch finite line source method is applicable
-		Real64 minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
+		Real64 const minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
 
 		// Time scale constant
-		Real64 ts = pow_2( bhLength ) / ( 9 * soil.diffusivity ) ;
+		Real64 const ts = pow_2( bhLength ) / ( 9 * soil.diffusivity ) ;
 
 		// Temporary vector for holding the LNTTS vals
 		std::vector < Real64 > tempLNTTS;
-		Real64 lnttsStepSize = 0.5;
+		Real64 const lnttsStepSize = 0.5;
 
 		tempLNTTS.push_back( log( minTimeForgFunctions / ts ) );
 
@@ -642,7 +650,7 @@ namespace GroundHeatExchangers {
 				}
 				myRespFactors->GFNC( lntts_index ) += sum_T_ji;
 			}
-			myRespFactors->GFNC( lntts_index ) /= totalTubeLength;
+			myRespFactors->GFNC( lntts_index ) /= ( 2 * totalTubeLength );
 		}
 	}
 
@@ -764,7 +772,7 @@ namespace GroundHeatExchangers {
 
 							// If we're calculating a ring's temperature response to itself as a ring source,
 							// then we need some extra effort in calculating the double integral
-							if ( m1 == m && n1 == n) {
+							if ( m1 == m && n1 == n ) {
 								I0 = 33;
 								J0 = 1089;
 							} else {
@@ -795,7 +803,7 @@ namespace GroundHeatExchangers {
 								}
 
 							// if the ring(n1, m1) is in the far-field or the ring(n,m)
-							} else if ( disRing > (10 + coilDiameter ) ) {
+							} else if ( disRing > ( 10 + coilDiameter ) ) {
 								gFuncin = 0;
 
 							// else the ring(n1, m1) is in the middle-field of the ring(n,m)
@@ -865,7 +873,7 @@ namespace GroundHeatExchangers {
 		Real64 sqrtAlphaT;
 		Real64 sqrtDistDepth;
 
-		distance1 = distance( m, n, m1, n1, eta, theta);
+		distance1 = distance( m, n, m1, n1, eta, theta );
 
 		sqrtAlphaT = std::sqrt( soil.diffusivity * t );
 
@@ -2016,7 +2024,7 @@ namespace GroundHeatExchangers {
 								tempVectOfBHObjects.push_back( tempBHptr );
 							} else {
 								errorsFound = true;
-								ShowSevereError( "Borehole= " + DataIPShortCuts::cAlphaArgs( index ) + " not found.");
+								ShowSevereError( "Borehole= " + DataIPShortCuts::cAlphaArgs( index ) + " not found." );
 								break;
 							}
 						} else {
