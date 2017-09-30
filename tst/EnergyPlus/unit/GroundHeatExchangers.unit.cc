@@ -72,22 +72,25 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Interpolate )
 	Real64 thisLNTTS;
 	Real64 thisGFunc;
 
-	thisGLHE.NPairs = 2;
+	int NPairs = 2;
 
-	thisGLHE.LNTTS.allocate( thisGLHE.NPairs );
-	thisGLHE.GFNC.allocate( thisGLHE.NPairs );
+	std::shared_ptr< GLHEResponseFactorsStruct > thisRF( new GLHEResponseFactorsStruct );
+	thisGLHE.myRespFactors = thisRF;
 
-	thisGLHE.LNTTS( 1 ) = 0.0;
-	thisGLHE.LNTTS( 2 ) = 5.0;
-	thisGLHE.GFNC( 1 ) = 0.0;
-	thisGLHE.GFNC( 2 ) = 5.0;
-	
+	thisGLHE.myRespFactors->LNTTS.allocate( NPairs );
+	thisGLHE.myRespFactors->GFNC.allocate( NPairs );
+
+	thisGLHE.myRespFactors->LNTTS( 1 ) = 0.0;
+	thisGLHE.myRespFactors->LNTTS( 2 ) = 5.0;
+	thisGLHE.myRespFactors->GFNC( 1 ) = 0.0;
+	thisGLHE.myRespFactors->GFNC( 2 ) = 5.0;
+
 	// Case when extrapolating beyond lower bound
 	thisLNTTS = -1.0;
 	thisGFunc = thisGLHE.interpGFunc( thisLNTTS );
 	EXPECT_DOUBLE_EQ( -1.0, thisGFunc );
 
-	// Case when extrapolating beyond opper bound
+	// Case when extrapolating beyond upper bound
 	thisLNTTS = 6.0;
 	thisGFunc = thisGLHE.interpGFunc( thisLNTTS );
 	EXPECT_DOUBLE_EQ( 6.0 , thisGFunc );
@@ -98,23 +101,26 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Interpolate )
 	EXPECT_DOUBLE_EQ( 2.5, thisGFunc );
 }
 
-TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_GetGFunc )
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Slinky_GetGFunc )
 {
 
 	// Initialization
 	GLHESlinky thisGLHE;
 	Real64 thisGFunc;
 	Real64 time;
-	
-	thisGLHE.NPairs = 2;
 
-	thisGLHE.LNTTS.allocate( thisGLHE.NPairs );
-	thisGLHE.GFNC.allocate( thisGLHE.NPairs );
+	int NPairs = 2;
 
-	thisGLHE.LNTTS( 1 ) = 0.0;
-	thisGLHE.LNTTS( 2 ) = 5.0;
-	thisGLHE.GFNC( 1 ) = 0.0;
-	thisGLHE.GFNC( 2 ) = 5.0;
+	std::shared_ptr< GLHEResponseFactorsStruct > thisRF( new GLHEResponseFactorsStruct );
+	thisGLHE.myRespFactors = thisRF;
+
+	thisGLHE.myRespFactors->LNTTS.allocate( NPairs );
+	thisGLHE.myRespFactors->GFNC.allocate( NPairs );
+
+	thisGLHE.myRespFactors->LNTTS( 1 ) = 0.0;
+	thisGLHE.myRespFactors->LNTTS( 2 ) = 5.0;
+	thisGLHE.myRespFactors->GFNC( 1 ) = 0.0;
+	thisGLHE.myRespFactors->GFNC( 2 ) = 5.0;
 
 	time = std::pow( 10.0, 2.5 );
 
@@ -123,42 +129,45 @@ TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_GetGFunc )
 	EXPECT_EQ( 2.5, thisGFunc );
 }
 
-TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_GetGFunc )
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc )
 {
 
 	// Initialization
 	GLHEVert thisGLHE;
 	Real64 thisGFunc;
 	Real64 time;
-	
-	thisGLHE.NPairs = 2;
 
-	thisGLHE.LNTTS.allocate( thisGLHE.NPairs );
-	thisGLHE.GFNC.allocate( thisGLHE.NPairs );
+	int NPairs = 2;
 
-	thisGLHE.LNTTS( 1 ) = 0.0;
-	thisGLHE.LNTTS( 2 ) = 5.0;
-	thisGLHE.GFNC( 1 ) = 0.0;
-	thisGLHE.GFNC( 2 ) = 5.0;
+	std::shared_ptr< GLHEResponseFactorsStruct > thisRF( new GLHEResponseFactorsStruct );
+	thisGLHE.myRespFactors = thisRF;
+
+	thisGLHE.myRespFactors->LNTTS.allocate( NPairs );
+	thisGLHE.myRespFactors->GFNC.allocate( NPairs );
+
+	thisGLHE.myRespFactors->LNTTS( 1 ) = 0.0;
+	thisGLHE.myRespFactors->LNTTS( 2 ) = 5.0;
+	thisGLHE.myRespFactors->GFNC( 1 ) = 0.0;
+	thisGLHE.myRespFactors->GFNC( 2 ) = 5.0;
 
 	time = std::pow( 2.7182818284590452353602874, 2.5 );
 
-	thisGLHE.boreholeLength = 1.0;
-	thisGLHE.boreholeRadius = 1.0;
+	thisGLHE.bhLength = 1.0;
+	thisGLHE.bhRadius = 1.0;
 
 	// Situation when correction is not applied
-	thisGLHE.gReferenceRatio = 1.0;
+	thisGLHE.myRespFactors->gRefRatio = 1.0;
 	thisGFunc = thisGLHE.getGFunc( time );
 	EXPECT_DOUBLE_EQ( 2.5, thisGFunc );
 
-	//Situation when correction is applied
-	thisGLHE.gReferenceRatio = 2.0;
+	// Situation when correction is applied
+	thisGLHE.myRespFactors->gRefRatio = 2.0;
 	thisGFunc = thisGLHE.getGFunc( time );
 	EXPECT_NEAR( 2.5 + 0.6931, thisGFunc, 0.0001);
 
 }
 
-TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcHXResistance )
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance )
 {
 	// Initializations
 	GLHESlinky thisGLHE;
@@ -168,13 +177,13 @@ TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcHXResistance )
 
 	PlantLoop( thisGLHE.loopNum ).FluidName = "WATER";
 	PlantLoop( thisGLHE.loopNum ).FluidIndex = 1;
-	
+
 	thisGLHE.inletTemp = 5.0;
 	thisGLHE.massFlowRate = 0.01;
 	thisGLHE.numTrenches = 1;
-	thisGLHE.pipeOutDia = 0.02667;
-	thisGLHE.pipeThick = 0.004;
-	thisGLHE.kPipe = 0.4;
+	thisGLHE.pipe.outDia = 0.02667;
+	thisGLHE.pipe.thickness = 0.004;
+	thisGLHE.pipe.k = 0.4;
 
 	// Re < 2300 mass flow rate
 	thisGLHE.calcHXResistance();
@@ -196,43 +205,46 @@ TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcHXResistance )
 	EXPECT_NEAR( 0.07094, thisGLHE.HXResistance, 0.0001 );
 }
 
-TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_CalcHXResistance )
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Vertical_CalcHXResistance )
 {
 
 	// Initializations
 	GLHEVert thisGLHE;
+
+	std::shared_ptr< GLHEResponseFactorsStruct > thisRF( new GLHEResponseFactorsStruct );
+	thisGLHE.myRespFactors = thisRF;
 
 	PlantLoop.allocate( 1 );
 	thisGLHE.loopNum = 1;
 
 	PlantLoop( thisGLHE.loopNum ).FluidName = "WATER";
 	PlantLoop( thisGLHE.loopNum ).FluidIndex = 1;
-	
+
 	thisGLHE.inletTemp = 5.0;
 	thisGLHE.massFlowRate = 0.01;
-	thisGLHE.numBoreholes = 1;
-	thisGLHE.pipeOutDia = 0.02667;
-	thisGLHE.pipeThick = 0.004;
-	thisGLHE.kPipe = 0.4;
-	thisGLHE.boreholeRadius = 0.1;
-	thisGLHE.kGrout = 1.0;
+	thisGLHE.myRespFactors->numBoreholes = 1;
+	thisGLHE.pipe.outDia = 0.02667;
+	thisGLHE.pipe.thickness = 0.004;
+	thisGLHE.pipe.k = 0.4;
+	thisGLHE.bhRadius = 0.1;
+	thisGLHE.grout.k = 1.0;
 
 	// Re < 2300 mass flow rate; 0.0 <= distanceRatio <= 2.5 correction factor
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.49421, thisGLHE.HXResistance, 0.0001 );
 
 	// Re < 2300 mass flow rate; 0.25 < distanceRatio < 0.5 correction factor
-	thisGLHE.UtubeDist = 0.05;
+	thisGLHE.bhUTubeDist = 0.05;
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.46859, thisGLHE.HXResistance, 0.0001 );
 
 	// Re < 2300 mass flow rate; 0.5 <= distanceRatio < 0.75 correction factor
-	thisGLHE.UtubeDist = 0.087;
+	thisGLHE.bhUTubeDist = 0.087;
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.32891, thisGLHE.HXResistance, 0.0001 );
 
 	// 4000 > Re > 2300 mass flow rate; all other distance ratios correction factor
-	thisGLHE.UtubeDist = 0.12;
+	thisGLHE.bhUTubeDist = 0.12;
 	thisGLHE.massFlowRate = 0.07;
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.18391, thisGLHE.HXResistance, 0.0001 );
@@ -248,11 +260,14 @@ TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_CalcHXResistance )
 	EXPECT_NEAR( 0.16903, thisGLHE.HXResistance, 0.0001 );
 }
 
-TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcGroundHeatExchanger )
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger )
 {
 
 	// Initializations
 	GLHESlinky thisGLHE;
+
+	std::shared_ptr< GLHEResponseFactorsStruct > thisRF( new GLHEResponseFactorsStruct );
+	thisGLHE.myRespFactors = thisRF;
 
 	thisGLHE.numCoils = 100;
 	thisGLHE.numTrenches = 2;
@@ -260,24 +275,24 @@ TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcGroundHeatExchanger
 	thisGLHE.coilPitch = 0.4;
 	thisGLHE.coilDepth = 1.5;
 	thisGLHE.coilDiameter = 0.8;
-	thisGLHE.pipeOutDia = 0.034;
+	thisGLHE.pipe.outDia = 0.034;
 	thisGLHE.trenchSpacing = 3.0;
-	thisGLHE.diffusivityGround = 3.0e-007;
+	thisGLHE.soil.diffusivity = 3.0e-007;
 	thisGLHE.AGG = 192;
 	thisGLHE.SubAGG = 15;
 
 	// Horizontal G-Functions
 	thisGLHE.calcGFunctions();
-	EXPECT_NEAR( 19.08237, thisGLHE.GFNC( 28 ), 0.0001 );
+	EXPECT_NEAR( 19.08237, thisGLHE.myRespFactors->GFNC( 28 ), 0.0001 );
 
 	// Vertical G-Functions
 	thisGLHE.verticalConfig = true;
 	thisGLHE.calcGFunctions();
-	EXPECT_NEAR( 18.91819, thisGLHE.GFNC( 28 ), 0.0001 );
+	EXPECT_NEAR( 18.91819, thisGLHE.myRespFactors->GFNC( 28 ), 0.0001 );
 
 }
 
-TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 ) 
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_GLHEBadIDF_1 )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",
@@ -340,7 +355,7 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 )
 
 }
 
-TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_2 )
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_GLHEBadIDF_2 )
 {
 		std::string const idf_objects = delimited_string({
 		"Version,8.4;",
