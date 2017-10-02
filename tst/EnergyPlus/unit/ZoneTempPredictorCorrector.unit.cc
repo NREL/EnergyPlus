@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -106,8 +107,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
 
 	ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
@@ -116,7 +115,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
 	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
 	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
@@ -125,6 +123,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 
 	Zone.allocate( 1 );
 	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+	Zone( 1 ).ZoneEqNum = 1;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	Zone( 1 ).Multiplier = 1.0;
@@ -193,7 +192,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 2 - Unbalanced exhaust flow
@@ -220,7 +219,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 3 - Balanced exhaust flow with proper source flow from mixing
@@ -247,7 +246,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.02;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 4 - Balanced exhaust flow without source flow from mixing
@@ -274,11 +273,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Add a section to check #6119 by L. Gu on 5/16/17
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Deallocate everything
@@ -992,8 +991,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
 
 	ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
@@ -1002,10 +999,14 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	Zone.allocate( 1 );
 	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+	Zone( 1 ).ZoneEqNum	 = 1;
+	Zone( 1 ).IsControlled = true;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	Zone( 1 ).Multiplier = 1.0;
@@ -1064,14 +1065,14 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	NumZoneReturnPlenums = 0;
 	NumZoneSupplyPlenums = 0;
 
-	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 	EXPECT_EQ( 5.0, SumHA );
 	EXPECT_EQ( 300.0, SumHATsurf );
 	EXPECT_EQ( 150.0, SumHATref );
 
 	Node( 1 ).MassFlowRate = 0.0;
 	Node( 2 ).MassFlowRate = 0.0;
-	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 	EXPECT_EQ( 10.0, SumHA );
 	EXPECT_EQ( 300.0, SumHATsurf );
 	EXPECT_EQ( 50.0, SumHATref );

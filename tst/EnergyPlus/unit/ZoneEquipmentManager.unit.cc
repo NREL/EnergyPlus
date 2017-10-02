@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -114,34 +115,41 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 
 	} );
 
-	ASSERT_FALSE(process_idf(idf_objects));
-	EXPECT_FALSE(has_err_output());
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
-	GetZoneData(ErrorsFound);
+	GetZoneData( ErrorsFound );
 	AllocateHeatBalArrays();
 	GetZoneEquipmentData1();
-	GetSimpleAirModelInputs(ErrorsFound);
-
+	ZoneEquipInputsFilled = true;
+	GetSimpleAirModelInputs( ErrorsFound );
 	int ZoneNum = 1;
 	int NodeNum;
-	for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-		Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+	for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumInletNodes; ++NodeNum ) {
+		Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRate = 1.0;
 	}
+
+	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 ) = 0;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNum ( 1 ) = 1;
+
 	// Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
-	Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
-	DataAirSystems::PrimaryAirSystem.allocate( 1 );
-	DataAirLoop::AirLoopFlow.allocate( 1 );
-	DataHVACGlobals::NumPrimaryAirSys = 1;
-
-	ZoneEquipConfig(ZoneNum).AirLoopNum = 1;
-	DataHVACGlobals::AirLoopsSimOnce = true;
+	Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( 1 ) ).MassFlowRate = 1.000000001;
 	CalcZoneMassBalance( );
-	EXPECT_FALSE(has_err_output());
+	EXPECT_FALSE( has_err_output() );
 
-	// Add true zone exhuast from exhuast fan, now there should be warning
-	ZoneEquipConfig(ZoneNum).ZoneExh = 0.1;
+	// Add excess balanced zone exhaust from exhaust fan, still no warning
+	ZoneEquipConfig( ZoneNum ).ZoneExh = 0.5;
+	ZoneEquipConfig( ZoneNum ).ZoneExhBalanced = 0.5;
+	Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( 2 ) ).MassFlowRate = 0.5;
 	CalcZoneMassBalance();
-	EXPECT_TRUE(has_err_output());
+	EXPECT_FALSE( has_err_output() );
+
+	// Add excess unbalanced zone exhaust from exhaust fan, now there should be warning
+	ZoneEquipConfig( ZoneNum ).ZoneExh = 0.5;
+	ZoneEquipConfig( ZoneNum ).ZoneExhBalanced = 0.0;
+	Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( 2 ) ).MassFlowRate = 0.5;
+	CalcZoneMassBalance();
+	EXPECT_TRUE( has_err_output() );
 
 	// Deallocate everything - should all be taken care of in clear_states
 }
@@ -435,4 +443,141 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest )
 	DataHeatBalFanSys::MixingMassFlowXHumRat.deallocate( );
 	DataHeatBalFanSys::ZoneReOrder.deallocate( );
 
+}
+
+TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2 )
+{
+
+	std::string const idf_objects = delimited_string({
+		" Version,8.4;",
+
+		"Zone,",
+		"  Space;                   !- Name",
+
+		"ZoneHVAC:EquipmentConnections,",
+		" Space,                    !- Zone Name",
+		" Space Equipment,          !- Zone Conditioning Equipment List Name",
+		" Space Inlet Nodes,            !- Zone Air Inlet Node or NodeList Name",
+		" Space Exh Nodes,           !- Zone Air Exhaust Node or NodeList Name",
+		" Space Node,               !- Zone Air Node Name",
+		" Space Return Nodes;           !- Zone Return Air Node or NodeList Name",
+
+		"ZoneHVAC:EquipmentList,",
+		" Space Equipment,          !- Name",
+		" Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
+		" Exhaust Fan,              !- Zone Equipment 1 Name",
+		" 1,                        !- Zone Equipment 1 Cooling Sequence",
+		" 1;                        !- Zone Equipment 1 Heating or No - Load Sequence",
+
+		"Fan:ZoneExhaust,",
+		"Exhaust Fan,               !- Name",
+		",                          !- Availability Schedule Name",
+		"0.338,                     !- Fan Total Efficiency",
+		"125.0000,                  !- Pressure Rise{Pa}",
+		"0.3000,                    !- Maximum Flow Rate{m3/s}",
+		"Exhaust Fan Inlet Node,    !- Air Inlet Node Name",
+		"Exhaust Fan Outlet Node,   !- Air Outlet Node Name",
+		"Zone Exhaust Fans;         !- End - Use Subcategory",
+
+		"NodeList,",
+		"  Space Exh Nodes,  !- Name",
+		"  Space ZoneHVAC Exh Node, !- Node 1 Name",
+		"  Exhaust Fan Inlet Node; !- Node 2 Name",
+
+		"NodeList,",
+		"  Space Inlet Nodes,  !- Name",
+		"  Space Inlet Node 1, !- Node 1 Name",
+		"  Space Inlet Node 2, !- Node 2 Name",
+		"  Space Inlet Node 3; !- Node 3 Name",
+
+		"NodeList,",
+		"  Space Return Nodes,  !- Name",
+		"  Space Return Node 1, !- Node 1 Name",
+		"  Space Return Node 2, !- Node 2 Name",
+		"  Space Return Node 3; !- Node 3 Name",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
+	bool ErrorsFound = false;
+	GetZoneData( ErrorsFound );
+	AllocateHeatBalArrays();
+	GetZoneEquipmentData1();
+	ZoneEquipInputsFilled = true;
+	GetSimpleAirModelInputs( ErrorsFound );
+
+	int ZoneNum = 1;
+	for ( int NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumInletNodes; ++NodeNum ) {
+		Node( ZoneEquipConfig ( ZoneNum ).InletNode( NodeNum ) ).MassFlowRate = 1.0;
+	}
+	ZoneEquipConfig( ZoneNum ).InletNodeAirLoopNum( 1 ) = 2; // Intentionally not in 1,2,3 order
+	ZoneEquipConfig( ZoneNum ).InletNodeAirLoopNum( 2 ) = 3;
+	ZoneEquipConfig( ZoneNum ).InletNodeAirLoopNum( 3 ) = 1;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 1 ) = 3; // Intentionally in a different order
+	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 2 ) = 2;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeAirLoopNum( 3 ) = 1;
+	int inletNode1 = ZoneEquipConfig( ZoneNum ).InletNode( 1 );
+	int inletNode2 = ZoneEquipConfig( ZoneNum ).InletNode( 2 );
+	int inletNode3 = ZoneEquipConfig( ZoneNum ).InletNode( 3 );
+	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNum( 1 ) = 2; // Intentionally in a different order
+	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNum( 2 ) = 1;
+	ZoneEquipConfig( ZoneNum ).ReturnNodeInletNum( 3 ) = 3;
+	int returnNode1 = ZoneEquipConfig( ZoneNum ).ReturnNode( 1 );
+	int returnNode2 = ZoneEquipConfig( ZoneNum ).ReturnNode( 2 );
+	int returnNode3 = ZoneEquipConfig( ZoneNum ).ReturnNode( 3 );
+
+	DataHVACGlobals::NumPrimaryAirSys = 3;
+	DataAirSystems::PrimaryAirSystem.allocate( 3 );
+	DataAirLoop::AirLoopFlow.allocate( 3 );
+
+	DataAirSystems::PrimaryAirSystem( 1 ).OASysExists = false;
+	DataAirLoop::AirLoopFlow( 1 ).DesReturnFrac = 1.0;
+	DataAirSystems::PrimaryAirSystem( 2 ).OASysExists = false;
+	DataAirLoop::AirLoopFlow( 2 ).DesReturnFrac = 1.0;
+	DataAirSystems::PrimaryAirSystem( 3 ).OASysExists = false;
+	DataAirLoop::AirLoopFlow( 3 ).DesReturnFrac = 1.0;
+	DataGlobals::DoingSizing = false;
+	DataGlobals::isPulseZoneSizing = false;
+
+	// Case 1 - send zero, expect zero back
+	Node( inletNode1 ).MassFlowRate = 0.0;
+	Node( inletNode2 ).MassFlowRate = 0.0;
+	Node( inletNode3 ).MassFlowRate = 0.0;
+	Node( returnNode1 ).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
+	Node( returnNode2 ).MassFlowRate = 0.32;
+	Node( returnNode3 ).MassFlowRate = 0.45;
+
+	Real64 StdTotalReturnMassFlow = 0.0;
+	Real64 FinalTotalReturnMassFlow = 0.0;
+
+	CalcZoneReturnFlows( ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow );
+	EXPECT_EQ( FinalTotalReturnMassFlow, 0.0 );
+	EXPECT_EQ( Node( returnNode1 ).MassFlowRate, 0.0 );
+	EXPECT_EQ( Node( returnNode2 ).MassFlowRate, 0.0 );
+	EXPECT_EQ( Node( returnNode3 ).MassFlowRate, 0.0 );
+
+
+	// Case 2 - send zero, expect sum of inlet flow back
+	StdTotalReturnMassFlow = 0.0;
+	FinalTotalReturnMassFlow = 0.0;
+
+	Node( inletNode2 ).MassFlowRate = 2.0;
+	Node( inletNode1 ).MassFlowRate = 1.0;
+	Node( inletNode3 ).MassFlowRate = 3.0;
+	Node( returnNode1 ).MassFlowRate = 0.12; // Set to random values to make sure they get reset properly
+	Node( returnNode2 ).MassFlowRate = 0.32;
+	Node( returnNode3 ).MassFlowRate = 0.45;
+
+	StdTotalReturnMassFlow = 0.0;
+	FinalTotalReturnMassFlow = 0.0;
+
+	CalcZoneReturnFlows( ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow );
+	EXPECT_EQ( FinalTotalReturnMassFlow, 6.0 );
+	EXPECT_EQ( Node( returnNode1 ).MassFlowRate, 2.0 );
+	EXPECT_EQ( Node( returnNode2 ).MassFlowRate, 1.0 );
+	EXPECT_EQ( Node( returnNode3 ).MassFlowRate, 3.0 );
+
+
+	// Deallocate everything - should all be taken care of in clear_states
 }

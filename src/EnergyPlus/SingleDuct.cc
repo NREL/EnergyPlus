@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1834,12 +1835,10 @@ namespace SingleDuct {
 				}
 			}
 			// Find air loop associated with terminal unit
-			if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheat || Sys( SysNum ).SysType_Num == SingleDuctVAVNoReheat ) {
-				if ( ( Sys( SysNum ).CtrlZoneNum > 0 ) && ( Sys( SysNum ).CtrlZoneInNodeIndex > 0 ) ){
- 					Sys( SysNum ).AirLoopNum = ZoneEquipConfig( Sys( SysNum ).CtrlZoneNum ).InletNodeAirLoopNum( Sys( SysNum ).CtrlZoneInNodeIndex );
- 					AirDistUnit( Sys( SysNum ).ADUNum ).AirLoopNum = Sys( SysNum ).AirLoopNum;
-  				}
-			}
+			if ( ( Sys( SysNum ).CtrlZoneNum > 0 ) && ( Sys( SysNum ).CtrlZoneInNodeIndex > 0 ) ){
+				Sys( SysNum ).AirLoopNum = ZoneEquipConfig( Sys( SysNum ).CtrlZoneNum ).InletNodeAirLoopNum( Sys( SysNum ).CtrlZoneInNodeIndex );
+				AirDistUnit( Sys( SysNum ).ADUNum ).AirLoopNum = Sys( SysNum ).AirLoopNum;
+ 			}
 
 			MyEnvrnFlag( SysNum ) = false;
 		}
@@ -5033,7 +5032,8 @@ namespace SingleDuct {
 		// Keep trying until we find it, the airloopnum, that is
 		if ( this->OneTimeInitFlag2 ){
 			this->AirLoopNum = DataZoneEquipment::ZoneEquipConfig( DataDefineEquip::AirDistUnit( this->ADUNum ).ZoneEqNum ).InletNodeAirLoopNum( this->CtrlZoneInNodeIndex );
-			if (this->AirLoopNum > 0 ) {
+			DataDefineEquip::AirDistUnit( this->ADUNum ).AirLoopNum = this->AirLoopNum;
+			if ( this->AirLoopNum > 0 ) {
 				this->OneTimeInitFlag2 = false;
 			}
 		}
@@ -5067,7 +5067,9 @@ namespace SingleDuct {
 				Node( this->PriInNode ).MassFlowRate = max( Node( this->PriInNode ).MassFlowRate, Node( this->PriInNode ).MassFlowRateMin );
 			}
 		}
-
+		if ( this->MixerType == ATMixer_InletSide ) {
+				Node( this->PriInNode ).MassFlowRate = min( Node( this->PriInNode ).MassFlowRate, Node( this->MixedAirOutNode ).MassFlowRate );
+		}
 	}
 
 	void
@@ -5136,6 +5138,11 @@ namespace SingleDuct {
 			MixedAirMassFlowRate = Node( SysATMixer( SysNum ).MixedAirOutNode ).MassFlowRate;
 			SecAirMassFlowRate = max( MixedAirMassFlowRate - PriMassFlowRate, 0.0 );
 			Node( SysATMixer( SysNum ).SecInNode ).MassFlowRate = SecAirMassFlowRate;
+			if ( abs( PriMassFlowRate + SecAirMassFlowRate - MixedAirMassFlowRate ) > SmallMassFlow ) {
+				ShowSevereError( "CalcATMixer: Invalid mass flow rates in AirTerminal:SingleDuct:Mixer=" + SysATMixer( SysNum ).Name );
+				ShowContinueErrorTimeStamp( "Primary mass flow rate=" + General::RoundSigDigits( PriMassFlowRate, 6 ) + "Secondary mass flow rate=" + General::RoundSigDigits( SecAirMassFlowRate, 6 ) + "Mixed mass flow rate=" + General::RoundSigDigits( MixedAirMassFlowRate, 6 ) );
+				ShowFatalError( "Simulation terminates." );
+			}
 		}
 		// now calculate the mixed (outlet) conditions
 		if ( MixedAirMassFlowRate > 0.0 ) {
@@ -5211,6 +5218,13 @@ namespace SingleDuct {
 				Node( MixedAirOutNode ).GenContam = ( Node( SecInNode ).MassFlowRate * Node( SecInNode ).GenContam + Node( PriInNode ).MassFlowRate * Node( PriInNode ).GenContam ) / Node( MixedAirOutNode ).MassFlowRate;
 			}
 		}
+
+		// update ADU flow data - because SimATMixer is called from the various zone equipment so the updates in SimZoneAirLoopEquipment won't work
+		int aduNum = SysATMixer( SysNum ).ADUNum;
+		DataDefineEquip::AirDistUnit( aduNum ).MassFlowRateTU = Node( PriInNode ).MassFlowRate;
+		DataDefineEquip::AirDistUnit( aduNum ).MassFlowRateZSup = Node( PriInNode ).MassFlowRate;
+		DataDefineEquip::AirDistUnit( aduNum ).MassFlowRateSup = Node( PriInNode ).MassFlowRate;
+
 	}
 
 	void

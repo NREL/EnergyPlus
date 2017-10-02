@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -650,6 +651,7 @@ namespace DataAirflowNetwork {
 		Real64 azimuth; // Azimuthal angle of the associated surface
 		Real64 height; // Nodal height
 		int ExtNum; // External node number
+		int OutAirNodeNum; // Outdoor air node number
 		int facadeNum; // Facade number
 		int curve; // Curve ID, replace with pointer after curve refactor
 		bool symmetricCurve; // Symmtric curves are evaluated from 0 to 180, others are evaluated from 0 to 360
@@ -660,6 +662,7 @@ namespace DataAirflowNetwork {
 			azimuth( 0.0 ),
 			height( 0.0 ),
 			ExtNum( 0 ),
+			OutAirNodeNum( 0 ),
 			facadeNum( 0 ),
 			curve( 0 ),
 			symmetricCurve( false ),
@@ -1010,6 +1013,7 @@ namespace DataAirflowNetwork {
 		int EPlusZoneNum; // E+ zone number
 		int EPlusNodeNum;
 		int ExtNodeNum;
+		int OutAirNodeNum;
 		int EPlusTypeNum;
 		int RAFNNodeNum;  // RoomAir model node number
 		int NumOfLinks; // Number of links for RoomAir model
@@ -1022,6 +1026,7 @@ namespace DataAirflowNetwork {
 			EPlusZoneNum( 0 ),
 			EPlusNodeNum( 0 ),
 			ExtNodeNum( 0 ),
+			OutAirNodeNum( 0 ),
 			EPlusTypeNum( 0 ),
 			RAFNNodeNum( 0 ),
 			NumOfLinks( 0 )

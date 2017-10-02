@@ -1,4 +1,4 @@
-! SolarShadingTest.idf
+! SolarShadingTest_ExternalFraction.idf
 ! Basic file description:  2 story building divided into 9 zones, overhangs, reveal,
 !
 ! Highlights:              Test of shading effects for EnergyPlus.
@@ -663,7 +663,7 @@
 	,                             !- Polygon Clipping Algorithm
 	,                             !- Sky Diffuse Modeling Algorithm
 	ScheduledShading,             !- External Shading Calculation Method
-	No;                           !- Output External Shading Calculation Results
+	Yes;                          !- Output External Shading Calculation Results
 	
   SurfaceProperty:LocalEnvironment,
     LocEnv:EAST SIDE TREE,

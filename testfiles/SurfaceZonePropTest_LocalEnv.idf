@@ -1,4 +1,4 @@
-! SurfaceTest_SurfZoneMicroclimate.idf
+! SurfaceZonePropTest_LocalEnv.idf
 ! Basic file description:  2 story building divided into 9 zones, overhangs, reveal,
 !
 ! Highlights:              Test of the link to import local environment data at node, surface and zone level for EnergyPlus.
@@ -109,7 +109,7 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                      !- Run Simulation for Weather File Run Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     ,                        !- Name
@@ -2360,23 +2360,7 @@
 
   Output:Meter,Electricity:Building,hourly;
 
-  Output:Surfaces:Drawing,dxf,Triangulate3DFace;
-
-  Output:Surfaces:List,detailswithvertices;
-
   Output:Constructions,Constructions;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,monthly;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

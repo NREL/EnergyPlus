@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,6 +58,7 @@
 #include <DataLoopNode.hh>
 #include <NodeInputManager.hh>
 #include <DataDefineEquip.hh>
+#include <GeneralRoutines.hh>
 #include <SimulationManager.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputReportPredefined.hh>
@@ -1637,6 +1639,7 @@ namespace EnergyPlus {
 		DataGlobals::KickOffSimulation = true;
 
 		WeatherManager::ResetEnvironmentCounter();
+		TestAirPathIntegrity( ErrorsFound ); // Needed to initialize return node connections to airloops and inlet nodes
 		SimulationManager::SetupSimulation( ErrorsFound );
 		DataGlobals::KickOffSimulation = false;
 

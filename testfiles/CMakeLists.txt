@@ -94,6 +94,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_HighRHControl.idf EPW_FILE USA_IL_
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_MultizoneAverageRHControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_MultizoneMinMaxRHControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterLoopHeatPump.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5Zone_IdealLoadsAirSystems_ReturnPlenum.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5Zone_Transformer.idf EPW_FILE CZ06RV2.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5Zone_Unitary_HXAssistedCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5Zone_Unitary_VSDesuperheater.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -571,9 +572,10 @@ ADD_SIMULATION_TEST(IDF_FILE _SingleZoneTestCondFDTwoDD.idf EPW_FILE USA_IL_Chic
 ADD_SIMULATION_TEST(IDF_FILE _SmallOffice_Dulles.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE _VAVSingleDuctConstFlowBoiler_otherfuel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE gasAbsorptionChillerHeater.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE SurfaceTest_SurfLWR.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE SurfaceTest_SurfZoneMicroclimate.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest_ExtShdFracIO.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SurfaceZonePropTest_LocalEnv.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SurfacePropTest_SurfLWR.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest_ExternalFraction.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_MultiZone_LocalNode.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 
 # Additional files in subdirectories
 ADD_SIMULATION_TEST(IDF_FILE AdvancedOutput/ExerciseOutput1.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
