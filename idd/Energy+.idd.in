@@ -21158,7 +21158,10 @@ ElectricEquipment:ITE:AirCooled,
        \note The entered calculation method is used to specify how the IT inlet temperature and zone 
 	   \note return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. 
 	   \note If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature 
-	   \note should be defined to indicate the temperature difference due to the air distribution.
+	   \note should be defined to indicate the temperature difference due to the air distribution. When
+	   \note FlowFromSystem is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction
+	   \note and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple
+	   \note ITE objects defined for one zone, the same calculation method should apply.
 	   \type choice
        \key FlowFromSystem
        \key FlowControlWithApproachTemperatures

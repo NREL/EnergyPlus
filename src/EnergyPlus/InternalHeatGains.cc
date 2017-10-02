@@ -2346,9 +2346,16 @@ namespace InternalHeatGains {
 					else if ( SameString( AlphaName( 3 ), "FlowControlWithApproachTemperatures" ) ) {
 						ZoneITEq( Loop ).FlowControlWithApproachTemps = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir = true;
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
+						ErrorsFound = true;
 					}
 				}
-				// TODO:Check if all
+				if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir && ( !ZoneITEq( Loop ).FlowControlWithApproachTemps ) ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method " + AlphaName( 3 )  + " for Zone: " + AlphaName( 2 ) );
+					ShowContinueError( "...Multiple flow control methods apply to one zone. " );
+					ErrorsFound = true;
+				}
 				{ auto const equipmentLevel( AlphaName( 4 ) );
 				if ( equipmentLevel == "WATTS/UNIT" ) {
 					ZoneITEq( Loop ).DesignTotalPower = IHGNumbers( 1 ) * IHGNumbers( 2 );
@@ -2558,24 +2565,25 @@ namespace InternalHeatGains {
 				} else {
 					ZoneITEq( Loop ).EndUseSubcategoryUPS = "ITE-UPS";
 				}
-
-				if ( lAlphaFieldBlanks( 20 ) ) {
-					ZoneITEq( Loop ).SupplyApproachTempSch = GetScheduleIndex( AlphaName( 20 ) );
-				} else {
-					if ( ZoneITEq( Loop ).SupplyApproachTemp == 0 ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
-						ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 10 ) + " or " + cAlphaFieldNames( 20 ) + " is required, but both are left blank." );
-						ErrorsFound = true;
+				if ( ZoneITEq( Loop ).FlowControlWithApproachTemps ) {
+					if ( !lAlphaFieldBlanks( 20 ) ) {
+						ZoneITEq( Loop ).SupplyApproachTempSch = GetScheduleIndex( AlphaName( 20 ) );
+					} else {
+						if ( ZoneITEq( Loop ).SupplyApproachTemp == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 10 ) + " or " + cAlphaFieldNames( 20 ) + " is required, but both are left blank." );
+							ErrorsFound = true;
+						}
 					}
-				}
 
-				if ( lAlphaFieldBlanks( 21 ) ) {
-					ZoneITEq( Loop ).SupplyApproachTempSch = GetScheduleIndex( AlphaName( 21 ) );
-				} else {
-					if ( ZoneITEq( Loop ).SupplyApproachTemp == 0 ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
-						ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 11 ) + " or " + cAlphaFieldNames( 21 ) + " is required, but both are left blank." );
-						ErrorsFound = true;
+					if ( !lAlphaFieldBlanks( 21 ) ) {
+						ZoneITEq( Loop ).ReturnApproachTempSch = GetScheduleIndex( AlphaName( 21 ) );
+					} else {
+						if ( ZoneITEq( Loop ).ReturnApproachTemp == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 11 ) + " or " + cAlphaFieldNames( 21 ) + " is required, but both are left blank." );
+							ErrorsFound = true;
+						}
 					}
 				}
 
