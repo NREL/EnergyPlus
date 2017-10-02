@@ -320,7 +320,7 @@ TEST_F( EnergyPlusFixture, ScheduleHoursGT1perc_test )
 
 }
 
-TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpInterp )
+TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp )
 {
 	// J.Glazer - September 2017
 
@@ -352,7 +352,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpInterp )
 		"Schedule:Day:Interval,",
 		"  SchDy_A1a,  !- Name",
 		"  AnyNumber,  !- Schedule Type Limits Name",
-		"  Yes,        !- Interpolate to Timestep",
+		"  Linear,     !- Interpolate to Timestep",
 		"  07:00,      !- Time 1",
 		"  0.001,      !- Value Until Time 1",
 		"  08:00,      !- Time 2",
@@ -385,7 +385,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpInterp )
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
 
 
-	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate YES
+	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate Linear
 	EXPECT_NEAR( 0.001, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 ); 
 
 	// interpolate over one hour
@@ -440,7 +440,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpInterp )
 
 }
 
-TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourInterp )
+TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp )
 {
 	// J.Glazer - September 2017
 
@@ -472,7 +472,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourInterp )
 		"Schedule:Day:Interval,",
 		"  SchDy_A1a,  !- Name",
 		"  AnyNumber,  !- Schedule Type Limits Name",
-		"  Yes,        !- Interpolate to Timestep",
+		"  Linear,     !- Interpolate to Timestep",
 		"  07:00,      !- Time 1",
 		"  0.001,      !- Value Until Time 1",
 		"  07:30,      !- Time 2",
@@ -499,7 +499,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourInterp )
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
 
 
-	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate YES
+	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate Linear
 	EXPECT_NEAR( 0.001, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 );
 
 	// interpolate over first half hour
@@ -515,7 +515,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourInterp )
 
 }
 
-TEST_F( EnergyPlusFixture, ScheduleDayInterval_InterpIntervalNotTimestep )
+TEST_F( EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep )
 {
 	// J.Glazer - September 2017
 
@@ -547,7 +547,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_InterpIntervalNotTimestep )
 		"Schedule:Day:Interval,",
 		"  SchDy_A1a,  !- Name",
 		"  AnyNumber,  !- Schedule Type Limits Name",
-		"  Yes,        !- Interpolate to Timestep",
+		"  Linear,     !- Interpolate to Timestep",
 		"  07:00,      !- Time 1",
 		"  0.0,        !- Value Until Time 1",
 		"  07:20,      !- Time 2",
@@ -574,7 +574,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_InterpIntervalNotTimestep )
 	DataEnvironment::DayOfYear_Schedule = General::JulianDay( DataEnvironment::Month, DataEnvironment::DayOfMonth, 1 );
 
 
-	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate YES
+	int ASchedIndex = GetScheduleIndex( "SCHYR_A" );  //interpolate Linear
 	EXPECT_NEAR( 0.0, LookUpScheduleValue( ASchedIndex, 7, 4 ), 0.000001 );
 
 	// interpolate over first half hour
