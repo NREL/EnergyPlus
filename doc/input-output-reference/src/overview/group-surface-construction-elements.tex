@@ -624,11 +624,11 @@ This object also allows users to enter characteristic properties of the processe
 
 The MaterialProperty:PhaseChangeHysteresis object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
 
-\paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-name}
 
 This input must match the name of a material defined elsewhere within EnergyPlus.  The thermal properies of that material are then overridden by the properties defind in this object.
 
-\paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-latent-heat-during-the-entire-phase-change-process}
 
 This is the total amount of latent heat absorbed or discharged during the transition from solid to liquid or back, in Joules.
 The shapes of the enthalpy curves differ based on direction, but the total amount of energy from one state to the other does not.
@@ -641,19 +641,19 @@ This is the constant thermal conductivity used while the material is fully liqui
 
 This is the constant density while the material is fully liquid, in kg/m3.
 
-\paragraph{Field: Liquid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Liquid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-liquid-state-specific-heat}
 
 This is the constant specific heat while the material is fully liquid, in J/kg-K.
 
-\paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-high-temperature-difference-of-melting-curve}
 
 This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
 
-\paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-peak-melting-temperature}
 
 This is the center (peak) of the melting curve, in Kelvin.
 
-\paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-low-temperature-difference-of-melting-curve}
 
 This is the width of the enthalpy/specific heat melting curve, on the low side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
 
@@ -665,19 +665,19 @@ This is the constant thermal conductivity used while the material is fully solid
 
 This is the constant density while the material is fully solid, in kg/m3.
 
-\paragraph{Field: Solid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Solid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-solid-state-specific-heat}
 
 This is the constant specific heat while the material is fully crystallized, in J/kg-K.
 
-\paragraph{Field: High Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: High Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-high-temperature-difference-of-freezing-curve}
 
 This is the width of the enthalpy/specific heat freezing curve, on the high side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
 
-\paragraph{Field: Peak Freezing Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Peak Freezing Temperature}\label{materialpropertyphasechangehysteresis-inputs-peak-freezing-temperature}
 
 This is the center (peak) of the freezing curve, in Kelvin.  This will be higher than the peak melting temperature based on empirical data.
 
-\paragraph{Field: Low Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Low Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-low-temperature-difference-of-freezing-curve}
 
 This is the width of the enthalpy/specific heat freezing curve, on the low side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
 
@@ -1095,7 +1095,7 @@ MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
         2.602;     !- Thermal Conductivity \#2
 \end{lstlisting}
 
-\subsubsection{Surface Outputs}\label{outputs-2-021}
+\subsubsection{Surface Outputs}\label{surface-outputs}
 
 \begin{itemize}
 \item
@@ -1138,7 +1138,7 @@ This output is the temperature on the external ``surface'' of the surface.
 
 This output is the relative humidity on the external ``surface'' of the surface.
 
-\subsubsection{Internal Cell Outputs}\label{outputs-2-021}
+\subsubsection{Internal Cell Outputs}\label{internal-cell-outputs}
 
 Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
 
@@ -2217,7 +2217,7 @@ Transmittance averaged over the solar spectrum and weighted by the response of t
 
 Reflectance averaged over the solar spectrum and weighted by the response of the human eye. Assumed same on both side of shade and independent of incidence angle.
 
-\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity}
+\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity-201710020805}
 
 Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
 
