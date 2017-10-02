@@ -2615,7 +2615,8 @@ Schedule:Day:Interval,
        \note timestep resolution.  a No choice will use the interval value at the simulation timestep without regard to if it matches
        \note the boundary or not.
        \type choice
-       \key Yes
+       \key Average
+       \key Linear
        \key No
        \default No
  A4  , \field Time 1
@@ -3212,7 +3213,8 @@ Schedule:Day:List,
        \note timestep resolution.  a "No" choice will use the interval value at the simulation timestep without regard to if it matches
        \note the boundary or not.
        \type choice
-       \key Yes
+       \key Average
+       \key Linear
        \key No
        \default No
   N1 , \field Minutes per Item
@@ -4031,7 +4033,7 @@ Schedule:Compact,
    \memo Irregular object.  Does not follow the usual definition for fields.  Fields A3... are:
    \memo Through: Date
    \memo For: Applicable days (ref: Schedule:Week:Compact)
-   \memo Interpolate: Yes/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"
+   \memo Interpolate: Average/Linear/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"
    \memo Until: <Time> (ref: Schedule:Day:Interval)
    \memo <numeric value>
    \memo words "Through","For","Interpolate","Until" must be included.
