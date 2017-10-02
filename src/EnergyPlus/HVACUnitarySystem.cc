@@ -1395,20 +1395,25 @@ namespace HVACUnitarySystem {
 		}
 
 		if ( allocated( ZoneEquipConfig ) && MyCheckFlag( UnitarySysNum ) ) {
-			int zoneNum = Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).ZoneEqNum;
-			int zoneInlet = UnitarySystem( UnitarySysNum ).ZoneInletNode;
-			int coolingPriority = 0;
-			int heatingPriority = 0;
-			//setup zone equipment sequence information based on finding matching air terminal
-			if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
-				ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
-				UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = coolingPriority;
-				UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = heatingPriority;
+			if ( UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
+				int zoneNum = Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).ZoneEqNum;
+				int zoneInlet = UnitarySystem( UnitarySysNum ).ZoneInletNode;
+				int coolingPriority = 0;
+				int heatingPriority = 0;
+				//setup zone equipment sequence information based on finding matching air terminal
+				if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
+					ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
+					UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = coolingPriority;
+					UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = heatingPriority;
+				}
+				MyCheckFlag( UnitarySysNum ) = false;
+				if ( UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum == 0 ) {
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": No matching air terminal found in the zone equipment list for zone = " + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + "." );
+					ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  Preceding condition(s) causes termination." );
+				}
 			}
-			MyCheckFlag( UnitarySysNum ) = false;
-			if ( UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum == 0 ) {
-				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": No matching air terminal found in the zone equipment list for zone = " + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + "." );
-				ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  Preceding condition(s) causes termination." );
+			if ( UnitarySystem( UnitarySysNum ).ZoneInletNode == 0 ) {
+ 				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": The zone inlet node in the controlled zone (" + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + ") is not found." );
 			}
 		}
 
