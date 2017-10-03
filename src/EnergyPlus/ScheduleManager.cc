@@ -352,7 +352,6 @@ namespace ScheduleManager {
 		int numerrors;
 		int ifld;
 		int hrLimitCount;
-		ScheduleInterpolation schInterpKind;
 
 		MaxNums = 1; // Need at least 1 number because it's used as a local variable in the Schedule Types loop
 		MaxAlps = 0;
