@@ -3561,7 +3561,7 @@ namespace ZoneEquipmentManager {
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
-		} else if ( FirstHVACIteration && ( ZoneEquipList( ZoneNum ).LoadDistScheme == DataZoneEquipment::LoadDist::sequentialLoading ) ) {
+		} else if ( FirstHVACIteration && ( ( ZoneEquipList( ZoneNum ).LoadDistScheme == DataZoneEquipment::LoadDist::sequentialLoading ) || ( ZoneEquipList( ZoneNum ).LoadDistScheme == DataZoneEquipment::LoadDist::uniformLoading ) ) ) {
 			//init each sequenced demand to the full output
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired; // array assignment
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP; // array assignment
@@ -3570,7 +3570,7 @@ namespace ZoneEquipmentManager {
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
-		} else if ( FirstHVACIteration && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::sequentialLoading ) ) {
+		} else if ( FirstHVACIteration && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::sequentialLoading ) && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::uniformLoading ) ) {
 			//init each sequenced demand to the zone design load in order to get available capacities from equipment
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) { 
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
@@ -3695,7 +3695,7 @@ namespace ZoneEquipmentManager {
 				// Distribute load at uniform PLR across all active equipment
 				if ( energy.TotalOutputRequired >= 0.0 ) {
 					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
-						availCap += thisZEqList.HeatingCapacity( equipNum );
+						if ( thisZEqList.HeatingPriority( equipNum ) > 0 ) availCap += thisZEqList.HeatingCapacity( equipNum );
 					}
 					if ( availCap > 0.0 ) {
 						plr = energy.TotalOutputRequired / availCap;
@@ -3705,7 +3705,7 @@ namespace ZoneEquipmentManager {
 					plr = energy.TotalOutputRequired / availCap;
 				} else {
 					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
-						availCap += thisZEqList.CoolingCapacity( equipNum );
+						if ( thisZEqList.CoolingPriority( equipNum ) > 0 ) availCap += thisZEqList.CoolingCapacity( equipNum );
 					}
 					if ( availCap < 0.0 ) {
 						plr = energy.TotalOutputRequired / availCap;
@@ -3767,7 +3767,7 @@ namespace ZoneEquipmentManager {
 					// For heating capacities and TotalOutputRequired are positive
 					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
 						if ( ( thisZEqList.HeatingCapacity( equipNum ) > 0.0 ) && ( availCap < energy.TotalOutputRequired ) ) {
-							availCap += thisZEqList.HeatingCapacity( equipNum );
+							if ( thisZEqList.HeatingPriority( equipNum ) > 0 ) availCap += thisZEqList.HeatingCapacity( equipNum );
 							++numOperating;
 						}
 					}
@@ -3782,7 +3782,7 @@ namespace ZoneEquipmentManager {
 					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
 						// For cooling capacities and TotalOutputRequired are negative
 						if ( ( thisZEqList.CoolingCapacity( equipNum ) < 0.0 ) && ( availCap > energy.TotalOutputRequired ) ) {
-							availCap += thisZEqList.CoolingCapacity( equipNum );
+							if ( thisZEqList.CoolingPriority( equipNum ) > 0 ) availCap += thisZEqList.CoolingCapacity( equipNum );
 							++numOperating;
 						}
 					}
