@@ -400,6 +400,7 @@ namespace Furnaces {
 		HXUnitOn = false;
 		OnOffAirFlowRatio = 0.0;
 		// here we need to deal with sequenced zone equip
+		ZoneLoad = 0.0;
 		if ( Furnace( FurnaceNum ).ZoneSequenceCoolingNum > 0 && Furnace( FurnaceNum ).ZoneSequenceHeatingNum > 0 ) {
 			ZoneLoadToCoolSPSequenced = ZoneSysEnergyDemand( Furnace( FurnaceNum ).ControlZoneNum ).SequencedOutputRequiredToCoolingSP( Furnace( FurnaceNum ).ZoneSequenceCoolingNum );
 			ZoneLoadToHeatSPSequenced = ZoneSysEnergyDemand( Furnace( FurnaceNum ).ControlZoneNum ).SequencedOutputRequiredToHeatingSP( Furnace( FurnaceNum ).ZoneSequenceHeatingNum );

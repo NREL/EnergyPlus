@@ -556,12 +556,16 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).EquipData.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+				ZoneEquipList( ControlledZoneNum ).CoolingCapacity.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+				ZoneEquipList( ControlledZoneNum ).HeatingCapacity.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipType = "";
 				ZoneEquipList( ControlledZoneNum ).EquipType_Num = 0;
 				ZoneEquipList( ControlledZoneNum ).EquipName = "";
 				ZoneEquipList( ControlledZoneNum ).EquipIndex = 0;
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority = 0;
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority = 0;
+				ZoneEquipList( ControlledZoneNum ).CoolingCapacity = 0;
+				ZoneEquipList( ControlledZoneNum ).HeatingCapacity = 0;
 
 				IdealLoadsOnEquipmentList = false;
 				int countAirTermsInZone = 0;
@@ -591,6 +595,10 @@ namespace DataZoneEquipment {
 						if ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > 0 ) ShowContinueError( "only " + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) + " in the list." );
 						GetZoneEquipmentDataErrorsFound = true;
 					}
+
+					// do this here for initial prototype, but later will call all the equipment in a separate function to see who is on - maybe
+					if ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailHeatEquip;
+					if ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailCoolEquip;
 
 					{ auto const SELECT_CASE_var( MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
 

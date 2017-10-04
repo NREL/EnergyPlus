@@ -432,7 +432,6 @@ namespace DataZoneEquipment {
 		Real64 TotPlantSupplyOther;
 		Real64 PlantSupplyOtherEff;
 		Real64 PeakPlantSupplyOtherEff;
-		//Real64 Capacity;
 		int OpMode;
 
 		// Default Constructor
@@ -457,7 +456,6 @@ namespace DataZoneEquipment {
 			TotPlantSupplyOther( 0.0 ),
 			PlantSupplyOtherEff( 0.0 ),
 			PeakPlantSupplyOtherEff( 0.0 ),
-			//Capacity( 0.0 ),
 			OpMode( 0 )
 		{}
 
@@ -477,6 +475,8 @@ namespace DataZoneEquipment {
 		Array1D_int EquipIndex;
 		Array1D_int CoolingPriority;
 		Array1D_int HeatingPriority;
+		Array1D_int CoolingCapacity; // Current cooling capacity (negative) [W]
+		Array1D_int HeatingCapacity; // Current heating capacity (positive) [W]
 		Array1D< EquipmentData > EquipData; // Index of energy output report data
 
 		// Default Constructor

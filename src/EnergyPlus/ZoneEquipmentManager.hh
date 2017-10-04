@@ -152,7 +152,8 @@ namespace ZoneEquipmentManager {
 
 	void
 	DistributeSystemOutputRequired(
-		int const ActualZoneNum
+		int const ActualZoneNum,
+		bool const FirstHVACIteration
 	);
 
 	void
