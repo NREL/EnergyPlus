@@ -524,24 +524,6 @@ namespace GroundHeatExchangers {
 
 	};
 
-	std::shared_ptr < GLHEVertPropsStruct >
-	GetVertProps(
-		std::string const & name
-	);
-
-	std::shared_ptr < GLHEVertArrayStruct >
-	GetVertArray(
-		std::string const & name
-	);
-
-	// Object Data
-	extern std::vector < GLHEVert > verticalGLHE; // Vertical GLHEs
-	extern std::vector < GLHESlinky > slinkyGLHE; // Slinky GLHEs
-	extern std::vector < std::shared_ptr < GLHEVertArrayStruct > > vertArraysVector; // Vertical Arrays
-	extern std::vector < std::shared_ptr < GLHEVertPropsStruct > > vertPropsVector; // Vertical Properties
-	extern std::vector < std::shared_ptr < GLHEResponseFactorsStruct > > responseFactorsVector; // Vertical Response Factors
-	extern std::vector < std::shared_ptr< GLHEVertSingleStruct > > singleBoreholesVector; // Vertical Single Boreholes
-
 	void
 	clear_state();
 
@@ -562,6 +544,34 @@ namespace GroundHeatExchangers {
 	SetupBHPointsForResponseFactorsObject(
 		std::shared_ptr < GLHEResponseFactorsStruct > & thisRF
 	);
+
+	std::shared_ptr < GLHEResponseFactorsStruct >
+	GetResponseFactor(
+		std::string const & objectName
+	);
+
+	std::shared_ptr < GLHEVertSingleStruct >
+	GetSingleBH(
+		std::string const & objectName
+	);
+
+	std::shared_ptr < GLHEVertPropsStruct >
+	GetVertProps(
+		std::string const & objectName
+	);
+
+	std::shared_ptr < GLHEVertArrayStruct >
+	GetVertArray(
+		std::string const & objectName
+	);
+
+	// Object Data
+	extern std::vector < GLHEVert > verticalGLHE; // Vertical GLHEs
+	extern std::vector < GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	extern std::vector < std::shared_ptr < GLHEVertArrayStruct > > vertArraysVector; // Vertical Arrays
+	extern std::vector < std::shared_ptr < GLHEVertPropsStruct > > vertPropsVector; // Vertical Properties
+	extern std::vector < std::shared_ptr < GLHEResponseFactorsStruct > > responseFactorsVector; // Vertical Response Factors
+	extern std::vector < std::shared_ptr< GLHEVertSingleStruct > > singleBoreholesVector; // Vertical Single Boreholes
 
 } // GroundHeatExchangers
 

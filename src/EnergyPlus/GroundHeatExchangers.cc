@@ -299,7 +299,7 @@ namespace GroundHeatExchangers {
 			for ( int yBH = 1; yBH <= arrayObjectPtr->numBHinYDirection; ++yBH ) {
 				bhCounter += 1;
 				std::shared_ptr< GLHEVertSingleStruct > thisBH( new GLHEVertSingleStruct );
-				thisBH->name = "Array: " + thisRF->name + " BH " + std::to_string( bhCounter ) + " loc: (" + std::to_string( xLoc ) + ", " + std::to_string( yLoc ) + ")";
+				thisBH->name = thisRF->name + " BH " + std::to_string( bhCounter ) + " loc: (" + std::to_string( xLoc ) + ", " + std::to_string( yLoc ) + ")";
 				thisBH->props = GetVertProps( arrayObjectPtr->props->name );
 				thisBH->xLoc = xLoc;
 				thisBH->yLoc = yLoc;
@@ -1822,7 +1822,7 @@ namespace GroundHeatExchangers {
 				thisRF->LNTTS.dimension( thisRF->numGFuncPairs, 0.0 );
 				thisRF->GFNC.dimension( thisRF->numGFuncPairs, 0.0 );
 
-				int indexNum = 4;
+				int indexNum = 3;
 				for ( int pairNum = 1; pairNum <= thisRF->numGFuncPairs; ++pairNum ) {
 					thisRF->LNTTS( pairNum ) = DataIPShortCuts::rNumericArgs( indexNum );
 					thisRF->GFNC( pairNum ) = DataIPShortCuts::rNumericArgs( indexNum + 1 );
