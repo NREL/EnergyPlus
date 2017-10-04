@@ -2611,9 +2611,9 @@ Schedule:Day:Interval,
        \type object-list
        \object-list ScheduleTypeLimitsNames
   A3 , \field Interpolate to Timestep
-       \note when the interval does not match the user specified timestep a Yes choice will average between the intervals request (to
-       \note timestep resolution.  a No choice will use the interval value at the simulation timestep without regard to if it matches
-       \note the boundary or not.
+       \note when the interval does not match the user specified timestep a Average choice will average between the intervals request (to
+       \note timestep resolution. A No choice will use the interval value at the simulation timestep without regard to if it matches
+       \note the boundary or not. A Linear choice will interpolate linearly between successive values.
        \type choice
        \key Average
        \key Linear
@@ -3209,9 +3209,9 @@ Schedule:Day:List,
        \type object-list
        \object-list ScheduleTypeLimitsNames
   A3 , \field Interpolate to Timestep
-       \note when the interval does not match the user specified timestep a "Yes" choice will average between the intervals request (to
-       \note timestep resolution.  a "No" choice will use the interval value at the simulation timestep without regard to if it matches
-       \note the boundary or not.
+       \note when the interval does not match the user specified timestep a "Average" choice will average between the intervals request (to
+       \note timestep resolution.  A "No" choice will use the interval value at the simulation timestep without regard to if it matches
+       \note the boundary or not. A "Linear" choice will interpolate linearly between successive values.
        \type choice
        \key Average
        \key Linear
