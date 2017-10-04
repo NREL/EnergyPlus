@@ -667,7 +667,6 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad )
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToHumidSP.allocate( 3 );
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToDehumidSP.allocate( 3 );
 	auto & energy( DataZoneEnergyDemands::ZoneSysEnergyDemand( ZoneNum ) );
-	auto & moisture( DataZoneEnergyDemands::ZoneSysMoistureDemand( ZoneNum ) );
 
 	// Sequential Test 1 - Heating, FirstHVACIteration = true
 	energy.TotalOutputRequired = 1000.0;
@@ -813,7 +812,6 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad )
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToHumidSP.allocate( 3 );
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToDehumidSP.allocate( 3 );
 	auto & energy( DataZoneEnergyDemands::ZoneSysEnergyDemand( ZoneNum ) );
-	auto & moisture( DataZoneEnergyDemands::ZoneSysMoistureDemand( ZoneNum ) );
 
 	// UniformLoad Test 1 - Heating, FirstHVACIteration = true
 	energy.TotalOutputRequired = 1000.0;
@@ -959,7 +957,6 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR )
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToHumidSP.allocate( 3 );
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToDehumidSP.allocate( 3 );
 	auto & energy( DataZoneEnergyDemands::ZoneSysEnergyDemand( ZoneNum ) );
-	auto & moisture( DataZoneEnergyDemands::ZoneSysMoistureDemand( ZoneNum ) );
 
 	// Set up capacities for PLR calcs
 	DataSizing::FinalZoneSizing.allocate( 1 );
@@ -1123,7 +1120,6 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR )
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToHumidSP.allocate( 3 );
 	DataZoneEnergyDemands::ZoneSysMoistureDemand( 1 ).SequencedOutputRequiredToDehumidSP.allocate( 3 );
 	auto & energy( DataZoneEnergyDemands::ZoneSysEnergyDemand( ZoneNum ) );
-	auto & moisture( DataZoneEnergyDemands::ZoneSysMoistureDemand( ZoneNum ) );
 
 	// Set up capacities for PLR calcs
 	DataSizing::FinalZoneSizing.allocate( 1 );
