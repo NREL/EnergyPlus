@@ -3637,6 +3637,7 @@ namespace ZoneEquipmentManager {
 		Real64 coolLoadRatio = 1.0;
 		Real64 availCap = 0.0;
 		Real64 plr = 1.0;
+		int numOperating = 0;
 
 		switch ( thisZEqList.LoadDistScheme ) {
 			case DataZoneEquipment::LoadDist::sequentialLoading:
@@ -3760,7 +3761,94 @@ namespace ZoneEquipmentManager {
 				}
 				break;
 			case DataZoneEquipment::LoadDist::sequentialUniformPLRLoading:
-				// Do nothing - not implemented yet
+				// Determine how many pieces of equipment are required to meet the current load,
+				// then distribute load at uniform PLR across all active equipment
+				if ( energy.TotalOutputRequired >= 0.0 ) {
+					// For heating capacities and TotalOutputRequired are positive
+					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
+						if ( ( thisZEqList.HeatingCapacity( equipNum ) > 0.0 ) && ( availCap < energy.TotalOutputRequired ) ) {
+							availCap += thisZEqList.HeatingCapacity( equipNum );
+							++numOperating;
+						}
+					}
+					if ( availCap > 0.0 ) {
+						plr = energy.TotalOutputRequired / availCap;
+					} else {
+						plr = 0.0;
+						numOperating = 0;
+					}
+					plr = energy.TotalOutputRequired / availCap;
+				} else {
+					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
+						// For cooling capacities and TotalOutputRequired are negative
+						if ( ( thisZEqList.CoolingCapacity( equipNum ) < 0.0 ) && ( availCap > energy.TotalOutputRequired ) ) {
+							availCap += thisZEqList.CoolingCapacity( equipNum );
+							++numOperating;
+						}
+					}
+					if ( availCap < 0.0 ) {
+						plr = energy.TotalOutputRequired / availCap;
+					} else {
+						plr = 0.0;
+						numOperating = 0;
+					}
+				}
+				if ( plr <= 0.0 ) break; // Don't change anything
+				// Set loads for operating equipment
+				for ( int equipNum = 1.0; equipNum <= numOperating; ++equipNum ) {
+					if ( energy.TotalOutputRequired >= 0.0 ) {
+						if ( thisZEqList.HeatingPriority( equipNum ) > 0 ) {
+							energy.SequencedOutputRequired( equipNum ) = thisZEqList.HeatingCapacity( equipNum ) * plr;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = thisZEqList.HeatingCapacity( equipNum ) * plr;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = thisZEqList.HeatingCapacity( equipNum ) * plr;
+							if ( energy.OutputRequiredToHeatingSP != 0.0 ) {
+								moisture.SequencedOutputRequired( equipNum ) = moisture.TotalOutputRequired * ( thisZEqList.HeatingCapacity( equipNum ) * plr ) / energy.OutputRequiredToHeatingSP;
+								moisture.SequencedOutputRequiredToHumidSP( equipNum ) = moisture.OutputRequiredToHumidifyingSP * ( thisZEqList.HeatingCapacity( equipNum ) * plr ) / energy.OutputRequiredToHeatingSP;
+							} else {
+								moisture.SequencedOutputRequired( equipNum ) = moisture.TotalOutputRequired  * plr;
+								moisture.SequencedOutputRequiredToHumidSP( equipNum ) = moisture.OutputRequiredToHumidifyingSP * plr;
+							}
+							moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = 0.0;
+						} else {
+							energy.SequencedOutputRequired( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequired( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToHumidSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = 0.0;
+						}
+					} else {
+						if ( thisZEqList.CoolingPriority( equipNum ) > 0 ) {
+							energy.SequencedOutputRequired( equipNum ) = thisZEqList.CoolingCapacity( equipNum ) * plr;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = thisZEqList.CoolingCapacity( equipNum ) * plr;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = thisZEqList.CoolingCapacity( equipNum ) * plr;
+							if ( energy.OutputRequiredToCoolingSP != 0.0 ) {
+								moisture.SequencedOutputRequired( equipNum ) = moisture.TotalOutputRequired * ( thisZEqList.CoolingCapacity( equipNum ) * plr ) / energy.OutputRequiredToCoolingSP;
+								moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = moisture.OutputRequiredToDehumidifyingSP * ( thisZEqList.CoolingCapacity( equipNum ) * plr ) / energy.OutputRequiredToCoolingSP;
+							} else {
+								moisture.SequencedOutputRequired( equipNum ) = moisture.TotalOutputRequired  * plr;
+								moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = moisture.OutputRequiredToDehumidifyingSP * plr;
+							}
+							moisture.SequencedOutputRequiredToHumidSP( equipNum ) = 0.0;
+						} else {
+							energy.SequencedOutputRequired( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToHeatingSP( equipNum ) = 0.0;
+							energy.SequencedOutputRequiredToCoolingSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequired( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToHumidSP( equipNum ) = 0.0;
+							moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = 0.0;
+						}
+					}
+				}
+				// Set loads to zero for remaining equipment
+				for ( int equipNum = numOperating + 1; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
+					energy.SequencedOutputRequired( equipNum ) = 0.0;
+					energy.SequencedOutputRequiredToHeatingSP( equipNum ) = 0.0;
+					energy.SequencedOutputRequiredToCoolingSP( equipNum ) = 0.0;
+					moisture.SequencedOutputRequired( equipNum ) = 0.0;
+					moisture.SequencedOutputRequiredToHumidSP( equipNum ) = 0.0;
+					moisture.SequencedOutputRequiredToDehumidSP( equipNum ) = 0.0;
+				}
 				break;
 			default:
 				ShowFatalError( "DistributeSystemOutputRequired: Illegal load distribution scheme type." );
@@ -3864,8 +3952,6 @@ namespace ZoneEquipmentManager {
 
 		// Sensible output updates
 		auto & thisZEqList( DataZoneEquipment::ZoneEquipList( ctrlZoneNum ) );
-		Real64 heatLoadRatio = 1.0;
-		Real64 coolLoadRatio = 1.0;
 		switch ( thisZEqList.LoadDistScheme ) {
 			case DataZoneEquipment::LoadDist::sequentialLoading:
 				// sequentialLoading, use original method for remaining output
