@@ -41915,13 +41915,13 @@ ZoneHVAC:EquipmentList,
   N1 , \field Zone Equipment 1 Cooling Sequence
        \required-field
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N2 , \field Zone Equipment 1 Heating or No-Load Sequence
        \required-field
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A5 , \field Zone Equipment 2 Object Type
@@ -41969,7 +41969,7 @@ ZoneHVAC:EquipmentList,
        \note when the zone thermostat requests cooling
   N4 , \field Zone Equipment 2 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A7 , \field Zone Equipment 3 Object Type
@@ -42012,12 +42012,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N5 , \field Zone Equipment 3 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N6 , \field Zone Equipment 3 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A9 , \field Zone Equipment 4 Object Type
@@ -42060,12 +42060,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N7 , \field Zone Equipment 4 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N8 , \field Zone Equipment 4 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A11, \field Zone Equipment 5 Object Type
@@ -42108,12 +42108,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N9 , \field Zone Equipment 5 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N10, \field Zone Equipment 5 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A13, \field Zone Equipment 6 Object Type
@@ -42156,12 +42156,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N11, \field Zone Equipment 6 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N12, \field Zone Equipment 6 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A15, \field Zone Equipment 7 Object Type
@@ -42204,12 +42204,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N13, \field Zone Equipment 7 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N14, \field Zone Equipment 7 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A17, \field Zone Equipment 8 Object Type
@@ -42252,12 +42252,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N15, \field Zone Equipment 8 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N16, \field Zone Equipment 8 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A19, \field Zone Equipment 9 Object Type
@@ -42300,12 +42300,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N17, \field Zone Equipment 9 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N18, \field Zone Equipment 9 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A21, \field Zone Equipment 10 Object Type
@@ -42348,12 +42348,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N19, \field Zone Equipment 10 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N20, \field Zone Equipment 10 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A23, \field Zone Equipment 11 Object Type
@@ -42396,12 +42396,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N21, \field Zone Equipment 11 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N22, \field Zone Equipment 11 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A25, \field Zone Equipment 12 Object Type
@@ -42444,12 +42444,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N23, \field Zone Equipment 12 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N24, \field Zone Equipment 12 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A27, \field Zone Equipment 13 Object Type
@@ -42492,12 +42492,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N25, \field Zone Equipment 13 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N26, \field Zone Equipment 13 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A29, \field Zone Equipment 14 Object Type
@@ -42540,12 +42540,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N27, \field Zone Equipment 14 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N28, \field Zone Equipment 14 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A31, \field Zone Equipment 15 Object Type
@@ -42588,12 +42588,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N29, \field Zone Equipment 15 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N30, \field Zone Equipment 15 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A33, \field Zone Equipment 16 Object Type
@@ -42636,12 +42636,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N31, \field Zone Equipment 16 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N32, \field Zone Equipment 16 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A35, \field Zone Equipment 17 Object Type
@@ -42684,12 +42684,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N33, \field Zone Equipment 17 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N34, \field Zone Equipment 17 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
   A37, \field Zone Equipment 18 Object Type
@@ -42732,12 +42732,12 @@ ZoneHVAC:EquipmentList,
        \object-list ZoneEquipmentNames
   N35, \field Zone Equipment 18 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N36; \field Zone Equipment 18 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
 
