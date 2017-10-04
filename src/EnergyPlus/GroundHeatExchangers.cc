@@ -2028,6 +2028,10 @@ namespace GroundHeatExchangers {
 				thisGLHE.bhRadius = thisGLHE.bhDiameter / 2.0;
 				thisGLHE.bhLength = thisGLHE.myRespFactors->props->bhLength;
 				thisGLHE.bhUTubeDist = thisGLHE.myRespFactors->props->bhUTubeDist;
+				thisGLHE.pipe.outDia = thisGLHE.myRespFactors->props->pipe.outDia;
+				thisGLHE.pipe.thickness = thisGLHE.myRespFactors->props->pipe.thickness;
+				thisGLHE.pipe.k = thisGLHE.myRespFactors->props->pipe.k;
+				thisGLHE.grout.k = thisGLHE.myRespFactors->props->grout.k;
 
 				// Number of simulation years from RunPeriod
 				thisGLHE.myRespFactors->maxSimYears = MaxNumberSimYears;
