@@ -637,46 +637,6 @@ bool KivaManager::setupKivaInstances()
 				}
 			}
 
-			// Get combinations of wall constructions and wall heights -- each different
-			// combination gets its own Kiva instance. Combination map points each set
-			// of construction and wall height to the associated exposed perimeter and
-			// list of wall surface numbers.
-			std::map<std::pair<int, Real64>,WallGroup> combinationMap;
-
-			if ( wallSurfaces.size() != 0 ) {
-				for ( auto& wl : wallSurfaces ) {
-
-					auto&v = Surfaces( wl ).Vertex;
-					// Enforce quadrilateralism
-					if ( v.size() != 4) {
-						ErrorsFound = true;
-						ShowSevereError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
-						ShowContinueError( "Surface=\"" + Surfaces( wl ).Name + "\", has " + General::TrimSigDigits( v.size() ) + " vertices." );
-					}
-
-					// sort vertices by Z-value
-					std::vector<int> zs = {0, 1, 2, 3};
-					sort( zs.begin(),zs.end(),[v]( int a, int b ){return v[a].z < v[b].z;} );
-
-					Real64 perimeter = distance( v[zs[0]], v[zs[1]] );
-
-					Real64 surfHeight = ( v[zs[2]].z + v[zs[2]].z )/2.0 - ( v[zs[0]].z + v[zs[1]].z )/2.0;
-					// round to avoid numerical precision differences
-					surfHeight = std::round( ( surfHeight ) * 1000.0 ) / 1000.0;
-
-					if ( combinationMap.count( {Surfaces( wl ).Construction, surfHeight}) == 0) {
-						// create new combination
-						std::vector<int> walls = {wl};
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}] = WallGroup( perimeter, walls );
-					}
-					else {
-						// add to existing combination
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}].exposedPerimeter += perimeter;
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}].wallIDs.push_back( wl );
-					}
-				}
-			}
-
 			// Calculate total exposed perimeter attributes
 			std::vector<bool> isExposedPerimeter;
 
@@ -762,6 +722,46 @@ bool KivaManager::setupKivaInstances()
 			// Remaining exposed perimeter will be alloted to each instance as appropriate
 			Real64 remainingExposedPerimeter = totalExposedPerimeter;
 
+			// Get combinations of wall constructions and wall heights -- each different
+			// combination gets its own Kiva instance. Combination map points each set
+			// of construction and wall height to the associated exposed perimeter and
+			// list of wall surface numbers.
+			std::map<std::pair<int, Real64>,WallGroup> combinationMap;
+
+			if ( wallSurfaces.size() != 0 ) {
+				for ( auto& wl : wallSurfaces ) {
+
+					auto&v = Surfaces( wl ).Vertex;
+					// Enforce quadrilateralism
+					if ( v.size() != 4) {
+						ErrorsFound = true;
+						ShowSevereError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
+						ShowContinueError( "Surface=\"" + Surfaces( wl ).Name + "\", has " + General::TrimSigDigits( v.size() ) + " vertices." );
+					}
+
+					// sort vertices by Z-value
+					std::vector<int> zs = {0, 1, 2, 3};
+					sort( zs.begin(),zs.end(),[v]( int a, int b ){return v[a].z < v[b].z;} );
+
+					Real64 perimeter = distance( v[zs[0]], v[zs[1]] );
+
+					Real64 surfHeight = ( v[zs[2]].z + v[zs[2]].z )/2.0 - ( v[zs[0]].z + v[zs[1]].z )/2.0;
+					// round to avoid numerical precision differences
+					surfHeight = std::round( ( surfHeight ) * 1000.0 ) / 1000.0;
+
+					if ( combinationMap.count( {Surfaces( wl ).Construction, surfHeight}) == 0) {
+						// create new combination
+						std::vector<int> walls = {wl};
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}] = WallGroup( perimeter*exposedFraction, walls );
+					}
+					else {
+						// add to existing combination
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}].exposedPerimeter += perimeter*exposedFraction;
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}].wallIDs.push_back( wl );
+					}
+				}
+			}
+
 			// setup map to point floor surface to all related kiva instances
 			std::vector<std::pair<int, Kiva::Surface::SurfaceType>> floorSurfaceMaps;
 
@@ -804,8 +804,8 @@ bool KivaManager::setupKivaInstances()
 				fnd.exposedFraction = exposedFraction;
 
 
-				if ( foundationInputs[surface.OSCPtr].wallConstructionIndex > 0 ) {
-					auto& c = Constructs( foundationInputs[surface.OSCPtr].wallConstructionIndex );
+				if ( constructionNum > 0 ) {
+					auto& c = Constructs( constructionNum );
 
 					// Clear layers
 					fnd.wall.layers.clear();

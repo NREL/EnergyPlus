@@ -16586,7 +16586,7 @@ SurfaceProperty:ExposedFoundationPerimeter,
   N1 , \field Total Exposed Perimeter
        \type real
        \units m
-       \minimum> 0.0
+       \minimum 0.0
   N2 , \field Exposed Perimeter Fraction
        \type real
        \units dimensionless
