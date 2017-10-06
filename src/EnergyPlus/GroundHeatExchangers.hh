@@ -565,6 +565,9 @@ namespace GroundHeatExchangers {
 		std::string const & objectName
 	);
 
+	void
+	WriteGLHECacheFile();
+
 	// Object Data
 	extern std::vector < GLHEVert > verticalGLHE; // Vertical GLHEs
 	extern std::vector < GLHESlinky > slinkyGLHE; // Slinky GLHEs

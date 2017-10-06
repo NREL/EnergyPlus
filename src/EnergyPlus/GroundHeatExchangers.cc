@@ -608,6 +608,11 @@ namespace GroundHeatExchangers {
 		using DataGlobals::HoursInDay;
 		using DataGlobals::SecInHour;
 
+		if (  myRespFactors->LNTTS.size() > 0 ) {
+			// No g-functions to calculate
+			return;
+		}
+
 		DisplayString( "Initializing GroundHeatExchanger:System: " + name );
 
 		// Minimum simulation time for witch finite line source method is applicable
@@ -1663,6 +1668,17 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
+	WriteGLHECacheFile()
+	{
+		Json::Value obj;
+
+
+
+	}
+
+	//******************************************************************************
+
+	void
 	GetGroundHeatExchangerInput()
 	{
 		// SUBROUTINE INFORMATION:
@@ -2078,6 +2094,9 @@ namespace GroundHeatExchangers {
 				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name );
 				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, thisGLHE.aveFluidTemp, "System", "Average", thisGLHE.name );
 			}
+
+			WriteGLHECacheFile();
+
 		}
 
 		// SLINKY GLHE
