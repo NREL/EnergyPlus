@@ -11,7 +11,7 @@ This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole buildin
  - Many users of EnergyPlus are active on [Unmet Hours](https://unmethours.com/), so that's a great place to start if you have a question about EnergyPlus or building simulation.
  - For more in-depth, developer-driven support, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
 
-# Releases [![](https://img.shields.io/badge/latest%20release-8.6.0-orange.svg)](https://github.com/NREL/EnergyPlus/releases/latest)
+# Releases [![](https://img.shields.io/badge/latest%20release-8.8.0-orange.svg)](https://github.com/NREL/EnergyPlus/releases/latest)
 
 EnergyPlus is typically released twice annually, usually in March and September.  It is recommended all use of EnergyPlus is production workflows use these formal, public releases.  Iteration **(pre-)releases** may be created during a development cycle, however users should generally avoid these, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.  If an interim release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will accompany this type of release.
 
