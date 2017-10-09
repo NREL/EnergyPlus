@@ -339,14 +339,14 @@ namespace GroundHeatExchangers {
 
 			thisProps->grout.cp += thisBH->props->grout.cp / numBH;
 			thisProps->grout.diffusivity += thisBH->props->grout.diffusivity / numBH;
-			thisProps->grout.k += thisBH->props->grout.diffusivity / numBH;
-			thisProps->grout.rho += thisBH->props->grout.k / numBH;
+			thisProps->grout.k += thisBH->props->grout.k / numBH;
+			thisProps->grout.rho += thisBH->props->grout.rho / numBH;
 			thisProps->grout.rhoCp += thisBH->props->grout.rhoCp / numBH;
 
 			thisProps->pipe.cp += thisBH->props->pipe.cp / numBH;
 			thisProps->pipe.diffusivity += thisBH->props->pipe.diffusivity / numBH;
-			thisProps->pipe.k += thisBH->props->pipe.diffusivity / numBH;
-			thisProps->pipe.rho += thisBH->props->pipe.k / numBH;
+			thisProps->pipe.k += thisBH->props->pipe.k / numBH;
+			thisProps->pipe.rho += thisBH->props->pipe.rho / numBH;
 			thisProps->pipe.rhoCp += thisBH->props->pipe.rhoCp / numBH;
 
 			thisProps->pipe.outDia += thisBH->props->pipe.outDia / numBH;
@@ -512,7 +512,6 @@ namespace GroundHeatExchangers {
 	Real64
 	GLHEVert::integral(
 		MyCartesian const & point_i,
-		std::shared_ptr< GLHEVertSingleStruct > const & bh_i,
 		std::shared_ptr< GLHEVertSingleStruct > const & bh_j,
 		Real64 const & currTime
 	)
@@ -557,7 +556,7 @@ namespace GroundHeatExchangers {
 			int const lastIndex = bh_i->pointLocations_ii.size() - 1;
 			for( auto & thisPoint : bh_i->pointLocations_ii ) {
 
-				Real64 f = integral( thisPoint, bh_i, bh_j, currTime );
+				Real64 f = integral( thisPoint, bh_j, currTime );
 
 				// Integrate using Simpson's
 				if( index == 0 || index == lastIndex ) {
@@ -580,7 +579,7 @@ namespace GroundHeatExchangers {
 			int const lastIndex = bh_i->pointLocations_i.size() - 1;
 			for( auto & thisPoint : bh_i->pointLocations_i ) {
 
-				Real64 f = integral( thisPoint, bh_i, bh_j, currTime );
+				Real64 f = integral( thisPoint, bh_j, currTime );
 
 				// Integrate using Simpson's
 				if( index == 0 || index == lastIndex ) {
@@ -650,7 +649,7 @@ namespace GroundHeatExchangers {
 		}
 
 		// Calculate the g-functions
-		for( int lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index ) {
+		for( size_t lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index ) {
 			for( auto & bh_i : myRespFactors->myBorholes ) {
 				Real64 sum_T_ji = 0;
 				for( auto & bh_j : myRespFactors->myBorholes ) {
@@ -2048,6 +2047,7 @@ namespace GroundHeatExchangers {
 				thisGLHE.pipe.thickness = thisGLHE.myRespFactors->props->pipe.thickness;
 				thisGLHE.pipe.k = thisGLHE.myRespFactors->props->pipe.k;
 				thisGLHE.grout.k = thisGLHE.myRespFactors->props->grout.k;
+				thisGLHE.myRespFactors->gRefRatio = thisGLHE.bhRadius / thisGLHE.bhLength;
 
 				// Number of simulation years from RunPeriod
 				thisGLHE.myRespFactors->maxSimYears = MaxNumberSimYears;

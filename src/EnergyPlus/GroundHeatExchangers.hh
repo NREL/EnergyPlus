@@ -366,7 +366,6 @@ namespace GroundHeatExchangers {
 		Real64
 		integral(
 			MyCartesian const & point_i,
-			std::shared_ptr< GLHEVertSingleStruct > const & bh_i,
 			std::shared_ptr< GLHEVertSingleStruct > const & bh_j,
 			Real64 const & currTime
 		);
