@@ -153,6 +153,17 @@ The ground surface temperature is assumed to be the same as the air temperature.
 {h_{r,air}} = \frac{{\varepsilon \sigma {F_{sky}}\left( {1 - \beta } \right)(T_{surf}^4 - T_{air}^4)}}{{{T_{surf}} - {T_{air}}}}
 \end{equation}
 
+Optionally, however, the long wave radiation from surrounding surfaces to an exterior surface, can also be considered if explicitly defined. Then the equation above should be modified as:
+\begin{equation}
+q_{_{LWR}}^`` = \varepsilon \sigma[{F_{gnd}}(T_{gnd}^4 - T_{surf}^4) + {F_{sky}}(T_{sky}^4 - T_{surf}^4)  + {F_{s_1}}(T_{s_1}^4 - T_{surf}^4)+ ... + {F_{s_n}}(T_{s_n}^4 - T_{surf}^4) +  {F_{air}}(T_{air}^4 - T_{surf}^4)]
+\end{equation}
+
+where
+
+F\(_{s_i}\) = View factor of surrounding surface i to the exterior surface.
+
+T\(_{s_i}\) = Outside surface temperature of the surrounding surface i.
+
 \subsection{References}\label{references-034}
 
 ASHRAE. 1993. 1993 ASHRAE Handbook -- Fundamentals. Atlanta: American Society of Heating, Refrigerating, and Air-Conditioning Engineers, Inc.

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1408,7 +1409,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > MaterialProps( 27 ); // Temporary array to transfer material properties
 		int RegMat; // Regular Materials -- full property definition
 		int RegRMat; // Regular Materials -- R only property definition
-		int AirMat; // Air space materias in opaque constructions
+		int AirMat; // Air space materials in opaque constructions
 		int IRTMat; // Infrared Transmitting Materials -- R only property definition
 
 		int EcoRoofMat; // Materials for ecoRoof
@@ -1429,7 +1430,7 @@ namespace HeatBalanceManager {
 		Real64 TransmittivityVis; // Glass transmittivity, visible
 		static bool DoReport( false );
 		Real64 DenomRGas; // Denominator for WindowGas calculations of NominalR
-		Real64 Openness; // insect screen oppenness fraction = (1-d/s)^2
+		Real64 Openness; // insect screen openness fraction = (1-d/s)^2
 		Real64 minAngValue; // minimum value of angle
 		Real64 maxAngValue; // maximum value of angle
 		Real64 minLamValue; // minimum value of wavelength
@@ -1439,7 +1440,7 @@ namespace HeatBalanceManager {
 		static int iTC( 0 );
 		static int iMat( 0 );
 
-		// Added TH 7/27/2009 for constructions defined with F or C factro method
+		// Added TH 7/27/2009 for constructions defined with F or C factor method
 		int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
 		int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
@@ -1476,6 +1477,15 @@ namespace HeatBalanceManager {
 
 		TotFfactorConstructs = GetNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
+
+		if ( TotFfactorConstructs > 0 ) {
+			NoFfactorConstructionsUsed = false;
+		}
+
+		if ( TotCfactorConstructs > 0 ) {
+			NoCfactorConstructionsUsed = false;
+		}
+
 		if ( TotFfactorConstructs + TotCfactorConstructs >= 1 ) {
 			// Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
 			TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
@@ -3895,7 +3905,7 @@ namespace HeatBalanceManager {
 		//  Window5 data file
 		bool EOFonW5File; // True if EOF encountered reading Window5 data file
 		static bool NoRegularMaterialsUsed( true );
-		int MaterialLayerGroup; // window contruction layer material group index
+		int MaterialLayerGroup; // window construction layer material group index
 
 		int iMatGlass; // number of glass layers
 		Array1D_string WConstructNames;
@@ -3908,6 +3918,15 @@ namespace HeatBalanceManager {
 
 		TotFfactorConstructs = GetNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
+
+		if ( TotFfactorConstructs > 0 ) {
+			NoFfactorConstructionsUsed = false;
+		}
+
+		if ( TotCfactorConstructs > 0 ) {
+			NoCfactorConstructionsUsed = false;
+		}
+
 		TotComplexFenStates = GetNumObjectsFound( "Construction:ComplexFenestrationState" );
 		TotWindow5Constructs = GetNumObjectsFound( "Construction:WindowDataFile" );
 		TotWinEquivLayerConstructs = GetNumObjectsFound( "Construction:WindowEquivalentLayer" );
@@ -4116,8 +4135,8 @@ namespace HeatBalanceManager {
 		TotRegConstructs += TotSourceConstructs;
 		TotConstructs = TotRegConstructs;
 
-		if ( TotConstructs > 0 && NoRegularMaterialsUsed ) {
-			ShowSevereError( "This building has no thermal mass which can cause an unstable solution." );
+		if ( TotConstructs > 0 && ( NoRegularMaterialsUsed && NoCfactorConstructionsUsed && NoFfactorConstructionsUsed ) ) {
+			ShowWarningError( "This building has no thermal mass which can cause an unstable solution." );
 			ShowContinueError( "Use Material object for all opaque material definitions except very light insulation layers." );
 		}
 
@@ -4788,14 +4807,14 @@ namespace HeatBalanceManager {
 		}
 
 		// Zone outdoor environmental variables, used for zone infiltration/ventilation
-		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
-		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
-		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
-		SetupOutputVariable( "Zone Outdoor Air Wind Direction [degree]", Zone( ZoneLoop ).WindDir, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone( ZoneLoop ).WindDir, "Zone", "Average", Zone( ZoneLoop ).Name );
 
 
 		if ( FlagHybridModel ){
-			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate", OutputProcessor::Unit::ach, Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
 		}
 
 	}
@@ -4957,18 +4976,10 @@ namespace HeatBalanceManager {
 			SetOutAirNodes();
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
-						Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
-					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
-						Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
-					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
-						Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
-					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
-						Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
-					}
+					Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+					Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+					Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+					Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
 				}
 			}
 		}
@@ -6755,6 +6766,14 @@ Label1000: ;
 		// Count number of constructions defined with Ffactor or Cfactor method
 		TotFfactorConstructs = GetNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
+
+		if ( TotFfactorConstructs > 0 ) {
+			NoFfactorConstructionsUsed = false;
+		}
+
+		if ( TotCfactorConstructs > 0 ) {
+			NoCfactorConstructionsUsed = false;
+		}
 
 		// First create ground floor constructions defined with F factor method if any
 		CurrentModuleObject = "Construction:FfactorGroundFloor";

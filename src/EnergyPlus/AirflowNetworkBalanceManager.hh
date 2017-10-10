@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -249,12 +250,14 @@ namespace AirflowNetworkBalanceManager {
 
 	Real64
     CalcWindPressure(
-        int const curve, // Curve index, change this to pointer after curve refactor
-        Real64 const Vref, // Velocity at reference height
-        Real64 const height, // Node height for outdoor temperature calculation
-        Real64 const azimuth, // Azimuthal angle of surface
-        bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
-        bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
+		int const curve, // Curve index, change this to pointer after curve refactor
+		bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+		bool const relativeAngle, // True if the Cp curve angle is measured relative to the surface
+		Real64 const azimuth, // Azimuthal angle of surface
+		Real64 const windSpeed, // Wind velocity
+		Real64 const windDir, // Wind direction
+		Real64 const dryBulbTemp, // Air node dry bulb temperature
+		Real64 const humRat // Air node humidity ratio
     );
 
 	void

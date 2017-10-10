@@ -508,14 +508,6 @@
     1/2IN Gypsum,            !- Outside Layer
     1/2IN Gypsum;            !- Layer 2
 
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
 ! Common Materials
 
   Material,

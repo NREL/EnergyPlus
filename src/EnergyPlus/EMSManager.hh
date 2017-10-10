@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -85,7 +86,7 @@ namespace EMSManager {
 	// Functions
 	void
 	clear_state();
-	
+
 	void
 	CheckIfAnyEMS();
 
@@ -94,7 +95,7 @@ namespace EMSManager {
 	void
 	ManageEMS(
 		int const iCalledFrom, // indicates where subroutine was called from, parameters in DataGlobals.
-		bool & anyProgramRan, // true if any Erl programs ran for this call 
+		bool & anyProgramRan, // true if any Erl programs ran for this call
 		Optional_int_const ProgramManagerToRun = _ // specific program manager to run
 	);
 
@@ -138,7 +139,7 @@ namespace EMSManager {
 	);
 
 	bool
-	CheckIfNodeMoreInfoSensedByEMS( 
+	CheckIfNodeMoreInfoSensedByEMS(
 		int const nodeNum, // index of node being checked.
 		std::string const & varName
 	);

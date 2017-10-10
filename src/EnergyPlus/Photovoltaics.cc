@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -715,15 +716,15 @@ namespace Photovoltaics {
 			}}
 
 			//set up report variables CurrentModuleObject='Photovoltaics'
-			SetupOutputVariable( "Generator Produced DC Electric Power [W]", PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
-			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
-			SetupOutputVariable( "Generator PV Array Efficiency []", PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Power", OutputProcessor::Unit::W, PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
+			SetupOutputVariable( "Generator PV Array Efficiency", OutputProcessor::Unit::None, PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
 
 			// CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
 			if ( ( PVarray( PVnum ).PVModelType == iTRNSYSPVModel ) || ( PVarray( PVnum ).PVModelType == iSandiaPVModel ) ) {
-				SetupOutputVariable( "Generator PV Cell Temperature [C]", PVarray( PVnum ).Report.CellTemp, "System", "Average", PVarray( PVnum ).Name );
-				SetupOutputVariable( "Generator PV Short Circuit Current [A]", PVarray( PVnum ).Report.ArrayIsc, "System", "Average", PVarray( PVnum ).Name );
-				SetupOutputVariable( "Generator PV Open Circuit Voltage [V]", PVarray( PVnum ).Report.ArrayVoc, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Cell Temperature", OutputProcessor::Unit::C, PVarray( PVnum ).Report.CellTemp, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Short Circuit Current", OutputProcessor::Unit::A, PVarray( PVnum ).Report.ArrayIsc, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Open Circuit Voltage", OutputProcessor::Unit::V, PVarray( PVnum ).Report.ArrayVoc, "System", "Average", PVarray( PVnum ).Name );
 			}
 
 			// do some checks and setup

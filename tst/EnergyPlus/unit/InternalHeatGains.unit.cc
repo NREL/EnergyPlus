@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -50,15 +51,20 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <InternalHeatGains.hh>
-#include <HeatBalanceManager.hh>
-#include <ScheduleManager.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
-#include <HVACManager.hh>
 #include <DataLoopNode.hh>
+#include <DataSizing.hh>
+#include <DisplacementVentMgr.hh>
 #include <ExteriorEnergyUse.hh>
+#include <HeatBalanceManager.hh>
+#include <HeatBalanceInternalHeatGains.hh>
+#include <HVACManager.hh>
+#include <InternalHeatGains.hh>
+#include <OutputReportTabular.hh>
+#include <ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -441,3 +447,70 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 	NewPower = DataHeatBalance::ZoneITEq( 1 ).CPUPower + DataHeatBalance::ZoneITEq( 1 ).FanPower + DataHeatBalance::ZoneITEq( 1 ).UPSPower;
 	ASSERT_EQ( InitialPower, NewPower );
 }
+
+TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals) {
+
+	std::string const idf_objects = delimited_string({
+		"Version,8.5;",
+		"Zone,Zone1;",
+	});
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( has_err_output() );
+
+	bool ErrorsFound( false );
+	HeatBalanceManager::GetZoneData( ErrorsFound );
+	ASSERT_FALSE( ErrorsFound );
+	InternalHeatGains::GetInternalHeatGainsInput();
+
+	// Set up a simple convective gain for each gain type
+	int zoneNum = 1;
+	int numGainTypes = DataHeatBalance::NumZoneIntGainDeviceTypes;
+	Array1D< Real64 > convGains;
+	convGains.allocate( numGainTypes );
+	convGains = 0.0;
+	Real64 totConvGains = 0.0;
+	Real64 expectedTotConvGains = 0.0;
+
+	for (int gainType = 1; gainType <= numGainTypes; ++gainType ) {
+		convGains( gainType ) = 100 * gainType;
+		expectedTotConvGains += convGains( gainType );
+		SetupZoneInternalGain( zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes( gainType ), "Gain", gainType, convGains( gainType ) );
+	}
+
+	InternalHeatGains::UpdateInternalGainValues();
+
+	// Check total of all convective gains
+	InternalHeatGains::SumAllInternalConvectionGains( zoneNum, totConvGains );
+	EXPECT_EQ( totConvGains, expectedTotConvGains );
+
+	// Check subtotals used in zone component loads
+	DataEnvironment::TotDesDays = 1;
+	DataEnvironment::TotRunDesPersDays = 0;
+	DataSizing::CurOverallSimDay = 1;
+	DataGlobals::HourOfDay = 1;
+	DataGlobals::NumOfTimeStepInHour = 10;
+	DataGlobals::TimeStep = 1;
+	OutputReportTabular::AllocateLoadComponentArrays();
+	int timeStepInDay = ( DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
+		
+	DataGlobals::CompLoadReportIsReq = true;
+	DataGlobals::isPulseZoneSizing = false;
+	InternalHeatGains::GatherComponentLoadsIntGain();
+	totConvGains = OutputReportTabular::peopleInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::lightInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::equipInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::refrigInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::waterUseInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::hvacLossInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum ) + OutputReportTabular::powerGenInstantSeq( DataSizing::CurOverallSimDay, timeStepInDay, zoneNum );
+
+	// Legitimate gain types excluded from this total
+	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide ); // this is only used for CO2
+	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam ); // this is only used for generic contaminants
+	expectedTotConvGains -= convGains( DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular ); // this is included in Fenestration Conduction - Sensible Instant
+
+	// ** NOTE: If this unit test fails, the likely cause is that a new internal gain type was added, but it was not added to one of the subtotal types in InternalHeatGains::GatherComponentLoadsIntGain()
+	// this also means that the new type may be missing from other places that collect internal gains by subgroups, such as the room air models and output reporting for zone-level gains
+	// search for IntGainTypeOf_Lights for places where these types of subtotals occur and add the new type as appropriate
+	EXPECT_EQ( totConvGains, expectedTotConvGains );
+
+
+	// cleanup
+	convGains.deallocate();
+}
+

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -55,6 +56,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -3468,9 +3470,9 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 0.25;
@@ -3506,9 +3508,9 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 1.0;
@@ -3554,6 +3556,114 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
 
 }
+
+TEST_F( EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep )
+{
+	//Glazer - Sep 2017
+
+	displayDemandEndUse = true;
+	displayLEEDSummary = true;
+	DataGlobals::TimeStepZoneSec = 900.0;
+
+	int resourceNum = 1;
+	int totalMeterNum = 2;
+	int endUseMeterNum = 3;
+	int subEndUseMeterNum = 4;
+
+	int endUseNum = 1;
+	int subEndUseNum = 1;
+
+	meterNumEndUseSubBEPS.allocate( 10, 10, 10 );
+	gatherDemandEndUseSub.allocate( 10, 10, 10 );
+	gatherDemandIndEndUseSub.allocate( 10, 10, 10 );
+	EnergyMeters.allocate( 100 );
+
+	EndUseCategory.allocate( endUseNum );
+	EndUseCategory( endUseNum ).NumSubcategories = 1;
+
+	meterNumTotalsBEPS( resourceNum ) = totalMeterNum; // create a test meter number
+	gatherDemandTotal( resourceNum ) = 0.;
+
+	meterNumEndUseBEPS( resourceNum, endUseNum ) = endUseMeterNum;
+	gatherDemandEndUse( resourceNum, endUseNum ) = 0.;
+	gatherDemandIndEndUse( resourceNum, endUseNum ) = 0.;
+
+	meterNumEndUseSubBEPS( subEndUseNum, endUseNum, resourceNum ) = subEndUseMeterNum;
+	gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) = 0.;
+	gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) = 0.;
+
+	// first "timestep"
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 123.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 47.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 28.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 123., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 47., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 47., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 28., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 28., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+	// next "timestep" total higher
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 133.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 57.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 38.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 133., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 57., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 57., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 38., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 38., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+	// next "timestep" total lower but end use higher and sub end use higher
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 103.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 61.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 42.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 133., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 57., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 61., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 38., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 42., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+	// next "timestep" total higher but end use lower and sub end use lower
+
+	EnergyMeters( totalMeterNum ).CurTSValue = 143.0 * DataGlobals::TimeStepZoneSec; // create the current value for the total meter
+	EnergyMeters( endUseMeterNum ).CurTSValue = 59.0 * DataGlobals::TimeStepZoneSec; // create the current value for the end use meter
+	EnergyMeters( subEndUseMeterNum ).CurTSValue = 39.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+
+	GatherPeakDemandForTimestep( ZoneTSReporting );
+
+	EXPECT_EQ( 143., gatherDemandTotal( resourceNum ) );
+
+	EXPECT_EQ( 59., gatherDemandEndUse( resourceNum, endUseNum ) );
+	EXPECT_EQ( 61., gatherDemandIndEndUse( resourceNum, endUseNum ) );
+
+	EXPECT_EQ( 39., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+	EXPECT_EQ( 42., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
+
+
+	meterNumEndUseSubBEPS.deallocate();
+	gatherDemandEndUseSub.deallocate();
+	gatherDemandIndEndUseSub.deallocate();
+
+
+}
+
 
 
 TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
@@ -5991,9 +6101,9 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy [J]", extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
+	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 0.25;
@@ -6408,5 +6518,39 @@ TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
 
 }
 
+TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay )
+{
+	sqlite_test->sqliteBegin();
+	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+	EnergyPlus::sqlite = std::move( sqlite_test );
+
+	DataHVACGlobals::NumPrimaryAirSys = 1;
+	SysSizPeakDDNum.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	DataSizing::FinalSysSizing.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	DataSizing::CalcSysSizing.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	int numDesDays = 2;
+	DataAirLoop::AirToZoneNodeInfo.allocate( DataHVACGlobals::NumPrimaryAirSys );
+	DataGlobals::NumOfZones = 0;
+	displayAirLoopComponentLoadSummary = true;
+	CompLoadReportIsReq = true;
+	SysSizPeakDDNum( DataHVACGlobals::NumPrimaryAirSys ).TimeStepAtTotCoolPk.allocate( numDesDays );
+
+	SysSizPeakDDNum( DataHVACGlobals::NumPrimaryAirSys ).TotCoolPeakDD = 0; //set to zero to indicate no design day chosen
+	SysSizPeakDDNum( DataHVACGlobals::NumPrimaryAirSys ).HeatPeakDD = 0;    //set to zero to indicate no design day chosen
+
+	WriteLoadComponentSummaryTables();
+
+	sqlite_test = std::move( EnergyPlus::sqlite );
+
+	auto tabularData = queryResult( "SELECT * FROM TabularData;", "TabularData" );
+	auto strings = queryResult( "SELECT * FROM Strings;", "Strings" );
+	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
+	sqlite_test->sqliteCommit();
+
+	EXPECT_EQ( 460ul, tabularData.size() ); 
+	EXPECT_EQ( 76ul, strings.size() );
+	EXPECT_EQ( "AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
+
+}
 
 

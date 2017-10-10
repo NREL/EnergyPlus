@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -385,7 +386,8 @@ namespace DualDuct {
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperIndex ).ColdAirInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperIndex ).HotAirInletNodeNum;
 						Damper( DamperIndex ).ADUNum = ADUNum;
 					}
 				}
@@ -434,8 +436,8 @@ namespace DualDuct {
 				}
 				//Setup the Average damper Position output variable
 				// CurrentModuleObject='AirTerminal:DualDuct:ConstantVolume'
-				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position []", Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position []", Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
 
 			} // end Number of Damper Loop
 		}
@@ -480,7 +482,8 @@ namespace DualDuct {
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperIndex ).ColdAirInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperIndex ).HotAirInletNodeNum;
 						Damper( DamperIndex ).ADUNum = ADUNum;
 					}
 				}
@@ -533,9 +536,9 @@ namespace DualDuct {
 
 				//Setup the Average damper Position output variable
 				// CurrentModuleObject='AirTerminal:DualDuct:VAV'
-				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position []", Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position []", Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]", Damper( DamperNum ).OutdoorAirFlowRate, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", OutputProcessor::Unit::m3_s, Damper( DamperNum ).OutdoorAirFlowRate, "System", "Average", Damper( DamperNum ).DamperName );
 			} // end Number of Damper Loop
 		}
 
@@ -596,7 +599,8 @@ namespace DualDuct {
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperIndex ).OAInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperIndex ).RecircAirInletNodeNum;
 						Damper( DamperIndex ).ADUNum = ADUNum;
 					}
 				}
@@ -687,9 +691,9 @@ namespace DualDuct {
 				}
 
 				//Setup the Average damper Position output variable
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Duct Damper Position []", Damper( DamperNum ).OADamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Recirculated Air Duct Damper Position []", Damper( DamperNum ).RecircAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Fraction []", Damper( DamperNum ).OAFraction, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).OADamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Recirculated Air Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).RecircAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Fraction", OutputProcessor::Unit::None, Damper( DamperNum ).OAFraction, "System", "Average", Damper( DamperNum ).DamperName );
 
 			} // end Number of Damper Loop
 		}
@@ -865,16 +869,13 @@ namespace DualDuct {
 			MyEnvrnFlag( DamperNum ) = true;
 		}
 
-		// Find air loop associated with VAV dual duct or VAV:OutdoorAir terminal units
+		// Find air loop associated with this terminal unit
 		if ( MyAirLoopFlag( DamperNum ) ) {
-			if ( Damper( DamperNum ).DamperType == DualDuct_VariableVolume || Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
-				if ( Damper( DamperNum ).AirLoopNum == 0 ) {
-					if ( ( Damper( DamperNum ).CtrlZoneNum > 0 ) && ( Damper( DamperNum ).CtrlZoneInNodeIndex > 0 ) ){
-						Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).InletNodeAirLoopNum( Damper( DamperNum ).CtrlZoneInNodeIndex );
-						AirDistUnit( Damper( DamperNum ).ADUNum ).AirLoopNum = Damper( DamperNum ).AirLoopNum;
-					}
-				} else {
-					MyAirLoopFlag( DamperNum ) = false;
+			if ( Damper( DamperNum ).AirLoopNum == 0 ) {
+				if ( ( Damper( DamperNum ).CtrlZoneNum > 0 ) && ( Damper( DamperNum ).CtrlZoneInNodeIndex > 0 ) ){
+					Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).InletNodeAirLoopNum( Damper( DamperNum ).CtrlZoneInNodeIndex );
+					AirDistUnit( Damper( DamperNum ).ADUNum ).AirLoopNum = Damper( DamperNum ).AirLoopNum;
+					// Don't set MyAirLoopFlag to false yet because airloopnums might not be populated yet
 				}
 			} else {
 				MyAirLoopFlag( DamperNum ) = false;

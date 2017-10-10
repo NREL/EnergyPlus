@@ -100,18 +100,6 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-!!  RunPeriod,
-!!    10,                      !- Begin Month
-!!    1,                       !- Begin Day Of Month
-!!    9,                       !- End Month
-!!    30,                      !- End Day Of Month
-!!    Tuesday,                 !- Day Of Week For Start Day
-!!    Yes,                     !- Use WeatherFile Holidays/Special Days
-!!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-!!    No,                      !- Apply Weekend Holiday Rule
-!!    Yes,                     !- Use WeatherFile Rain Indicators
-!!    Yes;                     !- Use WeatherFile Snow Indicators
-
   Timestep,4;
 
 ! 6, 16 to 6, 19
@@ -359,12 +347,6 @@
     .0063;                   !- Thickness {m}
 
   Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
     Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
     LoE CLEAR 6MM,           !- Outside Layer
     AIR 6MM,                 !- Layer 2
@@ -411,8 +393,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   Zone,
     ZNF1,                    !- Name
@@ -422,8 +404,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   Zone,
     ZSF2,                    !- Name
@@ -433,8 +415,8 @@
     3.352800369,             !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   Zone,
     ZNF2,                    !- Name
@@ -444,8 +426,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   Zone,
     BASE-1,                  !- Name
@@ -455,8 +437,8 @@
     -2.438400269,            !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    2.438400269,             !- Ceiling Height {m}
-    724.992004395;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   GlobalGeometryRules,
     LowerLeftCorner,         !- Starting Vertex Position
@@ -830,6 +812,70 @@
     17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
     17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,-2.4384;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BASE-E,                  !- Name
+    WALL,                    !- Surface Type
+    SLABL,                   !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,17.588914871,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BASE-W,                  !- Name
+    WALL,                    !- Surface Type
+    SLABL,                   !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,17.588914871,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BASE-N,                  !- Name
+    WALL,                    !- Surface Type
+    SLABL,                   !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    0,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0,17.588914871,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,17.588914871,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BASE-S,                  !- Name
+    WALL,                    !- Surface Type
+    SLABL,                   !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,-2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     EWWndw,                  !- Name

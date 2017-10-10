@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1581,6 +1582,50 @@ namespace WindowManager {
 		// shade. These are used to calculate zone MRT contribution from window when
 		// interior blind/shade is deployed.
 
+		// Loop for BSDF windows
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			auto& surfaceWindow( SurfaceWindow( SurfNum ) );
+
+			if ( surfaceWindow.WindowModelType == WindowBSDFModel ) {
+				// Set shading flags for BSDF windows
+				// Set shading flags. This could be also done inside SurfaceWindow structure, however, order is important
+				if ( Construct( Surface( SurfNum ).Construction ).BSDFInput.BasisType != 0 ) {
+					surfaceWindow.WindowModelType = WindowBSDFModel;
+					// Set shading layer flags for windows
+					auto& construction( Construct( Surface( SurfNum ).Construction ) );
+					auto& surface_window( SurfaceWindow( SurfNum ) );
+					int TotLayers = construction.TotLayers;
+					for ( auto Lay = 1; Lay <= TotLayers; ++Lay ) {
+						int LayPtr = construction.LayerPoint( Lay );
+						auto& material( Material( LayPtr ) );
+						bool isShading = material.Group == ComplexWindowShade;
+						if ( isShading && Lay == 1 ) surface_window.ShadingFlag = ExtShadeOn;
+						if ( isShading && Lay == TotLayers ) surface_window.ShadingFlag = IntShadeOn;
+					}
+				}
+				if ( surfaceWindow.ShadingFlag == IntShadeOn ) {
+					auto& construction( Construct( Surface( SurfNum ).Construction ) );
+					int TotLay = construction.TotLayers;
+					int ShadingLayerPtr = construction.LayerPoint( TotLay );
+					ShadingLayerPtr = Material( ShadingLayerPtr ).ComplexShadePtr;
+					auto& complexShade = ComplexShade( ShadingLayerPtr );
+					auto TauShadeIR = complexShade.IRTransmittance;
+					auto EpsShadeIR = complexShade.BackEmissivity;
+					auto RhoShadeIR = max( 0.0, 1.0 - TauShadeIR - EpsShadeIR );
+					// Get properties of glass next to inside shading layer
+					int GlassLayPtr = construction.LayerPoint( TotLay - 2 );
+					auto EpsGlassIR = Material( GlassLayPtr ).AbsorpThermalBack;
+					auto RhoGlassIR = 1 - EpsGlassIR;
+
+					auto EffShBlEmiss = EpsShadeIR * ( 1.0 + RhoGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR ) );
+					surfaceWindow.EffShBlindEmiss[ 0 ] = EffShBlEmiss;
+					auto EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR );
+					surfaceWindow.EffGlassEmiss[ 0 ] = EffGlEmiss;
+				}
+			}
+		}
+
+		// Loop for ordinary windows
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
@@ -2365,6 +2410,7 @@ namespace WindowManager {
 		int SrdSurfNum; // Surrounding surface number DO loop counter
 		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
 		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+		Real64 OutSrdIR; // LWR from surrouding srfs
 
 		// New variables for thermochromic windows calc
 		Real64 locTCSpecTemp; // The temperature corresponding to the specified optical properties of the TC layer
@@ -2404,6 +2450,8 @@ namespace WindowManager {
 				thetas( i ) = window.ThetaFace( i );
 			}
 			hcout = HextConvCoeff;
+			hcin = HConvIn( SurfNum );
+			tin = MAT( surface.Zone ) + TKelvin; // Inside air temperature
 
 			// This is code repeating and it is necessary to calculate report variables.  Do not know
 			// how to solve this in more elegant way :(
@@ -2416,6 +2464,10 @@ namespace WindowManager {
 			} else { // Window not exposed to wind
 				tout = surface.OutDryBulbTemp + TKelvin;
 			}
+
+			Ebout = sigma * pow_4( tout );
+			Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + 
+				( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout;
 
 		} else if ( window.WindowModelType == WindowEQLModel ) {
 
@@ -2755,11 +2807,10 @@ namespace WindowManager {
 
 			} else { // Exterior window (Ext BoundCond = 0)
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
-				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				OutSrdIR = 0;
 				if ( AnyLocalEnvironmentsInModel ) {
 					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-						// Real64 test = surface.ViewFactorSkyIR;
 						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 							surface.ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
 						}
@@ -2769,7 +2820,7 @@ namespace WindowManager {
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-							QRadLWOutSrdSurfs( SurfNum ) += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+							OutSrdIR += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
 						}
 					}
 				}
@@ -2783,7 +2834,7 @@ namespace WindowManager {
 					tout = surface.OutDryBulbTemp + TKelvin;
 				}
 				Ebout = sigma * pow_4( tout );
-				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
+				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout + OutSrdIR;
 
 			}
 
@@ -2887,6 +2938,18 @@ namespace WindowManager {
 		QdotConvOutRep( SurfNum ) = -surface.Area * hcout * ( Tsout - tout );
 		QdotConvOutRepPerArea( SurfNum ) = -hcout * ( Tsout - tout );
 		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * TimeStepZoneSec;
+
+		QRadLWOutSrdSurfs( SurfNum ) = 0;
+		if ( AnyLocalEnvironmentsInModel ) {
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;					
+				for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+					SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+					SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+					QRadLWOutSrdSurfs( SurfNum ) += SurfOutsideEmiss * sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) - pow_4( Tsout ) );
+				}
+			}
+		}
 
 		Real64 const Tsout_4( pow_4( Tsout ) ); //Tuned To reduce pow calls and redundancies
 		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) + QRadLWOutSrdSurfs( SurfNum ) ) );

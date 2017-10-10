@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -760,8 +761,8 @@ namespace HVACManager {
 		PlantManageHalfLoopCalls = 0;
 		SetAllPlantSimFlagsToValue( true );
 		if ( ! SimHVACIterSetup ) {
-			SetupOutputVariable( "HVAC System Solver Iteration Count []", HVACManageIteration, "HVAC", "Sum", "SimHVAC" );
-			SetupOutputVariable( "Air System Solver Iteration Count []", RepIterAir, "HVAC", "Sum", "SimHVAC" );
+			SetupOutputVariable( "HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC" );
+			SetupOutputVariable( "Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC" );
 			ManageSetPoints(); //need to call this before getting plant loop data so setpoint checks can complete okay
 			GetPlantLoopData();
 			GetPlantInput();
@@ -774,8 +775,8 @@ namespace HVACManager {
 			}
 
 			if ( TotNumLoops > 0 ) {
-				SetupOutputVariable( "Plant Solver Sub Iteration Count []", PlantManageSubIterations, "HVAC", "Sum", "SimHVAC" );
-				SetupOutputVariable( "Plant Solver Half Loop Calls Count []", PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC" );
+				SetupOutputVariable( "Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, PlantManageSubIterations, "HVAC", "Sum", "SimHVAC" );
+				SetupOutputVariable( "Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC" );
 				for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 					// init plant sizing numbers in main plant data structure
 					InitOneTimePlantSizingInfo( LoopNum );
@@ -2593,7 +2594,13 @@ namespace HVACManager {
 			// check to see if a controlled zone is served exclusively by a zonal system
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 				ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-				if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == 0 && ZoneEquipConfig( ControlledZoneNum ).NumInletNodes == ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes ) {
+				bool airLoopFound = false;
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					if( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) > 0 ) {
+						airLoopFound = true;
+					}
+				}
+				if ( !airLoopFound && ZoneEquipConfig( ControlledZoneNum ).NumInletNodes == ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes ) {
 					ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly = true;
 				}
 			}
@@ -2603,10 +2610,12 @@ namespace HVACManager {
 				if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 				ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
 				CyclingFan = false;
-				AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-				if ( AirLoopNum > 0 ) {
-					if ( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr > 0 ) {
-						CyclingFan = CheckScheduleValue( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr, 0.0 );
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
+					if ( AirLoopNum > 0 ) {
+						if ( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr > 0 ) {
+							CyclingFan = CheckScheduleValue( AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr, 0.0 );
+						}
 					}
 				}
 				if ( ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly || CyclingFan ) {
@@ -2643,23 +2652,24 @@ namespace HVACManager {
 				}
 			}
 		}
-		// set the zone level NoHeatToReturnAir flag and the ZoneEquip fan operation mode
+		// set the zone level NoHeatToReturnAir flag 
+		// if any air loop in the zone is continuous fan, then set NoHeatToReturnAir = false and sort it out node-by-node
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 			if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 			ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-			AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-			if ( AirLoopNum > 0 ) {
-				ZoneEquipConfig( ControlledZoneNum ).FanOpMode = AirLoopControlInfo( AirLoopNum ).FanOpMode;
-			} else {
-				ZoneEquipConfig( ControlledZoneNum ).FanOpMode = 0;
-			}
-			if ( ZoneEquipConfig( ControlledZoneNum ).FanOpMode == CycFanCycCoil || ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly ) {
-				Zone( ZoneNum ).NoHeatToReturnAir = true;
-			} else {
-				Zone( ZoneNum ).NoHeatToReturnAir = false;
+			Zone( ZoneNum ).NoHeatToReturnAir = true;
+			if ( ! ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly ) {
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					AirLoopNum = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
+					if ( AirLoopNum > 0 ) {
+						if ( AirLoopControlInfo( AirLoopNum ).FanOpMode == ContFanCycCoil ) {
+							Zone( ZoneNum ).NoHeatToReturnAir = false;
+							break;
+						}
+					}
+				}
 			}
 		}
-
 	}
 
 

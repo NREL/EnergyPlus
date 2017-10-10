@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -62,6 +63,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -240,6 +242,7 @@ namespace OutputReportTabular {
 	// arrays the hold the demand values
 	extern Array1D< Real64 > gatherDemandTotal;
 	extern Array2D< Real64 > gatherDemandEndUse;
+	extern Array2D< Real64 > gatherDemandIndEndUse;
 	extern Array3D< Real64 > gatherDemandEndUseSub;
 	extern Array3D< Real64 > gatherDemandIndEndUseSub;
 	extern Array1D_int gatherDemandTimeStamp;
@@ -410,7 +413,7 @@ namespace OutputReportTabular {
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
-		std::string units; // the units string, may be blank
+		OutputProcessor::Unit units; // the units enumeration
 		std::string ScheduleName; // the name of the schedule
 		int scheduleIndex; // index to the schedule specified - if no schedule use zero
 
@@ -516,7 +519,7 @@ namespace OutputReportTabular {
 		std::string variMeter; // the name of the variable or meter
 		std::string colHead; // the column header to use instead of the variable name (only for predefined)
 		int aggregate; // the type of aggregation for the variable (see aggType parameters)
-		std::string varUnits; // Units sting, may be blank
+		OutputProcessor::Unit varUnits; // Units enumeration
 		std::string variMeterUpper; // the name of the variable or meter uppercased
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int keyCount; // noel
@@ -528,6 +531,7 @@ namespace OutputReportTabular {
 		// Default Constructor
 		MonthlyFieldSetInputType() :
 			aggregate( 0 ),
+			varUnits( OutputProcessor::Unit::None ),
 			typeOfVar( 0 ),
 			keyCount( 0 ),
 			varAvgSum( 1 ),
@@ -560,7 +564,7 @@ namespace OutputReportTabular {
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
-		std::string units; // the units string, may be blank
+		OutputProcessor::Unit units; // the units string, may be blank
 		int aggType; // index to the type of aggregation (see list of parameters)
 		Array1D< Real64 > reslt; // monthly results
 		Array1D< Real64 > duration; // the time during which results are summed for use in averages
@@ -574,6 +578,7 @@ namespace OutputReportTabular {
 			typeOfVar( 0 ),
 			avgSum( 0 ),
 			stepType( 0 ),
+			units( OutputProcessor::Unit::None ),
 			aggType( 0 ),
 			reslt( 12, 0.0 ),
 			duration( 12, 0.0 ),

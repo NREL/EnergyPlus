@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -425,6 +426,10 @@ namespace DataHeatBalance {
 	extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
 	extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
 	extern bool AdaptiveComfortRequested_ASH55; // true if people objects have adaptive comfort requests. ASH55
+
+	extern bool NoFfactorConstructionsUsed;
+	extern bool NoCfactorConstructionsUsed;
+
 	extern int NumRefrigeratedRacks; // Total number of refrigerated case compressor racks in input
 	extern int NumRefrigSystems; // Total number of detailed refrigeration systems in input
 	extern int NumRefrigCondensers; // Total number of detailed refrigeration condensers in input
@@ -1320,6 +1325,10 @@ namespace DataHeatBalance {
 		Real64 ExtGrossGroundWallArea_Multiplied; // Ground contact Wall Area for Zone (Gross) with multipliers
 		int SystemZoneNodeNumber; // This is the zone node number for the system for a controlled zone
 		bool IsControlled; // True when this is a controlled zone.
+		bool IsSupplyPlenum; // True when this zone is a supply plenum
+		bool IsReturnPlenum; // True when this zone is a return plenum
+		int ZoneEqNum; // Controlled zone equip config number
+		int PlenumCondNum; // Supply or return plenum conditions number, 0 if this is not a plenum zone
 		int TempControlledZoneIndex; // this is the index number for TempControlledZone structure for lookup
 		//            Pointers to Surface Data Structure
 		int SurfaceFirst; // First Surface in Zone
@@ -1418,6 +1427,10 @@ namespace DataHeatBalance {
 			ExtGrossGroundWallArea_Multiplied( 0.0 ),
 			SystemZoneNodeNumber( 0 ),
 			IsControlled( false ),
+			IsSupplyPlenum( false ),
+			IsReturnPlenum( false ),
+			ZoneEqNum ( 0 ),
+			PlenumCondNum( 0 ),
 			TempControlledZoneIndex( 0 ),
 			SurfaceFirst( 0 ),
 			SurfaceLast( 0 ),
@@ -1670,7 +1683,7 @@ namespace DataHeatBalance {
 		bool FractionReturnAirIsCalculated;
 		Real64 FractionReturnAirPlenTempCoeff1;
 		Real64 FractionReturnAirPlenTempCoeff2;
-		int ReturnNodePtr;
+		int ZoneReturnNum; // zone return index (not the node number) for return heat gain
 		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
 		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
 		bool ManageDemand; // Flag to indicate whether to use demand limiting
@@ -1707,7 +1720,7 @@ namespace DataHeatBalance {
 			FractionReturnAirIsCalculated( false ),
 			FractionReturnAirPlenTempCoeff1( 0.0 ),
 			FractionReturnAirPlenTempCoeff2( 0.0 ),
-			ReturnNodePtr( 1 ),
+			ZoneReturnNum( 1 ),
 			NomMinDesignLevel( 0.0 ),
 			NomMaxDesignLevel( 0.0 ),
 			ManageDemand( false ),

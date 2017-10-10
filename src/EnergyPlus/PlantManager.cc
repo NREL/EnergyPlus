@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -453,7 +454,7 @@ namespace PlantManager {
 					}
 				}
 			} else {
-				ShowWarningError( "Input error: " + cAlphaFieldNames( 2 ) + '=' + Alpha( 2 ) + "entered, in " + CurrentModuleObject + '=' + Alpha( 1 ) );
+				ShowWarningError( "Input error: " + cAlphaFieldNames( 2 ) + '=' + Alpha( 2 ) + " entered, in " + CurrentModuleObject + '=' + Alpha( 1 ) );
 				ShowContinueError( "Will default to Water." );
 
 				this_loop.FluidType = NodeType_Water;
@@ -711,7 +712,7 @@ namespace PlantManager {
 		// outside the IF statement.
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 
-			SetupOutputVariable( "Plant System Cycle On Off Status []", PlantAvailMgr( LoopNum ).AvailStatus, "Plant", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant System Cycle On Off Status", OutputProcessor::Unit::None, PlantAvailMgr( LoopNum ).AvailStatus, "Plant", "Average", PlantLoop( LoopNum ).Name );
 
 		}
 
@@ -2015,18 +2016,18 @@ namespace PlantManager {
 				CurrentModuleObject = "Cond Loop";
 			}
 			// CurrentModuleObject='Plant/Condenser Loop'
-			SetupOutputVariable( "Plant Supply Side Cooling Demand Rate [W]", PlantReport( LoopNum ).CoolingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Heating Demand Rate [W]", PlantReport( LoopNum ).HeatingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Inlet Mass Flow Rate [kg/s]", PlantReport( LoopNum ).InletNodeFlowrate, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Cooling Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).CoolingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Heating Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).HeatingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Inlet Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantReport( LoopNum ).InletNodeFlowrate, "System", "Average", PlantLoop( LoopNum ).Name );
 
-			SetupOutputVariable( "Plant Supply Side Inlet Temperature [C]", PlantReport( LoopNum ).InletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Outlet Temperature [C]", PlantReport( LoopNum ).OutletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Inlet Temperature", OutputProcessor::Unit::C, PlantReport( LoopNum ).InletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Outlet Temperature", OutputProcessor::Unit::C, PlantReport( LoopNum ).OutletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
 
-			SetupOutputVariable( "Plant Supply Side Not Distributed Demand Rate [W]", PlantReport( LoopNum ).DemandNotDispatched, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Unmet Demand Rate [W]", PlantReport( LoopNum ).UnmetDemand, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Not Distributed Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).DemandNotDispatched, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Unmet Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).UnmetDemand, "System", "Average", PlantLoop( LoopNum ).Name );
 
 			// Debug variables -- used by OSU developers
-			SetupOutputVariable( "Debug Plant Loop Bypass Fraction []", PlantReport( LoopNum ).BypassFrac, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Debug Plant Loop Bypass Fraction", OutputProcessor::Unit::None, PlantReport( LoopNum ).BypassFrac, "System", "Average", PlantLoop( LoopNum ).Name );
 			//    CALL SetupOutputVariable('Debug SSInletNode Flowrate[kg/s]', &
 			//           PlantReport(LoopNum)%InletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
 			//    CALL SetupOutputVariable('Debug SSInletNode Temperature[C]', &
@@ -2035,26 +2036,26 @@ namespace PlantManager {
 			//           PlantReport(LoopNum)%OutletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
 			//    CALL SetupOutputVariable('Debug SSOutletNode Temperature[C]', &
 			//           PlantReport(LoopNum)%OutletNodeTemperature,'System','Average',PlantLoop(LoopNum)%Name)
-			SetupOutputVariable( "Debug Plant Last Simulated Loop Side []", PlantReport( LoopNum ).LastLoopSideSimulated, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Debug Plant Last Simulated Loop Side", OutputProcessor::Unit::None, PlantReport( LoopNum ).LastLoopSideSimulated, "System", "Average", PlantLoop( LoopNum ).Name );
 		}
 
 		// setup more variables inside plant data structure
 		// CurrentModuleObject='Plant/Condenser Loop(Advanced)'
 		if ( DisplayAdvancedReportVariables ) {
 			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
-				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
-				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature", OutputProcessor::Unit::C, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature", OutputProcessor::Unit::C, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time", OutputProcessor::Unit::hr, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time", OutputProcessor::Unit::hr, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
 				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 							if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType != DemandOpSchemeType ) {
-								SetupOutputVariable( "Plant Component Distributed Demand Rate [W]", PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad, "System", "Average", PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Name );
+								SetupOutputVariable( "Plant Component Distributed Demand Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad, "System", "Average", PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Name );
 							}
 						}
 					}
