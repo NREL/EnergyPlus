@@ -1144,7 +1144,7 @@ namespace SimAirServingZones {
 						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
 						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
 							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
-								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
+								CompType = OutsideAirSys( OASysNum ).ComponentType( OACompNum );
 								if (SameString( CompType, "Coil:Heating:Water" )) {
 									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
 								}
