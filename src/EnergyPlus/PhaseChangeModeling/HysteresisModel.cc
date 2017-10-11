@@ -299,7 +299,7 @@ namespace EnergyPlus {
 			//	Tc                  ! Critical (Melting/Freezing) Temperature of PCM
 			//	Tau1                ! Width of Melting Zone low
 			//	Tau2                ! Width of Melting Zone high
-			//	EnthalpyOld         ! Previos Timestep Nodal Enthalpy
+			//	EnthalpyOld         ! Previous Timestep Nodal Enthalpy
 			//	EnthalpyNew         ! Current Timestep Nodal Enthalpy
 
 			Real64 T = temperatureCurrent;
