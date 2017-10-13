@@ -51,6 +51,9 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
+// JSON Headers
+#include <nlohmann/json.hpp>
+
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
@@ -259,6 +262,7 @@ namespace GroundHeatExchangers {
 		Real64 QGLHE; // [W] heat transfer rate
 		bool myFlag;
 		bool myEnvrnFlag;
+		bool gFunctionsExist;
 		Real64 lastQnSubHr;
 		Real64 HXResistance; // The thermal resistance of the GHX, (K per W/m)
 		Real64 totalTubeLength; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
@@ -289,6 +293,7 @@ namespace GroundHeatExchangers {
 			QGLHE( 0.0 ),
 			myFlag( true ),
 			myEnvrnFlag( true ),
+			gFunctionsExist( false ),
 			lastQnSubHr( 0.0 ),
 			HXResistance( 0.0 ),
 			timeSS( 0.0 ),
@@ -343,6 +348,7 @@ namespace GroundHeatExchangers {
 		Real64 bhRadius; // Radius of borehole {m}
 		Real64 bhLength; // Length of borehole {m}
 		Real64 bhUTubeDist; // Distance between u-tube legs {m}
+		nlohmann::json myCacheData;
 
 		GLHEVert() :
 			bhDiameter( 0.0 ),
@@ -393,6 +399,15 @@ namespace GroundHeatExchangers {
 		getGFunc(
 			Real64 const time
 		);
+
+		void
+		MakeCache();
+
+		void
+		ReadCache();
+
+		void
+		WriteCache();
 
 	};
 
@@ -563,9 +578,6 @@ namespace GroundHeatExchangers {
 	GetVertArray(
 		std::string const & objectName
 	);
-
-	void
-	WriteGLHECacheFile();
 
 	// Object Data
 	extern std::vector < GLHEVert > verticalGLHE; // Vertical GLHEs
