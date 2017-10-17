@@ -143,6 +143,7 @@ public:
 	FoundationKiva defaultFoundation;
 	std::vector<FoundationKiva> foundationInputs;
 	std::vector<KivaInstanceMap> kivaInstances;
+	Real64 timestep;
 
 
 

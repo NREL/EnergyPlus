@@ -1067,7 +1067,7 @@ void KivaManager::calcKivaInstances()
 	for ( auto& kv : kivaInstances ) {
 		auto& grnd = kv.ground;
 		kv.setBoundaryConditions();
-		grnd.calculate( kv.bcs,DataGlobals::MinutesPerTimeStep*60. );
+		grnd.calculate( kv.bcs, timestep);
 		grnd.calculateSurfaceAverages();
 		kv.reportKivaSurfaces();
 		if ( DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1 ) {
