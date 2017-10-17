@@ -980,6 +980,27 @@ bool KivaManager::setupKivaInstances()
 		surfNum++;
 	}
 
+	// Loop through Foundation surfaces and make sure they are all assigned to an instance
+	for ( std::size_t surfNum = 1; surfNum <= Surfaces.size(); ++surfNum ) {
+		if ( Surfaces( surfNum ).ExtBoundCond == DataSurfaces::KivaFoundation ) {
+			if ( surfaceMap[surfNum].size() == 0 ) {
+				ErrorsFound = true;
+				ShowSevereError( "Surface=\""+ Surfaces( surfNum ).Name + "\" has a 'Foundation' Outside Boundary Condition" );
+				ShowContinueError( "  referencing Foundation:Kiva=\"" + foundationInputs[Surfaces( surfNum ).OSCPtr].name + "\"." );
+				if ( Surfaces( surfNum ).Class == DataSurfaces::SurfaceClass_Wall ) {
+					ShowContinueError( "  You must also reference Foundation:Kiva=\"" + foundationInputs[Surfaces( surfNum ).OSCPtr].name + "\"" );
+					ShowContinueError( "  in a floor surface within the same Zone=\"" + DataHeatBalance::Zone( Surfaces( surfNum ).Zone ).Name + "\"." );
+				} else if ( Surfaces( surfNum ).Class == DataSurfaces::SurfaceClass_Floor ) {
+					ShowContinueError( "  However, this floor was never assigned to a Kiva instance." );
+					ShowContinueError( "  This should not occur for floor surfaces. Please report to EnergyPlus Development Team." );
+				} else {
+					ShowContinueError( "  Only floor and wall surfaces are allowed to reference 'Foundation' Outside Boundary Conditions." );
+					ShowContinueError( "  Surface=\"" + Surfaces( surfNum ).Name + "\", is not a floor or wall." );
+				}
+			}
+		}
+	}
+
 	gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed Perimeter, Perimeter Fraction, Wall Height, Wall Construction, Floor Surface, Wall Surface(s)";
 	std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A',',A',',A,A)";
 	for ( auto& kv : kivaInstances ) {
@@ -1132,6 +1153,7 @@ Real64 KivaManager::getValue(
 	Real64 h = 0.0;
 	Real64 q = 0.0;
 	Real64 Tz = DataHeatBalFanSys::MAT( DataSurfaces::Surface( surfNum ).Zone ) + DataGlobals::KelvinConv;
+	assert(surfaceMap[surfNum].size() > 0);
 	for ( auto& i : surfaceMap[surfNum] ) {
 		auto& kI = kivaInstances[i.first];
 		auto& st = i.second;
