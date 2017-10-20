@@ -915,7 +915,7 @@ Figure~\ref{fig:short-time-step-g-function-curve-as-an} shows the \emph{g}-funct
 
 The \emph{g}-functions developed by Eskilson are valid only after time estimated by Eskilson as \(5r_b^2/\alpha\) . This time varies from 3-6 hours for a typical borehole field. This is because the analytical line source model, based on which the Eskilson's model was developed, does not give a prompt increase in borehole wall temperature at \(r = {r_b}\) . It gives acceptable results only after the non-dimensional times of \(\alpha t/r_b^2 > 5\) . But to model short time responses of a borehole we need response factors, which can give accurate results down to minutes.
 
-In order to generate the response factors on the fly, EnergyPlus uses the model developed by Marcotte \& Pasquier(2009) which uses a discretized line source model. The \emph{g}-functions are generated using the following equation.
+In order to generate the response factors on the fly, EnergyPlus uses the model developed by Marcotte \& Pasquier(2009) which uses a discretized line source model. The \emph{g}-functions are generated using the following equation. The model estimates surface effects by creating ``imaginary" boreholes which are mirrored about the ground surface.
 
 \begin{equation}
 g = \frac{1}{2 H_T} \sum_{i=1}^N \sum_{j=1}^N \left( \int_{u_1^i}^{u_2^i} \int_{u_1^i}^{u_2^i} \frac{\erfc\left( \frac{d(u_i, u_j)}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j)} - \frac{\erfc\left( \frac{d(u_i, u_j^{'})}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j^{'})}\right)
@@ -933,6 +933,7 @@ where
 	d(u_i, u_j) &= \mbox{Distance between current point and point on other borehole} \\
 	d(u_i, u_j^{'}) &= \mbox{Distance between current point and point on other imaginary borehole}
 \end{align}
+
 
 \subsubsection{Short Time-Step Response Factors}\label{short-time-step-response-factors}
 

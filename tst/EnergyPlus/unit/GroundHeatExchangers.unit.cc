@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -761,7 +762,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors
 	EXPECT_EQ( 1, responseFactorsVector.size() );
 	EXPECT_EQ( 1, verticalGLHE.size() );
 
-	auto & thisProp( vertPropsVector[0] );
 	auto & thisRF( responseFactorsVector[0] );
 	auto & thisGLHE( verticalGLHE[0] );
 
@@ -832,7 +832,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check 
 	EXPECT_EQ( 1, vertArraysVector.size() );
 	EXPECT_EQ( 1, verticalGLHE.size() );
 
-	auto & thisProp( vertPropsVector[0] );
 	auto & thisArray( vertArraysVector[0] );
 	auto & thisGLHE( verticalGLHE[0] );
 
@@ -924,7 +923,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_C
 	EXPECT_EQ( 4, singleBoreholesVector.size() );
 	EXPECT_EQ( 1, verticalGLHE.size() );
 
-	auto & thisProp( vertPropsVector[0] );
 	auto & thisGLHE( verticalGLHE[0] );
 
 	EXPECT_EQ( "VERTICAL GHE 1X4 STD", thisGLHE.name );
@@ -939,4 +937,101 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_C
 	EXPECT_EQ( 0, thisGLHE.myRespFactors->maxSimYears );
 	EXPECT_EQ( 440, thisGLHE.totalTubeLength );
 	EXPECT_EQ( thisGLHE.soil.k / thisGLHE.soil.rhoCp, thisGLHE.soil.diffusivity );
+}
+
+TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_Long_Timestep_g_Function_Check )
+{
+	using namespace DataSystemVariables;
+
+	std::string const idf_objects = delimited_string( {
+		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+		"	KATemps,                 !- Name",
+		"	1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+		"	920,                     !- Soil Density {kg/m3}",
+		"	2200,                    !- Soil Specific Heat {J/kg-K}",
+		"	15.5,                    !- Average Soil Surface Temperature {C}",
+		"	3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+		"	8;                       !- Phase Shift of Minimum Surface Temperature {days}",
+
+		"GroundHeatExchanger:Vertical:Properties,",
+		"	GHE-1 Props,        !- Name",
+		"	1,                  !- Depth of Top of Borehole {m}",
+		"	100,                !- Borehole Length {m}",
+		"	0.109982,           !- Borehole Diameter {m}",
+		"	0.744,              !- Grout Thermal Conductivity {W/m-K}",
+		"	3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}",
+		"	0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+		"	0.0267,             !- Pipe Outer Diameter {m}",
+		"	0.00243,            !- Pipe Thickness {m}",
+		"	0.01887;            !- U-Tube Distance {m}",
+
+		"GroundHeatExchanger:Vertical:Single,",
+		"	GHE-1,              !- Name",
+		"	GHE-1 Props,        !- GHE Properties",
+		"	0,                  !- X Location {m}",
+		"	0;                  !- Y Location {m}",
+
+		"GroundHeatExchanger:Vertical:Single,",
+		"	GHE-2,              !- Name",
+		"	GHE-1 Props,        !- GHE Properties",
+		"	5.0,                !- X Location {m}",
+		"	0;                  !- Y Location {m}",
+
+		"GroundHeatExchanger:Vertical:Single,",
+		"	GHE-3,              !- Name",
+		"	GHE-1 Props,        !- GHE Properties",
+		"	0,                  !- X Location {m}",
+		"	5.0;                !- Y Location {m}",
+
+		"GroundHeatExchanger:Vertical:Single,",
+		"	GHE-4,              !- Name",
+		"	GHE-1 Props,        !- GHE Properties",
+		"	5.0,                !- X Location {m}",
+		"	5.0;                !- Y Location {m}",
+
+		"GroundHeatExchanger:System,",
+		"	Vertical GHE 1x4 Std,  !- Name",
+		"	GHLE Inlet,         !- Inlet Node Name",
+		"	GHLE Outlet,        !- Outlet Node Name",
+		"	0.0007571,          !- Design Flow Rate {m3/s}",
+		"	Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+		"	KATemps,            !- Undisturbed Ground Temperature Model Name",
+		"	2.423,              !- Ground Thermal Conductivity {W/m-K}",
+		"	2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
+		"	,					!- Response Factors Object Name",
+		"	,                   !- GHE Array Object Name",
+		"	GHE-1,              !- GHE Borehole Definition 1",
+		"	GHE-2,              !- GHE Borehole Definition 2",
+		"	GHE-3,              !- GHE Borehole Definition 3",
+		"	GHE-4;              !- GHE Borehole Definition 4"
+	} );
+
+	DisableCaching = true;
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	GetGroundHeatExchangerInput();
+
+	auto & thisGLHE( verticalGLHE[0] );
+
+	thisGLHE.myRespFactors->maxSimYears = 1;
+
+	thisGLHE.calcGFunctions();
+
+	Real64 tolerance = 0.1;
+
+	// Test g-function values from GLHEPro
+	EXPECT_NEAR( thisGLHE.interpGFunc( -9.604849 ), 1.93, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -9.104849 ), 2.20, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -8.604849 ), 2.48, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -8.104849 ), 2.78, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -7.604849 ), 3.02, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -7.104849 ), 3.27, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -6.604849 ), 3.52, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -6.104849 ), 3.81, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -5.604849 ), 4.15, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -5.104849 ), 4.56, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -4.604849 ), 5.10, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -4.104849 ), 5.71, tolerance );
+	EXPECT_NEAR( thisGLHE.interpGFunc( -3.604849 ), 6.45, tolerance );
 }

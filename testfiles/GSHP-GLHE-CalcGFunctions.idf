@@ -916,13 +916,13 @@
     GHE-1 Props,        !- Name
     1,                  !- Depth of Top of Borehole {m}
     100,                !- Borehole Length {m}
-    0.05715,            !- Borehole Diameter {m}
+    0.109982,           !- Borehole Diameter {m}
     0.744,              !- Grout Thermal Conductivity {W/m-K}
-    2.56E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
-    0.4,                !- Pipe Thermal Conductivity {W/m-K}
+    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
+    0.389,              !- Pipe Thermal Conductivity {W/m-K}
     0.0267,             !- Pipe Outer Diameter {m}
     0.00243,            !- Pipe Thickness {m}
-    0.0254;             !- U-Tube Distance {m}
+    0.01887;            !- U-Tube Distance {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:VERTICAL:ARRAY ===========
 
@@ -931,7 +931,9 @@
     GHE-1 Props,        !- GHE Properties
     2,                  !- Number of Boreholes in X Direction
     2,                  !- Number of Boreholes in Y Direction
-    4;                  !- Borehole Spacing {m}
+    5;                  !- Borehole Spacing {m}
+
+!-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:VERTICAL:SINGLE ===========
 
   GroundHeatExchanger:Vertical:Single,
     GHE-1,              !- Name
@@ -942,26 +944,28 @@
   GroundHeatExchanger:Vertical:Single,
     GHE-2,              !- Name
     GHE-1 Props,        !- GHE Properties
-    2,                  !- X Location {m}
+    5.5,                !- X Location {m}
     0;                  !- Y Location {m}
 
   GroundHeatExchanger:Vertical:Single,
     GHE-3,              !- Name
     GHE-1 Props,        !- GHE Properties
     0,                  !- X Location {m}
-    2;                  !- Y Location {m}
+    5.5;                !- Y Location {m}
 
-   GroundHeatExchanger:Vertical:Single,
+GroundHeatExchanger:Vertical:Single,
     GHE-4,              !- Name
     GHE-1 Props,        !- GHE Properties
-    2,                  !- X Location {m}
-    2;                  !- Y Location {m}
+    5.5,                !- X Location {m}
+    5.5;                !- Y Location {m}
+
+!-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:ResponseFactors ===========
 
   GroundHeatExchanger:ResponseFactors,
     GHE-1 g-functions,       !- Name
     GHE-1 Props,             !- GHE Properties
     4,                       !- Number of Boreholes
-    0.00043,                 !- G-Function Reference Ratio {dimensionless}
+    0.0005,                  !- G-Function Reference Ratio {dimensionless}
     -15.585075,              !- G-Function Ln(T/Ts) Value 1
     -2.672011,               !- G-Function G Value 1
     -15.440481,              !- G-Function Ln(T/Ts) Value 2

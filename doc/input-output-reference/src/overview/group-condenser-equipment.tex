@@ -2833,10 +2833,10 @@ The g-function is different for each borehole field configuration (i.e.~a 4x4 fi
 \begin{enumerate}
     \item Use the GroundHeatExchanger:Vertical:Array object to define a rectangular borehole field. EnergyPlus will compute and cache the g-functions for reuse again in future simulations.
     \item Use one or more GroundHeatExchanger:Vertical:Single objects to define a vertical borehole field with the boreholes located arbitrarily. EnergyPlus will compute and cache the g-functions for reuse again in future simulations.
-    \item Use a third-party tool, such as GLHEPro, to compute the g-functions an pass them to EnergyPlus using the GroundHeatExchanger:ResponseFactors object.
+    \item Use a third-party tool, such as GLHEPro, to compute the g-functions and pass them to EnergyPlus using the GroundHeatExchanger:ResponseFactors object.
 \end{enumerate}
 
-A small number of reference data set containing examples input data for 1x2, 4x4 and 8x8 configurations and for both standard and thermally enhanced grout are provided as well.
+A small number of reference datasets containing example input data for 1x2, 4x4 and 8x8 configurations and for both standard and thermally enhanced grout are provided as well.
 
 \begin{figure}[hbtp] % fig 83
 \centering
@@ -2862,7 +2862,7 @@ This alpha field contains the ground heat exchanger outlet node name.
 
 \paragraph{Field: Design Flow Rate}\label{field-design-flow-rate-000}
 
-This numeric field contains the GHE design flow rate in cubic meters per second \{m\(^{3}\)/s\}.
+This numeric field contains the GHE design flow rate in cubic meters per second \{m\(^{3}\)/s\}. The flow rate specified is the total flow rate for the entire borehole field. Flow will be assumed to be evenly distributed across all boreholes.
 
 \paragraph{Field: Type of Undisturbed Ground Temperature Object}\label{field-type-of-undisturbed-ground-temperature-object}
 
@@ -2882,11 +2882,11 @@ This numeric field contains the thermal heat capacity of the ground in J/m\(^{3}
 
 \paragraph{Field: GHE:ResponseFactors object name}
 
-The unique name of the GroundHeatExchanger:ResponseFactors object used to define the third-party response factors.
+The unique name of the GroundHeatExchanger:ResponseFactors object used to define the third-party response factors. If present, the GHE:Vertical:Array and GHE:Vertical:Single objects defined will be ignored.
 
 \paragraph{Field: GHE:Vertical:Array object name}
 
-The unique name of the GroundHeatExchanger:Vertical:Array object used to define a rectangular borehole field.
+The unique name of the GroundHeatExchanger:Vertical:Array object used to define a rectangular borehole field. If present, the GHE:Vertical:Single objects will be ignored.
 
 \paragraph{Field: GHE:Vertical:Single names}
 
@@ -3046,6 +3046,8 @@ The final example uses the ResponseFactors object to provide third-party g-funct
   HVAC,Average,Ground Heat Exchanger Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Ground Heat Exchanger Average Fluid Temperature {[}C{]}
+\item
+  HVAC,Average,Ground Heat Exchanger Farfield Ground Temperature {[}C{]}
 \end{itemize}
 
 \paragraph{Ground Heat Exchanger Average Borehole Temperature {[}C{]}}\label{ground-heat-exchanger-average-borehole-temperature-c}
@@ -3072,6 +3074,10 @@ This is the mass flow rate of the working fluid through the heat exchanger.
 
 This is the average temperature of the working fluid inside the heat exchanger.
 
+\paragraph{Ground Heat Exchanger Farfield Ground Temperature}
+
+This is the farfield temperature used by the object which is provided by the undisturbed ground temperature object. The temperature is the average of the 5 evenly spaced points between the top of the borehole and the bottom of the borehole.
+
 \subsection{GroundHeatExchanger:Vertical:Properties}\label{groundheatexchangerverticalproperties}
 
 This object defines several borehole parameters.
@@ -3084,11 +3090,11 @@ This alpha field indicates the unique name of the object.
 
 \paragraph{Field: Depth of Top of Borehole}
 
-This numeric field indicates the depth of the top of the borehole below the ground surface, in meters.
+This numeric field indicates the depth of the top of the borehole below the ground surface, in meters. The depth measured from the ground surface downward is positive.
 
 \paragraph{Field: Borehole Length}
 
-This numeric field indicates the length of the borehole, referenced from the starting location (potentially below the ground surface), to the end of the borehole, in meters.
+This numeric field indicates the active length of the borehole, referenced from the starting location (potentially below the ground surface), to the end of the borehole, in meters.
 
 \paragraph{Field: Grout Thermal Conductivity}\label{field-grout-thermal-conductivity}
 
@@ -3102,7 +3108,7 @@ This numeric field contains the thermal heat capacity of the grout in J/m\(^{3}\
 
 This numeric field contains the thermal conductivity of the pipe in W/m-K.
 
-\paragraph{Field: Pipe Out Diameter}\label{field-pipe-out-diameter}
+\paragraph{Field: Pipe Outer Diameter}\label{field-pipe-out-diameter}
 
 This numeric field contains the outer diameter of the U-tube (pipe) in meters \{m\}.
 
@@ -3142,7 +3148,7 @@ This alpha field indicates the unique name of the object.
 
 This alpha field indicates the name of the GroundHeatExchanger:Vertical:Properties object referenced by the boreholes in the array.
 
-\paragraph{Field: Number of Boreholes in the X-Direciton}
+\paragraph{Field: Number of Boreholes in the X-Direction}
 
 This numeric field indicates the number of boreholes in one axis of the rectangular borehole field.
 
@@ -3152,7 +3158,7 @@ This numeric field indicates the number of boreholes in the other axis of the re
 
 \paragraph{Field: Borehole Spacing}
 
-This numeric field indicates the center-to-center borehole spacing, in meters, which applied to the rectangular borehole field.
+This numeric field indicates the center-to-center borehole spacing, in meters, which is applied to the rectangular borehole field.
 
 An example object is shown below.
 
@@ -3199,7 +3205,7 @@ This numeric field indicates the y-location of this borehole.
 
 This object is used to provide third-party g-functions which are generated by other tools.
 
-\subsubsection{inputs}
+\subsubsection{Inputs}
 
 \paragraph{Field: Name}
 

@@ -67,6 +67,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
+#include <DataSystemVariables.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
@@ -606,6 +607,8 @@ namespace GroundHeatExchangers {
 	GLHEVert::calcGFunctions()
 	{
 
+		using namespace DataSystemVariables;
+
 		int const numDaysInYear( 365 );
 		using DataGlobals::HoursInDay;
 		using DataGlobals::SecInHour;
@@ -615,9 +618,10 @@ namespace GroundHeatExchangers {
 			return;
 		}
 
-		MakeCache();
-
-		ReadCache();
+		if( !DisableCaching ) {
+			MakeCache();
+			ReadCache();
+		}
 
 		if ( gFunctionsExist ) {
 			// g-functions already exist from previous run
@@ -660,6 +664,8 @@ namespace GroundHeatExchangers {
 			++index;
 		}
 
+		DisplayString( "Initializing GroundHeatExchanger:System" );
+
 		// Calculate the g-functions
 		for( size_t lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index ) {
 			for( auto & bh_i : myRespFactors->myBorholes ) {
@@ -670,6 +676,12 @@ namespace GroundHeatExchangers {
 				myRespFactors->GFNC( lntts_index ) += sum_T_ji;
 			}
 			myRespFactors->GFNC( lntts_index ) /= ( 2 * totalTubeLength );
+
+			std::stringstream ss;
+			ss << std::fixed << std::setprecision( 1 ) << float( lntts_index ) / myRespFactors->LNTTS.size() * 100;
+
+			DisplayString( "...progress: " + ss.str() + "%");
+
 		}
 
 		gFunctionsExist = true;
@@ -680,7 +692,10 @@ namespace GroundHeatExchangers {
 		myCacheData["Response Factors"]["GFNC"] = myRespFactors->GFNC;
 
 		// save data for later
-		WriteCache();
+
+		if ( !DisableCaching ) {
+			WriteCache();
+		}
 	}
 
 	//******************************************************************************
@@ -739,13 +754,11 @@ namespace GroundHeatExchangers {
 				ifs >> json_in;
 				ifs.close();
 			} catch ( ... ) {
-				ShowWarningError( "eplusout.glhe contains invalid file format" );
+				if ( !json_in.empty() ) {
+					// file exists, is not empty, but failed for some other reason
+					ShowWarningError( "eplusout.glhe contains invalid file format" );
+				}
 				ifs.close();
-				return;
-			}
-
-			// file exists, but is empty
-			if ( json_in.empty() ) {
 				return;
 			}
 
@@ -758,9 +771,6 @@ namespace GroundHeatExchangers {
 			}
 
 			if ( gFunctionsExist ) {
-
-				// Time scale constant
-				Real64 const ts = pow_2( bhLength ) / ( 9 * soil.diffusivity ) ;
 
 				// Setup the arrays
 				int numEntries = myCacheData["Response Factors"]["LNTTS"].size();
@@ -819,14 +829,12 @@ namespace GroundHeatExchangers {
 				ifs >> json_in;
 				ifs.close();
 			} catch ( ... ) {
-				ShowWarningError( "eplusout.glhe contains invalid file format" );
+				if ( !json_in.empty() ) {
+					// file exists, is not empty, but failed for some other reason
+					ShowWarningError( "Error reading from eplusout.glhe" );
+					ShowWarningError( "Data from previous eplusout.glhe not saved" );
+				}
 				ifs.close();
-				return;
-			}
-
-			// file exists, but is empty
-			if ( json_in.empty() ) {
-				return;
 			}
 
 			// empty json object for output writing
@@ -2207,15 +2215,21 @@ namespace GroundHeatExchangers {
 						ShowSevereError( "GroundHeatExchanger:ResponseFactors object not found." );
 					}
 
-				} else if ( !DataIPShortCuts::lAlphaFieldBlanks( 7 ) ) {
+				} else if( !DataIPShortCuts::lAlphaFieldBlanks( 7 ) ) {
 					// Response factors come from eplusout.glhe or use array object to calculate them
 					thisGLHE.myRespFactors = BuildAndGetResponseFactorObjectFromArray( GetVertArray( DataIPShortCuts::cAlphaArgs( 7 ) ) );
 
-					if ( !thisGLHE.myRespFactors ) {
+					if( !thisGLHE.myRespFactors ) {
 						errorsFound = true;
 						ShowSevereError( "GroundHeatExchanger:Vertical:Array object not found." );
 					}
 				} else {
+					if ( DataIPShortCuts::lAlphaFieldBlanks( 8 ) ) {
+						// No ResponseFactors, GHEArray, or SingleBH object are referenced
+						ShowSevereError( "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single object found" );
+						ShowFatalError( "Check references to these object for GHE:System object= " + thisGLHE.name );
+					}
+
 					// Calculate response factors from individual boreholes
 					std::vector < std::shared_ptr < GLHEVertSingleStruct > > tempVectOfBHObjects;
 
@@ -2296,6 +2310,7 @@ namespace GroundHeatExchangers {
 				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average", thisGLHE.name );
 				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name );
 				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, thisGLHE.aveFluidTemp, "System", "Average", thisGLHE.name );
+				SetupOutputVariable( "Ground Heat Exchanger Farfield Ground Temperature", OutputProcessor::Unit::C, thisGLHE.tempGround, "System", "Average", thisGLHE.name );
 			}
 
 		}
