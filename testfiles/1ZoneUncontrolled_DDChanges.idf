@@ -91,7 +91,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,4;
 
@@ -1041,8 +1041,8 @@
     6,                       !- Month
     9,                       !- Day of Month
     Wednesday,               !- Day Type
-    24.225,                  !- Maximum Dry-Bulb Temperature {C}
-    5.225,                   !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Maximum Dry-Bulb Temperature {C}
+    ,                        !- Daily Dry-Bulb Temperature Range {deltaC}
     TemperatureProfileSchedule,  !- Dry-Bulb Temperature Range Modifier Type
     Example Weather Temp,    !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     RelativeHumiditySchedule,!- Humidity Condition Type

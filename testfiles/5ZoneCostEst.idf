@@ -37,7 +37,7 @@
 !
 ! WeatherFilename=USA_IL_Chicago-OHare_TMY2.epw
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,4;
 
@@ -802,26 +802,6 @@
     Krypton,                 !- Gas Type
     0.0079;                  !- Thickness {m}
 
-  Construction,
-    North_window,            !- Name
-    103 Clear_6.DAT,         !- Outside Layer
-    KRYPTON 8MM,             !- Layer 2
-    COATED POLY-88,          !- Layer 3
-    KRYPTON 3MM,             !- Layer 4
-    COATED POLY-88,          !- Layer 5
-    KRYPTON 8MM,             !- Layer 6
-    103 Clear_6.DAT;         !- Layer 7
-
-  Construction,
-    nonnorth_window,         !- Name
-    103 Clear_6.DAT,         !- Outside Layer
-    KRYPTON 8MM,             !- Layer 2
-    COATED POLY-33,          !- Layer 3
-    KRYPTON 3MM,             !- Layer 4
-    COATED POLY-88,          !- Layer 5
-    KRYPTON 8MM,             !- Layer 6
-    103 Clear_6.DAT;         !- Layer 7
-
 ! insulation level at R-21 IP + 21.6 clear
 
   Construction,
@@ -898,44 +878,8 @@
     23.79;                   !- Cost per Area {$/m2}
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    MAT-CC05 4  MW CONCRETE, !- Outside Layer
-    CP02 CARPET PAD;         !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    CP02 CARPET PAD,         !- Outside Layer
-    MAT-CC05 4  MW CONCRETE; !- Layer 2
-
-  Construction,
     InteriorFurnishings,     !- Name
     Wood 6inch;              !- Outside Layer
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    MAT-CC05 4  MW CONCRETE; !- Outside Layer
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    1.5  MW CONCRETE,        !- Outside Layer
-    CP02 CARPET PAD;         !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    CP02 CARPET PAD,         !- Outside Layer
-    1.5  MW CONCRETE;        !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Clear Acrylic Plastic;   !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Diffusing Acrylic Plastic;  !- Outside Layer
 
   WindowMaterial:Glazing,
     CLEAR 3MM(206),          !- Name
@@ -4245,4 +4189,5 @@
   Output:Meter,Electricity:HVAC,runperiod;
 
   Output:Meter,Electricity:Plant,runperiod;
+
 

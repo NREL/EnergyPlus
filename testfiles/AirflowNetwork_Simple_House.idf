@@ -103,7 +103,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -414,10 +414,6 @@
     IN05;                    !- Layer 2
 
   Construction,
-    CEILING:ATTIC,           !- Name
-    GP01;                    !- Outside Layer
-
-  Construction,
     GABLE,                   !- Name
     PW03;                    !- Outside Layer
 
@@ -432,11 +428,6 @@
   Construction,
     Garage:SteelDoor,        !- Name
     HF-A3;                   !- Outside Layer
-
-  Construction,
-    FLOOR:ATTICLIVING,       !- Name
-    GP01,                    !- Outside Layer
-    IN05;                    !- Layer 2
 
   Construction,
     CEILING:Garage,          !- Name

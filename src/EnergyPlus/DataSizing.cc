@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -80,7 +81,7 @@ namespace DataSizing {
 	// MODULE PARAMETER DEFINITIONS:
 
 	// parameters for outside air flow method
-	int const NumOAFlowMethods( 6 );
+	int const NumOAFlowMethods( 9 );
 
 	int const OAFlowNone( 0 );
 	int const OAFlowPPer( 1 );
@@ -90,7 +91,7 @@ namespace DataSizing {
 	int const OAFlowSum( 5 );
 	int const OAFlowMax( 6 );
 
-	Array1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum" } );
+	Array1D_string const cOAFlowMethodTypes( NumOAFlowMethods, { "Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum", "IndoorAirQualityProcedure", "ProportionalControlBasedonOccupancySchedule", "ProportionalControlBasedOnDesignOccupancy"  } );
 
 	// parameters for outside air
 	int const AllOA( 1 );
@@ -148,6 +149,11 @@ namespace DataSizing {
 	int const ZOAM_FlowPerACH( 4 ); // sum the outdoor air flow rate based on number of air changes for the zone
 	int const ZOAM_Sum( 5 ); // sum the outdoor air flow rate of the people component and the space floor area component
 	int const ZOAM_Max( 6 ); // use the maximum of the outdoor air flow rate of the people component and the space floor area component
+	int const ZOAM_IAQP( 7 ); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
+	int const ZOAM_ProportionalControlSchOcc( 8 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on scheduled occupancy
+	int const ZOAM_ProportionalControlDesOcc( 9 ); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on design occupancy
 
 	//System Outdoor Air Method
 	int const SOAM_ZoneSum( 1 ); // Sum the outdoor air flow rates of all zones
@@ -208,6 +214,7 @@ namespace DataSizing {
 	int CurSysNum( 0 ); // Current Air System index (0 if not in air loop)
 	int CurOASysNum( 0 ); // Current outside air system index (0 if not in OA Sys)
 	int CurZoneEqNum( 0 ); // Current Zone Equipment index (0 if not simulating ZoneEq)
+	int CurTermUnitSizingNum; // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
 	int CurBranchNum( 0 ); // Index of branch being simulated (or 0 if not air loop)
 	int CurDuctType( 0 ); // Duct type of current branch
 	int CurLoopNum( 0 ); // the current plant loop index
@@ -273,7 +280,9 @@ namespace DataSizing {
 	Real64 DataNonZoneNonAirloopValue( 0.0 ); // used when equipment is not located in a zone or airloop
 	int DataZoneUsedForSizing( 0 ); // pointer to control zone for air loop equipment
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
-	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
+	int NumZoneHVACSizing( 0 ); // Number of design specification zone HVAC sizing objects
+	int NumAirTerminalSizingSpec( 0 ); // Number of design specfication air terminal sizing objects
+	int NumAirTerminalUnits( 0 ); // Number of air terminal units (same as total number of zone inlet nodes)
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
@@ -299,13 +308,13 @@ namespace DataSizing {
 	Array1D< ZoneSizingData > FinalZoneSizing; // Final data for zone sizing including effects
 	Array2D< ZoneSizingData > CalcZoneSizing; // Data for zone sizing (all data)
 	Array1D< ZoneSizingData > CalcFinalZoneSizing; // Final data for zone sizing (calculated only)
-	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units
+	Array1D< ZoneSizingData > TermUnitFinalZoneSizing; // Final data for sizing terminal units (indexed per terminal unit)
 	Array1D< SystemSizingInputData > SysSizInput; // Input data array for system sizing object
 	Array2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
 	Array1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
 	Array1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
 	Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
-	Array1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
+	Array1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines (indexed per terminal unit)
 	Array1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
 	Array1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines
 	Array1D< ZoneEqSizingData > OASysEqSizing; // Data added in unitary system sizing routines
@@ -313,6 +322,7 @@ namespace DataSizing {
 	Array1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
 	Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	Array1D< AirTerminalSizingSpecData > AirTerminalSizingSpec; // Input data for zone HVAC sizing
 	// used only for Facility Load Component Summary
 	Array1D< FacilitySizingData > CalcFacilitySizing; // Data for zone sizing 
 	FacilitySizingData CalcFinalFacilitySizing; // Final data for zone sizing 
@@ -330,6 +340,7 @@ namespace DataSizing {
 		CurSysNum = 0;
 		CurOASysNum = 0;
 		CurZoneEqNum = 0;
+		CurTermUnitSizingNum = 0;
 		CurBranchNum = 0;
 		CurDuctType = 0;
 		CurLoopNum = 0;
@@ -394,6 +405,8 @@ namespace DataSizing {
 		DataNonZoneNonAirloopValue = 0.0;
 		DataZoneNumber = 0;
 		NumZoneHVACSizing = 0;
+		NumAirTerminalSizingSpec = 0;
+		NumAirTerminalUnits = 0;
 		DXCoolCap = 0.0;
 		GlobalHeatSizingFactor = 0.0;
 		GlobalCoolSizingFactor = 0.0;
@@ -426,6 +439,7 @@ namespace DataSizing {
 		DesDayWeath.deallocate();
 		CompDesWaterFlow.deallocate();
 		ZoneHVACSizing.deallocate();
+		AirTerminalSizingSpec.deallocate();
 		DataDesicDehumNum = 0;
 		DataDesicRegCoil = false;
 

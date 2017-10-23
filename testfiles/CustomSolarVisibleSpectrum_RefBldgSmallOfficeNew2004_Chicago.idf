@@ -67,7 +67,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 6
 
-  Version,8.7;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -521,14 +521,6 @@
     2.5,0.804,0.0682,0.0692;
 
 ! ***COMMON CONSTRUCTIONS AND MATERIALS***
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name

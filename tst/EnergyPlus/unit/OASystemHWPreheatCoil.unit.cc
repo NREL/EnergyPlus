@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,6 +55,7 @@
 
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -65,6 +67,7 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataLoopNode;
+using namespace EnergyPlus::HVACControllers;
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::Psychrometrics;
@@ -2019,6 +2022,12 @@ namespace EnergyPlus {
 		AirInletNodeNum = WaterCoil( 1 ).AirInletNodeNum;
 		CpAir = PsyCpAirFnWTdb( Node( AirInletNodeNum ).HumRat, Node( AirInletNodeNum ).Temp );
 		EXPECT_NEAR( WaterCoil( 1 ).TotWaterHeatingCoilRate, WaterCoil( 1 ).InletAirMassFlowRate * CpAir * ( WaterCoil( 1 ).OutletAirTemp - WaterCoil( 1 ).InletAirTemp ), 1.0 ); 
+
+		// test that OA sys water coil bypasses normal controller calls before air loop simulation
+		EXPECT_EQ( "PREHEAT COIL CONTROLLER", HVACControllers::ControllerProps( 1 ).ControllerName );
+		EXPECT_TRUE( HVACControllers::ControllerProps( 1 ).BypassControllerCalc );
+		// test that water coil knows which controller controls the HW coil
+		EXPECT_EQ( WaterCoil( 1 ).ControllerIndex, 1 );
 
 	}
 

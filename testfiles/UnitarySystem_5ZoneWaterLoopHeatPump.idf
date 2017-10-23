@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -2016,7 +2016,7 @@
     FanAvailSched,           !- Availability Schedule Name
     AHU 1 Air Loop Inlet,    !- Air Inlet Node Name
     AHU 1 Air Loop Outlet,   !- Air Outlet Node Name
-    Fan:SystemModel,               !- Supply Fan Object Type
+    Fan:SystemModel,         !- Supply Fan Object Type
     AHU 1 Supply Fan,        !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
@@ -2026,7 +2026,7 @@
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AHU1,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU1,  !- Supplemental Heating Coil Name
@@ -2058,24 +2058,22 @@
   OutdoorAir:Node,
     Outside Air Inlet Node;  !- Name
 
-
-Fan:SystemModel,
-  AHU 1 Supply Fan, !- Name
-  FanAvailSched , !- Availability Schedule Name
-  AHU 1 Air Loop Inlet,  !- Air Inlet Node Name
-  AHU 1 Supply Fan Outlet,  !- Air Outlet Node Name
-  2.0 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  600.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.7; !- Fan Total Efficiency 
-
+  Fan:SystemModel,
+    AHU 1 Supply Fan,        !- Name
+    FanAvailSched,           !- Availability Schedule Name
+    AHU 1 Air Loop Inlet,    !- Air Inlet Node Name
+    AHU 1 Supply Fan Outlet, !- Air Outlet Node Name
+    2.0,                     !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    600.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7;                     !- Fan Total Efficiency
 
   Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
     Heat Pump Cooling Mode AHU1,  !- Name
@@ -2311,7 +2309,7 @@ Fan:SystemModel,
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AHU2,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU2,  !- Supplemental Heating Coil Name
@@ -2585,7 +2583,7 @@ Fan:SystemModel,
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AHU3,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU3,  !- Supplemental Heating Coil Name
@@ -2859,7 +2857,7 @@ Fan:SystemModel,
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AHU4,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU4,  !- Supplemental Heating Coil Name
@@ -3133,7 +3131,7 @@ Fan:SystemModel,
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AHU5,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AHU5,  !- Supplemental Heating Coil Name

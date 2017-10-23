@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -63,6 +64,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
@@ -346,6 +348,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 	GetZoneData( ErrorsFound );
 	Zone( 1 ).SurfaceFirst = 1;
 	Zone( 1 ).SurfaceLast = 1;
+	ScheduleManager::Schedule.allocate(1); 
 	AllocateHeatBalArrays();
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 

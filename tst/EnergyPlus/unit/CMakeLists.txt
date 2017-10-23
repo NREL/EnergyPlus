@@ -12,6 +12,7 @@ set( test_src
   Fixtures/SQLiteFixture.hh
   PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
+  AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
@@ -33,6 +34,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
+  DataEnvironment.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
@@ -155,6 +157,7 @@ set( test_src
   WeatherManager.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
+  WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

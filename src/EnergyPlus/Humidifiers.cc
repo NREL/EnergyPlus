@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -469,29 +470,29 @@ namespace Humidifiers {
 		for ( HumNum = 1; HumNum <= NumHumidifiers; ++HumNum ) {
 			// Setup Report variables for the Humidifiers
 			if ( Humidifier( HumNum ).SuppliedByWaterSystem ) {
-				SetupOutputVariable( "Humidifier Water Volume Flow Rate [m3/s]", Humidifier( HumNum ).WaterConsRate, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Water Volume [m3]", Humidifier( HumNum ).WaterCons, "System", "Sum", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Storage Tank Water Volume Flow Rate [m3/s]", Humidifier( HumNum ).TankSupplyVdot, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Storage Tank Water Volume [m3]", Humidifier( HumNum ).TankSupplyVol, "System", "Sum", Humidifier( HumNum ).Name, _, "Water", "HUMIDIFIER", _, "SYSTEM" );
-				SetupOutputVariable( "Humidifier Starved Storage Tank Water Volume Flow Rate [m3/s]", Humidifier( HumNum ).StarvedSupplyVdot, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Starved Storage Tank Water Volume [m3]", Humidifier( HumNum ).StarvedSupplyVol, "System", "Sum", Humidifier( HumNum ).Name, _, "Water", "HUMIDIFIER", _, "SYSTEM" );
-				SetupOutputVariable( "Humidifier Mains Water Volume [m3]", Humidifier( HumNum ).StarvedSupplyVol, "System", "Sum", Humidifier( HumNum ).Name, _, "MainsWater", "HUMIDIFIER", _, "SYSTEM" );
+				SetupOutputVariable( "Humidifier Water Volume Flow Rate", OutputProcessor::Unit::m3_s, Humidifier( HumNum ).WaterConsRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Water Volume", OutputProcessor::Unit::m3, Humidifier( HumNum ).WaterCons, "System", "Sum", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s, Humidifier( HumNum ).TankSupplyVdot, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Storage Tank Water Volume", OutputProcessor::Unit::m3, Humidifier( HumNum ).TankSupplyVol, "System", "Sum", Humidifier( HumNum ).Name, _, "Water", "HUMIDIFIER", _, "SYSTEM" );
+				SetupOutputVariable( "Humidifier Starved Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s, Humidifier( HumNum ).StarvedSupplyVdot, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Starved Storage Tank Water Volume", OutputProcessor::Unit::m3, Humidifier( HumNum ).StarvedSupplyVol, "System", "Sum", Humidifier( HumNum ).Name, _, "Water", "HUMIDIFIER", _, "SYSTEM" );
+				SetupOutputVariable( "Humidifier Mains Water Volume", OutputProcessor::Unit::m3, Humidifier( HumNum ).StarvedSupplyVol, "System", "Sum", Humidifier( HumNum ).Name, _, "MainsWater", "HUMIDIFIER", _, "SYSTEM" );
 
 			} else {
-				SetupOutputVariable( "Humidifier Water Volume Flow Rate [m3/s]", Humidifier( HumNum ).WaterConsRate, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Water Volume [m3]", Humidifier( HumNum ).WaterCons, "System", "Sum", Humidifier( HumNum ).Name, _, "WATER", "HUMIDIFIER", _, "System" );
-				SetupOutputVariable( "Humidifier Mains Water Volume [m3]", Humidifier( HumNum ).WaterCons, "System", "Sum", Humidifier( HumNum ).Name, _, "MAINSWATER", "HUMIDIFIER", _, "System" );
+				SetupOutputVariable( "Humidifier Water Volume Flow Rate", OutputProcessor::Unit::m3_s, Humidifier( HumNum ).WaterConsRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Water Volume", OutputProcessor::Unit::m3, Humidifier( HumNum ).WaterCons, "System", "Sum", Humidifier( HumNum ).Name, _, "WATER", "HUMIDIFIER", _, "System" );
+				SetupOutputVariable( "Humidifier Mains Water Volume", OutputProcessor::Unit::m3, Humidifier( HumNum ).WaterCons, "System", "Sum", Humidifier( HumNum ).Name, _, "MAINSWATER", "HUMIDIFIER", _, "System" );
 
 			}
 			if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Electric ) {
-				SetupOutputVariable( "Humidifier Electric Power [W]", Humidifier( HumNum ).ElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Electric Energy [J]", Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
+				SetupOutputVariable( "Humidifier Electric Power", OutputProcessor::Unit::W, Humidifier( HumNum ).ElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Electric Energy", OutputProcessor::Unit::J, Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
 			} else if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Gas ) {
-				SetupOutputVariable( "Humidifier Gas Use Thermal Efficiency []", Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Gas Use Rate [W]", Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Gas Use Energy [J]", Humidifier( HumNum ).GasUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "GAS", "HUMIDIFIER", _, "System" );
-				SetupOutputVariable( "Humidifier Auxiliary Electric Power [W]", Humidifier( HumNum ).AuxElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
-				SetupOutputVariable( "Humidifier Auxiliary Electric Energy [J]", Humidifier( HumNum ).AuxElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
+				SetupOutputVariable( "Humidifier Gas Use Thermal Efficiency", OutputProcessor::Unit::None, Humidifier( HumNum ).ThermalEff, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Rate", OutputProcessor::Unit::W, Humidifier( HumNum ).GasUseRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Gas Use Energy", OutputProcessor::Unit::J, Humidifier( HumNum ).GasUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "GAS", "HUMIDIFIER", _, "System" );
+				SetupOutputVariable( "Humidifier Auxiliary Electric Power", OutputProcessor::Unit::W, Humidifier( HumNum ).AuxElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
+				SetupOutputVariable( "Humidifier Auxiliary Electric Energy", OutputProcessor::Unit::J, Humidifier( HumNum ).AuxElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
 			}
 
 		}

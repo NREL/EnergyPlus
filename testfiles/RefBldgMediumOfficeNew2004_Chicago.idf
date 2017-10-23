@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,8.7;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -89,7 +89,7 @@
     6;                       !- Minimum Number of Warmup Days
 
   RunPeriod,
-    annual,                        !- Name
+    annual,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -401,10 +401,6 @@
   Construction,
     DropCeiling,             !- Name
     Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -4357,45 +4353,45 @@
 ! ***HVAC EQUIPMENT***
 
   Fan:SystemModel,
-    VAV_1_Fan , !- Name
-    HVACOperationSchd , !- Availability Schedule Name
+    VAV_1_Fan,               !- Name
+    HVACOperationSchd,       !- Availability Schedule Name
     VAV_1_HeatC-VAV_1_FanNode,  !- Air Inlet Node Name
     VAV_1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
-    Autosize , !- Design Maximum Air Flow Rate
-    Continuous , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    1109.648, !- Design Pressure Rise
-    0.91 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5915,  !- Fan Total Efficiency 
-    VAV Fan Curve, !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    Fan Energy; !- End-Use Subcategory
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    1109.648,                !- Design Pressure Rise {Pa}
+    0.91,                    !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5915,                  !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    Fan Energy;              !- End-Use Subcategory
 
   Curve:Quartic,
-    VAV Fan Curve , !- Name
-    0.0407598940 , !- Coefficient1 Constant
-    0.08804497 , !- Coefficient2 x
-    -0.072926120 , !- Coefficient3 x**2
-    0.9437398230 , !- Coefficient4 x**3
-    0.0 , !- Coefficient5 x**4
-    0.0 , !- Minimum Value of x
-    1.0, !- Maximum Value of x
-    0.0 , !- Minimum Curve Output
-    1.0 , !- Maximum Curve Output
-    Dimensionless , !- Input Unit Type for X
-    Dimensionless ; !- Output Unit Type
+    VAV Fan Curve,           !- Name
+    0.0407598940,            !- Coefficient1 Constant
+    0.08804497,              !- Coefficient2 x
+    -0.072926120,            !- Coefficient3 x**2
+    0.9437398230,            !- Coefficient4 x**3
+    0.0,                     !- Coefficient5 x**4
+    0.0,                     !- Minimum Value of x
+    1.0,                     !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    1.0,                     !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
-Output:Variable,VAV Fan Curve,Performance Curve Input Variable 1 Value,detailed; !- HVAC Average []
+  Output:Variable,VAV Fan Curve,Performance Curve Input Variable 1 Value,detailed;
 
-Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC Average []
+  Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed;
 
   Fan:VariableVolume,
     VAV_2_Fan,               !- Name

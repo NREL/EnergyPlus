@@ -34,7 +34,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
-  Version,8.7;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -382,10 +382,6 @@
   Construction,
     DropCeiling,             !- Name
     Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -7322,10 +7318,10 @@
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
-    ,                        !- Design Inlet Air Dry-Bulb Temperature
-    ,                        !- Design Inlet Air Wet-Bulb Temperature
-    ,                        !- Design Approach Temperature
-    ,                        !- Design Range Temperature
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
@@ -9274,8 +9270,6 @@
 
   Output:Meter,Heating:Gas,HOURLY;
 
-  Output:Meter,InteriorEquipment:Gas,HOURLY;
-
   Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
@@ -9297,8 +9291,6 @@
   Output:Variable,*,Chiller Electric Energy,HOURLY;
 
   Output:Variable,*,Chiller COP,HOURLY;
-
-  Output:Variable,*,Plant Component Distributed Demand Rate,HOURLY;
 
   Output:Variable,*,Chiller Electric Power,HOURLY;
 

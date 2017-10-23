@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -116,8 +117,8 @@ namespace DataGlobals {
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
 	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
-	Real64 const BigNumber( huge( 1.0 ) ); // Max Number real used for initializations
-	Real64 const rTinyValue( epsilon( 1.0 ) ); // Tiny value to replace use of TINY(x)
+	Real64 const BigNumber( HUGE_( 1.0 ) ); // Max Number real used for initializations
+	Real64 const rTinyValue( EPSILON( 1.0 ) ); // Tiny value to replace use of TINY(x)
 	std::string::size_type const MaxNameLength( 100 ); // Maximum Name Length in Characters -- should be the same
 	// as MaxAlphaArgLength in InputProcessor module
 
@@ -195,6 +196,7 @@ namespace DataGlobals {
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
 	int OutputFileMeters( 0 ); // Unit number for meters output
 	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
+	int OutputFileShadingFrac( 0 ); // Unit number for shading output
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
 	int OutputDElightIn( 0 ); // Unit number for the DElight In file
@@ -232,6 +234,7 @@ namespace DataGlobals {
 	bool RedoSizesHVACSimulation( false ); // doing kick off simulation for redoing sizes as part of sizing
 	bool FinalSizingHVACSizingSimIteration( false ); //when doing HVAC sizing Simulation
 	bool AnyEnergyManagementSystemInModel( false ); // true if there is any EMS or Erl in model.  otherwise false
+	bool AnyLocalEnvironmentsInModel( false ); //true if there is any local environmental data objected defined in model, otherwise false
 	bool AnyPlantInModel( false ); // true if there are any plant or condenser loops in model, otherwise false
 	int CacheIPErrorFile( 0 ); // Cache IP errors until IDF processing done.
 	bool AnyIdealCondEntSetPointInModel( false ); // true if there is any ideal condenser entering set point manager in model.
@@ -286,6 +289,7 @@ namespace DataGlobals {
 		OutputFileZoneSizing = 0;
 		OutputFileSysSizing = 0;
 		OutputFileMeters = 0;
+		OutputFileShadingFrac = 0;
 		StdMeterRecordCount = 0;
 		OutputFileBNDetails = 0;
 		ZoneSizingCalc = false;
@@ -321,6 +325,7 @@ namespace DataGlobals {
 		RedoSizesHVACSimulation = false;
 		FinalSizingHVACSizingSimIteration = false;
 		AnyEnergyManagementSystemInModel = false;
+		AnyLocalEnvironmentsInModel = false;
 		AnyPlantInModel = false;
 		CacheIPErrorFile = 0;
 		AnyIdealCondEntSetPointInModel = false;

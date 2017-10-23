@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -430,15 +431,15 @@ namespace PlantLoadProfile {
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), cCurrentModuleObject + " Nodes" );
 
 				// Setup report variables
-				SetupOutputVariable( "Plant Load Profile Mass Flow Rate [kg/s]", PlantProfile( ProfileNum ).MassFlowRate, "System", "Average", PlantProfile( ProfileNum ).Name );
+				SetupOutputVariable( "Plant Load Profile Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantProfile( ProfileNum ).MassFlowRate, "System", "Average", PlantProfile( ProfileNum ).Name );
 
-				SetupOutputVariable( "Plant Load Profile Heat Transfer Rate [W]", PlantProfile( ProfileNum ).Power, "System", "Average", PlantProfile( ProfileNum ).Name );
+				SetupOutputVariable( "Plant Load Profile Heat Transfer Rate", OutputProcessor::Unit::W, PlantProfile( ProfileNum ).Power, "System", "Average", PlantProfile( ProfileNum ).Name );
 
-				SetupOutputVariable( "Plant Load Profile Heat Transfer Energy [J]", PlantProfile( ProfileNum ).Energy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "ENERGYTRANSFER", "Heating", _, "Plant" ); // is EndUseKey right?
+				SetupOutputVariable( "Plant Load Profile Heat Transfer Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).Energy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "ENERGYTRANSFER", "Heating", _, "Plant" ); // is EndUseKey right?
 
-				SetupOutputVariable( "Plant Load Profile Heating Energy [J]", PlantProfile( ProfileNum ).HeatingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "Heating", _, "Plant" );
+				SetupOutputVariable( "Plant Load Profile Heating Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).HeatingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "Heating", _, "Plant" );
 
-				SetupOutputVariable( "Plant Load Profile Cooling Energy [J]", PlantProfile( ProfileNum ).CoolingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "Cooling", _, "Plant" );
+				SetupOutputVariable( "Plant Load Profile Cooling Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).CoolingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "Cooling", _, "Plant" );
 
 				if ( AnyEnergyManagementSystemInModel ) {
 					SetupEMSActuator( "Plant Load Profile", PlantProfile( ProfileNum ).Name, "Mass Flow Rate", "[kg/s]", PlantProfile( ProfileNum ).EMSOverrideMassFlow, PlantProfile( ProfileNum ).EMSMassFlowValue );

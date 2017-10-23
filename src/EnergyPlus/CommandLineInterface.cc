@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -292,6 +293,7 @@ ProcessArgs(int argc, const char * argv[])
 	std::string sqliteSuffix;
 	std::string adsSuffix;
 	std::string screenSuffix;
+	std::string shdSuffix;
 
 	if (suffixType == "L" || suffixType == "l")	{
 
@@ -304,6 +306,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "sqlite";
 		adsSuffix = "ADS";
 		screenSuffix = "screen";
+		shdSuffix = "shading";
 
 	} else if (suffixType == "D" || suffixType == "d") {
 
@@ -316,6 +319,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "-sqlite";
 		adsSuffix = "-ads";
 		screenSuffix = "-screen";
+		shdSuffix = "-shading";
 
 	} else if (suffixType == "C" || suffixType == "c") {
 
@@ -328,6 +332,7 @@ ProcessArgs(int argc, const char * argv[])
 		sqliteSuffix = "Sqlite";
 		adsSuffix = "Ads";
 		screenSuffix = "Screen";
+		shdSuffix = "Shading";
 
 	} else {
 		DisplayString("ERROR: Unrecognized argument for output suffix style: " + suffixType);
@@ -371,6 +376,7 @@ ProcessArgs(int argc, const char * argv[])
 	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
 	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
 	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
+	outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
 	if (suffixType == "L" || suffixType == "l") {
 		outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
 	}

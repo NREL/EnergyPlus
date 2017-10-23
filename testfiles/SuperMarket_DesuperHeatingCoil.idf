@@ -123,7 +123,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.8;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -871,10 +871,6 @@
     0.0063;                  !- Thickness {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
-
-  Construction,
-    IntFloorConstruction,    !- Name
-    ConcForIntFloor;         !- Outside Layer
 
   Construction,
     FurnitureConstruction,   !- Name

@@ -75,7 +75,7 @@
 ! End SimMetaData
 ! Number of Zones: 11
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,6;
 
@@ -1680,7 +1680,7 @@
     0.00061,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:FourPipeFanCoil,
     Corner_Class_1_Pod_1 Fan Coil,  !- Name
@@ -2560,7 +2560,7 @@
     0.00061,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:FourPipeFanCoil,
     Mult_Class_1_Pod_1 Fan Coil,  !- Name
@@ -2933,7 +2933,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.05856,                 !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:FourPipeFanCoil,
     Corridor_Pod_1 Fan Coil, !- Name
@@ -3421,7 +3421,7 @@
     0.00061,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:FourPipeFanCoil,
     Corner_Class_2_Pod_1 Fan Coil,  !- Name
@@ -4101,7 +4101,7 @@
     0.00061,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:FourPipeFanCoil,
     Mult_Class_2_Pod_1 Fan Coil,  !- Name
@@ -4644,7 +4644,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.16653,                 !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:Baseboard:Convective:Water,
     Main_Corridor Baseboard Heater,  !- Name
@@ -5119,7 +5119,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.052155,                !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:Baseboard:Convective:Water,
     Lobby Baseboard Heater,  !- Name
@@ -5562,7 +5562,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.07686,                 !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:Baseboard:Convective:Water,
     Mech Baseboard Heater,   !- Name
@@ -5965,7 +5965,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.38608,                 !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:Baseboard:Convective:Water,
     Bathrooms Baseboard Heater,  !- Name
@@ -6839,7 +6839,7 @@
     0.000305,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:Baseboard:Convective:Water,
     Offices Baseboard Heater,!- Name
@@ -7510,7 +7510,7 @@
     0.00061,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    MinOA_Sched;             !- Outdoor Air Flow Rate Fraction Schedule Name
+    MinOA_Sched;             !- Outdoor Air Schedule Name
 
   ZoneHVAC:Baseboard:Convective:Water,
     Media_Center Baseboard Heater,  !- Name

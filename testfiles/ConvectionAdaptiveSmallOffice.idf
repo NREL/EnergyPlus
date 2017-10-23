@@ -109,7 +109,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 6
 
-  Version,8.7;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -507,14 +507,6 @@
     int-walls,               !- Name
     1/2IN Gypsum,            !- Outside Layer
     1/2IN Gypsum;            !- Layer 2
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
 ! Common Materials
 

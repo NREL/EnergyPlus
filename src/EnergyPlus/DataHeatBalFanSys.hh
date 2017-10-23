@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -141,8 +142,8 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > MCPTThermChim; // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
 	extern Array1D< Real64 > MCPThermChim; // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
 	extern Array1D< Real64 > ZoneLatentGain; // Latent Energy from each Zone (People, equipment)
-	extern Array1D< Real64 > OAMFL; // OUTDOOR AIR MASS FLOW (M**3/SEC) for infiltration
-	extern Array1D< Real64 > VAMFL; // OUTDOOR AIR MASS FLOW (M**3/SEC) for ventilation
+	extern Array1D< Real64 > OAMFL; // OUTDOOR AIR MASS FLOW (kg/s) for infiltration
+	extern Array1D< Real64 > VAMFL; // OUTDOOR AIR MASS FLOW (kg/s) for ventilation
 	extern Array1D< Real64 > NonAirSystemResponse; // Convective heat addition rate from non forced air
 	// equipment such as baseboards plus heat from lights to
 	extern Array1D< Real64 > SysDepZoneLoads; // Convective heat addition or subtraction rate from sources that
@@ -156,7 +157,7 @@ namespace DataHeatBalFanSys {
 	extern Array1D< Real64 > MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT
 	extern Array1D< Real64 > MDotOA; // Airbalance MASS FLOW rate
 
-	extern Array1D< Real64 > MixingMassFlowZone; // Mixing MASS FLOW
+	extern Array1D< Real64 > MixingMassFlowZone; // Mixing MASS FLOW (kg/s)
 	extern Array1D< Real64 > MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
 
 	extern Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag

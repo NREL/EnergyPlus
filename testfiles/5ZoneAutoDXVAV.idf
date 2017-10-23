@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -428,14 +428,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03,                    !- Outside Layer
     CP01;                    !- Layer 2
@@ -532,26 +524,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
@@ -2431,7 +2405,7 @@
     0.000508,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Outdoor Air Flow per Zone {m3/s}
     ,                        !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    Min OARequirements Sched;!- Outdoor Air Flow Rate Fraction Schedule Name
+    Min OARequirements Sched;!- Outdoor Air Schedule Name
 
   Schedule:Compact,
     Min OARequirements Sched,!- Name
@@ -2708,7 +2682,7 @@
     VarSpeedCoolEIRLSFT,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     Main Cooling Coil 1 Condenser Node,  !- Condenser Air Inlet Node Name
     EvaporativelyCooled,     !- Condenser Type
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}
     ,                        !- High Speed Evaporative Condenser Air Flow Rate {m3/s}
     ,                        !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}

@@ -17,7 +17,7 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-  Version,8.7;
+  Version,8.8;
 
   Timestep,4;
 
@@ -1453,29 +1453,9 @@
 
   Output:VariableDictionary,regular;
 
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary;
-
   Output:Surfaces:Drawing,dxf;
 
   Output:Constructions,Constructions;
-
-  Output:Meter:MeterFileOnly,Carbon Equivalent:Facility,hourly;
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Building,hourly;
 

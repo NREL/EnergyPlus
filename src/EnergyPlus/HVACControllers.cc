@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <HVACControllers.hh>
+#include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -190,7 +192,7 @@ namespace HVACControllers {
 	// MODULE PARAMETER DEFINITIONS
 	// Number of significant digits to display in error messages for floating-point numbers
 	Real64 const SomeFloatingPoint( 1.0 );
-	int const NumSigDigits( precision( SomeFloatingPoint ) );
+	int const NumSigDigits( PRECISION( SomeFloatingPoint ) );
 
 	static std::string const BlankString;
 
@@ -289,11 +291,11 @@ namespace HVACControllers {
 		std::string const & ControllerName,
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
-		int const EP_UNUSED( AirLoopNum ), // unused1208
-		int const AirLoopPass,
+		int const AirLoopNum,
 		int const Operation,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
+		bool & BypassOAController,
 		Optional_bool AllowWarmRestartFlag
 	)
 	{
@@ -323,6 +325,7 @@ namespace HVACControllers {
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::FlowLocked;
+		using DataAirLoop::AirLoopControlInfo;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -375,6 +378,14 @@ namespace HVACControllers {
 				CheckEquipName( ControlNum ) = false;
 			}
 		}
+
+		if ( ControllerProps( ControlNum ).BypassControllerCalc && BypassOAController ) {
+			IsUpToDateFlag = true;
+			IsConvergedFlag = true;
+			if ( present( AllowWarmRestartFlag ) ) AllowWarmRestartFlag = true;
+			return;
+		}
+
 		// Find the correct ControllerNumber with the AirLoop & CompNum from AirLoop Derived Type
 		//ControlNum = AirLoopEquip(AirLoopNum)%ComponentOfTypeNum(CompNum)
 
@@ -485,7 +496,7 @@ namespace HVACControllers {
 		// To enable generating an individual, detailed trace file for each controller on each air loop,
 		// define the environment variable TRACE_CONTROLLER=YES or TRACE_CONTROLLER=Y
 		if ( TraceHVACControllerEnvFlag ) {
-			TraceIndividualController( ControlNum, FirstHVACIteration, AirLoopPass, Operation, IsConvergedFlag );
+			TraceIndividualController( ControlNum, FirstHVACIteration, AirLoopControlInfo( AirLoopNum ).AirLoopPass, Operation, IsConvergedFlag );
 		}
 
 	}
@@ -937,7 +948,7 @@ namespace HVACControllers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   July 1998
-		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC), 
+		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC),
 		//       MODIFIED       Feb. 2006, Dimitri Curtil (LBNL), Moved first call convergence test code to ResetController()
 		//                      Jul. 2016, R. Zhang (LBNL), Applied the water coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
@@ -1204,7 +1215,7 @@ namespace HVACControllers {
 			if ( ! ControllerProps( ControlNum ).IsSetPointDefinedFlag ) {
 				ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint;
 				ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
-				
+
 				//If there is a fault of water coil SAT sensor (zrp_Jul2016)
 				if( ControllerProps( ControlNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 					//calculate the sensor offset using fault information
@@ -2172,51 +2183,6 @@ namespace HVACControllers {
 		}
 
 	}
-
-	void
-	LimitController(
-		int & EP_UNUSED( ControlNum ), // unused1208
-		bool & EP_UNUSED( IsConvergedFlag ) // unused1208
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR
-		//       DATE WRITTEN   July 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-	}
-
-	// End Algorithm Section of the Module
-	// *****************************************************************************
-
-	// Beginning of Update subroutines for the Controller Module
-	// *****************************************************************************
 
 	void
 	UpdateController( int const ControlNum )
@@ -3550,6 +3516,47 @@ Label100: ;
 			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
 				NodeNotFound = false;
 			}
+		}
+
+	}
+
+	void
+	GetControllerNameAndIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		std::string & ControllerName, // controller name used by water coil
+		int & ControllerIndex, // controller index used by water coil
+		bool & ErrorsFound // true if matching actuator node not found
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   June 2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine checks that the water inlet node number is matched by
+		// the actuator node number of some water coil and passed back controller name and index
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ControlNum;
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		ControllerName = " ";
+		ControllerIndex = 0;
+		for ( ControlNum = 1; ControlNum <= NumControllers; ++ControlNum ) {
+			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
+				ControllerIndex = ControlNum;
+				ControllerName = ControllerProps( ControlNum ).ControllerName;
+				break;
+			}
+		}
+
+		if ( ControllerIndex == 0 ) {
+			ErrorsFound = true;
 		}
 
 	}

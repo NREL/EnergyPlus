@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -232,6 +233,7 @@ namespace HVACControllers {
 		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		bool BypassControllerCalc; // set true for OA sys water coils
 
 		// Default Constructor
 		ControllerPropsType() :
@@ -275,7 +277,8 @@ namespace HVACControllers {
 			BadActionErrIndex( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+			BypassControllerCalc( false)
 		{}
 
 	};
@@ -343,10 +346,10 @@ namespace HVACControllers {
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
 		int const AirLoopNum, // unused1208
-		int const AirLoopPass,
 		int const Operation,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
+		bool & BypassOAController,
 		Optional_bool AllowWarmRestartFlag = _
 	);
 
@@ -421,12 +424,6 @@ namespace HVACControllers {
 		int const ControlNum,
 		bool const FirstHVACIteration,
 		bool const IsConvergedFlag
-	);
-
-	void
-	LimitController(
-		int & ControlNum, // unused1208
-		bool & IsConvergedFlag // unused1208
 	);
 
 	// End Algorithm Section of the Module
@@ -547,6 +544,14 @@ namespace HVACControllers {
 	CheckCoilWaterInletNode(
 		int const WaterInletNodeNum, // input actuator node number
 		bool & NodeNotFound // true if matching actuator node not found
+	);
+
+	void
+	GetControllerNameAndIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		std::string & ControllerName, // controller name used by water coil
+		int & ControllerIndex, // controller index used by water coil
+		bool & ErrorsFound // true if matching actuator node not found
 	);
 
 	void

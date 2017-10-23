@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -406,6 +407,7 @@ namespace DataPhotovoltaics {
 		std::string SurfaceName; // named surface in heat balance domain
 		std::string PerfObjName;
 		int SurfacePtr; // index for named surface
+		int Zone; // index for zone (for getting any zone multipliers)
 		int PVModelType; // type of performance modeling, Simple, TRNSYS or Equivalent 1-diode, or Sandia/King model
 		int CellIntegrationMode; // how are PV cells integrated with other E+ modeling
 		Real64 NumModNSeries; // number of modules in series in one string
@@ -427,6 +429,7 @@ namespace DataPhotovoltaics {
 		// Default Constructor
 		PVArrayStruct() :
 			SurfacePtr( 0 ),
+			Zone( 0 ),
 			PVModelType( 0 ),
 			CellIntegrationMode( 0 ),
 			NumModNSeries( 1.0 ),

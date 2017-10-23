@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -106,8 +107,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
 
 	ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
@@ -116,12 +115,15 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	Node.allocate( 5 );
 
 	Zone.allocate( 1 );
 	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+	Zone( 1 ).ZoneEqNum = 1;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	Zone( 1 ).Multiplier = 1.0;
@@ -190,7 +192,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 2 - Unbalanced exhaust flow
@@ -217,7 +219,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 3 - Balanced exhaust flow with proper source flow from mixing
@@ -244,7 +246,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.02;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 4 - Balanced exhaust flow without source flow from mixing
@@ -271,11 +273,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Add a section to check #6119 by L. Gu on 5/16/17
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Deallocate everything
@@ -989,8 +991,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
 
 	ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
@@ -999,10 +999,14 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	Zone.allocate( 1 );
 	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+	Zone( 1 ).ZoneEqNum	 = 1;
+	Zone( 1 ).IsControlled = true;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	Zone( 1 ).Multiplier = 1.0;
@@ -1061,14 +1065,14 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	NumZoneReturnPlenums = 0;
 	NumZoneSupplyPlenums = 0;
 
-	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 	EXPECT_EQ( 5.0, SumHA );
 	EXPECT_EQ( 300.0, SumHATsurf );
 	EXPECT_EQ( 150.0, SumHATref );
 
 	Node( 1 ).MassFlowRate = 0.0;
 	Node( 2 ).MassFlowRate = 0.0;
-	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 	EXPECT_EQ( 10.0, SumHA );
 	EXPECT_EQ( 300.0, SumHATsurf );
 	EXPECT_EQ( 50.0, SumHATref );
@@ -1141,4 +1145,111 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest )
 
 }
 
+TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
+{
+	// J.Glazer - August 2017
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.8;",
+		" ",
+		"ScheduleTypeLimits,",
+		"  Any Number;              !- Name",
+		" ",
+		"Schedule:Compact,",
+		" Sched1,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 20.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" Sched2,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 1/31,            !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 24.0,        !- Field 26",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 26.0;        !- Field 26",
+		" ",
+		"Schedule:Compact,",
+		" Sched3,                  !- Name",
+		" Any Number,               !- Schedule Type Limits Name",
+		" Through: 1/31,            !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 09:00, 24.0,        !- Field 26",
+		" Until: 17:00, 26.0,        !- Field 26",
+		" Until: 24:00, 24.0,        !- Field 26",
+		" Through: 12/31,           !- Field 1",
+		" For: AllDays,             !- Field 2",
+		" Until: 24:00, 26.0;        !- Field 26",
+
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 15;
+	DataEnvironment::CurrentYearIsLeapYear = false;
+
+	Real64 valueAtTime;
+	int numDays;
+	std::string monthAssumed;
+	const int wednesday = 4;
+
+	DataEnvironment::Latitude = 30.; //northern hemisphere
+	int sched1Index = GetScheduleIndex( "SCHED1" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 20, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	// test month selected based on hemisphere and isSummer flag.
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, true, wednesday, 11 );
+	EXPECT_EQ( "July", monthAssumed );
+
+	DataEnvironment::Latitude = -30.; //southern hemisphere
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, false, wednesday, 11 );
+	EXPECT_EQ( "July", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched1Index, true, wednesday, 11 );
+	EXPECT_EQ( "January", monthAssumed );
+
+	DataEnvironment::Latitude = 30.; //northern hemisphere
+	int sched2Index = GetScheduleIndex( "SCHED2" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched2Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 24, valueAtTime );
+	EXPECT_EQ( 31, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched2Index, true, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 334, numDays );
+	EXPECT_EQ( "July", monthAssumed );
+
+	int sched3Index = GetScheduleIndex( "SCHED3" );
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, false, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, true, wednesday, 11 );
+
+	EXPECT_EQ( 26, valueAtTime );
+	EXPECT_EQ( 365, numDays );
+	EXPECT_EQ( "July", monthAssumed );
+
+	std::tie( valueAtTime, numDays, monthAssumed ) = temperatureAndCountInSch( sched3Index, false, wednesday, 19 );
+
+	EXPECT_EQ( 24, valueAtTime );
+	EXPECT_EQ( 31, numDays );
+	EXPECT_EQ( "January", monthAssumed );
+
+
+}
 

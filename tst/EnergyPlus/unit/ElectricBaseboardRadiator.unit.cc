@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -304,7 +305,7 @@ namespace EnergyPlus {
 		bool FirstHVACIteration( false );
 
 		std::string const idf_objects = delimited_string( {
-			" Version,8.7;",
+			" Version,8.8;",
 
 			"  Zone,",
 			"    SPACE2-1,                !- Name",
@@ -650,4 +651,65 @@ namespace EnergyPlus {
 		EXPECT_EQ( ElectricBaseboardRadiator::ElecBaseboard( BaseboardNum ).NominalCapacity, 3000.0 );
 
 	}
+	
+	TEST_F( EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOff ) {
+		// this unit test is related to issue #6276, unit was producing negative heating, new routines turning things off or calculating things when on were added
+		Real64 LoadMet;
+		Real64 QBBCap;
+		Real64 RadHeat;
+		Real64 QBBElecRadSrc;
+		Real64 ElecUseRate;
+		Real64 AirOutletTemp;
+		Real64 AirInletTemp;
+		
+		// Set conditions
+		LoadMet = -1000.0;
+		QBBCap = 500.0;
+		RadHeat = 300.0;
+		QBBElecRadSrc = 300.0;
+		ElecUseRate = 600.0;
+		AirOutletTemp = 25.0;
+		AirInletTemp = 23.0;
+
+		// Call the Off routine
+		ElectricBaseboardRadiator::UpdateElectricBaseboardOff( LoadMet, QBBCap, RadHeat, QBBElecRadSrc, ElecUseRate, AirOutletTemp, AirInletTemp );
+
+		// Check that it zeroed things out properly
+		EXPECT_EQ( LoadMet, 0.0 );
+		EXPECT_EQ( QBBCap, 0.0 );
+		EXPECT_EQ( RadHeat, 0.0 );
+		EXPECT_EQ( QBBElecRadSrc, 0.0 );
+		EXPECT_EQ( ElecUseRate, 0.0 );
+		EXPECT_EQ( AirOutletTemp, AirInletTemp );
+		
+	}
+
+	TEST_F( EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOn ) {
+		// this unit test is related to issue #6276, unit was producing negative heating, new routines turning things off or calculating things when on were added
+		Real64 AirOutletTemp;
+		Real64 ElecUseRate;
+		Real64 AirInletTemp;
+		Real64 QBBCap;
+		Real64 CapacitanceAir;
+		Real64 Effic;
+
+		// Set conditions
+		AirOutletTemp = 0.0;
+		ElecUseRate = 0.0;
+		AirInletTemp = 20.0;
+		QBBCap = 1200.0;
+		CapacitanceAir = 1000.0;
+		Effic = 0.5;
+		
+		// Call the On routine
+		ElectricBaseboardRadiator::UpdateElectricBaseboardOn( AirOutletTemp, ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
+
+		// Check that the output variables (AirOutletTemp and ElecUseRate) were calculated properly
+		// AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
+		// ElecUseRate = QBBCap / Effic;
+		EXPECT_NEAR( AirOutletTemp, 21.2, 0.0001 );
+		EXPECT_NEAR( ElecUseRate, 2400.0, 0.0001 );
+		
+	}
+	
 }

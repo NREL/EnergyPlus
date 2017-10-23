@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -136,13 +137,36 @@ namespace HVACSingleDuctInduc {
 	Array1D_bool CheckEquipName;
 	bool GetIUInputFlag( true ); // First time, input is "gotten"
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		static bool MyOneTimeFlag( true );
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyAirDistInitFlag;
+	}
 
-	// PRIVATE UpdateIndUnit
-	// PRIVATE ReportIndUnit
+	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
 
 	// Object Data
 	Array1D< IndUnitData > IndUnit;
+
+	void
+	clear_state()
+	{
+		NumIndUnits = 0;
+		IndUnit.deallocate();
+		GetIUInputFlag = true;
+		MyOneTimeFlag = true;
+		MyEnvrnFlag.deallocate();
+		MySizeFlag.deallocate();
+		MyPlantScanFlag.deallocate();
+		MyAirDistInitFlag.deallocate();
+	}
 
 	// Functions
 
@@ -218,6 +242,7 @@ namespace HVACSingleDuctInduc {
 			}
 		}
 
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( IndUnit( IUNum ).ADUNum ).TermUnitSizingNum;
 		// initialize the unit
 		InitIndUnit( IUNum, FirstHVACIteration );
 
@@ -437,43 +462,9 @@ namespace HVACSingleDuctInduc {
 			// Register component set data
 			TestCompSet( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, NodeID( IndUnit( IUNum ).PriAirInNode ), NodeID( IndUnit( IUNum ).OutAirNode ), "Air Nodes" );
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
 			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( IndUnit( IUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
-							ShowSevereError( "Error in connecting a terminal unit to a zone" );
-							ShowContinueError( NodeID( IndUnit( IUNum ).OutAirNode ) + " already connects to another zone" );
-							ShowContinueError( "Occurs for terminal unit " + IndUnit( IUNum ).UnitType + " = " + IndUnit( IUNum ).Name );
-							ShowContinueError( "Check terminal unit node names for errors" );
-							ErrorsFound = true;
-						} else {
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = IndUnit( IUNum ).PriAirInNode;
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
-						}
-						AirNodeFound = true;
-						// save the induction ratio in the term unit sizing array for use in the system sizing calculation
-						if ( ZoneSizingRunDone ) {
-							TermUnitSizing( CtrlZone ).InducRat = IndUnit( IUNum ).InducRatio;
-						}
-						break;
-					}
-				}
-			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 3 ) );
-				ErrorsFound = true;
-			}
-
-		}
-
-		for ( IUNum = 1; IUNum <= NumIndUnits; ++IUNum ) {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( IndUnit( IUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
-					//        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum
 					IndUnit( IUNum ).ADUNum = ADUNum;
 				}
 			}
@@ -481,7 +472,36 @@ namespace HVACSingleDuctInduc {
 			if ( IndUnit( IUNum ).ADUNum == 0 ) {
 				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for Unit = [" + IndUnit( IUNum ).UnitType + ',' + IndUnit( IUNum ).Name + "]." );
 				ShowContinueError( "...should have outlet node=" + NodeID( IndUnit( IUNum ).OutAirNode ) );
-				//          ErrorsFound=.TRUE.
+				ErrorsFound = true;
+			} else {
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( IndUnit( IUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							if ( ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode > 0 ) {
+								ShowSevereError( "Error in connecting a terminal unit to a zone" );
+								ShowContinueError( NodeID( IndUnit( IUNum ).OutAirNode ) + " already connects to another zone" );
+								ShowContinueError( "Occurs for terminal unit " + IndUnit( IUNum ).UnitType + " = " + IndUnit( IUNum ).Name );
+								ShowContinueError( "Check terminal unit node names for errors" );
+								ErrorsFound = true;
+							} else {
+								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = IndUnit( IUNum ).PriAirInNode;
+								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
+								AirDistUnit( IndUnit( IUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+								AirDistUnit( IndUnit( IUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							}
+							IndUnit( IUNum ).CtrlZoneInNodeIndex = SupAirIn;
+							AirNodeFound = true;
+							break;
+						}
+					}
+				}
+				if ( ! AirNodeFound ) {
+					ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
+					ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 3 ) );
+					ErrorsFound = true;
+				}
 			}
 		}
 
@@ -542,10 +562,6 @@ namespace HVACSingleDuctInduc {
 		int ColdConNode; // cold water control node  number
 		Real64 IndRat; // unit induction ratio
 		Real64 RhoAir; // air density at outside pressure and standard temperature and humidity
-		static bool MyOneTimeFlag( true );
-		static Array1D_bool MyEnvrnFlag;
-		static Array1D_bool MySizeFlag;
-		static Array1D_bool MyPlantScanFlag;
 
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
@@ -560,9 +576,11 @@ namespace HVACSingleDuctInduc {
 			MyEnvrnFlag.allocate( NumIndUnits );
 			MySizeFlag.allocate( NumIndUnits );
 			MyPlantScanFlag.allocate( NumIndUnits );
+			MyAirDistInitFlag.allocate( NumIndUnits );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
+			MyAirDistInitFlag = true;
 			MyOneTimeFlag = false;
 		}
 
@@ -587,6 +605,20 @@ namespace HVACSingleDuctInduc {
 			MyPlantScanFlag( IUNum ) = false;
 		}
 
+		if ( MyAirDistInitFlag( IUNum ) ) {
+			// save the induction ratio in the term unit sizing array for use in the system sizing calculation
+			if ( DataSizing::CurTermUnitSizingNum > 0 ){
+				DataSizing::TermUnitSizing( DataSizing::CurTermUnitSizingNum ).InducRat = IndUnit( IUNum ).InducRatio;
+			}
+			if ( IndUnit( IUNum ).AirLoopNum == 0 ) {
+				if ( (IndUnit( IUNum ).CtrlZoneNum > 0 ) && ( IndUnit( IUNum ).CtrlZoneInNodeIndex > 0 ) ){
+					IndUnit( IUNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( IndUnit( IUNum ).CtrlZoneNum ).InletNodeAirLoopNum( IndUnit( IUNum ).CtrlZoneInNodeIndex );
+					AirDistUnit( IndUnit( IUNum ).ADUNum ).AirLoopNum = IndUnit( IUNum ).AirLoopNum;
+				}
+			} else {
+				MyAirDistInitFlag( IUNum ) = false;
+			}
+		}
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
 			ZoneEquipmentListChecked = true;
 			// Check to see if there is a Air Distribution Unit on the Zone Equipment List
@@ -764,7 +796,11 @@ namespace HVACSingleDuctInduc {
 				}
 			} else {
 				CheckZoneSizing( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name );
-				MaxTotAirVolFlowDes = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				if ( CurTermUnitSizingNum > 0 ) {
+					MaxTotAirVolFlowDes = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
+				} else {
+					MaxTotAirVolFlowDes = 0.0;
+				}
 				if ( MaxTotAirVolFlowDes < SmallAirVolFlow ) {
 					MaxTotAirVolFlowDes = 0.0;
 				}
@@ -793,7 +829,7 @@ namespace HVACSingleDuctInduc {
 		if ( IndUnit( IUNum ).MaxVolHotWaterFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
 				if ( IndUnit( IUNum ).MaxVolHotWaterFlow > 0.0 ) {
 					ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "User-Specified Maximum Hot Water Flow Rate [m3/s]", IndUnit( IUNum ).MaxVolHotWaterFlow );
@@ -809,15 +845,15 @@ namespace HVACSingleDuctInduc {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", IndUnit( IUNum ).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						if ( PltSizHeatNum > 0 ) {
 
-							if ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+							if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
 								DesPriVolFlow = IndUnit( IUNum ).MaxTotAirVolFlow / ( 1.0 + IndUnit( IUNum ).InducRatio );
-								CpAir = PsyCpAirFnWTdb( TermUnitFinalZoneSizing( CurZoneEqNum ).HeatDesHumRat, TermUnitFinalZoneSizing( CurZoneEqNum ).HeatDesTemp );
+								CpAir = PsyCpAirFnWTdb( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesHumRat, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesTemp );
 								// the design heating coil load is the zone load minus whatever the central system does. Note that
 								// DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
-								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak > 0.0 ) {
-									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak );
+								if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak > 0.0 ) {
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak );
 								} else {
-									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
+									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU );
 								}
 								IndUnit( IUNum ).DesHeatingLoad = DesCoilLoad;
 								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
@@ -838,8 +874,8 @@ namespace HVACSingleDuctInduc {
 					if ( IsAutoSize ) {
 						IndUnit( IUNum ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Maximum Hot Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes );
-						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
-						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Temperature [C]", TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU );
+						ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]", TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInHumRatTU );
 					} else {
 						if ( IndUnit( IUNum ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = IndUnit( IUNum ).MaxVolHotWaterFlow;
@@ -865,7 +901,7 @@ namespace HVACSingleDuctInduc {
 		if ( IndUnit( IUNum ).MaxVolColdWaterFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( CurZoneEqNum > 0 ) {
+		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
 				if ( IndUnit( IUNum ).MaxVolColdWaterFlow > 0.0 ) {
 					ReportSizingOutput( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, "User-Specified Maximum Cold Water Flow Rate [m3/s]", IndUnit( IUNum ).MaxVolColdWaterFlow );
@@ -881,15 +917,15 @@ namespace HVACSingleDuctInduc {
 						PltSizCoolNum = MyPlantSizingIndex( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						if ( PltSizCoolNum > 0 ) {
 
-							if ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
+							if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 								DesPriVolFlow = IndUnit( IUNum ).MaxTotAirVolFlow / ( 1.0 + IndUnit( IUNum ).InducRatio );
-								CpAir = PsyCpAirFnWTdb( TermUnitFinalZoneSizing( CurZoneEqNum ).CoolDesHumRat, TermUnitFinalZoneSizing( CurZoneEqNum ).CoolDesTemp );
+								CpAir = PsyCpAirFnWTdb( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).CoolDesHumRat, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).CoolDesTemp );
 								// the design cooling coil load is the zone load minus whatever the central system does. Note that
 								// DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
-								if ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak > 0.0 ) {
-									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU );
+								if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak > 0.0 ) {
+									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU );
 								} else {
-									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
+									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
 								}
 								IndUnit( IUNum ).DesCoolingLoad = DesCoilLoad;
 								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( IndUnit( IUNum ).CWLoopNum ).FluidIndex, RoutineName );
@@ -931,22 +967,22 @@ namespace HVACSingleDuctInduc {
 			}
 		}
 
-		if ( CurZoneEqNum > 0 ) {
+		if ( CurTermUnitSizingNum > 0 ) {
 			// note we save the induced air flow for use by the hw and cw coil sizing routines
-			TermUnitSizing( CurZoneEqNum ).AirVolFlow = IndUnit( IUNum ).MaxTotAirVolFlow * IndUnit( IUNum ).InducRatio / ( 1.0 + IndUnit( IUNum ).InducRatio );
+			TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = IndUnit( IUNum ).MaxTotAirVolFlow * IndUnit( IUNum ).InducRatio / ( 1.0 + IndUnit( IUNum ).InducRatio );
 			// save the max hot and cold water flows for use in coil sizing
-			TermUnitSizing( CurZoneEqNum ).MaxHWVolFlow = IndUnit( IUNum ).MaxVolHotWaterFlow;
-			TermUnitSizing( CurZoneEqNum ).MaxCWVolFlow = IndUnit( IUNum ).MaxVolColdWaterFlow;
+			TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = IndUnit( IUNum ).MaxVolHotWaterFlow;
+			TermUnitSizing( CurTermUnitSizingNum ).MaxCWVolFlow = IndUnit( IUNum ).MaxVolColdWaterFlow;
 			// save the design load used for reporting
-			TermUnitSizing( CurZoneEqNum ).DesCoolingLoad = IndUnit( IUNum ).DesCoolingLoad;
-			TermUnitSizing( CurZoneEqNum ).DesHeatingLoad = IndUnit( IUNum ).DesHeatingLoad;
+			TermUnitSizing( CurTermUnitSizingNum ).DesCoolingLoad = IndUnit( IUNum ).DesCoolingLoad;
+			TermUnitSizing( CurTermUnitSizingNum ).DesHeatingLoad = IndUnit( IUNum ).DesHeatingLoad;
 			// save the induction ratio for use in subsequent sizing calcs
-			TermUnitSizing( CurZoneEqNum ).InducRat = IndUnit( IUNum ).InducRatio;
+			TermUnitSizing( CurTermUnitSizingNum ).InducRat = IndUnit( IUNum ).InducRatio;
 			if ( SameString( IndUnit( IUNum ).HCoilType, "Coil:Heating:Water" ) ) {
-				SetCoilDesFlow( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
+				SetCoilDesFlow( IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow, ErrorsFound );
 			}
 			if ( SameString( IndUnit( IUNum ).CCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
-				SetCoilDesFlow( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, TermUnitSizing( CurZoneEqNum ).AirVolFlow, ErrorsFound );
+				SetCoilDesFlow( IndUnit( IUNum ).CCoilType, IndUnit( IUNum ).CCoil, TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow, ErrorsFound );
 			}
 		}
 

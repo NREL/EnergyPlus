@@ -1,11 +1,11 @@
 #ifndef ObjexxFCL_CArrayA_hh_INCLUDED
-#define ObjexxFCL_CArrayA_hh_ Support
+#define ObjexxFCL_CArrayA_hh_INCLUDED
 
 // CArrayA: Memory-Managed C Array Wrapper with Alignment Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //

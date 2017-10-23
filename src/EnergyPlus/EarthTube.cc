@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -122,7 +123,7 @@ namespace EarthTube {
 		ZnRptET.deallocate();
 	}
 
-	
+
 	void
 	ManageEarthTube()
 	{
@@ -336,24 +337,24 @@ namespace EarthTube {
 			if ( EarthTubeSys( Loop ).ZonePtr > 0 ) {
 				if ( RepVarSet( EarthTubeSys( Loop ).ZonePtr ) ) {
 					RepVarSet( EarthTubeSys( Loop ).ZonePtr ) = false;
-					SetupOutputVariable( "Earth Tube Zone Sensible Cooling Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatLoss, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Zone Sensible Cooling Rate [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatLossRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Zone Sensible Heating Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGain, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Zone Sensible Heating Rate [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGainRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Air Flow Volume [m3]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolume, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Current Density Air Volume Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Standard Density Air Volume Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRateStd, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Air Flow Mass [kg]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMass, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Air Mass Flow Rate [kg/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Water Mass Flow Rate [kg/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeWaterMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Fan Electric Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElec, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name, _, "Electricity", _, _, "Building" );
-					SetupOutputVariable( "Earth Tube Fan Electric Power [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElecPower, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Zone Inlet Air Temperature [C]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeAirTemp, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Ground Interface Temperature [C]", EarthTubeSys( Loop ).GroundTempz1z2t, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Outdoor Air Heat Transfer Rate [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeOATreatmentPower, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Zone Inlet Wet Bulb Temperature [C]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeWetBulbTemp, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Zone Inlet Humidity Ratio [kgWater/kgDryAir]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHumRat, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-				
+					SetupOutputVariable( "Earth Tube Zone Sensible Cooling Energy", OutputProcessor::Unit::J, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatLoss, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Sensible Cooling Rate", OutputProcessor::Unit::W, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatLossRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Sensible Heating Energy", OutputProcessor::Unit::J, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGain, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Sensible Heating Rate", OutputProcessor::Unit::W, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGainRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Air Flow Volume", OutputProcessor::Unit::m3, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolume, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Current Density Air Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Standard Density Air Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRateStd, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Air Flow Mass", OutputProcessor::Unit::kg, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMass, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Air Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Water Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeWaterMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Fan Electric Energy", OutputProcessor::Unit::J, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElec, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name, _, "Electricity", _, _, "Building" );
+					SetupOutputVariable( "Earth Tube Fan Electric Power", OutputProcessor::Unit::W, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElecPower, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Inlet Air Temperature", OutputProcessor::Unit::C, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeAirTemp, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Ground Interface Temperature", OutputProcessor::Unit::C, EarthTubeSys( Loop ).GroundTempz1z2t, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Outdoor Air Heat Transfer Rate", OutputProcessor::Unit::W, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeOATreatmentPower, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Inlet Wet Bulb Temperature", OutputProcessor::Unit::C, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeWetBulbTemp, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Zone Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHumRat, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+
 				}
 			}
 		}
@@ -366,7 +367,7 @@ namespace EarthTube {
 
 	}
 
-	
+
 	void
 	CheckEarthTubesInZones
 	(
@@ -378,7 +379,7 @@ namespace EarthTube {
 
 		int Loop;
 		int Loop1;
-		
+
 		// Check to make sure there is only one earth tube statement per zone
 		for ( Loop = 1; Loop <= TotEarthTube - 1; ++Loop ) {
 			for ( Loop1 = Loop + 1; Loop1 <= TotEarthTube; ++Loop1 ) {
@@ -391,9 +392,9 @@ namespace EarthTube {
 			}
 		}
 
-		
+
 	}
-	
+
 	void
 	CalcEarthTube()
 	{
@@ -515,7 +516,7 @@ namespace EarthTube {
 			}
 
 			CalcEarthTubeHumRat( Loop, NZ );
-			
+
 		}
 
 	}
@@ -526,16 +527,16 @@ namespace EarthTube {
 		int const NZ // Zone number (index)
 	)
 	{
-		
+
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   November 2005
 		//       MODIFIED       Rick Strand, June 2017 (made this a separate subroutine)
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine determines the leaving humidity ratio for the EarthTube
 		// and calculates parameters associated with humidity ratio.
-		
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 InsideEnthalpy;
 		Real64 OutletAirEnthalpy;
@@ -543,7 +544,7 @@ namespace EarthTube {
 		Real64 InsideHumRat;
 
 		InsideDewPointTemp = PsyTdpFnWPb( OutHumRat, OutBaroPress );
-		
+
 		if ( EarthTubeSys( Loop ).InsideAirTemp >= InsideDewPointTemp ) {
 			InsideHumRat = OutHumRat;
 			InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, OutHumRat );
@@ -559,7 +560,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).AirTemp = EarthTubeSys( Loop ).InsideAirTemp;
 			}
 			MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
-			
+
 		} else {
 			InsideHumRat = PsyWFnTdpPb( EarthTubeSys( Loop ).InsideAirTemp, OutBaroPress );
 			InsideEnthalpy = PsyHFnTdbW( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat );
@@ -576,13 +577,13 @@ namespace EarthTube {
 			}
 			MCPTE( NZ ) = MCPE( NZ ) * EarthTubeSys( Loop ).AirTemp;
 		}
-		
+
 		EarthTubeSys( Loop ).HumRat = InsideHumRat;
 		EarthTubeSys( Loop ).WetBulbTemp = PsyTwbFnTdbWPb( EarthTubeSys( Loop ).InsideAirTemp, InsideHumRat, OutBaroPress );
-		EAMFLxHumRat( NZ ) = EAMFL( NZ ) * InsideHumRat;		
-		
+		EAMFLxHumRat( NZ ) = EAMFL( NZ ) * InsideHumRat;
+
 	}
-	
+
 	void
 	ReportEarthTube()
 	{

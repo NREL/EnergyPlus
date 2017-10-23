@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -56,6 +57,7 @@
 
 // EnergyPlus Headers
 #include <General.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -2567,6 +2569,26 @@ namespace General {
 
 		return OutputString;
 
+	}
+
+	// returns the Julian date for the first, second, etc. day of week for a given month 
+	int
+	nthDayOfWeekOfMonth(
+		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
+		int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
+		int const & monthNumber // January = 1
+	)
+	{
+		// J. Glazer - August 2017
+		int firstDayOfMonth = JulianDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear );
+		int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7 ;
+		int jdatForNth;
+		if ( dayOfWeek >= dayOfWeekForFirstDay ) {
+			jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay ) + 7 * ( nthTime - 1 );
+		} else {
+			jdatForNth = firstDayOfMonth + ( (dayOfWeek + 7) - dayOfWeekForFirstDay ) + 7 * ( nthTime - 1 );
+		}
+		return jdatForNth;
 	}
 
 	Real64

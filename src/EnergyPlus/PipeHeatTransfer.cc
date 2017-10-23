@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -668,21 +669,21 @@ namespace PipeHeatTransfer {
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
 		for ( Item = 1; Item <= nsvNumOfPipeHT; ++Item ) {
 
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", PipeHT( Item ).FluidHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", PipeHT( Item ).FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate", OutputProcessor::Unit::W, PipeHT( Item ).FluidHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT( Item ).FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
 
 			if ( PipeHT( Item ).EnvironmentPtr == ZoneEnv ) {
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate [W]", PipeHT( Item ).EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy [J]", PipeHT( Item ).EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate", OutputProcessor::Unit::W, PipeHT( Item ).EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT( Item ).EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
 
 				SetupZoneInternalGain( PipeHT( Item ).EnvrZonePtr, "Pipe:Indoor", PipeHT( Item ).Name, IntGainTypeOf_PipeIndoor, PipeHT( Item ).ZoneHeatGainRate );
 
 			}
 
-			SetupOutputVariable( "Pipe Mass Flow Rate [kg/s]", PipeHT( Item ).MassFlowRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Volume Flow Rate [m3/s]", PipeHT( Item ).VolumeFlowRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Inlet Temperature [C]", PipeHT( Item ).FluidInletTemp, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Outlet Temperature [C]", PipeHT( Item ).FluidOutletTemp, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PipeHT( Item ).MassFlowRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Volume Flow Rate", OutputProcessor::Unit::m3_s, PipeHT( Item ).VolumeFlowRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Inlet Temperature", OutputProcessor::Unit::C, PipeHT( Item ).FluidInletTemp, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Outlet Temperature", OutputProcessor::Unit::C, PipeHT( Item ).FluidOutletTemp, "Plant", "Average", PipeHT( Item ).Name );
 		}
 
 	}

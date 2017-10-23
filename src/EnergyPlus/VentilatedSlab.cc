@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1093,28 +1094,28 @@ namespace VentilatedSlab {
 			//   CALL SetupOutputVariable('Ventilated Slab Direct Heat Gain [J]',        &
 			//                           VentSlab(Item)%DirectHeatGain,'System', &
 			//                             'Sum', VentSlab(Item)%Name)
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Rate [W]", VentSlab( Item ).RadHeatingPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Energy [J]", VentSlab( Item ).RadHeatingEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Rate [W]", VentSlab( Item ).RadCoolingPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Energy [J]", VentSlab( Item ).RadCoolingEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Rate [W]", VentSlab( Item ).HeatCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Energy [J]", VentSlab( Item ).HeatCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Rate [W]", VentSlab( Item ).TotCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Energy [J]", VentSlab( Item ).TotCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Rate [W]", VentSlab( Item ).SensCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Energy [J]", VentSlab( Item ).SensCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Rate [W]", VentSlab( Item ).LateCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Energy [J]", VentSlab( Item ).LateCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Air Mass Flow Rate [kg/s]", VentSlab( Item ).AirMassFlowRate, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Power [W]", VentSlab( Item ).ElecFanPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Rate", OutputProcessor::Unit::W, VentSlab( Item ).RadHeatingPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Energy", OutputProcessor::Unit::J, VentSlab( Item ).RadHeatingEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).RadCoolingPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).RadCoolingEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Rate", OutputProcessor::Unit::W, VentSlab( Item ).HeatCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Energy", OutputProcessor::Unit::J, VentSlab( Item ).HeatCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).TotCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).TotCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).SensCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).SensCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).LateCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).LateCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Air Mass Flow Rate", OutputProcessor::Unit::kg_s, VentSlab( Item ).AirMassFlowRate, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Power", OutputProcessor::Unit::W, VentSlab( Item ).ElecFanPower, "System", "Average", VentSlab( Item ).Name );
 			//! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
-			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Energy [J]", VentSlab( Item ).ElecFanEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Inlet Air Temperature [C]", VentSlab( Item ).SlabInTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Outlet Air Temperature [C]", VentSlab( Item ).SlabOutTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Zone Inlet Air Temperature [C]", VentSlab( Item ).ZoneInletTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Return Air Temperature [C]", VentSlab( Item ).ReturnAirTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Outlet Air Temperature [C]", VentSlab( Item ).FanOutletTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Availability Status []", VentSlab( Item ).AvailStatus, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Energy", OutputProcessor::Unit::J, VentSlab( Item ).ElecFanEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Inlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).SlabInTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Outlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).SlabOutTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Zone Inlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).ZoneInletTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Return Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).ReturnAirTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Outlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).FanOutletTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Availability Status", OutputProcessor::Unit::None, VentSlab( Item ).AvailStatus, "System", "Average", VentSlab( Item ).Name );
 
 		}
 

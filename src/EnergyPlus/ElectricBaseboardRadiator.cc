@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -85,8 +86,6 @@ namespace ElectricBaseboardRadiator {
 	// MODULE INFORMATION:
 	//       AUTHOR         Daeho Kang
 	//       DATE WRITTEN   Feb 2010
-	//       MODIFIED
-	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
 	// This module is to calculate the actual convective heat addition that an electrical baseboard heater
@@ -101,24 +100,15 @@ namespace ElectricBaseboardRadiator {
 	// HighTempRadiantSystem module (ZoneHVAC:HighTemperatureRadiant)
 	// Convective electric baseboard module (ZoneHVAC:Baseboard:Convective:Electric)
 
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataGlobals;
 	using namespace DataPrecisionGlobals;
 
-	// Use statements for access to subroutines in other modules
-
-	// Data
-	//MODULE PARAMETER DEFINITIONS
+	// PARAMETER DEFINITIONS
 	int const BaseboardRadiator_Electric( 1 );
 	std::string const cCMO_BBRadiator_Electric( "ZoneHVAC:Baseboard:RadiantConvective:Electric" );
 
-	// DERIVED TYPE DEFINITIONS
-
-	//MODULE VARIABLE DECLARATIONS:
+	// VARIABLE DECLARATIONS:
 	int NumElecBaseboards( 0 );
 	Array1D< Real64 > QBBElecRadSource; // Need to keep the last value in case we are still iterating
 	Array1D< Real64 > QBBElecRadSrcAvg; // Need to keep the last value in case we are still iterating
@@ -129,7 +119,6 @@ namespace ElectricBaseboardRadiator {
 	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
 	Array1D_bool MySizeFlag;
 	Array1D_bool CheckEquipName;
-	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
 	// Object Data
 	Array1D< ElecBaseboardParams > ElecBaseboard;
@@ -152,13 +141,9 @@ namespace ElectricBaseboardRadiator {
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   Nov 2001
 		//       MODIFIED       Feb 2010 Daeho Kang for radiant component
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine simulates the Electric Baseboard units.
-
-		// METHODOLOGY EMPLOYED:
-		// na
 
 		// REFERENCES:
 		// Water baseboard module
@@ -166,18 +151,6 @@ namespace ElectricBaseboardRadiator {
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // Index of unit in baseboard array
@@ -238,16 +211,9 @@ namespace ElectricBaseboardRadiator {
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   Nov 2001
 		//       MODIFIED       Feb 2010 Daeho Kang for radiant component
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the Baseboard units.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard input processor calls.
-
-		// REFERENCES:
-		// Hot water baseboard module
 
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
@@ -266,10 +232,6 @@ namespace ElectricBaseboardRadiator {
 		using DataSizing::CapacityPerFloorArea;
 		using DataSizing::FractionOfAutosizedHeatingCapacity;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
 		Real64 const MaxFraction( 1.0 ); // Maximum limit of fractional values
@@ -280,12 +242,6 @@ namespace ElectricBaseboardRadiator {
 		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to HW baseboard heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to HW baseboard heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); // get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
@@ -512,17 +468,17 @@ namespace ElectricBaseboardRadiator {
 
 			// Setup Report variables for the Electric Baseboards
 			// CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Electric'
-			SetupOutputVariable( "Baseboard Total Heating Rate [W]", ElecBaseboard( BaseboardNum ).TotPower, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, ElecBaseboard( BaseboardNum ).TotPower, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
 
-			SetupOutputVariable( "Baseboard Convective Heating Rate [W]", ElecBaseboard( BaseboardNum ).ConvPower, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
-			SetupOutputVariable( "Baseboard Radiant Heating Rate [W]", ElecBaseboard( BaseboardNum ).RadPower, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Convective Heating Rate", OutputProcessor::Unit::W, ElecBaseboard( BaseboardNum ).ConvPower, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, ElecBaseboard( BaseboardNum ).RadPower, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
 
-			SetupOutputVariable( "Baseboard Electric Energy [J]", ElecBaseboard( BaseboardNum ).ElecUseLoad, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName, _, "Electric", "HEATING", _, "System" );
-			SetupOutputVariable( "Baseboard Electric Power [W]", ElecBaseboard( BaseboardNum ).ElecUseRate, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
-			SetupOutputVariable( "Baseboard Total Heating Energy [J]", ElecBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Electric Energy", OutputProcessor::Unit::J, ElecBaseboard( BaseboardNum ).ElecUseLoad, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName, _, "Electric", "HEATING", _, "System" );
+			SetupOutputVariable( "Baseboard Electric Power", OutputProcessor::Unit::W, ElecBaseboard( BaseboardNum ).ElecUseRate, "System", "Average", ElecBaseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, ElecBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
 
-			SetupOutputVariable( "Baseboard Convective Heating Energy [J]", ElecBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName );
-			SetupOutputVariable( "Baseboard Radiant Heating Energy [J]", ElecBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Convective Heating Energy", OutputProcessor::Unit::J, ElecBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName );
+			SetupOutputVariable( "Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, ElecBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", ElecBaseboard( BaseboardNum ).EquipName );
 		}
 
 	}
@@ -539,34 +495,15 @@ namespace ElectricBaseboardRadiator {
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   Nov 2001
 		//       MODIFIED       Feb 2010 Daeho Kang for radiant component
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine initializes the Baseboard units during simulation.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::ZoneEquipConfig;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNode;
@@ -628,11 +565,6 @@ namespace ElectricBaseboardRadiator {
 			MyEnvrnFlag( BaseboardNum ) = true;
 		}
 
-		// Do the Begin Day initializations
-		if ( BeginDayFlag ) {
-
-		}
-
 		if ( BeginTimeStepFlag && FirstHVACIteration ) {
 			ZoneNum = ElecBaseboard( BaseboardNum ).ZonePtr;
 			ZeroSourceSumHATsurf( ZoneNum ) = SumHATsurf( ZoneNum );
@@ -670,7 +602,6 @@ namespace ElectricBaseboardRadiator {
 		//       DATE WRITTEN   February 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
 		//                      July 2014, B. Nigusse, added scalable sizing
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is for sizing electric baseboard components for which nominal capacities have not been
@@ -680,9 +611,6 @@ namespace ElectricBaseboardRadiator {
 		// Obtains flow rates from the zone sizing arrays and plant sizing data. UAs are
 		// calculated by numerically inverting the baseboard calculation routine.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using ReportSizingManager::ReportSizingOutput;
@@ -691,23 +619,10 @@ namespace ElectricBaseboardRadiator {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizeElectricBaseboard");
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 NominalCapacityDes; // Design capacity value for reproting
-		Real64 NominalCapacityUser; // User hard-sized UA value for reproting
-		bool IsAutoSize; // Indicator to autosizing nominal capacity
-
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -718,9 +633,6 @@ namespace ElectricBaseboardRadiator {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
-		IsAutoSize = false;
-		NominalCapacityDes = 0.0;
-		NominalCapacityUser = 0.0;
 		DataScalableCapSizingON = false;
 
 		if ( CurZoneEqNum > 0 ) {
@@ -785,7 +697,6 @@ namespace ElectricBaseboardRadiator {
 		//       DATE WRITTEN   Nov 2001
 		//       MODIFIED       Feb 2010 Daeho Kang for radiant component
 		//                      Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates the heat exchange rate in a Electric baseboard heater.
@@ -796,8 +707,6 @@ namespace ElectricBaseboardRadiator {
 		// This is primarily modified from Convective Electric Baseboard. An existing algorithm of radiant
 		// heat transfer calculation in the High Tmeperature Radiant System module is implemented.
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using ScheduleManager::GetScheduleIndex;
@@ -807,18 +716,8 @@ namespace ElectricBaseboardRadiator {
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
 		using DataHVACGlobals::SmallLoad;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SimpConvAirFlowSpeed( 0.5 ); // m/s
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum;
@@ -872,31 +771,52 @@ namespace ElectricBaseboardRadiator {
 				// should include this.
 				LoadMet = ( SumHATsurf( ZoneNum ) - ZeroSourceSumHATsurf( ZoneNum ) ) + ( QBBCap * ElecBaseboard( BaseboardNum ).FracConvect ) + ( RadHeat * ElecBaseboard( BaseboardNum ).FracDistribPerson );
 
-				if ( LoadMet < 0.0 ) { // No cooling output
-					AirOutletTemp = AirInletTemp;
-					ElecBaseboard( BaseboardNum ).ElecUseRate = 0.0;
+				if ( LoadMet < 0.0 ) {
+					// This basically means that SumHATsurf is LESS than ZeroSourceSumHATsurf which
+					// should not happen unless something unusual is happening like a fast change
+					// in temperature or some sort of change in internal load.  This is not a problem
+					// normally, but when LoadMet goes negative the choice is to either zero out
+					// the baseboard or give it another shot at getting an accurate reading on
+					// what is happening in the zone.  If it is still predicting a negative heating
+					// load, then zero everything out.
+					// First, turn off the baseboard:
+					Real64 TempZeroSourceSumHATsurf;
+					QBBElecRadSource( BaseboardNum ) = 0.0;
+					DistributeBBElecRadGains();
+					HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
+					TempZeroSourceSumHATsurf = SumHATsurf( ZoneNum );
+					// Now, turn it back on:
+					QBBElecRadSource( BaseboardNum ) = RadHeat;
+					DistributeBBElecRadGains();
+					HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf( ZoneNum );
+					HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf( ZoneNum );
+					// Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
+					LoadMet = ( SumHATsurf( ZoneNum ) - TempZeroSourceSumHATsurf ) + ( QBBCap * ElecBaseboard( BaseboardNum ).FracConvect ) + ( RadHeat * ElecBaseboard( BaseboardNum ).FracDistribPerson );
+					if ( LoadMet < 0.0 ) {
+						// LoadMet is still less than zero so shut everything down
+						UpdateElectricBaseboardOff( LoadMet, QBBCap, RadHeat, QBBElecRadSource( BaseboardNum ), ElecBaseboard( BaseboardNum ).ElecUseRate, AirOutletTemp, AirInletTemp );
+					} else {
+						// Corrected LoadMet is now positive so use this and move forward with system operating
+						UpdateElectricBaseboardOn( AirOutletTemp, ElecBaseboard( BaseboardNum ).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
+					}
 				} else {
-					AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
-					// This could be utilized somehow or even reported so the data structures are left in place
-					// The Baseboard electric Load is calculated using the efficiency
-					ElecBaseboard( BaseboardNum ).ElecUseRate = QBBCap / Effic;
+
+					UpdateElectricBaseboardOn( AirOutletTemp, ElecBaseboard( BaseboardNum ).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
+	
 				}
 
 			} else { // zero radiant fraction, no need of recalculation of heat balances
 
 				LoadMet = QBBCap;
-				ElecBaseboard( BaseboardNum ).ElecUseRate = QBBCap / Effic;
+				UpdateElectricBaseboardOn( AirOutletTemp, ElecBaseboard( BaseboardNum ).ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
 
 			}
 
 		} else { // If there is an off condition the BB does nothing.
 
-			QBBCap = 0.0;
-			LoadMet = 0.0;
-			RadHeat = 0.0;
-			AirOutletTemp = AirInletTemp;
-			QBBElecRadSource( BaseboardNum ) = 0.0;
-			ElecBaseboard( BaseboardNum ).ElecUseRate = 0.0;
+			UpdateElectricBaseboardOff( LoadMet, QBBCap, RadHeat, QBBElecRadSource( BaseboardNum ), ElecBaseboard( BaseboardNum ).ElecUseRate, AirOutletTemp, AirInletTemp );
+
 		}
 
 		// Assign calculated ones
@@ -905,6 +825,56 @@ namespace ElectricBaseboardRadiator {
 		ElecBaseboard( BaseboardNum ).TotPower = LoadMet;
 		ElecBaseboard( BaseboardNum ).RadPower = RadHeat;
 		ElecBaseboard( BaseboardNum ).ConvPower = QBBCap - RadHeat;
+
+	}
+
+	void
+	UpdateElectricBaseboardOff(
+		Real64 & LoadMet,
+		Real64 & QBBCap,
+		Real64 & RadHeat,
+		Real64 & QBBElecRadSrc,
+		Real64 & ElecUseRate,
+		Real64 & AirOutletTemp,
+		Real64 const AirInletTemp
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   August 2017
+
+		// PURPOSE OF THIS SUBROUTINE: Zero out appropriate system variables when it is off
+
+		QBBCap = 0.0;
+		LoadMet = 0.0;
+		RadHeat = 0.0;
+		AirOutletTemp = AirInletTemp;
+		QBBElecRadSrc = 0.0;
+		ElecUseRate = 0.0;
+
+	}
+
+	void
+	UpdateElectricBaseboardOn(
+		Real64 & AirOutletTemp,
+		Real64 & ElecUseRate,
+		Real64 const AirInletTemp,
+		Real64 const QBBCap,
+		Real64 const CapacitanceAir,
+		Real64 const Effic )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   August 2017
+
+		// PURPOSE OF THIS SUBROUTINE: System is on, so calculate some of the result variables
+
+		AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
+		// This could be utilized somehow or even reported so the data structures are left in place
+		// The Baseboard electric Load is calculated using the efficiency
+		ElecUseRate = QBBCap / Effic;
 
 	}
 
@@ -918,33 +888,12 @@ namespace ElectricBaseboardRadiator {
 		//       DATE WRITTEN   Nov 1997
 		//                      February 2001
 		//       MODIFIED       Feb 2010 Daeho Kang for radiant component
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-		// The update subrotines in water baseboard radiator is modified.
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int Iter( 0 );
@@ -979,7 +928,6 @@ namespace ElectricBaseboardRadiator {
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   February 2001
 		//       MODIFIED       Feb 2010 Daeho Kang for baseboard
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To transfer the average value of the heat source over the entire
@@ -994,28 +942,9 @@ namespace ElectricBaseboardRadiator {
 		// see if the system was even on.  If any average term is non-zero, then
 		// one or more of the radiant systems was running.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // DO loop counter for surface index
 
-		// FLOW:
 		ElecBaseboardSysOn = false;
 
 		// If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -1046,7 +975,6 @@ namespace ElectricBaseboardRadiator {
 		//       DATE WRITTEN   February 2001
 		//       MODIFIED       Feb 2010 Daeho Kang for baseboard
 		//                      April 2010 Brent Griffith, max limit to protect surface temperature calcs
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// To distribute the gains from the electric basebaord heater
@@ -1059,9 +987,6 @@ namespace ElectricBaseboardRadiator {
 		// Note that the energy radiated to people is assumed to affect them
 		// but them it is assumed to be convected to the air.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalFanSys::QElecBaseboardToPerson;
 		using DataHeatBalFanSys::QElecBaseboardSurf;
@@ -1070,17 +995,8 @@ namespace ElectricBaseboardRadiator {
 		using DataSurfaces::Surface;
 		using DataZoneEquipment::ZoneEquipConfig;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallestArea( 0.001 ); // Smallest area in meters squared (to avoid a divide by zero)
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int RadSurfNum; // Counter for surfaces receiving radiation from radiant heater
@@ -1089,7 +1005,6 @@ namespace ElectricBaseboardRadiator {
 		int ZoneNum; // Pointer to the Zone derived type
 		Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-		// FLOW:
 		// Initialize arrays
 		QElecBaseboardSurf = 0.0;
 		QElecBaseboardToPerson = 0.0;
@@ -1133,36 +1048,11 @@ namespace ElectricBaseboardRadiator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Richard Liesen
-		//       DATE WRITTEN   Nov 2001
-		//       MODIFIED       Feb 2010 Daeho Kang for additional variables
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE: This subroutine
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
+		//       AUTHOR         Daeho Kang
+		//       DATE WRITTEN   Feb 2010
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		ElecBaseboard( BaseboardNum ).ElecUseLoad = ElecBaseboard( BaseboardNum ).ElecUseRate * TimeStepSys * SecInHour;
 		ElecBaseboard( BaseboardNum ).TotEnergy = ElecBaseboard( BaseboardNum ).TotPower * TimeStepSys * SecInHour;
@@ -1179,19 +1069,11 @@ namespace ElectricBaseboardRadiator {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
 		//       DATE WRITTEN   July 2003
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
 		// The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
 		// and should be updated accordingly.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using namespace DataSurfaces;
@@ -1201,14 +1083,10 @@ namespace ElectricBaseboardRadiator {
 		// Return value
 		Real64 SumHATsurf;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int SurfNum; // Surface number
 		Real64 Area; // Effective surface area
 
-		// FLOW:
 		SumHATsurf = 0.0;
 
 		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {

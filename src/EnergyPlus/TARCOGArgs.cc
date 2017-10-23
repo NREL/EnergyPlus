@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -44,11 +45,10 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <cmath>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
+
+#include <DataGlobals.hh>
 
 // EnergyPlus Headers
 #include <TARCOGArgs.hh>
@@ -499,6 +499,7 @@ namespace TARCOGArgs {
 		Real64 & Gin,
 		Array1A< Real64 > rir,
 		Array1A< Real64 > vfreevent,
+		Array1A< Real64 > Ah,    // Front openness area for airflow calculations [m2]
 		int & nperr,
 		std::string & ErrorMessage
 	)
@@ -582,13 +583,17 @@ namespace TARCOGArgs {
 					if ( thick( i ) < SlatThick( i ) ) thick( i ) = SlatThick( i );
 				} else if ( ( ThermalMod == THERM_MOD_ISO15099 ) || ( ThermalMod == THERM_MOD_CSM ) ) {
 					thick( i ) = SlatThick( i );
+					Real64 slatAngRad = SlatAngle( i ) * 2.0 * DataGlobals::Pi / 360.0;
+					if ( Ah( i ) > 1e-8 ) {
+						thick( i ) = C4_VENET * ( SlatWidth( i ) * cos( slatAngRad ) );
+					}
 				}
 			} // Venetian
 		}
 
 		hint = hin;
 		houtt = hout;
-		tiltr = tilt * 2.0 * Pi / 360.0; // convert tilt in degrees to radians
+		tiltr = tilt * 2.0 * DataGlobals::Pi / 360.0; // convert tilt in degrees to radians
 
 		// external radiation term
 		{ auto const SELECT_CASE_var( isky );

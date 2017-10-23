@@ -859,7 +859,7 @@ For each system (AirLoopHVAC), in the corresponding Sizing:System object, specif
 
 \subsection{DesignSpecification:OutdoorAir}\label{designspecificationoutdoorair}
 
-This object allows for the outdoor air requirements to be defined in a common location for use by other objects. This object may be referenced by name from other objects (e.g., VAV terminal units) as required to identify an outdoor air quantity for use by that object. Note that a zone name Is not included as an input to this zone outdoor air definition and the number of people in a zone, zone floor area, and zone volume can only be determined after this object has been referenced by another. A single zone outdoor air definition may be referenced by multiple objects to specify that the same outdoor air requirements are used by those objects \emph{or} multiple zone outdoor air objects may be defined and referenced by other objects as needed. If multiple zone outdoor air definitions are used, each outdoor air definition must have a unique name.
+This object allows for the outdoor air requirements to be defined in a common location for use by other objects. This object may be referenced by name from other objects (e.g., VAV terminal units, AirTerminal:SingleDuct:Uncontrolled, and AirTerminal:SingleDuct:Mixer) as required to identify an outdoor air quantity for use by that object. Note that a zone name Is not included as an input to this zone outdoor air definition and the number of people in a zone, zone floor area, and zone volume can only be determined after this object has been referenced by another. A single zone outdoor air definition may be referenced by multiple objects to specify that the same outdoor air requirements are used by those objects \emph{or} multiple zone outdoor air objects may be defined and referenced by other objects as needed. If multiple zone outdoor air definitions are used, each outdoor air definition must have a unique name.
 
 \subsubsection{Inputs}\label{inputs-012}
 
@@ -869,7 +869,29 @@ Unique identifying name. Any reference to this name by other objects will denote
 
 \paragraph{Field: Outdoor Air Method}\label{field-outdoor-air-method}
 
-The input must be either \emph{Flow/Person}, \emph{Flow/Area}, \emph{Flow/Zone, AirChanges/Hour}, \emph{Sum}, or \emph{Maximum}. \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the actual zone occupancy to calculate a zone outdoor air flow rate. \emph{Flow/Area} means that the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} and the actual zone floor area as the zone outdoor air flow rate. \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow per Zone} as the zone outdoor air flow rate. \emph{AirChanges/Hour} means that the program will use the input from the field \emph{Air Changes per Hour} and the actual zone volume (divided by 3600 seconds per hour) as the zone outdoor air flow rate. \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area, Outdoor Air Flow per Zone}, and \emph{Air Changes per Hour} (using the associated conversions to m\(^{3}\)/s for each field) will be added to obtain the zone outdoor air flow rate. \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area, Outdoor Air Flow per Zone,} and \emph{Air Changes per Hour} (using the associated conversions to m\(^{3}\)/s for each field) will be used as the zone outdoor air flow rate. The default is \emph{Flow/Person}.
+The input must be either \emph{Flow/Person}, \emph{Flow/Area}, \emph{Flow/Zone, AirChanges/Hour}, \emph{Sum}, \emph{Maximum}, \emph{IndoorAirQualityProcedure}, \emph{ProportionalControlBasedOnDesignOccupancy}, or \emph{ProportionalControlBasedonOccupancySchedule}. The default is \emph{Flow/Person}.
+\begin{itemize} 
+\tightlist 
+
+\item  \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the actual zone occupancy to calculate a zone outdoor air flow rate.  
+
+\item  \emph{Flow/Area} means that the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} and the actual zone floor area as the zone outdoor air flow rate.   
+\item  \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow per Zone} as the zone outdoor air flow rate.   
+
+\item  \emph{AirChanges/Hour} means that the program will use the input from the field \emph{Air Changes per Hour} and the actual zone volume (divided by 3600 seconds per hour) as the zone outdoor air flow rate.  
+
+\item  \emph{Sum} means that the flows calculated from the fields \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area, Outdoor Air Flow per Zone}, and \emph{Air Changes per Hour} (using the associated conversions to m\(^{3}\)/s for each field) will be added to obtain the zone outdoor air flow rate.
+
+\item  \emph{Maximum} means that the maximum flow derived from \emph{Outdoor Air Flow per Person,} \emph{Outdoor Air Flow per Area, Outdoor Air Flow per Zone,} and \emph{Air Changes per Hour} (using the associated conversions to m\(^{3}\)/s for each field) will be used as the zone outdoor air flow rate.
+   
+\item  \emph{IndoorAirQualityProcedure} means that the program will use the other procedure defined in ASHRAE Standard 62.1-2007 to calculate the amount of outdoor air necessary in order to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the ZoneControl:ContaminantController object. Appendix A of the ASHRAE 62.1-2010 userâ€™s manual discusses another method for implementing CO2-based DCV in a single zone system. The last two methods of Proportional Control calculate the required outdoor air flow rate which varies in proportion to the percentage of the CO2 signal range and has two choices to calculate occupancy-based outdoor air rate. 
+  
+\item  \emph{ProportionalControlBasedonOccupancySchedule} uses the real occupancy at the current time step to calculate outdoor air rate.
+
+\item  \emph{ProportionalControlBasedonDesignOccupancy} uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage.
+
+\end{itemize} 
+
 
 \paragraph{Field: Outdoor Air Flow per Person}\label{field-outdoor-air-flow-per-person}
 
@@ -891,7 +913,7 @@ The design outdoor air volume flow rate in air changes per hour. This factor is 
 
 This field is the name of schedule that defines how outdoor air requirements change over time. The field is optional. If left blank, the schedule defaults to 1.0. If used, then the schedule values are multiplied by the outdoor air flow rate defined by the previous fields. The schedule values must be between 0 and 1, inclusive.  
 
-If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calcaulations.
+If this DesignSpecification:OutdoorAir object is referenced by a Controller:MechanicalVentilation object (either directly or indirectly through Sizing:Zone), the schedule will be applied to all types of outdoor air calculations for the corresponding zone, regardless of the System Outdoor Air Method selected. If the schedule value is zero, then the zone will be completely removed from the system outdoor air calculations.
 
 \paragraph{Field: Proportional Control Minimum Outdoor Air Flow Rate Schedule Name }\label{field-proportional-control-minimum-outdoor-air-flow-rate-schedule-name}
 
@@ -1096,6 +1118,10 @@ The humidity ratio in kilograms of water per kilogram of dry air of the supply a
 
 This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the design outdoor air flow rate for the zone.
 
+When a choice of IndoorAirQualityProcedure is entered in the Outdoor Air Method field of the DesignSpecification:OutdoorAir object, the design outdoor airflow rate is calculated based on the choice of Sum in the same field.
+
+When a choice of ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedonOccupancySchedule is entered, the design outdoor airflow rate is calculated based on equations specified in the "Proportional Control" section in the Engineering Reference.  
+
 \paragraph{Field: Zone Heating Sizing Factor}\label{field-zone-heating-sizing-factor}
 
 This input is a zone level heating sizing ratio. The zone design heating air flow rates and loads will be multiplied by the number input in this field. This input overrides the building level sizing factor input in the Sizing:Parameters object. And, of course, if this field is blank or zero, the global heating sizing factor from the Sizing:Parameters object is used.
@@ -1114,15 +1140,15 @@ The design zone cooling air flow rate in cubic meters per second. This input is 
 
 \paragraph{Field: Cooling Minimum Air Flow per Zone Floor Area}\label{field-cooling-minimum-air-flow-per-zone-floor-area}
 
-The minimum zone cooling volumetric flow rate per square meter (units are m\(^{3}\)/s-m\(^{2}\)). This field is used when \emph{Cooling Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets a lower bound on the zone design cooling air flow rate. In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, and \emph{Cooling Minimum Air Flow Fraction}~ is used to set a minimum supply air flow rate for the zone for VAV systems. The default is .000762, corresponding to .15 cfm/ft\(^{2}\).~ The applicable sizing factor is not applied to this value.
+The minimum zone cooling volumetric flow rate per square meter (units are m\(^{3}\)/s-m\(^{2}\)). This field is used when \emph{Cooling Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets a lower bound on the zone design cooling air flow rate. In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, \emph{Cooling Minimum Air Flow Fraction} and the design outdoor air flow rate (including VRP adjustments) is used to set a minimum supply air flow rate for the zone for VAV systems. The default is 0.000762, corresponding to 0.15 cfm/ft\(^{2}\). The applicable sizing factor is not applied to this value.
 
 \paragraph{Field: Cooling Minimum Air Flow}\label{field-cooling-minimum-air-flow}
 
-The minimum zone cooling volumetric flow rate in m\(^{3}\)/s. This field is used when \emph{Cooling Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets a lower bound on the zone design cooling air flow rate. In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, and \emph{Cooling Minimum Air Flow Fraction}~ is used to set a minimum supply air flow rate for the zone for VAV systems. The default is zero.~ The applicable sizing factor is not applied to this value.
+The minimum zone cooling volumetric flow rate in m\(^{3}\)/s. This field is used when \emph{Cooling Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets a lower bound on the zone design cooling air flow rate.  In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, \emph{Cooling Minimum Air Flow Fraction} and the design outdoor air flow rate (including VRP adjustments) is used to set a minimum supply air flow rate for the zone for VAV systems. The default is zero. The applicable sizing factor is not applied to this value.
 
 \paragraph{Field: Cooling Minimum Air Flow Fraction}\label{field-cooling-minimum-air-flow-fraction}
 
-The minimum zone design cooling volumetric flow rate expressed as a fraction of the zone design cooling volumetric flow rate. . In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, and \emph{Cooling Minimum Air Flow Fraction}~ is used to set a minimum supply air flow rate for the zone for VAV systems. The default is 0.2. This input is currently used in sizing the VAV air terminal unit. It does not currently affect other component autosizing.
+The minimum zone design cooling volumetric flow rate expressed as a fraction of the zone design cooling volumetric flow rate.  In all cases the maximum flow derived from \emph{Cooling Minimum Air Flow per Zone Floor Area}, \emph{Cooling Minimum Air Flow}, \emph{Cooling Minimum Air Flow Fraction} and the design outdoor air flow rate (including VRP adjustments) is used to set a minimum supply air flow rate for the zone for VAV systems. The default is 0.2. This input is currently used in sizing the VAV air terminal unit and fan minimum flow rate. It does not currently affect other component autosizing.
 
 \paragraph{Field: Heating Design Air Flow Method}\label{field-heating-design-air-flow-method}
 
@@ -1134,11 +1160,11 @@ The design zone heating air flow rate in cubic meters per second. This input is 
 
 \paragraph{Field: Heating Maximum Air Flow per Zone Floor Area}\label{field-heating-maximum-air-flow-per-zone-floor-area}
 
-The maximum zone heating volumetric flow rate per square meter (units are m\(^{3}\)/s-m\(^{2}\)). This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this and the next two input fields, the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction}~ is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is .002032, corresponding to .40 cfm/ft\(^{2}\). If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one ore more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
+The maximum zone heating volumetric flow rate per square meter (units are m\(^{3}\)/s-m\(^{2}\)). This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this and the next two input fields, the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction}~ is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.002032, corresponding to 0.40 cfm/ft\(^{2}\). If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one ore more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
 
 \paragraph{Field: Heating Maximum Air Flow}\label{field-heating-maximum-air-flow}
 
-The maximum zone heating volumetric flow rate in m\(^{3}\)/s. This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this field and the two input fields just prior to and after this field,,the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction} is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is .1415762, corresponding to 300 cfm. If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one ore more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
+The maximum zone heating volumetric flow rate in m\(^{3}\)/s. This field is used when \emph{Heating Design Air Flow Method} is specified as \emph{DesignDayWithLimit}. In this case it sets an upper bound on the zone design heating air flow rate. For this field and the two input fields just prior to and after this field,,the maximum flow derived from \emph{Heating Maximum Air Flow per Zone Floor Area}, \emph{Heating Maximum Air Flow}, and \emph{Heating Maximum Air Flow Fraction} is used to set a maximum heating supply air flow rate for the zone for VAV systems. The default is 0.1415762, corresponding to 300 cfm. If the maximum heating design flow rate calculated using these input fields is greater than the design heating flow rate calculated during sizing, these input fields have no impact on sizing. It may be more appropriate to select only one of these three fields to calculate the maximum heating design flow rate (i.e., if one ore more of these three fields is 0, it will not be used in calculating the maximum heating design flow rate).
 
 \paragraph{Field: Heating Maximum Air Flow Fraction}\label{field-heating-maximum-air-flow-fraction}
 
@@ -1492,6 +1518,56 @@ Enter the heating capacity as a fraction of the autosized heating capacity. This
       ;                        !- Fraction of Autosized Cooling Design Capacity {-}
 \end{lstlisting}
 
+\subsection{DesignSpecification:AirTerminal:Sizing}\label{designspecificationairterminalsizing}
+
+This object modifies the sizing of an air loop terminal unit. It may be referenced by a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled object. The values specified here are applied to the base sizing results from the corresponding Sizing:Zone inputs. Any given DesignSpecification:AirTerminal:Sizing object may be used by multiple terminal units with similar characteristics.
+
+This feature has the following limitations:
+\begin{itemize}
+\item It does not work with VRP sizing.
+\item It does not work with a specified system flow rate in Sizing:System.
+\item It does not work if the base minimum outdoor air flow exceeds the heating or cooling air flow.
+\end{itemize}
+
+\subsubsection{Inputs}\label{inputs-52-007}
+
+\paragraph{Field: Name}\label{field-name-2-009}
+
+Name of the design specification air terminal sizing object. This name may be referenced by a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled object.
+
+\paragraph{Field: Fraction of Design Sensible Cooling Load}\label{fraction-of-design-sensible-cooling-load}
+
+The fraction of the design sensible cooling load to be met by this terminal unit. This fraction is applied after the Zone Cooling Sizing Factor (see Sizing:Zone).
+
+\paragraph{Field: Cooling Design Supply Air Temperature Difference Ratio}\label{cooling-design-supply-air-temperature-difference-ratio}
+
+This ratio adjusts the supply air temperature difference used to calculate the cooling design supply air flow rate for this terminal unit.
+
+\paragraph{Field: Fraction of Design Sensible Heating Load}\label{fraction-of-design-sensible-heating-load}
+
+The fraction of the design sensible heating load to be met by this terminal unit. This fraction is applied after the Zone Heating Sizing Factor (see Sizing:Zone).
+
+\paragraph{Field: Heating Design Supply Air Temperature Difference Ratio}\label{heating-design-supply-air-temperature-difference-ratio}
+
+This ratio adjusts the supply air temperature difference used to calculate the heating design supply air flow rate for this terminal unit.
+
+\paragraph{Field: Fraction of Minimum Outdoor Air Flow}\label{fraction-of-minimum-outdoor-air-requirement}
+
+The fraction of the zone minimum outdoor air requirement to be met by this terminal unit.
+
+An IDF example:
+
+\begin{lstlisting}
+
+  DesignSpecification:AirTerminal:Sizing,
+    Recirculation System A Terminal Sizing, !- Name
+    0.6,                     !- Fraction of Design Cooling Load
+    0.8,                     !- Cooling Design Supply Air Temperature Difference Ratio
+    1.0,                     !- Fraction of Design Heating Load
+    1.0,                     !- Heating Design Supply Air Temperature Difference Ratio
+    0.0;                     !- Fraction of Minimum Outdoor Air Flow
+\end{lstlisting}
+
 \subsection{Sizing:System}\label{sizingsystem}
 
 The Sizing:System object contains the input needed to perform a central forced air system design air flow, heating capacity, and cooling capacity calculation for a system serving one or more zones. The information needed consists of the outside environmental conditions and the design supply air temperatures, outdoor air flow rate, and minimum system air flow ratio.
@@ -1558,11 +1634,11 @@ Entering \emph{Yes} means the system will be sized for heating using 100\% outdo
 
 \paragraph{Field: Central Cooling Design Supply Air Humidity Ratio}\label{field-central-cooling-design-supply-air-humidity-ratio}
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. The default is .008 (kgWater/kgDryAir).
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central cooling coil. The default is 0.008 (kgWater/kgDryAir).
 
 \paragraph{Field: Central Heating Design Supply Air Humidity Ratio}\label{field-central-heating-design-supply-air-humidity-ratio}
 
-The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system. The default is .008 (kgWater/kgDryAir).
+The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. This value is also used for the sizing of zone equipment (e.g., reheat coil) for the system embedded with central heating coils, but it is not used if there is no central heating coil in the system. The default is 0.008 (kgWater/kgDryAir).
 
 \paragraph{Field: Cooling Supply Air Flow Rate Method}\label{field-cooling-supply-air-flow-rate-method}
 
@@ -1610,7 +1686,7 @@ Enter the heating supply air volume flow rate per unit heating capacity in m3/s-
 
 \paragraph{Field: System Outdoor Air Method}\label{field-system-outdoor-air-method-000}
 
-The method used to calculate the system minimum outdoor air flow. The two choices are ZoneSum and VentilationRateProcedure (VRP). ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions.
+The method used to calculate the system minimum outdoor air flow. The two choices are ZoneSum and VentilationRateProcedure (VRP). ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. VRP may also adjust autosized air terminal maximum and minimum supply flow rates if needed to ensure adequate outdoor air flow rate to each zone.
 
 \paragraph{Field: Zone Maximum Outdoor Air Fraction}\label{field-zone-maximum-outdoor-air-fraction-000}
 

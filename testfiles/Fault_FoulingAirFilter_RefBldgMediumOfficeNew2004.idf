@@ -71,7 +71,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,8.7;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -403,10 +403,6 @@
   Construction,
     DropCeiling,             !- Name
     Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -7615,8 +7611,6 @@
   Output:Meter,Gas:Facility,HOURLY;
 
   Output:Meter,Heating:Gas,HOURLY;
-
-  Output:Meter,InteriorEquipment:Gas,HOURLY;
 
   Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
 

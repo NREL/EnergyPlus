@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -425,6 +426,10 @@ namespace DataHeatBalance {
 	extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
 	extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
 	extern bool AdaptiveComfortRequested_ASH55; // true if people objects have adaptive comfort requests. ASH55
+
+	extern bool NoFfactorConstructionsUsed;
+	extern bool NoCfactorConstructionsUsed;
+
 	extern int NumRefrigeratedRacks; // Total number of refrigerated case compressor racks in input
 	extern int NumRefrigSystems; // Total number of detailed refrigeration systems in input
 	extern int NumRefrigCondensers; // Total number of detailed refrigeration condensers in input
@@ -1320,6 +1325,10 @@ namespace DataHeatBalance {
 		Real64 ExtGrossGroundWallArea_Multiplied; // Ground contact Wall Area for Zone (Gross) with multipliers
 		int SystemZoneNodeNumber; // This is the zone node number for the system for a controlled zone
 		bool IsControlled; // True when this is a controlled zone.
+		bool IsSupplyPlenum; // True when this zone is a supply plenum
+		bool IsReturnPlenum; // True when this zone is a return plenum
+		int ZoneEqNum; // Controlled zone equip config number
+		int PlenumCondNum; // Supply or return plenum conditions number, 0 if this is not a plenum zone
 		int TempControlledZoneIndex; // this is the index number for TempControlledZone structure for lookup
 		//            Pointers to Surface Data Structure
 		int SurfaceFirst; // First Surface in Zone
@@ -1336,9 +1345,23 @@ namespace DataHeatBalance {
 		Real64 MaximumY; // Maximum Y value for entire zone
 		Real64 MinimumZ; // Minimum Z value for entire zone
 		Real64 MaximumZ; // Maximum Z value for entire zone
+
 		Real64 OutDryBulbTemp; // Zone outside dry bulb air temperature (C)
+		bool OutDryBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor air temp
+		Real64 OutDryBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air drybulb temp (C)
 		Real64 OutWetBulbTemp; // Zone outside wet bulb air temperature (C)
+		bool OutWetBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor wetbulb
+		Real64 OutWetBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air wetbulb temp (C)
 		Real64 WindSpeed; // Zone outside wind speed (m/s)
+		bool WindSpeedEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind speed
+		Real64 WindSpeedEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+		Real64 WindDir; // Zone outside wind direction (degree)
+		bool WindDirEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind direction
+		Real64 WindDirEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+
+		bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
+		int LinkedOutAirNode; // Index of the an OutdoorAir:Node
+
 		bool isPartOfTotalArea; // Count the zone area when determining the building total floor area
 		bool isNominalOccupied; // has occupancy nominally specified
 		bool isNominalControlled; // has Controlled Zone Equip Configuration reference
@@ -1404,6 +1427,10 @@ namespace DataHeatBalance {
 			ExtGrossGroundWallArea_Multiplied( 0.0 ),
 			SystemZoneNodeNumber( 0 ),
 			IsControlled( false ),
+			IsSupplyPlenum( false ),
+			IsReturnPlenum( false ),
+			ZoneEqNum ( 0 ),
+			PlenumCondNum( 0 ),
 			TempControlledZoneIndex( 0 ),
 			SurfaceFirst( 0 ),
 			SurfaceLast( 0 ),
@@ -1419,9 +1446,21 @@ namespace DataHeatBalance {
 			MaximumY( 0.0 ),
 			MinimumZ( 0.0 ),
 			MaximumZ( 0.0 ),
+
 			OutDryBulbTemp( 0.0 ),
+			OutDryBulbTempEMSOverrideOn( false ),
+			OutDryBulbTempEMSOverrideValue( 0.0 ),
 			OutWetBulbTemp( 0.0 ),
+			OutWetBulbTempEMSOverrideOn( false ),
+			OutWetBulbTempEMSOverrideValue( 0.0 ),
 			WindSpeed( 0.0 ),
+			WindSpeedEMSOverrideOn( false ),
+			WindSpeedEMSOverrideValue( 0.0 ),
+			WindDir( 0.0 ),
+			WindDirEMSOverrideOn( false ),
+			WindDirEMSOverrideValue( 0.0 ),
+			HasLinkedOutAirNode( false ),
+			LinkedOutAirNode( 0.0 ),
 			isPartOfTotalArea( true ),
 			isNominalOccupied( false ),
 			isNominalControlled( false ),
@@ -1457,6 +1496,10 @@ namespace DataHeatBalance {
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+		void
+		SetWindDirAt( Real64 const fac );
+
 
 	};
 
@@ -1640,6 +1683,7 @@ namespace DataHeatBalance {
 		bool FractionReturnAirIsCalculated;
 		Real64 FractionReturnAirPlenTempCoeff1;
 		Real64 FractionReturnAirPlenTempCoeff2;
+		int ZoneReturnNum; // zone return index (not the node number) for return heat gain
 		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
 		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
 		bool ManageDemand; // Flag to indicate whether to use demand limiting
@@ -1676,6 +1720,7 @@ namespace DataHeatBalance {
 			FractionReturnAirIsCalculated( false ),
 			FractionReturnAirPlenTempCoeff1( 0.0 ),
 			FractionReturnAirPlenTempCoeff2( 0.0 ),
+			ZoneReturnNum( 1 ),
 			NomMinDesignLevel( 0.0 ),
 			NomMaxDesignLevel( 0.0 ),
 			ManageDemand( false ),
@@ -2314,6 +2359,7 @@ namespace DataHeatBalance {
 		Real64 CarbonDioxideGainRate; // current timestep value of carbon dioxide gain rate for device
 		Reference< Real64 > PtrGenericContamGainRate; // fortan POINTER to value of generic contaminant gain rate for device
 		Real64 GenericContamGainRate; // current timestep value of generic contaminant gain rate for device
+		int ReturnAirNodeNum; // return air node number for retrun air convection heat gain
 
 		// Default Constructor
 		GenericComponentZoneIntGainStruct() :
@@ -2324,7 +2370,8 @@ namespace DataHeatBalance {
 			LatentGainRate( 0.0 ),
 			ReturnAirLatentGainRate( 0.0 ),
 			CarbonDioxideGainRate( 0.0 ),
-			GenericContamGainRate( 0.0 )
+			GenericContamGainRate( 0.0 ),
+			ReturnAirNodeNum( 0 )
 		{}
 
 	};
@@ -3080,6 +3127,21 @@ namespace DataHeatBalance {
 
 	};
 
+	struct ZoneLocalEnvironmentData
+	{
+		// Members
+		std::string Name;
+		int ZonePtr; // surface pointer
+		int OutdoorAirNodePtr; // schedule pointer
+
+		// Default Constructor
+		ZoneLocalEnvironmentData() :
+			ZonePtr( 0 ),
+			OutdoorAirNodePtr( 0 )
+		{}
+
+	};
+
 	struct ZoneReportVars // Zone level.
 	{
 		// Members
@@ -3407,6 +3469,7 @@ namespace DataHeatBalance {
 	extern Array1D< GlobalInternalGainMiscObject > VentilationObjects;
 	extern Array1D< ZoneReportVars > ZnRpt;
 	extern Array1D< ZoneMassConservationData > MassConservation;
+	extern Array1D< ZoneLocalEnvironmentData > ZoneLocalEnvironment;
 	extern ZoneAirMassFlowConservation ZoneAirMassFlow;
 
 	// Functions
@@ -3424,6 +3487,9 @@ namespace DataHeatBalance {
 
 	void
 	SetZoneWindSpeedAt();
+
+	void
+	SetZoneWindDirAt();
 
 	void
 	CheckAndSetConstructionProperties(

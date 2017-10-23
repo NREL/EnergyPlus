@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.8;
 
   Building,
     Building,                !- Name
@@ -468,14 +468,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -492,26 +484,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Zone,
     PLENUM-1,                !- Name
@@ -841,7 +815,7 @@
     3.7,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp01-RIGHT,                 !- Name
+    Sp01-RIGHT,              !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
@@ -857,7 +831,7 @@
     30.5,3.7,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp01-LEFT,                 !- Name
+    Sp01-LEFT,               !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
@@ -1065,7 +1039,7 @@
     26.8,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp03-RIGHT,                 !- Name
+    Sp03-RIGHT,              !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
@@ -1081,7 +1055,7 @@
     30.5,15.2,2.4;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
-    Sp03-LEFT,                 !- Name
+    Sp03-LEFT,               !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
@@ -1095,7 +1069,6 @@
     0.0,15.2,0.0,  !- X,Y,Z ==> Vertex 2 {m}
     0.0,11.6,0.0,  !- X,Y,Z ==> Vertex 3 {m}
     0.0,11.6,2.4;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   BuildingSurface:Detailed,
     LEFT-1,                  !- Name

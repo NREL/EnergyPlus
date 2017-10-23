@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -431,9 +432,9 @@ namespace Psychrometrics {
 		++NumTimesCalled( iPsyTwbFnTdbWPb_cache );
 #endif
 
-		Tdb_tag = TRANSFER( Tdb, Tdb_tag );
-		W_tag = TRANSFER( W, W_tag );
-		Pb_tag = TRANSFER( Pb, Pb_tag );
+		Tdb_tag = bit::bit_transfer( Tdb, Tdb_tag );
+		W_tag = bit::bit_transfer( W, W_tag );
+		Pb_tag = bit::bit_transfer( Pb, Pb_tag );
 
 		Tdb_tag = bit::bit_shift( Tdb_tag, -Grid_Shift );
 		W_tag = bit::bit_shift( W_tag, -Grid_Shift );
@@ -445,9 +446,9 @@ namespace Psychrometrics {
 			cached_Twb( hash ).iW = W_tag;
 			cached_Twb( hash ).iPb = Pb_tag;
 
-			Tdb_tag_r = TRANSFER( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
-			W_tag_r = TRANSFER( bit::bit_shift( W_tag, Grid_Shift ), W_tag_r );
-			Pb_tag_r = TRANSFER( bit::bit_shift( Pb_tag, Grid_Shift ), Pb_tag_r );
+			Tdb_tag_r = bit::bit_transfer( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
+			W_tag_r = bit::bit_transfer( bit::bit_shift( W_tag, Grid_Shift ), W_tag_r );
+			Pb_tag_r = bit::bit_transfer( bit::bit_shift( Pb_tag, Grid_Shift ), Pb_tag_r );
 
 			cached_Twb( hash ).Twb = PsyTwbFnTdbWPb_raw( Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom );
 		}
