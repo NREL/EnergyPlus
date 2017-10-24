@@ -164,8 +164,14 @@ public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	);
 
+	int const
+	getZoneIndex();
 
+	int const
+	getAirLoopNum();
 
+	Real64 const
+	getPrimAirDesignVolFlow();
 
  private: // Methods
 

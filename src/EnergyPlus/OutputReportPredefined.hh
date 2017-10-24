@@ -319,6 +319,10 @@ namespace OutputReportPredefined {
 	extern int pdchSysSizUserClAir;
 	extern int pdchSysSizCalcHtAir;
 	extern int pdchSysSizUserHtAir;
+	extern int pdchSysSizAdjustedClAir;
+	extern int pdchSysSizAdjustedHtAir;
+	extern int pdchSysSizAdjustedMainAir;
+	extern int pdchSysSizHeatFlowRatio;
 	extern int pdstPlantSize;
 	extern int pdchPlantSizCalcVdot;
 	extern int pdchPlantSizMeasVdot;
@@ -531,6 +535,8 @@ namespace OutputReportPredefined {
 	extern int pdchS62svrClEv;
 	extern int pdchS62svrClVot;
 	extern int pdchS62svrClPercOA;
+	extern int pdchS62svrClEnvironmentOfPs;
+	extern int pdchS62svrClTimeOfPs;
 
 	extern int pdstS62sysVentReqHeat;
 	extern int pdchS62svrHtSumVpz;
@@ -543,6 +549,8 @@ namespace OutputReportPredefined {
 	extern int pdchS62svrHtEv;
 	extern int pdchS62svrHtVot;
 	extern int pdchS62svrHtPercOA;
+	extern int pdchS62svrHtEnvironmentOfPs;
+	extern int pdchS62svrHtTimeOfPs;
 
 	extern int pdstS62znVentPar;
 	extern int pdchS62zvpAlN;

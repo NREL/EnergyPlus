@@ -328,6 +328,10 @@ namespace OutputReportPredefined {
 	int pdchSysSizUserClAir;
 	int pdchSysSizCalcHtAir;
 	int pdchSysSizUserHtAir;
+	int pdchSysSizAdjustedClAir;
+	int pdchSysSizAdjustedHtAir;
+	int pdchSysSizAdjustedMainAir;
+	int pdchSysSizHeatFlowRatio;
 	int pdstPlantSize;
 	int pdchPlantSizCalcVdot;
 	int pdchPlantSizMeasVdot;
@@ -540,6 +544,9 @@ namespace OutputReportPredefined {
 	int pdchS62svrClEv;
 	int pdchS62svrClVot;
 	int pdchS62svrClPercOA;
+	int pdchS62svrClEnvironmentOfPs;
+	int pdchS62svrClTimeOfPs;
+
 
 	int pdstS62sysVentReqHeat;
 	int pdchS62svrHtSumVpz;
@@ -552,6 +559,8 @@ namespace OutputReportPredefined {
 	int pdchS62svrHtEv;
 	int pdchS62svrHtVot;
 	int pdchS62svrHtPercOA;
+	int pdchS62svrHtEnvironmentOfPs;
+	int pdchS62svrHtTimeOfPs;
 
 	int pdstS62znVentPar;
 	int pdchS62zvpAlN;
@@ -958,6 +967,10 @@ namespace OutputReportPredefined {
 		pdchSysSizUserClAir = 0;
 		pdchSysSizCalcHtAir = 0;
 		pdchSysSizUserHtAir = 0;
+		pdchSysSizAdjustedClAir = 0;
+		pdchSysSizAdjustedHtAir = 0;
+		pdchSysSizAdjustedMainAir = 0;
+		pdchSysSizHeatFlowRatio = 0;
 		pdstPlantSize = 0;
 		pdchPlantSizCalcVdot = 0;
 		pdchPlantSizMeasVdot = 0;
@@ -1138,6 +1151,9 @@ namespace OutputReportPredefined {
 		pdchS62svrClEv = 0;
 		pdchS62svrClVot = 0;
 		pdchS62svrClPercOA = 0;
+		pdchS62svrClEnvironmentOfPs = 0;
+		pdchS62svrClTimeOfPs = 0;
+
 		pdstS62sysVentReqHeat = 0;
 		pdchS62svrHtSumVpz = 0;
 		pdchS62svrHtPs = 0;
@@ -1149,6 +1165,9 @@ namespace OutputReportPredefined {
 		pdchS62svrHtEv = 0;
 		pdchS62svrHtVot = 0;
 		pdchS62svrHtPercOA = 0;
+		pdchS62svrHtEnvironmentOfPs = 0;
+		pdchS62svrHtTimeOfPs = 0;
+
 		pdstS62znVentPar = 0;
 		pdchS62zvpAlN = 0;
 		pdchS62zvpRp = 0;
@@ -1629,6 +1648,10 @@ namespace OutputReportPredefined {
 		pdchSysSizUserClAir = newPreDefColumn( pdstSystemSize, "User cooling [m3/s]" );
 		pdchSysSizCalcHtAir = newPreDefColumn( pdstSystemSize, "Calculated heating [m3/s]" );
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
+		pdchSysSizAdjustedClAir = newPreDefColumn( pdstSystemSize, "Adjusted cooling [m3/s]" );
+		pdchSysSizAdjustedHtAir = newPreDefColumn( pdstSystemSize, "Adjusted heating [m3/s]" );
+		pdchSysSizAdjustedMainAir = newPreDefColumn( pdstSystemSize, "Adjusted main [m3/s]" );
+		pdchSysSizHeatFlowRatio = newPreDefColumn( pdstSystemSize, "Calculated Heating Air Flow Ratio" );
 
 		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
 //		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
@@ -1878,6 +1901,8 @@ namespace OutputReportPredefined {
 			pdchS62svrClEv = newPreDefColumn( pdstS62sysVentReqCool, "System Ventilation Efficiency - Ev" );
 			pdchS62svrClVot = newPreDefColumn( pdstS62sysVentReqCool, "Outdoor Air Intake Flow - Vot [m3/s]" );
 			pdchS62svrClPercOA = newPreDefColumn( pdstS62sysVentReqCool, "Percent Outdoor Air - %OA" );
+			pdchS62svrClEnvironmentOfPs =  newPreDefColumn( pdstS62sysVentReqCool, "Environment Name of Peak System Population - Ps" );
+			pdchS62svrClTimeOfPs =  newPreDefColumn( pdstS62sysVentReqCool, "Date and Time of Last Peak System Population - Ps" );
 
 			pdstS62sysVentReqHeat = newPreDefSubTable( pdrStd62, "System Ventilation Requirements for Heating" );
 
@@ -1891,6 +1916,8 @@ namespace OutputReportPredefined {
 			pdchS62svrHtEv = newPreDefColumn( pdstS62sysVentReqHeat, "System Ventilation Efficiency - Ev" );
 			pdchS62svrHtVot = newPreDefColumn( pdstS62sysVentReqHeat, "Outdoor Air Intake Flow Vot [m3/s]" );
 			pdchS62svrHtPercOA = newPreDefColumn( pdstS62sysVentReqHeat, "Percent Outdoor Air - %OA" );
+			pdchS62svrHtEnvironmentOfPs =  newPreDefColumn( pdstS62sysVentReqHeat, "Environment Name of Peak System Population - Ps" );
+			pdchS62svrHtTimeOfPs =  newPreDefColumn( pdstS62sysVentReqHeat, "Date and Time of Last Peak System Population - Ps" );
 
 			pdstS62znVentPar = newPreDefSubTable( pdrStd62, "Zone Ventilation Parameters" );
 
