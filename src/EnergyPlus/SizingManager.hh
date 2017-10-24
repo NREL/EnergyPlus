@@ -97,6 +97,15 @@ namespace SizingManager {
 	ManageSizing();
 
 	void
+	ManageSystemSizingAdjustments();
+
+	void
+	ManageSystemVentilationAdjustments();
+
+	void
+	DetermineSystemPopulationDiversity();
+
+	void
 	GetOARequirements();
 
 	void

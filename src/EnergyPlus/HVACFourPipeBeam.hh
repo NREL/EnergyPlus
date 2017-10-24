@@ -164,6 +164,9 @@ public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	);
 
+
+
+
  private: // Methods
 
 	void

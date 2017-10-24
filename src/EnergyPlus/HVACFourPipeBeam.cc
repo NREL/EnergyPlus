@@ -356,8 +356,23 @@ namespace FourPipeBeam {
 
 	}
 
+	int const
+	HVACFourPipeBeam::getAirLoopNum()
+	{
+		return airLoopNum;
+	}
 
+	int const
+	HVACFourPipeBeam::getZoneIndex()
+	{
+		return zoneIndex;
+	}
 
+	Real64 const
+	HVACFourPipeBeam::getPrimAirDesignVolFlow()
+	{
+		return vDotDesignPrimAir;
+	}
 
 	void
 	HVACFourPipeBeam::simulate(
@@ -497,6 +512,12 @@ namespace FourPipeBeam {
 									this->hWLocation.branchNum,
 									this->hWLocation.compNum
 									);
+			}
+
+			if ( this->airLoopNum == 0 ) { // fill air loop index
+				if ( this->zoneIndex > 0 ) {
+					this->airLoopNum = DataZoneEquipment::ZoneEquipConfig( this->zoneIndex ).InletNodeAirLoopNum( this->airOutNodeNum );
+				}
 			}
 
 			this->myEnvrnFlag = false;
@@ -782,6 +803,8 @@ namespace FourPipeBeam {
 		if ( ( originalTermUnitSizeMaxVDot > 0.0 ) && ( originalTermUnitSizeMaxVDot != this->vDotDesignPrimAir ) && ( CurZoneEqNum > 0 ) ) {
 			if ( ( DataSizing::SysSizingRunDone ) && ( this->airLoopNum > 0 ) ) {
 				// perturb system size to handle change in system size calculated without knowing about 4 pipe beam
+				// Note that this approach is not necessarily appropriate for coincident system design option
+				//and it might be moved to make such adjustments in SizingManager::ManageSystemSizingAdjustments() 
 				DataSizing::FinalSysSizing( this->airLoopNum).DesMainVolFlow
 					+= ( this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot );
 				DataSizing::FinalSysSizing( this->airLoopNum ).DesCoolVolFlow

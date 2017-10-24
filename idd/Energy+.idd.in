@@ -32541,7 +32541,8 @@ Sizing:System,
       \type real
       \minimum 0.0
       \maximum 1.0
-      \default 0.5
+      \default autosize
+      \autosizable
   N3, \field Preheat Design Temperature
       \required-field
       \type real

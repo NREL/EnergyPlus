@@ -94,7 +94,7 @@ protected: // Creation
 		airInNodeNum( 0 ),
 		airOutNodeNum( 0 ),
 		zoneIndex( 0 ),
-		zoneNodeIndex( 0 )
+		zoneNodeIndex( 0 ),
 	{}
 
 	// Copy Constructor
