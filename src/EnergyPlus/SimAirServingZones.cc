@@ -3944,16 +3944,8 @@ namespace SimAirServingZones {
 		Real64 HtgSupplyAirAdjustFactor; // temporary variable
 		Real64 SysOAUnc; // uncorrected system OA summing up people and area based OA for all zones for VRP
 		Real64 ZoneOAUnc; // uncorrected zone OA summing up people and area based OA for each zone
-		Real64 TotalPeople; // total number of people in each zone
-
-		Real64 PeakPeople; // peak population based on maximum people schedule value
-
-		Real64 PopulationDiversity; // ratio of total system co-incident peak population to sum of people for all zones in system
 
 		//have moved a large number of std 62.1 variables to DataSizing.hh so they can be used outside of this routine
-
-		//  INTEGER :: ZoneIndex
-		int iAirDistUnit;
 
 		// allocate arrays used to store values for standard 62.1 tabular report
 		if ( ! allocated( VpzClgByZone ) ) {

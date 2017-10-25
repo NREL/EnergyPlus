@@ -1343,16 +1343,7 @@ namespace MixedAir {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int MaxNumAirLoopZones; // maximum number of heating plus cooling zones attached to any air loop
-		int NumAirLoopZones; // number of heating plus cooling zones attached to a given air loop
-		int NumofAirLoop; // counter for NumPrimaryAirSys
-		int NumAirLoopCooledZones; // number of cooling zones for a given air loop
-		int NumAirLoopCooledZonesTemp; // index for number of cooling zones
-		int AirLoopZones; // total number of unique heating and cooling zones for each air loop
-		int NumAirLoopHeatedZones; // number of heating zones for a given air loop
-		int NumAirLoopHeatedZonesTemp; // index for number of heating zones
 		int ZoneNum; // zone number attached to a given air loop
-		bool CommonZone; // logical for the same zone being a cooling zone and a heating zone
 		int NumNums; // Number of real numbers returned by GetObjectItem
 		int NumAlphas; // Number of alphanumerics returned by GetObjectItem
 		int OutAirNum; // Number of Controller:OutdoorAir or CONTROLLER:STAND ALONE ERV objects

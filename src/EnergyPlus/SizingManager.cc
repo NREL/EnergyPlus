@@ -1128,9 +1128,6 @@ namespace SizingManager {
 		// redo std 62.1 calculations using latest information on zone flows and report to tables
 
 		//redo 62.1 zone calculations with final (or user) zone terminal flow sizes, only redo calculations that might change with final flows
-		Real64 ZoneOAFracCooling( 0.0 ); // zone OA fraction for cooling design air flow
-		Real64 ZoneOAFracHeating( 0.0 ); // zone OA fraction for heating design air flow
-		Real64 ZoneOAUnc( 0.0 ); // uncorrected zone OA summing up people and area based OA for each zone
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 			int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
@@ -1151,8 +1148,6 @@ namespace SizingManager {
 					}
 				} // end loop over zones on air loop to calculate Zdz values
 
-				Real64 D = DataSizing::DBySys( AirLoopNum );
-				
 				//Sum Voz values for System Vou, in E+ the Vbz value has now been corrected to remove population Diversity, so we add the term back in here directly to get Vou
 				DataSizing::VouBySys( AirLoopNum ) = 0.0;
 				for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {

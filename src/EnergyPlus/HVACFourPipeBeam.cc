@@ -356,19 +356,19 @@ namespace FourPipeBeam {
 
 	}
 
-	int const
+	int
 	HVACFourPipeBeam::getAirLoopNum()
 	{
 		return airLoopNum;
 	}
 
-	int const
+	int
 	HVACFourPipeBeam::getZoneIndex()
 	{
 		return zoneIndex;
 	}
 
-	Real64 const
+	Real64
 	HVACFourPipeBeam::getPrimAirDesignVolFlow()
 	{
 		return vDotDesignPrimAir;

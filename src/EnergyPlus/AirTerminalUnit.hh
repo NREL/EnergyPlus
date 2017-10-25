@@ -136,15 +136,15 @@ public: // Methods
 	) = 0;
 
 	virtual
-	int const
+	int
 	getZoneIndex() = 0;
 
 	virtual
-	int const
+	int
 	getAirLoopNum() = 0;
 
 	virtual
-	Real64 const
+	Real64
 	getPrimAirDesignVolFlow() = 0;
 
 protected: // Data
