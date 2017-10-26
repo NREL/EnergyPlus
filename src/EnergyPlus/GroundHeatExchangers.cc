@@ -619,8 +619,8 @@ namespace GroundHeatExchangers {
 		}
 
 		if( !DisableCaching ) {
-			MakeCache();
-			ReadCache();
+			makeCache();
+			readCache();
 		}
 
 		if ( gFunctionsExist ) {
@@ -694,14 +694,14 @@ namespace GroundHeatExchangers {
 		// save data for later
 
 		if ( !DisableCaching ) {
-			WriteCache();
+			writeCache();
 		}
 	}
 
 	//******************************************************************************
 
 	void
-	GLHEVert::MakeCache()
+	GLHEVert::makeCache()
 	{
 		// For convenience
 		auto & d = myCacheData["Phys Data"];
@@ -732,7 +732,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-	GLHEVert::ReadCache()
+	GLHEVert::readCache()
 	{
 		// For convenience
 		using json = nlohmann::json;
@@ -809,7 +809,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-	GLHEVert::WriteCache()
+	GLHEVert::writeCache()
 	{
 
 		// For convenience
@@ -1979,6 +1979,11 @@ namespace GroundHeatExchangers {
 				thisProp->pipe.outDia = DataIPShortCuts::rNumericArgs( 7 );
 				thisProp->pipe.thickness = DataIPShortCuts::rNumericArgs( 8 );
 				thisProp->bhUTubeDist = DataIPShortCuts::rNumericArgs( 9 );
+
+				thisProp->pipe.innerDia = thisProp->pipe.outDia - 2 * thisProp->pipe.thickness;
+				thisProp->pipe.outRadius = thisProp->pipe.outDia / 2;
+				thisProp->pipe.innerRadius = thisProp->pipe.innerDia / 2;
+
 				vertPropsVector.push_back( thisProp );
 			}
 		}
@@ -2261,6 +2266,9 @@ namespace GroundHeatExchangers {
 				thisGLHE.bhLength = thisGLHE.myRespFactors->props->bhLength;
 				thisGLHE.bhUTubeDist = thisGLHE.myRespFactors->props->bhUTubeDist;
 				thisGLHE.pipe.outDia = thisGLHE.myRespFactors->props->pipe.outDia;
+				thisGLHE.pipe.innerDia = thisGLHE.myRespFactors->props->pipe.innerDia;
+				thisGLHE.pipe.outRadius = thisGLHE.pipe.outDia / 2;
+				thisGLHE.pipe.innerRadius = thisGLHE.pipe.innerDia / 2;
 				thisGLHE.pipe.thickness = thisGLHE.myRespFactors->props->pipe.thickness;
 				thisGLHE.pipe.k = thisGLHE.myRespFactors->props->pipe.k;
 				thisGLHE.grout.k = thisGLHE.myRespFactors->props->grout.k;
@@ -2274,6 +2282,9 @@ namespace GroundHeatExchangers {
 
 				// ground thermal diffusivity
 				thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
+
+				// multipole method constants
+				thisGLHE.calcMultipoleCoefficients();
 
 				thisGLHE.SubAGG = 15;
 				thisGLHE.AGG = 192;
@@ -2596,6 +2607,213 @@ namespace GroundHeatExchangers {
 
 		Rgrout = 1.0 / ( grout.k * ( B0 * std::pow( bhRadius / pipeOuterRad, B1 ) ) );
 		HXResistance = Rcond + Rconv + Rgrout;
+	}
+
+	//******************************************************************************
+
+	void
+	GLHEVert::calcMultipoleCoefficients()
+	{
+		theta_1 = bhUTubeDist / ( 2 * bhRadius );
+		theta_2 = bhRadius / pipe.outRadius;
+		theta_3 = 1 / ( 2 * theta_1 * theta_2 );
+		sigma = ( grout.k - soil.k ) / ( grout.k + soil.k );
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcBHAverageResistance()
+	{
+		// Calculates the average thermal resistance of the borehole using the first-order multipole method.
+
+		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+
+		// Equation 13
+
+		Real64 const beta = 2 * Pi * grout.k * calcPipeResistance();
+
+		Real64 const final_term_1 = log( theta_2 / ( 2 * theta_1 * pow( 1 - pow_4( theta_1 ), sigma ) ) );
+		Real64 const num_final_term_2 = pow_2( theta_3 ) * pow_2( 1 - ( 4 * sigma * pow_4( theta_1 ) ) / ( 1 - pow_4( theta_1 ) ) );
+		Real64 const den_final_term_2_pt_1 = ( 1 + beta ) / ( 1 - beta );
+		Real64 const den_final_term_2_pt_2 = pow_2( theta_3 ) * ( 1 + ( 16 * sigma * pow_4( theta_1 ) ) / pow_2( 1 - pow_4( theta_1 ) ) );
+		Real64 const den_final_term_2 = den_final_term_2_pt_1 + den_final_term_2_pt_2;
+		Real64 const final_term_2 = num_final_term_2 / den_final_term_2;
+
+		return ( 1 / ( 4 * Pi * grout.k ) ) * ( beta + final_term_1 - final_term_2 );
+
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcBHTotalInternalResistance()
+	{
+		// Calculates the total internal thermal resistance of the borehole using the first-order multipole method.
+
+		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+
+		// Equation 26
+
+		Real64 beta = 2 * Pi * grout.k * calcPipeResistance();
+
+		Real64 final_term_1 = log( pow( 1 + pow_2( theta_1 ), sigma ) / ( theta_3 * pow( 1 - pow_2( theta_1 ), sigma ) ) );
+		Real64 num_term_2 = pow_2( theta_3 ) * pow_2( 1 - pow_4( theta_1 ) + 4 * sigma * pow_2( theta_1 ) );
+		Real64 den_term_2_pt_1 = ( 1 + beta ) / ( 1 - beta ) * pow_2( 1 - pow_4( theta_1 ) );
+		Real64 den_term_2_pt_2 = pow_2( theta_3 ) * pow_2( 1 - pow_4( theta_1 ) );
+		Real64 den_term_2_pt_3 = 8 * sigma * pow_2( theta_1 ) * pow_2( theta_3 ) * ( 1 + pow_4( theta_1 ) );
+		Real64 den_term_2 = den_term_2_pt_1 - den_term_2_pt_2 + den_term_2_pt_3;
+		Real64 final_term_2 = num_term_2 / den_term_2;
+
+		return ( 1 / ( Pi * grout.k ) ) * ( beta + final_term_1 - final_term_2 );
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcBHGroutResistance()
+	{
+		// Calculates borehole resistance. Use for validation.
+
+		return 0;
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcBHResistance()
+	{
+		// Calculates the effective thermal resistance of the borehole assuming a uniform heat flux.
+
+		// Javed, S. & Spitler, J.D. Calculation of Borehole Thermal Resistance. In 'Advances in
+		// Ground-Source Heat Pump Systems,' pp. 84. Rees, S.J. ed. Cambridge, MA. Elsevier Ltd. 2016.
+
+		// Eq: 3-67
+
+		// Coefficients for equations 13 and 26 from Javed & Spitler 2016 calculated here.
+
+		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+
+		// Equation 14
+
+		return 0;
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcPipeConductionResistance()
+	{
+		// Calculates the thermal resistance of a pipe, in [K/(W/m)].
+
+		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+		// for Grouted Single U-tube Ground Heat Exchangers.' J. Energy Engineering. Draft in progress.
+
+		return log( pipe.outDia / pipe.innerDia ) / ( 2 * Pi * pipe.k );
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcPipeConvectionResistance()
+	{
+		// Calculates the convection resistance using Gnielinski and Petukov, in [k/(W/m)]
+
+		// Gneilinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
+		// International Chemical Engineering 16(1976), pp. 359-368.
+
+		using FluidProperties::GetSpecificHeatGlycol;
+		using FluidProperties::GetDensityGlycol;
+		using FluidProperties::GetViscosityGlycol;
+		using FluidProperties::GetConductivityGlycol;
+		using DataPlant::PlantLoop;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "calcPipeConvectionResistance" );
+
+		// Get fluid props
+		inletTemp = Node( inletNodeNum ).Temp;
+
+		Real64 cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		Real64 kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		Real64 fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		Real64 fluidViscosity = GetViscosityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+
+		// Smoothing fit limits
+		Real64 lower_limit = 2000;
+		Real64 upper_limit = 4000;
+
+		Real64 bhMassFlowRate = massFlowRate / myRespFactors->numBoreholes;
+
+		Real64 reynoldsNum = 4 * bhMassFlowRate / ( fluidViscosity * Pi * pipe.innerDia );
+
+		Real64 nusseltNum = 0.0;
+		if ( reynoldsNum < lower_limit ) {
+			nusseltNum = 4.01; // laminar mean(4.36, 3.66)
+		} else if ( lower_limit <= reynoldsNum && reynoldsNum < upper_limit ){
+			Real64 nu_low = 4.01;  // laminar
+			Real64 f = frictionFactor( reynoldsNum ); // turbulent
+			Real64 prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
+			Real64 nu_high = ( f / 8 ) * ( reynoldsNum - 1000 ) * prandtlNum / ( 1 + 12.7 * std::sqrt( f / 8 ) * ( pow( prandtlNum, 2.0 / 3.0 ) - 1 ) );
+			Real64 sigma = 1 / ( 1 + std::exp( -( reynoldsNum - 3000 ) / 150.0 ) ); // smoothing function
+			nusseltNum = ( 1 - sigma ) * nu_low + sigma * nu_high;
+		} else {
+			Real64 f = frictionFactor( reynoldsNum );
+			Real64 prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
+			nusseltNum = ( f / 8 ) * ( reynoldsNum - 1000 ) * prandtlNum / ( 1 + 12.7 * std::sqrt( f / 8 ) * ( pow( prandtlNum, 2.0 / 3.0 ) - 1 ) );
+		}
+
+		Real64 h = nusseltNum * kFluid / pipe.innerDia;
+
+		return 1 / ( h * Pi * pipe.innerDia );
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::frictionFactor(
+		Real64 const reynoldsNum
+	)
+	{
+		// Calculates the friction factor in smooth tubes
+
+		// Petukov, B.S. 1970. 'Heat transfer and friction in turbulent pipe flow with variable physical properties.'
+		// In Advances in Heat Transfer, ed. T.F. Irvine and J.P. Hartnett, Vol. 6. New York Academic Press.
+
+		// limits picked be within about 1% of actual values
+		Real64 lower_limit = 1500;
+		Real64 upper_limit = 5000;
+
+		if ( reynoldsNum < lower_limit ) {
+			return 64.0 / reynoldsNum;  // pure laminar flow
+		}
+		else if ( lower_limit <= reynoldsNum && reynoldsNum < upper_limit ) {
+			Real64 f_low = 64.0 / reynoldsNum; // pure laminar flow
+			// pure turbulent flow
+			Real64 f_high = pow( 0.79 * log( reynoldsNum ) - 1.64, -2.0 );
+			Real64 sf = 1 / ( 1 + exp( -( reynoldsNum - 3000.0 ) / 450.0 ) ); // smoothing function
+			return ( 1 - sf ) * f_low + sf * f_high;
+		} else {
+			return pow( 0.79 * log( reynoldsNum ) - 1.64, -2.0 ); // pure turbulent flow
+		}
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::calcPipeResistance()
+	{
+		// Calculates the combined conduction and convection pipe resistance
+
+		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+		// for Grouted Single U-tube Ground Heat Exchangers.' J. Energy Engineering. Draft in progress.
+
+		// Equation 3
+
+		return calcPipeConductionResistance() + calcPipeConvectionResistance();
 	}
 
 	//******************************************************************************

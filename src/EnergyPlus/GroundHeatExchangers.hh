@@ -107,6 +107,9 @@ namespace GroundHeatExchangers {
 
 		// Members
 		Real64 outDia; // Outer diameter of the pipe [m]
+		Real64 innerDia; // Inner diameter of the pipe [m]
+		Real64 outRadius; // Outer radius of the pipe [m]
+		Real64 innerRadius; // Inner radius of the pipe [m]
 		Real64 thickness; // Thickness of the pipe wall [m]
 
 		pipePropsStruct() :
@@ -348,13 +351,24 @@ namespace GroundHeatExchangers {
 		Real64 bhRadius; // Radius of borehole {m}
 		Real64 bhLength; // Length of borehole {m}
 		Real64 bhUTubeDist; // Distance between u-tube legs {m}
+
+		// Parameters for the multipole method
+		Real64 theta_1;
+		Real64 theta_2;
+		Real64 theta_3;
+		Real64 sigma;
+
 		nlohmann::json myCacheData;
 
 		GLHEVert() :
 			bhDiameter( 0.0 ),
 			bhRadius( 0.0 ),
 			bhLength( 0.0 ),
-			bhUTubeDist( 0.0 )
+			bhUTubeDist( 0.0 ),
+			theta_1( 0.0 ),
+			theta_2( 0.0 ),
+			theta_3( 0.0 ),
+			sigma( 0.0 )
 		{}
 
 		std::vector< Real64 >
@@ -401,13 +415,42 @@ namespace GroundHeatExchangers {
 		);
 
 		void
-		MakeCache();
+		makeCache();
 
 		void
-		ReadCache();
+		readCache();
 
 		void
-		WriteCache();
+		writeCache();
+
+		Real64
+		calcBHAverageResistance();
+
+		Real64
+		calcBHTotalInternalResistance();
+
+		Real64
+		calcBHGroutResistance();
+
+		Real64
+		calcBHResistance();
+
+		Real64
+		calcPipeConductionResistance();
+
+		Real64
+		calcPipeConvectionResistance();
+
+		Real64
+		frictionFactor(
+			Real64 const reynoldsNum
+		);
+
+		Real64
+		calcPipeResistance();
+
+		void
+		calcMultipoleCoefficients();
 
 	};
 
