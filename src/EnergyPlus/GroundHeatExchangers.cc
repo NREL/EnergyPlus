@@ -2284,7 +2284,10 @@ namespace GroundHeatExchangers {
 				thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
 
 				// multipole method constants
-				thisGLHE.calcMultipoleCoefficients();
+				thisGLHE.theta_1 = thisGLHE.bhUTubeDist / ( 2 * thisGLHE.bhRadius );
+				thisGLHE.theta_2 = thisGLHE.bhRadius / thisGLHE.pipe.outRadius;
+				thisGLHE.theta_3 = 1 / ( 2 * thisGLHE.theta_1 * thisGLHE.theta_2 );
+				thisGLHE.sigma = ( thisGLHE.grout.k - thisGLHE.soil.k ) / ( thisGLHE.grout.k + thisGLHE.soil.k );
 
 				thisGLHE.SubAGG = 15;
 				thisGLHE.AGG = 192;
@@ -2611,17 +2614,6 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
-	void
-	GLHEVert::calcMultipoleCoefficients()
-	{
-		theta_1 = bhUTubeDist / ( 2 * bhRadius );
-		theta_2 = bhRadius / pipe.outRadius;
-		theta_3 = 1 / ( 2 * theta_1 * theta_2 );
-		sigma = ( grout.k - soil.k ) / ( grout.k + soil.k );
-	}
-
-	//******************************************************************************
-
 	Real64
 	GLHEVert::calcBHAverageResistance()
 	{
@@ -2675,9 +2667,14 @@ namespace GroundHeatExchangers {
 	Real64
 	GLHEVert::calcBHGroutResistance()
 	{
-		// Calculates borehole resistance. Use for validation.
+		// Calculates grout resistance. Use for validation.
 
-		return 0;
+		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
+		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+
+		// Equation 3
+
+		return calcBHAverageResistance() - calcPipeResistance() / 2.0;
 	}
 
 	//******************************************************************************
@@ -2692,14 +2689,15 @@ namespace GroundHeatExchangers {
 
 		// Eq: 3-67
 
-		// Coefficients for equations 13 and 26 from Javed & Spitler 2016 calculated here.
+		using FluidProperties::GetSpecificHeatGlycol;
+		using DataPlant::PlantLoop;
 
-		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
-		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "calcBHResistance" );
 
-		// Equation 14
+		Real64 cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
-		return 0;
+		return calcBHAverageResistance() + 1 / ( 3 * calcBHTotalInternalResistance() ) * pow_2( bhLength / massFlowRate * cpFluid );
 	}
 
 	//******************************************************************************

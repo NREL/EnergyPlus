@@ -1828,7 +1828,20 @@ struct StructBHIntResistanceParameters {
 	}
 };
 
-class GroundHeatExchangerTest_System_calcBHTotalInternalResistance :  public EnergyPlusFixture, public ::testing::WithParamInterface<const StructBHIntResistanceParameters> {};
+class GroundHeatExchangerTest_System_calcBHTotalInternalResistance : public EnergyPlusFixture, public ::testing::WithParamInterface<const StructBHIntResistanceParameters>
+{
+	protected:
+		static void SetUpTestCase() { }
+		static void TearDownTestCase() { }
+
+		virtual void SetUp() {
+			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+		}
+
+		virtual void TearDown() {
+			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+		}
+};
 
 TEST_P( GroundHeatExchangerTest_System_calcBHTotalInternalResistance, test_calcBHTotalInternalResistance ) {
 

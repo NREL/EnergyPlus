@@ -449,9 +449,6 @@ namespace GroundHeatExchangers {
 		Real64
 		calcPipeResistance();
 
-		void
-		calcMultipoleCoefficients();
-
 	};
 
 	struct GLHESlinky : GLHEBase
