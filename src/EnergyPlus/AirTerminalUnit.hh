@@ -95,6 +95,7 @@ protected: // Creation
 		airOutNodeNum( 0 ),
 		zoneIndex( 0 ),
 		zoneNodeIndex( 0 ),
+		ctrlZoneInNodeIndex( 0 ),
 		airLoopNum( 0 )
 	{}
 

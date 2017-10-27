@@ -501,6 +501,7 @@ namespace PoweredInductionUnits {
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							AirNodeFound = true;
 							PIU( PIUNum ).CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
+							PIU( PIUNum ).ctrlZoneInNodeIndex = SupAirIn;
 							break;
 						}
 					}
@@ -667,6 +668,7 @@ namespace PoweredInductionUnits {
 							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							PIU( PIUNum ).CtrlZoneNum = CtrlZone; // store control zone index for later use in finding air loop index
+							PIU( PIUNum ).ctrlZoneInNodeIndex = SupAirIn;
 							AirNodeFound = true;
 						}
 					}
@@ -831,8 +833,8 @@ namespace PoweredInductionUnits {
 			}
 
 			if ( PIU( PIUNum ).AirLoopNum == 0 ) { // fill air loop index
-				if ( PIU( PIUNum ).CtrlZoneNum > 0 ) {
-					PIU( PIUNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).OutAirNode );
+				if ( PIU( PIUNum ).CtrlZoneNum > 0 && PIU( PIUNum ).ctrlZoneInNodeIndex > 0 ) {
+					PIU( PIUNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).ctrlZoneInNodeIndex );
 				}
 			}
 

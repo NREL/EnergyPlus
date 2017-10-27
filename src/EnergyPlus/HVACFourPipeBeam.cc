@@ -515,8 +515,8 @@ namespace FourPipeBeam {
 			}
 
 			if ( this->airLoopNum == 0 ) { // fill air loop index
-				if ( this->zoneIndex > 0 ) {
-					this->airLoopNum = DataZoneEquipment::ZoneEquipConfig( this->zoneIndex ).InletNodeAirLoopNum( this->airOutNodeNum );
+				if ( this->zoneIndex > 0 && this->ctrlZoneInNodeIndex > 0 ) {
+					this->airLoopNum = DataZoneEquipment::ZoneEquipConfig( this->zoneIndex ).InletNodeAirLoopNum( this->ctrlZoneInNodeIndex );
 				}
 			}
 
