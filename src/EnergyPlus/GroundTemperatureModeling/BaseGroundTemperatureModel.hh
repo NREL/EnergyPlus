@@ -74,7 +74,7 @@ namespace EnergyPlus{
 			errorsFound( false )
 
 			{}
-		
+
 		// Virtual method for retrieving the ground temp
 		virtual Real64
 		getGroundTemp()=0;
