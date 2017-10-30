@@ -111,7 +111,7 @@ FNULL = open(os.devnull, 'w') # open dev/null for stderr
 # then build with wkhtmltopdf
 # spawn each individually
 documents = []
-documents.append(SingleDocInfo(srcdir, sitedir, "Acknowledgements", "Acknowledgements", 30000))
+documents.append(SingleDocInfo(srcdir, sitedir, "Acknowledgments", "Acknowledgments", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "AuxiliaryPrograms", "AuxiliaryPrograms", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "EMS_Application_Guide", "EMS_Application_Guide", 30000))
 documents.append(SingleDocInfo(srcdir, sitedir, "EngineeringReference", "EngRef", 24000000, EngRefConcatenate))  # yes...18000000ms = 18000s = 5h ... don't need that much, but just let it go overnight
@@ -140,7 +140,7 @@ print("***Preprocessing documents complete")
 # then build with mkdocs
 # don't forget:
 #  1. need to set python's sys.setrecursionlimit(50000) inside the actual /usr/local/bin/mkdocs run script
-#  2. need to set kernel stack limit: 
+#  2. need to set kernel stack limit:
 #      - temporarily this could be done with:   ulimit -s 16384
 #        but this only works if you remain in *that* shell
 #      - it is easier to just add lines to /etc/security/limits.conf:
@@ -166,7 +166,7 @@ for document in documents:
 	args.extend(["--page-size", "Letter"]) # Set the page size
 	#if document.doc_name in ["AuxiliaryPrograms","EngineeringReference", "InputOutputReference", "ModuleDeveloper","OutputDetailsAndExamples"]:
 	#	args.extend(["--minimum-font-size", "16"]) # Do an override to get the font an appropriate size
-	args.extend(["--margin-bottom", "20mm", "--margin-top", "20mm"]) # Top and bottom margins, 
+	args.extend(["--margin-bottom", "20mm", "--margin-top", "20mm"]) # Top and bottom margins,
 	args.extend(["--margin-left", "20mm", "--margin-right", "20mm"]) # Left and right margins
 	args.extend(["--footer-font-size", "9", "--footer-line", "--footer-left", "EnergyPlus Documentation", "--footer-right", "Page [page] of [toPage]"]) # Set the footer
 	args.extend(["index.html"]) # Input file name

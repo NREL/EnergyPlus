@@ -282,7 +282,7 @@ configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 if ( BUILD_DOCS )
-	install(FILES "${CMAKE_BINARY_DIR}/doc-build/Acknowledgements.pdf" DESTINATION "./Documentation")
+	install(FILES "${CMAKE_BINARY_DIR}/doc-build/Acknowledgments.pdf" DESTINATION "./Documentation")
 	install(FILES "${CMAKE_BINARY_DIR}/doc-build/AuxiliaryPrograms.pdf" DESTINATION "./Documentation")
 	install(FILES "${CMAKE_BINARY_DIR}/doc-build/EMSApplicationGuide.pdf" DESTINATION "./Documentation")
 	install(FILES "${CMAKE_BINARY_DIR}/doc-build/EngineeringReference.pdf" DESTINATION "./Documentation")
