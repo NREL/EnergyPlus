@@ -80,7 +80,7 @@ namespace DataGlobals {
 	extern int const ksRunPeriodWeather;
 	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
 	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-	extern int const ksReadAllWeatherData; // a weather period for reading all weather data proir to the simulation
+	extern int const ksReadAllWeatherData; // a weather period for reading all weather data prior to the simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -93,7 +93,7 @@ namespace DataGlobals {
 	extern Real64 const DegToRadians; // Conversion for Degrees to Radians
 	extern Real64 const RadToDeg; // Conversion for Radians to Degrees
 	extern Real64 const SecInHour; // Conversion for hours to seconds
-	extern Real64 const HoursInDay; // Number of Hourse in Day
+	extern Real64 const HoursInDay; // Number of Hours in Day
 	extern Real64 const SecsInDay; // Number of seconds in Day
 	extern Real64 const BigNumber; // Max Number real used for initializations
 	extern Real64 const rTinyValue; // Tiny value to replace use of TINY(x)

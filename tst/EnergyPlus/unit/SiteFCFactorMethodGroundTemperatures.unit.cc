@@ -62,7 +62,6 @@ using namespace EnergyPlus::GroundTemperatureManager;
 TEST_F( EnergyPlusFixture, SiteFCFactorMethodGroundTempTest )
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:FCFactorMethod,",
 		"	21.00,	!- January",
 		"	22.00,	!- February",
@@ -79,7 +78,7 @@ TEST_F( EnergyPlusFixture, SiteFCFactorMethodGroundTempTest )
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	
+
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );
