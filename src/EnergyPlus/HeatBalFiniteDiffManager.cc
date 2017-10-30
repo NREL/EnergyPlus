@@ -1752,8 +1752,8 @@ namespace HeatBalFiniteDiffManager {
 					// Check for PCM second layer
 					if ( mat2.phaseChange ) {
 						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-						RhoS2 = mat.phaseChange->getDensity( TD_i );
-						kt2 = mat.phaseChange->getConductivity( TDT_i );
+						RhoS2 = mat2.phaseChange->getDensity( TD_i );
+						kt2 = mat2.phaseChange->getConductivity( TDT_i );
 					} else if ( ( matFD_sum < 0.0 ) && ( matFD2_sum > 0.0 ) ) { // Phase change material Layer2, Use TempEnth Data
 						Real64 const Enth2Old( terpld( matFD2_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth2New( terpld( matFD2_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
@@ -1871,8 +1871,8 @@ namespace HeatBalFiniteDiffManager {
 					}
 					if ( mat2.phaseChange ) {
 						Cp2 = mat2.phaseChange->getCurrentSpecificHeat( TD_i, TDT_i, SurfaceFD( Surf ).PhaseChangeTemperatureReverse( i ), SurfaceFD( Surf ).PhaseChangeStateOld( i ), SurfaceFD( Surf ).PhaseChangeState( i ) );
-						RhoS2 = mat.phaseChange->getDensity( TD_i );
-						kt2 = mat.phaseChange->getConductivity( TDT_i );
+						RhoS2 = mat2.phaseChange->getDensity( TD_i );
+						kt2 = mat2.phaseChange->getConductivity( TDT_i );
 					}
 
 					Real64 const Delt_Delx1( Delt * Delx1 );
