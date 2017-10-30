@@ -251,11 +251,11 @@ AbortEnergyPlus()
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
 #endif
+	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
 	CloseOutOpenFiles();
 	// Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
 	// indicating that E+ terminated with an error.
 	if ( NumExternalInterfaces > 0 ) CloseSocket( -1 );
-	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
 	std::exit( EXIT_FAILURE );
 
 }
@@ -482,12 +482,12 @@ EndEnergyPlus()
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
 #endif
+	std::cerr << "EnergyPlus Completed Successfully." << std::endl;
 	CloseOutOpenFiles();
 	// Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
 	// indicating that E+ finished its simulation
 	if ( ( NumExternalInterfaces > 0 ) && haveExternalInterfaceBCVTB ) CloseSocket( 1 );
-	std::cerr << "EnergyPlus Completed Successfully." << std::endl; std::exit( EXIT_SUCCESS );
-
+	std::exit( EXIT_SUCCESS );
 }
 
 int

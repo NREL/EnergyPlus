@@ -1,6 +1,6 @@
 
 # to get the list of input files, go to the root of the document folder, and:
-# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/acknowledgements/|g' | sed 's/$/.tex/g'
+# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/acknowledgments/|g' | sed 's/$/.tex/g'
 SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/../header.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/auxiliary-programs.tex

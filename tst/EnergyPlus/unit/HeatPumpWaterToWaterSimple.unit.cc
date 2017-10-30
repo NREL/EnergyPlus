@@ -69,8 +69,8 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, PlantLoopSourceSideTest ) {
 		// this test is related to issue #4385 and #4972, test change that added plant loop interconnects
-		// entire IDF file from defect file used to set up model and run it some. 
-		std::string const idf_objects = delimited_string( { 
+		// entire IDF file from defect file used to set up model and run it some.
+		std::string const idf_objects = delimited_string( {
 		"Version,8.3;",
 		"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
 		"Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
@@ -801,7 +801,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, WWHP_AutosizeTest1 ) {
 		// this test is for checking autosizing of heating WWHP. derived from unit test PlantLoopSourceSideTest
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.6;",
 		"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
 		"Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
@@ -1189,7 +1189,7 @@ namespace EnergyPlus {
 		"    Heating,",
 		"    40.0,",
 		"    7.0;"
-		
+
 		"BranchList,",
 		"    GHEV Supply Branches,    !- Name",
 		"    GHEV Supply Pump Branch, !- Branch 1 Name",
@@ -1440,7 +1440,7 @@ namespace EnergyPlus {
 		OutputProcessor::GetReportVariableInput();
 		PlantManager::CheckIfAnyPlant();
 
-		BranchInputManager::ManageBranchInput(); // just gets input and 
+		BranchInputManager::ManageBranchInput(); // just gets input and
 		SizingManager::ManageSizing( );
 		DataGlobals::DoingSizing = false;
 		DataGlobals::KickOffSimulation = true;
