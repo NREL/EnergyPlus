@@ -1,0 +1,2139 @@
+  Version,8.8;
+
+  LifeCycleCost:Parameters,
+    {4b9df6a2-e182-45c5-a7d8-91cee8c66584},  !- Name
+    EndOfYear,               !- Discounting Convention
+    ConstantDollar,          !- Inflation Approach
+    0.03,                    !- Real Discount Rate
+    ,                        !- Nominal Discount Rate
+    ,                        !- Inflation
+    ,                        !- Base Date Month
+    2011,                    !- Base Date Year
+    ,                        !- Service Date Month
+    2011,                    !- Service Date Year
+    25,                      !- Length of Study Period in Years
+    ,                        !- Tax rate
+    None;                    !- Depreciation Method
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Electricity,  !- LCC Price Escalation Name
+    Electricity,             !- Resource
+    2011,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9838,                  !- Year 1 Escalation
+    0.9730,                  !- Year 2 Escalation
+    0.9632,                  !- Year 3 Escalation
+    0.9611,                  !- Year 4 Escalation
+    0.9571,                  !- Year 5 Escalation
+    0.9553,                  !- Year 6 Escalation
+    0.9539,                  !- Year 7 Escalation
+    0.9521,                  !- Year 8 Escalation
+    0.9546,                  !- Year 9 Escalation
+    0.9550,                  !- Year 10 Escalation
+    0.9553,                  !- Year 11 Escalation
+    0.9564,                  !- Year 12 Escalation
+    0.9575,                  !- Year 13 Escalation
+    0.9596,                  !- Year 14 Escalation
+    0.9618,                  !- Year 15 Escalation
+    0.9614,                  !- Year 16 Escalation
+    0.9618,                  !- Year 17 Escalation
+    0.9618,                  !- Year 18 Escalation
+    0.9593,                  !- Year 19 Escalation
+    0.9589,                  !- Year 20 Escalation
+    0.9607,                  !- Year 21 Escalation
+    0.9625,                  !- Year 22 Escalation
+    0.9650,                  !- Year 23 Escalation
+    0.9708,                  !- Year 24 Escalation
+    0.9751,                  !- Year 25 Escalation
+    0.9762,                  !- Year 26 Escalation
+    0.9766,                  !- Year 27 Escalation
+    0.9766,                  !- Year 28 Escalation
+    0.9769,                  !- Year 29 Escalation
+    0.9773;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Distillate Oil,  !- LCC Price Escalation Name
+    FuelOil#1,               !- Resource
+    2011,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9714,                  !- Year 1 Escalation
+    0.9730,                  !- Year 2 Escalation
+    0.9942,                  !- Year 3 Escalation
+    1.0164,                  !- Year 4 Escalation
+    1.0541,                  !- Year 5 Escalation
+    1.0928,                  !- Year 6 Escalation
+    1.1267,                  !- Year 7 Escalation
+    1.1580,                  !- Year 8 Escalation
+    1.1792,                  !- Year 9 Escalation
+    1.1967,                  !- Year 10 Escalation
+    1.2200,                  !- Year 11 Escalation
+    1.2333,                  !- Year 12 Escalation
+    1.2566,                  !- Year 13 Escalation
+    1.2709,                  !- Year 14 Escalation
+    1.2826,                  !- Year 15 Escalation
+    1.2985,                  !- Year 16 Escalation
+    1.3102,                  !- Year 17 Escalation
+    1.3250,                  !- Year 18 Escalation
+    1.3261,                  !- Year 19 Escalation
+    1.3282,                  !- Year 20 Escalation
+    1.3324,                  !- Year 21 Escalation
+    1.3356,                  !- Year 22 Escalation
+    1.3431,                  !- Year 23 Escalation
+    1.3510,                  !- Year 24 Escalation
+    1.3568,                  !- Year 25 Escalation
+    1.3606,                  !- Year 26 Escalation
+    1.3637,                  !- Year 27 Escalation
+    1.3674,                  !- Year 28 Escalation
+    1.3706,                  !- Year 29 Escalation
+    1.3743;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Residual Oil,  !- LCC Price Escalation Name
+    FuelOil#2,               !- Resource
+    2011,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8469,                  !- Year 1 Escalation
+    0.8257,                  !- Year 2 Escalation
+    0.8681,                  !- Year 3 Escalation
+    0.8988,                  !- Year 4 Escalation
+    0.9289,                  !- Year 5 Escalation
+    0.9604,                  !- Year 6 Escalation
+    0.9897,                  !- Year 7 Escalation
+    1.0075,                  !- Year 8 Escalation
+    1.0314,                  !- Year 9 Escalation
+    1.0554,                  !- Year 10 Escalation
+    1.0861,                  !- Year 11 Escalation
+    1.1278,                  !- Year 12 Escalation
+    1.1497,                  !- Year 13 Escalation
+    1.1620,                  !- Year 14 Escalation
+    1.1743,                  !- Year 15 Escalation
+    1.1852,                  !- Year 16 Escalation
+    1.1948,                  !- Year 17 Escalation
+    1.2037,                  !- Year 18 Escalation
+    1.2071,                  !- Year 19 Escalation
+    1.2119,                  !- Year 20 Escalation
+    1.2139,                  !- Year 21 Escalation
+    1.2194,                  !- Year 22 Escalation
+    1.2276,                  !- Year 23 Escalation
+    1.2365,                  !- Year 24 Escalation
+    1.2420,                  !- Year 25 Escalation
+    1.2461,                  !- Year 26 Escalation
+    1.2509,                  !- Year 27 Escalation
+    1.2550,                  !- Year 28 Escalation
+    1.2591,                  !- Year 29 Escalation
+    1.2638;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Natural gas,  !- LCC Price Escalation Name
+    NaturalGas,              !- Resource
+    2011,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9823,                  !- Year 1 Escalation
+    0.9557,                  !- Year 2 Escalation
+    0.9279,                  !- Year 3 Escalation
+    0.9257,                  !- Year 4 Escalation
+    0.9346,                  !- Year 5 Escalation
+    0.9412,                  !- Year 6 Escalation
+    0.9512,                  !- Year 7 Escalation
+    0.9645,                  !- Year 8 Escalation
+    0.9856,                  !- Year 9 Escalation
+    1.0067,                  !- Year 10 Escalation
+    1.0222,                  !- Year 11 Escalation
+    1.0410,                  !- Year 12 Escalation
+    1.0610,                  !- Year 13 Escalation
+    1.0787,                  !- Year 14 Escalation
+    1.0942,                  !- Year 15 Escalation
+    1.1098,                  !- Year 16 Escalation
+    1.1220,                  !- Year 17 Escalation
+    1.1308,                  !- Year 18 Escalation
+    1.1386,                  !- Year 19 Escalation
+    1.1486,                  !- Year 20 Escalation
+    1.1619,                  !- Year 21 Escalation
+    1.1763,                  !- Year 22 Escalation
+    1.1918,                  !- Year 23 Escalation
+    1.2118,                  !- Year 24 Escalation
+    1.2284,                  !- Year 25 Escalation
+    1.2439,                  !- Year 26 Escalation
+    1.2605,                  !- Year 27 Escalation
+    1.2772,                  !- Year 28 Escalation
+    1.2938,                  !- Year 29 Escalation
+    1.3115;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Coal,  !- LCC Price Escalation Name
+    Coal,                    !- Resource
+    2011,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9970,                  !- Year 1 Escalation
+    1.0089,                  !- Year 2 Escalation
+    1.0089,                  !- Year 3 Escalation
+    0.9941,                  !- Year 4 Escalation
+    0.9941,                  !- Year 5 Escalation
+    1.0000,                  !- Year 6 Escalation
+    1.0030,                  !- Year 7 Escalation
+    1.0059,                  !- Year 8 Escalation
+    1.0089,                  !- Year 9 Escalation
+    1.0119,                  !- Year 10 Escalation
+    1.0148,                  !- Year 11 Escalation
+    1.0178,                  !- Year 12 Escalation
+    1.0208,                  !- Year 13 Escalation
+    1.0267,                  !- Year 14 Escalation
+    1.0297,                  !- Year 15 Escalation
+    1.0356,                  !- Year 16 Escalation
+    1.0415,                  !- Year 17 Escalation
+    1.0534,                  !- Year 18 Escalation
+    1.0564,                  !- Year 19 Escalation
+    1.0593,                  !- Year 20 Escalation
+    1.0653,                  !- Year 21 Escalation
+    1.0712,                  !- Year 22 Escalation
+    1.0742,                  !- Year 23 Escalation
+    1.0801,                  !- Year 24 Escalation
+    1.0831,                  !- Year 25 Escalation
+    1.0831,                  !- Year 26 Escalation
+    1.0861,                  !- Year 27 Escalation
+    1.0890,                  !- Year 28 Escalation
+    1.0920,                  !- Year 29 Escalation
+    1.0950;                  !- Year 30 Escalation
+
+  Building,
+    LowITE-SmallDataCenter-ASHRAE 169-2006-2A created: 2017-06-07 18:06:51 -0700,  !- Name
+    0,                       !- North Axis {deg}
+    City,                    !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    FullExterior,            !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Zone,
+    ComputerRoom ZN,         !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    ,                        !- Type
+    ,                        !- Multiplier
+    ,                        !- Ceiling Height {m}
+    ,                        !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    ,                        !- Zone Inside Convection Algorithm
+    ;                        !- Zone Outside Convection Algorithm
+
+  BuildingSurface:Detailed,
+    ComputerRoom_GroundFloor_0_0_0,  !- Name
+    Floor,                   !- Surface Type
+    Floor Adiabatic construction,  !- Construction Name
+    ComputerRoom ZN,         !- Zone Name
+    Adiabatic,               !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    3.4912388997,-1.6267671711,0,  !- X,Y,Z ==> Vertex 1 {m}
+    3.4912388997,-9.0913191711,0,  !- X,Y,Z ==> Vertex 2 {m}
+    -3.9733131003,-9.0913191711,0,  !- X,Y,Z ==> Vertex 3 {m}
+    -3.9733131003,-1.6267671711,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ComputerRoom_Roof_1_0_0, !- Name
+    Roof,                    !- Surface Type
+    Adiabatic Roof,          !- Construction Name
+    ComputerRoom ZN,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    3.4912388997,-9.0913191711,4.2672,  !- X,Y,Z ==> Vertex 1 {m}
+    3.4912388997,-1.6267671711,4.2672,  !- X,Y,Z ==> Vertex 2 {m}
+    -3.9733131003,-1.6267671711,4.2672,  !- X,Y,Z ==> Vertex 3 {m}
+    -3.9733131003,-9.0913191711,4.2672;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ComputerRoom_Wall_2_0_0, !- Name
+    Wall,                    !- Surface Type
+    Adiabatic Wall,          !- Construction Name
+    ComputerRoom ZN,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    3.4912388997,-9.0913191711,4.2672,  !- X,Y,Z ==> Vertex 1 {m}
+    3.4912388997,-9.0913191711,0,  !- X,Y,Z ==> Vertex 2 {m}
+    3.4912388997,-1.6267671711,0,  !- X,Y,Z ==> Vertex 3 {m}
+    3.4912388997,-1.6267671711,4.2672;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ComputerRoom_Wall_3_0_0, !- Name
+    Wall,                    !- Surface Type
+    Adiabatic Wall,          !- Construction Name
+    ComputerRoom ZN,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    3.4912388997,-1.6267671711,4.2672,  !- X,Y,Z ==> Vertex 1 {m}
+    3.4912388997,-1.6267671711,0,  !- X,Y,Z ==> Vertex 2 {m}
+    -3.9733131003,-1.6267671711,0,  !- X,Y,Z ==> Vertex 3 {m}
+    -3.9733131003,-1.6267671711,4.2672;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ComputerRoom_Wall_4_0_0, !- Name
+    Wall,                    !- Surface Type
+    Adiabatic Wall,          !- Construction Name
+    ComputerRoom ZN,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    -3.9733131003,-1.6267671711,4.2672,  !- X,Y,Z ==> Vertex 1 {m}
+    -3.9733131003,-1.6267671711,0,  !- X,Y,Z ==> Vertex 2 {m}
+    -3.9733131003,-9.0913191711,0,  !- X,Y,Z ==> Vertex 3 {m}
+    -3.9733131003,-9.0913191711,4.2672;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    ComputerRoom_Wall_5_0_0, !- Name
+    Wall,                    !- Surface Type
+    Adiabatic Wall,          !- Construction Name
+    ComputerRoom ZN,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    -3.9733131003,-9.0913191711,4.2672,  !- X,Y,Z ==> Vertex 1 {m}
+    -3.9733131003,-9.0913191711,0,  !- X,Y,Z ==> Vertex 2 {m}
+    3.4912388997,-9.0913191711,0,  !- X,Y,Z ==> Vertex 3 {m}
+    3.4912388997,-9.0913191711,4.2672;  !- X,Y,Z ==> Vertex 4 {m}
+
+  ZoneInfiltration:DesignFlowRate,
+    ComputerRoom Infiltration,  !- Name
+    ComputerRoom ZN,         !- Zone or ZoneList Name
+    Always On Discrete,      !- Schedule Name
+    Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
+    ,                        !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area {m3/s-m2}
+    0,                       !- Flow per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    0,                       !- Constant Term Coefficient
+    0,                       !- Temperature Term Coefficient
+    0.224,                   !- Velocity Term Coefficient
+    0;                       !- Velocity Squared Term Coefficient
+
+  ZoneControl:Thermostat,
+    ComputerRoom ZN Thermostat,  !- Name
+    ComputerRoom ZN,         !- Zone or ZoneList Name
+    ComputerRoom ZN Thermostat Schedule,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    SmallDataCenter ComputerRoom Thermostat 1;  !- Control 1 Name
+
+  Schedule:Compact,
+    ComputerRoom ZN Thermostat Schedule,  !- Name
+    ComputerRoom ZN Thermostat Schedule Type Limits,  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
+
+  ScheduleTypeLimits,
+    ComputerRoom ZN Thermostat Schedule Type Limits,  !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  ThermostatSetpoint:DualSetpoint,
+    SmallDataCenter ComputerRoom Thermostat 1,  !- Name
+    DataCenter HTGSETP_SCH,  !- Heating Setpoint Temperature Schedule Name
+    DataCenter CLGSETP_SCH;  !- Cooling Setpoint Temperature Schedule Name
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    ,                        !- Lower Limit Value
+    ,                        !- Upper Limit Value
+    Continuous,              !- Numeric Type
+    temperature;             !- Unit Type
+
+  Schedule:Day:Interval,
+    DataCenter HTGSETP_SCH Default,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    15;                      !- Value Until Time 1
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {0ed4c2ae-1dff-4f1d-91c8-42faa274daff},  !- Name
+    DataCenter HTGSETP_SCH Default,  !- Sunday Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- Monday Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- Tuesday Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- Wednesday Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- Thursday Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- Friday Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- Saturday Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter HTGSETP_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter HTGSETP_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter HTGSETP_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter HTGSETP_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Year,
+    DataCenter HTGSETP_SCH,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Schedule:Week:Daily {0ed4c2ae-1dff-4f1d-91c8-42faa274daff},  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+  Schedule:Day:Interval,
+    DataCenter HTGSETP_SCH Summer Design Day,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    15;                      !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter HTGSETP_SCH Winter Design Day,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    15;                      !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter CLGSETP_SCH Default,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    35;                      !- Value Until Time 1
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {69a01470-fecc-41f0-a548-d2f5ad8d37ad},  !- Name
+    DataCenter CLGSETP_SCH Default,  !- Sunday Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- Monday Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- Tuesday Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- Wednesday Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- Thursday Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- Friday Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- Saturday Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter CLGSETP_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter CLGSETP_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter CLGSETP_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter CLGSETP_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Year,
+    DataCenter CLGSETP_SCH,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Schedule:Week:Daily {69a01470-fecc-41f0-a548-d2f5ad8d37ad},  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+  Schedule:Day:Interval,
+    DataCenter CLGSETP_SCH Summer Design Day,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    35;                      !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter CLGSETP_SCH Winter Design Day,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    35;                      !- Value Until Time 1
+
+  ZoneHVAC:EquipmentConnections,
+    ComputerRoom ZN,         !- Zone Name
+    ComputerRoom ZN Equipment List,  !- Zone Conditioning Equipment List Name
+    ComputerRoom ZN Inlet Node List,  !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    Node 1,                  !- Zone Air Node Name
+    Node 11;                 !- Zone Return Air Node or NodeList Name
+
+  NodeList,
+    ComputerRoom ZN Inlet Node List,  !- Name
+    Node 6;                  !- Node 1 Name
+
+  ZoneHVAC:AirDistributionUnit,
+    ADU ComputerRoom ZN CRAC Diffuser,  !- Name
+    Node 6,                  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type
+    ComputerRoom ZN CRAC Diffuser;  !- Air Terminal Name
+
+  AirTerminal:SingleDuct:VAV:NoReheat,
+    ComputerRoom ZN CRAC Diffuser,  !- Name
+    Always On Discrete,      !- Availability Schedule Name
+    Node 6,                  !- Air Outlet Node Name
+    Node 12,                 !- Air Inlet Node Name
+    Autosize,                !- Maximum Air Flow Rate {m3/s}
+    Constant,                !- Zone Minimum Air Flow Input Method
+    0.3,                     !- Constant Minimum Air Flow Fraction
+    0;                       !- Fixed Minimum Air Flow Rate {m3/s}
+
+  Schedule:Constant,Always On Discrete,OnOff,1;
+
+  ZoneHVAC:EquipmentList,
+    ComputerRoom ZN Equipment List,  !- Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ADU ComputerRoom ZN CRAC Diffuser,  !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+
+  Sizing:Zone,
+    ComputerRoom ZN,         !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    22.5,                    !- Zone Cooling Design Supply Air Temperature {C}
+    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    22.5,                    !- Zone Heating Design Supply Air Temperature {C}
+    11.11,                   !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    0.0085,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    SmallDataCenter ComputerRoom Ventilation,  !- Design Specification Outdoor Air Object Name
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    DesignDay,               !- Cooling Design Air Flow Method
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
+    0.000762,                !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
+    0,                       !- Cooling Minimum Air Flow {m3/s}
+    0,                       !- Cooling Minimum Air Flow Fraction
+    DesignDay,               !- Heating Design Air Flow Method
+    0,                       !- Heating Design Air Flow Rate {m3/s}
+    0.002032,                !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
+    0.1415762,               !- Heating Maximum Air Flow {m3/s}
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ComputerRoom ZN Design Spec Zone Air Dist,  !- Design Specification Zone Air Distribution Object Name
+    No;                      !- Account for Dedicated Outdoor Air System
+
+  DesignSpecification:ZoneAirDistribution,
+    ComputerRoom ZN Design Spec Zone Air Dist,  !- Name
+    1,                       !- Zone Air Distribution Effectiveness in Cooling Mode {dimensionless}
+    1;                       !- Zone Air Distribution Effectiveness in Heating Mode {dimensionless}
+
+  ScheduleTypeLimits,
+    OnOff,                   !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    Discrete,                !- Numeric Type
+    availability;            !- Unit Type
+
+  Schedule:Day:Interval,
+    DataCenter HVACOperationSchd Default,  !- Name
+    OnOff,                   !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {da23983d-69b1-494e-a6b9-97a3ea46cee9},  !- Name
+    DataCenter HVACOperationSchd Default,  !- Sunday Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- Monday Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- Tuesday Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- Wednesday Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- Thursday Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- Friday Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- Saturday Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- Holiday Schedule:Day Name
+    DataCenter HVACOperationSchd Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter HVACOperationSchd Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter HVACOperationSchd Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter HVACOperationSchd Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Year,
+    DataCenter HVACOperationSchd,  !- Name
+    OnOff,                   !- Schedule Type Limits Name
+    Schedule:Week:Daily {da23983d-69b1-494e-a6b9-97a3ea46cee9},  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+  Schedule:Day:Interval,
+    DataCenter HVACOperationSchd Summer Design Day,  !- Name
+    OnOff,                   !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter HVACOperationSchd Winter Design Day,  !- Name
+    OnOff,                   !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Controller:MechanicalVentilation,
+    Controller Mechanical Ventilation 1,  !- Name
+    DataCenter HVACOperationSchd,  !- Availability Schedule Name
+    No,                      !- Demand Controlled Ventilation
+    ZoneSum,                 !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ComputerRoom ZN,         !- Zone 1 Name
+    SmallDataCenter ComputerRoom Ventilation,  !- Design Specification Outdoor Air Object Name 1
+    ComputerRoom ZN Design Spec Zone Air Dist;  !- Design Specification Zone Air Distribution Object Name 1
+
+  DesignSpecification:OutdoorAir,
+    SmallDataCenter ComputerRoom Ventilation,  !- Name
+    Sum,                     !- Outdoor Air Method
+    0,                       !- Outdoor Air Flow per Person {m3/s-person}
+    0,                       !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0,                       !- Outdoor Air Flow per Zone {m3/s}
+    0;                       !- Outdoor Air Flow Air Changes per Hour {1/hr}
+
+  SimulationControl,
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    No,                      !- Run Simulation for Sizing Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
+
+  ConvergenceLimits,
+    1,                       !- Minimum System Timestep {minutes}
+    25;                      !- Maximum HVAC Iterations
+
+  HeatBalanceAlgorithm,ConductionTransferFunction,2000;
+
+  RunPeriod,
+    DataCenter,              !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    Yes,                     !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes,                     !- Use Weather File Snow Indicators
+    1;                       !- Number of Times Runperiod to be Repeated
+
+  ShadowCalculation,
+    AverageOverDaysInFrequency,  !- Calculation Method
+    20,                      !- Calculation Frequency
+    15000,                   !- Maximum Figures in Shadow Overlap Calculations
+    SutherlandHodgman,       !- Polygon Clipping Algorithm
+    SimpleSkyDiffuseModeling;!- Sky Diffuse Modeling Algorithm
+
+  SurfaceConvectionAlgorithm:Inside,TARP;
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+  Timestep,4;
+
+  Sizing:Parameters,
+    1.2,                     !- Heating Sizing Factor
+    1.2;                     !- Cooling Sizing Factor
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    Counterclockwise,        !- Vertex Entry Direction
+    Relative,                !- Coordinate System
+    Relative,                !- Daylighting Reference Point Coordinate System
+    Relative;                !- Rectangular Surface Coordinate System
+
+  Material,
+    100mm Normalweight concrete floor,  !- Name
+    MediumSmooth,            !- Roughness
+    0.1016,                  !- Thickness {m}
+    2.31,                    !- Conductivity {W/m-K}
+    2322,                    !- Density {kg/m3}
+    832,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  Material,
+    G01 13mm gypsum board,   !- Name
+    Smooth,                  !- Roughness
+    0.0127,                  !- Thickness {m}
+    0.16,                    !- Conductivity {W/m-K}
+    800,                     !- Density {kg/m3}
+    1090,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.5;                     !- Visible Absorptance
+
+  Material,
+    M10 200mm concrete block basement wall,  !- Name
+    MediumRough,             !- Roughness
+    0.2032,                  !- Thickness {m}
+    1.326,                   !- Conductivity {W/m-K}
+    1842,                    !- Density {kg/m3}
+    912,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  Material,
+    Std Wood 6inch,          !- Name
+    MediumSmooth,            !- Roughness
+    0.15,                    !- Thickness {m}
+    0.12,                    !- Conductivity {W/m-K}
+    540,                     !- Density {kg/m3}
+    1210,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  Material:NoMass,
+    Adiabatic Material,      !- Name
+    Smooth,                  !- Roughness
+    1760.92572663938,        !- Thermal Resistance {m2-K/W}
+    0.9,                     !- Thermal Absorptance
+    0,                       !- Solar Absorptance
+    0;                       !- Visible Absorptance
+
+  Material:NoMass,
+    CP02 CARPET PAD,         !- Name
+    VeryRough,               !- Roughness
+    0.21648,                 !- Thermal Resistance {m2-K/W}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.8;                     !- Visible Absorptance
+
+  Material:NoMass,
+    Nonres_Floor_Insulation, !- Name
+    MediumSmooth,            !- Roughness
+    2.88291975297193,        !- Thermal Resistance {m2-K/W}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  Construction,
+    Adiabatic ExteriorFloor, !- Name
+    Adiabatic Material;      !- Outside Layer
+
+  Construction,
+    Adiabatic GroundContactFloor,  !- Name
+    Adiabatic Material;      !- Outside Layer
+
+  Construction,
+    Adiabatic Roof,          !- Name
+    Adiabatic Material;      !- Outside Layer
+
+  Construction,
+    Adiabatic Wall,          !- Name
+    Adiabatic Material;      !- Outside Layer
+
+  Construction,
+    Basement Floor construction,  !- Name
+    M10 200mm concrete block basement wall,  !- Outside Layer
+    CP02 CARPET PAD;         !- Layer 2
+
+  Construction,
+    Basement Wall construction,  !- Name
+    M10 200mm concrete block basement wall;  !- Outside Layer
+
+  Construction,
+    Floor Adiabatic construction,  !- Name
+    CP02 CARPET PAD,         !- Outside Layer
+    100mm Normalweight concrete floor,  !- Layer 2
+    Nonres_Floor_Insulation; !- Layer 3
+
+  Construction,
+    InteriorFurnishings,     !- Name
+    Std Wood 6inch;          !- Outside Layer
+
+  Construction,
+    Typical Interior Ceiling,!- Name
+    CP02 CARPET PAD,         !- Outside Layer
+    100mm Normalweight concrete floor;  !- Layer 2
+
+  Construction,
+    Typical Interior Floor,  !- Name
+    100mm Normalweight concrete floor,  !- Outside Layer
+    CP02 CARPET PAD;         !- Layer 2
+
+  Construction,
+    Typical Interior Wall,   !- Name
+    G01 13mm gypsum board,   !- Outside Layer
+    G01 13mm gypsum board;   !- Layer 2
+
+  Construction,
+    Wall Adiabatic construction,  !- Name
+    G01 13mm gypsum board,   !- Outside Layer
+    G01 13mm gypsum board;   !- Layer 2
+
+  ScheduleTypeLimits,
+    Fractional,              !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Default,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Summer Design Day,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Winter Design Day,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.25;                    !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.5;                     !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.75;                    !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.75;                    !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.25;                    !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.5;                     !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.75;                    !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.25;                    !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.5;                     !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter Lighting_SCH Default,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    1;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Economizer Max OA Fraction 70 pct Default,  !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0.7;                     !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 1,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 2,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 3,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 4,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 5,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 6,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 7,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Day:Interval,
+    Schedule Day 8,          !- Name
+    ,                        !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    24:00,                   !- Time 1
+    0;                       !- Value Until Time 1
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {9cc52dfc-d9eb-46e3-a1b9-76c7d65b60ba},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {0df29391-6686-4587-8b49-f2065e6412fd},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {22b3e0e6-4cd5-4150-88ba-5f8466c29529},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {d26b6c69-685d-4d34-a0d1-cd9b63447d3d},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 1,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {17af5311-2eb5-48e9-ba56-b70f077eb851},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {be0cbcb1-e8e4-4940-8f2b-d31c621526a9},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 2,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {23915d71-1d10-42ee-ac59-3341b66589b2},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {e45de8cd-3e8c-46a8-bcb2-3ae60dfeb959},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 3,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {1f31bade-7592-436d-a4f6-5cf5c9049895},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {dda1d015-3727-425f-81f8-59c16d51b1f4},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 4,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {f8b7a406-febc-4eae-95b0-c27167e17f53},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {4c297b15-6cdb-49db-abda-6d3dddd0268a},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 5,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {69a3f966-de86-4c71-9fa9-fcdd1c74b09a},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {2ad3404a-4ceb-41b9-ad1b-662aff745156},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 6,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {07f7f9a9-d523-4a18-8a1e-e732f63202a0},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {10e0186f-471d-4558-b493-a352cf682224},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 7,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {c1ca232b-4b0c-4990-81c9-542dcd08e28a},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 8,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {0a74ddf3-60e2-4fa7-bb59-5718557bf6ac},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {e88122c2-f1da-4767-9942-01d178738d2c},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 9,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {4322db93-857d-4f4b-a6c6-9663e8e32f04},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {e8daa4af-ad2e-4fb5-bd13-3e54aceef90b},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 10,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {6df73afe-27b5-440b-b61c-8a8cd25496e0},  !- Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Sunday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Monday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Tuesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Wednesday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Thursday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Friday Schedule:Day Name
+    DataCenter Equipment_SCH Wknd|Wkdy Day 11,  !- Saturday Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Equipment_SCH Summer Design Day,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Winter Design Day,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Equipment_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Equipment_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Year,
+    DataCenter Equipment_SCH,!- Name
+    Fractional,              !- Schedule Type Limits Name
+    Schedule:Week:Daily {9cc52dfc-d9eb-46e3-a1b9-76c7d65b60ba},  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    1,                       !- End Month 1
+    28,                      !- End Day 1
+    Schedule:Week:Daily {0df29391-6686-4587-8b49-f2065e6412fd},  !- Schedule:Week Name 2
+    1,                       !- Start Month 2
+    29,                      !- Start Day 2
+    2,                       !- End Month 2
+    4,                       !- End Day 2
+    Schedule:Week:Daily {22b3e0e6-4cd5-4150-88ba-5f8466c29529},  !- Schedule:Week Name 3
+    2,                       !- Start Month 3
+    5,                       !- Start Day 3
+    2,                       !- End Month 3
+    25,                      !- End Day 3
+    Schedule:Week:Daily {d26b6c69-685d-4d34-a0d1-cd9b63447d3d},  !- Schedule:Week Name 4
+    2,                       !- Start Month 4
+    26,                      !- Start Day 4
+    3,                       !- End Month 4
+    4,                       !- End Day 4
+    Schedule:Week:Daily {17af5311-2eb5-48e9-ba56-b70f077eb851},  !- Schedule:Week Name 5
+    3,                       !- Start Month 5
+    5,                       !- Start Day 5
+    3,                       !- End Month 5
+    25,                      !- End Day 5
+    Schedule:Week:Daily {be0cbcb1-e8e4-4940-8f2b-d31c621526a9},  !- Schedule:Week Name 6
+    3,                       !- Start Month 6
+    26,                      !- Start Day 6
+    4,                       !- End Month 6
+    1,                       !- End Day 6
+    Schedule:Week:Daily {23915d71-1d10-42ee-ac59-3341b66589b2},  !- Schedule:Week Name 7
+    4,                       !- Start Month 7
+    2,                       !- Start Day 7
+    4,                       !- End Month 7
+    29,                      !- End Day 7
+    Schedule:Week:Daily {e45de8cd-3e8c-46a8-bcb2-3ae60dfeb959},  !- Schedule:Week Name 8
+    4,                       !- Start Month 8
+    30,                      !- Start Day 8
+    5,                       !- End Month 8
+    6,                       !- End Day 8
+    Schedule:Week:Daily {1f31bade-7592-436d-a4f6-5cf5c9049895},  !- Schedule:Week Name 9
+    5,                       !- Start Month 9
+    7,                       !- Start Day 9
+    5,                       !- End Month 9
+    27,                      !- End Day 9
+    Schedule:Week:Daily {dda1d015-3727-425f-81f8-59c16d51b1f4},  !- Schedule:Week Name 10
+    5,                       !- Start Month 10
+    28,                      !- Start Day 10
+    6,                       !- End Month 10
+    3,                       !- End Day 10
+    Schedule:Week:Daily {f8b7a406-febc-4eae-95b0-c27167e17f53},  !- Schedule:Week Name 11
+    6,                       !- Start Month 11
+    4,                       !- Start Day 11
+    6,                       !- End Month 11
+    24,                      !- End Day 11
+    Schedule:Week:Daily {4c297b15-6cdb-49db-abda-6d3dddd0268a},  !- Schedule:Week Name 12
+    6,                       !- Start Month 12
+    25,                      !- Start Day 12
+    7,                       !- End Month 12
+    1,                       !- End Day 12
+    Schedule:Week:Daily {69a3f966-de86-4c71-9fa9-fcdd1c74b09a},  !- Schedule:Week Name 13
+    7,                       !- Start Month 13
+    2,                       !- Start Day 13
+    7,                       !- End Month 13
+    29,                      !- End Day 13
+    Schedule:Week:Daily {2ad3404a-4ceb-41b9-ad1b-662aff745156},  !- Schedule:Week Name 14
+    7,                       !- Start Month 14
+    30,                      !- Start Day 14
+    8,                       !- End Month 14
+    5,                       !- End Day 14
+    Schedule:Week:Daily {07f7f9a9-d523-4a18-8a1e-e732f63202a0},  !- Schedule:Week Name 15
+    8,                       !- Start Month 15
+    6,                       !- Start Day 15
+    8,                       !- End Month 15
+    26,                      !- End Day 15
+    Schedule:Week:Daily {10e0186f-471d-4558-b493-a352cf682224},  !- Schedule:Week Name 16
+    8,                       !- Start Month 16
+    27,                      !- Start Day 16
+    9,                       !- End Month 16
+    2,                       !- End Day 16
+    Schedule:Week:Daily {c1ca232b-4b0c-4990-81c9-542dcd08e28a},  !- Schedule:Week Name 17
+    9,                       !- Start Month 17
+    3,                       !- Start Day 17
+    9,                       !- End Month 17
+    30,                      !- End Day 17
+    Schedule:Week:Daily {0a74ddf3-60e2-4fa7-bb59-5718557bf6ac},  !- Schedule:Week Name 18
+    10,                      !- Start Month 18
+    1,                       !- Start Day 18
+    10,                      !- End Month 18
+    28,                      !- End Day 18
+    Schedule:Week:Daily {e88122c2-f1da-4767-9942-01d178738d2c},  !- Schedule:Week Name 19
+    10,                      !- Start Month 19
+    29,                      !- Start Day 19
+    11,                      !- End Month 19
+    4,                       !- End Day 19
+    Schedule:Week:Daily {4322db93-857d-4f4b-a6c6-9663e8e32f04},  !- Schedule:Week Name 20
+    11,                      !- Start Month 20
+    5,                       !- Start Day 20
+    11,                      !- End Month 20
+    25,                      !- End Day 20
+    Schedule:Week:Daily {e8daa4af-ad2e-4fb5-bd13-3e54aceef90b},  !- Schedule:Week Name 21
+    11,                      !- Start Month 21
+    26,                      !- Start Day 21
+    12,                      !- End Month 21
+    2,                       !- End Day 21
+    Schedule:Week:Daily {6df73afe-27b5-440b-b61c-8a8cd25496e0},  !- Schedule:Week Name 22
+    12,                      !- Start Month 22
+    3,                       !- Start Day 22
+    12,                      !- End Month 22
+    31;                      !- End Day 22
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {c366fade-4c46-4bc6-8e84-e64a85f7140d},  !- Name
+    DataCenter Lighting_SCH Default,  !- Sunday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- Monday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- Tuesday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- Wednesday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- Thursday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- Friday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- Saturday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- Holiday Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- SummerDesignDay Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- WinterDesignDay Schedule:Day Name
+    DataCenter Lighting_SCH Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter Lighting_SCH Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Year,
+    DataCenter Lighting_SCH, !- Name
+    Fractional,              !- Schedule Type Limits Name
+    Schedule:Week:Daily {c366fade-4c46-4bc6-8e84-e64a85f7140d},  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {c608ee2c-f50d-4b95-879a-915866566243},  !- Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Sunday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Monday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Tuesday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Wednesday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Thursday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Friday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Saturday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- Holiday Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- SummerDesignDay Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- WinterDesignDay Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default,  !- CustomDay1 Schedule:Day Name
+    DataCenter MinOA_MotorizedDamper_Sched Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Year,
+    DataCenter MinOA_MotorizedDamper_Sched,  !- Name
+    Fractional,              !- Schedule Type Limits Name
+    Schedule:Week:Daily {c608ee2c-f50d-4b95-879a-915866566243},  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+  Schedule:Week:Daily,
+    Schedule:Week:Daily {63c1ef61-389b-46d3-9774-7f9b4b82a16b},  !- Name
+    Economizer Max OA Fraction 70 pct Default,  !- Sunday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- Monday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- Tuesday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- Wednesday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- Thursday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- Friday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- Saturday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- Holiday Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- SummerDesignDay Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- WinterDesignDay Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default,  !- CustomDay1 Schedule:Day Name
+    Economizer Max OA Fraction 70 pct Default;  !- CustomDay2 Schedule:Day Name
+
+  Schedule:Year,
+    Economizer Max OA Fraction 70 pct,  !- Name
+    ,                        !- Schedule Type Limits Name
+    Schedule:Week:Daily {63c1ef61-389b-46d3-9774-7f9b4b82a16b},  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+  Schedule:Constant,Always Off Discrete,,0;
+
+  Schedule:Constant,Always On Continuous,,1;
+
+  AirLoopHVAC,
+    ComputerRoom ZN CRAC,    !- Name
+    ,                        !- Controller List Name
+    ComputerRoom ZN CRACAvailability Manager List,  !- Availability Manager List Name
+    AutoSize,                !- Design Supply Air Flow Rate {m3/s}
+    ComputerRoom ZN CRAC Supply Branches,  !- Branch List Name
+    ,                        !- Connector List Name
+    Node 2,                  !- Supply Side Inlet Node Name
+    Node 5,                  !- Demand Side Outlet Node Name
+    ComputerRoom ZN CRAC Demand Inlet Nodes,  !- Demand Side Inlet Node Names
+    ComputerRoom ZN CRAC Supply Outlet Nodes;  !- Supply Side Outlet Node Names
+
+  NodeList,
+    ComputerRoom ZN CRAC Supply Outlet Nodes,  !- Name
+    Node 3;                  !- Node 1 Name
+
+  NodeList,
+    ComputerRoom ZN CRAC Demand Inlet Nodes,  !- Name
+    Node 4;                  !- Node 1 Name
+
+  Sizing:System,
+    ComputerRoom ZN CRAC,    !- AirLoop Name
+    Sensible,                !- Type of Load to Size On
+    Autosize,                !- Design Outdoor Air Flow Rate {m3/s}
+    0.05,                    !- Central Heating Maximum System Air Flow Ratio
+    7,                       !- Preheat Design Temperature {C}
+    0.0085,                  !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
+    27,                      !- Precool Design Temperature {C}
+    0.0085,                  !- Precool Design Humidity Ratio {kgWater/kgDryAir}
+    22.5,                    !- Central Cooling Design Supply Air Temperature {C}
+    22.5,                    !- Central Heating Design Supply Air Temperature {C}
+    NonCoincident,           !- Type of Zone Sum to Use
+    No,                      !- 100% Outdoor Air in Cooling
+    No,                      !- 100% Outdoor Air in Heating
+    0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    0.0099676501,            !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1,                       !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    3.9475456e-005,          !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    0.0099676501,            !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1,                       !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    1,                       !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    3.1588213e-005,          !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ZoneSum,                 !- System Outdoor Air Method
+    1,                       !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    Autosize,                !- Cooling Design Capacity {W}
+    234.7,                   !- Cooling Design Capacity Per Floor Area {W/m2}
+    1,                       !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    157,                     !- Heating Design Capacity Per Floor Area {W/m2}
+    1,                       !- Fraction of Autosized Heating Design Capacity
+    OnOff;                   !- Central Cooling Capacity Control Method
+
+  AvailabilityManagerAssignmentList,
+    ComputerRoom ZN CRACAvailability Manager List,  !- Name
+    AvailabilityManager:NightCycle,  !- Availability Manager 1 Object Type
+    Availability Manager Night Cycle 1;  !- Availability Manager 1 Name
+
+  AvailabilityManager:NightCycle,
+    Availability Manager Night Cycle 1,  !- Name
+    Always On Discrete,      !- Applicability Schedule Name
+    DataCenter HVACOperationSchd,  !- Fan Schedule Name
+    CycleOnAny,              !- Control Type
+    1,                       !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
+    3600;                    !- Cycling Run Time {s}
+
+  BranchList,
+    ComputerRoom ZN CRAC Supply Branches,  !- Name
+    ComputerRoom ZN CRAC Main Branch;  !- Branch 1 Name
+
+  Branch,
+    ComputerRoom ZN CRAC Main Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
+    ComputerRoom ZN CRAC OA Sys,  !- Component 1 Name
+    Node 2,                  !- Component 1 Inlet Node Name
+    Node 10,                 !- Component 1 Outlet Node Name
+    CoilSystem:Cooling:DX,   !- Component 2 Object Type
+    ComputerRoom ZN CRAC 1spd DX AC Clg Coil 109kBtu/hr 2.1SCOP 2.63COP CoilSystem,  !- Component 2 Name
+    Node 10,                 !- Component 2 Inlet Node Name
+    Node 9,                  !- Component 2 Outlet Node Name
+    Fan:VariableVolume,      !- Component 3 Object Type
+    ComputerRoom ZN CRAC Fan,!- Component 3 Name
+    Node 9,                  !- Component 3 Inlet Node Name
+    Node 3;                  !- Component 3 Outlet Node Name
+
+  AirLoopHVAC:OutdoorAirSystem,
+    ComputerRoom ZN CRAC OA Sys,  !- Name
+    ComputerRoom ZN CRAC OA Sys Controller List,  !- Controller List Name
+    ComputerRoom ZN CRAC OA Sys Equipment List,  !- Outdoor Air Equipment List Name
+    ComputerRoom ZN CRAC OA Sys Availability Manager List;  !- Availability Manager List Name
+
+  AirLoopHVAC:ControllerList,
+    ComputerRoom ZN CRAC OA Sys Controller List,  !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
+    ComputerRoom ZN CRAC OA Sys Controller;  !- Controller 1 Name
+
+  Controller:OutdoorAir,
+    ComputerRoom ZN CRAC OA Sys Controller,  !- Name
+    Node 8,                  !- Relief Air Outlet Node Name
+    Node 2,                  !- Return Air Node Name
+    Node 10,                 !- Mixed Air Node Name
+    Node 7,                  !- Actuator Node Name
+    Autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    NoEconomizer,            !- Economizer Control Type
+    ModulateFlow,            !- Economizer Control Action Type
+    28,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    64000,                   !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Electronic Enthalpy Limit Curve Name
+    -100,                    !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    NoLockout,               !- Lockout Type
+    FixedMinimum,            !- Minimum Limit Type
+    DataCenter HVACOperationSchd,  !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Fraction of Outdoor Air Schedule Name
+    ,                        !- Maximum Fraction of Outdoor Air Schedule Name
+    Controller Mechanical Ventilation 1,  !- Mechanical Ventilation Controller Name
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
+    ,                        !- Humidistat Control Zone Name
+    ,                        !- High Humidity Outdoor Air Flow Ratio
+    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
+    BypassWhenWithinEconomizerLimits;  !- Heat Recovery Bypass Control Type
+
+  AvailabilityManagerAssignmentList,
+    ComputerRoom ZN CRAC OA Sys Availability Manager List,  !- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    ComputerRoom ZN CRAC OA Sys Availability Manager;  !- Availability Manager 1 Name
+
+  AvailabilityManager:Scheduled,
+    ComputerRoom ZN CRAC OA Sys Availability Manager,  !- Name
+    Always On Discrete;      !- Schedule Name
+
+  OutdoorAir:NodeList,
+    Node 7;                  !- Node or NodeList Name 1
+
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+    ComputerRoom ZN CRAC OA Sys Equipment List,  !- Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    ComputerRoom ZN CRAC OA Sys Outdoor Air Mixer;  !- Component 1 Name
+
+  OutdoorAir:Mixer,
+    ComputerRoom ZN CRAC OA Sys Outdoor Air Mixer,  !- Name
+    Node 10,                 !- Mixed Air Node Name
+    Node 7,                  !- Outdoor Air Stream Node Name
+    Node 8,                  !- Relief Air Stream Node Name
+    Node 2;                  !- Return Air Stream Node Name
+
+  SetpointManager:MixedAir,
+    Node 10 OS Default SPM,  !- Name
+    Temperature,             !- Control Variable
+    Node 3,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 3,                  !- Fan Outlet Node Name
+    Node 10;                 !- Setpoint Node or NodeList Name
+
+  CoilSystem:Cooling:DX,
+    ComputerRoom ZN CRAC 1spd DX AC Clg Coil 109kBtu/hr 2.1SCOP 2.63COP CoilSystem,  !- Name
+    Always On Discrete,      !- Availability Schedule Name
+    Node 10,                 !- DX Cooling Coil System Inlet Node Name
+    Node 9,                  !- DX Cooling Coil System Outlet Node Name
+    Node 9,                  !- DX Cooling Coil System Sensor Node Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    ComputerRoom ZN CRAC 1spd DX AC Clg Coil 109kBtu/hr 2.1SCOP 2.63COP;  !- Cooling Coil Name
+
+  Curve:Biquadratic,
+    CoilClgDXQRatio_fTwbToadbSI,  !- Name
+    0.86779,                 !- Coefficient1 Constant
+    0.014245,                !- Coefficient2 x
+    0.000554,                !- Coefficient3 x**2
+    -0.007569,               !- Coefficient4 y
+    3.2e-005,                !- Coefficient5 y**2
+    -0.000191,               !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    0.77,                    !- Minimum Curve Output
+    1.29;                    !- Maximum Curve Output
+
+  Curve:Cubic,
+    CoilClgDXDblQRatio_fCFMRatio,  !- Name
+    0.472786,                !- Coefficient1 Constant
+    1.243342,                !- Coefficient2 x
+    -1.038706,               !- Coefficient3 x**2
+    0.322578,                !- Coefficient4 x**3
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0.47;                    !- Minimum Curve Output
+
+  Curve:Biquadratic,
+    CoilClgDXEIRRatio_fTwbToadbSI,  !- Name
+    0.116709,                !- Coefficient1 Constant
+    0.028458,                !- Coefficient2 x
+    -0.000411,               !- Coefficient3 x**2
+    0.021422,                !- Coefficient4 y
+    0.000162,                !- Coefficient5 y**2
+    -0.00068,                !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    0.77,                    !- Minimum Curve Output
+    1.33;                    !- Maximum Curve Output
+
+  Curve:Cubic,
+    CoilClgDXDblEIRRatio_fCFMRatio,  !- Name
+    1.007948,                !- Coefficient1 Constant
+    0.345441,                !- Coefficient2 x
+    -0.692289,               !- Coefficient3 x**2
+    0.338899,                !- Coefficient4 x**3
+    0,                       !- Minimum Value of x
+    1;                       !- Maximum Value of x
+
+  Curve:Cubic,
+    CoilClgDXEIRRatio_fQFrac,!- Name
+    0,                       !- Coefficient1 Constant
+    5.1091,                  !- Coefficient2 x
+    -8.5515,                 !- Coefficient3 x**2
+    4.4744,                  !- Coefficient4 x**3
+    0.7,                     !- Minimum Value of x
+    1,                       !- Maximum Value of x
+    0.92,                    !- Minimum Curve Output
+    1;                       !- Maximum Curve Output
+
+  SetpointManager:MixedAir,
+    Node 9 OS Default SPM,   !- Name
+    Temperature,             !- Control Variable
+    Node 3,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 3,                  !- Fan Outlet Node Name
+    Node 9;                  !- Setpoint Node or NodeList Name
+
+  Coil:Cooling:DX:SingleSpeed,
+    ComputerRoom ZN CRAC 1spd DX AC Clg Coil 109kBtu/hr 2.1SCOP 2.63COP,  !- Name
+    Always On Discrete,      !- Availability Schedule Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    Autosize,                !- Gross Rated Sensible Heat Ratio
+    2.63,                    !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    773.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    Node 10,                 !- Air Inlet Node Name
+    Node 9,                  !- Air Outlet Node Name
+    CoilClgDXQRatio_fTwbToadbSI,  !- Total Cooling Capacity Function of Temperature Curve Name
+    CoilClgDXDblQRatio_fCFMRatio,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    CoilClgDXEIRRatio_fTwbToadbSI,  !- Energy Input Ratio Function of Temperature Curve Name
+    CoilClgDXDblEIRRatio_fCFMRatio,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    CoilClgDXEIRRatio_fQFrac,!- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    0,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    0,                       !- Basin Heater Capacity {W/K}
+    10;                      !- Basin Heater Setpoint Temperature {C}
+
+  Fan:VariableVolume,
+    ComputerRoom ZN CRAC Fan,!- Name
+    DataCenter HVACOperationSchd,  !- Availability Schedule Name
+    0.58175,                 !- Fan Total Efficiency
+    996.35564,               !- Pressure Rise {Pa}
+    AutoSize,                !- Maximum Flow Rate {m3/s}
+    Fraction,                !- Fan Power Minimum Flow Rate Input Method
+    0.1,                     !- Fan Power Minimum Flow Fraction
+    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}
+    0.895,                   !- Motor Efficiency
+    1,                       !- Motor In Airstream Fraction
+    0.027828,                !- Fan Power Coefficient 1
+    0.026583,                !- Fan Power Coefficient 2
+    -0.087069,               !- Fan Power Coefficient 3
+    1.03092,                 !- Fan Power Coefficient 4
+    0,                       !- Fan Power Coefficient 5
+    Node 9,                  !- Air Inlet Node Name
+    Node 3;                  !- Air Outlet Node Name
+
+  SetpointManager:Warmest,
+    Setpoint Manager Warmest 1,  !- Name
+    Temperature,             !- Control Variable
+    ComputerRoom ZN CRAC,    !- HVAC Air Loop Name
+    18,                      !- Minimum Setpoint Temperature {C}
+    27,                      !- Maximum Setpoint Temperature {C}
+    MaximumTemperature,      !- Strategy
+    Node 3;                  !- Setpoint Node or NodeList Name
+
+  AirLoopHVAC:SupplyPath,
+    ComputerRoom ZN CRAC Node 4 Supply Path,  !- Name
+    Node 4,                  !- Supply Air Path Inlet Node Name
+    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
+    Air Loop HVAC Zone Splitter 1;  !- Component 1 Name
+
+  AirLoopHVAC:ZoneSplitter,
+    Air Loop HVAC Zone Splitter 1,  !- Name
+    Node 4,                  !- Inlet Node Name
+    Node 12;                 !- Outlet 1 Node Name
+
+  AirLoopHVAC:ReturnPath,
+    ComputerRoom ZN CRAC Return Path,  !- Name
+    Node 5,                  !- Return Air Path Outlet Node Name
+    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
+    Air Loop HVAC Zone Mixer 1;  !- Component 1 Name
+
+  AirLoopHVAC:ZoneMixer,
+    Air Loop HVAC Zone Mixer 1,  !- Name
+    Node 5,                  !- Outlet Node Name
+    Node 11;                 !- Inlet 1 Node Name
+
+  RunPeriodControl:DaylightSavingTime,
+    1st Sunday in April,     !- Start Date
+    Last Sunday in October;  !- End Date
+
+  Site:Location,
+    Houston Bush Intercontinental_TX_USA,  !- Name
+    30,                      !- Latitude {deg}
+    -95.37,                  !- Longitude {deg}
+    -6,                      !- Time Zone {hr}
+    29;                      !- Elevation {m}
+
+  Site:GroundTemperature:BuildingSurface,19.527,19.502,19.536,19.598,20.002,21.64,22.225,22.375,21.449,20.121,19.802,19.633;
+
+  Site:WaterMainsTemperature,
+    Correlation,             !- Calculation Method
+    ,                        !- Temperature Schedule Name
+    20.3166666666667,        !- Annual Average Outdoor Air Temperature {C}
+    17.8;                    !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
+
+  SizingPeriod:DesignDay,
+    Houston Bush Intercontinental Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    36,                      !- Maximum Dry-Bulb Temperature {C}
+    10.1,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    24.8,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    100977,                  !- Barometric Pressure {Pa}
+    3.5,                     !- Wind Speed {m/s}
+    170,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.499,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    1.97;                    !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+
+  SizingPeriod:DesignDay,
+    Houston Bush Intercontinental Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -1.6,                    !- Maximum Dry-Bulb Temperature {C}
+    0,                       !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -1.6,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    100977,                  !- Barometric Pressure {Pa}
+    2.8,                     !- Wind Speed {m/s}
+    0,                       !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0;                       !- Sky Clearness
+
+  ZoneList,
+    SmallDataCenter ComputerRoom,  !- Name
+    ComputerRoom ZN;         !- Zone 1 Name
+
+  Lights,
+    SmallDataCenter ComputerRoom Lights,  !- Name
+    SmallDataCenter ComputerRoom,  !- Zone or ZoneList Name
+    DataCenter Lighting_SCH, !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    10.7639104167097,        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    ,                        !- Return Air Fraction
+    0.7,                     !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    ;                        !- Fraction Replaceable
+
+	
+  ElectricEquipment:ITE:AirCooled,
+    SmallDataCenter ComputerRoom Elec Equip,     !- Name
+    ComputerRoom ZN,               !- Zone Name
+	FlowControlWithApproachTemperatures,
+    Watts/Area,              !- Design Power Input Calculation Method
+    ,                     !- Watts per Unit {W}
+    ,                     !- Number of Units
+    430.556416668389,                !- Watts per Zone Floor Area {W/m2}
+    Data Center Operation Schedule,  !- Design Power Input Schedule Name
+    DataCenter Equipment_SCH,  !- CPU Loading  Schedule Name
+    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
+    0.4,                     !- Design Fan Power Input Fraction
+    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}
+    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name
+    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name
+    15,                      !- Design Entering Air Temperature {C}
+    A3,                      !- Environmental Class
+    AdjustedSupply,          !- Air Inlet Connection Type
+    ,                        !- Air Inlet Room Air Model Node Name
+    ,                        !- Air Outlet Room Air Model Node Name
+    Node 6, 			     !- Supply Air Node Name
+    0,                     !- Design Recirculation Fraction
+    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name
+    0.9,                     !- Design Electric Power Supply Efficiency
+    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+    1,                       !- Fraction of Electric Power Supply Losses to Zone
+    ITE-CPU,                 !- CPU End-Use Subcategory
+    ITE-Fans,                !- Fan End-Use Subcategory
+    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
+	0,                       !- field Supply Approach Temperature
+	0,                       !- field Supply Approach Temperature Schedule
+	-3,                      !- field Return Approach Temperature 
+	0;                       !- field Return Approach Temperature Schedule
+
+
+  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;
+
+  Curve:Biquadratic,
+    Data Center Servers Power fLoadTemp,  !- Name
+    -1.0,                    !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.06667,                 !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Data Center Servers Airflow fLoadTemp,  !- Name
+    -1.4,                    !- Coefficient1 Constant
+    0.9,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.1,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    ECM FanPower fFlow,      !- Name
+    0.0,                     !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    99.0;                    !- Maximum Value of x
+
+  Curve:Biquadratic,
+    Data Center Recirculation fLoadTemp,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+	
+  Curve:Quadratic,
+    UPS Efficiency fPLR,     !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    99.0;                    !- Maximum Value of x
+
+	
+	
+  Curve:Biquadratic,
+    Curve Biquadratic 1,     !- Name
+    0.9712123,               !- Coefficient1 Constant
+    -0.015275502,            !- Coefficient2 x
+    0.0014434524,            !- Coefficient3 x**2
+    -0.00039321,             !- Coefficient4 y
+    -6.8364e-006,            !- Coefficient5 y**2
+    -0.0002905956,           !- Coefficient6 x*y
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    -100,                    !- Minimum Value of y
+    100;                     !- Maximum Value of y
+
+  Curve:Biquadratic,
+    Curve Biquadratic 2,     !- Name
+    0.28687133,              !- Coefficient1 Constant
+    0.023902164,             !- Coefficient2 x
+    -0.000810648,            !- Coefficient3 x**2
+    0.013458546,             !- Coefficient4 y
+    0.0003389364,            !- Coefficient5 y**2
+    -0.0004870044,           !- Coefficient6 x*y
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    -100,                    !- Minimum Value of y
+    100;                     !- Maximum Value of y
+
+  Curve:Quadratic,
+    Curve Quadratic 1,       !- Name
+    1,                       !- Coefficient1 Constant
+    0,                       !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    -100,                    !- Minimum Value of x
+    100;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    Curve Quadratic 2,       !- Name
+    1,                       !- Coefficient1 Constant
+    0,                       !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    -100,                    !- Minimum Value of x
+    100;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    Curve Quadratic 3,       !- Name
+    0.90949556,              !- Coefficient1 Constant
+    0.09864773,              !- Coefficient2 x
+    -0.00819488,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1,                       !- Maximum Value of x
+    0.7,                     !- Minimum Curve Output
+    1;                       !- Maximum Curve Output
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
+  
+  Output:Variable,*,Zone Air Temperature,Hourly;
+
+  Output:Variable,*,ITE CPU Electric Power,Hourly;
+
+  Output:Variable,*,ITE Fan Electric Power,Hourly;
+
+  Output:Variable,*,ITE UPS Electric Power,Hourly;
+
+  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,Hourly;
+
+  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,Hourly;
+
+  Output:Variable,*,ITE UPS Heat Gain to Zone Rate,Hourly;
+
+  Output:Variable,*,ITE Total Heat Gain to Zone Rate,Hourly;
+
+  Output:Variable,*,ITE Standard Density Air Volume Flow Rate,Hourly;
+
+  Output:Variable,*,ITE Air Mass Flow Rate,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity,Hourly;
+
+  Output:Variable,*,ITE Air Outlet Dry-Bulb Temperature,Hourly;
+
+  Output:Variable,*,ITE Supply Heat Index,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Operating Range Exceeded Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Above Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Below Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Above Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Below Operating Range Time,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,Hourly;
+
+  Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,Hourly;
+  
+  Output:Variable,*,Zone ITE Total Heat Gain to Zone Rate,Hourly;
+  
+  Output:Variable,*,Zone ITE Adjusted Return Air Temperature,Hourly;
+
+  Output:Variable,*,Cooling Coil Electric Power,Hourly;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
+  
+  
+  Output:Variable,*,System Node Temperature,hourly; !- HVAC Average [C]  
+
+  Output:Variable,*,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+
+  
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+
+  Output:VariableDictionary,IDF,Unsorted;
+
+  Output:SQLite,
+    SimpleAndTabular;        !- Option Type
+
+  LifeCycleCost:NonrecurringCost,
+    Default Cost,            !- Name
+    Construction,            !- Category
+    0,                       !- Cost
+    ServicePeriod;           !- Start of Costs
+
