@@ -21154,15 +21154,15 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list ZoneNames
-  A3 , \field Calculation Method 
+  A3 , \field Air Flow Caclulation Method
        \note The entered calculation method is used to specify how the IT inlet temperature and zone 
-	   \note return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. 
-	   \note If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature 
-	   \note should be defined to indicate the temperature difference due to the air distribution. When
-	   \note FlowFromSystem is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction
-	   \note and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple
-	   \note ITE objects defined for one zone, the same calculation method should apply.
-	   \type choice
+       \note return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. 
+       \note If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature 
+       \note should be defined to indicate the temperature difference due to the air distribution. When
+       \note FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction
+       \note and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple
+       \note ITE objects defined for one zone, the same calculation method should apply.
+       \type choice
        \key FlowFromSystem
        \key FlowControlWithApproachTemperatures
        \default FlowFromSystem
@@ -21262,6 +21262,7 @@ ElectricEquipment:ITE:AirCooled,
        \note ZoneAirNode = ITE air inlet condition is  the average zone condition.
        \note All heat output is added to the zone air heat balance as a convective gain.
        \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes.
+       \note This field is only used when Air Flow Calculation Method is FlowFromSystem.
        \type choice
        \key AdjustedSupply
        \key ZoneAirNode
@@ -21278,12 +21279,13 @@ ElectricEquipment:ITE:AirCooled,
   A14, \field Supply Air Node Name
        \note Name of the supply air inlet node serving this ITE. Required if the
        \note Air Node Connection Type = AdjustedSupply. Also required if 
-	   \note Calculation Method = FlowControlWithApproachTemperatures. Also required if reporting of
+       \note Calculation Method = FlowControlWithApproachTemperatures. Also required if reporting of
        \note Supply Heat Index is desired.
        \type node
   N7,  \field Design Recirculation Fraction
        \note The recirculation fraction for this equipment at design conditions. This field is used only
        \note if the Air Node Connection Type = AdjustedSupply. The default is 0.0 (no recirculation).
+       \note This field is only used when Air Flow Calculation Method is FlowFromSystem.
        \type real
        \minimum 0.0
        \maximum 0.5
@@ -21298,6 +21300,7 @@ ElectricEquipment:ITE:AirCooled,
        \note Design Entering Air Temperature).This field is used only if the
        \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve
        \note is assumed to always equal 1.0.
+       \note This field is only used when Air Flow Calculation Method is FlowFromSystem.
   N8 , \field Design Electric Power Supply Efficiency
        \note The efficiency of the power supply system serving this ITE
        \type real
@@ -21334,28 +21337,30 @@ ElectricEquipment:ITE:AirCooled,
        \type alpha
        \retaincase
        \default ITE-UPS
-  N10, \field Supply Approach Temperature 
-       \note Either N10 or A20 is required if Calculation Method is set to FlowControlWithApproachTemperatures 
-	   \note The difference of the IT inlet temperature from the AHU supply air temperature
+  N10, \field Supply Temperature Difference
+       \note The difference of the IT inlet temperature from the AHU supply air temperature.
+       \note Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. 
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
        \type real
-       \units C
-       \default 0.0
-  A20, \field Supply Approach Temperature Schedule
-       \note Either N10 or A20 is required if Calculation Method is set to FlowControlWithApproachTemperatures 
-	   \note The difference schedule of the IT inlet temperature from the AHU supply air temperature
+       \units deltaC
+  A20, \field Supply Temperature Difference Schedule
+       \note The difference schedule of the IT inlet temperature from the AHU supply air temperature.   
+       \note Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. 
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
        \type object-list
-	   \object-list ScheduleNames
-  N11, \field Return Approach Temperature 
-       \note Either N11 or A21 is required if Calculation Method is set to FlowControlWithApproachTemperatures 
-	   \note The difference of the unit outlet temperature from the well mixed zone temperature
+       \object-list ScheduleNames
+  N11, \field Return Temperature Difference
+       \note The difference of the unit outlet temperature from the well mixed zone temperature.
+       \note Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures.
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
        \type real
-       \units C
-       \default 0.0
-  A21; \field Return Approach Temperature Schedule
-       \note Either N11 or A21 is required if Calculation Method is set to FlowControlWithApproachTemperatures 
-	   \note The difference schedule of the unit outlet temperature from the well mixed zone temperature
+       \units deltaC
+  A21; \field Return Temperature Difference Schedule
+       \note The difference schedule of the unit outlet temperature from the well mixed zone temperature.
+       \note Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. 
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
        \type object-list
-	   \object-list ScheduleNames
+       \object-list ScheduleNames
 	   
 ZoneBaseboard:OutdoorTemperatureControlled,
        \memo Specifies outside temperature-controlled electric baseboard heating.

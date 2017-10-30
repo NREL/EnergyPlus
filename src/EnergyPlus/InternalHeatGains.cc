@@ -48,6 +48,7 @@
 // C++ Headers
 #include <cmath>
 #include <string>
+#include <map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -94,7 +95,6 @@
 #include <DataHVACGlobals.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <ExteriorEnergyUse.hh>
-#include <map>
 
 namespace EnergyPlus {
 
@@ -2337,6 +2337,7 @@ namespace InternalHeatGains {
 				ZoneITEq( Loop ).Name = AlphaName( 1 );
 				ZoneITEq( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone );
 
+				// IT equipment design level calculation method.
 				if ( lAlphaFieldBlanks( 3 ) ) {
 					ZoneITEq( Loop ).FlowControlWithApproachTemps = false;
 				} else {
@@ -2346,16 +2347,14 @@ namespace InternalHeatGains {
 					else if ( SameString( AlphaName( 3 ), "FlowControlWithApproachTemperatures" ) ) {
 						ZoneITEq( Loop ).FlowControlWithApproachTemps = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir = true;
+						Zone( ZoneITEq( Loop ).ZonePtr ).NoHeatToReturnAir = false;
+
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
 						ErrorsFound = true;
 					}
 				}
-				if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir && ( !ZoneITEq( Loop ).FlowControlWithApproachTemps ) ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method " + AlphaName( 3 )  + " for Zone: " + AlphaName( 2 ) );
-					ShowContinueError( "...Multiple flow control methods apply to one zone. " );
-					ErrorsFound = true;
-				}
+				
 				{ auto const equipmentLevel( AlphaName( 4 ) );
 				if ( equipmentLevel == "WATTS/UNIT" ) {
 					ZoneITEq( Loop ).DesignTotalPower = IHGNumbers( 1 ) * IHGNumbers( 2 );
@@ -2383,7 +2382,7 @@ namespace InternalHeatGains {
 					}
 
 				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + ", value  =" + AlphaName( 4 ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + ", value  =" + AlphaName( 4 ) );
 					ShowContinueError( "...Valid values are \"Watts/Unit\" or \"Watts/Area\"." );
 					ErrorsFound = true;
 				}}
@@ -2396,7 +2395,7 @@ namespace InternalHeatGains {
 				SchMin = 0.0;
 				SchMax = 0.0;
 				if ( ZoneITEq( Loop ).OperSchedPtr == 0 ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + " entered=" + AlphaName( 5 ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 5 ) + " entered=" + AlphaName( 5 ) );
 					ErrorsFound = true;
 				} else { // check min/max on schedule
 					SchMin = GetScheduleMinValue( ZoneITEq( Loop ).OperSchedPtr );
@@ -2526,7 +2525,7 @@ namespace InternalHeatGains {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
-					ShowContinueError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + AlphaName( 11 ) );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 11 ) + '=' + AlphaName( 11 ) );
 					ShowContinueError( "Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel." );
 					ErrorsFound = true;
 				}
@@ -2569,7 +2568,7 @@ namespace InternalHeatGains {
 					if ( !lAlphaFieldBlanks( 20 ) ) {
 						ZoneITEq( Loop ).SupplyApproachTempSch = GetScheduleIndex( AlphaName( 20 ) );
 					} else {
-						if ( ZoneITEq( Loop ).SupplyApproachTemp == 0 ) {
+						if ( lNumericFieldBlanks( 10 ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 10 ) + " or " + cAlphaFieldNames( 20 ) + " is required, but both are left blank." );
 							ErrorsFound = true;
@@ -2579,7 +2578,7 @@ namespace InternalHeatGains {
 					if ( !lAlphaFieldBlanks( 21 ) ) {
 						ZoneITEq( Loop ).ReturnApproachTempSch = GetScheduleIndex( AlphaName( 21 ) );
 					} else {
-						if ( ZoneITEq( Loop ).ReturnApproachTemp == 0 ) {
+						if ( lNumericFieldBlanks( 11 ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 11 ) + " or " + cAlphaFieldNames( 21 ) + " is required, but both are left blank." );
 							ErrorsFound = true;
@@ -2638,7 +2637,7 @@ namespace InternalHeatGains {
 					SetupOutputVariable( "Zone ITE Fan Electric Power at Design Inlet Conditions", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanPowerAtDesign, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone ITE UPS Heat Gain to Zone Rate", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqUPSGainRateToZone, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone ITE Total Heat Gain to Zone Rate", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqConGainRateToZone, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone ITE Adjusted Return Air Temperature", OutputProcessor::Unit::W, ZnRpt( Loop ).ITEAdjReturnTemp, "Zone", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone ITE Adjusted Return Air Temperature", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEAdjReturnTemp, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 
 					SetupOutputVariable( "Zone ITE CPU Electric Energy", OutputProcessor::Unit::J, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqCPUConsumption, "Zone", "Sum", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone ITE Fan Electric Energy", OutputProcessor::Unit::J, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanConsumption, "Zone", "Sum", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
@@ -2660,6 +2659,9 @@ namespace InternalHeatGains {
 					SetupOutputVariable( "Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time", OutputProcessor::Unit::hr, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeBelowRH, "Zone", "Sum", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 				}
 
+				
+				
+
 				// MJW - EMS Not in place yet
 				// if ( AnyEnergyManagementSystemInModel ) {
 				// SetupEMSActuator( "ElectricEquipment", ZoneITEq( Loop ).Name, "Electric Power Level", "[W]", ZoneITEq( Loop ).EMSZoneEquipOverrideOn, ZoneITEq( Loop ).EMSEquipPower );
@@ -2669,6 +2671,13 @@ namespace InternalHeatGains {
 				if ( !ErrorsFound ) SetupZoneInternalGain( ZoneITEq( Loop ).ZonePtr, "ElectricEquipment:ITE:AirCooled", ZoneITEq( Loop ).Name, IntGainTypeOf_ElectricEquipmentITEAirCooled, ZoneITEq( Loop ).ConGainRateToZone );
 
 			} // Item - Number of ZoneITEq objects
+			for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
+				if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir && ( !ZoneITEq( Loop ).FlowControlWithApproachTemps ) ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method " + AlphaName( 3 ) + " for Zone: " + AlphaName( 2 ) );
+					ShowContinueError( "...Multiple flow control methods apply to one zone. " );
+					ErrorsFound = true;
+				}
+			}
 		} // Check on number of ZoneITEq
 
 		RepVarSet = true;
@@ -3967,7 +3976,7 @@ namespace InternalHeatGains {
 					TSupply = Node( SupplyNodeNum ).Temp;
 					WSupply = Node( SupplyNodeNum ).HumRat;
 				} else {
-					ShowFatalError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
+					ShowSevereError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
 					ShowContinueError( "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified." );
 				}
 				if ( ZoneITEq( Loop ).SupplyApproachTempSch != 0) {
@@ -3983,7 +3992,7 @@ namespace InternalHeatGains {
 						TSupply = Node( SupplyNodeNum ).Temp;
 						WSupply = Node( SupplyNodeNum ).HumRat;
 					} else {
-						ShowFatalError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
+						ShowSevereError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
 						ShowContinueError( "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified." );
 					}
 					if ( ZoneITEq( Loop ).RecircFLTCurve != 0 ) {

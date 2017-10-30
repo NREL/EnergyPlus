@@ -727,10 +727,16 @@ namespace ZoneEquipmentManager {
 						Temp = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTemp;
 						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 						DeltaTemp = Temp - Node( ZoneNode ).Temp;
+						if ( DataHeatBalance::Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {						
+							DeltaTemp = Temp - DataHeatBalance::Zone( ActualZoneNum ).AdjustedTempToReturnAir;
+						}
 						// If the user specify the design cooling supply air temperature difference, then
 					} else {
 						DeltaTemp = -std::abs( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTempDiff );
 						Temp = DeltaTemp + Node( ZoneNode ).Temp;
+						if ( DataHeatBalance::Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
+							Temp = DeltaTemp + DataHeatBalance::Zone( ActualZoneNum ).AdjustedTempToReturnAir;
+						}
 						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 					}
 				} else { // Heating Case
@@ -4292,6 +4298,11 @@ namespace ZoneEquipmentManager {
 						} else {
 							Node( ReturnNode ).Temp = TempRetAir;
 						}
+						// Overwrite heat-to-return from ITE objects
+						if ( Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
+							TempRetAir = Zone( ActualZoneNum ).AdjustedTempToReturnAir;
+							Node( ReturnNode ).Temp = TempRetAir;
+						}
 					} else { // No return air flow
 						// Assign all heat-to-return from window gap airflow to zone air
 						if ( WinGapFlowToRA > 0.0 ) SysDepZoneLoads( ActualZoneNum ) += WinGapFlowToRA * CpAir * ( WinGapTtoRA - TempZoneAir );
@@ -4303,9 +4314,7 @@ namespace ZoneEquipmentManager {
 					// update the return air node for zonal and central on/off systems
 					Node( ReturnNode ).Temp = Node( ZoneNode ).Temp;
 				}
-				if ( Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
-					Node( ReturnNode ).Temp = Zone( ActualZoneNum ).AdjustedTempToReturnAir;
-				}
+
 				// Update the rest of the Return Air Node conditions, if the return air system exists!
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
