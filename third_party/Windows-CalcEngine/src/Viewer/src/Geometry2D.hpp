@@ -59,7 +59,7 @@ namespace Viewer {
 
 		// returns Y coordinate of intersection with Y axis for line going through t_Point and for given
 		// tangens of profile angle
-		static double intersectionWithYAxis( double const tanPhi, CPoint2D const& t_Point );
+		// static double intersectionWithYAxis( double const tanPhi, CPoint2D const& t_Point );
 
 		// Checks if view factors are valid for current geometry
 		void checkViewFactors();

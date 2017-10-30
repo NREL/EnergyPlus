@@ -1,6 +1,5 @@
 #include <memory>
 #include <vector>
-#include <stdexcept>
 #include <gtest/gtest.h>
 
 #include "WCECommon.hpp"
@@ -109,10 +108,10 @@ TEST_F( TestMatrixSeries, Test2 ) {
 		}
 	}
 
-	// for ( size_t i = 0; i < matrixResults.size(); ++i ) {
-	// 	for ( size_t k = 0; k < matrixResults[ i ]->size(); ++k ) {
-	// 		EXPECT_NEAR( correctResults[ i ][ k ], ( *matrixResults[ i ] )[ k ]->value(), 1e-6 );
-	// 	}
-	// }
+	for ( size_t i = 0; i < matrixResults.size(); ++i ) {
+ 		for ( size_t k = 0; k < matrixResults[ i ]->size(); ++k ) {
+ 			EXPECT_NEAR( correctResults[ i ][ k ], ( *matrixResults[ i ] )[ k ].value(), 1e-6 );
+ 		}
+	}
 
 }

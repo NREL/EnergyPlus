@@ -1,5 +1,4 @@
 #include <memory>
-#include <stdexcept>
 #include <gtest/gtest.h>
 
 #include "WCECommon.hpp"

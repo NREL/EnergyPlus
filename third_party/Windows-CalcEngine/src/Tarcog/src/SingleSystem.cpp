@@ -38,21 +38,21 @@ namespace Tarcog {
 			throw std::runtime_error( "Outdoor environment has not been assigned to the system. Null value passed." );
 		}
 
-		auto aIndoorLayer = m_IGU->getLayer( Environment::Indoor );
+		const auto aIndoorLayer = m_IGU->getLayer( Environment::Indoor );
 		auto aIndoor = m_Environment.at( Environment::Indoor );
 		aIndoor->connectToIGULayer( aIndoorLayer );
 		aIndoor->setTilt( m_IGU->getTilt() );
 		aIndoor->setWidth( m_IGU->getWidth() );
 		aIndoor->setHeight( m_IGU->getHeight() );
 
-		auto aOutdoorLayer = m_IGU->getLayer( Environment::Outdoor );
+		const auto aOutdoorLayer = m_IGU->getLayer( Environment::Outdoor );
 		auto aOutdoor = m_Environment.at( Environment::Outdoor );
 		aOutdoor->connectToIGULayer( aOutdoorLayer );
 		aOutdoor->setTilt( m_IGU->getTilt() );
 		aOutdoor->setWidth( m_IGU->getWidth() );
 		aOutdoor->setHeight( m_IGU->getHeight() );
 
-		auto solarRadiation = t_Outdoor->getDirectSolarRadiation();
+		const auto solarRadiation = t_Outdoor->getDirectSolarRadiation();
 		m_IGU->setSolarRadiation( solarRadiation );
 
 		initializeStartValues();
@@ -61,19 +61,24 @@ namespace Tarcog {
 	}
 
 	CSingleSystem::CSingleSystem( CSingleSystem const& t_SingleSystem ) {
-		m_IGU = std::make_shared< CIGU >( *t_SingleSystem.m_IGU );
+		operator=( t_SingleSystem );
+	}
 
+	CSingleSystem &	CSingleSystem::operator=( CSingleSystem const & t_SingleSystem ) {
+		m_IGU = std::make_shared< CIGU >( *t_SingleSystem.m_IGU );
 		m_Environment[ Environment::Indoor ] = t_SingleSystem.m_Environment.at( Environment::Indoor )->cloneEnvironment();
-		auto aLastLayer = m_IGU->getLayer( Environment::Indoor );
+		const auto aLastLayer = m_IGU->getLayer( Environment::Indoor );
 		m_Environment.at( Environment::Indoor )->connectToIGULayer( aLastLayer );
 
 		m_Environment[ Environment::Outdoor ] = t_SingleSystem.m_Environment.at( Environment::Outdoor )->cloneEnvironment();
-		auto aFirstLayer = m_IGU->getLayer( Environment::Outdoor );
+		const auto aFirstLayer = m_IGU->getLayer( Environment::Outdoor );
 		m_Environment.at( Environment::Outdoor )->connectToIGULayer( aFirstLayer );
 
 		initializeStartValues();
 
 		m_NonLinearSolver = std::make_shared< CNonLinearSolver >( m_IGU );
+
+		return *this;
 	}
 
 	std::vector< std::shared_ptr< CIGUSolidLayer > > CSingleSystem::getSolidLayers() const {

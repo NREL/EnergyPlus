@@ -13,6 +13,10 @@ namespace SingleLayerOptics {
 		updateProfileAngle( m_Theta, m_Phi );
 	}
 
+	CBeamDirection::CBeamDirection( CBeamDirection const & t_BeamDirection ) {
+		operator=( t_BeamDirection );
+	}
+
 	CBeamDirection::CBeamDirection( const double t_Theta, const double t_Phi ) :
 		m_Theta( t_Theta ), m_Phi( t_Phi ) {
 		if ( t_Theta < 0 ) {

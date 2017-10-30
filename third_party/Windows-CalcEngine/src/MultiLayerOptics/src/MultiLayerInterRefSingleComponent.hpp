@@ -35,7 +35,7 @@ namespace MultiLayerOptics {
 	class CInterRefSingleComponent {
 	public:
 		CInterRefSingleComponent( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb );
-		CInterRefSingleComponent( const std::shared_ptr< const SingleLayerOptics::CLayerSingleComponent >& t_Layer );
+		explicit CInterRefSingleComponent( const std::shared_ptr< const SingleLayerOptics::CLayerSingleComponent >& t_Layer );
 
 		// Adding layer to the back or front side of the IGU composition
 		void addLayer( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb,

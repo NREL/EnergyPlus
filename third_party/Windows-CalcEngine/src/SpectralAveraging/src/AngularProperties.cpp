@@ -66,10 +66,8 @@ namespace SpectralAveraging {
 			auto a = 0.0;
 
 			if ( m_Transmittance0 > 0 ) {
-				auto k = 0.0;
-				auto alpha = 0.0;
-				k = - t_Wavelength / ( 4 * M_PI * m_Thickness ) * log( ( m_Reflectance0 - m_Rho0 ) / ( m_Transmittance0 * m_Rho0 ) );
-				alpha = 2 * M_PI * k / t_Wavelength;
+				auto k = - t_Wavelength / ( 4 * M_PI * m_Thickness ) * log( ( m_Reflectance0 - m_Rho0 ) / ( m_Transmittance0 * m_Rho0 ) );
+				auto alpha = 2 * M_PI * k / t_Wavelength;
 				a = exp( -2 * alpha * m_Thickness / aCosPhiPrim );
 			}
 

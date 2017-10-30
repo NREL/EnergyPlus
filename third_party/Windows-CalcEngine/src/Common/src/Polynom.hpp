@@ -19,7 +19,7 @@ namespace FenestrationCommon {
 	// only valid for incoming angle Phi = 10 deg.
 	class PolynomPoint {
 	public:
-		explicit PolynomPoint( double const Value, Polynom const t_Poly );
+		explicit PolynomPoint( double const Value, Polynom const & t_Poly );
 		double value() const;
 		double valueAt( double const t_X ) const;
 

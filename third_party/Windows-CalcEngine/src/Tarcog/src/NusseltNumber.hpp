@@ -6,7 +6,7 @@ namespace Tarcog {
 	public:
 		virtual double calculate( double const t_Tilt, double const t_Ra, double const t_Asp );
 	protected:
-		~CNusseltNumberStrategy() = default;
+    virtual ~CNusseltNumberStrategy() = default;
 		double pos( double const t_Value );
 	};
 

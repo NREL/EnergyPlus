@@ -19,7 +19,8 @@ namespace Tarcog {
 		public std::enable_shared_from_this< CBaseLayer > {
 	public:
 		CBaseLayer();
-		CBaseLayer( CBaseLayer const& t_Layer );
+		explicit CBaseLayer( CBaseLayer const& t_Layer );
+		CBaseLayer & operator=( CBaseLayer const & t_BaseLayer );
 
 		std::shared_ptr< CBaseLayer > getPreviousLayer() const;
 		std::shared_ptr< CBaseLayer > getNextLayer() const;

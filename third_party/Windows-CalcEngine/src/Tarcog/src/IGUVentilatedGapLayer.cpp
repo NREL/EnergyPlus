@@ -18,11 +18,19 @@ namespace Tarcog {
 	}
 
 	CIGUVentilatedGapLayer::CIGUVentilatedGapLayer( CIGUVentilatedGapLayer const& t_Layer ) :
-		CState( t_Layer ), CIGUGapLayer( t_Layer ) {
+			CState( t_Layer ), CIGUGapLayer( t_Layer ) {
+		operator=( t_Layer );
+	}
+
+	CIGUVentilatedGapLayer & CIGUVentilatedGapLayer::operator=( CIGUVentilatedGapLayer const & t_Layer ) {
+		this->CState::operator=( t_Layer );
+		this->CIGUGapLayer::operator=( t_Layer );
 		m_inTemperature = t_Layer.m_inTemperature;
 		m_outTemperature = t_Layer.m_outTemperature;
 		m_Zin = t_Layer.m_Zin;
 		m_Zout = t_Layer.m_Zout;
+
+		return *this;
 	}
 
 	double CIGUVentilatedGapLayer::layerTemperature() {

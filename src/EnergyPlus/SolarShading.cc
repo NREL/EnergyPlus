@@ -96,7 +96,6 @@
 #include <WindowManager.hh>
 #include <WindowManagerExteriorData.hh>
 #include <WindowComplexManager.hh>
-
 #include <WCEMultiLayerOptics.hpp>
 
 namespace EnergyPlus {
@@ -3670,9 +3669,9 @@ namespace SolarShading {
 		Real64 CurrentTime; // Current Time for passing to Solar Position Routine
 
 		if ( NumOfTimeStepInHour != 1 ) {
-			CurrentTime = Real64( iHour - 1 ) + Real64( iTimeStep ) * ( TimeStepZone );
+			CurrentTime = double( iHour - 1 ) + double( iTimeStep ) * ( TimeStepZone );
 		} else {
-			CurrentTime = Real64( iHour ) + TS1TimeOffset;
+			CurrentTime = double( iHour ) + TS1TimeOffset;
 		}
 		SUN4( CurrentTime, EqOfTime, SinSolarDeclin, CosSolarDeclin );
 
@@ -5409,8 +5408,7 @@ namespace SolarShading {
 				InOutProjSLFracMult = SurfaceWindow( SurfNum ).InOutProjSLFracMult( HourOfDay );
 				if ( SunlitFracWithoutReveal( TimeStep, HourOfDay, SurfNum ) > 0.0 ) {
 
-					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && 
-            SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) {
+					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) {
 
 						// For bare glazing or switchable glazing, the following includes the effects of
 						// (1) diffuse solar produced by beam solar incident on the outside and inside reveal
@@ -5422,7 +5420,7 @@ namespace SolarShading {
 						NGlass = Construct( ConstrNum ).TotGlassLayers;
 
 						for ( Lay = 1; Lay <= NGlass; ++Lay ) {
-              AbWin = POLYF( CosInc, Construct( ConstrNum ).AbsBeamCoef( {1,6}, Lay ) ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+							AbWin = POLYF( CosInc, Construct( ConstrNum ).AbsBeamCoef( {1,6}, Lay ) ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
 							ADiffWin = Construct( ConstrNum ).AbsDiff( Lay );
 							if ( ShadeFlag <= 0 || ShadeFlag >= 10 ) {
 
@@ -5703,11 +5701,11 @@ namespace SolarShading {
 						// will not be loaded in that case even if diffuse part of solar radiation is entering through the window
 						if ( FenSolAbsPtr == 0 ) {
 							// Put in the equivalent layer absorptions
-              // Simon: This should not be multiplied with CosInc since Abs coefficient already includes angular
-              // factor
+							// Simon: This should not be multiplied with CosInc since Abs coefficient already includes angular
+							// factor
 							for ( Lay = 1; Lay <= SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).NLayers; ++Lay ) {
-                auto absBeamWin = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( HourOfDay, TimeStep, Lay );
-                AbWin = absBeamWin * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+								auto absBeamWin = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( HourOfDay, TimeStep, Lay );
+								AbWin = absBeamWin * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
 
 								// Add contribution of beam reflected from outside and inside reveal
 								AWinSurf( Lay, SurfNum ) = AbWin + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinFtHemAbs( Lay ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBkHemAbs( Lay );
@@ -5750,7 +5748,7 @@ namespace SolarShading {
 						TBmDiffEQL = max( 0.0, AbsSolBeamEQL( 2, CFS( EQLNum ).NL + 1 ) );
 						// Beam-beam transmittance: difference between beam-total and beam-diffuse transmittance
 						TBmBmEQL = max( 0.0, ( TBmBmEQL - TBmDiffEQL ) );
-          }
+					}
 
 				} // End of SunlitFrac check
 
@@ -5761,8 +5759,7 @@ namespace SolarShading {
 				SkySolarInc = SurfaceWindow( SurfNum ).SkySolarInc;
 				GndSolarInc = SurfaceWindow( SurfNum ).GndSolarInc;
 
-				if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && 
-             SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) { // Regular window
+				if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) { // Regular window
 
 					DiffTrans = Construct( ConstrNum ).TransDiff;
 					if ( DifSolarRad != 0.0 ) {
@@ -5864,8 +5861,7 @@ namespace SolarShading {
 
 				}
 
-				if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && 
-          SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) {
+				if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) {
 					if ( ShadeFlag <= 0 || ShadeFlag >= 10 ) {
 						// Unshaded window
 						DSZone( ZoneNum ) += DSZoneWin;
@@ -5944,7 +5940,7 @@ namespace SolarShading {
 
 					DSZone( ZoneNum ) += DSZoneWin;
 					DGZone( ZoneNum ) += DGZoneWin;
-        }
+				}
 				//-----------------------------------------------------------------
 				// BEAM SOLAR ON EXTERIOR WINDOW TRANSMITTED AS BEAM AND/OR DIFFUSE
 				//-----------------------------------------------------------------
@@ -5960,8 +5956,7 @@ namespace SolarShading {
 					if ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) {
 						TBmDif = TransTDD( PipeNum, CosInc, SolarBeam );
 						TDDPipe( PipeNum ).TransSolBeam = TBmDif; // Report variable
-					} else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && 
-            SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) { // Regular window
+					} else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel ) { // Regular window
 						if ( ! SurfaceWindow( SurfNum ).SolarDiffusing ) { // Clear glazing
 							TBmBm = POLYF( CosInc, Construct( ConstrNum ).TransSolBeamCoef ); //[-]
 						} else { // Diffusing glazing
@@ -5975,7 +5970,7 @@ namespace SolarShading {
 						// get ASHWAT fenestration model beam-beam and beam-diffuse properties
 						TBmBm = TBmBmEQL;
 						TBmDif = TBmDiffEQL;
-          }
+					}
 				}
 
 				// Report variables
@@ -5986,11 +5981,11 @@ namespace SolarShading {
 				if ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) {
 					TDifBare = TransTDD( PipeNum, CosInc, SolarAniso );
 				} else {
-          if( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
-            //Complex Fenestration: use hemispherical ave of directional-hemispherical transmittance
-            //Note: this is not quite the same as the effective transmittance for total of sky and ground radiation
-            TDifBare = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDiffTrans;
-          } else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowEQLModel ) {
+					if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
+						//Complex Fenestration: use hemispherical ave of directional-hemispherical transmittance
+						//Note: this is not quite the same as the effective transmittance for total of sky and ground radiation
+						TDifBare = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinDiffTrans;
+					} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowEQLModel ) {
 						//get ASHWAT fenestration model diffuse-diffuse properties includes shade if present
 						TDifBare = Construct( ConstrNum ).TransDiff;
 					} else { // Regular window
@@ -6692,7 +6687,6 @@ namespace SolarShading {
 								for ( CurTrnDir = 1; CurTrnDir <= ComplexWind( SurfNum ).Geom( CurCplxFenState ).Trn.NBasis; ++CurTrnDir ) {
 									CurLambda = ComplexWind( SurfNum ).Geom( CurCplxFenState ).Trn.Lamda( CurTrnDir );
 									DirTrans = Construct( IConst ).BSDFInput.SolFrtTrans( IBm, CurTrnDir );
-
 									// Now calculate effect of this direction on all back surfaces
 									for ( IBack = 1; IBack <= NBkSurf; ++IBack ) {
 										CFDirBoverlap( IBack, CurTrnDir ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).AOverlap( IBack, CurTrnDir ) * DirTrans * CurLambda * CosInc;
@@ -7157,9 +7151,7 @@ namespace SolarShading {
 
 		for ( int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			for ( int SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
-				if ( ( ( Surface( SurfNum ).ExtBoundCond != ExternalEnvironment ) &&
-						( Surface( SurfNum ).ExtBoundCond != OtherSideCondModeledExt ) ) &&
-					SurfaceWindow( SurfNum ).OriginalClass != SurfaceClass_TDD_Diffuser )
+				if ( ( ( Surface( SurfNum ).ExtBoundCond != ExternalEnvironment ) && ( Surface( SurfNum ).ExtBoundCond != OtherSideCondModeledExt ) ) && SurfaceWindow( SurfNum ).OriginalClass != SurfaceClass_TDD_Diffuser )
 					continue;
 				if ( !Surface( SurfNum ).HeatTransSurf ) continue;
 				// TH added 3/24/2010 while debugging CR 7872
@@ -7289,8 +7281,7 @@ namespace SolarShading {
 
 				int ConstrNum = Surface( SurfNum2 ).Construction;
 				if ( window.ShadedConstruction > 0 ) ConstrNum = window.ShadedConstruction;
-				auto aLayer = CWindowConstructionsSimplified::instance().
-					getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
+				auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
 				///////////////////////////////////////////////
 				// Solar absorbed in window layers
@@ -7316,15 +7307,13 @@ namespace SolarShading {
 					}
 					else {
 						for ( size_t Lay = 1; Lay <= numOfLayers; ++Lay ) {
-							auto AbWinBeam = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi ) *
-								window.OutProjSLFracMult( HourOfDay );
+							auto AbWinBeam = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi ) * window.OutProjSLFracMult( HourOfDay );
 							auto AbWinDiffFront = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi );
 							auto AbWinDiffBack = aLayer->getAbsorptanceLayer( Lay, Side::Back, ScatteringSimple::Diffuse, Theta, Phi );
 
 							// Simon: This should not be multiplied with cosine of incident angle. This however gives same
 							// results as BSDF and Winkelmann models.
-							AWinSurf( Lay, SurfNum ) = AbWinBeam * CosInc * SunLitFract *
-								SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+							AWinSurf( Lay, SurfNum ) = AbWinBeam * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
 							AWinSurfDiffFront( Lay, SurfNum ) = AbWinDiffFront;
 							AWinSurfDiffBack( Lay, SurfNum ) = AbWinDiffBack;
 
@@ -7358,10 +7347,8 @@ namespace SolarShading {
 				////////////////////////////////////////////////////////////////////
 				Real64 TBmBm = aLayer->getPropertySimple( PropertySimple::T, Side::Front, Scattering::DirectDirect, Theta, Phi );
 				Real64 TBmDif = aLayer->getPropertySimple( PropertySimple::T, Side::Front, Scattering::DirectDiffuse, Theta, Phi );
-				Real64 WinTransBmBmSolar = TBmBm * SunLitFract * CosInc * Surface( SurfNum ).Area *
-					window.InOutProjSLFracMult( HourOfDay );
-				Real64 WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface( SurfNum ).Area *
-					window.InOutProjSLFracMult( HourOfDay );
+				Real64 WinTransBmBmSolar = TBmBm * SunLitFract * CosInc * Surface( SurfNum ).Area * window.InOutProjSLFracMult( HourOfDay );
+				Real64 WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface( SurfNum ).Area * window.InOutProjSLFracMult( HourOfDay );
 				BTOTZone += WinTransBmBmSolar + WinTransBmDifSolar;
 
 				Real64 DifSolarRadiation = window.SkySolarInc + window.GndSolarInc;
@@ -7384,8 +7371,7 @@ namespace SolarShading {
 				////////////////////////////////////////////////////////////////////
 				Real64 TBm = TBmBm;
 				// Correction for beam absorbed by inside reveal
-				Real64 TBmDenom = SunLitFract * CosInc * Surface( SurfNum ).Area *
-					window.InOutProjSLFracMult( HourOfDay );
+				Real64 TBmDenom = SunLitFract * CosInc * Surface( SurfNum ).Area * window.InOutProjSLFracMult( HourOfDay );
 				if ( TBmDenom != 0.0 ) { // when =0.0, no correction
 					TBm -= SurfaceWindow( SurfNum ).BmSolAbsdInsReveal / TBmDenom;
 				}
@@ -7441,8 +7427,7 @@ namespace SolarShading {
 						if ( ISABSF( FloorNum ) <= 0.0 || FloorNum == SurfNum ) continue; // Keep only floor surfaces
 						int FlConstrNum = Surface( FloorNum ).Construction;
 
-						Real64 BTOTWinZone = TBm * SunLitFract * Surface( SurfNum ).Area * CosInc *
-							window.InOutProjSLFracMult( HourOfDay ); //[m2]
+						Real64 BTOTWinZone = TBm * SunLitFract * Surface( SurfNum ).Area * CosInc * window.InOutProjSLFracMult( HourOfDay ); //[m2]
 
 						if ( Construct( FlConstrNum ).TransDiff <= 0.0 ) {
 							// Opaque surface
@@ -7665,9 +7650,9 @@ namespace SolarShading {
 				}
 
 				//  Compute Period Values
-				AvgSinSolarDeclin = SumDec / Real64( ShadowingDaysLeft );
+				AvgSinSolarDeclin = SumDec / double( ShadowingDaysLeft );
 				AvgCosSolarDeclin = std::sqrt( 1.0 - pow_2( AvgSinSolarDeclin ) );
-				AvgEqOfTime = SumET / Real64( ShadowingDaysLeft );
+				AvgEqOfTime = SumET / double( ShadowingDaysLeft );
 			} else {
 				SUN3( DayOfYear, AvgSinSolarDeclin, AvgEqOfTime );
 				AvgCosSolarDeclin = std::sqrt( 1.0 - pow_2( AvgSinSolarDeclin ) );

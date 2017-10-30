@@ -12,7 +12,7 @@ namespace FenestrationCommon {
 	// Interface for 2D interpolation curve
 	class IInterpolation2D {
 	public:
-		IInterpolation2D( std::vector< std::pair< double, double > > const& t_Points );
+		explicit IInterpolation2D( std::vector< std::pair< double, double > > const& t_Points );
 
 		virtual double getValue( double const t_Value ) const = 0;
 
@@ -26,7 +26,7 @@ namespace FenestrationCommon {
 
 	class CSPChipInterpolation2D : public IInterpolation2D {
 	public:
-		CSPChipInterpolation2D( std::vector< std::pair< double, double > > const& t_Points );
+		explicit CSPChipInterpolation2D( std::vector< std::pair< double, double > > const& t_Points );
 
 		double getValue( double const t_Value ) const;
 

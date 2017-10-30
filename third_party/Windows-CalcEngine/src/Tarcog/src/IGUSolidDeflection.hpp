@@ -17,6 +17,7 @@ namespace Tarcog {
 		                          const double t_YoungsModulus, const double t_PoisonRatio );
 
 		CIGUSolidLayerDeflection( CIGUSolidLayerDeflection const& t_Layer );
+		CIGUSolidLayerDeflection & operator=( CIGUSolidLayerDeflection const & t_Layer );
 
 		double flexuralRigidity() const;
 

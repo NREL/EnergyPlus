@@ -13,7 +13,7 @@ file( GLOB SOURCES_HPP "src/*.hpp" )
 
 LIST(APPEND SOURCES ${SOURCES_HPP} ${SOURCES_CPP} )
 
-add_library( ${target_name} STATIC ${SOURCES} src/Polynom.cpp src/Polynom.hpp )
+add_library( ${target_name} STATIC ${SOURCES} )
 
 # Install will be used by master projects to get information on destination of library files
 install(TARGETS ${target_name}

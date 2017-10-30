@@ -21,7 +21,8 @@ namespace Tarcog {
 		               std::shared_ptr< CEnvironment > const& t_Indoor,
 		               std::shared_ptr< CEnvironment > const& t_Outdoor );
 
-		CSingleSystem( CSingleSystem const& t_SingleSystem );
+		CSingleSystem( CSingleSystem const & t_SingleSystem );
+		CSingleSystem & operator=( CSingleSystem const & t_SingleSystem );
 
 		std::vector< std::shared_ptr< CIGUSolidLayer > > getSolidLayers() const;
 		std::vector< std::shared_ptr< CIGUGapLayer > > getGapLayers() const;

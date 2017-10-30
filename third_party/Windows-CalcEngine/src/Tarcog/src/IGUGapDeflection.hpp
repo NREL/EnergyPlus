@@ -9,8 +9,7 @@ namespace Tarcog {
 
 	class CIGUGapLayerDeflection : public CIGUGapLayer {
 	public:
-		CIGUGapLayerDeflection( std::shared_ptr< CIGUGapLayer > t_GapLayer,
-		                        double const t_Tini, double const t_Pini );
+		CIGUGapLayerDeflection( CIGUGapLayer const & t_GapLayer, double const t_Tini, double const t_Pini );
 
 		double getPressure() override;
 

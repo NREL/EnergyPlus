@@ -10,8 +10,9 @@ using namespace FenestrationCommon;
 namespace MultiLayerOptics {
 
 	CEquivalentLayerSingleComponent::CEquivalentLayerSingleComponent( const double t_Tf, const double t_Rf,
-	                                                                  const double t_Tb, const double t_Rb ) {
-		m_EquivalentLayer = make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb );
+	                                                                  const double t_Tb, const double t_Rb ) :
+		m_EquivalentLayer( make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb ) ) {
+		
 	}
 
 	CEquivalentLayerSingleComponent::CEquivalentLayerSingleComponent(

@@ -16,22 +16,15 @@ namespace MultiLayerOptics {
 	                                                        const double Tf_dir_dif, const double Rf_dir_dif,
 	                                                        const double Tb_dir_dif, const double Rb_dir_dif,
 	                                                        const double Tf_dif_dif, const double Rf_dif_dif,
-	                                                        const double Tb_dif_dif, const double Rb_dif_dif ) {
+	                                                        const double Tb_dif_dif, const double Rb_dif_dif ) :
+		m_Layer( make_shared< CScatteringLayer >( 
+			std::make_shared< CScatteringSurface >( Tf_dir_dir, Rf_dir_dir, Tf_dir_dif, Rf_dir_dif, Tf_dif_dif, Rf_dif_dif ), 
+			std::make_shared< CScatteringSurface >( Tb_dir_dir, Rb_dir_dir, Tb_dir_dif, Rb_dir_dif, Tb_dif_dif, Rb_dif_dif ) ) ),
+		m_DiffuseLayer( std::make_shared< CEquivalentLayerSingleComponent >( Tf_dif_dif, Rf_dif_dif, Tb_dif_dif, Rb_dif_dif ) ),
+		m_BeamLayer( std::make_shared< CEquivalentLayerSingleComponent >( Tf_dir_dir, Rf_dir_dir, Tb_dir_dir, Rb_dir_dir ) )
+	{
 
-		std::shared_ptr< CScatteringSurface > aFrontSurface =
-			std::make_shared< CScatteringSurface >( Tf_dir_dir, Rf_dir_dir, Tf_dir_dif,
-			                                   Rf_dir_dif, Tf_dif_dif, Rf_dif_dif );
-		std::shared_ptr< CScatteringSurface >
-			aBackSurface = make_shared< CScatteringSurface >( Tb_dir_dir, Rb_dir_dir, Tb_dir_dif,
-			                                                  Rb_dir_dif, Tb_dif_dif, Rb_dif_dif );
-
-		m_Layer = make_shared< CScatteringLayer >( aFrontSurface, aBackSurface );
-
-		m_DiffuseLayer = make_shared< CEquivalentLayerSingleComponent >( Tf_dif_dif, Rf_dif_dif,
-		                                                                 Tb_dif_dif, Rb_dif_dif );
-
-		m_BeamLayer = make_shared< CEquivalentLayerSingleComponent >( Tf_dir_dir, Rf_dir_dir,
-		                                                              Tb_dir_dir, Rb_dir_dir );
+		
 	}
 
 	CEquivalentScatteringLayer::CEquivalentScatteringLayer( CScatteringLayer& t_Layer,

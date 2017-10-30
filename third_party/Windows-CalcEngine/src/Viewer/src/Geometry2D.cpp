@@ -215,19 +215,20 @@ namespace Viewer {
 		return subViewCoeff;
 	}
 
-	double CGeometry2D::intersectionWithYAxis( double const tanPhi, CPoint2D const& t_Point ) {
-		auto y = 0.0;
-		if ( tanPhi != 0 ) {
-			auto x1 = t_Point.y() / tanPhi;
-			auto x = x1 + t_Point.x();
-			y = tanPhi * x;
-		}
-		else {
-			y = t_Point.y();
-		}
-
-		return y;
-	}
+	// Not used for now. Commented to avoid warnings
+	// double CGeometry2D::intersectionWithYAxis( double const tanPhi, CPoint2D const& t_Point ) {
+	// 	auto y = 0.0;
+	// 	if ( tanPhi != 0 ) {
+	// 		auto x1 = t_Point.y() / tanPhi;
+	// 		auto x = x1 + t_Point.x();
+	// 		y = tanPhi * x;
+	// 	}
+	// 	else {
+	// 		y = t_Point.y();
+	// 	}
+	// 
+	// 	return y;
+	// }
 
 	void CGeometry2D::checkViewFactors() {
 		if ( !m_ViewFactorsCalculated ) {

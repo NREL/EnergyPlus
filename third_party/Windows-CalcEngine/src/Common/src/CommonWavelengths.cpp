@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iterator>
 #include <cassert>
 
 #include "CommonWavelengths.hpp"

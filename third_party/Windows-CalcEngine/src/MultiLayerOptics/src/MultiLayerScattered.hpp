@@ -30,7 +30,7 @@ namespace MultiLayerOptics {
 			const double t_Tf_dif_dif, const double t_Rf_dif_dif,
 			const double t_Tb_dif_dif, const double t_Rb_dif_dif );
 
-		CMultiLayerScattered( const std::shared_ptr< SingleLayerOptics::CScatteringLayer >& t_Layer );
+		explicit CMultiLayerScattered( const std::shared_ptr< SingleLayerOptics::CScatteringLayer >& t_Layer );
 
 		void addLayer(
 			const double t_Tf_dir_dir, const double t_Rf_dir_dir,

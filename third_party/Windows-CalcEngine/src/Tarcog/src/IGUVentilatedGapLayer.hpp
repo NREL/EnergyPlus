@@ -17,6 +17,7 @@ namespace Tarcog {
 	public:
 		explicit CIGUVentilatedGapLayer( std::shared_ptr< CIGUGapLayer > const& t_Layer );
 		CIGUVentilatedGapLayer( CIGUVentilatedGapLayer const& t_Layer );
+		CIGUVentilatedGapLayer & operator=( CIGUVentilatedGapLayer const & t_Layer );
 
 		virtual double layerTemperature();
 

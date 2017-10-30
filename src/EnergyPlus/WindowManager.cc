@@ -367,31 +367,31 @@ namespace WindowManager {
 		CosPhiIndepVar = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
 	}
 
-  void
-  InitWindowOpticalCalculations() 
-  {
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   September 2016
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+	void
+	InitWindowOpticalCalculations()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Simon Vidanovic
+		//       DATE WRITTEN   September 2016
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Manages if optical calculation will be performed with internal or external routines
+		// PURPOSE OF THIS SUBROUTINE:
+		// Manages if optical calculation will be performed with internal or external routines
 
-    // METHODOLOGY EMPLOYED:
-    // na
+		// METHODOLOGY EMPLOYED:
+		// na
 
-    // REFERENCES:
-    // na
-    // check and read custom solar and/or visible spectrum data if any
-    CheckAndReadCustomSprectrumData();
-    if( inExtWindowModel->isExternalLibraryModel() ) {
-      InitWCE_SimplifiedOpticalData();
-    } else {
-      InitGlassOpticalCalculations();
-    }
-  }
+		// REFERENCES:
+		// na
+		// check and read custom solar and/or visible spectrum data if any
+		CheckAndReadCustomSprectrumData();
+		if ( inExtWindowModel->isExternalLibraryModel() ) {
+			InitWCE_SimplifiedOpticalData();
+		} else {
+			InitGlassOpticalCalculations();
+		}
+	}
 
 	void
 	InitGlassOpticalCalculations()
@@ -617,13 +617,11 @@ namespace WindowManager {
 			TotLay = Construct( ConstrNum ).TotLayers;
 
 			// First layer must be glass, shade, screen or blind to be a glazing construction
-
 			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass &&
-				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade &&
-				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen &&
-				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind &&
-				Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing )
-				continue;
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
 
 			ShadeLayNum = 0;
 			ExtShade = false;
@@ -898,7 +896,7 @@ namespace WindowManager {
 
 			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
 				// 10 degree increment for incident angle is only value for a construction without a layer = SpectralAndAngle
-				Phi = Real64( IPhi - 1 ) * 10.0;
+				Phi = double( IPhi - 1 ) * 10.0;
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					// Override 10 degree increment for incident angle for a construction with a layer = SpectralAndAngle
 					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
@@ -1087,7 +1085,7 @@ namespace WindowManager {
 			// but exclude the effect of a shade or blind if present in the construction.
 			// When a construction has a layer = SpectralAndAngle, the 10 degree increment will be overridden.
 			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
-				Phi = Real64( IPhi - 1 ) * 10.0;
+				Phi = double( IPhi - 1 ) * 10.0;
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
 					if ( Material( LayPtr ).GlassSpecAngTransDataPtr ) {
@@ -1587,7 +1585,7 @@ namespace WindowManager {
 					tsolPhiFit( IPhi ) = 0.0;
 					tvisPhiFit( IPhi ) = 0.0;
 
-					Phi = Real64( IPhi - 1 ) * 10.0;
+					Phi = double( IPhi - 1 ) * 10.0;
 					for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 						LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
 						if ( Material( LayPtr ).GlassSpecAngTransDataPtr ) {
@@ -2495,8 +2493,7 @@ namespace WindowManager {
 			temp = 0;
 
 			//Simon: Complex fenestration state works only with tarcog
-			CalcComplexWindowThermal( SurfNum, temp, HextConvCoeff, SurfInsideTemp, 
-				SurfOutsideTemp, SurfOutsideEmiss, noCondition );
+			CalcComplexWindowThermal( SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition );
 
 			ConstrNum = surface.Construction;
 			TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
@@ -2859,8 +2856,7 @@ namespace WindowManager {
 				// The IR radiance of this window's "exterior" surround is the IR radiance
 				// from surfaces and high-temp radiant sources in the adjacent zone
 
-				Outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + 
-					QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
+				Outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
 			} else { // Exterior window (Ext BoundCond = 0)
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -3016,8 +3012,8 @@ namespace WindowManager {
 		QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;
 
 	}
-  
-  //****************************************************************************
+
+	//****************************************************************************
 
 	void
 	WindowHeatBalanceEquations( int const SurfNum ) // Surface number
@@ -9294,7 +9290,7 @@ Label99999: ;
 					}
 				}
 				if ( SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
-          iVisibleSpectrum = Loop;
+					iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {
 						ShowSevereError( "Visible spectrum data pair is more than 81 - " + cCurrentModuleObject + " - " + cAlphaArgs( 1 ) );
@@ -9335,7 +9331,7 @@ Label99999: ;
 		winOpticalModel = CWindowOpticalModel::WindowOpticalModelFactory();
 	}
 
-  //*****************************************************************************************
+	//*****************************************************************************************
 
 } // WindowManager
 

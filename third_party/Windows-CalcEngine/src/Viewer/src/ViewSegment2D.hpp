@@ -14,8 +14,8 @@ namespace Viewer {
 
 	class CViewSegment2D : public CSegment2D, public std::enable_shared_from_this< CViewSegment2D > {
 	public:
-		CViewSegment2D( std::shared_ptr< const CPoint2D > t_StartPoint,
-		                std::shared_ptr< const CPoint2D > t_EndPoint );
+		CViewSegment2D( std::shared_ptr< const CPoint2D > const & t_StartPoint,
+		                std::shared_ptr< const CPoint2D > const & t_EndPoint );
 
 		std::shared_ptr< const CViewSegment2D > getNormal();
 

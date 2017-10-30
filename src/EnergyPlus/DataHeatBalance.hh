@@ -1268,8 +1268,8 @@ namespace DataHeatBalance {
 			TransDiffBackEQL( 0.0 )
 		{}
 
-    bool
-    isGlazingConstruction() const;
+		bool
+		isGlazingConstruction() const;
 
 	};
 

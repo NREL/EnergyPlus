@@ -24,6 +24,7 @@ namespace Chromogenics {
 		                       double const& t_Transmittance );
 
 		CThermochromicSurface( CThermochromicSurface const& t_Surface );
+		CThermochromicSurface& operator=( CThermochromicSurface const& t_Surface );
 
 		std::shared_ptr< Tarcog::ISurface > clone() const override;
 

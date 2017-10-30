@@ -9,7 +9,8 @@ namespace FenestrationCommon {
 	public:
 		virtual ~CState() = default;
 		CState();
-		CState( const CState& t_State );
+		CState( CState const & t_State );
+		CState& operator=( CState const & t_State );
 		virtual void resetCalculated() final; // to reset state to non-calculated
 		virtual void setCalculated() final; // calculations are up to date and set state to valid state
 		virtual bool isCalculated() final; // check if state have valid results

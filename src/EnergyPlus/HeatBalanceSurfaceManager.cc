@@ -2220,8 +2220,7 @@ namespace HeatBalanceSurfaceManager {
 				//  DBZone needs to subtract this part since it is already counted in DBZone.
 				//  Use InitialZoneDifSolReflW (Rob's previous work) as it better counts initial distribution of
 				//   diffuse solar rather than using weighted area*absorptance
-				QDforDaylight( ZoneNum ) = ( DBZone( ZoneNum ) - DBZoneIntWin( ZoneNum ) ) * BeamSolarRad + 
-					DBZoneSSG( ZoneNum ) + InitialZoneDifSolReflW( ZoneNum );
+				QDforDaylight( ZoneNum ) = ( DBZone( ZoneNum ) - DBZoneIntWin( ZoneNum ) ) * BeamSolarRad + DBZoneSSG( ZoneNum ) + InitialZoneDifSolReflW( ZoneNum );
 
 				// RJH 08/30/07 - Substitute InitialZoneDifSolReflW(ZoneNum) for DSZone and DGZone here
 				// to exclude diffuse solar now absorbed/transmitted in CalcWinTransDifSolInitialDistribution
@@ -2231,8 +2230,7 @@ namespace HeatBalanceSurfaceManager {
 				//QD(ZoneNum)  = DBZone(ZoneNum)*BeamSolarRad  &
 				//                +DSZone(ZoneNum)*DifSolarRad  &
 				//                +DGZone(ZoneNum)*GndSolarRad
-				QD( ZoneNum ) = DBZone( ZoneNum ) * BeamSolarRad + DBZoneSSG( ZoneNum ) + 
-					InitialZoneDifSolReflW( ZoneNum );
+				QD( ZoneNum ) = DBZone( ZoneNum ) * BeamSolarRad + DBZoneSSG( ZoneNum ) + InitialZoneDifSolReflW( ZoneNum );
 			}
 
 			// Flux of diffuse solar in each zone
@@ -2390,9 +2388,7 @@ namespace HeatBalanceSurfaceManager {
 
 							} else { // Exterior window
 
-								if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
-									SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel &&
-									!inExtWindowModel->isExternalLibraryModel() ) {
+								if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel && SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel && !inExtWindowModel->isExternalLibraryModel() ) {
 									TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
 									for ( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
 										AbsDiffWin( Lay ) = Construct( ConstrNum ).AbsDiff( Lay );
@@ -2414,9 +2410,9 @@ namespace HeatBalanceSurfaceManager {
 
 										if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) { // Blind on
 											for ( Lay = 1; Lay <= TotGlassLay; ++Lay ) {
-												AbsDiffWin( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiff( { 1, MaxSlatAngs }, Lay ) );
-												AbsDiffWinGnd( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( { 1, MaxSlatAngs }, Lay ) );
-												AbsDiffWinSky( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( { 1, MaxSlatAngs }, Lay ) );
+												AbsDiffWin( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiff( {1,MaxSlatAngs}, Lay ) );
+												AbsDiffWinGnd( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( {1,MaxSlatAngs}, Lay ) );
+												AbsDiffWinSky( Lay ) = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( {1,MaxSlatAngs}, Lay ) );
 											}
 											SurfaceWindow( SurfNum ).ExtDiffAbsByShade = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBlind ) * ( SkySolarInc + GndSolarInc );
 											if ( Blind( SurfaceWindow( SurfNum ).BlindNumber ).SlatOrientation == Horizontal ) {
@@ -2446,8 +2442,8 @@ namespace HeatBalanceSurfaceManager {
 										QRadSWwinAbs( Lay, SurfNum ) = AbsDiffWin( Lay ) * ( SkySolarInc + GndSolarInc ) + AWinSurf( Lay, SurfNum ) * BeamSolar; // AWinSurf is from InteriorSolarDistribution
 										if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
 											if ( Blind( SurfaceWindow( SurfNum ).BlindNumber ).SlatOrientation == Horizontal ) {
-												AbsDiffGlassLayGnd = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( { 1, 19 }, Lay ) );
-												AbsDiffGlassLaySky = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( { 1, 19 }, Lay ) );
+												AbsDiffGlassLayGnd = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffGnd( {1,19}, Lay ) );
+												AbsDiffGlassLaySky = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffSky( {1,19}, Lay ) );
 												QRadSWwinAbs( Lay, SurfNum ) = SkySolarInc * ( 0.5 * ACosTlt * AbsDiffGlassLayGnd + ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLaySky ) + GndSolarInc * ( ( 1.0 - 0.5 * ACosTlt ) * AbsDiffGlassLayGnd + 0.5 * ACosTlt * AbsDiffGlassLaySky ) + AWinSurf( Lay, SurfNum ) * BeamSolar;
 											}
 										}
@@ -2485,10 +2481,7 @@ namespace HeatBalanceSurfaceManager {
 											// from the sky.  Second item (AWinSurf(SurfNum,Lay) * BeamSolar) is accounting for absorbed solar radiation
 											// originating from beam on exterior side.  Third item (AWinCFOverlap(SurfNum,Lay)) is accounting for
 											// absorptances from beam hitting back of the window which passes through rest of exterior windows
-											QRadSWwinAbs( Lay, SurfNum ) = 
-												SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyFtAbs( Lay ) * SkySolarInc + 
-												SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyGndAbs( Lay ) * GndSolarInc + 
-												AWinSurf( Lay, SurfNum ) * BeamSolar + AWinCFOverlap( Lay, SurfNum ) * BeamSolar;
+											QRadSWwinAbs( Lay, SurfNum ) = SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyFtAbs( Lay ) * SkySolarInc + SurfaceWindow( SurfNum ).ComplexFen.State( CurrentState ).WinSkyGndAbs( Lay ) * GndSolarInc + AWinSurf( Lay, SurfNum ) * BeamSolar + AWinCFOverlap( Lay, SurfNum ) * BeamSolar;
 										}
 										// Total solar absorbed in solid layer (W), for reporting
 										QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;
@@ -2527,17 +2520,14 @@ namespace HeatBalanceSurfaceManager {
 									Real64 Phi = incomingAngle.second;
 
 									std::shared_ptr< CMultiLayerScattered > aLayer =
-										CWindowConstructionsSimplified::instance().getEquivalentLayer( WavelengthRange::Solar,
-										                                                               ConstrNum );
+										CWindowConstructionsSimplified::instance().getEquivalentLayer( WavelengthRange::Solar, ConstrNum );
 
 									size_t totLayers = aLayer->getNumOfLayers();
 									for ( size_t Lay = 1; Lay <= totLayers; ++Lay ) {
 
-										Real64 AbWinDiff = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Diffuse,
-										                                                Theta, Phi );
+										Real64 AbWinDiff = aLayer->getAbsorptanceLayer( Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi );
 
-										QRadSWwinAbs( Lay, SurfNum ) = AbWinDiff *
-											( SkySolarInc + GndSolarInc ) + AWinSurf( Lay, SurfNum ) * BeamSolar;
+										QRadSWwinAbs( Lay, SurfNum ) = AbWinDiff * ( SkySolarInc + GndSolarInc ) + AWinSurf( Lay, SurfNum ) * BeamSolar;
 
 										// Total solar absorbed in solid layer (W), for reporting
 										QRadSWwinAbsLayer( Lay, SurfNum ) = QRadSWwinAbs( Lay, SurfNum ) * Surface( SurfNum ).Area;

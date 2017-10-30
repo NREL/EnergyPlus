@@ -19,6 +19,10 @@ namespace Gases {
 		return m_A + m_B * t_Temperature + m_C * pow( t_Temperature, 2 );
 	}
 
+	CIntCoeff::CIntCoeff( CIntCoeff const & t_IntCoeff ) {
+		operator=( t_IntCoeff );
+	}
+
 	CIntCoeff& CIntCoeff::operator=( CIntCoeff const& t_IntCoeff ) {
 		m_A = t_IntCoeff.m_A;
 		m_B = t_IntCoeff.m_B;
@@ -39,6 +43,10 @@ namespace Gases {
 		calculateAlphaAndPrandl();
 
 		return *this;
+	}
+
+	GasProperties::GasProperties( GasProperties const & t_GasProperties ) {
+		operator=( t_GasProperties );
 	}
 
 	double GasProperties::getLambdaPrim() const {

@@ -8,9 +8,22 @@ namespace Tarcog {
 
 	}
 
-	CBaseLayer::CBaseLayer( CBaseLayer const& t_Layer ) :
-		CState( t_Layer ), CLayerGeometry( t_Layer ), CLayerHeatFlow( t_Layer ) {
+	// CBaseLayer::CBaseLayer( CBaseLayer const& t_Layer ) :
+	// 	CState( t_Layer ), CLayerGeometry( t_Layer ), CLayerHeatFlow( t_Layer ) {
+	// 
+	// }
 
+	CBaseLayer::CBaseLayer( CBaseLayer const& t_Layer ) : CState( t_Layer ),
+														  CLayerGeometry( t_Layer ), CLayerHeatFlow( t_Layer ) {
+
+	}
+
+	CBaseLayer & CBaseLayer::operator=( CBaseLayer const & t_BaseLayer ) {
+		this->CState::operator=( t_BaseLayer );
+		this->CLayerGeometry::operator=( t_BaseLayer );
+		this->CLayerHeatFlow::operator=( t_BaseLayer );
+
+		return *this;
 	}
 
 	std::shared_ptr< CBaseLayer > CBaseLayer::getPreviousLayer() const {

@@ -256,12 +256,13 @@ namespace Gases {
 
 	CGas& CGas::operator=( CGas const& t_Gas ) {
 		m_GasItem.clear();
-		for ( auto item : t_Gas.m_GasItem ) {
+		for ( auto const item : t_Gas.m_GasItem ) {
 			m_GasItem.push_back( item );
 		}
 		m_SimpleProperties = t_Gas.m_SimpleProperties;
 		m_Properties = t_Gas.m_Properties;
 		m_DefaultGas = t_Gas.m_DefaultGas;
+		m_Pressure = t_Gas.m_Pressure;
 
 		return *this;
 	}

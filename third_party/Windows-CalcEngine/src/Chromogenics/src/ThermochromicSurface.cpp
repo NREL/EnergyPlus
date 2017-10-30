@@ -33,9 +33,15 @@ namespace Chromogenics {
 	}
 
 	CThermochromicSurface::CThermochromicSurface( CThermochromicSurface const& t_Surface ) :
-		ISurface( t_Surface ) {
+		ISurface( t_Surface ), m_EmissivityInterpolator( t_Surface.m_EmissivityInterpolator ),
+		m_TransmittanceInterpolator( t_Surface.m_TransmittanceInterpolator ) {
+
+	}
+
+	CThermochromicSurface &CThermochromicSurface::operator=( CThermochromicSurface const &t_Surface ) {
 		m_EmissivityInterpolator = t_Surface.m_EmissivityInterpolator;
 		m_TransmittanceInterpolator = t_Surface.m_TransmittanceInterpolator;
+		return *this;
 	}
 
 	std::shared_ptr< ISurface > CThermochromicSurface::clone() const {

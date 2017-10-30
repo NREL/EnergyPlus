@@ -54,9 +54,8 @@ namespace SingleLayerOptics {
 	///  CBSDFPatch
 	/////////////////////////////////////////////////////////////////
 
-	CBSDFPatch::CBSDFPatch( const std::shared_ptr< CAngleLimits >& t_Theta, const std::shared_ptr< CAngleLimits >& t_Phi ) {
-		m_Phi = t_Phi;
-		m_Theta = t_Theta;
+	CBSDFPatch::CBSDFPatch( const std::shared_ptr< CAngleLimits >& t_Theta, 
+		const std::shared_ptr< CAngleLimits >& t_Phi ) : m_Theta( t_Theta ), m_Phi( t_Phi ) {
 		calculateLambda();
 	}
 

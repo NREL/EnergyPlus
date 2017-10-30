@@ -37,6 +37,7 @@ namespace Tarcog {
 	public:
 		CLayerGeometry();
 		CLayerGeometry( CLayerGeometry const& t_Layer );
+		CLayerGeometry & operator=( CLayerGeometry const & t_Layer );
 
 		virtual void setWidth( double const t_Width ) final;
 		virtual void setHeight( double const t_Height ) final;
@@ -52,6 +53,7 @@ namespace Tarcog {
 	public:
 		CLayerHeatFlow();
 		CLayerHeatFlow( CLayerHeatFlow const& t_Layer );
+		CLayerHeatFlow & operator=( CLayerHeatFlow const & t_Layer );
 		CLayerHeatFlow( std::shared_ptr< ISurface > const& t_FrontSurface,
 		                std::shared_ptr< ISurface > const& t_BackSurface );
 		virtual double getHeatFlow() final;
@@ -86,6 +88,7 @@ namespace Tarcog {
 		CGasLayer( double const t_Pressure, double const t_AirSpeed, AirHorizontalDirection const t_AirDirection );
 		CGasLayer( double const t_Pressure, std::shared_ptr< Gases::CGas > const& t_Gas );
 		CGasLayer( CGasLayer const& t_Layer );
+		CGasLayer & operator=( CGasLayer const & t_Layer );
 
 		virtual double getPressure();
 

@@ -376,9 +376,7 @@ namespace HeatBalanceIntRadExchange {
 						// and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
 					} else if ( surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn ) {
 						RecSurfTemp = surface_window.EffInsSurfTemp;
-						RecSurfEmiss = InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, 
-              surface_window.EffShBlindEmiss ) + InterpSlatAng( surface_window.SlatAngThisTS, 
-                surface_window.MovableSlats, surface_window.EffGlassEmiss );
+						RecSurfEmiss = InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss ) + InterpSlatAng( surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss );
 					} else {
 						RecSurfTemp = SurfaceTemp( RecSurfNum );
 						RecSurfEmiss = construct.InsideAbsorpThermal;

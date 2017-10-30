@@ -15,7 +15,8 @@ namespace Tarcog {
 		                     double const t_SkyTemperature, SkyModel const t_Model,
 		                     double const t_FractClearSky = TarcogConstants::DEFAULT_FRACTION_OF_CLEAR_SKY );
 
-		COutdoorEnvironment( COutdoorEnvironment const& t_Outdoor );
+		COutdoorEnvironment( COutdoorEnvironment const & t_Outdoor );
+		COutdoorEnvironment & operator=( COutdoorEnvironment const & t_Outdoor );
 
 		void connectToIGULayer( std::shared_ptr< CBaseLayer > const& t_IGULayer ) override;
 

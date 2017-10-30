@@ -31,7 +31,7 @@ namespace SingleLayerOptics {
 		CScatteringLayer( const std::shared_ptr< CScatteringSurface >& t_Front,
 		                  const std::shared_ptr< CScatteringSurface >& t_Back );
 
-		CScatteringLayer( const std::shared_ptr< CScatteringLayer >& t_Layer );
+		explicit CScatteringLayer( const std::shared_ptr< CScatteringLayer >& t_Layer );
 
 		CScatteringLayer(
 			const double Tf_dir_dir, const double Rf_dir_dir,

@@ -13,6 +13,7 @@ namespace Tarcog {
 		ISurface( double const t_Emissivity, double const t_Transmittance );
 
 		ISurface( ISurface const& t_Surface );
+		ISurface & operator=( ISurface const & t_Surface );
 
 		virtual std::shared_ptr< ISurface > clone() const = 0;
 

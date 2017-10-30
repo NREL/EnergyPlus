@@ -24,11 +24,17 @@ namespace Tarcog {
 
 	}
 
-	CLayerGeometry::CLayerGeometry( CLayerGeometry const& t_Layer ) :
-		CState( t_Layer ) {
+	CLayerGeometry::CLayerGeometry( CLayerGeometry const& t_Layer ) : CState( t_Layer ) {
+		operator=( t_Layer );
+	}
+
+	CLayerGeometry & CLayerGeometry::operator=( CLayerGeometry const & t_Layer ) {
+		this->CState::operator=( t_Layer );
 		m_Height = t_Layer.m_Height;
 		m_Width = t_Layer.m_Width;
 		m_Tilt = t_Layer.m_Tilt;
+
+		return *this;
 	}
 
 	void CLayerGeometry::setWidth( double const t_Width ) {
@@ -55,16 +61,22 @@ namespace Tarcog {
 		m_Surface[ Side::Back ] = nullptr;
 	}
 
-	CLayerHeatFlow::CLayerHeatFlow( CLayerHeatFlow const& t_Layer ) :
-		CState( t_Layer ) {
+	CLayerHeatFlow::CLayerHeatFlow( CLayerHeatFlow const& t_Layer ) : CState( t_Layer ) {
+		operator=( t_Layer );
+	}
+
+	CLayerHeatFlow & CLayerHeatFlow::operator=( CLayerHeatFlow const & t_Layer ) {
+		this->CState::operator=( t_Layer );
 		m_ConductiveConvectiveCoeff = t_Layer.m_ConductiveConvectiveCoeff;
 		m_LayerGainFlow = t_Layer.m_LayerGainFlow;
 		for ( auto aSide : EnumSide() ) {
-			auto aSurface = t_Layer.m_Surface.at( aSide );
+			const auto aSurface = t_Layer.m_Surface.at( aSide );
 			if ( aSurface != nullptr ) {
 				m_Surface[ aSide ] = aSurface->clone();
 			}
 		}
+
+		return *this;
 	}
 
 	CLayerHeatFlow::CLayerHeatFlow( std::shared_ptr< ISurface > const& t_FrontSurface,
@@ -171,12 +183,19 @@ namespace Tarcog {
 	}
 
 	CGasLayer::CGasLayer( CGasLayer const& t_Layer ) : CState( t_Layer ) {
+		operator=( t_Layer );
+	}
+
+	CGasLayer &	CGasLayer::operator=( CGasLayer const & t_Layer ) {
+		this->CState::operator=( t_Layer );
 		m_Pressure = t_Layer.m_Pressure;
 		m_AirSpeed = t_Layer.m_AirSpeed;
 		m_AirVerticalDirection = t_Layer.m_AirVerticalDirection;
 		m_AirHorizontalDirection = t_Layer.m_AirHorizontalDirection;
 		m_ForcedVentilation = t_Layer.m_ForcedVentilation;
 		m_Gas = t_Layer.m_Gas;
+
+		return *this;
 	}
 
 	double CGasLayer::getPressure() {

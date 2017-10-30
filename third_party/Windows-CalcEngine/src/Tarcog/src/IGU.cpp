@@ -28,13 +28,19 @@ namespace Tarcog {
 	}
 
 	CIGU::CIGU( CIGU const& t_IGU ) {
+		operator=( t_IGU );
+	}
+
+	CIGU & CIGU::operator=( CIGU const & t_IGU ) {
 		m_Width = t_IGU.m_Width;
 		m_Height = t_IGU.m_Height;
 		m_Tilt = t_IGU.m_Tilt;
 		for ( auto& layer : t_IGU.m_Layers ) {
-			auto aLayer = std::dynamic_pointer_cast< CBaseIGULayer >( layer->clone() );
+			const auto aLayer = std::dynamic_pointer_cast< CBaseIGULayer >( layer->clone() );
 			addLayer( aLayer );
 		}
+
+		return *this;
 	}
 
 	CIGU::~CIGU() {
@@ -263,7 +269,7 @@ namespace Tarcog {
 			replaceLayer( aLayer, std::make_shared< CIGUDeflectionTempAndPressure >( aDeflectionLayer, Lmax, Lmean ) );
 		}
 		for ( std::shared_ptr< CIGUGapLayer >& aLayer : getGapLayers() ) {
-			replaceLayer( aLayer, std::make_shared< CIGUGapLayerDeflection >( aLayer, t_Tini, t_Pini ) );
+			replaceLayer( aLayer, std::make_shared< CIGUGapLayerDeflection >( *aLayer, t_Tini, t_Pini ) );
 		}
 	}
 

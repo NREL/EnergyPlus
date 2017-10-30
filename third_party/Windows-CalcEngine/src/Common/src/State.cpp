@@ -10,8 +10,14 @@ namespace FenestrationCommon {
 
 	}
 
-	CState::CState( const CState& t_State ) {
+	CState::CState( CState const & t_State ) : m_StateCalculated( t_State.m_StateCalculated ) {
+
+	}
+
+	CState & CState::operator=( CState const & t_State ) {
 		m_StateCalculated = t_State.m_StateCalculated;
+
+		return *this;
 	}
 
 	void CState::resetCalculated() {

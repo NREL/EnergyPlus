@@ -1,5 +1,6 @@
 #include <stdexcept>
-#include <math.h>
+#include <limits>
+#include <cmath>
 
 #include "SpectralSample.hpp"
 #include "MeasuredSampleData.hpp"
@@ -108,28 +109,24 @@ namespace SpectralAveraging {
 			}
 		}
 
-		auto min1 = 100000.0;
-		auto min2 = 100000.0;
+		auto min1 = std::numeric_limits< double >::max();
+		auto min2 = std::numeric_limits< double >::max();
 		auto angle1 = 0.0;
 		auto angle2 = 0.0;
-		size_t imin = 0;
-		size_t imax = 0;
 		std::shared_ptr< CSpectralSample > sample1 = nullptr;
 		std::shared_ptr< CSpectralSample > sample2 = nullptr;
 		for ( size_t i = 0; i < m_Measurements.size(); i++ ) {
-			auto angle = m_Measurements[ i ]->getAngle();
-			auto diff = fabs( angle - t_Angle );
+			const auto angle = m_Measurements[ i ]->getAngle();
+			const auto diff = fabs( angle - t_Angle );
 			if ( diff < min1 ) {
 				sample1 = m_Measurements[ i ]->getData();
 				angle1 = angle;
 				min1 = diff;
-				imin = i;
 			}
 			else if ( diff < min2 ) {
 				sample2 = m_Measurements[ i ]->getData();
 				angle2 = angle;
 				min2 = diff;
-				imax = i;
 			}
 		}
 

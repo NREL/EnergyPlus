@@ -15,7 +15,7 @@ namespace Tarcog {
 
 	CNonLinearSolver::CNonLinearSolver( std::shared_ptr< CIGU > const& t_IGU ) :
 		m_IGU( t_IGU ), m_Tolerance( IterationConstants::CONVERGENCE_TOLERANCE ), m_Iterations( 0 ),
-		m_RelaxParam( IterationConstants::RELAXATION_PARAMETER_MAX ) {
+		m_RelaxParam( IterationConstants::RELAXATION_PARAMETER_MAX ), m_SolutionTolerance( 0 ) {
 		assert( t_IGU != nullptr );
 		m_LinearSolver = std::make_shared< CLinearSolver >();
 		assert( m_LinearSolver != nullptr );

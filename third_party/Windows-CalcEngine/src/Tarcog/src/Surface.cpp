@@ -1,8 +1,6 @@
 #include <math.h>
 #include <stdexcept>
-#include <cassert>
 #include <vector>
-#include <algorithm>
 
 #include "BaseLayer.hpp"
 #include "Surface.hpp"
@@ -29,6 +27,10 @@ namespace Tarcog {
 	}
 
 	ISurface::ISurface( ISurface const& t_Surface ) {
+		operator=( t_Surface );
+	}
+
+	ISurface & ISurface::operator=( ISurface const & t_Surface ) {
 		m_Emissivity = t_Surface.m_Emissivity;
 		m_Transmittance = t_Surface.m_Transmittance;
 		m_Temperature = t_Surface.m_Temperature;
@@ -36,6 +38,8 @@ namespace Tarcog {
 		m_MaxDeflection = t_Surface.m_MaxDeflection;
 		m_MeanDeflection = t_Surface.m_MeanDeflection;
 		calculateReflectance();
+
+		return *this;
 	}
 
 	void ISurface::setTemperature( double const t_Temperature ) {

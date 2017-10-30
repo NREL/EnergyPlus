@@ -919,7 +919,9 @@ namespace DataSurfaces {
 		SetWindSpeedAt( Real64 const fac );
 
 		void
-		SetWindDirAt( Real64 const fac );		Real64
+		SetWindDirAt( Real64 const fac );
+		
+		Real64
 		getInsideAirTemperature( const int t_SurfNum ) const;
 
 		static Real64

@@ -17,13 +17,13 @@ namespace MultiLayerOptics {
 
 		// Adding layer to front or back side of composition
 		void addLayer( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb,
-		               FenestrationCommon::Side t_Side = FenestrationCommon::Side::Back );
+		               FenestrationCommon::Side t_Side = FenestrationCommon::Side::Back ) const;
 
 		// Get oprical properties of equivalent layer
 		double getProperty( const FenestrationCommon::Property t_Property,
 		                    const FenestrationCommon::Side t_Side ) const;
 
-		double getLayerAbsorptance( const size_t Index, const FenestrationCommon::Side t_Side );
+		double getLayerAbsorptance( const size_t Index, const FenestrationCommon::Side t_Side ) const;
 
 	private:
 		std::shared_ptr< CInterRefSingleComponent > m_Inter;

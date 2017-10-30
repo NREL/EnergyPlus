@@ -8,7 +8,7 @@ namespace FenestrationCommon {
 	// To create wavelength range for certain pre-defined ranges
 	class CWavelengthRange {
 	public:
-		CWavelengthRange( const WavelengthRange t_Range );
+		explicit CWavelengthRange( const WavelengthRange t_Range );
 		double minLambda() const;
 		double maxLambda() const;
 	private:

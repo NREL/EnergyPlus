@@ -29,6 +29,7 @@ namespace SpectralAveraging {
 		explicit CSample( std::shared_ptr< FenestrationCommon::CSeries > const& t_SourceData );
 		CSample();
 		CSample( CSample const & t_Sample );
+		CSample& operator=( CSample const & t_Sample );
 
 		// Assigns detector and wavelengths from other sample. 
 		void assignDetectorAndWavelengths( std::shared_ptr< CSample > const& t_Sample );

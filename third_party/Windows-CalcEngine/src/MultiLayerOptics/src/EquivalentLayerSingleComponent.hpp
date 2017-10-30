@@ -17,7 +17,7 @@ namespace MultiLayerOptics {
 	class CEquivalentLayerSingleComponent {
 	public:
 		CEquivalentLayerSingleComponent( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb );
-		CEquivalentLayerSingleComponent( const SingleLayerOptics::CLayerSingleComponent& t_Layer );
+		explicit CEquivalentLayerSingleComponent( const SingleLayerOptics::CLayerSingleComponent& t_Layer );
 
 		// Adding layer to front or back side of the IGU composition
 		void addLayer( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb,

@@ -26,11 +26,18 @@ namespace Tarcog {
 		m_YoungsModulus( t_YoungsModulus ), m_PoisonRatio( t_PoisonRatio ) {
 	}
 
-	CIGUSolidLayerDeflection::CIGUSolidLayerDeflection(
-		CIGUSolidLayerDeflection const& t_Layer ) : CState( t_Layer ),
-		                                            CIGUSolidLayer( t_Layer ) {
+	CIGUSolidLayerDeflection::CIGUSolidLayerDeflection(	CIGUSolidLayerDeflection const& t_Layer ) :
+			CState( t_Layer ), CIGUSolidLayer( t_Layer ) {
+		operator=( t_Layer );
+	}
+
+	CIGUSolidLayerDeflection & CIGUSolidLayerDeflection::operator=( CIGUSolidLayerDeflection const & t_Layer ) {
+		this->CState::operator=( t_Layer );
+		this->CIGUSolidLayer::operator=( t_Layer );
 		m_YoungsModulus = t_Layer.m_YoungsModulus;
 		m_PoisonRatio = t_Layer.m_PoisonRatio;
+
+		return *this;
 	}
 
 	void CIGUSolidLayerDeflection::calculateConvectionOrConductionFlow() {

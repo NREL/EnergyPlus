@@ -1,7 +1,8 @@
 #include <stdexcept>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
+#include "wceunique.hpp"
 #include "Series.hpp"
 #include "IntegratorStrategy.hpp"
 
@@ -27,7 +28,7 @@ namespace FenestrationCommon {
 	}
 
 	std::unique_ptr< ISeriesPoint > CSeriesPoint::clone() const {
-		return std::unique_ptr< CSeriesPoint >( new CSeriesPoint( *this ) );
+		return wce::make_unique< CSeriesPoint >( *this );
 	}
 
 	double CSeriesPoint::x() const {
@@ -68,11 +69,11 @@ namespace FenestrationCommon {
 
 	void CSeries::addProperty( const double t_x, const double t_Value ) {
 		std::shared_ptr< CSeriesPoint > aProperty = std::make_shared< CSeriesPoint >( t_x, t_Value );
-		m_Series.push_back( std::unique_ptr< ISeriesPoint >( new CSeriesPoint( t_x, t_Value ) ) );
+		m_Series.push_back( wce::make_unique< CSeriesPoint >( t_x, t_Value ) );
 	}
 
 	void CSeries::insertToBeginning( double t_x, double t_Value ) {
-		m_Series.insert( m_Series.begin(), std::unique_ptr< ISeriesPoint >( new CSeriesPoint( t_x, t_Value ) ) );
+		m_Series.insert( m_Series.begin(), wce::make_unique< CSeriesPoint >( t_x, t_Value ) );
 	}
 
 	void CSeries::setConstantValues( const std::vector< double >& t_Wavelengths, double const t_Value ) {
@@ -84,7 +85,7 @@ namespace FenestrationCommon {
 
 	std::unique_ptr< CSeries > CSeries::integrate( IntegrationType t_IntegrationType ) const {
 
-		std::unique_ptr< CSeries > newProperties = std::unique_ptr< CSeries >( new CSeries() );
+		std::unique_ptr< CSeries > newProperties = wce::make_unique< CSeries >( );
 		CIntegratorFactory aFactory = CIntegratorFactory();
 		std::shared_ptr< IIntegratorStrategy > aIntegrator = aFactory.getIntegrator( t_IntegrationType );
 		ISeriesPoint* previousProperty = nullptr;
@@ -152,7 +153,7 @@ namespace FenestrationCommon {
 
 	std::unique_ptr< CSeries > CSeries::interpolate(
 		const std::vector< double >& t_Wavelengths ) const {
-		std::unique_ptr< CSeries > newProperties = std::unique_ptr< CSeries >( new CSeries() );
+		std::unique_ptr< CSeries > newProperties = wce::make_unique< CSeries >();
 
 		if ( size() != 0 ) {
 
@@ -179,7 +180,7 @@ namespace FenestrationCommon {
 	}
 
 	std::unique_ptr< CSeries > CSeries::mMult( const CSeries& t_Series ) const {
-		std::unique_ptr< CSeries > newProperties = std::unique_ptr< CSeries >( new CSeries() );
+		std::unique_ptr< CSeries > newProperties = wce::make_unique< CSeries >();
 
 		const double WAVELENGTHTOLERANCE = 1e-10;
 
@@ -203,7 +204,7 @@ namespace FenestrationCommon {
 	std::unique_ptr< CSeries > CSeries::mSub( const CSeries& t_Series ) const {
 		const double WAVELENGTHTOLERANCE = 1e-10;
 
-		std::unique_ptr< CSeries > newProperties = std::unique_ptr< CSeries >( new CSeries() );
+		std::unique_ptr< CSeries > newProperties = wce::make_unique< CSeries >();
 		size_t minSize = std::min( m_Series.size(), t_Series.m_Series.size() );
 
 		for ( size_t i = 0; i < minSize; ++i ) {
@@ -224,7 +225,7 @@ namespace FenestrationCommon {
 	std::unique_ptr< CSeries > CSeries::mAdd( const CSeries& t_Series ) const {
 		const double WAVELENGTHTOLERANCE = 1e-10;
 
-		std::unique_ptr< CSeries > newProperties = std::unique_ptr< CSeries >( new CSeries() );
+		std::unique_ptr< CSeries > newProperties( new CSeries() );
 		size_t minSize = std::min( m_Series.size(), t_Series.m_Series.size() );
 
 		for ( size_t i = 0; i < minSize; ++i ) {

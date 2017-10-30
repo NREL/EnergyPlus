@@ -9,6 +9,7 @@ namespace Tarcog {
 	public:
 		CIndoorEnvironment( double const t_AirTemperature, double const t_Pressure );
 		CIndoorEnvironment( CIndoorEnvironment const& t_Indoor );
+		CIndoorEnvironment & operator=( CIndoorEnvironment const & t_Environment );
 
 		void connectToIGULayer( std::shared_ptr< CBaseLayer > const& t_IGULayer ) override;
 

@@ -50,7 +50,7 @@ namespace SingleLayerOptics {
 	class CMaterial {
 	public:
 		CMaterial( const double minLambda, const double maxLambda );
-		CMaterial( const FenestrationCommon::WavelengthRange t_Range );
+		explicit CMaterial( const FenestrationCommon::WavelengthRange t_Range );
 
 		virtual void setSourceData( std::shared_ptr< FenestrationCommon::CSeries > t_SourceData );
 

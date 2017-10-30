@@ -16,7 +16,8 @@ namespace Tarcog {
 	class CEnvironment : public CBaseLayer, public CGasLayer {
 	public:
 		CEnvironment( double t_Pressure, double t_AirSpeed, AirHorizontalDirection t_AirDirection );
-		CEnvironment( CEnvironment const& t_Environment );
+		CEnvironment( CEnvironment const & t_Environment );
+		CEnvironment & operator=( CEnvironment const & t_Environment );
 
 		~CEnvironment();
 

@@ -3,8 +3,7 @@
 #include "MatrixSeries.hpp"
 #include "SquareMatrix.hpp"
 #include "Series.hpp"
-
-
+#include "IntegratorStrategy.hpp"
 
 namespace FenestrationCommon {
 
@@ -20,6 +19,10 @@ namespace FenestrationCommon {
 	}
 
 	CMatrixSeries::CMatrixSeries( CMatrixSeries const& t_MatrixSeries ) {
+		*this = t_MatrixSeries;
+	}
+
+	CMatrixSeries& CMatrixSeries::operator=( CMatrixSeries const &t_MatrixSeries ) {
 		m_Size1 = t_MatrixSeries.m_Size1;
 		m_Size2 = t_MatrixSeries.m_Size2;
 		m_Matrix = std::vector< std::vector< std::unique_ptr< CSeries > > >( m_Size1 );
@@ -29,6 +32,7 @@ namespace FenestrationCommon {
 				m_Matrix[ i ][ j ] = std::unique_ptr< CSeries >( new CSeries( *t_MatrixSeries.m_Matrix[ i ][ j ] ) );
 			}
 		}
+		return *this;
 	}
 
 	void CMatrixSeries::addProperty( const size_t i, const size_t j,

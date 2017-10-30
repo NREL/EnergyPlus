@@ -11,6 +11,7 @@ namespace SingleLayerOptics {
 	class CBeamDirection {
 	public:
 		CBeamDirection();
+		CBeamDirection( CBeamDirection const & t_BeamDirection );
 		CBeamDirection( const double t_Theta, const double t_Phi );
 
 		double theta() const;

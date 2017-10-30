@@ -23,6 +23,7 @@ namespace Tarcog {
 		                double const t_BackEmissivity, double const t_BackIRTransmittance );
 
 		CIGUSolidLayer( CIGUSolidLayer const& t_Layer );
+		CIGUSolidLayer & operator=( CIGUSolidLayer const & t_Layer );
 
 		void connectToBackSide( std::shared_ptr< CBaseLayer > const& t_Layer ) override;
 

@@ -17,6 +17,7 @@ namespace Tarcog {
 	public:
 		CIGU( double const t_Width, double const t_Height, double const t_Tilt = 90 );
 		CIGU( CIGU const& t_IGU );
+		CIGU & operator=( CIGU const & t_IGU );
 		~CIGU();
 
 		void addLayer( std::shared_ptr< CBaseIGULayer > const& t_Layer );

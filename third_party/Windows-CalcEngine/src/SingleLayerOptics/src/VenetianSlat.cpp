@@ -15,8 +15,8 @@ namespace SingleLayerOptics {
 	CVenetianSlat::CVenetianSlat( const double t_SlatWidth, const double t_SlatSpacing, const double t_SlatTiltAngle,
 	                              const double t_CurvatureRadius, const size_t t_NumOfSegments, SegmentsDirection t_Direction ) :
 		m_SlatWidth( t_SlatWidth ), m_SlatSpacing( t_SlatSpacing ), m_SlatTiltAngle( t_SlatTiltAngle ),
-		m_CurvatureRadius( t_CurvatureRadius ), m_NumOfSlatSegments( t_NumOfSegments ), m_Direction( t_Direction ) {
-		m_Geometry = make_shared< CGeometry2D >();
+		m_CurvatureRadius( t_CurvatureRadius ), m_NumOfSlatSegments( t_NumOfSegments ), m_Direction( t_Direction ),
+		m_Geometry( std::make_shared< CGeometry2D >() ) {
 		buildSlat();
 	}
 

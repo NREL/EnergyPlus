@@ -1,7 +1,5 @@
 #include "Environment.hpp"
 #include "TarcogConstants.hpp"
-#include "BaseLayer.hpp"
-
 
 
 namespace Tarcog {
@@ -16,13 +14,22 @@ namespace Tarcog {
 		m_ForcedVentilation = ForcedVentilation(); // Creates forced ventilation with zero values
 	}
 
-	CEnvironment::CEnvironment( CEnvironment const& t_Environment ) :
-		CState( t_Environment ), CBaseLayer( t_Environment ), CGasLayer( t_Environment ) {
+	CEnvironment::CEnvironment( CEnvironment const & t_Environment ) :
+	CState( t_Environment ), CBaseLayer( t_Environment ), CGasLayer( t_Environment ) {
+		operator=( t_Environment );
+	}
+
+	CEnvironment & CEnvironment::operator=( CEnvironment const & t_Environment ) {
+		this->CState::operator=( t_Environment );
+		this->CBaseLayer::operator=( t_Environment );
+		this->CGasLayer::operator=( t_Environment );
 		m_DirectSolarRadiation = t_Environment.m_DirectSolarRadiation;
 		m_Emissivity = t_Environment.m_Emissivity;
 		m_HInput = t_Environment.m_HInput;
 		m_HCoefficientModel = t_Environment.m_HCoefficientModel;
 		m_IRCalculatedOutside = t_Environment.m_IRCalculatedOutside;
+
+		return *this;
 	}
 
 	CEnvironment::~CEnvironment() {

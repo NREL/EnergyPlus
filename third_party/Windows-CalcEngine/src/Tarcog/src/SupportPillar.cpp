@@ -3,8 +3,6 @@
 #include <memory>
 
 #include "WCETarcog.hpp"
-#include "BaseIGULayer.hpp"
-
 
 
 namespace Tarcog {
