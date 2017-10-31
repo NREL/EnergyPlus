@@ -28,6 +28,8 @@ namespace SpectralAveraging {
 	}
 
 	CSample &CSample::operator=( CSample const &t_Sample ) {
+		m_StateCalculated = t_Sample.m_StateCalculated;
+		m_WavelengthSet = t_Sample.m_WavelengthSet;
 		m_IncomingSource = wce::make_unique< CSeries >( *t_Sample.m_IncomingSource );
 		m_TransmittedSource = wce::make_unique< CSeries >( *t_Sample.m_TransmittedSource );
 		m_ReflectedFrontSource = wce::make_unique< CSeries >( *t_Sample.m_ReflectedFrontSource );

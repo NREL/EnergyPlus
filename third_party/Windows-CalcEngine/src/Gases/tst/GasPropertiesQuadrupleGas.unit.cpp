@@ -1,4 +1,5 @@
 #include <memory>
+#include <string>
 #include <gtest/gtest.h>
 
 #include "WCEGases.hpp"
@@ -11,33 +12,38 @@ protected:
 	CGas m_Gas;
 
 	virtual void SetUp() {
+		const std::string AirName = "Air";
+		const std::string ArgonName = "Argon";
+		const std::string KryptonName = "Air";
+		const std::string XenonName = "Argon";
+
 		// Create coefficients for Air
 		CIntCoeff AirCon{ 2.8733e-03, 7.76e-05, 0.0 };
 		CIntCoeff AirCp{ 1.002737e+03, 1.2324e-02, 0.0 };
 		CIntCoeff AirVisc{ 3.7233e-06, 4.94e-08, 0.0 };
 
-		CGasData const AirData{ "Air", 28.97, 1.4, AirCp, AirCon, AirVisc };
+		CGasData const AirData{ AirName, 28.97, 1.4, AirCp, AirCon, AirVisc };
 
 		// Create coefficients for Argon
 		CIntCoeff ArgonCon{ 2.2848e-03, 5.1486e-05, 0.0 };
 		CIntCoeff ArgonCp{ 5.21929e+02, 0.0, 0.0 };
 		CIntCoeff ArgonVisc{ 3.3786e-06, 6.4514e-08, 0.0 };
 
-		CGasData const ArgonData{ "Argon", 39.948, 1.67, ArgonCp, ArgonCon, ArgonVisc };
+		CGasData const ArgonData{ ArgonName, 39.948, 1.67, ArgonCp, ArgonCon, ArgonVisc };
 
 		// Create coefficients for Krypton
 		CIntCoeff KryptonCon{ 9.443e-04, 2.8260e-5, 0.0 };
 		CIntCoeff KryptonCp{ 2.4809e+02, 0.0, 0.0 };
 		CIntCoeff KryptonVisc{ 2.213e-6, 7.777e-8, 0.0 };
 
-		CGasData const KryptonData{ "Krypton", 83.8, 1.68, KryptonCp, KryptonCon, KryptonVisc };
+		CGasData const KryptonData{ KryptonName, 83.8, 1.68, KryptonCp, KryptonCon, KryptonVisc };
 
 		// Create coefficients for Xenon
 		CIntCoeff XenonCon{ 4.538e-04, 1.723e-05, 0.0 };
 		CIntCoeff XenonCp{ 1.5834e+02, 0.0, 0.0 };
 		CIntCoeff XenonVisc{ 1.069e-6, 7.414e-8, 0.0 };
 
-		CGasData const XenonData{ "Xenon", 131.3, 1.66, XenonCp, XenonCon, XenonVisc };
+		CGasData const XenonData{ XenonName, 131.3, 1.66, XenonCp, XenonCon, XenonVisc };
 
 		CGasItem Air{ 0.1, AirData };
 		CGasItem Argon{ 0.3, ArgonData };

@@ -37,7 +37,7 @@ namespace FenestrationCommon {
 		std::vector< double > combinedWavelengths;
 
 		set_union( t_wv1.begin(), t_wv1.end(), t_wv2.begin(), t_wv2.end(),
-		           std::back_inserter( unionWavelengths ) );
+		           back_inserter( unionWavelengths ) );
 
 		if ( t_Combination == Combine::Interpolate ) {
 			// Remove extrapolated data. It is incorrect to have extrapolated wavelengths from one sample
