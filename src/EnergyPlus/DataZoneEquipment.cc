@@ -520,15 +520,15 @@ namespace DataZoneEquipment {
 
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
-				if (! lAlphaBlanks( 2 ) ){
+				if ( !lAlphaBlanks( 2 ) ){
 					if ( SameString( AlphArray( 2 ), "SequentialLoad" ) ) {
-						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::sequentialLoading;
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialLoading;
 					} else if ( SameString( AlphArray( 2 ), "UniformLoad" ) ) {
-						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::uniformLoading;
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformLoading;
 					} else if ( SameString( AlphArray( 2 ), "UniformPLR" ) ) {
-						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::uniformPLRLoading;
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformPLRLoading;
 					} else if ( SameString( AlphArray( 2 ), "SequentialUniformPLR" ) ) {
-						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::sequentialUniformPLRLoading;
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLRLoading;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\", Invalid choice." );
 						ShowContinueError( "..." + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\"." );

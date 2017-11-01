@@ -145,10 +145,10 @@ namespace DataZoneEquipment {
 
 	enum class LoadDist 
 	{
-		sequentialLoading,
-		uniformLoading,
-		uniformPLRLoading,
-		sequentialUniformPLRLoading
+		SequentialLoading,
+		UniformLoading,
+		UniformPLRLoading,
+		SequentialUniformPLRLoading
 	};
 
 	struct EquipMeterData
@@ -481,7 +481,7 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		EquipList() :
-			LoadDistScheme( DataZoneEquipment::LoadDist::sequentialLoading ),
+			LoadDistScheme( DataZoneEquipment::LoadDist::SequentialLoading ),
 			NumOfEquipTypes( 0 ),
 			NumAvailHeatEquip( 0 ),
 			NumAvailCoolEquip( 0 )

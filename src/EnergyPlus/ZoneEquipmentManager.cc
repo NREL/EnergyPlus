@@ -3360,7 +3360,7 @@ namespace ZoneEquipmentManager {
 				ZoneEquipConfig( ControlledZoneNum ).PlenumMassFlow += PlenumInducedMassFlow;
 
 				// Store available capacities for load distribution calculations
-				if ( FirstHVACIteration && ( ZoneEquipList( CurZoneEqNum ).LoadDistScheme != DataZoneEquipment::LoadDist::sequentialLoading ) ){
+				if ( FirstHVACIteration && ( ZoneEquipList( CurZoneEqNum ).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading ) ){
 					if ( SysOutputProvided > 0.0 ) {
 						ZoneEquipList( CurZoneEqNum ).HeatingCapacity( EquipPtr ) = SysOutputProvided;
 					} else {
@@ -3561,7 +3561,7 @@ namespace ZoneEquipmentManager {
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
-		} else if ( FirstHVACIteration && ( ( ZoneEquipList( ZoneNum ).LoadDistScheme == DataZoneEquipment::LoadDist::sequentialLoading ) || ( ZoneEquipList( ZoneNum ).LoadDistScheme == DataZoneEquipment::LoadDist::uniformLoading ) ) ) {
+		} else if ( FirstHVACIteration && ( ( ZoneEquipList( ZoneNum ).LoadDistScheme == DataZoneEquipment::LoadDist::SequentialLoading ) || ( ZoneEquipList( ZoneNum ).LoadDistScheme == DataZoneEquipment::LoadDist::UniformLoading ) ) ) {
 			//init each sequenced demand to the full output
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired; // array assignment
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = ZoneSysEnergyDemand( ZoneNum ).OutputRequiredToHeatingSP; // array assignment
@@ -3570,7 +3570,7 @@ namespace ZoneEquipmentManager {
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequired = ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToHumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP; // array assignment
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
-		} else if ( FirstHVACIteration && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::sequentialLoading ) && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::uniformLoading ) ) {
+		} else if ( FirstHVACIteration && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading ) && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading ) ) {
 			//init each sequenced demand to the zone design load in order to get available capacities from equipment
 			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) { 
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
@@ -3640,10 +3640,10 @@ namespace ZoneEquipmentManager {
 		int numOperating = 0;
 
 		switch ( thisZEqList.LoadDistScheme ) {
-			case DataZoneEquipment::LoadDist::sequentialLoading:
+			case DataZoneEquipment::LoadDist::SequentialLoading:
 				// Nothing to do here for this case
 				break;
-			case DataZoneEquipment::LoadDist::uniformLoading:
+			case DataZoneEquipment::LoadDist::UniformLoading:
 				// Distribute load uniformly across all active equipment
 				if ( thisZEqList.NumAvailHeatEquip > 0 ) {
 					heatLoadRatio = 1.0 / thisZEqList.NumAvailHeatEquip;
@@ -3691,7 +3691,7 @@ namespace ZoneEquipmentManager {
 					}
 				}
 				break;
-			case DataZoneEquipment::LoadDist::uniformPLRLoading:
+			case DataZoneEquipment::LoadDist::UniformPLRLoading:
 				// Distribute load at uniform PLR across all active equipment
 				if ( energy.TotalOutputRequired >= 0.0 ) {
 					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
@@ -3760,7 +3760,7 @@ namespace ZoneEquipmentManager {
 					}
 				}
 				break;
-			case DataZoneEquipment::LoadDist::sequentialUniformPLRLoading:
+			case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
 				// Determine how many pieces of equipment are required to meet the current load,
 				// then distribute load at uniform PLR across all active equipment
 				if ( energy.TotalOutputRequired >= 0.0 ) {
@@ -3892,7 +3892,7 @@ namespace ZoneEquipmentManager {
 
 		// If zone is uncontrolled use original method for remaining output
 		if ( !DataHeatBalance::Zone( ZoneNum ).IsControlled ) {
-			// sequentialLoading, use original method for remaining output
+			// SequentialLoading, use original method for remaining output
 			energy.RemainingOutputRequired -= SysOutputProvided;
 			energy.RemainingOutputReqToHeatSP -= SysOutputProvided;
 			energy.RemainingOutputReqToCoolSP -= SysOutputProvided;
@@ -3953,8 +3953,8 @@ namespace ZoneEquipmentManager {
 		// Sensible output updates
 		auto & thisZEqList( DataZoneEquipment::ZoneEquipList( ctrlZoneNum ) );
 		switch ( thisZEqList.LoadDistScheme ) {
-			case DataZoneEquipment::LoadDist::sequentialLoading:
-				// sequentialLoading, use original method for remaining output
+			case DataZoneEquipment::LoadDist::SequentialLoading:
+				// SequentialLoading, use original method for remaining output
 				energy.RemainingOutputRequired -= SysOutputProvided;
 				energy.RemainingOutputReqToHeatSP -= SysOutputProvided;
 				energy.RemainingOutputReqToCoolSP -= SysOutputProvided;
@@ -4010,9 +4010,9 @@ namespace ZoneEquipmentManager {
 					}
 				}
 				break;
-			case DataZoneEquipment::LoadDist::uniformLoading:
-			case DataZoneEquipment::LoadDist::uniformPLRLoading: 
-			case DataZoneEquipment::LoadDist::sequentialUniformPLRLoading:
+			case DataZoneEquipment::LoadDist::UniformLoading:
+			case DataZoneEquipment::LoadDist::UniformPLRLoading: 
+			case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
 				// For every load distribution scheme except SequentialLoad, do not touch the sequenced loads, 
 				// but set the remaining loads to the next equipment type's load to support equipment types that don't use the sequenced loads
 				if ( present( EquipPriorityNum ) ) {

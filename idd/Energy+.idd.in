@@ -41861,6 +41861,7 @@ ZoneHVAC:EquipmentList,
        \memo should be assigned Heating Sequence = 1 and Cooling Sequence = 1.  Any other equipment should
        \memo be assigned sequence 2 or higher so that it will see the net load after the DOAS air is added
        \memo to the zone.
+       \min-fields 6
   A1 , \field Name
        \required-field
        \reference ZoneEquipmentLists
