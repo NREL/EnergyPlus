@@ -62,7 +62,6 @@ using namespace EnergyPlus::GroundTemperatureManager;
 TEST_F( EnergyPlusFixture, SiteShallowGroundTempTest )
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:Shallow,",
 		"	21.00,	!- January",
 		"	22.00,	!- February",
