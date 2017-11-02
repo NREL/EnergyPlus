@@ -4,7 +4,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "EquivalentLayerSingleComponent.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 
@@ -16,13 +15,13 @@ namespace MultiLayerOptics {
 	CSurfaceEnergy::CSurfaceEnergy() {
 		for ( Side t_Side : EnumSide() ) {
 			for ( EnergyFlow t_EnergyFlow : EnumEnergyFlow() ) {
-				m_IEnergy[ make_pair( t_Side, t_EnergyFlow ) ] = make_shared< std::vector< double > >();
+				m_IEnergy[ std::make_pair( t_Side, t_EnergyFlow ) ] = std::make_shared< std::vector< double > >();
 			}
 		}
 	}
 
 	void CSurfaceEnergy::addEnergy( const Side t_Side, const EnergyFlow t_EnergySide, const double t_Value ) {
-		m_IEnergy.at( make_pair( t_Side, t_EnergySide ) )->push_back( t_Value );
+		m_IEnergy.at( std::make_pair( t_Side, t_EnergySide ) )->push_back( t_Value );
 	}
 
 	double CSurfaceEnergy::IEnergy( const size_t Index, const Side t_Side, const EnergyFlow t_EnergyFlow ) {
@@ -49,7 +48,7 @@ namespace MultiLayerOptics {
 
 	void CInterRefSingleComponent::addLayer( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb,
 	                                         const Side t_Side ) {
-		std::shared_ptr< CLayerSingleComponent > aLayer = make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb );
+		std::shared_ptr< CLayerSingleComponent > aLayer = std::make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb );
 		switch ( t_Side ) {
 		case Side::Front:
 			m_Layers.insert( m_Layers.begin(), aLayer );
@@ -101,7 +100,7 @@ namespace MultiLayerOptics {
 	void CInterRefSingleComponent::initialize( const double t_Tf, const double t_Rf,
 	                                           const double t_Tb, const double t_Rb ) {
 		m_StateCalculated = false;
-		m_IEnergy = make_shared< CSurfaceEnergy >();
+		m_IEnergy = std::make_shared< CSurfaceEnergy >();
 		addLayer( t_Tf, t_Rf, t_Tb, t_Rb );
 	}
 
@@ -137,7 +136,7 @@ namespace MultiLayerOptics {
 
 	void CInterRefSingleComponent::calculateForwardLayers() {
 		// Insert exterior environment properties
-		std::shared_ptr< CLayerSingleComponent > aLayer = make_shared< CLayerSingleComponent >( 1, 0, 1, 0 );
+		std::shared_ptr< CLayerSingleComponent > aLayer = std::make_shared< CLayerSingleComponent >( 1, 0, 1, 0 );
 		m_ForwardLayers.push_back( aLayer );
 
 		// First layer just in. No calculation is needed
@@ -153,7 +152,7 @@ namespace MultiLayerOptics {
 
 	void CInterRefSingleComponent::calculateBackwardLayers() {
 		// Insert interior environment properties
-		std::shared_ptr< CLayerSingleComponent > aLayer = make_shared< CLayerSingleComponent >( 1, 0, 1, 0 );
+		std::shared_ptr< CLayerSingleComponent > aLayer = std::make_shared< CLayerSingleComponent >( 1, 0, 1, 0 );
 		m_BackwardLayers.push_back( aLayer );
 
 		size_t size = m_Layers.size() - 1;

@@ -3,16 +3,15 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 class PolynomialPointsTest : public testing::Test {
 
 protected:
 	void SetUp() override {
-		auto poly1 = Polynom( { -6.75, 8.65, -0.75 } );
-		auto poly2 = Polynom( { 1.5, -2.5, 0.3 } );
-		auto poly3 = Polynom( { 2.4, 20, 1.3, -0.24 } );
+		const auto poly1 = Polynom( { -6.75, 8.65, -0.75 } );
+		const auto poly2 = Polynom( { 1.5, -2.5, 0.3 } );
+		const auto poly3 = Polynom( { 2.4, 20, 1.3, -0.24 } );
 
 		m_Points.storePoint( 10, poly1 );
 		m_Points.storePoint( 20, poly2 );

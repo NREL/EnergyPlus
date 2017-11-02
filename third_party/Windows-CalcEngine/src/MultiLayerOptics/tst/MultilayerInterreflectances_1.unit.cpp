@@ -4,7 +4,7 @@
 #include "WCEMultiLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace MultiLayerOptics;
 using namespace FenestrationCommon;
 
@@ -18,7 +18,7 @@ private:
 
 protected:
 	virtual void SetUp() {
-		m_Interref = make_shared< CInterRefSingleComponent >( 0.46, 0.52, 0.64, 0.22 );
+		m_Interref = std::make_shared< CInterRefSingleComponent >( 0.46, 0.52, 0.64, 0.22 );
 		m_Interref->addLayer( 0.56, 0.34, 0.49, 0.39 );
 		m_Interref->addLayer( 0.12, 0.47, 0.33, 0.63 );
 

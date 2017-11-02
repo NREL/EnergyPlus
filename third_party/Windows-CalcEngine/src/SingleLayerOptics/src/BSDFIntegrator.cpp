@@ -3,7 +3,6 @@
 #include "BSDFPatch.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -14,8 +13,8 @@ namespace SingleLayerOptics {
 
 		for ( auto t_Side : EnumSide() ) {
 			for ( auto t_Property : EnumPropertySimple() ) {
-				m_Matrix[ make_pair( t_Side, t_Property ) ] = make_shared< CSquareMatrix >( m_DimMatrices );
-				m_Hem[ make_pair( t_Side, t_Property ) ] = make_shared< std::vector< double > >( m_DimMatrices );
+				m_Matrix[ std::make_pair( t_Side, t_Property ) ] = std::make_shared< CSquareMatrix >( m_DimMatrices );
+				m_Hem[ std::make_pair( t_Side, t_Property ) ] = std::make_shared< std::vector< double > >( m_DimMatrices );
 			}
 		}
 	}
@@ -27,8 +26,8 @@ namespace SingleLayerOptics {
 
 		for ( auto t_Side : EnumSide() ) {
 			for ( auto t_Property : EnumPropertySimple() ) {
-				m_Matrix[ make_pair( t_Side, t_Property ) ] = make_shared< CSquareMatrix >( m_DimMatrices );
-				m_Hem[ make_pair( t_Side, t_Property ) ] = make_shared< std::vector< double > >( m_DimMatrices );
+				m_Matrix[ std::make_pair( t_Side, t_Property ) ] = std::make_shared< CSquareMatrix >( m_DimMatrices );
+				m_Hem[ std::make_pair( t_Side, t_Property ) ] = std::make_shared< std::vector< double > >( m_DimMatrices );
 			}
 		}
 	}
@@ -40,13 +39,13 @@ namespace SingleLayerOptics {
 
 	std::shared_ptr< CSquareMatrix > CBSDFIntegrator::getMatrix( const Side t_Side,
 	                                                        const PropertySimple t_Property ) const {
-		return m_Matrix.at( make_pair( t_Side, t_Property ) );
+		return m_Matrix.at( std::make_pair( t_Side, t_Property ) );
 	}
 
 	void CBSDFIntegrator::setResultMatrices( const std::shared_ptr< CSquareMatrix >& t_Tau,
 	                                         const std::shared_ptr< CSquareMatrix >& t_Rho, Side t_Side ) {
-		m_Matrix[ make_pair( t_Side, PropertySimple::T ) ] = t_Tau;
-		m_Matrix[ make_pair( t_Side, PropertySimple::R ) ] = t_Rho;
+		m_Matrix[ std::make_pair( t_Side, PropertySimple::T ) ] = t_Tau;
+		m_Matrix[ std::make_pair( t_Side, PropertySimple::R ) ] = t_Rho;
 	}
 
 	double CBSDFIntegrator::DirDir( const Side t_Side, const PropertySimple t_Property,
@@ -67,7 +66,7 @@ namespace SingleLayerOptics {
 	std::shared_ptr< std::vector< double > > CBSDFIntegrator::DirHem( const FenestrationCommon::Side t_Side,
 	                                                        const FenestrationCommon::PropertySimple t_Property ) {
 		calcHemispherical();
-		return m_Hem.at( make_pair( t_Side, t_Property ) );
+		return m_Hem.at( std::make_pair( t_Side, t_Property ) );
 	}
 
 	std::shared_ptr< std::vector< double > > CBSDFIntegrator::Abs( Side t_Side ) {
@@ -127,17 +126,17 @@ namespace SingleLayerOptics {
 		if ( !m_HemisphericalCalculated ) {
 			for ( Side t_Side : EnumSide() ) {
 				for ( PropertySimple t_Property : EnumPropertySimple() ) {
-					m_Hem[ make_pair( t_Side, t_Property ) ] =
-						m_Matrix.at( make_pair( t_Side, t_Property ) )->multVxM( *m_Directions->lambdaVector() );
+					m_Hem[ std::make_pair( t_Side, t_Property ) ] =
+						m_Matrix.at( std::make_pair( t_Side, t_Property ) )->multVxM( *m_Directions->lambdaVector() );
 				}
-				m_Abs[ t_Side ] = make_shared< std::vector< double > >();
+				m_Abs[ t_Side ] = std::make_shared< std::vector< double > >();
 			}
 
-			size_t size = m_Hem[ make_pair( Side::Front, PropertySimple::T ) ]->size();
+			size_t size = m_Hem[ std::make_pair( Side::Front, PropertySimple::T ) ]->size();
 			for ( size_t i = 0; i < size; ++i ) {
 				for ( Side t_Side : EnumSide() ) {
-					m_Abs.at( t_Side )->push_back( 1 - ( *m_Hem.at( make_pair( t_Side, PropertySimple::T ) ) )[ i ]
-					                              - ( *m_Hem.at( make_pair( t_Side, PropertySimple::R ) ) )[ i ] );
+					m_Abs.at( t_Side )->push_back( 1 - ( *m_Hem.at( std::make_pair( t_Side, PropertySimple::T ) ) )[ i ]
+					                              - ( *m_Hem.at( std::make_pair( t_Side, PropertySimple::R ) ) )[ i ] );
 				}
 			}
 			m_HemisphericalCalculated = true;

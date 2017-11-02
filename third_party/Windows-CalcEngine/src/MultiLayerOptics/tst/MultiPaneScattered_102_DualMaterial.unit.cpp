@@ -6,7 +6,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
@@ -21,7 +21,7 @@ private:
 
 	std::shared_ptr< CSeries > loadSolarRadiationFile() {
 
-		std::shared_ptr< CSeries > aSolarRadiation = make_shared< CSeries >();
+		std::shared_ptr< CSeries > aSolarRadiation = std::make_shared< CSeries >();
 
 		// Deafult solar radiation in EnergyPlus (year 2017)
 		aSolarRadiation->addProperty( 0.3000, 0 );
@@ -159,13 +159,13 @@ protected:
 
 		// Create material from samples
 		double thickness = 3.048e-3; // [m]
-		std::shared_ptr< CMaterial > aMaterial_102 = make_shared< CMaterialSample >( aSample,
+		std::shared_ptr< CMaterial > aMaterial_102 = std::make_shared< CMaterialSample >( aSample,
 		                                                                        thickness, MaterialType::Monolithic, WavelengthRange::Solar );
 
-		std::shared_ptr< CScatteringLayer > Layer_102 = make_shared< CScatteringLayer >( aMaterial_102 );
+		std::shared_ptr< CScatteringLayer > Layer_102 = std::make_shared< CScatteringLayer >( aMaterial_102 );
 
 		// Equivalent scattering layer
-		m_Layer = make_shared< CMultiLayerScattered >( Layer_102 );
+		m_Layer = std::make_shared< CMultiLayerScattered >( Layer_102 );
 
 		std::shared_ptr< CSeries > aSolarRadiation = loadSolarRadiationFile();
 		m_Layer->setSourceData( aSolarRadiation );

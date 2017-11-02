@@ -7,7 +7,6 @@
 #include "AbsorptancesMultiPane.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 
@@ -17,7 +16,7 @@ namespace MultiLayerOptics {
 
 	}
 
-	vector< double > CMultiPaneSampleData::getWavelengths() const {
+	std::vector< double > CMultiPaneSampleData::getWavelengths() const {
 		CCommonWavelengths aWavelengths;
 
 		for ( auto it = m_MeasuredSamples.begin(); it < m_MeasuredSamples.end(); ++it ) {
@@ -46,14 +45,14 @@ namespace MultiLayerOptics {
 	std::shared_ptr< CSeries > CMultiPaneSampleData::getLayerAbsorptances( size_t const Index ) {
 		calculateProperties();
 		if ( ( Index - 1 ) > m_LayerAbsorptances.size() ) {
-			throw runtime_error( "Index out of range. " );
+			throw std::runtime_error( "Index out of range. " );
 		}
 		return m_LayerAbsorptances[ Index - 1 ];
 	}
 
 	// Interpolate current sample data to new wavelengths set
 	void CMultiPaneSampleData::interpolate( const std::vector< double >& t_Wavelengths ) {
-		vector< std::shared_ptr< CSpectralSampleData > >::iterator it;
+		std::vector< std::shared_ptr< CSpectralSampleData > >::iterator it;
 		for ( it = m_MeasuredSamples.begin(); it < m_MeasuredSamples.end(); ++it ) {
 			( *it )->interpolate( t_Wavelengths );
 		}
@@ -62,7 +61,7 @@ namespace MultiLayerOptics {
 	}
 
 	void CMultiPaneSampleData::calculateEquivalentProperties() {
-		vector< double > wavelengths = getWavelengths();
+		std::vector< double > wavelengths = getWavelengths();
 		interpolate( wavelengths );
 
 		assert( m_MeasuredSamples.size() != 0 );
@@ -73,7 +72,7 @@ namespace MultiLayerOptics {
 		CEquivalentLayerSingleComponentMW aEqivalentLayer( T, T, Rf, Rb );
 		CAbsorptancesMultiPane aAbsorptances( T, Rf, Rb );
 
-		vector< std::shared_ptr< CSpectralSampleData > >::iterator it;
+		std::vector< std::shared_ptr< CSpectralSampleData > >::iterator it;
 		for ( it = next( m_MeasuredSamples.begin() ); it < m_MeasuredSamples.end(); ++it ) {
 			aEqivalentLayer.addLayer( ( *it )->properties( SampleData::T ), ( *it )->properties( SampleData::T ),
 			                          ( *it )->properties( SampleData::Rf ), ( *it )->properties( SampleData::Rb ) );

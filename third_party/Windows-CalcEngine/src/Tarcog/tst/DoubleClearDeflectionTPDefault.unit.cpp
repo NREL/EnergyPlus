@@ -5,7 +5,6 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -57,12 +56,12 @@ protected:
 
 		auto gapThickness = 0.0127;
 		auto gapPressure = 101325.0;
-		std::shared_ptr< CBaseIGULayer > m_GapLayer = make_shared< CIGUGapLayer >( gapThickness, gapPressure );
+		std::shared_ptr< CBaseIGULayer > m_GapLayer = std::make_shared< CIGUGapLayer >( gapThickness, gapPressure );
 		ASSERT_TRUE( m_GapLayer != nullptr );
 
 		double windowWidth = 1;
 		double windowHeight = 1;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer1 );
 		aIGU->addLayer( m_GapLayer );
@@ -76,27 +75,27 @@ protected:
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		m_TarcogSystem->solve();
 	}
 
 public:
-	std::shared_ptr< CSingleSystem > GetSystem() const {
+	std::shared_ptr< CSingleSystem > getSystem() const {
 		return m_TarcogSystem;
-	};
+	}
 
 };
 
 TEST_F( DoubleClearDeflectionTPDefault, Test1 ) {
 	SCOPED_TRACE( "Begin Test: Double Clear - Calculated Deflection" );
 
-	auto aSystem = GetSystem();
+	auto aSystem = getSystem();
 	ASSERT_TRUE( aSystem != nullptr );
 
 	auto Temperature = *aSystem->getTemperatures();
-	vector< double > correctTemperature = { 258.811500, 259.137749, 278.961419, 279.573136 };
+	std::vector< double > correctTemperature = { 258.811500, 259.137749, 278.961419, 279.573136 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -104,7 +103,7 @@ TEST_F( DoubleClearDeflectionTPDefault, Test1 ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities();
-	vector< double > correctRadiosity = { 252.131797, 267.765290, 331.256183, 358.865247 };
+	std::vector< double > correctRadiosity = { 252.131797, 267.765290, 331.256183, 358.865247 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {
@@ -112,7 +111,7 @@ TEST_F( DoubleClearDeflectionTPDefault, Test1 ) {
 	}
 
 	auto MaxDeflection = *aSystem->getMaxDeflections();
-	vector< double > correctMaxDeflection = { -0.0031162, 0.00029386 };
+	std::vector< double > correctMaxDeflection = { -0.0031162, 0.00029386 };
 	ASSERT_EQ( correctMaxDeflection.size(), MaxDeflection.size() );
 
 	for ( auto i = 0u; i < correctMaxDeflection.size(); ++i ) {
@@ -120,7 +119,7 @@ TEST_F( DoubleClearDeflectionTPDefault, Test1 ) {
 	}
 
 	auto MeanDeflection = *aSystem->getMeanDeflections();
-	vector< double > correctMeanDeflection = { -0.0013055, 0.00012311 };
+	std::vector< double > correctMeanDeflection = { -0.0013055, 0.00012311 };
 	ASSERT_EQ( correctMeanDeflection.size(), MeanDeflection.size() );
 
 	for ( auto i = 0u; i < correctMaxDeflection.size(); ++i ) {

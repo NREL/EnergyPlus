@@ -6,7 +6,6 @@
 #include "WCESpectralAveraging.hpp"
 #include "OpticalSurface.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 
@@ -19,8 +18,8 @@ namespace SingleLayerOptics {
 	RMaterialProperties::RMaterialProperties( const double aTf, const double aTb,
 	                                          const double aRf, const double aRb ) {
 
-		m_Surface[ Side::Front ] = make_shared< CSurface >( aTf, aRf );
-		m_Surface[ Side::Back ] = make_shared< CSurface >( aTb, aRb );
+		m_Surface[ Side::Front ] = std::make_shared< CSurface >( aTf, aRf );
+		m_Surface[ Side::Back ] = std::make_shared< CSurface >( aTb, aRb );
 
 	}
 
@@ -51,18 +50,18 @@ namespace SingleLayerOptics {
 		return getProperty( t_Property, t_Side ); // Default behavior is no angular dependence
 	}
 
-	vector< double > CMaterial::getBandPropertiesAtAngle( const Property t_Property,
+	std::vector< double > CMaterial::getBandPropertiesAtAngle( const Property t_Property,
 	                                                      const Side t_Side, const double ) const {
 		return getBandProperties( t_Property, t_Side ); // Default beahvior is no angular dependence
 	}
 
 	std::shared_ptr< std::vector< RMaterialProperties > > CMaterial::getBandProperties() {
-		std::shared_ptr< std::vector< RMaterialProperties > > aProperties = make_shared< std::vector< RMaterialProperties > >();
+		std::shared_ptr< std::vector< RMaterialProperties > > aProperties = std::make_shared< std::vector< RMaterialProperties > >();
 
-		vector< double > Tf = getBandProperties( Property::T, Side::Front );
-		vector< double > Tb = getBandProperties( Property::T, Side::Back );
-		vector< double > Rf = getBandProperties( Property::R, Side::Front );
-		vector< double > Rb = getBandProperties( Property::R, Side::Back );
+		std::vector< double > Tf = getBandProperties( Property::T, Side::Front );
+		std::vector< double > Tb = getBandProperties( Property::T, Side::Back );
+		std::vector< double > Rf = getBandProperties( Property::R, Side::Front );
+		std::vector< double > Rb = getBandProperties( Property::R, Side::Back );
 
 		// It is necessary to skip calculations if solar properties are not assigned yet
 		size_t size = getBandSize();
@@ -76,21 +75,21 @@ namespace SingleLayerOptics {
 	}
 
 	std::shared_ptr< CSpectralSample > CMaterial::getSpectralSample() {
-		vector< double > Tf = getBandProperties( Property::T, Side::Front );
-		vector< double > Rf = getBandProperties( Property::R, Side::Front );
-		vector< double > Rb = getBandProperties( Property::R, Side::Back );
+		std::vector< double > Tf = getBandProperties( Property::T, Side::Front );
+		std::vector< double > Rf = getBandProperties( Property::R, Side::Front );
+		std::vector< double > Rb = getBandProperties( Property::R, Side::Back );
 
-		std::shared_ptr< CSpectralSampleData > aSampleData = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > aSampleData = std::make_shared< CSpectralSampleData >();
 
 		size_t size = getBandSize();
 		for ( size_t i = 0; i < size; ++i ) {
 			aSampleData->addRecord( m_Wavelengths[ i ], Tf[ i ], Rf[ i ], Rb[ i ] );
 		}
 
-		return make_shared< CSpectralSample >( aSampleData );
+		return std::make_shared< CSpectralSample >( aSampleData );
 	}
 
-	vector< double > CMaterial::getBandWavelengths() {
+	std::vector< double > CMaterial::getBandWavelengths() {
 		if ( !m_WavelengthsCalculated ) {
 			m_Wavelengths = calculateBandWavelengths();
 		}
@@ -126,30 +125,30 @@ namespace SingleLayerOptics {
 	CMaterialSingleBand::CMaterialSingleBand( const double t_Tf, const double t_Tb,
 	                                          const double t_Rf, const double t_Rb,
 	                                          const double minLambda, const double maxLambda ) : CMaterial( minLambda, maxLambda ) {
-		m_Property[ Side::Front ] = make_shared< CSurface >( t_Tf, t_Rf );
-		m_Property[ Side::Back ] = make_shared< CSurface >( t_Tb, t_Rb );
+		m_Property[ Side::Front ] = std::make_shared< CSurface >( t_Tf, t_Rf );
+		m_Property[ Side::Back ] = std::make_shared< CSurface >( t_Tb, t_Rb );
 	}
 
 	CMaterialSingleBand::CMaterialSingleBand( const double t_Tf, const double t_Tb,
 	                                          const double t_Rf, const double t_Rb,
 	                                          const WavelengthRange t_Range ) : CMaterial( t_Range ) {
-		m_Property[ Side::Front ] = make_shared< CSurface >( t_Tf, t_Rf );
-		m_Property[ Side::Back ] = make_shared< CSurface >( t_Tb, t_Rb );
+		m_Property[ Side::Front ] = std::make_shared< CSurface >( t_Tf, t_Rf );
+		m_Property[ Side::Back ] = std::make_shared< CSurface >( t_Tb, t_Rb );
 	}
 
 	double CMaterialSingleBand::getProperty( Property t_Property, Side t_Side ) const {
 		return m_Property.at( t_Side )->getProperty( t_Property );
 	}
 
-	vector< double > CMaterialSingleBand::getBandProperties(
+	std::vector< double > CMaterialSingleBand::getBandProperties(
 		const Property t_Property, const Side t_Side ) const {
-		vector< double > aResult;
+		std::vector< double > aResult;
 		aResult.push_back( getProperty( t_Property, t_Side ) );
 		return aResult;
 	}
 
-	vector< double > CMaterialSingleBand::calculateBandWavelengths() {
-		vector< double > aWavelengths;
+	std::vector< double > CMaterialSingleBand::calculateBandWavelengths() {
+		std::vector< double > aWavelengths;
 		aWavelengths.push_back( m_MinLambda );
 		return aWavelengths;
 	}
@@ -203,10 +202,10 @@ namespace SingleLayerOptics {
 		return m_MaterialFullRange->getProperty( t_Property, t_Side );
 	}
 
-	vector< double > CMaterialDualBand::getBandProperties( const Property t_Property,
+	std::vector< double > CMaterialDualBand::getBandProperties( const Property t_Property,
 	                                                       const Side t_Side ) const {
 		size_t aSize = m_Materials.size();
-		vector< double > aResults;
+		std::vector< double > aResults;
 		for ( size_t i = 0; i < aSize; ++i ) {
 			double value = m_Materials[ i ]->getProperty( t_Property, t_Side );
 			aResults.push_back( value );
@@ -215,8 +214,8 @@ namespace SingleLayerOptics {
 		return aResults;
 	}
 
-	vector< double > CMaterialDualBand::calculateBandWavelengths() {
-		vector< double > aWavelengths;
+	std::vector< double > CMaterialDualBand::calculateBandWavelengths() {
+		std::vector< double > aWavelengths;
 		size_t size = m_Materials.size();
 		for ( size_t i = 0; i < size; ++i ) {
 			aWavelengths.push_back( m_Materials[ i ]->getMinLambda() );
@@ -229,7 +228,7 @@ namespace SingleLayerOptics {
 		double lowLambda = t_Material.getMinLambda();
 		double highLambda = t_Material.getMaxLambda();
 		if ( lowLambda < 0.32 || highLambda < 0.32 || lowLambda > 2.5 || highLambda > 2.5 ) {
-			throw runtime_error( "Material properties out of range. Wavelength range must be between 0.32 and 2.5 microns." );
+			throw std::runtime_error( "Material properties out of range. Wavelength range must be between 0.32 and 2.5 microns." );
 		}
 	}
 
@@ -238,7 +237,7 @@ namespace SingleLayerOptics {
 		double R = 0;
 		double minLambda = 0.3;
 		double maxLambda = 0.32;
-		std::shared_ptr< CMaterial > aUVMaterial = make_shared< CMaterialSingleBand >( T, T, R, R, minLambda, maxLambda );
+		std::shared_ptr< CMaterial > aUVMaterial = std::make_shared< CMaterialSingleBand >( T, T, R, R, minLambda, maxLambda );
 		m_Materials.push_back( aUVMaterial );
 	}
 
@@ -286,10 +285,10 @@ namespace SingleLayerOptics {
 		CMaterial( minLambda, maxLambda ) {
 
 		if ( t_SpectralSample == nullptr ) {
-			throw runtime_error( "Cannot create specular material from non-existing sample." );
+			throw std::runtime_error( "Cannot create specular material from non-existing sample." );
 		}
 
-		m_AngularSample = make_shared< CAngularSpectralSample >( t_SpectralSample, t_Thickness, t_Type );
+		m_AngularSample = std::make_shared< CAngularSpectralSample >( t_SpectralSample, t_Thickness, t_Type );
 
 	}
 
@@ -298,10 +297,10 @@ namespace SingleLayerOptics {
 	                                  const WavelengthRange t_Range ) : CMaterial( t_Range ) {
 
 		if ( t_SpectralSample == nullptr ) {
-			throw runtime_error( "Cannot create specular material from non-existing sample." );
+			throw std::runtime_error( "Cannot create specular material from non-existing sample." );
 		}
 
-		m_AngularSample = make_shared< CAngularSpectralSample >( t_SpectralSample, t_Thickness, t_Type );
+		m_AngularSample = std::make_shared< CAngularSpectralSample >( t_SpectralSample, t_Thickness, t_Type );
 
 	}
 
@@ -319,18 +318,18 @@ namespace SingleLayerOptics {
 		return getPropertyAtAngle( t_Property, t_Side, 0 );
 	}
 
-	vector< double > CMaterialSample::getBandPropertiesAtAngle( const Property t_Property,
+	std::vector< double > CMaterialSample::getBandPropertiesAtAngle( const Property t_Property,
 	                                                            const Side t_Side, const double t_Angle ) const {
 		assert( m_AngularSample );
 		return m_AngularSample->getWavelengthsProperty( m_MinLambda, m_MaxLambda, t_Property, t_Side, t_Angle );
 	}
 
-	vector< double > CMaterialSample::getBandProperties( const Property t_Property,
+	std::vector< double > CMaterialSample::getBandProperties( const Property t_Property,
 	                                                     const Side t_Side ) const {
 		return getBandPropertiesAtAngle( t_Property, t_Side, 0 );
 	}
 
-	vector< double > CMaterialSample::calculateBandWavelengths() {
+	std::vector< double > CMaterialSample::calculateBandWavelengths() {
 		return m_AngularSample->getBandWavelengths();
 	}
 
@@ -344,7 +343,7 @@ namespace SingleLayerOptics {
 		m_AngularMeasurements( t_AngularMeasurements ) {
 
 		if ( t_AngularMeasurements == nullptr ) {
-			throw runtime_error( "Cannot create specular and angular material from non-existing sample." );
+			throw std::runtime_error( "Cannot create specular and angular material from non-existing sample." );
 		}
 	}
 
@@ -354,7 +353,7 @@ namespace SingleLayerOptics {
 		m_AngularMeasurements( t_AngularMeasurements ) {
 
 		if ( t_AngularMeasurements == nullptr ) {
-			throw runtime_error( "Cannot create specular and angular material from non-existing sample." );
+			throw std::runtime_error( "Cannot create specular and angular material from non-existing sample." );
 		}
 
 	}
@@ -376,14 +375,14 @@ namespace SingleLayerOptics {
 		return getPropertyAtAngle( t_Property, t_Side, 0 );
 	}
 
-	vector< double > CMaterialMeasured::getBandPropertiesAtAngle( const Property t_Property,
+	std::vector< double > CMaterialMeasured::getBandPropertiesAtAngle( const Property t_Property,
 	                                                              const Side t_Side, const double t_Angle ) const {
 		assert( m_AngularMeasurements );
 		std::shared_ptr< CSingleAngularMeasurement > aAngular = m_AngularMeasurements->getMeasurements( t_Angle );
 		std::shared_ptr< CSpectralSample > aSample = aAngular->getData();
 		std::shared_ptr< CSeries > aProperties = aSample->getWavelengthsProperty( t_Property, t_Side );
 
-		vector< double > aValues;
+		std::vector< double > aValues;
 
 		if ( aProperties != nullptr ) {
 			for ( std::unique_ptr< ISeriesPoint > const & aProperty : *aProperties ) {
@@ -397,12 +396,12 @@ namespace SingleLayerOptics {
 
 	}
 
-	vector< double > CMaterialMeasured::getBandProperties( const Property t_Property,
+	std::vector< double > CMaterialMeasured::getBandProperties( const Property t_Property,
 	                                                       const Side t_Side ) const {
 		return getBandPropertiesAtAngle( t_Property, t_Side, 0 );
 	}
 
-	vector< double > CMaterialMeasured::calculateBandWavelengths() {
+	std::vector< double > CMaterialMeasured::calculateBandWavelengths() {
 		CSingleAngularMeasurement aAngular = *m_AngularMeasurements->getMeasurements( 0.0 );
 		auto aSample = aAngular.getData();
 

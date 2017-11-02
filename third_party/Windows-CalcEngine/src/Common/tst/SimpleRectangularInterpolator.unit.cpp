@@ -3,7 +3,7 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace FenestrationCommon;
 
 class TestSimpleRectangularIntegration : public testing::Test {

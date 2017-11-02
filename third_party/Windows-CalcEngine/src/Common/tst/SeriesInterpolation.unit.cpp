@@ -3,7 +3,6 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 class TestSeriesInterpolation : public testing::Test {
@@ -13,7 +12,7 @@ private:
 
 protected:
 	void SetUp() override {
-		m_Series = make_shared< CSeries >();
+		m_Series = std::make_shared< CSeries >();
 
 		// part of ASTM E891-87 Table 1
 		m_Series->addProperty( 0.40, 556 );
@@ -31,18 +30,19 @@ protected:
 	}
 
 public:
-	std::shared_ptr< CSeries > getProperty() {
+	std::shared_ptr< CSeries > getProperty() const
+	{
 		return m_Series;
-	};
+	}
 
 };
 
 TEST_F( TestSeriesInterpolation, TestInterpolation ) {
 	SCOPED_TRACE( "Begin Test: Test interpolation over the range of data." );
 
-	CSeries& aSpectralProperties = *getProperty();
+	auto & aSpectralProperties = *getProperty();
 
-	vector< double > wavelengths;
+	std::vector< double > wavelengths;
 	wavelengths.push_back( 0.400 );
 	wavelengths.push_back( 0.405 );
 	wavelengths.push_back( 0.410 );
@@ -66,7 +66,7 @@ TEST_F( TestSeriesInterpolation, TestInterpolation ) {
 
 	std::shared_ptr< CSeries > aInterpolatedProperties = aSpectralProperties.interpolate( wavelengths );
 
-	vector< double > correctResults;
+	std::vector< double > correctResults;
 	correctResults.push_back( 556.000 );
 	correctResults.push_back( 606.150 );
 	correctResults.push_back( 656.300 );

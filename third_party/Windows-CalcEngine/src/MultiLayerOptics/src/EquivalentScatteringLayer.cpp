@@ -5,7 +5,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 
@@ -17,7 +16,7 @@ namespace MultiLayerOptics {
 	                                                        const double Tb_dir_dif, const double Rb_dir_dif,
 	                                                        const double Tf_dif_dif, const double Rf_dif_dif,
 	                                                        const double Tb_dif_dif, const double Rb_dif_dif ) :
-		m_Layer( make_shared< CScatteringLayer >( 
+		m_Layer( std::make_shared< CScatteringLayer >( 
 			std::make_shared< CScatteringSurface >( Tf_dir_dir, Rf_dir_dir, Tf_dir_dif, Rf_dir_dif, Tf_dif_dif, Rf_dif_dif ), 
 			std::make_shared< CScatteringSurface >( Tb_dir_dir, Rb_dir_dir, Tb_dir_dif, Rb_dir_dif, Tb_dif_dif, Rb_dif_dif ) ) ),
 		m_DiffuseLayer( std::make_shared< CEquivalentLayerSingleComponent >( Tf_dif_dif, Rf_dif_dif, Tb_dif_dif, Rb_dif_dif ) ),
@@ -29,21 +28,21 @@ namespace MultiLayerOptics {
 
 	CEquivalentScatteringLayer::CEquivalentScatteringLayer( CScatteringLayer& t_Layer,
 	                                                        const double t_Theta, const double t_Phi ) {
-		m_Layer = make_shared< CScatteringLayer >( t_Layer );
+		m_Layer = std::make_shared< CScatteringLayer >( t_Layer );
 
 		double Tf = t_Layer.getPropertySimple( PropertySimple::T, Side::Front, Scattering::DirectDirect, t_Theta, t_Phi );
 		double Rf = t_Layer.getPropertySimple( PropertySimple::R, Side::Front, Scattering::DirectDirect, t_Theta, t_Phi );
 		double Tb = t_Layer.getPropertySimple( PropertySimple::T, Side::Back, Scattering::DirectDirect, t_Theta, t_Phi );
 		double Rb = t_Layer.getPropertySimple( PropertySimple::R, Side::Back, Scattering::DirectDirect, t_Theta, t_Phi );
 
-		m_BeamLayer = make_shared< CEquivalentLayerSingleComponent >( Tf, Rf, Tb, Rb );
+		m_BeamLayer = std::make_shared< CEquivalentLayerSingleComponent >( Tf, Rf, Tb, Rb );
 
 		Tf = t_Layer.getPropertySimple( PropertySimple::T, Side::Front, Scattering::DiffuseDiffuse, t_Theta, t_Phi );
 		Rf = t_Layer.getPropertySimple( PropertySimple::R, Side::Front, Scattering::DiffuseDiffuse, t_Theta, t_Phi );
 		Tb = t_Layer.getPropertySimple( PropertySimple::T, Side::Back, Scattering::DiffuseDiffuse, t_Theta, t_Phi );
 		Rb = t_Layer.getPropertySimple( PropertySimple::R, Side::Back, Scattering::DiffuseDiffuse, t_Theta, t_Phi );
 
-		m_DiffuseLayer = make_shared< CEquivalentLayerSingleComponent >( Tf, Rf, Tb, Rb );
+		m_DiffuseLayer = std::make_shared< CEquivalentLayerSingleComponent >( Tf, Rf, Tb, Rb );
 	}
 
 	void CEquivalentScatteringLayer::addLayer( const double Tf_dir_dir, const double Rf_dir_dir,
@@ -124,10 +123,10 @@ namespace MultiLayerOptics {
 			std::make_shared< CScatteringSurface >( Tf_dir_dir, Rf_dir_dir, Tf_dir_dif,
 			                                   Rf_dir_dif, Tf_dif_dif, Rf_dif_dif );
 		std::shared_ptr< CScatteringSurface >
-			aBackSurface = make_shared< CScatteringSurface >( Tb_dir_dir, Rb_dir_dir, Tb_dir_dif,
+			aBackSurface = std::make_shared< CScatteringSurface >( Tb_dir_dir, Rb_dir_dir, Tb_dir_dif,
 			                                                  Rb_dir_dif, Tb_dif_dif, Rb_dif_dif );
 
-		m_Layer = make_shared< CScatteringLayer >( aFrontSurface, aBackSurface );
+		m_Layer = std::make_shared< CScatteringLayer >( aFrontSurface, aBackSurface );
 	}
 
 	double CEquivalentScatteringLayer::getInterreflectance(
@@ -143,7 +142,7 @@ namespace MultiLayerOptics {
 		const CScatteringSurface& b1,
 		const CScatteringSurface& f2 ) const {
 
-		auto aResult = make_shared< SimpleResults >();
+		auto aResult = std::make_shared< SimpleResults >();
 
 		// Diffuse from direct beam component on the outside
 		// Direct to direct interreflectance component

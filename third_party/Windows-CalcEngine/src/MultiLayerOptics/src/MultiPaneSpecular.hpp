@@ -82,7 +82,7 @@ namespace MultiLayerOptics {
 		std::vector< double > m_CommonWavelengths;
 		std::shared_ptr< FenestrationCommon::CSeries > m_SolarRadiation;
 
-		// Results for angle-properties pair. If same angle is required twice, then model will not
+		// Results for angle-properties std::pair. If same angle is required twice, then model will not
 		// calculate it twice. First it will search for results here and if results are not
 		// available, then it will perform calculation for given angle
 		std::vector< std::shared_ptr< CEquivalentLayerSingleComponentMWAngle > > m_EquivalentAngle;

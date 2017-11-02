@@ -47,7 +47,7 @@ namespace MultiLayerOptics {
 		double DirDir( const double minLambda, const double maxLambda, const FenestrationCommon::Side t_Side,
 		               const FenestrationCommon::PropertySimple t_Property, const size_t Index );
 
-		// Vector of layer by layer absorptances for each incoming direction
+		// std::vector of layer by layer absorptances for each incoming direction
 		std::shared_ptr< std::vector< double > > Abs( const double minLambda, const double maxLambda,
 		                                              const FenestrationCommon::Side t_Side, const size_t Index );
 

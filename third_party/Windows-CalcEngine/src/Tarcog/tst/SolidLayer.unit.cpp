@@ -3,7 +3,7 @@
 
 #include "WCETarcog.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 
 class TestSolidLayer : public testing::Test {
@@ -20,7 +20,7 @@ protected:
 		ASSERT_TRUE( surface2 != nullptr );
 		surface2->setTemperature( 300 );
 
-		m_SolidLayer = make_shared< CIGUSolidLayer >( 0.01, 2.5, surface1, surface2 );
+		m_SolidLayer = std::make_shared< CIGUSolidLayer >( 0.01, 2.5, surface1, surface2 );
 		ASSERT_TRUE( m_SolidLayer != nullptr );
 	}
 

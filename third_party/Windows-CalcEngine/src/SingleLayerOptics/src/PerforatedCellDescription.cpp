@@ -5,7 +5,6 @@
 #include "BeamDirection.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -38,14 +37,12 @@ namespace SingleLayerOptics {
 	}
 
 	double CCircularCellDescription::visibleAhole( const CBeamDirection& t_Direction ) const {
-		double AngleLimit( 0 );
 		double aHole( 0 );
 
-		AngleLimit = atan( 2 * m_Radius / m_Thickness );
-
+		double angleLimit = atan( 2 * m_Radius / m_Thickness );
 		double aTheta = radians( t_Direction.theta() );
 
-		if ( ( aTheta < 0 ) || ( aTheta > AngleLimit ) ) {
+		if ( ( aTheta < 0 ) || ( aTheta > angleLimit ) ) {
 			aHole = 0;
 		}
 		else {

@@ -1,11 +1,9 @@
 #include "BSDFPhiAngles.hpp"
 
-using namespace std;
-
 namespace SingleLayerOptics {
 
 	CBSDFPhiAngles::CBSDFPhiAngles( const size_t t_NumOfPhis ) :
-		m_PhiAngles( make_shared< std::vector< double > >() ) {
+		m_PhiAngles( std::make_shared< std::vector< double > >() ) {
 		createPhis( t_NumOfPhis );
 	}
 

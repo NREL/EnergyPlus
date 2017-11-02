@@ -5,7 +5,7 @@
 #include "WCESpectralAveraging.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace SpectralAveraging;
 using namespace FenestrationCommon;
 using namespace MultiLayerOptics;
@@ -18,7 +18,7 @@ private:
 protected:
 	virtual void SetUp() {
 
-		std::shared_ptr< CSeries > solarRadiation = make_shared< CSeries >();
+		std::shared_ptr< CSeries > solarRadiation = std::make_shared< CSeries >();
 		solarRadiation->addProperty( 0.50, 1026.70 );
 		solarRadiation->addProperty( 0.51, 1066.70 );
 		solarRadiation->addProperty( 0.52, 1011.50 );
@@ -34,7 +34,7 @@ protected:
 		solarRadiation->addProperty( 0.69, 859.20 );
 		solarRadiation->addProperty( 0.71, 1002.40 );
 
-		std::shared_ptr< CSpectralSampleData > sampleMeasurements1 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > sampleMeasurements1 = std::make_shared< CSpectralSampleData >();
 		sampleMeasurements1->addRecord( 0.500, 0.6928, 0.2449, 0.1892 );
 		sampleMeasurements1->addRecord( 0.505, 0.6968, 0.2406, 0.1840 );
 		sampleMeasurements1->addRecord( 0.510, 0.7004, 0.2365, 0.1792 );
@@ -77,7 +77,7 @@ protected:
 		sampleMeasurements1->addRecord( 0.695, 0.6432, 0.2080, 0.1682 );
 		sampleMeasurements1->addRecord( 0.700, 0.6366, 0.2115, 0.1733 );
 
-		std::shared_ptr< CSpectralSampleData > sampleMeasurements2 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > sampleMeasurements2 = std::make_shared< CSpectralSampleData >();
 		sampleMeasurements2->addRecord( 0.500, 0.8940, 0.0820, 0.0820 );
 		sampleMeasurements2->addRecord( 0.510, 0.8950, 0.0820, 0.0820 );
 		sampleMeasurements2->addRecord( 0.520, 0.8950, 0.0820, 0.0820 );
@@ -100,11 +100,11 @@ protected:
 		sampleMeasurements2->addRecord( 0.690, 0.8100, 0.0730, 0.0730 );
 		sampleMeasurements2->addRecord( 0.700, 0.8020, 0.0720, 0.0720 );
 
-		std::shared_ptr< CMultiPaneSampleData > multiSample = make_shared< CMultiPaneSampleData >();
+		std::shared_ptr< CMultiPaneSampleData > multiSample = std::make_shared< CMultiPaneSampleData >();
 		multiSample->addSample( sampleMeasurements1 );
 		multiSample->addSample( sampleMeasurements2 );
 
-		m_MultiLayerOptics = make_shared< CMultiPaneSpectralSample >( multiSample, solarRadiation );
+		m_MultiLayerOptics = std::make_shared< CMultiPaneSpectralSample >( multiSample, solarRadiation );
 	}
 
 public:

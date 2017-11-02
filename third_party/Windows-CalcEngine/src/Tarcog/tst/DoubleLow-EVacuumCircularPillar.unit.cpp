@@ -5,7 +5,6 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -70,14 +69,14 @@ protected:
 		auto pillarConductivity = 999.0;
 		auto pillarSpacing = 0.03;
 		auto pillarRadius = 0.0002;
-		std::shared_ptr< CBaseIGULayer > m_GapLayer = make_shared< CCircularPillar >( aGapLayer,
+		std::shared_ptr< CBaseIGULayer > m_GapLayer = std::make_shared< CCircularPillar >( aGapLayer,
 		                                                                         pillarConductivity, pillarSpacing, pillarRadius );
 
 		ASSERT_TRUE( m_GapLayer != nullptr );
 
 		auto windowWidth = 1.0; //[m]
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer1 );
 		aIGU->addLayer( m_GapLayer );
@@ -86,7 +85,7 @@ protected:
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		m_TarcogSystem->solve();
@@ -107,7 +106,7 @@ TEST_F( DoubleLowEVacuumCircularPillar, Test1 ) {
 	ASSERT_TRUE( aSystem != nullptr );
 
 	auto Temperature = *aSystem->getTemperatures();
-	vector< double > correctTemperature = { 255.997063, 256.095933, 290.398479, 290.496419 };
+	std::vector< double > correctTemperature = { 255.997063, 256.095933, 290.398479, 290.496419 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -115,7 +114,7 @@ TEST_F( DoubleLowEVacuumCircularPillar, Test1 ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities();
-	vector< double > correctRadiosity = { 242.987484, 396.293176, 402.108090, 407.071738 };
+	std::vector< double > correctRadiosity = { 242.987484, 396.293176, 402.108090, 407.071738 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {

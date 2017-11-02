@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 
 using namespace Tarcog;
-using namespace std;
+
 
 class TestIndoorEnvironmentIRFixed : public testing::Test {
 
@@ -40,7 +40,7 @@ protected:
 		// getting the results since current version of WINDOW does not support IR input.
 		auto IRRadiation = 424.458750;
 
-		m_Indoor = make_shared< CIndoorEnvironment >( roomTemperature, pressure );
+		m_Indoor = std::make_shared< CIndoorEnvironment >( roomTemperature, pressure );
 		ASSERT_TRUE( m_Indoor != nullptr );
 		m_Indoor->setEnvironmentIR( IRRadiation );
 
@@ -50,19 +50,19 @@ protected:
 		auto solidLayerThickness = 0.003048; // [m]
 		auto solidLayerConductance = 100.0;
 
-		auto aSolidLayer = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto aSolidLayer = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( aSolidLayer != nullptr );
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer );
 
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, m_Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, m_Indoor, Outdoor );
 		m_TarcogSystem->solve();
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 	}

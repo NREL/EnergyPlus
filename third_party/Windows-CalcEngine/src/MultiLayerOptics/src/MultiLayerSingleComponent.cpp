@@ -2,7 +2,6 @@
 #include "MultiLayerInterRefSingleComponent.hpp"
 #include "EquivalentLayerSingleComponent.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace MultiLayerOptics {

@@ -3,7 +3,6 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 class TestHemispherical2DIntegration : public testing::Test {
@@ -13,7 +12,7 @@ public:
 
 protected:
 	void SetUp() override {
-		auto aSeries = make_shared< CSeries >();
+		auto aSeries = std::make_shared< CSeries >();
 
 		// example taken from WINDOW 7 double layer (NFRC 102 and NFRC 103) angular dependency for Tsol
 		// NOTE: It is not necessary to add angles in accending order. Series will sort out order before
@@ -29,7 +28,7 @@ protected:
 		aSeries->addProperty( 80, 0.185 );
 		aSeries->addProperty( 90, 0.000 );
 
-		m_Integrator = make_shared< CHemispherical2DIntegrator >( *aSeries, IntegrationType::Trapezoidal );
+		m_Integrator = std::make_shared< CHemispherical2DIntegrator >( *aSeries, IntegrationType::Trapezoidal );
 
 	}
 

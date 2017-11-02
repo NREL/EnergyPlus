@@ -2,7 +2,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 
@@ -56,7 +55,7 @@ namespace MultiLayerOptics {
 		                    *t_BackLayer.getMatrix( Side::Front, PropertySimple::T ),
 		                    *t_FrontLayer.getMatrix( Side::Back, PropertySimple::R ), *InterRefl1.value(), aLambda );
 
-		m_Results = make_shared< CBSDFIntegrator >( t_FrontLayer );
+		m_Results = std::make_shared< CBSDFIntegrator >( t_FrontLayer );
 		m_Results->setResultMatrices( m_Tf, m_Rf, Side::Front );
 		m_Results->setResultMatrices( m_Tb, m_Rb, Side::Back );
 
@@ -94,9 +93,9 @@ namespace MultiLayerOptics {
 
 	CEquivalentBSDFLayerSingleBand::CEquivalentBSDFLayerSingleBand( const std::shared_ptr< CBSDFIntegrator >& t_Layer ) :
 		m_PropertiesCalculated( false ) {
-		m_EquivalentLayer = make_shared< CBSDFIntegrator >( t_Layer );
+		m_EquivalentLayer = std::make_shared< CBSDFIntegrator >( t_Layer );
 		for ( Side aSide : EnumSide() ) {
-			m_A[ aSide ] = make_shared< std::vector< std::shared_ptr< std::vector< double > > > >();
+			m_A[ aSide ] = std::make_shared< std::vector< std::shared_ptr< std::vector< double > > > >();
 		}
 		m_Layers.push_back( t_Layer );
 		m_Lambda = t_Layer->lambdaMatrix();
@@ -154,7 +153,7 @@ namespace MultiLayerOptics {
 		m_Backward.push_back( m_Layers[ size - 1 ] );
 
 		size_t matrixSize = m_Lambda->getSize();
-		std::shared_ptr< std::vector< double > > zeros = make_shared< std::vector< double > >( matrixSize );
+		std::shared_ptr< std::vector< double > > zeros = std::make_shared< std::vector< double > >( matrixSize );
 
 		std::shared_ptr< std::vector< double > > Ap1f = nullptr;
 		std::shared_ptr< std::vector< double > > Ap2f = nullptr;
@@ -172,7 +171,7 @@ namespace MultiLayerOptics {
 				CInterReflectance InterRefl2 =
 					CInterReflectance( *m_Lambda, *Layer1.getMatrix( Side::Front, PropertySimple::R ),
 					                   *Layer2.getMatrix( Side::Back, PropertySimple::R ) );
-				vector< double >& Ab = *m_Layers[ i ]->Abs( Side::Back );
+				std::vector< double >& Ab = *m_Layers[ i ]->Abs( Side::Back );
 				Ap1b = absTerm1( Ab, *InterRefl2.value(), *Layer1.getMatrix( Side::Back, PropertySimple::T ) );
 				Ap2f = absTerm2( Ab, *InterRefl2.value(), *Layer1.getMatrix( Side::Front, PropertySimple::R ),
 				                 *Layer2.getMatrix( Side::Front, PropertySimple::T ) );
@@ -188,15 +187,15 @@ namespace MultiLayerOptics {
 				CInterReflectance InterRefl1 =
 					CInterReflectance( *m_Lambda, *Layer1.getMatrix( Side::Back, PropertySimple::R ),
 					                   *Layer2.getMatrix( Side::Front, PropertySimple::R ) );
-				vector< double >& Af = *m_Layers[ i ]->Abs( Side::Front );
+				std::vector< double >& Af = *m_Layers[ i ]->Abs( Side::Front );
 				Ap1f = absTerm1( Af, *InterRefl1.value(), *Layer1.getMatrix( Side::Front, PropertySimple::T ) );
 				Ap2b = absTerm2( Af, *InterRefl1.value(), *Layer1.getMatrix( Side::Back, PropertySimple::R ),
 				                 *Layer2.getMatrix( Side::Back, PropertySimple::T ) );
 			}
 
-			map< Side, std::shared_ptr< std::vector< double > > > aTotal;
+			std::map< Side, std::shared_ptr< std::vector< double > > > aTotal;
 			for ( Side aSide : EnumSide() ) {
-				aTotal[ aSide ] = make_shared< std::vector< double > >();
+				aTotal[ aSide ] = std::make_shared< std::vector< double > >();
 			}
 			for ( size_t j = 0; j < matrixSize; ++j ) {
 				aTotal.at( Side::Front )->push_back( ( *Ap1f )[ j ] + ( *Ap2f )[ j ] );

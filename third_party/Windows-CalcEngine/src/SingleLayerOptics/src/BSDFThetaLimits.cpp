@@ -1,14 +1,12 @@
 #include "BSDFThetaLimits.hpp"
 
-using namespace std;
-
 namespace SingleLayerOptics {
 
 	CThetaLimits::CThetaLimits( const std::vector< double >& t_ThetaAngles ) {
 		if ( t_ThetaAngles.size() == 0 ) {
-			throw runtime_error( "Error in definition of theta angles. Cannot form theta definitions." );
+			throw std::runtime_error( "Error in definition of theta angles. Cannot form theta definitions." );
 		}
-		m_ThetaLimits = make_shared< std::vector< double > >();
+		m_ThetaLimits = std::make_shared< std::vector< double > >();
 		createLimits( t_ThetaAngles );
 	}
 
@@ -17,7 +15,7 @@ namespace SingleLayerOptics {
 	}
 
 	void CThetaLimits::createLimits( const std::vector< double >& t_ThetaAngles ) {
-		vector< double >::const_reverse_iterator it;
+		std::vector< double >::const_reverse_iterator it;
 		double previousAngle = 90;
 		m_ThetaLimits->push_back( previousAngle );
 

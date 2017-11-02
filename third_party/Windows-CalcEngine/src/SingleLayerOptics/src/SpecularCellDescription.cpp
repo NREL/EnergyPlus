@@ -1,7 +1,6 @@
 #include "SpecularCellDescription.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {

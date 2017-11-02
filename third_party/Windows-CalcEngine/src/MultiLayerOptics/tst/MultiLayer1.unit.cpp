@@ -5,7 +5,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace SingleLayerOptics;
 using namespace MultiLayerOptics;
 using namespace FenestrationCommon;
@@ -23,17 +23,17 @@ protected:
 			std::make_shared< CScatteringSurface >( 0.06, 0.04, 0.46, 0.12, 0.46, 0.52 );
 		std::shared_ptr< CScatteringSurface > aBack =
 			std::make_shared< CScatteringSurface >( 0.11, 0.26, 0.34, 0.19, 0.64, 0.22 );
-		std::shared_ptr< CScatteringLayer > aLayer1 = make_shared< CScatteringLayer >( aFront, aBack );
+		std::shared_ptr< CScatteringLayer > aLayer1 = std::make_shared< CScatteringLayer >( aFront, aBack );
 
-		aFront = make_shared< CScatteringSurface >( 0.1, 0.05, 0.48, 0.26, 0.56, 0.34 );
-		aBack = make_shared< CScatteringSurface >( 0.15, 0, 0.38, 0.19, 0.49, 0.39 );
-		std::shared_ptr< CScatteringLayer > aLayer2 = make_shared< CScatteringLayer >( aFront, aBack );
+		aFront = std::make_shared< CScatteringSurface >( 0.1, 0.05, 0.48, 0.26, 0.56, 0.34 );
+		aBack = std::make_shared< CScatteringSurface >( 0.15, 0, 0.38, 0.19, 0.49, 0.39 );
+		std::shared_ptr< CScatteringLayer > aLayer2 = std::make_shared< CScatteringLayer >( aFront, aBack );
 
-		aFront = make_shared< CScatteringSurface >( 0.08, 0.05, 0.46, 0.23, 0.46, 0.52 );
-		aBack = make_shared< CScatteringSurface >( 0.13, 0.25, 0.38, 0.19, 0.64, 0.22 );
-		std::shared_ptr< CScatteringLayer > aLayer3 = make_shared< CScatteringLayer >( aFront, aBack );
+		aFront = std::make_shared< CScatteringSurface >( 0.08, 0.05, 0.46, 0.23, 0.46, 0.52 );
+		aBack = std::make_shared< CScatteringSurface >( 0.13, 0.25, 0.38, 0.19, 0.64, 0.22 );
+		std::shared_ptr< CScatteringLayer > aLayer3 = std::make_shared< CScatteringLayer >( aFront, aBack );
 
-		m_Layer = make_shared< CMultiLayerScattered >( aLayer1 );
+		m_Layer = std::make_shared< CMultiLayerScattered >( aLayer1 );
 		m_Layer->addLayer( aLayer2 );
 		m_Layer->addLayer( aLayer3 );
 

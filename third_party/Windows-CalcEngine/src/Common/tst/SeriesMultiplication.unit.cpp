@@ -3,7 +3,7 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace FenestrationCommon;
 
 class TestSeriesMultiplication : public testing::Test {
@@ -13,7 +13,7 @@ private:
 
 protected:
 	void SetUp() override {
-		m_Series = make_shared< CSeries >();
+		m_Series = std::make_shared< CSeries >();
 
 		CSeries astmSolarRadiation = CSeries();
 
@@ -67,7 +67,7 @@ TEST_F( TestSeriesMultiplication, TestMultiplication ) {
 
 	CSeries& aSpectralProperties = *getProperty();
 
-	vector< double > correctResults;
+	std::vector< double > correctResults;
 	correctResults.push_back( 711.29776 );
 	correctResults.push_back( 747.11668 );
 	correctResults.push_back( 714.82705 );

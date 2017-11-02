@@ -7,7 +7,6 @@
 #include "WCECommon.hpp"
 #include "BeamDirection.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -18,7 +17,7 @@ namespace SingleLayerOptics {
 
 		// TODO: Maybe to refactor results to incoming and outgoing if not affecting speed.
 		// This is not necessary before axisymmetry is introduced
-		m_Results = make_shared< CBSDFIntegrator >( m_BSDFHemisphere->getDirections( BSDFHemisphere::Incoming ) );
+		m_Results = std::make_shared< CBSDFIntegrator >( m_BSDFHemisphere->getDirections( BSDFHemisphere::Incoming ) );
 	}
 
 	void CBSDFLayer::setSourceData( std::shared_ptr< CSeries > t_SourceData ) {
@@ -51,7 +50,7 @@ namespace SingleLayerOptics {
 		return m_Cell->getBandIndex( t_Wavelength );
 	}
 
-	vector< double > CBSDFLayer::getBandWavelengths() const {
+	std::vector< double > CBSDFLayer::getBandWavelengths() const {
 		return m_Cell->getBandWavelengths();
 	}
 
@@ -59,8 +58,8 @@ namespace SingleLayerOptics {
 		for ( Side t_Side : EnumSide() ) {
 			CBSDFDirections aDirections = *m_BSDFHemisphere->getDirections( BSDFHemisphere::Incoming );
 			size_t size = aDirections.size();
-			std::shared_ptr< CSquareMatrix > Tau = make_shared< CSquareMatrix >( size );
-			std::shared_ptr< CSquareMatrix > Rho = make_shared< CSquareMatrix >( size );
+			std::shared_ptr< CSquareMatrix > Tau = std::make_shared< CSquareMatrix >( size );
+			std::shared_ptr< CSquareMatrix > Rho = std::make_shared< CSquareMatrix >( size );
 			for ( size_t i = 0; i < size; ++i ) {
 				const CBeamDirection aDirection = *aDirections[ i ]->centerPoint();
 				double Lambda = aDirections[ i ]->lambda();
@@ -82,8 +81,8 @@ namespace SingleLayerOptics {
 			size_t size = aDirections->size();
 			for ( size_t i = 0; i < size; ++i ) {
 				const CBeamDirection aDirection = *( *aDirections )[ i ]->centerPoint();
-				vector< double > aTau = m_Cell->T_dir_dir_band( aSide, aDirection );
-				vector< double > aRho = m_Cell->R_dir_dir_band( aSide, aDirection );
+				std::vector< double > aTau = m_Cell->T_dir_dir_band( aSide, aDirection );
+				std::vector< double > aRho = m_Cell->R_dir_dir_band( aSide, aDirection );
 				double Lambda = ( *aDirections )[ i ]->lambda();
 				std::shared_ptr< CSquareMatrix > Tau = nullptr;
 				std::shared_ptr< CSquareMatrix > Rho = nullptr;
@@ -126,7 +125,7 @@ namespace SingleLayerOptics {
 	}
 
 	void CBSDFLayer::fillWLResultsFromMaterialCell() {
-		m_WVResults = make_shared< std::vector< std::shared_ptr< CBSDFIntegrator > > >();
+		m_WVResults = std::make_shared< std::vector< std::shared_ptr< CBSDFIntegrator > > >();
 		size_t size = m_Cell->getBandSize();
 		for ( size_t i = 0; i < size; ++i ) {
 			std::shared_ptr< CBSDFIntegrator > aResults =

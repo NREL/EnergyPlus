@@ -7,7 +7,7 @@
 #include "WCETarcog.hpp"
 
 using namespace Tarcog;
-using namespace std;
+
 
 class TestNusseltNumber : public testing::Test {
 
@@ -16,7 +16,7 @@ private:
 
 protected:
 	void SetUp() override {
-		m_NusseltNumber = make_shared< CNusseltNumber >();
+		m_NusseltNumber = std::make_shared< CNusseltNumber >();
 	}
 
 public:

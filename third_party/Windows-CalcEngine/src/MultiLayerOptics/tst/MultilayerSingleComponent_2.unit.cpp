@@ -5,7 +5,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace MultiLayerOptics;
 using namespace FenestrationCommon;
 
@@ -19,7 +19,7 @@ private:
 
 protected:
 	virtual void SetUp() {
-		m_IGU = make_shared< CMultiLayerSingleComponent >( 0.12, 0.47, 0.33, 0.63 );
+		m_IGU = std::make_shared< CMultiLayerSingleComponent >( 0.12, 0.47, 0.33, 0.63 );
 		m_IGU->addLayer( 0.56, 0.34, 0.49, 0.39, Side::Front );
 		m_IGU->addLayer( 0.46, 0.52, 0.64, 0.22, Side::Front );
 

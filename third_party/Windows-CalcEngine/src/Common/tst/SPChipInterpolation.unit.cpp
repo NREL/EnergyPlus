@@ -4,7 +4,7 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace FenestrationCommon;
 
 class TestSPChipInterpolation : public testing::Test {
@@ -14,15 +14,15 @@ private:
 
 protected:
 	void SetUp() override {
-		vector< pair< double, double > > aPoints = {
-			make_pair( 24, 0.683876 ),
-			make_pair( 34, 0.631739 ),
-			make_pair( 48, 0.532746 ),
-			make_pair( 62, 0.410234 ),
-			make_pair( 75, 0.330733 )
+		std::vector< std::pair< double, double > > aPoints = {
+			std::make_pair( 24, 0.683876 ),
+			std::make_pair( 34, 0.631739 ),
+			std::make_pair( 48, 0.532746 ),
+			std::make_pair( 62, 0.410234 ),
+			std::make_pair( 75, 0.330733 )
 		};
 
-		m_Interpolation = make_shared< CSPChipInterpolation2D >( aPoints );
+		m_Interpolation = std::make_shared< CSPChipInterpolation2D >( aPoints );
 
 	}
 

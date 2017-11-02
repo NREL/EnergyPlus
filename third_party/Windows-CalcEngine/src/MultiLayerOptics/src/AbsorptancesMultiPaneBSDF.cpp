@@ -4,7 +4,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 
@@ -63,7 +62,7 @@ namespace MultiLayerOptics {
 	std::shared_ptr< std::vector< double > > CAbsorptancesMultiPaneBSDF::Abs( const double minLambda, const double maxLambda,
 	                                                                const size_t Index ) {
 		if ( Index > m_TausF.size() ) {
-			throw runtime_error( "Index for glazing layer absorptance is out of range." );
+			throw std::runtime_error( "Index for glazing layer absorptance is out of range." );
 		}
 
 		size_t aLayerIndex = layerIndex( Index - 1 );
@@ -81,9 +80,9 @@ namespace MultiLayerOptics {
 		const std::vector< double >& t_vec1,
 		const std::vector< double >& t_vec2 ) {
 		if ( t_vec1.size() != t_vec2.size() ) {
-			throw runtime_error( "Vectors are not same size." );
+			throw std::runtime_error( "Vectors are not same size." );
 		}
-		std::shared_ptr< std::vector< double > > Result = make_shared< std::vector< double > >();
+		std::shared_ptr< std::vector< double > > Result = std::make_shared< std::vector< double > >();
 		for ( size_t i = 0; i < t_vec1.size(); ++i ) {
 			double value = t_vec1[ i ] * t_vec2[ i ];
 			Result->push_back( value );
@@ -95,9 +94,9 @@ namespace MultiLayerOptics {
 		const std::vector< double >& t_vec1,
 		const std::vector< double >& t_vec2 ) {
 		if ( t_vec1.size() != t_vec2.size() ) {
-			throw runtime_error( "Vectors are not same size." );
+			throw std::runtime_error( "Vectors are not same size." );
 		}
-		std::shared_ptr< std::vector< double > > Result = make_shared< std::vector< double > >();
+		std::shared_ptr< std::vector< double > > Result = std::make_shared< std::vector< double > >();
 		for ( size_t i = 0; i < t_vec1.size(); ++i ) {
 			double value = t_vec1[ i ] / t_vec2[ i ];
 			Result->push_back( value );
@@ -109,9 +108,9 @@ namespace MultiLayerOptics {
 		const std::vector< double >& t_vec1,
 		const std::vector< double >& t_vec2 ) {
 		if ( t_vec1.size() != t_vec2.size() ) {
-			throw runtime_error( "Vectors are not same size." );
+			throw std::runtime_error( "Vectors are not same size." );
 		}
-		std::shared_ptr< std::vector< double > > Result = make_shared< std::vector< double > >();
+		std::shared_ptr< std::vector< double > > Result = std::make_shared< std::vector< double > >();
 		for ( size_t i = 0; i < t_vec1.size(); ++i ) {
 			double value = t_vec1[ i ] + t_vec2[ i ];
 			Result->push_back( value );
@@ -127,8 +126,8 @@ namespace MultiLayerOptics {
 		for ( size_t i = m_NumOfLayers; i-- > 0; ) {
 
 			// r and t for current layer (number of wavelengths)
-			std::shared_ptr< SquareMatrices > r = make_shared< std::vector< std::shared_ptr< CSquareMatrix > > >();
-			std::shared_ptr< SquareMatrices > t = make_shared< std::vector< std::shared_ptr< CSquareMatrix > > >();
+			std::shared_ptr< SquareMatrices > r = std::make_shared< std::vector< std::shared_ptr< CSquareMatrix > > >();
+			std::shared_ptr< SquareMatrices > t = std::make_shared< std::vector< std::shared_ptr< CSquareMatrix > > >();
 
 			std::shared_ptr< SquareMatrices > vTauF = nullptr;
 			std::shared_ptr< SquareMatrices > vTauB = nullptr;
@@ -188,8 +187,8 @@ namespace MultiLayerOptics {
 		}
 
 		// For every layer-wavelength set there is a set of incoming/outgoing directions
-		vector< SquareMatrices > IminusM( m_NumOfLayers );
-		vector< SquareMatrices > IplusM( m_NumOfLayers );
+		std::vector< SquareMatrices > IminusM( m_NumOfLayers );
+		std::vector< SquareMatrices > IplusM( m_NumOfLayers );
 
 		for ( size_t i = 0; i < m_NumOfLayers; ++i ) {
 			IminusM[ i ].resize( numOfWavelengths );
@@ -197,7 +196,7 @@ namespace MultiLayerOptics {
 		}
 
 		// This is true for every incoming wavelength
-		std::shared_ptr< CSquareMatrix > Iincoming = make_shared< CSquareMatrix >( matrixSize );
+		std::shared_ptr< CSquareMatrix > Iincoming = std::make_shared< CSquareMatrix >( matrixSize );
 		Iincoming->setIdentity();
 
 		// calculation irradiances (normalized to 1)
@@ -219,15 +218,15 @@ namespace MultiLayerOptics {
 		}
 
 		// Convert to incoming/outgoing energy for every direction
-		vector< std::vector< std::shared_ptr< std::vector< double > > > > IminusV( m_NumOfLayers );
-		vector< std::vector< std::shared_ptr< std::vector< double > > > > IplusV( m_NumOfLayers );
+		std::vector< std::vector< std::shared_ptr< std::vector< double > > > > IminusV( m_NumOfLayers );
+		std::vector< std::vector< std::shared_ptr< std::vector< double > > > > IplusV( m_NumOfLayers );
 
 		for ( size_t i = 0; i < m_NumOfLayers; ++i ) {
 			IminusV[ i ].resize( numOfWavelengths );
 			IplusV[ i ].resize( numOfWavelengths );
 		}
 
-		std::shared_ptr< std::vector< double > > One = make_shared< std::vector< double > >();
+		std::shared_ptr< std::vector< double > > One = std::make_shared< std::vector< double > >();
 		for ( size_t i = 0; i < matrixSize; ++i ) {
 			One->push_back( 1 );
 		}
@@ -244,7 +243,7 @@ namespace MultiLayerOptics {
 		m_Abs.resize( m_NumOfLayers );
 
 		for ( size_t i = 0; i < m_NumOfLayers; ++i ) {
-			m_Abs[ i ] = make_shared< std::vector< double > >( matrixSize );
+			m_Abs[ i ] = std::make_shared< std::vector< double > >( matrixSize );
 		}
 
 		double totalSolar = m_SolarRadiation->integrate( IntegrationType::Trapezoidal )->sum( minLambda, maxLambda );
@@ -252,7 +251,7 @@ namespace MultiLayerOptics {
 		// calculation of solar absorptances
 		for ( size_t i = 0; i < matrixSize; ++i ) {
 			for ( size_t j = 0; j < m_NumOfLayers; ++j ) {
-				std::shared_ptr< CSeries > curSpectralProperties = make_shared< CSeries >();
+				std::shared_ptr< CSeries > curSpectralProperties = std::make_shared< CSeries >();
 				for ( size_t k = 0; k < m_CommonWavelengths->size(); ++k ) {
 					double IminusIncoming = 0;
 					double IminusOutgoing = 0;
@@ -296,7 +295,7 @@ namespace MultiLayerOptics {
 		const CSquareMatrix& t_Reflectance,
 		const CSquareMatrix& t_PreviousR ) {
 		size_t matrixSize = t_Reflectance.getSize();
-		std::shared_ptr< CSquareMatrix > Denominator = make_shared< CSquareMatrix >( matrixSize );
+		std::shared_ptr< CSquareMatrix > Denominator = std::make_shared< CSquareMatrix >( matrixSize );
 		Denominator->setIdentity();
 		std::shared_ptr< CSquareMatrix > lambdaRF = m_Lambda->mult( t_Reflectance );
 		lambdaRF = lambdaRF->mult( t_PreviousR );

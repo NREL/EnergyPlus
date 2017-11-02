@@ -3,7 +3,7 @@
 
 #include "WCETarcog.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 
 class TestGapLayerInBetweenVentilation : public testing::Test {
@@ -43,10 +43,10 @@ protected:
 		auto solidLayerThickness = 0.005715; // [m]
 		auto solidLayerConductance = 1.0;
 
-		auto SolidLayer1 = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto SolidLayer1 = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( SolidLayer1 != nullptr );
 
-		auto SolidLayer2 = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto SolidLayer2 = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( SolidLayer2 != nullptr );
 
 		auto shadeLayerThickness = 0.01;
@@ -57,8 +57,8 @@ protected:
 		auto Aright = 0.1;
 		auto Afront = 0.2;
 
-		auto shadeLayer = make_shared< CIGUShadeLayer >( shadeLayerThickness, shadeLayerConductance,
-		                                                 make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ) );
+		auto shadeLayer = std::make_shared< CIGUShadeLayer >( shadeLayerThickness, shadeLayerConductance,
+		                                                 std::make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ) );
 
 		ASSERT_TRUE( shadeLayer != nullptr );
 
@@ -74,7 +74,7 @@ protected:
 
 		double windowWidth = 1;
 		double windowHeight = 1;
-		std::shared_ptr< CIGU > aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		std::shared_ptr< CIGU > aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( SolidLayer1 );
 		aIGU->addLayer( m_GapLayer1 );
@@ -85,7 +85,7 @@ protected:
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 	}
 

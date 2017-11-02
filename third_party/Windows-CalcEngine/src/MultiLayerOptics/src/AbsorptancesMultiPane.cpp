@@ -1,7 +1,6 @@
 #include "AbsorptancesMultiPane.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace MultiLayerOptics {
@@ -42,9 +41,9 @@ namespace MultiLayerOptics {
 			size_t size = m_T.size();
 
 			// Calculate r and t coefficients
-			std::shared_ptr< CSeries > r = make_shared< CSeries >();
-			std::shared_ptr< CSeries > t = make_shared< CSeries >();
-			vector< double > wv = m_T[ size - 1 ]->getXArray();
+			std::shared_ptr< CSeries > r = std::make_shared< CSeries >();
+			std::shared_ptr< CSeries > t = std::make_shared< CSeries >();
+			std::vector< double > wv = m_T[ size - 1 ]->getXArray();
 			r->setConstantValues( wv, 0 );
 			t->setConstantValues( wv, 0 );
 			m_rCoeffs.clear();
@@ -61,10 +60,10 @@ namespace MultiLayerOptics {
 
 			// Calculate normalized radiances
 			size = m_rCoeffs.size();
-			vector< std::shared_ptr< CSeries > > Iplus;
-			vector< std::shared_ptr< CSeries > > Iminus;
+			std::vector< std::shared_ptr< CSeries > > Iplus;
+			std::vector< std::shared_ptr< CSeries > > Iminus;
 
-			std::shared_ptr< CSeries > Im = make_shared< CSeries >();
+			std::shared_ptr< CSeries > Im = std::make_shared< CSeries >();
 			std::shared_ptr< CSeries > Ip = nullptr;
 			Im->setConstantValues( wv, 1 );
 			Iminus.push_back( Im );
@@ -75,7 +74,7 @@ namespace MultiLayerOptics {
 				Iplus.push_back( Ip );
 				Iminus.push_back( Im );
 			}
-			Ip = make_shared< CSeries >();
+			Ip = std::make_shared< CSeries >();
 			Ip->setConstantValues( wv, 0 );
 			Iplus.push_back( Ip );
 
@@ -97,7 +96,7 @@ namespace MultiLayerOptics {
 		const CSeries& t_Rb,
 		const CSeries& t_RCoeffs ) {
 
-		std::shared_ptr< CSeries > rCoeffs = make_shared< CSeries >();
+		std::shared_ptr< CSeries > rCoeffs = std::make_shared< CSeries >();
 		size_t size = t_T.size();
 
 		for ( size_t i = 0; i < size; ++i ) {
@@ -115,7 +114,7 @@ namespace MultiLayerOptics {
 		const CSeries& t_Rb,
 		const CSeries& t_RCoeffs ) {
 
-		std::shared_ptr< CSeries > tCoeffs = make_shared< CSeries >();
+		std::shared_ptr< CSeries > tCoeffs = std::make_shared< CSeries >();
 		size_t size = t_T.size();
 
 		for ( size_t i = 0; i < size; ++i ) {

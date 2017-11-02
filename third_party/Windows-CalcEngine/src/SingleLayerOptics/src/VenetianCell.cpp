@@ -8,7 +8,6 @@
 #include "WCEViewer.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace Viewer;
 using namespace FenestrationCommon;
 
@@ -26,11 +25,11 @@ namespace SingleLayerOptics {
 	}
 
 	std::shared_ptr< CVenetianCellDescription > CVenetianBase::getCellAsVenetian() const {
-		if ( dynamic_pointer_cast< CVenetianCellDescription >( m_CellDescription ) == NULL ) {
+		if ( std::dynamic_pointer_cast< CVenetianCellDescription >( m_CellDescription ) == NULL ) {
 			assert("Incorrectly assigned cell description.");
 		}
 
-		std::shared_ptr< CVenetianCellDescription > aCell = dynamic_pointer_cast< CVenetianCellDescription >( m_CellDescription );
+		std::shared_ptr< CVenetianCellDescription > aCell = std::dynamic_pointer_cast< CVenetianCellDescription >( m_CellDescription );
 
 		return aCell;
 	}
@@ -41,20 +40,20 @@ namespace SingleLayerOptics {
 	CVenetianSlatEnergies::CVenetianSlatEnergies( const CBeamDirection& t_BeamDirection,
 	                                              const std::shared_ptr< std::vector< SegmentIrradiance > >& t_SlatIrradiances,
 	                                              const std::shared_ptr< std::vector< double > >& t_SlatRadiances ) : m_SlatIrradiances( t_SlatIrradiances ),
-	                                                                                                        m_SlatRadiances( t_SlatRadiances ), m_CalcDirection( make_shared< CBeamDirection >() ) {
+	                                                                                                        m_SlatRadiances( t_SlatRadiances ), m_CalcDirection( std::make_shared< CBeamDirection >() ) {
 		*m_CalcDirection = t_BeamDirection;
 	}
 
 	SegmentIrradiance& CVenetianSlatEnergies::irradiances( const size_t index ) const {
 		if ( index > m_SlatIrradiances->size() ) {
-			throw runtime_error( "Index for slat irradiances is out of range." );
+			throw std::runtime_error( "Index for slat irradiances is out of range." );
 		}
 		return ( *m_SlatIrradiances )[ index ];
 	}
 
 	double CVenetianSlatEnergies::radiances( const size_t index ) const {
 		if ( index > m_SlatRadiances->size() ) {
-			throw runtime_error( "Index for slat irradiances is out of range." );
+			throw std::runtime_error( "Index for slat irradiances is out of range." );
 		}
 		return ( *m_SlatRadiances )[ index ];
 	}
@@ -77,7 +76,7 @@ namespace SingleLayerOptics {
 	std::shared_ptr< CVenetianSlatEnergies > CVenetianCellEnergy::CSlatEnergyResults::getEnergies( const CBeamDirection& t_BeamDirection ) const {
 		std::shared_ptr< CVenetianSlatEnergies > Energies = nullptr;
 
-		vector< std::shared_ptr< CVenetianSlatEnergies > >::const_iterator it;
+		std::vector< std::shared_ptr< CVenetianSlatEnergies > >::const_iterator it;
 		it = find_if( m_Energies.begin(), m_Energies.end(),
 		              [ &t_BeamDirection ]( const std::shared_ptr< CVenetianSlatEnergies >& obj ) {
 		              return *( obj->direction() ) == t_BeamDirection;
@@ -95,7 +94,7 @@ namespace SingleLayerOptics {
 		const CBeamDirection& t_BeamDirection,
 		const std::shared_ptr< std::vector< SegmentIrradiance > >& t_SlatIrradiances,
 		const std::shared_ptr< std::vector< double > >& t_SlatRadiances ) {
-		std::shared_ptr< CVenetianSlatEnergies > aEnergy = make_shared< CVenetianSlatEnergies >( t_BeamDirection, t_SlatIrradiances, t_SlatRadiances );
+		std::shared_ptr< CVenetianSlatEnergies > aEnergy = std::make_shared< CVenetianSlatEnergies >( t_BeamDirection, t_SlatIrradiances, t_SlatRadiances );
 		m_Energies.push_back( aEnergy );
 		return aEnergy;
 	}
@@ -141,7 +140,7 @@ namespace SingleLayerOptics {
 		calculateSlatEnergiesFromBeam( t_IncomingDirection );
 		assert( m_CurrentSlatEnergies != nullptr );
 
-		vector< BeamSegmentView > BVF = *beamVector( t_OutgoingDirection, Side::Back );
+		std::vector< BeamSegmentView > BVF = *beamVector( t_OutgoingDirection, Side::Back );
 
 		double aResult = 0;
 
@@ -167,7 +166,7 @@ namespace SingleLayerOptics {
 		calculateSlatEnergiesFromBeam( t_IncomingDirection );
 		assert( m_CurrentSlatEnergies != nullptr );
 
-		vector< BeamSegmentView > BVF = *beamVector( t_OutgoingDirection, Side::Front );
+		std::vector< BeamSegmentView > BVF = *beamVector( t_OutgoingDirection, Side::Front );
 
 		double aResult = 0;
 
@@ -190,11 +189,11 @@ namespace SingleLayerOptics {
 
 		std::shared_ptr< std::vector< double > > B = diffuseVector();
 
-		std::shared_ptr< CSquareMatrix > aEnergy = make_shared< CSquareMatrix >( m_Energy->getSize() );
+		std::shared_ptr< CSquareMatrix > aEnergy = std::make_shared< CSquareMatrix >( m_Energy->getSize() );
 		aEnergy->copyFrom( *m_Energy );
 
-		std::shared_ptr< CLinearSolver > aSolver = make_shared< CLinearSolver >();
-		vector< double > aSolution = aSolver->solveSystem( *aEnergy, *B );
+		std::shared_ptr< CLinearSolver > aSolver = std::make_shared< CLinearSolver >();
+		std::vector< double > aSolution = aSolver->solveSystem( *aEnergy, *B );
 
 		return aSolution[ numSeg - 1 ];
 	}
@@ -204,17 +203,17 @@ namespace SingleLayerOptics {
 
 		std::shared_ptr< std::vector< double > > B = diffuseVector();
 
-		std::shared_ptr< CSquareMatrix > aEnergy = make_shared< CSquareMatrix >( m_Energy->getSize() );
+		std::shared_ptr< CSquareMatrix > aEnergy = std::make_shared< CSquareMatrix >( m_Energy->getSize() );
 		aEnergy->copyFrom( *m_Energy );
 
-		std::shared_ptr< CLinearSolver > aSolver = make_shared< CLinearSolver >();
-		vector< double > aSolution = aSolver->solveSystem( *aEnergy, *B );
+		std::shared_ptr< CLinearSolver > aSolver = std::make_shared< CLinearSolver >();
+		std::vector< double > aSolution = aSolver->solveSystem( *aEnergy, *B );
 
 		return aSolution[ numSeg ];
 	}
 
 	std::shared_ptr< std::vector< SegmentIrradiance > > CVenetianCellEnergy::slatIrradiances( const CBeamDirection& t_IncomingDirection ) {
-		std::shared_ptr< std::vector< SegmentIrradiance > > aIrradiances = make_shared< std::vector< SegmentIrradiance > >();
+		std::shared_ptr< std::vector< SegmentIrradiance > > aIrradiances = std::make_shared< std::vector< SegmentIrradiance > >();
 
 		size_t numSeg = int( m_Cell->numberOfSegments() / 2 );
 
@@ -222,7 +221,7 @@ namespace SingleLayerOptics {
 		std::shared_ptr< std::vector< BeamSegmentView > > BVF = beamVector( t_IncomingDirection, Side::Front );
 
 		// Need to calculate irradiances based on current energy state. Need to do reordering according to energy slat numbering
-		std::shared_ptr< std::vector< double > > B = make_shared< std::vector< double > >();
+		std::shared_ptr< std::vector< double > > B = std::make_shared< std::vector< double > >();
 		for ( size_t i = 0; i < 2 * numSeg; ++i ) {
 			size_t index = 0;
 			if ( i < numSeg ) {
@@ -234,11 +233,11 @@ namespace SingleLayerOptics {
 			B->push_back( -( *BVF )[ index ].viewFactor );
 		}
 
-		std::shared_ptr< CSquareMatrix > aEnergy = make_shared< CSquareMatrix >( m_Energy->getSize() );
+		std::shared_ptr< CSquareMatrix > aEnergy = std::make_shared< CSquareMatrix >( m_Energy->getSize() );
 		aEnergy->copyFrom( *m_Energy );
 
-		std::shared_ptr< CLinearSolver > aSolver = make_shared< CLinearSolver >();
-		vector< double > aSolution = aSolver->solveSystem( *aEnergy, *B );
+		std::shared_ptr< CLinearSolver > aSolver = std::make_shared< CLinearSolver >();
+		std::vector< double > aSolution = aSolver->solveSystem( *aEnergy, *B );
 
 		for ( size_t i = 0; i <= numSeg; ++i ) {
 			SegmentIrradiance aIrr;
@@ -263,7 +262,7 @@ namespace SingleLayerOptics {
 	std::shared_ptr< std::vector< double > > CVenetianCellEnergy::slatRadiances(
 		std::shared_ptr< std::vector< SegmentIrradiance > > t_Irradiances ) {
 		size_t numSlats = t_Irradiances->size();
-		std::shared_ptr< std::vector< double > > aRadiances = make_shared< std::vector< double > >( 2 * numSlats - 2 );
+		std::shared_ptr< std::vector< double > > aRadiances = std::make_shared< std::vector< double > >( 2 * numSlats - 2 );
 		for ( size_t i = 0; i < numSlats; ++i ) {
 			if ( i == 0 ) {
 				( *aRadiances )[ b[ i ] ] = 1;
@@ -298,7 +297,7 @@ namespace SingleLayerOptics {
 		size_t numSeg = int( m_Cell->numberOfSegments() / 2 );
 
 		// Create energy matrix
-		m_Energy = make_shared< CSquareMatrix >( 2 * numSeg );
+		m_Energy = std::make_shared< CSquareMatrix >( 2 * numSeg );
 
 		// Results always from front side since cell is already flipped
 		double T = m_Tf;
@@ -395,7 +394,7 @@ namespace SingleLayerOptics {
 		size_t numSeg = int( m_Cell->numberOfSegments() / 2 );
 		std::shared_ptr< CSquareMatrix > aViewFactors = m_Cell->viewFactors();
 
-		std::shared_ptr< std::vector< double > > B = make_shared< std::vector< double > >( 2 * numSeg );
+		std::shared_ptr< std::vector< double > > B = std::make_shared< std::vector< double > >( 2 * numSeg );
 		for ( size_t i = 0; i < numSeg; ++i ) {
 			( * B )[ i ] = -( *aViewFactors )[ b[ 0 ] ][ f[ i ] ];
 			( * B )[ i + numSeg ] = -( *aViewFactors )[ b[ 0 ] ][ b[ i ] ];
@@ -416,7 +415,7 @@ namespace SingleLayerOptics {
 
 		std::shared_ptr< std::vector< BeamViewFactor > > beamVF = m_Cell->beamViewFactors( profileAngle, t_Side );
 
-		std::shared_ptr< std::vector< BeamSegmentView > > B = make_shared< std::vector< BeamSegmentView > >( 2 * numSeg );
+		std::shared_ptr< std::vector< BeamSegmentView > > B = std::make_shared< std::vector< BeamSegmentView > >( 2 * numSeg );
 		size_t index = 0;
 		for ( BeamViewFactor& aVF : *beamVF ) {
 			if ( aVF.enclosureIndex == 0 ) { // Top
@@ -478,10 +477,10 @@ namespace SingleLayerOptics {
 	void CVenetianEnergy::createForwardAndBackward( const double Tf, const double Tb, const double Rf, const double Rb,
 	                                                const std::shared_ptr< CVenetianCellDescription >& t_Cell ) {
 		assert( t_Cell != nullptr );
-		m_CellEnergy[ Side::Front ] = make_shared< CVenetianCellEnergy >( t_Cell, Tf, Tb, Rf, Rb );
+		m_CellEnergy[ Side::Front ] = std::make_shared< CVenetianCellEnergy >( t_Cell, Tf, Tb, Rf, Rb );
 
 		std::shared_ptr< CVenetianCellDescription > aBackwardCell = t_Cell->makeBackwardCell();
-		m_CellEnergy[ Side::Back ] = make_shared< CVenetianCellEnergy >( aBackwardCell, Tf, Tb, Rf, Rb );
+		m_CellEnergy[ Side::Back ] = std::make_shared< CVenetianCellEnergy >( aBackwardCell, Tf, Tb, Rf, Rb );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -502,7 +501,7 @@ namespace SingleLayerOptics {
 		m_Energy = CVenetianEnergy( *m_Material, getCellAsVenetian() );
 		// Create energy states for entire material band
 		m_EnergiesBand.clear();
-		vector< RMaterialProperties > aMat = *m_Material->getBandProperties();
+		std::vector< RMaterialProperties > aMat = *m_Material->getBandProperties();
 
 		if ( aMat.size() > 0 ) {
 			size_t size = m_Material->getBandSize();
@@ -528,10 +527,10 @@ namespace SingleLayerOptics {
 		return aCell->T_dir_dir( t_Direction );
 	}
 
-	vector< double > CVenetianCell::T_dir_dir_band( const Side t_Side,
+	std::vector< double > CVenetianCell::T_dir_dir_band( const Side t_Side,
 	                                                const CBeamDirection& t_Direction ) {
 		size_t size = m_EnergiesBand.size();
-		vector< double > aProperties;
+		std::vector< double > aProperties;
 		for ( size_t i = 0; i < size; ++i ) {
 			CVenetianCellEnergy aCell = *m_EnergiesBand[ i ].getCell( t_Side );
 			aProperties.push_back( aCell.T_dir_dir( t_Direction ) );
@@ -544,10 +543,10 @@ namespace SingleLayerOptics {
 		return aCell->T_dir_dif( t_Direction );
 	}
 
-	vector< double > CVenetianCell::T_dir_dif_band( const Side t_Side,
+	std::vector< double > CVenetianCell::T_dir_dif_band( const Side t_Side,
 	                                                const CBeamDirection& t_Direction ) {
 		size_t size = m_EnergiesBand.size();
-		vector< double > aProperties;
+		std::vector< double > aProperties;
 		for ( size_t i = 0; i < size; ++i ) {
 			CVenetianCellEnergy aCell = *m_EnergiesBand[ i ].getCell( t_Side );
 			aProperties.push_back( aCell.T_dir_dif( t_Direction ) );
@@ -560,10 +559,10 @@ namespace SingleLayerOptics {
 		return aCell->R_dir_dif( t_Direction );
 	}
 
-	vector< double > CVenetianCell::R_dir_dif_band( const Side t_Side,
+	std::vector< double > CVenetianCell::R_dir_dif_band( const Side t_Side,
 	                                                const CBeamDirection& t_Direction ) {
 		size_t size = m_EnergiesBand.size();
-		vector< double > aProperties;
+		std::vector< double > aProperties;
 		for ( size_t i = 0; i < size; ++i ) {
 			std::shared_ptr< CVenetianCellEnergy > aCell = m_EnergiesBand[ i ].getCell( t_Side );
 			aProperties.push_back( aCell->R_dir_dif( t_Direction ) );
@@ -582,7 +581,7 @@ namespace SingleLayerOptics {
 	                                                              const CBeamDirection& t_IncomingDirection,
 	                                                              const CBeamDirection& t_OutgoingDirection ) {
 		size_t size = m_EnergiesBand.size();
-		std::shared_ptr< std::vector< double > > aProperties = make_shared< std::vector< double > >();
+		std::shared_ptr< std::vector< double > > aProperties = std::make_shared< std::vector< double > >();
 		for ( size_t i = 0; i < size; ++i ) {
 			std::shared_ptr< CVenetianCellEnergy > aCell = m_EnergiesBand[ i ].getCell( t_Side );
 			aProperties->push_back( aCell->T_dir_dif( t_IncomingDirection, t_OutgoingDirection ) );
@@ -601,7 +600,7 @@ namespace SingleLayerOptics {
 	                                                              const CBeamDirection& t_IncomingDirection,
 	                                                              const CBeamDirection& t_OutgoingDirection ) {
 		size_t size = m_EnergiesBand.size();
-		std::shared_ptr< std::vector< double > > aProperties = make_shared< std::vector< double > >();
+		std::shared_ptr< std::vector< double > > aProperties = std::make_shared< std::vector< double > >();
 		for ( size_t i = 0; i < size; ++i ) {
 			std::shared_ptr< CVenetianCellEnergy > aCell = m_EnergiesBand[ i ].getCell( t_Side );
 			aProperties->push_back( aCell->R_dir_dif( t_IncomingDirection, t_OutgoingDirection ) );

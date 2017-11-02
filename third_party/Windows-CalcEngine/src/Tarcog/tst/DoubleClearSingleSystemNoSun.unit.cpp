@@ -5,7 +5,6 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -56,12 +55,12 @@ protected:
 
 		auto gapThickness = 0.012;
 		auto gapPressure = 101325.0;
-		std::shared_ptr< CBaseIGULayer > m_GapLayer = make_shared< CIGUGapLayer >( gapThickness, gapPressure );
+		std::shared_ptr< CBaseIGULayer > m_GapLayer = std::make_shared< CIGUGapLayer >( gapThickness, gapPressure );
 		ASSERT_TRUE( m_GapLayer != nullptr );
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer1 );
 		aIGU->addLayer( m_GapLayer );
@@ -70,7 +69,7 @@ protected:
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		m_TarcogSystem->solve();
@@ -90,7 +89,7 @@ TEST_F( TestDoubleClearSingleSystemNoSun, Test1 ) {
 	ASSERT_TRUE( aSystem != nullptr );
 
 	auto Temperature = *aSystem->getTemperatures();
-	vector< double > correctTemperature = { 258.756688, 259.359226, 279.178510, 279.781048 };
+	std::vector< double > correctTemperature = { 258.756688, 259.359226, 279.178510, 279.781048 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -98,7 +97,7 @@ TEST_F( TestDoubleClearSingleSystemNoSun, Test1 ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities();
-	vector< double > correctRadiosity = { 251.950834, 268.667346, 332.299338, 359.731700 };
+	std::vector< double > correctRadiosity = { 251.950834, 268.667346, 332.299338, 359.731700 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {

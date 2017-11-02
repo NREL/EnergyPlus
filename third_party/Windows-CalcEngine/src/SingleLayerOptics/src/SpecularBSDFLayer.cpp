@@ -3,12 +3,9 @@
 #include "SpecularBSDFLayer.hpp"
 #include "SpecularCell.hpp"
 #include "BSDFDirections.hpp"
-#include "BSDFPatch.hpp"
-#include "BSDFIntegrator.hpp"
 #include "WCECommon.hpp"
 #include "BeamDirection.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -20,7 +17,7 @@ namespace SingleLayerOptics {
 
 
 	std::shared_ptr< CSpecularCell > CSpecularBSDFLayer::cellAsSpecular() const {
-		std::shared_ptr< CSpecularCell > aCell = dynamic_pointer_cast< CSpecularCell >( m_Cell );
+		std::shared_ptr< CSpecularCell > aCell = std::dynamic_pointer_cast< CSpecularCell >( m_Cell );
 		assert( aCell != nullptr );
 		return aCell;
 	}

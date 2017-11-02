@@ -58,7 +58,7 @@ namespace MultiLayerOptics {
 
 		void updateWavelengthLayers( const std::shared_ptr< SingleLayerOptics::CBSDFLayer >& t_Layer ) const;
 
-		// Vector of layer results over each wavelength
+		// std::vector of layer results over each wavelength
 		std::shared_ptr< std::vector< std::shared_ptr< CEquivalentBSDFLayerSingleBand > > > m_LayersWL;
 
 		// Layers that are added to the equivalent layer

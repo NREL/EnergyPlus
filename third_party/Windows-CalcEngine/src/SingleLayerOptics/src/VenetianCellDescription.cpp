@@ -7,7 +7,6 @@
 #include "WCEViewer.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace Viewer;
 using namespace FenestrationCommon;
 
@@ -15,9 +14,9 @@ namespace SingleLayerOptics {
 
 	CVenetianCellDescription::CVenetianCellDescription( const double t_SlatWidth, const double t_SlatSpacing,
 	                                                    const double t_SlatTiltAngle, const double t_CurvatureRadius, const size_t t_NumOfSlatSegments ) :
-		m_Top( make_shared< CVenetianSlat >( t_SlatWidth, t_SlatSpacing, t_SlatTiltAngle, t_CurvatureRadius,
+		m_Top( std::make_shared< CVenetianSlat >( t_SlatWidth, t_SlatSpacing, t_SlatTiltAngle, t_CurvatureRadius,
 		                                     t_NumOfSlatSegments, SegmentsDirection::Positive ) ),
-		m_Bottom( make_shared< CVenetianSlat >( t_SlatWidth, 0, t_SlatTiltAngle, t_CurvatureRadius,
+		m_Bottom( std::make_shared< CVenetianSlat >( t_SlatWidth, 0, t_SlatTiltAngle, t_CurvatureRadius,
 		                                        t_NumOfSlatSegments, SegmentsDirection::Negative ) ) {
 
 		std::shared_ptr< CViewSegment2D > exteriorSegment =
@@ -26,13 +25,13 @@ namespace SingleLayerOptics {
 		std::shared_ptr< CViewSegment2D > interiorSegment =
 			std::make_shared< CViewSegment2D >( m_Top->geometry()->lastPoint(), m_Bottom->geometry()->firstPoint() );
 
-		m_Geometry = make_shared< CGeometry2D >();
+		m_Geometry = std::make_shared< CGeometry2D >();
 		m_Geometry->appendSegment( exteriorSegment );
 		m_Geometry->appendGeometry2D( m_Top->geometry() );
 		m_Geometry->appendSegment( interiorSegment );
 		m_Geometry->appendGeometry2D( m_Bottom->geometry() );
 
-		m_BeamGeometry = make_shared< CGeometry2DBeam >();
+		m_BeamGeometry = std::make_shared< CGeometry2DBeam >();
 		m_BeamGeometry->appendGeometry2D( m_Top->geometry() );
 		m_BeamGeometry->appendGeometry2D( m_Bottom->geometry() );
 	}
@@ -47,7 +46,7 @@ namespace SingleLayerOptics {
 	double CVenetianCellDescription::segmentLength( const size_t Index ) const {
 		std::shared_ptr< std::vector< std::shared_ptr< CViewSegment2D > > > aSegments = m_Geometry->segments();
 		if ( Index > aSegments->size() ) {
-			throw runtime_error( "Incorrect index for venetian segment." );
+			throw std::runtime_error( "Incorrect index for venetian segment." );
 		}
 		std::shared_ptr< CViewSegment2D > aSegment = ( *aSegments )[ Index ];
 		return aSegment->length();

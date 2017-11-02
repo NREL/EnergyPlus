@@ -3,7 +3,6 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 class TestMatrixCopyFrom : public testing::Test {
@@ -18,24 +17,24 @@ protected:
 TEST_F( TestMatrixCopyFrom, Test1 ) {
 	SCOPED_TRACE( "Begin Test: Test matrix addition operation." );
 
-	CSquareMatrix A = CSquareMatrix( 2 );
-	CSquareMatrix B = CSquareMatrix( 2 );
+	auto a = CSquareMatrix( 2 );
+	auto b = CSquareMatrix( 2 );
 
-	A[ 0 ][ 0 ] = 1;
-	A[ 0 ][ 1 ] = 2;
-	A[ 1 ][ 0 ] = 3;
-	A[ 1 ][ 1 ] = 4;
+	a[ 0 ][ 0 ] = 1;
+	a[ 0 ][ 1 ] = 2;
+	a[ 1 ][ 0 ] = 3;
+	a[ 1 ][ 1 ] = 4;
 
-	B[ 0 ][ 0 ] = 2;
-	B[ 0 ][ 1 ] = 3;
-	B[ 1 ][ 0 ] = 4;
-	B[ 1 ][ 1 ] = 5;
+	b[ 0 ][ 0 ] = 2;
+	b[ 0 ][ 1 ] = 3;
+	b[ 1 ][ 0 ] = 4;
+	b[ 1 ][ 1 ] = 5;
 
-	A.copyFrom( B );
+	a.copyFrom( b );
 
-	EXPECT_NEAR( 2, A[0][0], 1e-6 );
-	EXPECT_NEAR( 3, A[0][1], 1e-6 );
-	EXPECT_NEAR( 4, A[1][0], 1e-6 );
-	EXPECT_NEAR( 5, A[1][1], 1e-6 );
+	EXPECT_NEAR( 2, a[0][0], 1e-6 );
+	EXPECT_NEAR( 3, a[0][1], 1e-6 );
+	EXPECT_NEAR( 4, a[1][0], 1e-6 );
+	EXPECT_NEAR( 5, a[1][1], 1e-6 );
 
 }

@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -26,7 +26,7 @@ protected:
 		auto tSky = 255.15; // Kelvins
 		auto solarRadiation = 0.0;
 
-		auto Outdoor = make_shared< COutdoorEnvironment >( airTemperature, pressure, airSpeed, solarRadiation,
+		auto Outdoor = std::make_shared< COutdoorEnvironment >( airTemperature, pressure, airSpeed, solarRadiation,
 		                                                   airDirection, tSky, SkyModel::AllSpecified );
 		ASSERT_TRUE( Outdoor != nullptr );
 		Outdoor->setHCoeffModel( BoundaryConditionsCoeffModel::CalculateH );
@@ -37,7 +37,7 @@ protected:
 
 		auto roomTemperature = 294.15;
 
-		auto Indoor = make_shared< CIndoorEnvironment >( roomTemperature, pressure );
+		auto Indoor = std::make_shared< CIndoorEnvironment >( roomTemperature, pressure );
 		ASSERT_TRUE( Indoor != nullptr );
 
 		/////////////////////////////////////////////////////////
@@ -45,8 +45,8 @@ protected:
 		/////////////////////////////////////////////////////////
 		auto emissivity = 0.832855582237;
 		auto transmittance = 0.074604861438;
-		auto surface1 = make_shared< CSurface >( emissivity, transmittance );
-		auto surface2 = make_shared< CSurface >( emissivity, transmittance );
+		auto surface1 = std::make_shared< CSurface >( emissivity, transmittance );
+		auto surface2 = std::make_shared< CSurface >( emissivity, transmittance );
 
 		auto shadeLayerThickness = 0.0006;
 		auto shadeLayerConductance = 160.0;
@@ -56,9 +56,9 @@ protected:
 		auto Aright = 0.0;
 		auto Afront = 0.5;
 
-		std::shared_ptr< CIGUSolidLayer > aSolidLayer1 = make_shared< CIGUShadeLayer >(
+		std::shared_ptr< CIGUSolidLayer > aSolidLayer1 = std::make_shared< CIGUShadeLayer >(
 		                                                                          shadeLayerThickness, shadeLayerConductance,
-		                                                                          make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ), surface1, surface2 );
+		                                                                          std::make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ), surface1, surface2 );
 
 		ASSERT_TRUE( aSolidLayer1 != nullptr );
 
@@ -68,8 +68,8 @@ protected:
 		auto emissivity2 = 0.038798544556;
 		transmittance = 0.0;
 
-		auto surface3 = make_shared< CSurface >( emissivity1, transmittance );
-		auto surface4 = make_shared< CSurface >( emissivity2, transmittance );
+		auto surface3 = std::make_shared< CSurface >( emissivity1, transmittance );
+		auto surface4 = std::make_shared< CSurface >( emissivity2, transmittance );
 
 		auto aSolidLayer2 =
 			std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance, surface3, surface4 );
@@ -77,12 +77,12 @@ protected:
 
 		auto gapThickness = 0.0127;
 		auto gapPressure = 101325.0;
-		auto aGapLayer = make_shared< CIGUGapLayer >( gapThickness, gapPressure );
+		auto aGapLayer = std::make_shared< CIGUGapLayer >( gapThickness, gapPressure );
 		ASSERT_TRUE( aGapLayer != nullptr );
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer1 );
 		aIGU->addLayer( aGapLayer );
@@ -91,7 +91,7 @@ protected:
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		m_TarcogSystem->solve();
@@ -111,7 +111,7 @@ TEST_F( TestShadeOut, Test1 ) {
 	ASSERT_TRUE( aSystem != nullptr );
 
 	auto Temperature = *aSystem->getTemperatures();
-	vector< double > correctTemperature = { 256.991924, 256.992140, 269.666330, 270.128394 };
+	std::vector< double > correctTemperature = { 256.991924, 256.992140, 269.666330, 270.128394 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -119,7 +119,7 @@ TEST_F( TestShadeOut, Test1 ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities();
-	vector< double > correctRadiosity = { 249.993042, 250.921069, 291.999868, 419.703053 };
+	std::vector< double > correctRadiosity = { 249.993042, 250.921069, 291.999868, 419.703053 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {

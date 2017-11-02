@@ -6,7 +6,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
@@ -21,7 +21,7 @@ private:
 
 	std::shared_ptr< CSeries > loadSolarRadiationFile() const {
 
-		auto aSolarRadiation = make_shared< CSeries >();
+		auto aSolarRadiation = std::make_shared< CSeries >();
 
 		// Full ASTM E891-87 Table 1 (Solar radiation)
 		aSolarRadiation->addProperty( 0.3000, 0.0 );
@@ -150,7 +150,7 @@ private:
 	}
 
 	std::shared_ptr< CSpectralSampleData > loadSampleData_NFRC_102() const {
-		auto aMeasurements_102 = make_shared< CSpectralSampleData >();
+		auto aMeasurements_102 = std::make_shared< CSpectralSampleData >();
 
 		aMeasurements_102->addRecord( 0.300, 0.0020, 0.0470, 0.0480 );
 		aMeasurements_102->addRecord( 0.305, 0.0030, 0.0470, 0.0480 );
@@ -274,11 +274,11 @@ protected:
 		auto aMeasurements_102 = loadSampleData_NFRC_102();
 
 		// Create samples from measurements and solar radiation
-		auto aSample_102 = make_shared< CSpectralSample >( aMeasurements_102 );
+		auto aSample_102 = std::make_shared< CSpectralSample >( aMeasurements_102 );
 
 		// Create material from samples
 		auto thickness = 3.048e-3; // [m]
-		std::shared_ptr< CMaterial > aMaterial_102 = make_shared< CMaterialSample >( aSample_102,
+		std::shared_ptr< CMaterial > aMaterial_102 = std::make_shared< CMaterialSample >( aSample_102,
 		                                                                        thickness, MaterialType::Monolithic, WavelengthRange::Solar );
 
 		// Woven Shade
@@ -304,12 +304,12 @@ protected:
 		std::shared_ptr< ICellDescription > aCellDescription =
 			std::make_shared< CWovenCellDescription >( diameter, spacing );
 
-		auto Layer_102 = make_shared< CScatteringLayer >( aMaterial_102 );
-		auto Layer_Woven = make_shared< CScatteringLayer >( aMaterialWoven, aCellDescription );
+		auto Layer_102 = std::make_shared< CScatteringLayer >( aMaterial_102 );
+		auto Layer_Woven = std::make_shared< CScatteringLayer >( aMaterialWoven, aCellDescription );
 
 
 		// Equivalent BSDF layer
-		m_Layer = make_shared< CMultiLayerScattered >( Layer_102 );
+		m_Layer = std::make_shared< CMultiLayerScattered >( Layer_102 );
 		m_Layer->addLayer( Layer_Woven );
 
 		auto aSolarRadiation = loadSolarRadiationFile();

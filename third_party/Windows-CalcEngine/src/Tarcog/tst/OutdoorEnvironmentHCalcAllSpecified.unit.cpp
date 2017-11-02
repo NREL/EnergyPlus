@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 
 using namespace Tarcog;
-using namespace std;
+
 
 class TestOutdoorEnvironmentHCalcAllSpecified : public testing::Test {
 
@@ -25,7 +25,7 @@ protected:
 		auto tSky = 270.0; // Kelvins
 		auto solarRadiation = 0.0;
 
-		Outdoor = make_shared< COutdoorEnvironment >( airTemperature, pressure, airSpeed, solarRadiation,
+		Outdoor = std::make_shared< COutdoorEnvironment >( airTemperature, pressure, airSpeed, solarRadiation,
 		                                              airDirection, tSky, SkyModel::AllSpecified );
 		ASSERT_TRUE( Outdoor != nullptr );
 		Outdoor->setHCoeffModel( BoundaryConditionsCoeffModel::CalculateH );
@@ -36,7 +36,7 @@ protected:
 
 		auto roomTemperature = 294.15;
 
-		std::shared_ptr< CEnvironment > Indoor = make_shared< CIndoorEnvironment >( roomTemperature, pressure );
+		std::shared_ptr< CEnvironment > Indoor = std::make_shared< CIndoorEnvironment >( roomTemperature, pressure );
 		ASSERT_TRUE( Indoor != nullptr );
 
 		/////////////////////////////////////////////////////////
@@ -45,19 +45,19 @@ protected:
 		auto solidLayerThickness = 0.003048; // [m]
 		auto solidLayerConductance = 100.0;
 
-		auto aSolidLayer = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto aSolidLayer = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( aSolidLayer != nullptr );
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer );
 
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		m_TarcogSystem->solve();
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 	}

@@ -6,7 +6,7 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -39,7 +39,7 @@ protected:
 
 		auto roomTemperature = 295.15;
 
-		std::shared_ptr< CEnvironment > Indoor = make_shared< CIndoorEnvironment >( roomTemperature, pressure );
+		std::shared_ptr< CEnvironment > Indoor = std::make_shared< CIndoorEnvironment >( roomTemperature, pressure );
 		ASSERT_TRUE( Indoor != nullptr );
 
 		/////////////////////////////////////////////////////////
@@ -48,10 +48,10 @@ protected:
 		auto solidLayerThickness = 0.005715; // [m]
 		auto solidLayerConductance = 1.0;
 
-		auto aLayer1 = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto aLayer1 = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( aLayer1 != nullptr );
 
-		auto aLayer3 = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto aLayer3 = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( aLayer3 != nullptr );
 
 		auto shadeLayerThickness = 0.01;
@@ -62,8 +62,8 @@ protected:
 		auto Aright = 0.1;
 		auto Afront = 0.2;
 
-		std::shared_ptr< CIGUSolidLayer > aLayer2 = make_shared< CIGUShadeLayer >( shadeLayerThickness, shadeLayerConductance,
-		                                                                      make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ) );
+		std::shared_ptr< CIGUSolidLayer > aLayer2 = std::make_shared< CIGUShadeLayer >( shadeLayerThickness, shadeLayerConductance,
+		                                                                      std::make_shared< CShadeOpenings >( Atop, Abot, Aleft, Aright, Afront ) );
 
 		ASSERT_TRUE( aLayer2 != nullptr );
 
@@ -77,7 +77,7 @@ protected:
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aLayer1 );
 		aIGU->addLayer( GapLayer1 );
@@ -88,7 +88,7 @@ protected:
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		m_TarcogSystem->solve();
@@ -109,8 +109,8 @@ TEST_F( TestInBetweenShadeAir, Test1 ) {
 	auto temperature = *aSystem->getTemperatures();
 	auto radiosity = *aSystem->getRadiosities();
 
-	vector< double > correctTemp = { 257.908946, 258.369607, 271.538659, 271.542218, 283.615285, 284.075945 };
-	vector< double > correctJ = { 249.166619, 260.320613, 300.571561, 316.335545, 358.760651, 378.995512 };
+	std::vector< double > correctTemp = { 257.908946, 258.369607, 271.538659, 271.542218, 283.615285, 284.075945 };
+	std::vector< double > correctJ = { 249.166619, 260.320613, 300.571561, 316.335545, 358.760651, 378.995512 };
 
 	EXPECT_EQ( correctTemp.size(), temperature.size() );
 	EXPECT_EQ( correctJ.size(), radiosity.size() );

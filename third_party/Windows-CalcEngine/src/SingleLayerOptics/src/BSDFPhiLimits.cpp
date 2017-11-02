@@ -1,15 +1,13 @@
 #include "BSDFPhiLimits.hpp"
 #include "BSDFPhiAngles.hpp"
 
-using namespace std;
-
 namespace SingleLayerOptics {
 
 	CPhiLimits::CPhiLimits( const size_t t_NumOfPhis ) {
 		if ( t_NumOfPhis == 0 ) {
-			throw runtime_error( "Number of phi angles for BSDF definition must be greater than zero." );
+			throw std::runtime_error( "Number of phi angles for BSDF definition must be greater than zero." );
 		}
-		m_PhiLimits = make_shared< std::vector< double > >();
+		m_PhiLimits = std::make_shared< std::vector< double > >();
 
 		CBSDFPhiAngles aPhiAngles( t_NumOfPhis );
 

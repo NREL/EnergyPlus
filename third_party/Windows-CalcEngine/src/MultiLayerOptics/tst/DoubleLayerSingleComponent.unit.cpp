@@ -2,10 +2,8 @@
 #include <gtest/gtest.h>
 
 #include "WCEMultiLayerOptics.hpp"
-#include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace MultiLayerOptics;
 using namespace FenestrationCommon;
 
@@ -22,10 +20,10 @@ private:
 
 protected:
 	virtual void SetUp() {
-		m_DoubleBack = make_shared< CEquivalentLayerSingleComponent >( 0.46, 0.52, 0.64, 0.22 );
+		m_DoubleBack = std::make_shared< CEquivalentLayerSingleComponent >( 0.46, 0.52, 0.64, 0.22 );
 		m_DoubleBack->addLayer( 0.56, 0.34, 0.49, 0.39 );
 
-		m_DoubleFront = make_shared< CEquivalentLayerSingleComponent >( 0.46, 0.52, 0.64, 0.22 );
+		m_DoubleFront = std::make_shared< CEquivalentLayerSingleComponent >( 0.46, 0.52, 0.64, 0.22 );
 		m_DoubleFront->addLayer( 0.56, 0.34, 0.49, 0.39, Side::Front );
 
 	}

@@ -6,7 +6,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 using namespace SingleLayerOptics;
@@ -24,7 +23,7 @@ protected:
 	virtual void SetUp() {
 
 		// Create lambda matrix
-		vector< CBSDFDefinition > aDefinitions;
+		std::vector< CBSDFDefinition > aDefinitions;
 		aDefinitions.push_back( CBSDFDefinition( 0, 1 ) );
 		aDefinitions.push_back( CBSDFDefinition( 15, 1 ) );
 		aDefinitions.push_back( CBSDFDefinition( 30, 1 ) );
@@ -34,9 +33,9 @@ protected:
 		aDefinitions.push_back( CBSDFDefinition( 86.25, 1 ) );
 
 		// Create BSDF from definitions
-		std::shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( aDefinitions );
+		std::shared_ptr< CBSDFHemisphere > aBSDF = std::make_shared< CBSDFHemisphere >( aDefinitions );
 
-		std::shared_ptr< CSeries > aSolarRadiation = make_shared< CSeries >();
+		std::shared_ptr< CSeries > aSolarRadiation = std::make_shared< CSeries >();
 
 		// Full ASTM E891-87 Table 1
 		aSolarRadiation->addProperty( 0.3000, 0.0 );
@@ -161,7 +160,7 @@ protected:
 		aSolarRadiation->addProperty( 3.7650, 9.0 );
 		aSolarRadiation->addProperty( 4.0450, 6.9 );
 
-		std::shared_ptr< CSpectralSampleData > aMeasurements = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > aMeasurements = std::make_shared< CSpectralSampleData >();
 
 		aMeasurements->addRecord( 0.300, 0.0020, 0.0470, 0.0480 );
 		aMeasurements->addRecord( 0.305, 0.0030, 0.0470, 0.0480 );
@@ -275,7 +274,7 @@ protected:
 		aMeasurements->addRecord( 2.450, 0.8260, 0.0690, 0.0690 );
 		aMeasurements->addRecord( 2.500, 0.8220, 0.0680, 0.0680 );
 
-		std::shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aMeasurements, aSolarRadiation );
+		std::shared_ptr< CSpectralSample > aSample = std::make_shared< CSpectralSample >( aMeasurements, aSolarRadiation );
 
 		double thickness = 3.048e-3; // [m]
 		MaterialType aType = MaterialType::Monolithic;
@@ -291,14 +290,15 @@ protected:
 		CBSDFIntegrator aLayer1 = *aLayer102->getResults();
 		CBSDFIntegrator aLayer2 = *aLayer102->getResults();
 
-		m_DoubleLayer = make_shared< CBSDFDoubleLayer >( aLayer1, aLayer2 );
+		m_DoubleLayer = std::make_shared< CBSDFDoubleLayer >( aLayer1, aLayer2 );
 
 	}
 
 public:
-	std::shared_ptr< CBSDFDoubleLayer > getDoubleLayer() {
+	std::shared_ptr< CBSDFDoubleLayer > getDoubleLayer() const
+	{
 		return m_DoubleLayer;
-	};
+	}
 
 };
 

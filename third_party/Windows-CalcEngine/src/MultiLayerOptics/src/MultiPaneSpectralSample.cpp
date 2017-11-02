@@ -5,7 +5,6 @@
 #include "WCESpectralAveraging.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace SpectralAveraging;
 using namespace FenestrationCommon;
 
@@ -21,7 +20,7 @@ namespace MultiLayerOptics {
 		double aEnergy = 0;
 		calculateState();
 		if ( Index > m_AbsorbedLayersSource.size() ) {
-			throw runtime_error( "Index for glazing layer absorptance is out of range." );
+			throw std::runtime_error( "Index for glazing layer absorptance is out of range." );
 		}
 		aEnergy = m_AbsorbedLayersSource[ Index - 1 ]->sum( minLambda, maxLambda );
 		return aEnergy;
@@ -38,8 +37,8 @@ namespace MultiLayerOptics {
 	void CMultiPaneSpectralSample::calculateProperties() {
 		if ( !m_StateCalculated ) {
 			CSpectralSample::calculateProperties();
-			if ( dynamic_pointer_cast< CMultiPaneSampleData >( m_SampleData ) != NULL ) {
-				std::shared_ptr< CMultiPaneSampleData > aSample = dynamic_pointer_cast< CMultiPaneSampleData >( m_SampleData );
+			if ( std::dynamic_pointer_cast< CMultiPaneSampleData >( m_SampleData ) != NULL ) {
+				std::shared_ptr< CMultiPaneSampleData > aSample = std::dynamic_pointer_cast< CMultiPaneSampleData >( m_SampleData );
 				size_t numOfLayers = aSample->numberOfLayers();
 				for ( size_t i = 0; i < numOfLayers; ++i ) {
 					std::shared_ptr< CSeries > layerAbsorbed = aSample->getLayerAbsorptances( i + 1 );

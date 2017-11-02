@@ -5,7 +5,6 @@
 #include "WCECommon.hpp"
 #include "MaterialDescription.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -31,11 +30,11 @@ namespace SingleLayerOptics {
 		return m_CellDescription->R_dir_dir( t_Side, t_Direction );
 	}
 
-	vector< double > CBaseCell::T_dir_dir_band( const Side t_Side,
+	std::vector< double > CBaseCell::T_dir_dir_band( const Side t_Side,
 	                                            const CBeamDirection& t_Direction ) {
-		double value = T_dir_dir( t_Side, t_Direction );
-		vector< double > aResults;
-		vector< double > aMaterials = m_Material->getBandProperties( Property::T, t_Side );
+		const double value = T_dir_dir( t_Side, t_Direction );
+		std::vector< double > aResults;
+		std::vector< double > aMaterials = m_Material->getBandProperties( Property::T, t_Side );
 		size_t size = aMaterials.size();
 		for ( size_t i = 0; i < size; i++ ) {
 			aResults.push_back( value );
@@ -43,11 +42,11 @@ namespace SingleLayerOptics {
 		return aResults;
 	}
 
-	vector< double > CBaseCell::R_dir_dir_band( const Side t_Side,
+	std::vector< double > CBaseCell::R_dir_dir_band( const Side t_Side,
 	                                            const CBeamDirection& t_Direction ) {
 		double value = R_dir_dir( t_Side, t_Direction );
-		vector< double > aResults;
-		vector< double > aMaterials = m_Material->getBandProperties( Property::R, t_Side );
+		std::vector< double > aResults;
+		std::vector< double > aMaterials = m_Material->getBandProperties( Property::R, t_Side );
 		size_t size = aMaterials.size();
 		for ( size_t i = 0; i < size; i++ ) {
 			aResults.push_back( value );
@@ -55,7 +54,7 @@ namespace SingleLayerOptics {
 		return aResults;
 	}
 
-	vector< double > CBaseCell::getBandWavelengths() const {
+	std::vector< double > CBaseCell::getBandWavelengths() const {
 		assert( m_Material != nullptr );
 		return m_Material->getBandWavelengths();
 	}

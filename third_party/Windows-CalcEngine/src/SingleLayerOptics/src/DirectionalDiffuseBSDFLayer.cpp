@@ -10,7 +10,6 @@
 #include "BSDFPatch.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -22,7 +21,7 @@ namespace SingleLayerOptics {
 	}
 
 	std::shared_ptr< CDirectionalDiffuseCell > CDirectionalDiffuseBSDFLayer::cellAsDirectionalDiffuse() const {
-		std::shared_ptr< CDirectionalDiffuseCell > aCell = dynamic_pointer_cast< CDirectionalDiffuseCell >( m_Cell );
+		std::shared_ptr< CDirectionalDiffuseCell > aCell = std::dynamic_pointer_cast< CDirectionalDiffuseCell >( m_Cell );
 		assert( aCell != nullptr );
 		return aCell;
 	}

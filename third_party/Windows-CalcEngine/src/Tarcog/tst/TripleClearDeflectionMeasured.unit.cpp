@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -60,15 +60,15 @@ protected:
 
 		auto gapThickness = 0.0127;
 		auto gapPressure = 101325.0;
-		std::shared_ptr< CBaseIGULayer > aGapLayer1 = make_shared< CIGUGapLayer >( gapThickness, gapPressure );
+		std::shared_ptr< CBaseIGULayer > aGapLayer1 = std::make_shared< CIGUGapLayer >( gapThickness, gapPressure );
 		ASSERT_TRUE( aGapLayer1 != nullptr );
 
-		std::shared_ptr< CBaseIGULayer > aGapLayer2 = make_shared< CIGUGapLayer >( gapThickness, gapPressure );
+		std::shared_ptr< CBaseIGULayer > aGapLayer2 = std::make_shared< CIGUGapLayer >( gapThickness, gapPressure );
 		ASSERT_TRUE( aGapLayer2 != nullptr );
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer1 );
 		aIGU->addLayer( aGapLayer1 );
@@ -77,13 +77,13 @@ protected:
 		aIGU->addLayer( aSolidLayer3 );
 
 		// Deflection properties
-		vector< double > measuredGapsWidths = { 0.0135, 0.013 };
+		std::vector< double > measuredGapsWidths = { 0.0135, 0.013 };
 		aIGU->setDeflectionProperties( measuredGapsWidths );
 
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		m_TarcogSystem->solve();
@@ -103,7 +103,7 @@ TEST_F( TripleClearDeflectionMeasured, Test1 ) {
 	ASSERT_TRUE( aSystem != nullptr );
 
 	auto Temperature = *aSystem->getTemperatures();
-	vector< double > correctTemperature = { 257.493976, 257.702652, 271.535517, 271.926785, 284.395405, 284.604082 };
+	std::vector< double > correctTemperature = { 257.493976, 257.702652, 271.535517, 271.926785, 284.395405, 284.604082 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -111,7 +111,7 @@ TEST_F( TripleClearDeflectionMeasured, Test1 ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities();
-	vector< double > correctRadiosity = { 247.813715, 258.078374, 300.200818, 318.403140, 362.495875, 380.380188 };
+	std::vector< double > correctRadiosity = { 247.813715, 258.078374, 300.200818, 318.403140, 362.495875, 380.380188 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {
@@ -119,7 +119,7 @@ TEST_F( TripleClearDeflectionMeasured, Test1 ) {
 	}
 
 	auto MaxDeflection = *aSystem->getMaxDeflections();
-	vector< double > correctMaxDeflection = { 0.00074180, -5.820e-05, -0.0003582 };
+	std::vector< double > correctMaxDeflection = { 0.00074180, -5.820e-05, -0.0003582 };
 	ASSERT_EQ( correctMaxDeflection.size(), MaxDeflection.size() );
 
 	for ( auto i = 0u; i < correctMaxDeflection.size(); ++i ) {
@@ -127,7 +127,7 @@ TEST_F( TripleClearDeflectionMeasured, Test1 ) {
 	}
 
 	auto MeanDeflection = *aSystem->getMeanDeflections();
-	vector< double > correctMeanDeflection = { 0.00031076, -2.437e-05, -0.0001501 };
+	std::vector< double > correctMeanDeflection = { 0.00031076, -2.437e-05, -0.0001501 };
 	ASSERT_EQ( correctMeanDeflection.size(), MeanDeflection.size() );
 
 	for ( auto i = 0u; i < correctMaxDeflection.size(); ++i ) {

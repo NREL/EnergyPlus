@@ -7,7 +7,6 @@
 #include "EquivalentScatteringLayer.hpp"
 #include "MultiLayerInterRefSingleComponent.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 
@@ -17,19 +16,19 @@ namespace MultiLayerOptics {
 		m_StateCalculated( false ), m_Theta( t_Theta ), m_Phi( t_Phi ) {
 		m_Layers.push_back( t_Layer );
 		for ( Scattering aScattering : EnumScattering() ) {
-			m_Energy[ aScattering ] = make_shared< CSurfaceEnergy >();
+			m_Energy[ aScattering ] = std::make_shared< CSurfaceEnergy >();
 		}
 		for ( Side aSide : EnumSide() ) {
-			m_StackedLayers[ aSide ] = make_shared< CLayer_List >();
+			m_StackedLayers[ aSide ] = std::make_shared< CLayer_List >();
 		}
 		std::shared_ptr< CLayerSingleComponent > aLayer = t_Layer->getLayer( Scattering::DirectDirect, t_Theta, t_Phi );
-		m_DirectComponent = make_shared< CInterRefSingleComponent >( aLayer );
+		m_DirectComponent = std::make_shared< CInterRefSingleComponent >( aLayer );
 		aLayer = t_Layer->getLayer( Scattering::DiffuseDiffuse, t_Theta, t_Phi );
-		m_DiffuseComponent = make_shared< CInterRefSingleComponent >( aLayer );
+		m_DiffuseComponent = std::make_shared< CInterRefSingleComponent >( aLayer );
 
 		for ( Side aSide : EnumSide() ) {
-			m_Abs[ make_pair( aSide, ScatteringSimple::Diffuse ) ] = make_shared< std::vector< double > >();
-			m_Abs[ make_pair( aSide, ScatteringSimple::Direct ) ] = make_shared< std::vector< double > >();
+			m_Abs[ std::make_pair( aSide, ScatteringSimple::Diffuse ) ] = std::make_shared< std::vector< double > >();
+			m_Abs[ std::make_pair( aSide, ScatteringSimple::Direct ) ] = std::make_shared< std::vector< double > >();
 		}
 	}
 
@@ -59,10 +58,10 @@ namespace MultiLayerOptics {
 	double CInterRef::getAbsorptance( const size_t Index, Side t_Side, ScatteringSimple t_Scattering,
 	                                  const double t_Theta, const double t_Phi ) {
 		calculateEnergies( t_Theta, t_Phi );
-		std::shared_ptr< std::vector< double > > aVector = m_Abs.at( make_pair( t_Side, t_Scattering ) );
+		std::shared_ptr< std::vector< double > > aVector = m_Abs.at( std::make_pair( t_Side, t_Scattering ) );
 		size_t vecSize = aVector->size();
 		if ( vecSize < Index ) {
-			throw range_error( "Requested layer index is out of range." );
+			throw std::range_error( "Requested layer index is out of range." );
 		}
 		return ( *aVector )[ Index - 1 ];
 	}
@@ -100,9 +99,9 @@ namespace MultiLayerOptics {
 		std::shared_ptr< CLayer_List > aLayers = m_StackedLayers.at( Side::Front );
 
 		// Insert exterior environment first
-		std::shared_ptr< CScatteringSurface > aFront = make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
-		std::shared_ptr< CScatteringSurface > aBack = make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
-		std::shared_ptr< CScatteringLayer > exterior = make_shared< CScatteringLayer >( aFront, aBack );
+		std::shared_ptr< CScatteringSurface > aFront = std::make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
+		std::shared_ptr< CScatteringSurface > aBack = std::make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
+		std::shared_ptr< CScatteringLayer > exterior = std::make_shared< CScatteringLayer >( aFront, aBack );
 		aLayers->push_back( exterior );
 
 		std::shared_ptr< CScatteringLayer > aLayer = m_Layers[ 0 ];
@@ -121,9 +120,9 @@ namespace MultiLayerOptics {
 		std::shared_ptr< CLayer_List > aLayers = m_StackedLayers.at( Side::Back );
 
 		// Insert interior environment
-		std::shared_ptr< CScatteringSurface > aFront = make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
-		std::shared_ptr< CScatteringSurface > aBack = make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
-		std::shared_ptr< CScatteringLayer > exterior = make_shared< CScatteringLayer >( aFront, aBack );
+		std::shared_ptr< CScatteringSurface > aFront = std::make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
+		std::shared_ptr< CScatteringSurface > aBack = std::make_shared< CScatteringSurface >( 1, 0, 0, 0, 1, 0 );
+		std::shared_ptr< CScatteringLayer > exterior = std::make_shared< CScatteringLayer >( aFront, aBack );
 		aLayers->push_back( exterior );
 
 		size_t size = m_Layers.size() - 1;
@@ -141,7 +140,7 @@ namespace MultiLayerOptics {
 
 	std::shared_ptr< CSurfaceEnergy > CInterRef::calcDiffuseEnergy( const double t_Theta, const double t_Phi ) {
 		//Sum of previous two components. Total diffuse energy that gets off the surfaces.
-		std::shared_ptr< CSurfaceEnergy > diffSum = make_shared< CSurfaceEnergy >();
+		std::shared_ptr< CSurfaceEnergy > diffSum = std::make_shared< CSurfaceEnergy >();
 
 		for ( EnergyFlow aEnergyFlow : EnumEnergyFlow() ) {
 			for ( size_t i = 1; i <= m_Layers.size(); ++i ) { // Layer indexing goes from one
@@ -179,7 +178,7 @@ namespace MultiLayerOptics {
 
 		// Now need to calculate interreflections of total diffuse components that are leaving
 		// every surface and calculate total diffuse component that is incoming to every surface.
-		std::shared_ptr< CSurfaceEnergy > aScatter = make_shared< CSurfaceEnergy >();
+		std::shared_ptr< CSurfaceEnergy > aScatter = std::make_shared< CSurfaceEnergy >();
 
 		// Calculate total energy scatterred from beam to diffuse
 		for ( EnergyFlow aEnergyFlow : EnumEnergyFlow() ) {
@@ -228,8 +227,8 @@ namespace MultiLayerOptics {
 				// Note that front and back absorptances are actually reffereing to forward and backward
 				// energy flows. That is why we need this conversion.
 				Side flowSide = getSideFromFlow( aEnergyFlow );
-				m_Abs.at( make_pair( flowSide, ScatteringSimple::Direct ) )->push_back( EnergyDirect );
-				m_Abs.at( make_pair( flowSide, ScatteringSimple::Diffuse ) )->push_back( EnergyDiffuse );
+				m_Abs.at( std::make_pair( flowSide, ScatteringSimple::Direct ) )->push_back( EnergyDirect );
+				m_Abs.at( std::make_pair( flowSide, ScatteringSimple::Diffuse ) )->push_back( EnergyDiffuse );
 			}
 		}
 	}

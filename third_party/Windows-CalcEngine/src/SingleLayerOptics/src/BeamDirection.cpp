@@ -4,7 +4,6 @@
 #include "WCECommon.hpp"
 #include "BeamDirection.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -20,10 +19,10 @@ namespace SingleLayerOptics {
 	CBeamDirection::CBeamDirection( const double t_Theta, const double t_Phi ) :
 		m_Theta( t_Theta ), m_Phi( t_Phi ) {
 		if ( t_Theta < 0 ) {
-			throw runtime_error( "Theta angle cannot be less than zero degrees." );
+			throw std::runtime_error( "Theta angle cannot be less than zero degrees." );
 		}
 		if ( t_Theta > 90 ) {
-			throw runtime_error( "Theta angle cannot be more than 90 degrees." );
+			throw std::runtime_error( "Theta angle cannot be more than 90 degrees." );
 		}
 
 		updateProfileAngle( m_Theta, m_Phi );

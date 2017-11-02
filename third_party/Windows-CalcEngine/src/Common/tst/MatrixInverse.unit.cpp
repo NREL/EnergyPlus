@@ -4,7 +4,6 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 class TestMatrixInverse : public testing::Test {
@@ -20,17 +19,17 @@ TEST_F( TestMatrixInverse, Test1 ) {
 
 	const size_t n = 3;
 
-	CSquareMatrix A = CSquareMatrix( n );
+	auto a = CSquareMatrix( n );
 
-	A[ 0 ] = { 3.12, 8.56, 4.19 };
-	A[ 1 ] = { 6.87, 4.39, 7.11 };
-	A[ 2 ] = { 6.59, 4.98, 7.69 };
+	a[ 0 ] = { 3.12, 8.56, 4.19 };
+	a[ 1 ] = { 6.87, 4.39, 7.11 };
+	a[ 2 ] = { 6.59, 4.98, 7.69 };
 
-	std::shared_ptr< CSquareMatrix > inverse = A.inverse();
+	auto inverse = a.inverse();
 
 	EXPECT_EQ( n, inverse->getSize() );
 
-	CSquareMatrix inverseCorrect = CSquareMatrix( n );
+	auto inverseCorrect = CSquareMatrix( n );
 
 	inverseCorrect[ 0 ] = { 0.048264485, 1.316176934, -1.243204967 };
 	inverseCorrect[ 1 ] = { 0.17492546, 0.105952357, -0.193271643 };
@@ -49,18 +48,18 @@ TEST_F( TestMatrixInverse, Test2 ) {
 
 	const size_t n = 4;
 
-	CSquareMatrix A = CSquareMatrix( n );
+	auto A = CSquareMatrix( n );
 
 	A[ 0 ] = { 2.59, 1.48, 9.54, 4.16 };
 	A[ 1 ] = { 9.45, 7.25, 6.58, 4.95 };
 	A[ 2 ] = { 2.12, 5.36, 4.98, 8.23 };
 	A[ 3 ] = { 4.89, 1.11, 7.45, 3.26 };
 
-	std::shared_ptr< CSquareMatrix > inverse = A.inverse();
+	auto inverse = A.inverse();
 
 	EXPECT_EQ( n, inverse->getSize() );
 
-	CSquareMatrix inverseCorrect = CSquareMatrix( n );
+	auto inverseCorrect = CSquareMatrix( n );
 
 	inverseCorrect[ 0 ] = { -0.266190489, 0.003957093, -0.001994289, 0.338704853 };
 	inverseCorrect[ 1 ] = { 0.313584868, 0.208591568, -0.07062952, -0.538576798 };

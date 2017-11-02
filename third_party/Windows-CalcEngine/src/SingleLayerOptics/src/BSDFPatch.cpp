@@ -1,10 +1,8 @@
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include "BSDFPatch.hpp"
 #include "BeamDirection.hpp"
-
-using namespace std;
 
 namespace SingleLayerOptics {
 
@@ -60,7 +58,7 @@ namespace SingleLayerOptics {
 	}
 
 	std::shared_ptr< CBeamDirection > CBSDFPatch::centerPoint() const {
-		return make_shared< CBeamDirection >( m_Theta->average(), m_Phi->average() );
+		return std::make_shared< CBeamDirection >( m_Theta->average(), m_Phi->average() );
 	}
 
 	double CBSDFPatch::lambda() const {

@@ -6,7 +6,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 
@@ -21,7 +20,7 @@ namespace MultiLayerOptics {
 		const double t_Tb_dif_dif, const double t_Rb_dif_dif ) :
 		m_Calculated( false ), m_Theta( 0 ), m_Phi( 0 ) {
 
-		std::shared_ptr< CScatteringLayer > aLayer = make_shared< CScatteringLayer >(
+		std::shared_ptr< CScatteringLayer > aLayer = std::make_shared< CScatteringLayer >(
 		                                                                        t_Tf_dir_dir, t_Rf_dir_dir, t_Tb_dir_dir, t_Rb_dir_dir,
 		                                                                        t_Tf_dir_dif, t_Rf_dir_dif, t_Tb_dir_dif, t_Rb_dir_dif,
 		                                                                        t_Tf_dif_dif, t_Rf_dif_dif, t_Tb_dif_dif, t_Rb_dif_dif );
@@ -43,7 +42,7 @@ namespace MultiLayerOptics {
 		const double t_Tb_dif_dif, const double t_Rb_dif_dif,
 		const Side t_Side ) {
 
-		std::shared_ptr< CScatteringLayer > aLayer = make_shared< CScatteringLayer >(
+		std::shared_ptr< CScatteringLayer > aLayer = std::make_shared< CScatteringLayer >(
 		                                                                        t_Tf_dir_dir, t_Rf_dir_dir, t_Tb_dir_dir, t_Rb_dir_dir,
 		                                                                        t_Tf_dir_dif, t_Rf_dir_dif, t_Tb_dir_dif, t_Rb_dir_dif,
 		                                                                        t_Tf_dif_dif, t_Rf_dif_dif, t_Tb_dif_dif, t_Rb_dif_dif );
@@ -105,8 +104,8 @@ namespace MultiLayerOptics {
 
 	void CMultiLayerScattered::calculateState( const double t_Theta, const double t_Phi ) {
 		if ( !m_Calculated || ( t_Theta != m_Theta ) || ( t_Phi != m_Phi ) ) {
-			m_Layer = make_shared< CEquivalentScatteringLayer >( *m_Layers[ 0 ], t_Theta, t_Phi );
-			m_InterRef = make_shared< CInterRef >( m_Layers[ 0 ], t_Theta, t_Phi );
+			m_Layer = std::make_shared< CEquivalentScatteringLayer >( *m_Layers[ 0 ], t_Theta, t_Phi );
+			m_InterRef = std::make_shared< CInterRef >( m_Layers[ 0 ], t_Theta, t_Phi );
 			for ( size_t i = 1; i < m_Layers.size(); ++i ) {
 				m_Layer->addLayer( *m_Layers[ i ], Side::Back, t_Theta, t_Phi );
 				m_InterRef->addLayer( m_Layers[ i ], Side::Back, t_Theta, t_Phi );

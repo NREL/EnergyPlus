@@ -6,7 +6,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 using namespace SingleLayerOptics;
@@ -24,7 +23,7 @@ protected:
 	virtual void SetUp() {
 
 		// Create lambda matrix
-		vector< CBSDFDefinition > aDefinitions;
+		std::vector< CBSDFDefinition > aDefinitions;
 		aDefinitions.push_back( CBSDFDefinition( 0, 1 ) );
 		aDefinitions.push_back( CBSDFDefinition( 15, 1 ) );
 		aDefinitions.push_back( CBSDFDefinition( 30, 1 ) );
@@ -33,9 +32,9 @@ protected:
 		aDefinitions.push_back( CBSDFDefinition( 75, 1 ) );
 		aDefinitions.push_back( CBSDFDefinition( 86.25, 1 ) );
 
-		std::shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( aDefinitions );
+		std::shared_ptr< CBSDFHemisphere > aBSDF = std::make_shared< CBSDFHemisphere >( aDefinitions );
 
-		std::shared_ptr< CSeries > aSolarRadiation = make_shared< CSeries >();
+		std::shared_ptr< CSeries > aSolarRadiation = std::make_shared< CSeries >();
 
 		// Full ASTM E891-87 Table 1
 		aSolarRadiation->addProperty( 0.3000, 0.0 );
@@ -160,7 +159,7 @@ protected:
 		aSolarRadiation->addProperty( 3.7650, 9.0 );
 		aSolarRadiation->addProperty( 4.0450, 6.9 );
 
-		std::shared_ptr< CSpectralSampleData > aMeasurements = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > aMeasurements = std::make_shared< CSpectralSampleData >();
 
 		aMeasurements->addRecord( 0.300, 0.0020, 0.0470, 0.0480 );
 		aMeasurements->addRecord( 0.305, 0.0030, 0.0470, 0.0480 );
@@ -274,7 +273,7 @@ protected:
 		aMeasurements->addRecord( 2.450, 0.8260, 0.0690, 0.0690 );
 		aMeasurements->addRecord( 2.500, 0.8220, 0.0680, 0.0680 );
 
-		std::shared_ptr< CSpectralSample > aSample = make_shared< CSpectralSample >( aMeasurements, aSolarRadiation );
+		std::shared_ptr< CSpectralSample > aSample = std::make_shared< CSpectralSample >( aMeasurements, aSolarRadiation );
 
 		double thickness = 3.048e-3; // [m]
 		MaterialType aType = MaterialType::Monolithic;
@@ -283,16 +282,16 @@ protected:
 		std::shared_ptr< CMaterialSample > aMaterial =
 			std::make_shared< CMaterialSample >( aSample, thickness, aType, minLambda, maxLambda );
 
-		std::shared_ptr< CSpecularCellDescription > aCellDescription = make_shared< CSpecularCellDescription >();
+		std::shared_ptr< CSpecularCellDescription > aCellDescription = std::make_shared< CSpecularCellDescription >();
 
-		std::shared_ptr< CSpecularCell > aCell = make_shared< CSpecularCell >( aMaterial, aCellDescription );
+		std::shared_ptr< CSpecularCell > aCell = std::make_shared< CSpecularCell >( aMaterial, aCellDescription );
 
-		std::shared_ptr< CSpecularBSDFLayer > aLayer102 = make_shared< CSpecularBSDFLayer >( aCell, aBSDF );
+		std::shared_ptr< CSpecularBSDFLayer > aLayer102 = std::make_shared< CSpecularBSDFLayer >( aCell, aBSDF );
 
 		std::shared_ptr< CBSDFIntegrator > aLayer1 = aLayer102->getResults();
 		std::shared_ptr< CBSDFIntegrator > aLayer2 = aLayer102->getResults();
 
-		m_EquivalentBSDFLayer = make_shared< CEquivalentBSDFLayerSingleBand >( aLayer1 );
+		m_EquivalentBSDFLayer = std::make_shared< CEquivalentBSDFLayerSingleBand >( aLayer1 );
 		m_EquivalentBSDFLayer->addLayer( aLayer2 );
 
 	}
@@ -392,8 +391,8 @@ TEST_F( TestEquivalentBSDFDoubleSpecular, TestDoubleLayerBSDF ) {
 		}
 	}
 
-	vector< double > A = *aLayer->getLayerAbsorptances( 1, Side::Front );
-	vector< double > correctAbs = { 0.09710127, 0.09842101, 0.10243759, 0.10939515, 0.12006037, 0.13316094, 0.10745388 };
+	std::vector< double > A = *aLayer->getLayerAbsorptances( 1, Side::Front );
+	std::vector< double > correctAbs = { 0.09710127, 0.09842101, 0.10243759, 0.10939515, 0.12006037, 0.13316094, 0.10745388 };
 
 	for ( size_t i = 0; i < size; i++ ) {
 		EXPECT_NEAR( correctAbs[ i ], A[ i ], 1e-6 );

@@ -6,7 +6,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
@@ -21,7 +21,7 @@ private:
 
 	std::shared_ptr< CSeries > loadSolarRadiationFile() {
 
-		std::shared_ptr< CSeries > aSolarRadiation = make_shared< CSeries >();
+		std::shared_ptr< CSeries > aSolarRadiation = std::make_shared< CSeries >();
 
 		aSolarRadiation->addProperty( 0.3000, 0 );
 		aSolarRadiation->addProperty( 0.3050, 9.5 );
@@ -135,7 +135,7 @@ private:
 	}
 
 	std::shared_ptr< CSpectralSampleData > loadSampleData_NFRC_102() {
-		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = std::make_shared< CSpectralSampleData >();
 
 		aMeasurements_102->addRecord( 0.300, 0.0020, 0.0470, 0.0480 );
 		aMeasurements_102->addRecord( 0.305, 0.0030, 0.0470, 0.0480 );
@@ -259,17 +259,17 @@ protected:
 		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = loadSampleData_NFRC_102();
 
 		// Create samples from measurements and solar radiation
-		std::shared_ptr< CSpectralSample > aSample_102 = make_shared< CSpectralSample >( aMeasurements_102 );
+		std::shared_ptr< CSpectralSample > aSample_102 = std::make_shared< CSpectralSample >( aMeasurements_102 );
 
 		// Create material from samples
 		double thickness = 3.048e-3; // [m]
-		std::shared_ptr< CMaterial > aMaterial_102 = make_shared< CMaterialSample >( aSample_102,
+		std::shared_ptr< CMaterial > aMaterial_102 = std::make_shared< CMaterialSample >( aSample_102,
 		                                                                        thickness, MaterialType::Monolithic, WavelengthRange::Solar );
 
-		std::shared_ptr< CScatteringLayer > Layer_102 = make_shared< CScatteringLayer >( aMaterial_102 );
+		std::shared_ptr< CScatteringLayer > Layer_102 = std::make_shared< CScatteringLayer >( aMaterial_102 );
 
 		// Equivalent BSDF layer
-		m_Layer = make_shared< CMultiLayerScattered >( Layer_102 );
+		m_Layer = std::make_shared< CMultiLayerScattered >( Layer_102 );
 
 		std::shared_ptr< CSeries > aSolarRadiation = loadSolarRadiationFile();
 		m_Layer->setSourceData( aSolarRadiation );

@@ -8,11 +8,8 @@ namespace Tarcog {
 
 	}
 
-	// CBaseLayer::CBaseLayer( CBaseLayer const& t_Layer ) :
-	// 	CState( t_Layer ), CLayerGeometry( t_Layer ), CLayerHeatFlow( t_Layer ) {
-	// 
-	// }
-
+	// GCC complains about enable_shared_from_this in copy constructor which is invalid complain.
+	// This is to disable that warning message
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wextra"
 

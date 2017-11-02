@@ -3,7 +3,6 @@
 #include "EquivalentLayerSingleComponent.hpp"
 #include "WCESingleLayerOptics.hpp"
 
-using namespace std;
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 
@@ -11,7 +10,7 @@ namespace MultiLayerOptics {
 
 	CEquivalentLayerSingleComponent::CEquivalentLayerSingleComponent( const double t_Tf, const double t_Rf,
 	                                                                  const double t_Tb, const double t_Rb ) :
-		m_EquivalentLayer( make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb ) ) {
+		m_EquivalentLayer( std::make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb ) ) {
 		
 	}
 
@@ -23,7 +22,7 @@ namespace MultiLayerOptics {
 		const double Tb = t_Layer.getProperty( Property::T, Side::Back );
 		const double Rb = t_Layer.getProperty( Property::R, Side::Back );
 
-		m_EquivalentLayer = make_shared< CLayerSingleComponent >( Tf, Rf, Tb, Rb );
+		m_EquivalentLayer = std::make_shared< CLayerSingleComponent >( Tf, Rf, Tb, Rb );
 	}
 
 	void CEquivalentLayerSingleComponent::addLayer( const double t_Tf, const double t_Rf, const double t_Tb,
@@ -32,12 +31,12 @@ namespace MultiLayerOptics {
 		std::shared_ptr< CLayerSingleComponent > secondLayer = nullptr;
 		switch ( t_Side ) {
 		case Side::Front:
-			firstLayer = make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb );
+			firstLayer = std::make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb );
 			secondLayer = m_EquivalentLayer;
 			break;
 		case Side::Back:
 			firstLayer = m_EquivalentLayer;
-			secondLayer = make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb );
+			secondLayer = std::make_shared< CLayerSingleComponent >( t_Tf, t_Rf, t_Tb, t_Rb );
 			break;
 		default:
 			assert("Error in selection of side in double layer calculations.");
@@ -48,7 +47,7 @@ namespace MultiLayerOptics {
 		double Tb = T( *firstLayer, *secondLayer, Side::Back );
 		double Rf = R( *firstLayer, *secondLayer, Side::Front );
 		double Rb = R( *firstLayer, *secondLayer, Side::Back );
-		m_EquivalentLayer = make_shared< CLayerSingleComponent >( Tf, Rf, Tb, Rb );
+		m_EquivalentLayer = std::make_shared< CLayerSingleComponent >( Tf, Rf, Tb, Rb );
 	}
 
 	void CEquivalentLayerSingleComponent::addLayer( const CLayerSingleComponent& t_Layer,

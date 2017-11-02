@@ -109,7 +109,7 @@ namespace SingleLayerOptics {
 			std::vector< std::shared_ptr< CVenetianSlatEnergies > > m_Energies;
 		};
 
-		// Create mapping from view factors matrix to front and back slats (fills b and f vectors of this class)
+		// Create mapping from view factors matrix to front and back slats (fills b and f std::vectors of this class)
 		void createSlatsMapping();
 
 		// Energy matrix is valid for any incoming direction. Depends on geometry and will be caluculated only
@@ -127,10 +127,10 @@ namespace SingleLayerOptics {
 		std::shared_ptr< std::vector< double > > slatRadiances(
 			std::shared_ptr< std::vector< SegmentIrradiance > > t_Irradiances );
 
-		// Creates diffuse to diffuse vector. Right hand side of the equation
+		// Creates diffuse to diffuse std::vector. Right hand side of the equation
 		std::shared_ptr< std::vector< double > > diffuseVector();
 
-		// Create beam to diffuse vector. Right hand side of the equation
+		// Create beam to diffuse std::vector. Right hand side of the equation
 		std::shared_ptr< std::vector< CVenetianCellEnergy::BeamSegmentView > >
 		beamVector( const CBeamDirection& t_Direction, const FenestrationCommon::Side t_Side );
 

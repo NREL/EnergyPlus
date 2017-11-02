@@ -3,7 +3,6 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 class TestPolynomialFit : public testing::Test {
@@ -18,15 +17,15 @@ protected:
 TEST_F( TestPolynomialFit, Test1 ) {
 	SCOPED_TRACE( "Begin Test: Polynomial fit test 1." );
 
-	size_t const Order = 2;
+	const size_t order = 2;
 
-	vector< pair< double, double > > input = { { 1, 1 }, { 2, 8 }, { 3, 12 }, { 4, 16 } };
+	const std::vector< std::pair< double, double > > input = { { 1, 1 }, { 2, 8 }, { 3, 12 }, { 4, 16 } };
 
-	auto poly = PolynomialFit( Order );
+	auto poly = PolynomialFit( order );
 
 	auto res = poly.getCoefficients( input );
 
-	vector< double > correct = { -6.75, 8.65, -0.75 };
+	std::vector< double > correct = { -6.75, 8.65, -0.75 };
 
 	ASSERT_EQ( correct.size(), res.size() );
 
@@ -39,9 +38,9 @@ TEST_F( TestPolynomialFit, Test1 ) {
 TEST_F( TestPolynomialFit, Test2 ) {
 	SCOPED_TRACE( "Begin Test: Polynomial fit test 2." );
 
-	size_t const Order = 6;
+	const size_t order = 6;
 
-	vector< pair< double, double > > input{
+	std::vector< std::pair< double, double > > input{
 		{ 1.000000000, 0.833848000 },
 		{ 0.984807753, 0.833295072 },
 		{ 0.939692621, 0.831346909 },
@@ -54,11 +53,11 @@ TEST_F( TestPolynomialFit, Test2 ) {
 		{ 0.000000000, 0.000000000 }
 	};
 
-	PolynomialFit poly = PolynomialFit( Order );
+	auto poly = PolynomialFit( order );
 
 	auto res = poly.getCoefficients( input );
 
-	vector< double > correct = { -9.27348e-6, 2.288300, 1.646894, -15.397616,
+	std::vector< double > correct = { -9.27348e-6, 2.288300, 1.646894, -15.397616,
 		26.122771, -19.148321, 5.322077 };
 
 	ASSERT_EQ( correct.size(), res.size() );

@@ -3,7 +3,6 @@
 
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 class TestLinearSolver1 : public testing::Test {
@@ -20,14 +19,14 @@ protected:
 TEST_F( TestLinearSolver1, Test1 ) {
 	SCOPED_TRACE( "Begin Test: Test Linear Solver (1) - Solving simple matrix." );
 
-	auto size = 3;
+	const auto size = 3;
 	CSquareMatrix aMatrix( size );
 
 	aMatrix[ 0 ] = { 2, 1, 3 };
 	aMatrix[ 1 ] = { 2, 6, 8 };
 	aMatrix[ 2 ] = { 6, 8, 18 };
 
-	vector< double > aVector = { 1, 3, 5 };
+	std::vector< double > aVector = { 1, 3, 5 };
 
 	CLinearSolver aSolver;
 
@@ -41,7 +40,7 @@ TEST_F( TestLinearSolver1, Test1 ) {
 TEST_F( TestLinearSolver1, Test2 ) {
 	SCOPED_TRACE( "Begin Test: Test Linear Solver (2) - Solving simple matrix." );
 
-	auto size = 4;
+	const auto size = 4;
 	CSquareMatrix aMatrix( size );
 
 	// This set-up is from fortran tarcog example
@@ -50,7 +49,7 @@ TEST_F( TestLinearSolver1, Test2 ) {
 	aMatrix[ 2 ] = { 0, 0, -1, 1.26433319889839 };
 	aMatrix[ 3 ] = { 32808.3972386696, 0, -1, -32810.4664383299 };
 
-	vector< double > aVector = { 3163.241853, -73.479324, -67.913411, -1070.271453 };
+	std::vector< double > aVector = { 3163.241853, -73.479324, -67.913411, -1070.271453 };
 
 	CLinearSolver aSolver;
 

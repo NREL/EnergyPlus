@@ -5,7 +5,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 using namespace MultiLayerOptics;
@@ -21,7 +21,7 @@ protected:
 	virtual void SetUp() {
 
 		// Create lambda matrix
-		vector< CBSDFDefinition > aDefinitions;
+		std::vector< CBSDFDefinition > aDefinitions;
 		aDefinitions.push_back( CBSDFDefinition( 0, 1 ) );
 		aDefinitions.push_back( CBSDFDefinition( 15, 1 ) );
 		aDefinitions.push_back( CBSDFDefinition( 30, 1 ) );
@@ -53,7 +53,7 @@ protected:
 		Rf[ 5 ] = { 0, 0, 0, 0, 0, 0.951907739, 0 };
 		Rf[ 6 ] = { 0, 0, 0, 0, 0, 0, 15.28298172 };
 
-		m_InterReflectance = make_shared< CInterReflectance >( aLambdas, Rb, Rf );
+		m_InterReflectance = std::make_shared< CInterReflectance >( aLambdas, Rb, Rf );
 
 	}
 

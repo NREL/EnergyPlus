@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -46,7 +46,7 @@ protected:
 		/////////////////////////////////////////////////////////
 
 		auto roomTemperature = 294.15;
-		std::shared_ptr< CEnvironment > Indoor = make_shared< CIndoorEnvironment >( roomTemperature, pressure );
+		std::shared_ptr< CEnvironment > Indoor = std::make_shared< CIndoorEnvironment >( roomTemperature, pressure );
 		ASSERT_TRUE( Indoor != nullptr );
 
 		auto hcin = 2.6262;
@@ -67,14 +67,14 @@ protected:
 
 		auto windowWidth = 2.7130375;
 		auto windowHeight = 3.02895;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer );
 
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		auto convergenceTolerance = 0.02;
@@ -97,7 +97,7 @@ TEST_F( TestSingleClearSingleSystem_EPlusMode, Test1 ) {
 	ASSERT_TRUE( aSystem != nullptr );
 
 	auto Temperature = *aSystem->getTemperatures();
-	vector< double > correctTemperature = { 259.636156, 260.283157 };
+	std::vector< double > correctTemperature = { 259.636156, 260.283157 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -105,7 +105,7 @@ TEST_F( TestSingleClearSingleSystem_EPlusMode, Test1 ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities();
-	vector< double > correctRadiosity = { 251.497764, 283.391770 };
+	std::vector< double > correctRadiosity = { 251.497764, 283.391770 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {

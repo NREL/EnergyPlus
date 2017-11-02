@@ -5,7 +5,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 using namespace MultiLayerOptics;
@@ -21,7 +21,7 @@ protected:
 		// This test (example) shows how to get multilayer sample data from two measurements. Results are calculated
 		// at each wavelength
 
-		std::shared_ptr< CSpectralSampleData > sampleMeasurements1 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > sampleMeasurements1 = std::make_shared< CSpectralSampleData >();
 		sampleMeasurements1->addRecord( 0.330, 0.0857, 0.0560, 0.2646 );
 		sampleMeasurements1->addRecord( 0.335, 0.1280, 0.0623, 0.2664 );
 		sampleMeasurements1->addRecord( 0.340, 0.1707, 0.0719, 0.2668 );
@@ -38,7 +38,7 @@ protected:
 		sampleMeasurements1->addRecord( 0.395, 0.5455, 0.2553, 0.2781 );
 		sampleMeasurements1->addRecord( 0.400, 0.5630, 0.2651, 0.2757 );
 
-		std::shared_ptr< CSpectralSampleData > sampleMeasurements2 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > sampleMeasurements2 = std::make_shared< CSpectralSampleData >();
 		sampleMeasurements2->addRecord( 0.330, 0.1600, 0.0450, 0.0470 );
 		sampleMeasurements2->addRecord( 0.335, 0.2940, 0.0490, 0.0500 );
 		sampleMeasurements2->addRecord( 0.340, 0.4370, 0.0550, 0.0560 );
@@ -55,7 +55,7 @@ protected:
 		sampleMeasurements2->addRecord( 0.395, 0.8680, 0.0830, 0.0830 );
 		sampleMeasurements2->addRecord( 0.400, 0.8750, 0.0830, 0.0830 );
 
-		m_MultiLayerOptics = make_shared< CMultiPaneSampleData >();
+		m_MultiLayerOptics = std::make_shared< CMultiPaneSampleData >();
 		m_MultiLayerOptics->addSample( sampleMeasurements1 );
 		m_MultiLayerOptics->addSample( sampleMeasurements2 );
 	}
@@ -72,7 +72,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleData, TestDoublePaneResults ) {
 
 	auto MultiLayerOptics = getMultiLayerOptics();
 
-	vector< double > correctT;
+	std::vector< double > correctT;
 	correctT.push_back( 0.013877236 );
 	correctT.push_back( 0.038129730 );
 	correctT.push_back( 0.075706822 );
@@ -97,7 +97,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleData, TestDoublePaneResults ) {
 		EXPECT_NEAR( correctT[ i ], transmittances[ i ].value(), 1e-6 );
 	}
 
-	vector< double > correctRf;
+	std::vector< double > correctRf;
 	correctRf.push_back( 0.056334485 );
 	correctRf.push_back( 0.063113434 );
 	correctRf.push_back( 0.073526484 );
@@ -122,7 +122,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleData, TestDoublePaneResults ) {
 		EXPECT_NEAR( correctRf[ i ], Rf[ i ].value(), 1e-6 );
 	}
 
-	vector< double > correctRb;
+	std::vector< double > correctRb;
 	correctRb.push_back( 0.053855387 );
 	correctRb.push_back( 0.073331105 );
 	correctRb.push_back( 0.107709312 );
@@ -147,7 +147,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleData, TestDoublePaneResults ) {
 		EXPECT_NEAR( correctRb[ i ], Rb[ i ].value(), 1e-6 );
 	}
 
-	vector< double > correctAbs;
+	std::vector< double > correctAbs;
 	correctAbs.push_back( 0.929788279 );
 	correctAbs.push_back( 0.898756836 );
 	correctAbs.push_back( 0.850766694 );
@@ -180,7 +180,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleData, TestDoublePaneAbsorptances ) {
 
 	auto MultiLayerOptics = getMultiLayerOptics();
 
-	vector< double > correctAbs;
+	std::vector< double > correctAbs;
 	correctAbs.push_back( 0.860835761 );
 	correctAbs.push_back( 0.813548561 );
 	correctAbs.push_back( 0.762759679 );

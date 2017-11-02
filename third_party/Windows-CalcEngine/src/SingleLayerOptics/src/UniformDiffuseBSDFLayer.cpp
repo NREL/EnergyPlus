@@ -6,11 +6,9 @@
 #include "UniformDiffuseCell.hpp"
 #include "BSDFIntegrator.hpp"
 #include "BSDFDirections.hpp"
-#include "BSDFPatch.hpp"
 #include "WCECommon.hpp"
 #include "BeamDirection.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -22,7 +20,7 @@ namespace SingleLayerOptics {
 	}
 
 	std::shared_ptr< CUniformDiffuseCell > CUniformDiffuseBSDFLayer::cellAsUniformDiffuse() const {
-		std::shared_ptr< CUniformDiffuseCell > aCell = dynamic_pointer_cast< CUniformDiffuseCell >( m_Cell );
+		std::shared_ptr< CUniformDiffuseCell > aCell = std::dynamic_pointer_cast< CUniformDiffuseCell >( m_Cell );
 		assert( aCell != nullptr );
 		return aCell;
 	}
@@ -56,8 +54,8 @@ namespace SingleLayerOptics {
 
 		std::shared_ptr< CUniformDiffuseCell > aCell = cellAsUniformDiffuse();
 
-		vector< double > aTau = aCell->T_dir_dif_band( aSide, t_Direction );
-		vector< double > Ref = aCell->R_dir_dif_band( aSide, t_Direction );
+		std::vector< double > aTau = aCell->T_dir_dif_band( aSide, t_Direction );
+		std::vector< double > Ref = aCell->R_dir_dif_band( aSide, t_Direction );
 
 		std::shared_ptr< const CBSDFDirections > aDirections =
 			m_BSDFHemisphere->getDirections( BSDFHemisphere::Incoming );

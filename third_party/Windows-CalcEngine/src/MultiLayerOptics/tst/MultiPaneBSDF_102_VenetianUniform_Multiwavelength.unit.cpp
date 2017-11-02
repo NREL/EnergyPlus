@@ -6,7 +6,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
@@ -23,7 +23,7 @@ private:
 
 	std::shared_ptr< CSeries > loadSolarRadiationFile() {
 
-		std::shared_ptr< CSeries > aSolarRadiation = make_shared< CSeries >();
+		std::shared_ptr< CSeries > aSolarRadiation = std::make_shared< CSeries >();
 
 		// Full ASTM E891-87 Table 1 (Solar radiation)
 		aSolarRadiation->addProperty( 0.3000, 0.0 );
@@ -152,7 +152,7 @@ private:
 	}
 
 	std::shared_ptr< CSpectralSampleData > loadSampleData_NFRC_102() {
-		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = std::make_shared< CSpectralSampleData >();
 
 		aMeasurements_102->addRecord( 0.300, 0.0020, 0.0470, 0.0480 );
 		aMeasurements_102->addRecord( 0.305, 0.0030, 0.0470, 0.0480 );
@@ -271,7 +271,7 @@ private:
 	}
 
 	std::shared_ptr< CSpectralSampleData > loadVenetianBlindMaterial() {
-		std::shared_ptr< CSpectralSampleData > aMeasurements_Venetian = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > aMeasurements_Venetian = std::make_shared< CSpectralSampleData >();
 
 		aMeasurements_Venetian->addRecord( 0.30, 0, 0.08, 0.08 );
 		aMeasurements_Venetian->addRecord( 0.32, 0, 0.08, 0.08 );
@@ -344,16 +344,16 @@ protected:
 		// set or to use wavelenght set from solar radiation source or even detector source. Note that
 		// in this test case we are using default settings, which are use wavelength set from measurements
 		// and do not apply any detector data
-		std::shared_ptr< CSpectralSample > aSample_102 = make_shared< CSpectralSample >( aMeasurements_102 );
+		std::shared_ptr< CSpectralSample > aSample_102 = std::make_shared< CSpectralSample >( aMeasurements_102 );
 
 		// Define other properties that will be used to create material. Range is used to define range for which
 		// material will be used and thickness will be used to calculate angular dependence of the material.
 		// Material type is used to define material coating (also important for angular dependence)
 		double thickness = 3.048e-3; // [m]
-		std::shared_ptr< CMaterial > aMaterial_102 = make_shared< CMaterialSample >( aSample_102,
+		std::shared_ptr< CMaterial > aMaterial_102 = std::make_shared< CMaterialSample >( aSample_102,
 		                                                                        thickness, MaterialType::Monolithic, WavelengthRange::Solar );
 
-		std::shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Small );
+		std::shared_ptr< CBSDFHemisphere > aBSDF = std::make_shared< CBSDFHemisphere >( BSDFBasis::Small );
 
 		// specular layer NFRC=102
 		CBSDFLayerMaker aMaker102 = CBSDFLayerMaker( aMaterial_102, aBSDF );
@@ -367,7 +367,7 @@ protected:
 			std::make_shared< CSpectralSample >( aMeasurements_Venetian );
 
 		thickness = 1.5e-3; // [m]
-		std::shared_ptr< CMaterial > aMaterial_Venetian = make_shared< CMaterialSample >( aSample_Venetian,
+		std::shared_ptr< CMaterial > aMaterial_Venetian = std::make_shared< CMaterialSample >( aSample_Venetian,
 		                                                                             thickness, MaterialType::Monolithic, WavelengthRange::Solar );
 
 		// make cell geometry
@@ -386,14 +386,14 @@ protected:
 		std::shared_ptr< CBSDFLayer > aVenetian = aMakerVenetian.getLayer();
 
 		// All integration will be performed over wavelengths that are specified in NFRC=102
-		vector< double > commonWavelengths = aMeasurements_102->getWavelengths();
+		std::vector< double > commonWavelengths = aMeasurements_102->getWavelengths();
 
 		std::shared_ptr< CEquivalentBSDFLayer > aEqLayer =
 			std::make_shared< CEquivalentBSDFLayer >( commonWavelengths, Layer_102 );
 		aEqLayer->addLayer( aVenetian );
 
 		std::shared_ptr< CSeries > aSolarRadiation = loadSolarRadiationFile();
-		m_Layer = make_shared< CMultiPaneBSDF >( aEqLayer, aSolarRadiation );
+		m_Layer = std::make_shared< CMultiPaneBSDF >( aEqLayer, aSolarRadiation );
 
 	}
 
@@ -419,7 +419,7 @@ TEST_F( MultiPaneBSDF_102_VenetianUniformMultiWL, TestBSDF1 ) {
 	// Front transmittance matrix
 	size_t size = aT.getSize();
 
-	vector< double > correctResults;
+	std::vector< double > correctResults;
 	correctResults.push_back( 20.7108616 );
 	correctResults.push_back( 2.68840995 );
 	correctResults.push_back( 1.48890408 );
@@ -452,7 +452,7 @@ TEST_F( MultiPaneBSDF_102_VenetianUniformMultiWL, TestBSDF1 ) {
 	}
 
 	// Front absorptance layer 1
-	vector< double > aAbsF = *aLayer.Abs( minLambda, maxLambda, Side::Front, 1 );
+	std::vector< double > aAbsF = *aLayer.Abs( minLambda, maxLambda, Side::Front, 1 );
 
 	correctResults.clear();
 
@@ -488,7 +488,7 @@ TEST_F( MultiPaneBSDF_102_VenetianUniformMultiWL, TestBSDF1 ) {
 	}
 
 	// Back absorptance layer 1
-	vector< double > aAbsB = *aLayer.Abs( minLambda, maxLambda, Side::Back, 1 );
+	std::vector< double > aAbsB = *aLayer.Abs( minLambda, maxLambda, Side::Back, 1 );
 
 	correctResults.clear();
 

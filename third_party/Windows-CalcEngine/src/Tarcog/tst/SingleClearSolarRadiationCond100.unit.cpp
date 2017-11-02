@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -49,20 +49,20 @@ protected:
 		auto solidLayerConductance = 100.0;
 		auto solarAbsorptance = 0.094189159572;
 
-		auto aSolidLayer = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto aSolidLayer = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		aSolidLayer->setSolarAbsorptance( solarAbsorptance );
 		ASSERT_TRUE( aSolidLayer != nullptr );
 
 		double windowWidth = 1;
 		double windowHeight = 1;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer );
 
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( aIGU, aIndoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( aIGU, aIndoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 
 		m_TarcogSystem->solve();
@@ -82,7 +82,7 @@ TEST_F( TestSingleClearSolarCond001, TestTempAndRad ) {
 	ASSERT_TRUE( aSystem != nullptr );
 
 	auto Temperature = *aSystem->getTemperatures();
-	vector< double > correctTemperature = { 299.627742, 299.627975 };
+	std::vector< double > correctTemperature = { 299.627742, 299.627975 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -90,7 +90,7 @@ TEST_F( TestSingleClearSolarCond001, TestTempAndRad ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities();
-	vector< double > correctRadiosity = { 444.699763, 451.769813 };
+	std::vector< double > correctRadiosity = { 444.699763, 451.769813 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {

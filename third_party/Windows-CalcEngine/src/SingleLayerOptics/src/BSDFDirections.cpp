@@ -7,7 +7,6 @@
 #include "BSDFPhiLimits.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {
@@ -33,30 +32,30 @@ namespace SingleLayerOptics {
 	/////////////////////////////////////////////////////////////////
 
 	CBSDFDirections::CBSDFDirections( std::vector< CBSDFDefinition >& t_Definitions, const BSDFHemisphere t_Side ) {
-		vector< double > thetaAngles;
-		vector< size_t > numPhiAngles;
+		std::vector< double > thetaAngles;
+		std::vector< size_t > numPhiAngles;
 		for ( auto it = t_Definitions.begin(); it < t_Definitions.end(); ++it ) {
 			thetaAngles.push_back( ( *it ).theta() );
 			numPhiAngles.push_back( ( *it ).numOfPhis() );
 		}
 
 		CThetaLimits ThetaLimits( thetaAngles );
-		vector< double > thetaLimits = *ThetaLimits.getThetaLimits();
+		std::vector< double > thetaLimits = *ThetaLimits.getThetaLimits();
 
 		double lowerTheta = thetaLimits[ 0 ];
 		for ( size_t i = 1; i < thetaLimits.size(); ++i ) {
 			double upperTheta = thetaLimits[ i ];
 			std::shared_ptr< CAngleLimits > currentTheta = nullptr;
 			if ( i == 1 ) {
-				currentTheta = make_shared< CCentralAngleLimits >( upperTheta );
+				currentTheta = std::make_shared< CCentralAngleLimits >( upperTheta );
 			}
 			else {
-				currentTheta = make_shared< CAngleLimits >( lowerTheta, upperTheta );
+				currentTheta = std::make_shared< CAngleLimits >( lowerTheta, upperTheta );
 			}
 
 
 			CPhiLimits phiAngles( numPhiAngles[ i - 1 ] );
-			vector< double > phiLimits = *phiAngles.getPhiLimits();
+			std::vector< double > phiLimits = *phiAngles.getPhiLimits();
 			double lowerPhi = phiLimits[ 0 ];
 			if ( t_Side == BSDFHemisphere::Outgoing ) {
 				lowerPhi += 180;
@@ -66,18 +65,18 @@ namespace SingleLayerOptics {
 				if ( t_Side == BSDFHemisphere::Outgoing ) {
 					upperPhi += 180;
 				}
-				std::shared_ptr< CAngleLimits > currentPhi = make_shared< CAngleLimits >( lowerPhi, upperPhi );
-				std::shared_ptr< CBSDFPatch > currentPatch = make_shared< CBSDFPatch >( currentTheta, currentPhi );
+				std::shared_ptr< CAngleLimits > currentPhi = std::make_shared< CAngleLimits >( lowerPhi, upperPhi );
+				std::shared_ptr< CBSDFPatch > currentPatch = std::make_shared< CBSDFPatch >( currentTheta, currentPhi );
 				m_Patches.push_back( currentPatch );
 				lowerPhi = upperPhi;
 			}
 			lowerTheta = upperTheta;
 		}
 
-		// build lambda vector and matrix
+		// build lambda std::vector and matrix
 		size_t size = m_Patches.size();
-		m_LambdaVector = make_shared< std::vector< double > >();
-		m_LambdaMatrix = make_shared< CSquareMatrix >( size );
+		m_LambdaVector = std::make_shared< std::vector< double > >();
+		m_LambdaMatrix = std::make_shared< CSquareMatrix >( size );
 		for ( size_t i = 0; i < size; ++i ) {
 			m_LambdaVector->push_back( m_Patches[ i ]->lambda() );
 			( *m_LambdaMatrix )[ i ][ i ] = m_Patches[ i ]->lambda();
@@ -93,11 +92,11 @@ namespace SingleLayerOptics {
 		return m_Patches[ Index ];
 	}
 
-	vector< std::shared_ptr< CBSDFPatch > >::iterator CBSDFDirections::begin() {
+	std::vector< std::shared_ptr< CBSDFPatch > >::iterator CBSDFDirections::begin() {
 		return m_Patches.begin();
 	}
 
-	vector< std::shared_ptr< CBSDFPatch > >::iterator CBSDFDirections::end() {
+	std::vector< std::shared_ptr< CBSDFPatch > >::iterator CBSDFDirections::end() {
 		return m_Patches.end();
 	}
 
@@ -124,7 +123,7 @@ namespace SingleLayerOptics {
 	/////////////////////////////////////////////////////////////////
 
 	CBSDFHemisphere::CBSDFHemisphere( const BSDFBasis t_Basis ) {
-		vector< CBSDFDefinition > aDefinitions;
+		std::vector< CBSDFDefinition > aDefinitions;
 		switch ( t_Basis ) {
 		case BSDFBasis::Small:
 			aDefinitions.push_back( CBSDFDefinition( 0, 1 ) );
@@ -163,16 +162,15 @@ namespace SingleLayerOptics {
 			aDefinitions.push_back( CBSDFDefinition( 82.5, 12 ) );
 			break;
 		default:
-			throw runtime_error( "Incorrect definiton of the basis." );
-			break;
+			throw std::runtime_error( "Incorrect definiton of the basis." );
 		}
-		m_IncomingDirections = make_shared< CBSDFDirections >( aDefinitions, BSDFHemisphere::Incoming );
-		m_OutgoingDirections = make_shared< CBSDFDirections >( aDefinitions, BSDFHemisphere::Outgoing );
+		m_IncomingDirections = std::make_shared< CBSDFDirections >( aDefinitions, BSDFHemisphere::Incoming );
+		m_OutgoingDirections = std::make_shared< CBSDFDirections >( aDefinitions, BSDFHemisphere::Outgoing );
 	}
 
 	CBSDFHemisphere::CBSDFHemisphere( std::vector< CBSDFDefinition >& t_Definitions ) :
-		m_IncomingDirections( make_shared< CBSDFDirections >( t_Definitions, BSDFHemisphere::Incoming ) ),
-		m_OutgoingDirections( make_shared< CBSDFDirections >( t_Definitions, BSDFHemisphere::Outgoing ) ) {
+		m_IncomingDirections( std::make_shared< CBSDFDirections >( t_Definitions, BSDFHemisphere::Incoming ) ),
+		m_OutgoingDirections( std::make_shared< CBSDFDirections >( t_Definitions, BSDFHemisphere::Outgoing ) ) {
 	}
 
 	std::shared_ptr< const CBSDFDirections > CBSDFHemisphere::getDirections( const BSDFHemisphere t_Side ) const {

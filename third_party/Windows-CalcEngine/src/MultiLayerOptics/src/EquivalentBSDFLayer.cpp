@@ -8,7 +8,6 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 
@@ -19,11 +18,11 @@ namespace MultiLayerOptics {
 		m_CombinedLayerWavelengths( t_CommonWavelengths ),
 		m_Calculated( false ) {
 		if ( t_Layer == nullptr ) {
-			throw runtime_error( "Equivalent BSDF Layer must contain valid layer." );
+			throw std::runtime_error( "Equivalent BSDF Layer must contain valid layer." );
 		}
 
 		// Create layers for each wavelength
-		m_LayersWL = make_shared< std::vector< std::shared_ptr< CEquivalentBSDFLayerSingleBand > > >();
+		m_LayersWL = std::make_shared< std::vector< std::shared_ptr< CEquivalentBSDFLayerSingleBand > > >();
 
 		// Lambda matrix from spectral results. Same lambda is valid for any wavelength
 		m_Lambda = t_Layer->getResults()->lambdaMatrix();
@@ -46,7 +45,7 @@ namespace MultiLayerOptics {
 		return m_Layer[ 0 ]->getDirections( t_Side );
 	}
 
-	vector< double > CEquivalentBSDFLayer::getCommonWavelengths() const {
+	std::vector< double > CEquivalentBSDFLayer::getCommonWavelengths() const {
 		return m_CombinedLayerWavelengths;
 	}
 
@@ -62,7 +61,7 @@ namespace MultiLayerOptics {
 		if ( !m_Calculated ) {
 			calculate();
 		}
-		return m_Tot.at( make_pair( t_Side, t_Property ) );
+		return m_Tot.at( std::make_pair( t_Side, t_Property ) );
 	}
 
 	void CEquivalentBSDFLayer::setSolarRadiation( const std::shared_ptr< CSeries >& t_SolarRadiation ) {
@@ -80,9 +79,9 @@ namespace MultiLayerOptics {
 		size_t numberOfLayers = ( *m_LayersWL )[ 0 ]->getNumberOfLayers();
 
 		for ( Side aSide : EnumSide() ) {
-			m_TotA[ aSide ] = make_shared< CMatrixSeries >( numberOfLayers, matrixSize );
+			m_TotA[ aSide ] = std::make_shared< CMatrixSeries >( numberOfLayers, matrixSize );
 			for ( PropertySimple aProperty : EnumPropertySimple() ) {
-				m_Tot[ make_pair( aSide, aProperty ) ] = make_shared< CMatrixSeries >( matrixSize, matrixSize );
+				m_Tot[ std::make_pair( aSide, aProperty ) ] = std::make_shared< CMatrixSeries >( matrixSize, matrixSize );
 			}
 		}
 
@@ -102,7 +101,7 @@ namespace MultiLayerOptics {
 		//     endNum = WLsize;
 		//   }
 		// 
-		//   aThreads[ i ] = make_shared< thread >( &CEquivalentBSDFLayer::calculateWavelengthProperties, *this,
+		//   aThreads[ i ] = std::make_shared< thread >( &CEquivalentBSDFLayer::calculateWavelengthProperties, *this,
 		//    numberOfLayers, startNum, endNum );
 		//   
 		//   startNum += step;
@@ -134,7 +133,7 @@ namespace MultiLayerOptics {
 				}
 				for ( auto aProperty : EnumPropertySimple() ) {
 					auto curPropertyMatrix = curLayer.getProperty( aSide, aProperty );
-					m_Tot.at( make_pair( aSide, aProperty ) )->addProperties( curWL, *curPropertyMatrix );
+					m_Tot.at( std::make_pair( aSide, aProperty ) )->addProperties( curWL, *curPropertyMatrix );
 				}
 			}
 		}

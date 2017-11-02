@@ -62,17 +62,17 @@ namespace MultiLayerOptics {
 
 		// Keeping equivalent optical properties while adding layers. This is necessary
 		// for calculation of interreflectances.
-		// Forward layers is vector of layers that has been build by adding layers on the back side of
+		// Forward layers is std::vector of layers that has been build by adding layers on the back side of
 		// IGU and storing them into array. For example, three layer IGU will have forward layer built in this way -
-		// First item in the vector is exterior environment layer with transmittance of one and reflectance of zero.
-		// Second item in the vector is only first layer of the IGU.
-		// Third item in the vector is IGU made of first and second layer of the IGU.
-		// Fourth item in the vector is complete IGU. So in this case, number of items in forward layers vector
+		// First item in the std::vector is exterior environment layer with transmittance of one and reflectance of zero.
+		// Second item in the std::vector is only first layer of the IGU.
+		// Third item in the std::vector is IGU made of first and second layer of the IGU.
+		// Fourth item in the std::vector is complete IGU. So in this case, number of items in forward layers std::vector
 		// will be four
 		std::vector< std::shared_ptr< SingleLayerOptics::CLayerSingleComponent > > m_ForwardLayers;
 
-		// Backward layer vector is build in opposite way.
-		// First item in the vector is interior environment (transmittance is one and reflectance is zero).
+		// Backward layer std::vector is build in opposite way.
+		// First item in the std::vector is interior environment (transmittance is one and reflectance is zero).
 		// Second item is third layer from the IGU.
 		// Third item is IGU made of second and third layer of the IGU
 		// Fourth item is complete IGU

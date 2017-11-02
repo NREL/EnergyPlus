@@ -6,7 +6,7 @@
 #include "WCESpectralAveraging.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
 using namespace MultiLayerOptics;
@@ -19,7 +19,7 @@ private:
 protected:
 	virtual void SetUp() {
 
-		std::shared_ptr< CSpectralSampleData > sampleMeasurements1 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > sampleMeasurements1 = std::make_shared< CSpectralSampleData >();
 		sampleMeasurements1->addRecord( 0.330, 0.0857, 0.0560, 0.2646 );
 		sampleMeasurements1->addRecord( 0.335, 0.1280, 0.0623, 0.2664 );
 		sampleMeasurements1->addRecord( 0.340, 0.1707, 0.0719, 0.2668 );
@@ -36,7 +36,7 @@ protected:
 		sampleMeasurements1->addRecord( 0.395, 0.5455, 0.2553, 0.2781 );
 		sampleMeasurements1->addRecord( 0.400, 0.5630, 0.2651, 0.2757 );
 
-		std::shared_ptr< CSpectralSampleData > sampleMeasurements2 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > sampleMeasurements2 = std::make_shared< CSpectralSampleData >();
 		sampleMeasurements2->addRecord( 0.330, 0.1600, 0.0450, 0.0470 );
 		sampleMeasurements2->addRecord( 0.335, 0.2940, 0.0490, 0.0500 );
 		sampleMeasurements2->addRecord( 0.340, 0.4370, 0.0550, 0.0560 );
@@ -55,7 +55,7 @@ protected:
 
 		sampleMeasurements1->Filpped( true );
 
-		m_MultiLayerOptics = make_shared< CMultiPaneSampleData >();
+		m_MultiLayerOptics = std::make_shared< CMultiPaneSampleData >();
 		m_MultiLayerOptics->addSample( sampleMeasurements1 );
 		m_MultiLayerOptics->addSample( sampleMeasurements2 );
 	}
@@ -72,7 +72,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleDataFlipped, TestDoublePaneResultsFlip
 
 	CMultiPaneSampleData MultiLayerOptics = *getMultiLayerOptics();
 
-	vector< double > correctT;
+	std::vector< double > correctT;
 	correctT.push_back( 0.013746642 );
 	correctT.push_back( 0.037747231 );
 	correctT.push_back( 0.074892061 );
@@ -97,7 +97,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleDataFlipped, TestDoublePaneResultsFlip
 		EXPECT_NEAR( correctT[ i ], transmittances[ i ].value(), 1e-6 );
 	}
 
-	vector< double > correctRf;
+	std::vector< double > correctRf;
 	correctRf.push_back( 0.264931337 );
 	correctRf.push_back( 0.267205274 );
 	correctRf.push_back( 0.268408980 );
@@ -122,7 +122,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleDataFlipped, TestDoublePaneResultsFlip
 		EXPECT_NEAR( correctRf[ i ], Rf[ i ].value(), 1e-6 );
 	}
 
-	vector< double > correctRb;
+	std::vector< double > correctRb;
 	correctRb.push_back( 0.048437222 );
 	correctRb.push_back( 0.055401452 );
 	correctRb.push_back( 0.069785185 );
@@ -147,7 +147,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleDataFlipped, TestDoublePaneResultsFlip
 		EXPECT_NEAR( correctRb[ i ], Rb[ i ].value(), 1e-6 );
 	}
 
-	vector< double > correctAbs;
+	std::vector< double > correctAbs;
 	correctAbs.push_back( 0.721322021 );
 	correctAbs.push_back( 0.695047495 );
 	correctAbs.push_back( 0.656698960 );
@@ -180,7 +180,7 @@ TEST_F( TestMultiLayerOpticsMeasuredSampleDataFlipped, TestDoublePaneAbsorptance
 
 	CMultiPaneSampleData MultiLayerOptics = *getMultiLayerOptics();
 
-	vector< double > correctAbs;
+	std::vector< double > correctAbs;
 	correctAbs.push_back( 0.653018396 );
 	correctAbs.push_back( 0.610693989 );
 	correctAbs.push_back( 0.569639081 );

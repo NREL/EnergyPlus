@@ -2,9 +2,7 @@
 #include "CellDescription.hpp"
 #include "MaterialDescription.hpp"
 #include "WCECommon.hpp"
-#include "BeamDirection.hpp"
 
-using namespace std;
 using namespace FenestrationCommon;
 
 namespace SingleLayerOptics {

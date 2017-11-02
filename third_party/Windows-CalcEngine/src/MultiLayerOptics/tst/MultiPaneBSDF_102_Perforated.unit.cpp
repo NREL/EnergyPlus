@@ -6,7 +6,7 @@
 #include "WCESingleLayerOptics.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace SingleLayerOptics;
 using namespace FenestrationCommon;
 using namespace SpectralAveraging;
@@ -21,7 +21,7 @@ private:
 
 	std::shared_ptr< CSeries > loadSolarRadiationFile() {
 
-		std::shared_ptr< CSeries > aSolarRadiation = make_shared< CSeries >();
+		std::shared_ptr< CSeries > aSolarRadiation = std::make_shared< CSeries >();
 
 		// Full ASTM E891-87 Table 1 (Solar radiation)
 		aSolarRadiation->addProperty( 0.3000, 0.0 );
@@ -150,7 +150,7 @@ private:
 	}
 
 	std::shared_ptr< CSpectralSampleData > loadSampleData_NFRC_102() {
-		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = make_shared< CSpectralSampleData >();
+		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = std::make_shared< CSpectralSampleData >();
 
 		aMeasurements_102->addRecord( 0.300, 0.0020, 0.0470, 0.0480 );
 		aMeasurements_102->addRecord( 0.305, 0.0030, 0.0470, 0.0480 );
@@ -273,14 +273,14 @@ protected:
 
 		std::shared_ptr< CSpectralSampleData > aMeasurements_102 = loadSampleData_NFRC_102();
 
-		std::shared_ptr< CSpectralSample > aSample_102 = make_shared< CSpectralSample >( aMeasurements_102 );
+		std::shared_ptr< CSpectralSample > aSample_102 = std::make_shared< CSpectralSample >( aMeasurements_102 );
 
 		double thickness = 3.048e-3; // [m]
 		std::shared_ptr< CMaterial > aMaterial_102 =
 			std::make_shared< CMaterialSample >( aSample_102, thickness, MaterialType::Monolithic,
 			                                WavelengthRange::Solar );
 
-		std::shared_ptr< CBSDFHemisphere > aBSDF = make_shared< CBSDFHemisphere >( BSDFBasis::Small );
+		std::shared_ptr< CBSDFHemisphere > aBSDF = std::make_shared< CBSDFHemisphere >( BSDFBasis::Small );
 		std::shared_ptr< CBSDFLayer > Layer_102 = CBSDFLayerMaker( aMaterial_102, aBSDF ).getLayer();
 
 		// Setting circular perforated shade with double range material
@@ -314,7 +314,7 @@ protected:
 		std::shared_ptr< CBSDFLayer > Layer_Perforated =
 			CBSDFLayerMaker( aMaterialPerforated, aBSDF, aCellDescription ).getLayer();
 
-		vector< double > commonWavelengths = Layer_102->getBandWavelengths();
+		std::vector< double > commonWavelengths = Layer_102->getBandWavelengths();
 
 		// Equivalent multilayer
 		std::shared_ptr< CEquivalentBSDFLayer > aEqLayer =
@@ -322,7 +322,7 @@ protected:
 		aEqLayer->addLayer( Layer_Perforated );
 
 		std::shared_ptr< CSeries > aSolarRadiation = loadSolarRadiationFile();
-		m_Layer = make_shared< CMultiPaneBSDF >( aEqLayer, aSolarRadiation );
+		m_Layer = std::make_shared< CMultiPaneBSDF >( aEqLayer, aSolarRadiation );
 
 	}
 
@@ -401,7 +401,7 @@ TEST_F( MultiPaneBSDF_102_Perforated, Test102Perofrated1 ) {
 	// Front transmittance matrix
 	size_t size = aT.getSize();
 
-	vector< double > correctResults;
+	std::vector< double > correctResults;
 	correctResults.push_back( 1.80940064 );
 	correctResults.push_back( 0.193763453 );
 	correctResults.push_back( 0.0815732527 );
@@ -434,7 +434,7 @@ TEST_F( MultiPaneBSDF_102_Perforated, Test102Perofrated1 ) {
 	}
 
 	// Front absorptance layer 1
-	vector< double > aAbsF = *aLayer.Abs( minLambda, maxLambda, Side::Front, 1 );
+	std::vector< double > aAbsF = *aLayer.Abs( minLambda, maxLambda, Side::Front, 1 );
 
 	correctResults.clear();
 
@@ -470,7 +470,7 @@ TEST_F( MultiPaneBSDF_102_Perforated, Test102Perofrated1 ) {
 	}
 
 	// Back absorptance layer 1
-	vector< double > aAbsB = *aLayer.Abs( minLambda, maxLambda, Side::Back, 1 );
+	std::vector< double > aAbsB = *aLayer.Abs( minLambda, maxLambda, Side::Back, 1 );
 
 	correctResults.clear();
 

@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -38,7 +38,7 @@ protected:
 		// Indoor
 		/////////////////////////////////////////////////////////
 		auto roomTemperature = 294.15;
-		std::shared_ptr< CEnvironment > Indoor = make_shared< CIndoorEnvironment >( roomTemperature, pressure );
+		std::shared_ptr< CEnvironment > Indoor = std::make_shared< CIndoorEnvironment >( roomTemperature, pressure );
 		ASSERT_TRUE( Indoor != nullptr );
 
 		/////////////////////////////////////////////////////////
@@ -46,19 +46,19 @@ protected:
 		/////////////////////////////////////////////////////////
 		auto solidLayerThickness = 0.005715; // [m]
 		auto solidLayerConductance = 1.0;
-		m_solidLayer1 = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		m_solidLayer1 = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( m_solidLayer1 != nullptr );
-		m_solidLayer2 = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		m_solidLayer2 = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( m_solidLayer2 != nullptr );
 
 		auto gapThickness = 0.012;
 		auto gapPressure = 101325.0;
-		auto gapLayer = make_shared< CIGUGapLayer >( gapThickness, gapPressure );
+		auto gapLayer = std::make_shared< CIGUGapLayer >( gapThickness, gapPressure );
 		ASSERT_TRUE( gapLayer != nullptr );
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto TarcogIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto TarcogIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( TarcogIGU != nullptr );
 		TarcogIGU->addLayer( m_solidLayer1 );
 		TarcogIGU->addLayer( gapLayer );
@@ -67,7 +67,7 @@ protected:
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSingleSystem >( TarcogIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSingleSystem >( TarcogIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 	}
 

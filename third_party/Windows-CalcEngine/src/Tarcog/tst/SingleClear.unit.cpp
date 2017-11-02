@@ -5,7 +5,7 @@
 #include "WCETarcog.hpp"
 #include "WCECommon.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 using namespace FenestrationCommon;
 
@@ -37,7 +37,7 @@ protected:
 		/////////////////////////////////////////////////////////
 
 		auto roomTemperature = 294.15;
-		std::shared_ptr< CEnvironment > Indoor = make_shared< CIndoorEnvironment >( roomTemperature, pressure );
+		std::shared_ptr< CEnvironment > Indoor = std::make_shared< CIndoorEnvironment >( roomTemperature, pressure );
 		ASSERT_TRUE( Indoor != nullptr );
 
 		/////////////////////////////////////////////////////////
@@ -46,20 +46,20 @@ protected:
 		auto solidLayerThickness = 0.003048; // [m]
 		auto solidLayerConductance = 1.0;
 
-		auto aSolidLayer = make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
+		auto aSolidLayer = std::make_shared< CIGUSolidLayer >( solidLayerThickness, solidLayerConductance );
 		ASSERT_TRUE( aSolidLayer != nullptr );
 		aSolidLayer->setSolarAbsorptance( 0.094189159572 );
 
 		auto windowWidth = 1.0;
 		auto windowHeight = 1.0;
-		auto aIGU = make_shared< CIGU >( windowWidth, windowHeight );
+		auto aIGU = std::make_shared< CIGU >( windowWidth, windowHeight );
 		ASSERT_TRUE( aIGU != nullptr );
 		aIGU->addLayer( aSolidLayer );
 
 		/////////////////////////////////////////////////////////
 		// System
 		/////////////////////////////////////////////////////////
-		m_TarcogSystem = make_shared< CSystem >( aIGU, Indoor, Outdoor );
+		m_TarcogSystem = std::make_shared< CSystem >( aIGU, Indoor, Outdoor );
 		ASSERT_TRUE( m_TarcogSystem != nullptr );
 	}
 
@@ -80,7 +80,7 @@ TEST_F( TestSingleClear, Test1 ) {
 	//  U-value run
 	/////////////////////////////////////////////////////////////////////////
 	auto Temperature = *aSystem->getTemperatures( System::Uvalue );
-	vector< double > correctTemperature = { 297.207035, 297.14470 };
+	std::vector< double > correctTemperature = { 297.207035, 297.14470 };
 	ASSERT_EQ( correctTemperature.size(), Temperature.size() );
 
 	for ( auto i = 0u; i < correctTemperature.size(); ++i ) {
@@ -88,7 +88,7 @@ TEST_F( TestSingleClear, Test1 ) {
 	}
 
 	auto Radiosity = *aSystem->getRadiosities( System::Uvalue );
-	vector< double > correctRadiosity = { 432.444546, 439.201749 };
+	std::vector< double > correctRadiosity = { 432.444546, 439.201749 };
 	ASSERT_EQ( correctRadiosity.size(), Radiosity.size() );
 
 	for ( auto i = 0u; i < correctRadiosity.size(); ++i ) {

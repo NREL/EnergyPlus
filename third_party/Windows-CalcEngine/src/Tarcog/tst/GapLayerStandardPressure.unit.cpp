@@ -3,7 +3,7 @@
 
 #include "WCETarcog.hpp"
 
-using namespace std;
+
 using namespace Tarcog;
 
 class TestGapLayerStandardPressure : public testing::Test {
@@ -16,13 +16,13 @@ protected:
 	void SetUp() override {
 		// Gap layer construct is made in a way that it is not possible to create gap alone. In order to test gap, entire
 		// IGU has to be created. Example is taken as part of double clear air run from WINDOW 7 version of TARCOG
-		auto surface1 = make_shared< CSurface >();
+		auto surface1 = std::make_shared< CSurface >();
 		ASSERT_TRUE( surface1 != nullptr );
-		auto surface2 = make_shared< CSurface >();
+		auto surface2 = std::make_shared< CSurface >();
 		ASSERT_TRUE( surface2 != nullptr );
-		auto surface3 = make_shared< CSurface >();
+		auto surface3 = std::make_shared< CSurface >();
 		ASSERT_TRUE( surface3 != nullptr );
-		auto surface4 = make_shared< CSurface >();
+		auto surface4 = std::make_shared< CSurface >();
 		ASSERT_TRUE( surface4 != nullptr );
 
 		auto solidLayerThickness = 0.005715; // [m]
@@ -32,11 +32,11 @@ protected:
 		// surfaces 2 and 3 are actually surfaces of the gap
 		surface2->setTemperature( gapSurface1Temperature );
 		surface3->setTemperature( gapSurface2Temperature );
-		auto solidLayer1 = make_shared< CIGUSolidLayer >(
+		auto solidLayer1 = std::make_shared< CIGUSolidLayer >(
 		                                                 solidLayerThickness, solidLayerConductance, surface1, surface2 );
 
 		ASSERT_TRUE( solidLayer1 != nullptr );
-		auto solidLayer2 = make_shared< CIGUSolidLayer >(
+		auto solidLayer2 = std::make_shared< CIGUSolidLayer >(
 		                                                 solidLayerThickness, solidLayerConductance, surface3, surface4 );
 		ASSERT_TRUE( solidLayer2 != nullptr );
 
