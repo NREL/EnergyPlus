@@ -13,10 +13,15 @@ namespace Tarcog {
 	// 
 	// }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wextra"
+
 	CBaseLayer::CBaseLayer( CBaseLayer const& t_Layer ) : CState( t_Layer ),
 														  CLayerGeometry( t_Layer ), CLayerHeatFlow( t_Layer ) {
 
 	}
+
+#pragma GCC diagnostic pop
 
 	CBaseLayer & CBaseLayer::operator=( CBaseLayer const & t_BaseLayer ) {
 		this->CState::operator=( t_BaseLayer );
