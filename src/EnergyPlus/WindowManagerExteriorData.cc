@@ -93,8 +93,8 @@ namespace EnergyPlus {
 			//get the corresponding local Theta, Phi for ray
 			W6CoordsFromWorldVect( t_Ray, RadType, Gamma, Alpha, Theta, Phi );
 
-			Theta = 180 / M_PI * Theta;
-			Phi = 180 / M_PI * Phi;
+			Theta = 180 / Pi * Theta;
+			Phi = 180 / Pi * Phi;
 
 			return std::make_pair( Theta, Phi );
 
