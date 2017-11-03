@@ -1797,119 +1797,119 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance )
 	EXPECT_NEAR( thisGLHE.calcPipeResistance(),  0.082204 + 0.004453, tolerance );
 }
 
-struct StructBHIntResistanceParameters {
-	Real64 bhDiameter;
-	Real64 uTubeSpacing;
-	Real64 soilConductivity;
-	Real64 groutConductivity;
-	Real64 theta_1;
-	Real64 theta_2;
-	Real64 theta_3;
-	Real64 totIntResistance;
-
-	StructBHIntResistanceParameters(
-		Real64 _bhDiameter,
-		Real64 _uTubeSpacing,
-		Real64 _soilConductivity,
-		Real64 _groutConductivity,
-		Real64 _theta_1,
-		Real64 _theta_2,
-		Real64 _theta_3,
-		Real64 _totIntResistance
-	){
-		this->bhDiameter = _bhDiameter;
-		this->uTubeSpacing = _uTubeSpacing;
-		this->soilConductivity = _soilConductivity;
-		this->groutConductivity = _groutConductivity;
-		this->theta_1 = _theta_1;
-		this->theta_2 = _theta_2;
-		this->theta_3 = _theta_3;
-		this->totIntResistance = _totIntResistance;
-	}
-};
-
-class GroundHeatExchangerTest_System_calcBHTotalInternalResistance : public EnergyPlusFixture, public ::testing::WithParamInterface<const StructBHIntResistanceParameters>
-{
-	protected:
-		static void SetUpTestCase() { }
-		static void TearDownTestCase() { }
-
-		virtual void SetUp() {
-			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
-		}
-
-		virtual void TearDown() {
-			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
-		}
-};
-
-TEST_P( GroundHeatExchangerTest_System_calcBHTotalInternalResistance, test_calcBHTotalInternalResistance ) {
-
-	using namespace DataSystemVariables;
-
-	Real64 const tolerance = 0.000001;
-
-	StructBHIntResistanceParameters theseParameters = GetParam();
-
-	std::string const idf_objects = delimited_string( {
-		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
-		"	KATemps,                 !- Name",
-		"	1.8,                     !- Soil Thermal Conductivity {W/m-K}",
-		"	920,                     !- Soil Density {kg/m3}",
-		"	2200,                    !- Soil Specific Heat {J/kg-K}",
-		"	15.5,                    !- Average Soil Surface Temperature {C}",
-		"	3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
-		"	8;                       !- Phase Shift of Minimum Surface Temperature {days}",
-
-		"GroundHeatExchanger:Vertical:Properties,",
-		"	GHE-1 Props,        !- Name",
-		"	1,                  !- Depth of Top of Borehole {m}",
-		"	100,                !- Borehole Length {m}",
-		std::to_string( theseParameters.bhDiameter ) + ",           !- Borehole Diameter {m}",
-		"	0.744,              !- Grout Thermal Conductivity {W/m-K}",
-		"	3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}",
-		"	0.389,              !- Pipe Thermal Conductivity {W/m-K}",
-		"	0.0267,             !- Pipe Outer Diameter {m}",
-		"	0.00243,            !- Pipe Thickness {m}",
-		"	0.01887;            !- U-Tube Distance {m}",
-
-		"GroundHeatExchanger:Vertical:Array,",
-		"	GHE-Array,          !- Name",
-		"	GHE-1 Props,        !- GHE Properties",
-		"	2,                  !- Number of Boreholes in X Direction",
-		"	2,                  !- Number of Boreholes in Y Direction",
-		"	2;                  !- Borehole Spacing {m}",
-
-		"GroundHeatExchanger:System,",
-		"	Vertical GHE 1x4 Std,  !- Name",
-		"	GHLE Inlet,         !- Inlet Node Name",
-		"	GHLE Outlet,        !- Outlet Node Name",
-		"	0.0007571,          !- Design Flow Rate {m3/s}",
-		"	Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
-		"	KATemps,            !- Undisturbed Ground Temperature Model Name",
-		"	2.423,              !- Ground Thermal Conductivity {W/m-K}",
-		"	2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
-		"	,					!- Response Factors Object Name",
-		"	GHE-Array;          !- GHE Array Object Name"
-	} );
-
-	// Envr variable
-	DisableCaching = true;
-
-	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
-
-	GetGroundHeatExchangerInput();
-
-	auto & thisGLHE = verticalGLHE[0];
-
-	EXPECT_NEAR( theseParameters.totIntResistance, thisGLHE.calcBHTotalInternalResistance(), tolerance );
-
-}
-
-StructBHIntResistanceParameters s1 ( 0, 0, 0, 0, 0, 0, 0, 0 );
-StructBHIntResistanceParameters s2 ( 0, 0, 0, 0, 0, 0, 0, 0 );
-StructBHIntResistanceParameters s3 ( 0, 0, 0, 0, 0, 0, 0, 0 );
-StructBHIntResistanceParameters s4 ( 0, 0, 0, 0, 0, 0, 0, 0 );
-
-INSTANTIATE_TEST_CASE_P( Case1, GroundHeatExchangerTest_System_calcBHTotalInternalResistance, ::testing::Values( s1, s2, s3, s4 ) );
+//struct StructBHIntResistanceParameters {
+//	Real64 bhDiameter;
+//	Real64 uTubeSpacing;
+//	Real64 soilConductivity;
+//	Real64 groutConductivity;
+//	Real64 theta_1;
+//	Real64 theta_2;
+//	Real64 theta_3;
+//	Real64 totIntResistance;
+//
+//	StructBHIntResistanceParameters(
+//		Real64 _bhDiameter,
+//		Real64 _uTubeSpacing,
+//		Real64 _soilConductivity,
+//		Real64 _groutConductivity,
+//		Real64 _theta_1,
+//		Real64 _theta_2,
+//		Real64 _theta_3,
+//		Real64 _totIntResistance
+//	){
+//		this->bhDiameter = _bhDiameter;
+//		this->uTubeSpacing = _uTubeSpacing;
+//		this->soilConductivity = _soilConductivity;
+//		this->groutConductivity = _groutConductivity;
+//		this->theta_1 = _theta_1;
+//		this->theta_2 = _theta_2;
+//		this->theta_3 = _theta_3;
+//		this->totIntResistance = _totIntResistance;
+//	}
+//};
+//
+//class GroundHeatExchangerTest_System_calcBHTotalInternalResistance : public EnergyPlusFixture, public ::testing::WithParamInterface<const StructBHIntResistanceParameters>
+//{
+//	public:
+//		static void SetUpTestCase() { }
+//		static void TearDownTestCase() { }
+//
+//		virtual void SetUp() {
+//			EnergyPlusFixture::SetUp();  // Sets up the base fixture first.
+//		}
+//
+//		virtual void TearDown() {
+//			EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+//		}
+//};
+//
+//TEST_P( GroundHeatExchangerTest_System_calcBHTotalInternalResistance, test_calcBHTotalInternalResistance ) {
+//
+//	using namespace DataSystemVariables;
+//
+//	Real64 const tolerance = 0.000001;
+//
+//	StructBHIntResistanceParameters theseParameters = GetParam();
+//
+//	std::string const idf_objects = delimited_string( {
+//		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+//		"	KATemps,                 !- Name",
+//		"	1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+//		"	920,                     !- Soil Density {kg/m3}",
+//		"	2200,                    !- Soil Specific Heat {J/kg-K}",
+//		"	15.5,                    !- Average Soil Surface Temperature {C}",
+//		"	3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+//		"	8;                       !- Phase Shift of Minimum Surface Temperature {days}",
+//
+//		"GroundHeatExchanger:Vertical:Properties,",
+//		"	GHE-1 Props,        !- Name",
+//		"	1,                  !- Depth of Top of Borehole {m}",
+//		"	100,                !- Borehole Length {m}",
+//		std::to_string( theseParameters.bhDiameter ) + ",           !- Borehole Diameter {m}",
+//		"	0.744,              !- Grout Thermal Conductivity {W/m-K}",
+//		"	3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}",
+//		"	0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+//		"	0.0267,             !- Pipe Outer Diameter {m}",
+//		"	0.00243,            !- Pipe Thickness {m}",
+//		"	0.01887;            !- U-Tube Distance {m}",
+//
+//		"GroundHeatExchanger:Vertical:Array,",
+//		"	GHE-Array,          !- Name",
+//		"	GHE-1 Props,        !- GHE Properties",
+//		"	2,                  !- Number of Boreholes in X Direction",
+//		"	2,                  !- Number of Boreholes in Y Direction",
+//		"	2;                  !- Borehole Spacing {m}",
+//
+//		"GroundHeatExchanger:System,",
+//		"	Vertical GHE 1x4 Std,  !- Name",
+//		"	GHLE Inlet,         !- Inlet Node Name",
+//		"	GHLE Outlet,        !- Outlet Node Name",
+//		"	0.0007571,          !- Design Flow Rate {m3/s}",
+//		"	Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+//		"	KATemps,            !- Undisturbed Ground Temperature Model Name",
+//		"	2.423,              !- Ground Thermal Conductivity {W/m-K}",
+//		"	2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
+//		"	,					!- Response Factors Object Name",
+//		"	GHE-Array;          !- GHE Array Object Name"
+//	} );
+//
+//	// Envr variable
+//	DisableCaching = true;
+//
+//	// Setup
+//	ASSERT_FALSE( process_idf( idf_objects ) );
+//
+//	GetGroundHeatExchangerInput();
+//
+//	auto & thisGLHE = verticalGLHE[0];
+//
+//	EXPECT_NEAR( theseParameters.totIntResistance, thisGLHE.calcBHTotalInternalResistance(), tolerance );
+//
+//}
+//
+//StructBHIntResistanceParameters s1 ( 0, 0, 0, 0, 0, 0, 0, 0 );
+//StructBHIntResistanceParameters s2 ( 0, 0, 0, 0, 0, 0, 0, 0 );
+//StructBHIntResistanceParameters s3 ( 0, 0, 0, 0, 0, 0, 0, 0 );
+//StructBHIntResistanceParameters s4 ( 0, 0, 0, 0, 0, 0, 0, 0 );
+//
+//INSTANTIATE_TEST_CASE_P( Case1, GroundHeatExchangerTest_System_calcBHTotalInternalResistance, ::testing::Values( s1, s2, s3, s4 ) );

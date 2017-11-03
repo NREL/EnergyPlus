@@ -68962,19 +68962,24 @@ GroundHeatExchanger:Vertical:Properties,
         \type real
         \minimum> 0.0
         \units W/m-K
-  N7,   \field Pipe Outer Diameter
+  N7,   \field Pipe Thermal Heat Capacity
+        \required-field
+        \type real
+        \minimum> 0.0
+        \units J/m3-K
+  N8,   \field Pipe Outer Diameter
         \required-field
         \type real
         \minimum> 0.0
         \units m
         \ip-units in
-  N8,   \field Pipe Thickness
+  N9,   \field Pipe Thickness
         \required-field
         \type real
         \minimum> 0.0
         \units m
         \ip-units in
-  N9;   \field U-Tube Distance
+  N10;  \field U-Tube Distance
         \required-field
         \type real
         \minimum> 0.0

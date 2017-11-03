@@ -630,6 +630,8 @@ namespace GroundHeatExchangers {
 
 		// No other choice than to calculate the g-functions here
 
+		calcShortTimestepGFunctions();
+
 		// Minimum simulation time for which finite line source method is applicable
 		Real64 const minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
 
@@ -701,6 +703,305 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
+		GLHEVert::calcShortTimestepGFunctions()
+	{
+		using FluidProperties::GetSpecificHeatGlycol;
+		using FluidProperties::GetDensityGlycol;
+		using DataPlant::PlantLoop;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "calcShortTimestepGFunctions" );
+
+		enum class CellType { FLUID, CONVECTION, PIPE, GROUT, SOIL };
+
+		struct Cell
+		{
+
+			~Cell(){}
+
+			CellType type;
+			Real64 radius_center;
+			Real64 radius_outer;
+			Real64 radius_inner;
+			Real64 thickness;
+			Real64 vol;
+			Real64 conductivity;
+			Real64 rhoCp;
+			Real64 temperature;
+			Real64 temperature_prev_ts;
+
+			Cell() :
+				type(),
+				radius_center( 0.0 ),
+				radius_outer( 0.0 ),
+				radius_inner( 0.0 ),
+				thickness( 0.0 ),
+				vol( 0.0 ),
+				conductivity( 0.0 ),
+				rhoCp( 0.0 ),
+				temperature( 0.0 ),
+				temperature_prev_ts( 0.0 )
+			{}
+		};
+
+		// vector to hold 1-D cells
+		std::vector< Cell > Cells;
+
+		// setup pipe, convection, and fluid layer geometries
+		int const num_pipe_cells = 4;
+		int const num_conv_cells = 1;
+		int const num_fluid_cells = 3;
+		Real64 const pipe_thickness = pipe.thickness;
+		Real64 const pcf_cell_thickness = pipe_thickness / num_pipe_cells;
+		Real64 const radius_pipe_out = std::sqrt( 2 ) * pipe.outRadius;
+		Real64 const radius_pipe_in = radius_pipe_out - pipe_thickness;
+		Real64 const radius_conv = radius_pipe_in - num_conv_cells * pcf_cell_thickness;
+		Real64 const radius_fluid = radius_conv - num_fluid_cells * pcf_cell_thickness;
+
+		// setup grout layer geometry
+		int const num_grout_cells = 27;
+		Real64 const radius_grout = bhRadius;
+		Real64 const grout_cell_thickness = ( radius_grout - radius_pipe_out ) / num_grout_cells;
+
+		// setup soil layer geometry
+		int const num_soil_cells = 500;
+		Real64 const radius_soil = 10;
+		Real64 const soil_cell_thickness = ( radius_soil - radius_grout ) / num_soil_cells;
+
+		// use design flow rate
+		massFlowRate = designMassFlow;
+
+		// calculate equivalent thermal resistance between borehole wall and fluid
+		Real64 bhResistance = calcBHAverageResistance();
+		Real64 bhConvectionResistance = calcPipeConvectionResistance();
+		Real64 bh_equivalent_resistance_tube_grout = bhResistance - bhConvectionResistance / 2.0;
+		Real64 bh_equivalent_resistance_convection = bhResistance - bh_equivalent_resistance_tube_grout;
+
+		Real64 initial_temperature = inletTemp;
+		Real64 cpFluid_init = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, initial_temperature, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		Real64 fluidDensity_init = GetDensityGlycol( PlantLoop( loopNum ).FluidName, initial_temperature, PlantLoop( loopNum ).FluidIndex, RoutineName );
+
+		// initialize the fluid cells
+		for( int i = 0; i < num_fluid_cells; ++i ) {
+			Cell thisCell;
+			thisCell.type = CellType::FLUID;
+			thisCell.thickness = pcf_cell_thickness;
+			thisCell.radius_inner = radius_fluid + i * thisCell.thickness;
+			thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
+			thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
+			thisCell.conductivity = 200;
+			thisCell.rhoCp = 2.0 * cpFluid_init * fluidDensity_init * pow_2( pipe.innerRadius ) / ( pow_2( radius_conv ) - pow_2( radius_fluid ) );
+			Cells.push_back( thisCell );
+		}
+
+		// initialize the convection cells
+		for( int i = 0; i < num_conv_cells; ++i ) {
+			Cell thisCell;
+			thisCell.thickness = pcf_cell_thickness;
+			thisCell.radius_inner = radius_conv + i * thisCell.thickness;
+			thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
+			thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
+			thisCell.conductivity = log( radius_pipe_in / radius_conv ) / ( 2 * Pi * bh_equivalent_resistance_convection );
+			thisCell.rhoCp = 1;
+			Cells.push_back( thisCell );
+		}
+
+		// initialize pipe cells
+		for( int i = 0; i < num_pipe_cells; ++i ) {
+			Cell thisCell;
+			thisCell.type = CellType::PIPE;
+			thisCell.thickness = pcf_cell_thickness;
+			thisCell.radius_inner = radius_pipe_in + i * thisCell.thickness;
+			thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
+			thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
+			thisCell.conductivity = log( radius_grout / radius_pipe_in ) / ( 2 * Pi * bh_equivalent_resistance_tube_grout );
+			thisCell.rhoCp = pipe.rhoCp;
+			Cells.push_back( thisCell );
+		}
+
+		// initialize grout cells
+		for( int i = 0; i < num_grout_cells; ++i ) {
+			Cell thisCell;
+			thisCell.type = CellType::GROUT;
+			thisCell.thickness = grout_cell_thickness;
+			thisCell.radius_inner = radius_pipe_out + i * thisCell.thickness;
+			thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
+			thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
+			thisCell.conductivity = log( radius_grout / radius_pipe_in ) / ( 2 * Pi * bh_equivalent_resistance_tube_grout );
+			thisCell.rhoCp = grout.rhoCp;
+			Cells.push_back( thisCell );
+		}
+
+		// initialize soil cells
+		for( int i = 0; i < num_soil_cells; ++i ) {
+			Cell thisCell;
+			thisCell.type = CellType::SOIL;
+			thisCell.thickness = soil_cell_thickness;
+			thisCell.radius_inner = radius_grout + i * thisCell.thickness;
+			thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
+			thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
+			thisCell.conductivity = soil.k;
+			thisCell.rhoCp = soil.rhoCp;
+			Cells.push_back( thisCell );
+		}
+
+		// other non-geometric specific setup
+		for ( auto & thisCell : Cells ) {
+			thisCell.vol = Pi * ( pow_2( thisCell.radius_outer ) - pow_2( thisCell.radius_inner ) );
+			thisCell.temperature = initial_temperature;
+		}
+
+		// minimum simulation time for which finite line source method is applicable
+		Real64 const minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
+
+		// set upper limit of time for the short time-step g-function calcs so there is some overlap
+		Real64 const maxTimeForShortTimestepCalc = minTimeForgFunctions * 1.5;
+
+		// Determine time-step
+		Real64 const time_step = 300;
+
+		Real64 total_time = 0;
+
+		//int num_time_steps = std::ceil( maxTimeForShortTimestepCalc / time_step );
+
+		// delete me
+		int num_time_steps = std::ceil( 100 * 3600 / time_step );
+
+		// heat flux
+		Real64 const heat_flux = 40.4;
+
+		// delete me
+		std::ofstream static file( "gFuncOutput.csv", std::ofstream::out );
+
+		file << ",";
+		for ( auto & thisCell : Cells ) {
+			file << thisCell.radius_center << ",";
+		}
+
+		file << std::endl;
+
+		// time step loop
+		for ( int i = 0; i < num_time_steps; ++i ) {
+
+			for ( auto & thisCell : Cells ) {
+				thisCell.temperature_prev_ts = thisCell.temperature;
+			}
+
+			std::vector< Real64 > a;
+			std::vector< Real64 > b;
+			std::vector< Real64 > c;
+			std::vector< Real64 > d;
+
+			// setup tdma matrices
+			int num_cells = Cells.size();
+			for ( int cell_index = 0; cell_index < num_cells; ++cell_index ) {
+				if ( cell_index == 0 ) {
+					// heat flux BC
+
+					auto & thisCell = Cells[cell_index];
+					auto & eastCell = Cells[cell_index + 1];
+
+					Real64 FE1 = log( thisCell.radius_outer / thisCell.radius_center ) / ( 2 * Pi * thisCell.conductivity );
+					Real64 FE2 = log( eastCell.radius_center / eastCell.radius_inner ) / ( 2 * Pi * eastCell.conductivity );
+					Real64 AE = 1 / ( FE1 + FE2 );
+
+					Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
+
+					a.push_back( 0 );
+					b.push_back( -AE / AD - 1 );
+					c.push_back( AE / AD );
+					d.push_back( -thisCell.temperature_prev_ts - heat_flux / AD );
+
+				} else if( cell_index == num_cells - 1 ) {
+					// const ground temp bc
+
+					auto & thisCell = Cells[cell_index];
+
+					a.push_back( 0 );
+					b.push_back( 1 );
+					c.push_back( 0 );
+					d.push_back( thisCell.temperature_prev_ts );
+
+				} else {
+					// all other cells
+
+					auto & westCell = Cells[cell_index - 1];
+					auto & thisCell = Cells[cell_index];
+					auto & eastCell = Cells[cell_index + 1];
+
+					Real64 FE1 = log( thisCell.radius_outer / thisCell.radius_center ) / ( 2 * Pi * thisCell.conductivity );
+					Real64 FE2 = log( eastCell.radius_center / eastCell.radius_inner ) / ( 2 * Pi * eastCell.conductivity );
+					Real64 AE = 1 / ( FE1 + FE2 );
+
+					Real64 FW1 = log( westCell.radius_outer / westCell.radius_center ) / ( 2 * Pi * westCell.conductivity );
+					Real64 FW2 = log( thisCell.radius_center / thisCell.radius_inner ) / ( 2 * Pi * thisCell.conductivity );
+					Real64 AW = -1 / ( FW1 + FW2 );
+
+					Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
+
+					a.push_back( -AW / AD );
+					b.push_back( AW / AD - AE / AD - 1 );
+					c.push_back( AE / AD );
+					d.push_back( -thisCell.temperature_prev_ts );
+				}
+			} // end tdma stup
+
+			// solve for new temperatures
+			std::vector< Real64 > new_temps = TDMA( a, b, c, d );
+
+			for( int cell_index = 0; cell_index < num_cells; ++cell_index ) {
+				Cells[cell_index].temperature = new_temps[cell_index];
+			}
+
+			total_time += time_step;
+
+			file << total_time / 3600 << ",";
+
+			for ( auto & thisCell : Cells ) {
+				file << thisCell.temperature << ",";
+			}
+
+			file << std::endl;
+
+			int deleteME = 0;
+
+		} // end timestep loop
+	}
+
+	//******************************************************************************
+
+	std::vector<Real64>
+	TDMA(
+		std::vector<Real64> a,
+		std::vector<Real64> b,
+		std::vector<Real64> c,
+		std::vector<Real64> d
+	)
+	{
+		// from: https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm#C.2B.2B
+
+		int n = d.size() - 1;
+
+		c[0] /= b[0];
+		d[0] /= b[0];
+
+		for( int i = 1; i < n; ++i ) {
+			c[i] /= b[i] - a[i] * c[i - 1];
+			d[i] = ( d[i] - a[i] * d[i - 1] ) / ( b[i] - a[i] * c[i - 1] );
+		}
+
+		d[n] =  ( d[n] - a[n] * d[n - 1] ) / ( b[n] - a[n] * c[n - 1] );
+
+		for ( int i = n; i-- > 0; ) {
+			d[i] -= c[i] * d[i+1];
+		}
+
+		return d;
+	}
+
+	//******************************************************************************
+
+	void
 	GLHEVert::makeCache()
 	{
 		// For convenience
@@ -715,6 +1016,7 @@ namespace GroundHeatExchangers {
 		d["Grout k"] = myRespFactors->props->grout.k;
 		d["Grout rhoCp"] = myRespFactors->props->grout.rhoCp;
 		d["Pipe k"] = myRespFactors->props->pipe.k;
+		d["Pipe rhoCP"] = myRespFactors->props->pipe.rhoCp;
 		d["Pipe Diameter"] = myRespFactors->props->pipe.outDia;
 		d["Pipe Thickness"] = myRespFactors->props->pipe.thickness;
 		d["U-tube Dist"] = myRespFactors->props->bhUTubeDist;
@@ -1976,9 +2278,16 @@ namespace GroundHeatExchangers {
 				thisProp->grout.k = DataIPShortCuts::rNumericArgs( 4 );
 				thisProp->grout.rhoCp = DataIPShortCuts::rNumericArgs( 5 );
 				thisProp->pipe.k = DataIPShortCuts::rNumericArgs( 6 );
-				thisProp->pipe.outDia = DataIPShortCuts::rNumericArgs( 7 );
-				thisProp->pipe.thickness = DataIPShortCuts::rNumericArgs( 8 );
-				thisProp->bhUTubeDist = DataIPShortCuts::rNumericArgs( 9 );
+				thisProp->pipe.rhoCp = DataIPShortCuts::rNumericArgs( 7 );
+				thisProp->pipe.outDia = DataIPShortCuts::rNumericArgs( 8 );
+				thisProp->pipe.thickness = DataIPShortCuts::rNumericArgs( 9 );
+				thisProp->bhUTubeDist = DataIPShortCuts::rNumericArgs( 10 );
+
+				if ( thisProp->bhUTubeDist < thisProp->pipe.outDia ) {
+					ShowWarningError( "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center." );
+					ShowWarningError( "Shank spacing is set to the outer pipe diameter." );
+					thisProp->bhUTubeDist = thisProp->pipe.outDia;
+				}
 
 				thisProp->pipe.innerDia = thisProp->pipe.outDia - 2 * thisProp->pipe.thickness;
 				thisProp->pipe.outRadius = thisProp->pipe.outDia / 2;
@@ -2265,13 +2574,19 @@ namespace GroundHeatExchangers {
 				thisGLHE.bhRadius = thisGLHE.bhDiameter / 2.0;
 				thisGLHE.bhLength = thisGLHE.myRespFactors->props->bhLength;
 				thisGLHE.bhUTubeDist = thisGLHE.myRespFactors->props->bhUTubeDist;
+
+				// pull pipe and grout data up from response factor struct for simplicity
 				thisGLHE.pipe.outDia = thisGLHE.myRespFactors->props->pipe.outDia;
 				thisGLHE.pipe.innerDia = thisGLHE.myRespFactors->props->pipe.innerDia;
 				thisGLHE.pipe.outRadius = thisGLHE.pipe.outDia / 2;
 				thisGLHE.pipe.innerRadius = thisGLHE.pipe.innerDia / 2;
 				thisGLHE.pipe.thickness = thisGLHE.myRespFactors->props->pipe.thickness;
 				thisGLHE.pipe.k = thisGLHE.myRespFactors->props->pipe.k;
+				thisGLHE.pipe.rhoCp = thisGLHE.myRespFactors->props->pipe.rhoCp;
+
 				thisGLHE.grout.k = thisGLHE.myRespFactors->props->grout.k;
+				thisGLHE.grout.rhoCp = thisGLHE.myRespFactors->props->grout.rhoCp;
+
 				thisGLHE.myRespFactors->gRefRatio = thisGLHE.bhRadius / thisGLHE.bhLength;
 
 				// Number of simulation years from RunPeriod
@@ -2697,7 +3012,7 @@ namespace GroundHeatExchangers {
 
 		Real64 cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
-		return calcBHAverageResistance() + 1 / ( 3 * calcBHTotalInternalResistance() ) * pow_2( bhLength / massFlowRate * cpFluid );
+		return calcBHAverageResistance() + 1 / ( 3 * calcBHTotalInternalResistance() ) * pow_2( bhLength / ( massFlowRate * cpFluid ) );
 	}
 
 	//******************************************************************************
@@ -2735,6 +3050,9 @@ namespace GroundHeatExchangers {
 		// Get fluid props
 		inletTemp = Node( inletNodeNum ).Temp;
 
+		// delete me
+		inletTemp = 20;
+
 		Real64 cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		Real64 kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		Real64 fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
@@ -2764,7 +3082,10 @@ namespace GroundHeatExchangers {
 			nusseltNum = ( f / 8 ) * ( reynoldsNum - 1000 ) * prandtlNum / ( 1 + 12.7 * std::sqrt( f / 8 ) * ( pow( prandtlNum, 2.0 / 3.0 ) - 1 ) );
 		}
 
-		Real64 h = nusseltNum * kFluid / pipe.innerDia;
+		// Real64 h = nusseltNum * kFluid / pipe.innerDia;
+
+		// delete me
+		Real64 h = 1690;
 
 		return 1 / ( h * Pi * pipe.innerDia );
 	}

@@ -398,6 +398,9 @@ namespace GroundHeatExchangers {
 		);
 
 		void
+		calcShortTimestepGFunctions();
+
+		void
 		calcGFunctions();
 
 		void
@@ -617,6 +620,14 @@ namespace GroundHeatExchangers {
 	std::shared_ptr < GLHEVertArrayStruct >
 	GetVertArray(
 		std::string const & objectName
+	);
+
+	std::vector< Real64 >
+	TDMA(
+		std::vector< Real64 > a,
+		std::vector< Real64 > b,
+		std::vector< Real64 > c,
+		std::vector< Real64 > d
 	);
 
 	// Object Data

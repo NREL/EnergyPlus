@@ -920,6 +920,7 @@
     0.744,              !- Grout Thermal Conductivity {W/m-K}
     3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}
     0.389,              !- Pipe Thermal Conductivity {W/m-K}
+    1.542E+06,          !- Pipe Thermal Heat Capacity {J/m3-K}
     0.0267,             !- Pipe Outer Diameter {m}
     0.00243,            !- Pipe Thickness {m}
     0.01887;            !- U-Tube Distance {m}
