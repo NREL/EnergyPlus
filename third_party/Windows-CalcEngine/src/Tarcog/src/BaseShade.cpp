@@ -1,6 +1,6 @@
 #include <cassert>
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 
 #include "BaseShade.hpp"
 #include "Surface.hpp"
@@ -134,7 +134,7 @@ namespace Tarcog {
 			double B2 = t_Gap2->hagenPressureTerm();
 			double A = A1 + pow( ratio, 2 ) * A2;
 			double B = B1 + ratio * B2;
-			double speed1 = ( sqrt( fabs( pow( B, 2.0 ) + 4 * A * drivingPressure ) ) - B ) / ( 2.0 * A );
+			double speed1 = ( sqrt( std::abs( pow( B, 2.0 ) + 4 * A * drivingPressure ) ) - B ) / ( 2.0 * A );
 			double speed2 = speed1 / ratio;
 			t_Gap1->setFlowSpeed( speed1 );
 			t_Gap2->setFlowSpeed( speed2 );
@@ -170,8 +170,8 @@ namespace Tarcog {
 				gap2Direction = AirVerticalDirection::Up;
 			}
 
-			converged = fabs( Tup - TupOld ) < CONVERGENCE_TOLERANCE_AIRFLOW;
-			converged = converged && fabs( Tdown - TdownOld ) < CONVERGENCE_TOLERANCE_AIRFLOW;
+			converged = std::abs( Tup - TupOld ) < CONVERGENCE_TOLERANCE_AIRFLOW;
+			converged = converged && std::abs( Tdown - TdownOld ) < CONVERGENCE_TOLERANCE_AIRFLOW;
 
 			t_Gap1->setFlowTemperatures( Tup, Tdown, gap1Direction );
 			t_Gap2->setFlowTemperatures( Tup, Tdown, gap2Direction );
@@ -212,7 +212,7 @@ namespace Tarcog {
 			double drivingPressure = t_Gap->getAirflowReferencePoint( tempEnvironment );
 			double A = t_Gap->bernoullyPressureTerm() + t_Gap->pressureLossTerm();
 			double B = t_Gap->hagenPressureTerm();
-			double speed = ( sqrt( fabs( pow( B, 2 ) + 4 * A * drivingPressure ) ) - B ) / ( 2 * A );
+			double speed = ( sqrt( std::abs( pow( B, 2 ) + 4 * A * drivingPressure ) ) - B ) / ( 2 * A );
 			t_Gap->setFlowSpeed( speed );
 			double beta = t_Gap->betaCoeff();
 			double alpha = 1 - beta;
@@ -235,7 +235,7 @@ namespace Tarcog {
 
 			TgapOut = RelaxationParameter * tempGap + ( 1 - RelaxationParameter ) * TgapOutOld;
 
-			converged = fabs( TgapOut - TgapOutOld ) < CONVERGENCE_TOLERANCE_AIRFLOW;
+			converged = std::abs( TgapOut - TgapOutOld ) < CONVERGENCE_TOLERANCE_AIRFLOW;
 
 			++ iterationStep;
 			if ( iterationStep > NUMBER_OF_STEPS ) {

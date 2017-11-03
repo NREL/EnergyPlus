@@ -1,7 +1,6 @@
 #ifndef WCEGases_H
 #define WCEGases_H
 
-#include "../src/Constants.hpp"
 #include "../src/Gas.hpp"
 #include "../src/GasData.hpp"
 #include "../src/GasItem.hpp"

@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <stdexcept>
 #include <cassert>
 
@@ -64,7 +64,9 @@ namespace Tarcog {
 			radiationTemperature = getAirTemperature();
 		}
 		else {
-			auto fSky = ( 1 + cos( m_Tilt * M_PI / 180 ) ) / 2;
+			using ConstantsData::PI;
+
+			auto fSky = ( 1 + cos( m_Tilt * PI / 180 ) ) / 2;
 			auto fGround = 1 - fSky;
 			auto eZero = fGround + ( 1 - m_FractionOfClearSky ) * fSky + fSky * m_FractionOfClearSky * aEmissivity;
 			radiationTemperature = getAirTemperature() * pow( eZero, 0.25 );

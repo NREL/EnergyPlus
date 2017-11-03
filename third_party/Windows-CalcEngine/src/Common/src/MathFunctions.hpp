@@ -1,17 +1,18 @@
 #ifndef MATHFUNCTIONS_H
 #define MATHFUNCTIONS_H
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace FenestrationCommon {
 
+	static const double PI = 4.0 * std::atan(1.0);
+
 	inline double radians( const double d ) {
-		return d * M_PI / 180;
+		return d * PI / 180;
 	}
 
 	inline double degrees( const double r ) {
-		return r * 180 / M_PI;
+		return r * 180 / PI;
 	}
 
 }

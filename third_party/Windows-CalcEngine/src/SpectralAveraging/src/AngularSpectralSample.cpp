@@ -1,7 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
-#include <math.h>
+#include <cmath>
 
 #include "AngularSpectralSample.hpp"
 #include "MeasuredSampleData.hpp"
@@ -158,7 +158,7 @@ namespace SpectralAveraging {
 
 		std::vector< std::shared_ptr< CSpectralSampleAngle > >::iterator it = find_if( m_SpectralProperties.begin(), m_SpectralProperties.end(),
 		                                                                     [ &t_Angle ]( std::shared_ptr< CSpectralSampleAngle > const& obj ) {
-		                                                                     return fabs( obj->angle() - t_Angle ) < 1e-6;
+		                                                                     return std::abs( obj->angle() - t_Angle ) < 1e-6;
 	                                                                     } );
 
 		if ( it != m_SpectralProperties.end() ) {

@@ -98,13 +98,14 @@ namespace SingleLayerOptics {
 	}
 
 	double CBSDFIntegrator::integrate( CSquareMatrix const& t_Matrix ) const {
+		using ConstantsData::PI;
 		double sum = 0;
 		for ( size_t i = 0; i < m_DimMatrices; ++i ) {
 			for ( size_t j = 0; j < m_DimMatrices; ++j ) {
 				sum += t_Matrix[ i ][ j ] * ( *m_Directions )[ i ]->lambda() * ( *m_Directions )[ j ]->lambda();
 			}
 		}
-		return sum / M_PI;
+		return sum / PI;
 	}
 
 	void CBSDFIntegrator::calcDiffuseDiffuse() {

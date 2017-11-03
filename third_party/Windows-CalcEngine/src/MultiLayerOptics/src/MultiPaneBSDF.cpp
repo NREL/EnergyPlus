@@ -1,5 +1,4 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <numeric>
 #include <algorithm>
 #include <cassert>
@@ -114,6 +113,7 @@ namespace MultiLayerOptics {
 	}
 
 	void CMultiPaneBSDF::calcHemisphericalAbs( const Side t_Side ) {
+		using ConstantsData::PI;
 		size_t numOfLayers = m_Abs[ t_Side ]->size();
 		std::vector< double > aLambdas = *m_Results->lambdaVector();
 		for ( size_t layNum = 0; layNum < numOfLayers; ++layNum ) {
@@ -121,7 +121,7 @@ namespace MultiLayerOptics {
 			assert( aAbs.size() == aLambdas.size() );
 			std::vector< double > mult( aLambdas.size() );
 			std::transform( aLambdas.begin(), aLambdas.end(), aAbs.begin(), mult.begin(), std::multiplies< double >() );
-			double sum = std::accumulate( mult.begin(), mult.end(), 0.0 ) / M_PI;
+			double sum = std::accumulate( mult.begin(), mult.end(), 0.0 ) / PI;
 			m_AbsHem[ t_Side ]->push_back( sum );
 		}
 	}

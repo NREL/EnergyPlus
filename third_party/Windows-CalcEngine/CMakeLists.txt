@@ -126,7 +126,7 @@ else()
     LIST( REMOVE_ITEM all_test_src "src/MultiLayerOptics/tst/main.cpp")
     LIST( APPEND test_src ${all_test_src} )
     
-    CREATE_TEST_TARGETS( ${target_name} "${test_src}" "" )
+    CREATE_TEST_TARGETS_WCE( ${target_name} "${test_src}" "" )
   endif()
   
 endif()

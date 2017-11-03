@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <cassert>
 
 #include "UniformDiffuseBSDFLayer.hpp"
@@ -42,8 +42,10 @@ namespace SingleLayerOptics {
 		size_t size = aDirections->size();
 
 		for ( size_t j = 0; j < size; ++j ) {
-			( *Tau )[ j ][ t_DirectionIndex ] += aTau / M_PI;
-			( *Rho )[ j ][ t_DirectionIndex ] += Ref / M_PI;
+			using ConstantsData::PI;
+
+			( *Tau )[ j ][ t_DirectionIndex ] += aTau / PI;
+			( *Rho )[ j ][ t_DirectionIndex ] += Ref / PI;
 		}
 
 	}
@@ -64,13 +66,15 @@ namespace SingleLayerOptics {
 		for ( size_t i = 0; i < size; ++i ) {
 			size_t numWV = aTau.size();
 			for ( size_t j = 0; j < numWV; ++j ) {
+				using ConstantsData::PI;
+
 				std::shared_ptr< CBSDFIntegrator > aResults = nullptr;
 				aResults = ( *m_WVResults )[ j ];
 				assert( aResults != nullptr );
 				std::shared_ptr< CSquareMatrix > Tau = aResults->getMatrix( aSide, PropertySimple::T );
 				std::shared_ptr< CSquareMatrix > Rho = aResults->getMatrix( aSide, PropertySimple::R );
-				( *Tau )[ i ][ t_DirectionIndex ] += aTau[ j ] / M_PI;
-				( *Rho )[ i ][ t_DirectionIndex ] += Ref[ j ] / M_PI;
+				( *Tau )[ i ][ t_DirectionIndex ] += aTau[ j ] / PI;
+				( *Rho )[ i ][ t_DirectionIndex ] += Ref[ j ] / PI;
 			}
 		}
 

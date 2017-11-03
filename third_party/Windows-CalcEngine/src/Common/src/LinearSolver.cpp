@@ -4,7 +4,7 @@
 #include "LinearSolver.hpp"
 #include "SquareMatrix.hpp"
 
-#include <math.h>
+#include <cmath>
 
 
 
@@ -22,7 +22,7 @@ namespace FenestrationCommon {
 		for ( auto i = 0u; i < size; ++i ) {
 			auto aamax = 0.0;
 			for ( size_t j = 0; j < size; ++j ) {
-				double absCellValue = fabs( t_MatrixA[ i ][ j ] );
+				double absCellValue = std::abs( t_MatrixA[ i ][ j ] );
 				if ( absCellValue > aamax ) {
 					aamax = absCellValue;
 				}
@@ -65,7 +65,7 @@ namespace FenestrationCommon {
 					sum = sum - t_MatrixA[ i ][ k ] * t_MatrixA[ k ][ j ];
 				}
 				t_MatrixA[ i ][ j ] = sum;
-				auto dum = vv[ i ] * fabs( sum );
+				auto dum = vv[ i ] * std::abs( sum );
 				if ( dum >= aamax ) {
 					imax = i;
 					aamax = dum;

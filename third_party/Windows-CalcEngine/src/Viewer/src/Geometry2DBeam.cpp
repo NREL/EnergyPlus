@@ -172,7 +172,7 @@ namespace Viewer {
 
 		auto it = find_if( m_Results->begin(), m_Results->end(),
 		                   [ &t_ProfileAngle ]( std::shared_ptr< CDirect2DRaysResult > const& obj ) {
-		                   return fabs( obj->profileAngle() - t_ProfileAngle ) < 1e-6;
+		                   return std::abs( obj->profileAngle() - t_ProfileAngle ) < 1e-6;
 	                   } );
 
 		if ( it != m_Results->end() ) {
@@ -338,7 +338,7 @@ namespace Viewer {
 					if ( currentSegment == beamRay->closestSegmentHit() ) {
 						viewFactor = currentHeight / totalHeight;
 						projectedBeamHeight = projectedBeamHeight * currentHeight;
-						auto segmentHitLength = projectedBeamHeight / fabs( beamRay->cosAngle( currentSegment->getNormal() ) );
+						auto segmentHitLength = projectedBeamHeight / std::abs( beamRay->cosAngle( currentSegment->getNormal() ) );
 						percentHit = segmentHitLength / currentSegment->length();
 						auto aTest = find( aViewFactors->begin(),
 						                   aViewFactors->end(), BeamViewFactor( e, s, 0, 0 ) );

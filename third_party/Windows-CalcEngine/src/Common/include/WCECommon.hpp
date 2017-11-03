@@ -1,6 +1,7 @@
 #ifndef WCECOMMON_H
 #define WCECOMMON_H
 
+#include "../src/Constants.hpp"
 #include "../src/CommonWavelengths.hpp"
 #include "../src/FenestrationCommon.hpp"
 #include "../src/Hemispherical2DIntegrator.hpp"

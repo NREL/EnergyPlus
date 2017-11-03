@@ -1,6 +1,6 @@
 #include <cassert>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 #include "MultiPaneSpecular.hpp"
 #include "AbsorptancesMultiPane.hpp"
@@ -125,7 +125,7 @@ namespace MultiLayerOptics {
 		std::vector< std::shared_ptr< CEquivalentLayerSingleComponentMWAngle > >::iterator it;
 		it = find_if( m_EquivalentAngle.begin(), m_EquivalentAngle.end(),
 		              [ &t_Angle ]( const std::shared_ptr< CEquivalentLayerSingleComponentMWAngle >& obj ) {
-		              return fabs( obj->angle() - t_Angle ) < 1e-6;
+		              return std::abs( obj->angle() - t_Angle ) < 1e-6;
 	              } );
 
 		if ( it != m_EquivalentAngle.end() ) {

@@ -1,19 +1,20 @@
-#define _USE_MATH_DEFINES
+
 #include <memory>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
 
 #include "NusseltNumber.hpp"
 #include "WCEGases.hpp"
+#include "WCECommon.hpp"
 
 
 
 namespace Tarcog {
 
 	double CNusseltNumberStrategy::pos( double const t_Value ) {
-		return ( t_Value + fabs( t_Value ) ) / 2;
+		return ( t_Value + std::abs( t_Value ) ) / 2;
 	}
 
 	double CNusseltNumberStrategy::calculate( double const, double const, double const ) {
@@ -50,13 +51,15 @@ namespace Tarcog {
 	}
 
 	double CNusseltNumber60To90::calculate( double const t_Tilt, double const t_Ra, double const t_Asp ) {
+		using ConstantsData::PI;
+
 		std::shared_ptr< CNusseltNumber60 > nusselt60 = std::make_shared< CNusseltNumber60 >();
 		double Nu60 = nusselt60->calculate( t_Tilt, t_Ra, t_Asp );
 		std::shared_ptr< CNusseltNumber90 > nusselt90 = std::make_shared< CNusseltNumber90 >();
 		double Nu90 = nusselt90->calculate( t_Tilt, t_Ra, t_Asp );
 
 		// linear interpolation between 60 and 90 degrees
-		double gnu = ( ( Nu90 - Nu60 ) / ( 90.0 - 60.0 ) ) * ( t_Tilt * 180 / M_PI - 60.0 ) + Nu60;
+		double gnu = ( ( Nu90 - Nu60 ) / ( 90.0 - 60.0 ) ) * ( t_Tilt * 180 / PI - 60.0 ) + Nu60;
 
 		return gnu;
 	}
@@ -87,7 +90,9 @@ namespace Tarcog {
 	}
 
 	double CNusseltNumber::calculate( double const t_Tilt, double const t_Ra, double const t_Asp ) {
-		double tiltRadians = t_Tilt * M_PI / 180;
+		using ConstantsData::PI;
+
+		double tiltRadians = t_Tilt * PI / 180;
 		std::shared_ptr< CNusseltNumberStrategy > nusseltNumber;
 
 		if ( t_Tilt >= 0 && t_Tilt < 60 ) {

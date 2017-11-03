@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -18,7 +18,6 @@
 #include "BaseShade.hpp"
 #include "Environment.hpp"
 #include "WCECommon.hpp"
-
 
 using namespace FenestrationCommon;
 
@@ -345,12 +344,14 @@ namespace Tarcog {
 	}
 
 	double CIGU::Ldmean() const {
-		auto coeff = 16 / ( pow( M_PI, 6 ) );
+		using ConstantsData::PI;
+
+		auto coeff = 16 / ( pow( PI, 6 ) );
 		auto totalSum = 0.0;
 		for ( auto m = 1; m <= 5; m += 2 ) {
 			for ( auto n = 1; n <= 5; n += 2 ) {
 				auto nomin = 4.0;
-				auto denom = m * m * n * n * M_PI * M_PI * pow( pow( m / m_Width, 2 ) + pow( n / m_Height, 2 ), 2 );
+				auto denom = m * m * n * n * PI * PI * pow( pow( m / m_Width, 2 ) + pow( n / m_Height, 2 ), 2 );
 				totalSum += nomin / denom;
 			}
 		}
@@ -358,11 +359,13 @@ namespace Tarcog {
 	}
 
 	double CIGU::Ldmax() const {
-		auto coeff = 16 / ( pow( M_PI, 6 ) );
+		using ConstantsData::PI;
+
+		auto coeff = 16 / ( pow( PI, 6 ) );
 		auto totalSum = 0.0;
 		for ( auto m = 1; m <= 5; m += 2 ) {
 			for ( auto n = 1; n <= 5; n += 2 ) {
-				auto nomin = sin( m * M_PI / 2 ) * sin( n * M_PI / 2 );
+				auto nomin = sin( m * PI / 2 ) * sin( n * PI / 2 );
 				auto denom = m * n * pow( pow( m / m_Width, 2 ) + pow( n / m_Height, 2 ), 2 );
 				totalSum += nomin / denom;
 			}

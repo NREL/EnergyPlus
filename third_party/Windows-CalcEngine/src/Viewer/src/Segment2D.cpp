@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
@@ -124,11 +124,11 @@ namespace Viewer {
 		auto x = 0.0;
 		auto y = 0.0;
 
-		if ( fabs( A1 ) > ViewerConstants::DISTANCE_TOLERANCE ) {
+		if ( std::abs( A1 ) > ViewerConstants::DISTANCE_TOLERANCE ) {
 			auto t1 = C2 - C1 * A2 / A1;
 			auto t2 = B2 - B1 * A2 / A1;
 			// assert( t2 != 0 );
-			if ( fabs( t2 ) > ViewerConstants::DISTANCE_TOLERANCE ) {
+			if ( std::abs( t2 ) > ViewerConstants::DISTANCE_TOLERANCE ) {
 				y = t1 / t2;
 				x = ( C1 - B1 * y ) / A1;
 			}
@@ -154,13 +154,13 @@ namespace Viewer {
 		// Check X range
 		auto const maxX = std::max( m_EndPoint->x(), m_StartPoint->x() );
 		auto const minX = std::min( m_EndPoint->x(), m_StartPoint->x() );
-		if ( fabs( maxX - minX ) > ViewerConstants::DISTANCE_TOLERANCE ) {
+		if ( std::abs( maxX - minX ) > ViewerConstants::DISTANCE_TOLERANCE ) {
 			if ( t_Point->x() < ( maxX - ViewerConstants::DISTANCE_TOLERANCE ) && t_Point->x() > ( minX + ViewerConstants::DISTANCE_TOLERANCE ) ) {
 				inXRange = true;
 			}
 		}
 		else {
-			if ( fabs( t_Point->x() - maxX ) < ViewerConstants::DISTANCE_TOLERANCE ) {
+			if ( std::abs( t_Point->x() - maxX ) < ViewerConstants::DISTANCE_TOLERANCE ) {
 				inXRange = true;
 			}
 		}
@@ -168,13 +168,13 @@ namespace Viewer {
 		// Check Y range
 		auto const maxY = std::max( m_EndPoint->y(), m_StartPoint->y() );
 		auto const minY = std::min( m_EndPoint->y(), m_StartPoint->y() );
-		if ( fabs( maxY - minY ) > ViewerConstants::DISTANCE_TOLERANCE ) {
+		if ( std::abs( maxY - minY ) > ViewerConstants::DISTANCE_TOLERANCE ) {
 			if ( t_Point->y() < ( maxY - ViewerConstants::DISTANCE_TOLERANCE ) && t_Point->y() > ( minY + ViewerConstants::DISTANCE_TOLERANCE ) ) {
 				inYRange = true;
 			}
 		}
 		else {
-			if ( fabs( t_Point->y() - maxY ) < ViewerConstants::DISTANCE_TOLERANCE ) {
+			if ( std::abs( t_Point->y() - maxY ) < ViewerConstants::DISTANCE_TOLERANCE ) {
 				inYRange = true;
 			}
 		}

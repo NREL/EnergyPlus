@@ -1,6 +1,7 @@
-#define _USE_MATH_DEFINES
+
 #include <cmath>
 
+#include "WCECommon.hpp"
 #include "BSDFPatch.hpp"
 #include "BeamDirection.hpp"
 
@@ -70,9 +71,11 @@ namespace SingleLayerOptics {
 	}
 
 	void CBSDFPatch::calculateLambda() {
-		double thetaLow = m_Theta->low() * M_PI / 180;
-		double thetaHight = m_Theta->high() * M_PI / 180;
-		double deltaPhi = m_Phi->delta() * M_PI / 180;
+		using ConstantsData::PI;
+
+		double thetaLow = m_Theta->low() * PI / 180;
+		double thetaHight = m_Theta->high() * PI / 180;
+		double deltaPhi = m_Phi->delta() * PI / 180;
 		m_Lambda = 0.5 * deltaPhi * ( sin( thetaHight ) * sin( thetaHight ) - sin( thetaLow ) * sin( thetaLow ) );
 	}
 

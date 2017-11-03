@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 
 #include "PolarPoint2D.hpp"
 #include "WCECommon.hpp"
@@ -24,6 +24,8 @@ namespace Viewer {
 	}
 
 	void CPolarPoint2D::setCartesian( double const x, double const y ) {
+		using ConstantsData::PI;
+
 		m_x = x;
 		m_y = y;
 
@@ -31,10 +33,10 @@ namespace Viewer {
 			m_Theta = atan( y / x );
 		}
 		else if ( x == 0 && y > 0 ) {
-			m_Theta = M_PI_2;
+			m_Theta = PI / 2;
 		}
 		else if ( x == 0 && y < 0 ) {
-			m_Theta = 3 * M_PI_2;
+			m_Theta = 3 * PI / 2;
 		}
 		else {
 			m_Theta = 0;

@@ -1,6 +1,3 @@
-#include <cassert>
-#include <memory>
-
 #include "PerforatedCellDescription.hpp"
 #include "BeamDirection.hpp"
 #include "WCECommon.hpp"
@@ -37,6 +34,7 @@ namespace SingleLayerOptics {
 	}
 
 	double CCircularCellDescription::visibleAhole( const CBeamDirection& t_Direction ) const {
+		using ConstantsData::PI;
 		double aHole( 0 );
 
 		double angleLimit = atan( 2 * m_Radius / m_Thickness );
@@ -47,8 +45,8 @@ namespace SingleLayerOptics {
 		}
 		else {
 			double A1( 0 ), A2( 0 );
-			A1 = M_PI / 2 * m_Radius * m_Radius * cos( aTheta );
-			A2 = M_PI / 2 * ( m_Radius * m_Radius * cos( aTheta ) - m_Radius *
+			A1 = PI / 2 * m_Radius * m_Radius * cos( aTheta );
+			A2 = PI / 2 * ( m_Radius * m_Radius * cos( aTheta ) - m_Radius *
 				( m_Thickness ) * sin( aTheta ) );
 
 			aHole = A1 + A2;
@@ -92,7 +90,7 @@ namespace SingleLayerOptics {
 		}
 		else {
 			double Transmittance( 0 );
-			Transmittance = ( ( m_YHole / m_y ) - fabs( m_Thickness / m_y * tan( Psi ) ) );
+			Transmittance = ( ( m_YHole / m_y ) - std::abs( m_Thickness / m_y * tan( Psi ) ) );
 			if ( Transmittance < 0 ) Transmittance = 0;
 			return Transmittance;
 		}
@@ -115,7 +113,7 @@ namespace SingleLayerOptics {
 		}
 		else {
 			double Transmittance( 0 );
-			Transmittance = ( ( m_XHole / m_x ) - fabs( m_Thickness / m_x * tan( Eta ) ) );
+			Transmittance = ( ( m_XHole / m_x ) - std::abs( m_Thickness / m_x * tan( Eta ) ) );
 			if ( Transmittance < 0 ) Transmittance = 0;
 			return Transmittance;
 		}

@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <cassert>
 
 #include "IGUVentilatedGapLayer.hpp"
@@ -97,14 +97,15 @@ namespace Tarcog {
 
 	double CIGUVentilatedGapLayer::getAirflowReferencePoint( double const t_GapTemperature ) {
 		using ConstantsData::GRAVITYCONSTANT;
+		using ConstantsData::PI;
 
-		auto tiltAngle = M_PI / 180 * ( m_Tilt - 90 );
+		auto tiltAngle = PI / 180 * ( m_Tilt - 90 );
 		auto gapTemperature = layerTemperature();
 		auto aProperties = m_ReferenceGas->getGasProperties();
-		auto temperatureMultiplier = fabs( gapTemperature - t_GapTemperature ) /
+		auto temperatureMultiplier = std::abs( gapTemperature - t_GapTemperature ) /
 			( gapTemperature * t_GapTemperature );
 		return aProperties->m_Density * ReferenceTemperature * GRAVITYCONSTANT * m_Height *
-			fabs( cos( tiltAngle ) ) * temperatureMultiplier;
+			std::abs( cos( tiltAngle ) ) * temperatureMultiplier;
 	}
 
 	double CIGUVentilatedGapLayer::bernoullyPressureTerm() const {
@@ -128,7 +129,7 @@ namespace Tarcog {
 	}
 
 	void CIGUVentilatedGapLayer::smoothEnergyGain( double const qv1, double const qv2 ) {
-		auto smooth = ( fabs( qv1 ) + fabs( qv2 ) ) / 2;
+		auto smooth = ( std::abs( qv1 ) + std::abs( qv2 ) ) / 2;
 		m_LayerGainFlow = smooth;
 		if ( m_inTemperature < m_outTemperature ) {
 			m_LayerGainFlow = -m_LayerGainFlow;

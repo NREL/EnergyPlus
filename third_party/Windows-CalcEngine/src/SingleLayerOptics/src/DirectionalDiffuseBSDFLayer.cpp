@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <cassert>
 
 #include "DirectionalDiffuseBSDFLayer.hpp"
@@ -42,13 +42,15 @@ namespace SingleLayerOptics {
 
 		for ( size_t j = 0; j < size; ++j ) {
 
+			using ConstantsData::PI;
+
 			const CBeamDirection jDirection = *( *jDirections )[ j ]->centerPoint();
 
 			double aTau = aCell->T_dir_dif( aSide, t_Direction, jDirection );
 			double aRho = aCell->R_dir_dif( aSide, t_Direction, jDirection );
 
-			( *Tau )[ j ][ t_DirectionIndex ] += aTau / M_PI;
-			( *Rho )[ j ][ t_DirectionIndex ] += aRho / M_PI;
+			( *Tau )[ j ][ t_DirectionIndex ] += aTau / PI;
+			( *Rho )[ j ][ t_DirectionIndex ] += aRho / PI;
 		}
 
 	}
@@ -72,13 +74,15 @@ namespace SingleLayerOptics {
 
 			size_t numWV = aTau->size();
 			for ( size_t j = 0; j < numWV; ++j ) {
+				using ConstantsData::PI;
+
 				std::shared_ptr< CBSDFIntegrator > aResults = nullptr;
 				aResults = ( *m_WVResults )[ j ];
 				assert( aResults != nullptr );
 				std::shared_ptr< CSquareMatrix > Tau = aResults->getMatrix( aSide, PropertySimple::T );
 				std::shared_ptr< CSquareMatrix > Rho = aResults->getMatrix( aSide, PropertySimple::R );
-				( *Tau )[ i ][ t_DirectionIndex ] += ( *aTau )[ j ] / M_PI;
-				( *Rho )[ i ][ t_DirectionIndex ] += ( *Ref )[ j ] / M_PI;
+				( *Tau )[ i ][ t_DirectionIndex ] += ( *aTau )[ j ] / PI;
+				( *Rho )[ i ][ t_DirectionIndex ] += ( *Ref )[ j ] / PI;
 			}
 
 		}

@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <cassert>
 #include <stdexcept>
 
@@ -47,16 +47,18 @@ namespace SingleLayerOptics {
 	}
 
 	double CWovenCellDescription::Tx( const CBeamDirection& t_Direction ) {
+		using ConstantsData::PI;
+
 		double aTx = 0;
 		double cutOffAngle = this->cutOffAngle();
 		double aAzimuth = t_Direction.Azimuth();
-		if ( aAzimuth > M_PI_2 ) {
-			aAzimuth = M_PI - aAzimuth;
+		if ( aAzimuth > PI / 2 ) {
+			aAzimuth = PI - aAzimuth;
 		}
-		if ( aAzimuth < -M_PI_2 ) {
-			aAzimuth = -M_PI - aAzimuth;
+		if ( aAzimuth < -PI / 2 ) {
+			aAzimuth = -PI - aAzimuth;
 		}
-		aAzimuth = fabs( aAzimuth );
+		aAzimuth = std::abs( aAzimuth );
 		if ( aAzimuth < cutOffAngle ) {
 			aTx = 1 - this->gamma() / cos( aAzimuth );
 		}
@@ -67,7 +69,7 @@ namespace SingleLayerOptics {
 		double aTy = 0;
 		double cutOffAngle = this->cutOffAngle();
 		double aAltitude = t_Direction.Altitude();
-		double aPrim = fabs( atan( tan( aAltitude ) / cos( aAltitude ) ) );
+		double aPrim = std::abs( atan( tan( aAltitude ) / cos( aAltitude ) ) );
 		if ( aPrim < cutOffAngle ) {
 			aTy = 1 - this->gamma() / cos( aPrim );
 		}

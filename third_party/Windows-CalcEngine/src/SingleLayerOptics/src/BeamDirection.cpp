@@ -58,7 +58,7 @@ namespace SingleLayerOptics {
 	}
 
 	double CBeamDirection::distance( const double t_Theta, const double t_Phi ) const {
-		return abs( m_Theta - t_Theta ) + abs( m_Phi - t_Phi );
+		return std::abs( m_Theta - t_Theta ) + std::abs( m_Phi - t_Phi );
 	}
 
 	double CBeamDirection::Altitude() const {
@@ -72,7 +72,7 @@ namespace SingleLayerOptics {
 		double aTheta = radians( m_Theta );
 		double aPhi = radians( m_Phi );
 		double aAzimuth = 0;
-		if ( fabs( aTheta ) - fabs( aAltitude ) > 1e-8 ) {
+		if ( std::abs( aTheta ) - std::abs( aAltitude ) > 1e-8 ) {
 			aAzimuth = -acos( cos( aTheta ) / cos( aAltitude ) );
 		}
 		if ( cos( aPhi ) < 0 ) {

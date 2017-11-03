@@ -1,5 +1,6 @@
-#include <math.h>
-#include "Constants.hpp"
+#include <cmath>
+
+#include "WCECommon.hpp"
 #include "GasProperties.hpp"
 
 namespace Gases {

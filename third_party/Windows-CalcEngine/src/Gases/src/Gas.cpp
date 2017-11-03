@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 #include "Gas.hpp"
 #include "GasData.hpp"
 #include "GasItem.hpp"

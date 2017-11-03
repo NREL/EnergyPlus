@@ -191,7 +191,7 @@ namespace FenestrationCommon {
 			double wv = m_Series[ i ]->x();
 			double testWv = t_Series.m_Series[ i ]->x();
 
-			if ( fabs( wv - testWv ) > WAVELENGTHTOLERANCE ) {
+			if ( std::abs( wv - testWv ) > WAVELENGTHTOLERANCE ) {
 				throw std::runtime_error( "Wavelengths of two vectors are not the same. Cannot preform multiplication." );
 			}
 
@@ -212,7 +212,7 @@ namespace FenestrationCommon {
 			double wv = m_Series[ i ]->x();
 			double testWv = t_Series.m_Series[ i ]->x();
 
-			if ( fabs( wv - testWv ) > WAVELENGTHTOLERANCE ) {
+			if ( std::abs( wv - testWv ) > WAVELENGTHTOLERANCE ) {
 				throw std::runtime_error( "Wavelengths of two vectors are not the same. Cannot preform multiplication." );
 			}
 
@@ -233,7 +233,7 @@ namespace FenestrationCommon {
 			double wv = m_Series[ i ]->x();
 			double testWv = t_Series.m_Series[ i ]->x();
 
-			if ( fabs( wv - testWv ) > WAVELENGTHTOLERANCE ) {
+			if ( std::abs( wv - testWv ) > WAVELENGTHTOLERANCE ) {
 				throw std::runtime_error( "Wavelengths of two vectors are not the same. Cannot preform multiplication." );
 			}
 

@@ -1,5 +1,5 @@
 #include <cassert>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 #include "NonLinearSolver.hpp"
@@ -25,9 +25,9 @@ namespace Tarcog {
 
 	double CNonLinearSolver::calculateTolerance( std::vector< double > const& t_Solution ) const {
 		assert(t_Solution.size() == m_IGUState->size() );
-		auto aError = fabs( t_Solution[ 0 ] - ( *m_IGUState )[ 0 ] );
+		auto aError = std::abs( t_Solution[ 0 ] - ( *m_IGUState )[ 0 ] );
 		for ( size_t i = 1; i < m_IGUState->size(); ++i ) {
-			aError = std::max( aError, fabs( t_Solution[ i ] - ( *m_IGUState )[ i ] ) );
+			aError = std::max( aError, std::abs( t_Solution[ i ] - ( *m_IGUState )[ i ] ) );
 		}
 		return aError;
 	}

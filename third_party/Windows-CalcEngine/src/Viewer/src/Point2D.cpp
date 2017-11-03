@@ -24,8 +24,8 @@ namespace Viewer {
 	}
 
 	bool CPoint2D::sameCoordinates( CPoint2D const& t_Point ) const {
-		return ( fabs( t_Point.x() - m_x ) < ViewerConstants::DISTANCE_TOLERANCE ) &&
-			( fabs( t_Point.y() - m_y ) < ViewerConstants::DISTANCE_TOLERANCE );
+		return ( std::abs( t_Point.x() - m_x ) < ViewerConstants::DISTANCE_TOLERANCE ) &&
+			( std::abs( t_Point.y() - m_y ) < ViewerConstants::DISTANCE_TOLERANCE );
 	}
 
 	double CPoint2D::dotProduct( CPoint2D const& t_Point ) const {

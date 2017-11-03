@@ -104,7 +104,7 @@ namespace SpectralAveraging {
 		}
 
 		for ( size_t i = 0; i < m_Measurements.size(); i++ ) {
-			if ( fabs( m_Measurements[ i ]->getAngle() - t_Angle ) < angleTolerance ) {
+			if ( std::abs( m_Measurements[ i ]->getAngle() - t_Angle ) < angleTolerance ) {
 				return m_Measurements[ i ];
 			}
 		}
@@ -117,7 +117,7 @@ namespace SpectralAveraging {
 		std::shared_ptr< CSpectralSample > sample2 = nullptr;
 		for ( size_t i = 0; i < m_Measurements.size(); i++ ) {
 			const auto angle = m_Measurements[ i ]->getAngle();
-			const auto diff = fabs( angle - t_Angle );
+			const auto diff = std::abs( angle - t_Angle );
 			if ( diff < min1 ) {
 				sample1 = m_Measurements[ i ]->getData();
 				angle1 = angle;

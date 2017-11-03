@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <memory>
 
 #include "WCETarcog.hpp"
@@ -43,12 +43,14 @@ namespace Tarcog {
 	}
 
 	double CCircularPillar::conductivityOfPillarArray() {
+		using ConstantsData::PI;
+
 		auto cond1 = std::dynamic_pointer_cast< CBaseIGULayer >( m_PreviousLayer )->getConductivity();
 		auto cond2 = std::dynamic_pointer_cast< CBaseIGULayer >( m_NextLayer )->getConductivity();
 		auto aveCond = ( cond1 + cond2 ) / 2;
 
 		auto cond = 2 * aveCond * m_Radius / ( pow( m_Spacing, 2 ) );
-		cond *= 1 / ( 1 + 2 * m_Thickness * aveCond / ( m_Conductivity * M_PI * m_Radius ) );
+		cond *= 1 / ( 1 + 2 * m_Thickness * aveCond / ( m_Conductivity * PI * m_Radius ) );
 
 		return cond;
 	}

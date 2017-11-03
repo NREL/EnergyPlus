@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 #include <stdexcept>
 #include <cassert>
 
@@ -56,6 +56,8 @@ namespace SpectralAveraging {
 	}
 
 	void CAngularPropertiesUncoated::checkStateProperties( double const t_Angle, double const t_Wavelength ) {
+		using ConstantsData::PI;
+		
 		CAngularProperties::checkStateProperties( t_Angle, t_Wavelength );
 
 		if ( m_StateAngle != t_Angle || m_StateWavelength != t_Wavelength ) {
@@ -66,8 +68,8 @@ namespace SpectralAveraging {
 			auto a = 0.0;
 
 			if ( m_Transmittance0 > 0 ) {
-				auto k = - t_Wavelength / ( 4 * M_PI * m_Thickness ) * log( ( m_Reflectance0 - m_Rho0 ) / ( m_Transmittance0 * m_Rho0 ) );
-				auto alpha = 2 * M_PI * k / t_Wavelength;
+				auto k = - t_Wavelength / ( 4 * PI * m_Thickness ) * log( ( m_Reflectance0 - m_Rho0 ) / ( m_Transmittance0 * m_Rho0 ) );
+				auto alpha = 2 * PI * k / t_Wavelength;
 				a = exp( -2 * alpha * m_Thickness / aCosPhiPrim );
 			}
 

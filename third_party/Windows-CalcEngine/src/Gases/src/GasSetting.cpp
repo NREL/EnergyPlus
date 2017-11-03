@@ -1,5 +1,5 @@
+#include "WCECommon.hpp"
 #include "GasSetting.hpp"
-#include "Constants.hpp"
 
 namespace Gases {
 

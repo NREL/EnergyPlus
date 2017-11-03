@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 #include <stdexcept>
 #include <cassert>
 #include <iostream>
@@ -68,7 +68,7 @@ namespace Tarcog {
 		using ConstantsData::GRAVITYCONSTANT;
 
 		auto tGapTemperature = layerTemperature();
-		auto deltaTemp = fabs( getSurface( Side::Back )->getTemperature() -
+		auto deltaTemp = std::abs( getSurface( Side::Back )->getTemperature() -
 		                      getSurface( Side::Front )->getTemperature() );
 
 		auto aProperties = m_Gas->getGasProperties();

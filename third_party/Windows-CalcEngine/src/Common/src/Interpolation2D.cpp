@@ -83,7 +83,7 @@ namespace FenestrationCommon {
 			first_res = 0;
 		}
 		else if ( ( sgn( m_Deltas[ 0 ] ) != sgn( m_Deltas[ 1 ] ) ) &&
-			( fabs( first_res ) > fabs( 3 * m_Deltas[ 0 ] ) ) ) {
+			( std::abs( first_res ) > std::abs( 3 * m_Deltas[ 0 ] ) ) ) {
 			first_res = 3 * m_Deltas[ 0 ];
 		}
 		auto last_h = *( m_Hs.end() - 1 );
@@ -97,7 +97,7 @@ namespace FenestrationCommon {
 		if ( sgn( last_res ) != sgn( last_d ) ) {
 			last_res = 0;
 		}
-		else if ( ( sgn( last_d ) != sgn( penultimate_d ) ) && ( fabs( last_res ) > fabs( 3 * last_d ) ) ) {
+		else if ( ( sgn( last_d ) != sgn( penultimate_d ) ) && ( std::abs( last_res ) > std::abs( 3 * last_d ) ) ) {
 			last_res = 3 * last_d;
 		}
 
