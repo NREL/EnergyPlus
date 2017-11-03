@@ -70,8 +70,18 @@
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
   Timestep,1;
+  
+  WindowsCalculationEngine,
+    ExternalWindowsModel;
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
+
+  Site:Location,
+    CHICAGO_IL_USA TMY2-94846,  !- Name
+    41.78,                   !- Latitude {deg}
+    -87.75,                  !- Longitude {deg}
+    -6.00,                   !- Time Zone {hr}
+    190.00;                  !- Elevation {m}
 
   RunPeriod,
     ,                        !- Name
@@ -85,9 +95,6 @@
     Yes,                     !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-    
-  WindowsCalculationEngine,
-    ExternalWindowsModel;
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
