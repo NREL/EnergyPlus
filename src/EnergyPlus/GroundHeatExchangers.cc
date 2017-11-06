@@ -756,7 +756,7 @@ namespace GroundHeatExchangers {
 		Real64 const radius_pipe_out = std::sqrt( 2 ) * pipe.outRadius;
 		Real64 const radius_pipe_in = radius_pipe_out - pipe_thickness;
 		Real64 const radius_conv = radius_pipe_in - num_conv_cells * pcf_cell_thickness;
-		Real64 const radius_fluid = radius_conv - num_fluid_cells * pcf_cell_thickness;
+		Real64 const radius_fluid = radius_conv - ( num_fluid_cells - 0.5 ) * pcf_cell_thickness; // accounts for half thickness of boundary cell
 
 		// setup grout layer geometry
 		int const num_grout_cells = 27;
@@ -786,9 +786,16 @@ namespace GroundHeatExchangers {
 			Cell thisCell;
 			thisCell.type = CellType::FLUID;
 			thisCell.thickness = pcf_cell_thickness;
-			thisCell.radius_inner = radius_fluid + i * thisCell.thickness;
-			thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
-			thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
+			thisCell.radius_center = radius_fluid + i * thisCell.thickness;
+
+			// boundary cell is only half thickness
+			if ( i == 0 ) {
+				thisCell.radius_inner = thisCell.radius_center;
+			} else {
+				thisCell.radius_inner = thisCell.radius_center - thisCell.thickness / 2.0;
+			}
+
+			thisCell.radius_outer = thisCell.radius_center + thisCell.thickness / 2.0;
 			thisCell.conductivity = 200;
 			thisCell.rhoCp = 2.0 * cpFluid_init * fluidDensity_init * pow_2( pipe.innerRadius ) / ( pow_2( radius_conv ) - pow_2( radius_fluid ) );
 			Cells.push_back( thisCell );
@@ -850,6 +857,30 @@ namespace GroundHeatExchangers {
 			thisCell.vol = Pi * ( pow_2( thisCell.radius_outer ) - pow_2( thisCell.radius_inner ) );
 			thisCell.temperature = initial_temperature;
 		}
+
+		// delete me
+		std::ofstream static propsFile( "props.csv", std::ofstream::out );
+
+		Real64 fluid_thermalMass = 0.0;
+		Real64 pipe_thermalMass = 0.0;
+		Real64 grout_thermalMass = 0.0;
+		Real64 soil_thermalMass = 0.0;
+		for ( auto & thisCell : Cells ) {
+			if ( thisCell.type == CellType::FLUID ) {
+				fluid_thermalMass += thisCell.vol * thisCell.rhoCp;
+			} else if ( thisCell.type == CellType::PIPE ) {
+				pipe_thermalMass += thisCell.vol * thisCell.rhoCp;
+			} else if ( thisCell.type == CellType::GROUT ) {
+				grout_thermalMass += thisCell.vol * thisCell.rhoCp;
+			} else if ( thisCell.type == CellType::SOIL ) {
+				soil_thermalMass += thisCell.vol * thisCell.rhoCp;
+			}
+		}
+
+		propsFile << "Pipe," << pipe_thermalMass << std::endl;
+		propsFile << "Grout," << grout_thermalMass << std::endl;
+		propsFile << "Fluid," << fluid_thermalMass << std::endl;
+		propsFile << "Soil," << soil_thermalMass << std::endl;
 
 		// minimum simulation time for which finite line source method is applicable
 		Real64 const minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
@@ -944,7 +975,7 @@ namespace GroundHeatExchangers {
 					c.push_back( AE / AD );
 					d.push_back( -thisCell.temperature_prev_ts );
 				}
-			} // end tdma stup
+			} // end tdma setup
 
 			// solve for new temperatures
 			std::vector< Real64 > new_temps = TDMA( a, b, c, d );
@@ -966,6 +997,65 @@ namespace GroundHeatExchangers {
 			int deleteME = 0;
 
 		} // end timestep loop
+
+		// delete me
+		std::ofstream static resist_file( "resist.csv", std::ofstream::out );
+		int num_cells = Cells.size();
+
+		for( int cell_index = 0; cell_index < num_cells; ++cell_index ) {
+
+			auto & thisCell = Cells[cell_index];
+
+			Real64 temp_left = 0.0;
+			Real64 temp_center = 0.0;
+			Real64 temp_right = 0.0;
+			Real64 resist = 0.0;
+
+			if ( cell_index == 0 ) {
+				auto & rightCell = Cells[cell_index + 1];
+
+				temp_left = thisCell.temperature;
+				temp_center = thisCell.temperature;
+
+				Real64 FP = 2 * Pi * thisCell.conductivity / log( thisCell.radius_outer - thisCell.radius_center );
+				Real64 FE = 2 * Pi * rightCell.conductivity / log( rightCell.radius_center - rightCell.radius_inner );
+
+				temp_right = ( FP * thisCell.temperature + FE * rightCell.temperature ) / ( FP + FE );
+
+			} else if ( cell_index == num_cells - 1 ) {
+				auto & leftCell = Cells[cell_index - 1];
+
+				temp_right = thisCell.temperature;
+				temp_center = thisCell.temperature;
+
+				Real64 FP = 2 * Pi * thisCell.conductivity / log( thisCell.radius_center / thisCell.radius_inner );
+				Real64 FW = 2 * Pi * leftCell.conductivity / log( leftCell.radius_outer / leftCell.radius_center );
+
+				temp_left = ( FP * thisCell.temperature + FW* leftCell.temperature ) / ( FP + FW );
+
+			} else {
+				auto & rightCell = Cells[cell_index + 1];
+				auto & leftCell = Cells[cell_index - 1];
+
+				temp_center = thisCell.temperature;
+
+				Real64 FW = 2 * Pi * leftCell.conductivity / log( leftCell.radius_outer / leftCell.radius_center );
+				Real64 FP_W = 2 * Pi * thisCell.conductivity / log( thisCell.radius_center / thisCell.radius_inner );
+
+				temp_left = ( FP_W * thisCell.temperature + FW * leftCell.temperature ) / ( FP_W + FW );
+
+				Real64 FE = 2 * Pi * rightCell.conductivity / log( rightCell.radius_center / rightCell.radius_inner );
+				Real64 FP_E = 2 * Pi * thisCell.conductivity / log( thisCell.radius_outer / thisCell.radius_center );
+
+				temp_right = ( FP_E * thisCell.temperature + FE * rightCell.temperature ) / ( FP_E + FE );
+
+			}
+
+			resist = ( temp_left - temp_right ) / heat_flux;
+
+			resist_file << "," << temp_left << "," << temp_center << "," << temp_right << "," << resist << std::endl;
+
+		}
 	}
 
 	//******************************************************************************
