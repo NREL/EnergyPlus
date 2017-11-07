@@ -5,8 +5,10 @@ OnOff Thermostat
 
 **Florida Solar Energy Center**
 
- - Original
- - 10/20/17
+ - First revision
+ - 11/7/17
+
+ - Original, 10/20/17
 
  
 
@@ -16,7 +18,98 @@ In general, real cycling systems do not cycle several times in a short period. E
 
 ## E-mail and  Conference Call Conclusions ##
 
-N/A
+### E-mail communications
+
+Enclosed are E-mail communications among Tianzhen, Mike, Rich and Gu after submission of the original NFP.
+
+Gu:
+I am concerned that the approach of setting the current zone load to a high value will be confusing and not control well, especially with more than one piece of equipment serving a zone.
+It would seem better to build on the existing ZoneControl:Thermostat:StagedDualSetpoint (and SetpointManager:SingleZone:OneStageHeating/Cooling) which already establishes a framework for signalling on/off and stage (or speed) to AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed (and maybe from source code this works with AirLoopHVAC:UnitarySystem).
+It uses ZoneSysEnergyDemand( ActualZoneNum ).StageNum (+ for heating stage, - for cooling stage, 0 for off) and DataZoneControls::StageZoneLogic to communicate the current control state to the equipment.
+This task could use the same logic and extend it to other equipment types.
+Mike
+p.s.  Please open a pull requests to allow comments on github.
+
+On 11/3/2017 1:54 PM, Tianzhen Hong wrote:
+Thanks Gu for the clarifications.
+More comments as follows.
+Tianzhen
+
+On Fri, Nov 3, 2017 at 6:10 AM, Lixing Gu <gu@fsec.ucf.edu> wrote:
+Tianzhen:
+ 
+Thanks for your quick response. Here are my answers to your questions:
+ 
+1. For equipment with multi-stage or VFD controls, they can run at different capacity, do you need to overwrite or specify its operation if it is forced to cycle on?
+ 
+A: The equipment will run full capacity, since the predicted load will be set to very high value such as 1.0E20.
+
+In this case, would force the equipment to run at the lowest stage/capacity be a better approach to avoid overcooling or overheating? 
+ 
+2. Do manufacturers have minimal cycling on/off time for their equipment? Or rules of thumb? Would those be a user input. Currently you tie it to the simulation time step.
+ 
+A: Yes. The thermostat is tied to each time step. Minimum operation time can be added. If added, it will be user input. However, it may not belong to the thermostat. Instead, it should belong to each individual system, because different systems may have different operation time restriction.
+
+Agree. This is a system level control.
+ 
+3. If forced to cycle on/off for full time step, the zone temperature may be overcooled or underheated. How to flag this in the report?
+ 
+A: Yes, the zone may be got overcooled or overheated. I can report a temperature difference. Do you have any suggestions.
+
+Maybe adding a time-series report variable to indicate the status of cycling on/off.
+ 
+Please let me know any more concerns.
+ 
+Thanks.
+ 
+Gu   
+ 
+From: energyplusdevteam@googlegroups.com [mailto:energyplusdevteam@googlegroups.com] On Behalf Of Tianzhen Hong
+Sent: Thursday, November 02, 2017 6:02 PM
+To: Lixing Gu <gu@fsec.ucf.edu>
+Cc: energyplusdevteam@googlegroups.com
+Subject: Re: [energyplusdevteam] NFP OnOff Thermostat
+ 
+Gu,
+This is a nice feature especially for residential systems. I had some discussion with our residential group recently on this topic.
+ 
+Can you clarify the following?
+ 
+1. For equipment with multi-stage or VFD controls, they can run at different capacity, do you need to overwrite or specify its operation if it is forced to cycle on?
+ 
+2. Do manufacturers have minimal cycling on/off time for their equipment? Or rules of thumb? Would those be a user input. Currently you tie it to the simulation time step.
+ 
+3. If forced to cycle on/off for full time step, the zone temperature may be overcooled or underheated. How to flag this in the report?
+ 
+Thanks,
+Tianzhen
+ 
+On Thu, Nov 2, 2017 at 10:34 AM, Lixing Gu <gu@fsec.ucf.edu> wrote:
+Team:
+
+An NFP to allow OnOff Thermostat.
+
+https://github.com/NREL/EnergyPlus/blob/OnOffThermostat/design/FY2018/NFP-OnOffThermostat.md
+
+Comments are welcome via e-mail or github.  Please let me know if you wish to be a reviewer for this task.
+
+Thanks.
+
+Gu
+
+
+Rich's E-mail
+
+Right now predictor sends a load signal to the cooling and heating SP. This does not include the load to reach the cut-out zone temperature. What if predictor, if an OnOff thermostat were used, sent the load needed to get to the zone cut-out temperature. That way the equipment would still used the same load variables, run 100% each time step until the load is met and then cycle off sometime during the final time step. If more than 1 zone equipment is used, then this "load" would not be correct if the other equipment did not use the On/Off thermostat, but there is only 1 thermostat allowed in each zone so this shouldn't be a problem.
+
+### Gu's responses
+
+1. Will remove the proposed new field as OnOff Thermal Control Flag in the ZoneControl:Thermostat object
+2. Will add a new field as Temperature Difference between Cutout and Setpoint in the in the ZoneControl:Thermostat object. The proposed approach will not cause possible overheating or overcooling.
+3. If time and budget allows, will add two new optional fields in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object: Minimum HVAC Operation Time and Minimum HVAC Off Time.
+If there is no load and HVAC system is required to turn on, the first speed operation is forced. 
+
+It should be noted that the addition of Item 3 is not related to the cut-out temperature.  
 
 ## Overview ##
 
@@ -24,39 +117,69 @@ When a cycling system is called, the corresponding system module calculates its 
 
 ## Approach ##
 
-The proposed approach adds a new optional field to allow users to select on/off stage in a time step for cycling systems, so that real system performance could be simulated and execution time could be reduced.  
+The proposed approach adds a new optional field to allow users to input temperature difference between cut-out and setpoint. The temperature difference will be applied to both heating and cooling. The setpoint temperature will be used to start HVAC system operation, while the cut-out temperature will be used to turn off HVAC system.
 
-This capability is requested as a SOEP HVAC feature.
+When the cut-out temperature is applied, it will avoid possible overheating or overcooling.
+ 
 
 ### Revise ZoneControl:Thermostat ###
 
-An optional field as the last field will be added to allow systems to operate either OnOff switch or normal thermostat operation 
+An optional field as the last field will be added to allow systems to operate either cut-out operation with input > 0 or normal thermostat operation with blank or 0. 
 
-	  A12 ; \field OnOff Thermal Control Flag
-       \type choice
-       \key Yes
-       \key No
-       \default No
-       \note Select Yes to force system on in a whole time step.
-       \note Select No to disable this feature.
+	  N1 ; \field Temperature Difference between Cutout and Setpoint
+       \units deltaC
+       \type real
 
 ### Revise GetZoneAirSetPoints ###
 
-The function of GetZoneAirSetPoints in the ZoneTempPredictorCorrector will be revised to add a reading section to read an additional field of the ZoneControl:Thermostat and to set up the OnOffControlFlag based on input.
+The function of GetZoneAirSetPoints in the ZoneTempPredictorCorrector will be revised to add a reading section to read an additional field of the ZoneControl:Thermostat and to set up the temperature difference. The temperature difference will be used in both heating and cooling.
 
 ### Revise CalcPredictedSystemLoad ###
   
-When the OnOffControlFlag is true, the value of ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired is set to very high in the CalcPredictedSystemLoad function of the ZoneTempPredictorCorrector module, so that the value is much larger than any possible capacity of systems to force system to operate in a whole time step when HVAC system is requested.
+When the temperature difference (dt) is greater than 0, the following calculation procedures will be performed:
 
-### Revise UpdateSystemOutputRequired ###
+#### Heating
 
-If priority is greater than 1, the ZoneSysEnergyDemand( ZoneNum ).RemainingOutputRequired is set to zero, so that any HVAC systems with priority > 1 will not turn on.
+1. When the zone air temperature at the previous time step < setpoint
 
-If necessary, the values of two variables of ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP and ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP will be set to zero for any HVAC systems with priority > 1.
-   
-### Calculation procedure ###
+   Calculate the predicted load based on the setpoint and request heating
+2. When the zone air temperature > setpoint
+  
+   Calculate the predicted load based on the setpoint + dt and request heating
+ 
+#### Cooling
 
-The control logic for OnOff thermostat is to set TotalOutputRequired with very high value in the predictor for a system. The rest of systems serving this zone will get zero values of the RemainingOutputRequired or RemainingOutputReqToCoolSP and RemainingOutputReqToHeatSP. Therefore, it only allows a single system or equipment to turn on with priority = 1. 
+1. When the zone air temperature at the previous time step > setpoint
+
+   Calculate the predicted load based on the setpoint and request cooling
+2. When the zone air temperature < setpoint 
+
+   Calculate the predicted load based on the setpoint - dt and request cooling
+
+
+The predicted load will be assigned to the value of ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired.
+
+### Add min operation time in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
+
+If time and budget allows, modification of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed will be performed. Two new optional fields in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object: Minimum HVAC Operation Time and Minimum HVAC Off Time will be added.
+
+ 	 N19, \field Minimum HVAC Operation Time
+       \note Minimum operation time when HVAC system is forced on.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
+  	N20; \field Minimum HVAC Off Time
+       \note Minimum HVAC system off time.
+       \type real
+       \units minutes
+       \minimum 0.0
+       \default 0.0
+
+
+If there is no load and HVAC system is required to turn on, the first speed operation is forced. 
+
+It should be pointed out that it would be better to require every system type with min operation times. This is a starting point to test system performance with minimum operation time restriction.
 
 ## Testing/Validation/Data Sources ##
 
@@ -128,9 +251,16 @@ ThermostatSetpoint:DualSetpoint
 
 The corresponding control type name. The name is used in an object with the name of the control type and specifies the schedule.
 
-<span style="color:red;">**Field: OnOff Thermal Control Flag}\label{field-onoff-thermal-control-flag}**<span>
 
-<span style="color:red;">This optional choice field provides a choice for users to determine if a HVAC system serving this zone turns on in a whole time step or not. Valid choices are Yes and No. If Yes is selected, the system will operate in a whole time step, regardless zone load. The priority of the system defined in the ZoneHVAC:EquipmentList object should be 1. Any other priorities will turn off. If No is selected, this option is disabled and the system will operate based on zone load. The default value is No.  
+	  N1 ; \field Temperature Difference Between Cutout And Setpoint
+       \units deltaC
+       \type real
+       \minimum= 0
+
+<span style="color:red;">**Field: Temperature Difference Between Cutout And Setpoint}\label{field-temperature-difference-between-cutout-and-Setpoint}**<span>
+
+<span style="color:red;">This optional choice field provides a temperature difference between cut-out temperature and setpoint. The temperature difference is applied to both heating and cooling. When the zone air temperature at the previous time step is below the heating setpoint, the setpoint is used to predict zone heating load. When the zone air temperature at the previous time step is above the heating setpoint, the setpoint plus the temperature difference is used to predict zone heating load. When the zone air temperature at the previous time step is above the cooling setpoint, the setpoint is used to predict zone cooling load. When the zone air temperature at the previous time step is below the heating setpoint, the setpoint minus the temperature difference is used to predict zone cooling load. 
+  
 
 An example of this statement in an IDF is:
 
@@ -210,14 +340,11 @@ An optional field will be added as the last field in the ZoneControl:Thermostat 
        \type object-list
        \object-list ControlTypeNames
 
-<span style="color:red;">**	A12;  \field OnOff Thermal Control Flag **
+<span style="color:red;">**	N1;  \field Temperature Difference Between Cutout And Setpoint **
 
-       \type choice
-       \key Yes
-       \key No
-       \default No
-       \note Select Yes to force system on in a whole time step.
-       \note Select No to disable this feature.
+       \units deltaC
+       \type real
+       \minimum= 0
 
 
 ## Outputs Description ##
