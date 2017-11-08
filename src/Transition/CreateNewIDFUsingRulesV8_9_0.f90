@@ -407,10 +407,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(5)=TempArgs(11)
                  OutArgs(6)='3.90E+06'
                  OutArgs(7)=TempArgs(12)
-                 OutArgs(8)=TempArgs(13)
-                 OutArgs(9)=TempArgs(15)
-                 OutArgs(10)=TempArgs(14)
-                 CurArgs=10
+                 OutArgs(8)='1.77E+06'
+                 OutArgs(9)=TempArgs(13)
+                 OutArgs(10)=TempArgs(15)
+                 OutArgs(11)=TempArgs(14)
+                 CurArgs=11
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the ground temps object
