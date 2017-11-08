@@ -633,20 +633,20 @@ namespace GroundHeatExchangers {
 		calcShortTimestepGFunctions();
 
 		// Minimum simulation time for which finite line source method is applicable
-		Real64 const minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
+		Real64 const lntts_min_for_long_timestep = -8.5;
 
 		// Time scale constant
-		Real64 const ts = pow_2( bhLength ) / ( 9 * soil.diffusivity ) ;
+		Real64 const t_s = pow_2( bhLength ) / ( 9 * soil.diffusivity ) ;
 
 		// Temporary vector for holding the LNTTS vals
 		std::vector < Real64 > tempLNTTS;
 		Real64 const lnttsStepSize = 0.5;
 
-		tempLNTTS.push_back( log( minTimeForgFunctions / ts ) );
+		tempLNTTS.push_back( lntts_min_for_long_timestep );
 
 		// Determine how many g-function pairs to generate based on user defined maximum simulation time
 		while( true ) {
-			Real64 maxPossibleSimTime = exp( tempLNTTS.back() ) * ts;
+			Real64 maxPossibleSimTime = exp( tempLNTTS.back() ) * t_s;
 			if( maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * HoursInDay * SecInHour ) {
 				tempLNTTS.push_back( tempLNTTS.back() + lnttsStepSize );
 			} else {
@@ -661,12 +661,12 @@ namespace GroundHeatExchangers {
 
 		int index = 1;
 		for ( auto & thisLNTTS : tempLNTTS ) {
-			myRespFactors->time( index ) = exp( thisLNTTS ) * ts;
+			myRespFactors->time( index ) = exp( thisLNTTS ) * t_s;
 			myRespFactors->LNTTS( index ) = thisLNTTS;
 			++index;
 		}
 
-		DisplayString( "Initializing GroundHeatExchanger:System" );
+		DisplayString( "Initializing GroundHeatExchanger:System: " + name  );
 
 		// Calculate the g-functions
 		for( size_t lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index ) {
@@ -688,6 +688,8 @@ namespace GroundHeatExchangers {
 
 		gFunctionsExist = true;
 
+		combineShortAndLongTimestepGFunctions();
+
 		// add g-function data to cache
 		myCacheData["Response Factors"]["time"] = myRespFactors->time;
 		myCacheData["Response Factors"]["LNTTS"] = myRespFactors->LNTTS;
@@ -703,7 +705,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-		GLHEVert::calcShortTimestepGFunctions()
+	GLHEVert::calcShortTimestepGFunctions()
 	{
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
@@ -858,61 +860,18 @@ namespace GroundHeatExchangers {
 			thisCell.temperature = initial_temperature;
 		}
 
-		// delete me
-		std::ofstream static propsFile( "props.csv", std::ofstream::out );
-
-		Real64 fluid_thermalMass = 0.0;
-		Real64 pipe_thermalMass = 0.0;
-		Real64 grout_thermalMass = 0.0;
-		Real64 soil_thermalMass = 0.0;
-		for ( auto & thisCell : Cells ) {
-			if ( thisCell.type == CellType::FLUID ) {
-				fluid_thermalMass += thisCell.vol * thisCell.rhoCp;
-			} else if ( thisCell.type == CellType::PIPE ) {
-				pipe_thermalMass += thisCell.vol * thisCell.rhoCp;
-			} else if ( thisCell.type == CellType::GROUT ) {
-				grout_thermalMass += thisCell.vol * thisCell.rhoCp;
-			} else if ( thisCell.type == CellType::SOIL ) {
-				soil_thermalMass += thisCell.vol * thisCell.rhoCp;
-			}
-		}
-
-		propsFile << "Pipe," << pipe_thermalMass << std::endl;
-		propsFile << "Grout," << grout_thermalMass << std::endl;
-		propsFile << "Fluid," << fluid_thermalMass << std::endl;
-		propsFile << "Soil," << soil_thermalMass << std::endl;
-
-		// minimum simulation time for which finite line source method is applicable
-		Real64 const minTimeForgFunctions = 5 * pow_2( bhRadius ) / soil.diffusivity;
-
 		// set upper limit of time for the short time-step g-function calcs so there is some overlap
-		Real64 const maxTimeForShortTimestepCalc = minTimeForgFunctions * 1.5;
+		Real64 const lntts_max_for_short_timestep = -9.0;
+		Real64 const t_s = pow_2( bhLength ) / ( 9.0 * soil.diffusivity );
 
-		// Determine time-step
-		Real64 const time_step = 300;
-
+		Real64 const time_step = 500;
+		Real64 const time_max_for_short_timestep = exp( lntts_max_for_short_timestep ) * t_s;
 		Real64 total_time = 0;
 
-		//int num_time_steps = std::ceil( maxTimeForShortTimestepCalc / time_step );
-
-		// delete me
-		int num_time_steps = std::ceil( 100 * 3600 / time_step );
-
-		// heat flux
 		Real64 const heat_flux = 40.4;
 
-		// delete me
-		std::ofstream static file( "gFuncOutput.csv", std::ofstream::out );
-
-		file << ",";
-		for ( auto & thisCell : Cells ) {
-			file << thisCell.radius_center << ",";
-		}
-
-		file << std::endl;
-
 		// time step loop
-		for ( int i = 0; i < num_time_steps; ++i ) {
+		while ( total_time < time_max_for_short_timestep ) {
 
 			for ( auto & thisCell : Cells ) {
 				thisCell.temperature_prev_ts = thisCell.temperature;
@@ -984,78 +943,28 @@ namespace GroundHeatExchangers {
 				Cells[cell_index].temperature = new_temps[cell_index];
 			}
 
+			// calculate bh wall temp
+			Real64 T_bhWall = 0.0;
+			for ( int cell_index = 0; cell_index < num_cells; ++cell_index ) {
+				auto & leftCell = Cells[cell_index];
+				auto & rightCell = Cells[cell_index + 1];
+
+				if ( leftCell.type == CellType::GROUT && rightCell.type == CellType::SOIL ) {
+
+					Real64 left_conductance = 2 * Pi * leftCell.conductivity / log( leftCell.radius_outer / leftCell.radius_inner );
+					Real64 right_conductance = 2 * Pi * rightCell.conductivity / log( rightCell.radius_center / leftCell.radius_inner );
+
+					T_bhWall = ( left_conductance * leftCell.temperature + right_conductance * rightCell.temperature ) / ( left_conductance + right_conductance );
+					break;
+				}
+			}
+
 			total_time += time_step;
 
-			file << total_time / 3600 << ",";
-
-			for ( auto & thisCell : Cells ) {
-				file << thisCell.temperature << ",";
-			}
-
-			file << std::endl;
-
-			int deleteME = 0;
+			GFNC_shortTimestep.push_back( 2 * Pi * soil.k * ( ( Cells[0].temperature - initial_temperature ) / heat_flux - bhResistance ) );
+			LNTTS_shortTimestep.push_back( log( total_time / t_s ) );
 
 		} // end timestep loop
-
-		// delete me
-		std::ofstream static resist_file( "resist.csv", std::ofstream::out );
-		int num_cells = Cells.size();
-
-		for( int cell_index = 0; cell_index < num_cells; ++cell_index ) {
-
-			auto & thisCell = Cells[cell_index];
-
-			Real64 temp_left = 0.0;
-			Real64 temp_center = 0.0;
-			Real64 temp_right = 0.0;
-			Real64 resist = 0.0;
-
-			if ( cell_index == 0 ) {
-				auto & rightCell = Cells[cell_index + 1];
-
-				temp_left = thisCell.temperature;
-				temp_center = thisCell.temperature;
-
-				Real64 FP = 2 * Pi * thisCell.conductivity / log( thisCell.radius_outer - thisCell.radius_center );
-				Real64 FE = 2 * Pi * rightCell.conductivity / log( rightCell.radius_center - rightCell.radius_inner );
-
-				temp_right = ( FP * thisCell.temperature + FE * rightCell.temperature ) / ( FP + FE );
-
-			} else if ( cell_index == num_cells - 1 ) {
-				auto & leftCell = Cells[cell_index - 1];
-
-				temp_right = thisCell.temperature;
-				temp_center = thisCell.temperature;
-
-				Real64 FP = 2 * Pi * thisCell.conductivity / log( thisCell.radius_center / thisCell.radius_inner );
-				Real64 FW = 2 * Pi * leftCell.conductivity / log( leftCell.radius_outer / leftCell.radius_center );
-
-				temp_left = ( FP * thisCell.temperature + FW* leftCell.temperature ) / ( FP + FW );
-
-			} else {
-				auto & rightCell = Cells[cell_index + 1];
-				auto & leftCell = Cells[cell_index - 1];
-
-				temp_center = thisCell.temperature;
-
-				Real64 FW = 2 * Pi * leftCell.conductivity / log( leftCell.radius_outer / leftCell.radius_center );
-				Real64 FP_W = 2 * Pi * thisCell.conductivity / log( thisCell.radius_center / thisCell.radius_inner );
-
-				temp_left = ( FP_W * thisCell.temperature + FW * leftCell.temperature ) / ( FP_W + FW );
-
-				Real64 FE = 2 * Pi * rightCell.conductivity / log( rightCell.radius_center / rightCell.radius_inner );
-				Real64 FP_E = 2 * Pi * thisCell.conductivity / log( thisCell.radius_outer / thisCell.radius_center );
-
-				temp_right = ( FP_E * thisCell.temperature + FE * rightCell.temperature ) / ( FP_E + FE );
-
-			}
-
-			resist = ( temp_left - temp_right ) / heat_flux;
-
-			resist_file << "," << temp_left << "," << temp_center << "," << temp_right << "," << resist << std::endl;
-
-		}
 	}
 
 	//******************************************************************************
@@ -1087,6 +996,46 @@ namespace GroundHeatExchangers {
 		}
 
 		return d;
+	}
+
+	//******************************************************************************
+
+	void
+	GLHEVert::combineShortAndLongTimestepGFunctions()
+	{
+		std::vector< Real64 > GFNC_combined;
+		std::vector< Real64 > LNTTS_combined;
+
+		Real64 const t_s = pow_2( bhLength ) / ( 9.0 * soil.diffusivity );
+
+		// Nothing to do. Just put the short time step g-functions on the combined vector
+		int num_shortTimestepGFunctions = GFNC_shortTimestep.size();
+		for( int index_shortTS = 0; index_shortTS < num_shortTimestepGFunctions; ++index_shortTS ) {
+			GFNC_combined.push_back( GFNC_shortTimestep[index_shortTS] );
+			LNTTS_combined.push_back( LNTTS_shortTimestep[index_shortTS] );
+		}
+
+		// Add the rest of the long time-step g-functions to the combined curve
+		for ( int index_longTS = myRespFactors->GFNC.l(); index_longTS <= myRespFactors->GFNC.u(); ++index_longTS ) {
+				GFNC_combined.push_back( myRespFactors->GFNC( index_longTS ) );
+				LNTTS_combined.push_back( myRespFactors->LNTTS( index_longTS ) );
+		}
+
+		// Move combined values into right data struct
+		myRespFactors->time.deallocate();
+		myRespFactors->LNTTS.deallocate();
+		myRespFactors->GFNC.deallocate();
+
+		myRespFactors->time.dimension ( GFNC_combined.size(), 0.0 );
+		myRespFactors->LNTTS.dimension( GFNC_combined.size(), 0.0 );
+		myRespFactors->GFNC.dimension( GFNC_combined.size(), 0.0 );
+
+		for ( int index = 0; index < GFNC_combined.size(); ++index ) {
+			myRespFactors->time[index] = exp( LNTTS_combined[index] ) * t_s;
+			myRespFactors->LNTTS[index] = LNTTS_combined[index];
+			myRespFactors->GFNC[index] = GFNC_combined[index];
+		}
+
 	}
 
 	//******************************************************************************
@@ -1983,7 +1932,7 @@ namespace GroundHeatExchangers {
 		calcAggregateLoad();
 
 		// Update the heat exchanger resistance each time
-		calcHXResistance();
+		HXResistance = calcHXResistance();
 
 		if ( N == 1 ) {
 			if ( massFlowRate <= 0.0 ) {
@@ -2895,130 +2844,6 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
-	void
-	GLHEVert::calcHXResistance()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Cenk Yavuzturk
-		//       DATE WRITTEN   1998
-		//       MODIFIED       August, 2000
-		//       RE-ENGINEERED Dan Fisher
-
-		// PURPOSE OF THIS SUBROUTINE:
-		//    Calculates the resistance of a vertical borehole
-		//    with a U-tube inserted into it.
-
-		// METHODOLOGY EMPLOYED:
-
-		//  REFERENCE:          Thermal Analysis of Heat Extraction
-		//                      Boreholes.  Per Eskilson, Dept. of
-		//                      Mathematical Physics, University of
-		//                      Lund, Sweden, June 1987.
-		// USE STATEMENTS: na
-		// Using/Aliasing
-		using FluidProperties::GetSpecificHeatGlycol;
-		using FluidProperties::GetDensityGlycol;
-		using FluidProperties::GetViscosityGlycol;
-		using FluidProperties::GetConductivityGlycol;
-		using DataPlant::PlantLoop;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "CalcVerticalGroundHeatExchanger" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 cpFluid;
-		Real64 kFluid;
-		Real64 fluidDensity;
-		Real64 fluidViscosity;
-		Real64 pipeInnerDia;
-		Real64 BholeMdot;
-		Real64 pipeOuterRad;
-		Real64 pipeInnerRad;
-		Real64 nusseltNum;
-		Real64 reynoldsNum;
-		Real64 prandtlNum;
-		Real64 hci;
-		Real64 Rcond;
-		Real64 Rconv;
-		Real64 Rgrout;
-		Real64 B0; // grout resistance curve fit coefficients
-		Real64 B1;
-		Real64 maxDistance;
-		Real64 distanceRatio;
-		Real64 smoothingFunction;
-		Real64 A( 3150 );
-		Real64 B( 350 );
-		Real64 laminarNusseltNo( 4.364 );
-		Real64 turbulentNusseltNo;
-
-		cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-		kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-		fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-		fluidViscosity = GetViscosityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-
-		//calculate mass flow rate
-		BholeMdot = massFlowRate / myRespFactors->numBoreholes;
-
-		pipeOuterRad = pipe.outDia / 2.0;
-		pipeInnerRad = pipeOuterRad - pipe.thickness;
-		pipeInnerDia = 2.0 * pipeInnerRad;
-
-		if ( BholeMdot == 0.0 ) {
-			Rconv = 0.0;
-		} else {
-			//Re=Rho*V*D/Mu
-			reynoldsNum = fluidDensity * pipeInnerDia * ( BholeMdot / fluidDensity / ( Pi * pow_2( pipeInnerRad ) ) ) / fluidViscosity;
-			prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
-			//   Convection Resistance
-			if ( reynoldsNum <= 2300 ) {
-				nusseltNum = laminarNusseltNo;
-			} else if ( reynoldsNum > 2300 && reynoldsNum <= 4000 ) {
-				smoothingFunction = 0.5 + 0.5 * std::tanh( ( reynoldsNum - A ) / B );
-				turbulentNusseltNo = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
-				nusseltNum = laminarNusseltNo * ( 1 - smoothingFunction ) + turbulentNusseltNo * smoothingFunction;
-			} else {
-				nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
-			}
-			hci = nusseltNum * kFluid / pipeInnerDia;
-			Rconv = 1.0 / ( 2.0 * Pi * pipeInnerDia * hci );
-		}
-
-		//   Conduction Resistance
-		Rcond = std::log( pipeOuterRad / pipeInnerRad ) / ( 2.0 * Pi * pipe.k ) / 2.0; // pipe in parallel so /2
-
-		//   Resistance Due to the grout.
-		maxDistance = 2.0 * bhRadius - ( 2.0 * pipe.outDia );
-		distanceRatio = bhUTubeDist / maxDistance;
-
-		if ( distanceRatio >= 0.0 && distanceRatio <= 0.25 ) {
-			B0 = 14.450872;
-			B1 = -0.8176;
-		} else if ( distanceRatio > 0.25 && distanceRatio < 0.5 ) {
-			B0 = 20.100377;
-			B1 = -0.94467;
-		} else if ( distanceRatio >= 0.5 && distanceRatio <= 0.75 ) {
-			B0 = 17.44268;
-			B1 = -0.605154;
-		} else {
-			B0 = 21.90587;
-			B1 = -0.3796;
-		}
-
-		Rgrout = 1.0 / ( grout.k * ( B0 * std::pow( bhRadius / pipeOuterRad, B1 ) ) );
-		HXResistance = Rcond + Rconv + Rgrout;
-	}
-
-	//******************************************************************************
-
 	Real64
 	GLHEVert::calcBHAverageResistance()
 	{
@@ -3085,7 +2910,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	Real64
-	GLHEVert::calcBHResistance()
+	GLHEVert::calcHXResistance()
 	{
 		// Calculates the effective thermal resistance of the borehole assuming a uniform heat flux.
 
@@ -3140,9 +2965,6 @@ namespace GroundHeatExchangers {
 		// Get fluid props
 		inletTemp = Node( inletNodeNum ).Temp;
 
-		// delete me
-		inletTemp = 20;
-
 		Real64 cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		Real64 kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		Real64 fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
@@ -3172,10 +2994,7 @@ namespace GroundHeatExchangers {
 			nusseltNum = ( f / 8 ) * ( reynoldsNum - 1000 ) * prandtlNum / ( 1 + 12.7 * std::sqrt( f / 8 ) * ( pow( prandtlNum, 2.0 / 3.0 ) - 1 ) );
 		}
 
-		// Real64 h = nusseltNum * kFluid / pipe.innerDia;
-
-		// delete me
-		Real64 h = 1690;
+		Real64 h = nusseltNum * kFluid / pipe.innerDia;
 
 		return 1 / ( h * Pi * pipe.innerDia );
 	}
@@ -3227,7 +3046,7 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
-	void
+	Real64
 	GLHESlinky::calcHXResistance()
 	{
 
@@ -3307,7 +3126,7 @@ namespace GroundHeatExchangers {
 		//   Conduction Resistance
 		Rcond = std::log( pipeOuterRad / pipeInnerRad ) / ( 2.0 * Pi * pipe.k ) / 2.0; // pipe in parallel so /2
 
-		HXResistance = Rcond + Rconv;
+		return Rcond + Rconv;
 	}
 
 	//******************************************************************************

@@ -333,7 +333,7 @@ namespace GroundHeatExchangers {
 		virtual void
 		initGLHESimVars()=0;
 
-		virtual void
+		virtual Real64
 		calcHXResistance()=0;
 
 		virtual void
@@ -359,6 +359,9 @@ namespace GroundHeatExchangers {
 		Real64 sigma;
 
 		nlohmann::json myCacheData;
+
+		std::vector< Real64 > GFNC_shortTimestep;
+		std::vector< Real64 > LNTTS_shortTimestep;
 
 		GLHEVert() :
 			bhDiameter( 0.0 ),
@@ -403,7 +406,7 @@ namespace GroundHeatExchangers {
 		void
 		calcGFunctions();
 
-		void
+		Real64
 		calcHXResistance();
 
 		void
@@ -436,9 +439,6 @@ namespace GroundHeatExchangers {
 		calcBHGroutResistance();
 
 		Real64
-		calcBHResistance();
-
-		Real64
 		calcPipeConductionResistance();
 
 		Real64
@@ -451,6 +451,9 @@ namespace GroundHeatExchangers {
 
 		Real64
 		calcPipeResistance();
+
+		void
+		combineShortAndLongTimestepGFunctions();
 
 	};
 
@@ -492,7 +495,7 @@ namespace GroundHeatExchangers {
 			minSurfTemp( 0.0 )
 		{}
 
-		void
+		Real64
 		calcHXResistance();
 
 		void
