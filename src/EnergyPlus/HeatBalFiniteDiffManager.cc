@@ -14,26 +14,26 @@
 // provided that the following conditions are met:
 //
 // (1) Redistributions of source code must retain the above copyright notice, this list of
-//	 conditions and the following disclaimer.
+//     conditions and the following disclaimer.
 //
 // (2) Redistributions in binary form must reproduce the above copyright notice, this list of
-//	 conditions and the following disclaimer in the documentation and/or other materials
-//	 provided with the distribution.
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
 //
 // (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
-//	 the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
-//	 used to endorse or promote products derived from this software without specific prior
-//	 written permission.
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
 //
 // (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
-//	 without changes from the version obtained under this License, or (ii) Licensee makes a
-//	 reference solely to the software portion of its product, Licensee must refer to the
-//	 software as "EnergyPlus version X" software, where "X" is the version number Licensee
-//	 obtained under this License and may not use a different name for the software. Except as
-//	 specifically required in this Section (4), Licensee shall not use in a company name, a
-//	 product name, in advertising, publicity, or other promotional activities any name, trade
-//	 name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//	 similar designation, without the U.S. Department of Energy's prior written consent.
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -82,10 +82,10 @@ namespace HeatBalFiniteDiffManager {
 	// Module containing the heat balance simulation routines
 
 	// MODULE INFORMATION:
-	//	   AUTHOR		 Richard J. Liesen
-	//	   DATE WRITTEN   October 2003
-	//	   RE-ENGINEERED  Curtis Pedersen, 2006, Changed to Implicit FD calc for conduction.
-	//					  and included enthalpy formulations for phase change materials
+	//       AUTHOR         Richard J. Liesen
+	//       DATE WRITTEN   October 2003
+	//       RE-ENGINEERED  Curtis Pedersen, 2006, Changed to Implicit FD calc for conduction.
+	//                      and included enthalpy formulations for phase change materials
 	// PURPOSE OF THIS MODULE:
 	// To encapsulate the data and algorithms required to
 	// manage the finite difference heat balance simulation on the building.
@@ -93,7 +93,7 @@ namespace HeatBalFiniteDiffManager {
 	// REFERENCES:
 	// The MFD moisture balance method
 	//  C. O. Pedersen, Enthalpy Formulation of conduction heat transfer problems
-	//	involving latent heat, Simulation, Vol 18, No. 2, February 1972
+	//    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
@@ -218,10 +218,10 @@ namespace HeatBalFiniteDiffManager {
 	)
 	{
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard Liesen
-		//	   DATE WRITTEN   May 2000
-		//	   MODIFIED	   na
-		//	   RE-ENGINEERED  na
+		//       AUTHOR         Richard Liesen
+		//       DATE WRITTEN   May 2000
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages the moisture balance method.  It is called
@@ -244,10 +244,10 @@ namespace HeatBalFiniteDiffManager {
 	GetCondFDInput()
 	{
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Curtis Pedersen
-		//	   DATE WRITTEN   July 2006
-		//	   MODIFIED	   Brent Griffith Mar 2011, user settings
-		//	   RE-ENGINEERED  na
+		//       AUTHOR         Curtis Pedersen
+		//       DATE WRITTEN   July 2006
+		//       MODIFIED       Brent Griffith Mar 2011, user settings
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine is the main driver for initializations for the variable property CondFD part of the
@@ -272,7 +272,7 @@ namespace HeatBalFiniteDiffManager {
 		int MaterialNumProp; // Number of material properties being passed
 		Array1D< Real64 > MaterialProps( 40 ); // Temporary array to transfer material properties
 		static bool ErrorsFound( false ); // If errors detected in input
-		//  INTEGER :: CondFDMat				! Number of variable property CondFD materials in input
+		//  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
 		int Loop;
 		int NumAlphas;
 		int NumNumbers;
@@ -325,7 +325,7 @@ namespace HeatBalFiniteDiffManager {
 		cCurrentModuleObject = "MaterialProperty:PhaseChange"; // Phase Change Information First
 
 		if ( pcMat != 0 ) { //  Get Phase Change info
-			//	CondFDVariableProperties = .TRUE.
+			//    CondFDVariableProperties = .TRUE.
 			for ( Loop = 1; Loop <= pcMat; ++Loop ) {
 
 				//Call Input Get routine to retrieve material data
@@ -399,7 +399,7 @@ namespace HeatBalFiniteDiffManager {
 
 		cCurrentModuleObject = "MaterialProperty:VariableThermalConductivity"; // Variable Thermal Conductivity Info next
 		if ( vcMat != 0 ) { //  variable k info
-			//	CondFDVariableProperties = .TRUE.
+			//    CondFDVariableProperties = .TRUE.
 			for ( Loop = 1; Loop <= vcMat; ++Loop ) {
 
 				//Call Input Get routine to retrieve material data
@@ -479,11 +479,11 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard J. Liesen
-		//	   DATE WRITTEN   Oct 2003
-		//	   MODIFIED	   na
-		//	   RE-ENGINEERED  C O Pedersen 2006
-		//					  B. Griffith May 2011 move begin-environment and every-timestep inits, cleanup formatting
+		//       AUTHOR         Richard J. Liesen
+		//       DATE WRITTEN   Oct 2003
+		//       MODIFIED       na
+		//       RE-ENGINEERED  C O Pedersen 2006
+		//                      B. Griffith May 2011 move begin-environment and every-timestep inits, cleanup formatting
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine sets the initial values for the FD moisture calculation
@@ -582,10 +582,10 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Linda Lawrie
-		//	   DATE WRITTEN   March 2012
-		//	   MODIFIED	   na
-		//	   RE-ENGINEERED  na
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   March 2012
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine performs the original allocate, inits and setup output variables for the
@@ -747,7 +747,7 @@ namespace HeatBalFiniteDiffManager {
 					}
 					continue;
 				} else {
-					//	Regular material Properties
+					//    Regular material Properties
 					a = Material( CurrentLayer ).MoistACoeff;
 					b = Material( CurrentLayer ).MoistBCoeff;
 					c = Material( CurrentLayer ).MoistCCoeff;
@@ -968,22 +968,22 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard J. Liesen
-		//	   DATE WRITTEN   Oct 2003
-		//	   MODIFIED	   Aug 2006 by C O Pedersen to include implicit solution and variable properties with
-		//								material enthalpy added for Phase Change Materials.
-		//					  Sept 2010 B. Griffith, remove allocate/deallocate, use structure variables
-		//					  March 2011 P. Tabares, add relaxation factor and add surfIteration to
-		//								 update TD and TDT, correct interzone partition
-		//					  May 2011  B. Griffith add logging and errors when inner GS loop does not converge
-		//					  November 2011 P. Tabares fixed problems with adiabatic walls/massless walls and PCM stability problems
+		//       AUTHOR         Richard J. Liesen
+		//       DATE WRITTEN   Oct 2003
+		//       MODIFIED       Aug 2006 by C O Pedersen to include implicit solution and variable properties with
+		//                                material enthalpy added for Phase Change Materials.
+		//                      Sept 2010 B. Griffith, remove allocate/deallocate, use structure variables
+		//                      March 2011 P. Tabares, add relaxation factor and add surfIteration to
+		//                                 update TD and TDT, correct interzone partition
+		//                      May 2011  B. Griffith add logging and errors when inner GS loop does not converge
+		//                      November 2011 P. Tabares fixed problems with adiabatic walls/massless walls and PCM stability problems
 
-		//	   RE-ENGINEERED  na
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// this routine controls the calculation of the fluxes and temperatures using
-		//	  finite difference procedures for
-		//	  all building surface constructs.
+		//      finite difference procedures for
+		//      all building surface constructs.
 
 		// Using/Aliasing
 		using DataHeatBalance::CondFDRelaxFactor;
@@ -1130,10 +1130,10 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard Liesen
-		//	   DATE WRITTEN   November 2003
-		//	   MODIFIED	   B. Griffith, May 2011 add reporting of node x locations
-		//	   RE-ENGINEERED  na
+		//       AUTHOR         Richard Liesen
+		//       DATE WRITTEN   November 2003
+		//       MODIFIED       B. Griffith, May 2011 add reporting of node x locations
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine gives a detailed report to the user about
@@ -1171,7 +1171,7 @@ namespace HeatBalFiniteDiffManager {
 
 		if ( DoReport ) {
 
-			//									  Write Descriptions
+			//                                      Write Descriptions
 			gio::write( OutputFileInits, fmtA ) << "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}";
 			gio::write( OutputFileInits, fmtA ) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer Alpha*Delt/Delx**2,Layer Moisture Stability";
 			//HT Algo issue
@@ -1234,20 +1234,20 @@ namespace HeatBalFiniteDiffManager {
 		//author:c. o. pedersen
 		//purpose:
 		//   this function performs a linear interpolation
-		//	 on a two dimensional array containing both
-		//	 dependent and independent variables.
+		//     on a two dimensional array containing both
+		//     dependent and independent variables.
 
 		//inputs:
 		//  a = two dimensional array
 		//  nind=row containing independent variable
 		//  ndep=row containing the dependent variable
 		//   x1 = specific independent variable value for which
-		//	  interpolated output is wanted
+		//      interpolated output is wanted
 		//outputs:
-		//	the value of dependent variable corresponding
-		//	   to x1
-		//	routine returns first or last dependent variable
-		//	  for out of range x1.
+		//    the value of dependent variable corresponding
+		//       to x1
+		//    routine returns first or last dependent variable
+		//      for out of range x1.
 
 		int const first( a.l2() );
 
@@ -1309,13 +1309,13 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard Liesen
-		//	   DATE WRITTEN   November, 2003
-		//	   MODIFIED	   B. Griffith 2010, fix adiabatic and other side surfaces
-		//					  May 2011, B. Griffith, P. Tabares
-		//					  November 2011 P. Tabares fixed problems with adiabatic walls/massless walls
-		//					  November 2011 P. Tabares fixed problems PCM stability problems
-		//	   RE-ENGINEERED  Curtis Pedersen 2006
+		//       AUTHOR         Richard Liesen
+		//       DATE WRITTEN   November, 2003
+		//       MODIFIED       B. Griffith 2010, fix adiabatic and other side surfaces
+		//                      May 2011, B. Griffith, P. Tabares
+		//                      November 2011 P. Tabares fixed problems with adiabatic walls/massless walls
+		//                      November 2011 P. Tabares fixed problems PCM stability problems
+		//       RE-ENGINEERED  Curtis Pedersen 2006
 
 		// Using/Aliasing
 		using DataSurfaces::OtherSideCondModeledExt;
@@ -1368,7 +1368,7 @@ namespace HeatBalFiniteDiffManager {
 
 			} else {
 
-				// potential-lkl-from old	  CALL InteriorBCEqns(Delt,nodeIn,LayIn,Surf,SurfaceFD(Surface(Surf)%ExtBoundCond)%T, &
+				// potential-lkl-from old      CALL InteriorBCEqns(Delt,nodeIn,LayIn,Surf,SurfaceFD(Surface(Surf)%ExtBoundCond)%T, &
 				auto & surfaceFDEBC( SurfaceFD( surface_ExtBoundCond ) );
 				InteriorBCEqns( Delt, NodeIn, LayIn, surface_ExtBoundCond, surfaceFDEBC.T, surfaceFDEBC.TT, surfaceFDEBC.Rhov, surfaceFDEBC.RhoT, surfaceFDEBC.RH, surfaceFDEBC.TD, surfaceFDEBC.TDT, surfaceFDEBC.EnthOld, surfaceFDEBC.EnthNew, surfaceFDEBC.TDreport );
 
@@ -1382,7 +1382,7 @@ namespace HeatBalFiniteDiffManager {
 			}
 
 			Real64 const QNetSurfFromOutside( OpaqSurfInsFaceConductionFlux( surface_ExtBoundCond ) ); // filled in InteriorBCEqns
-			//	QFluxOutsideToOutSurf(Surf)	   = QnetSurfFromOutside
+			//    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
 			OpaqSurfOutsideFaceConductionFlux( Surf ) = -QNetSurfFromOutside;
 			OpaqSurfOutsideFaceConduction( Surf ) = surface.Area * OpaqSurfOutsideFaceConductionFlux( Surf );
 			QHeatOutFlux( Surf ) = QNetSurfFromOutside;
@@ -1442,7 +1442,7 @@ namespace HeatBalFiniteDiffManager {
 					Real64 RhoS( mat.Density );
 					if ( mat.phaseChange ) {
 						adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt );
-						SurfaceFD( Surf ).EnthalpyF = mat.phaseChange->enthalpyF;
+                        SurfaceFD( Surf ).EnthalpyF = mat.phaseChange->enthalpyF;
 						SurfaceFD( Surf ).EnthalpyM = mat.phaseChange->enthalpyM;
 					} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data to generate Cp
 						// Enthalpy function used to get average specific heat. Updated by GS so enthalpy function is followed.
@@ -1546,10 +1546,10 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard Liesen
-		//	   DATE WRITTEN   November, 2003
-		//	   MODIFIED	   May 2011, B. Griffith and P. Tabares
-		//	   RE-ENGINEERED  C. O. Pedersen, 2006
+		//       AUTHOR         Richard Liesen
+		//       DATE WRITTEN   November, 2003
+		//       MODIFIED       May 2011, B. Griffith and P. Tabares
+		//       RE-ENGINEERED  C. O. Pedersen, 2006
 
 		int const ConstrNum( Surface( Surf ).Construction );
 
@@ -1585,14 +1585,14 @@ namespace HeatBalFiniteDiffManager {
 
 		Real64 const Cpo( mat.SpecHeat ); // Const Cp from input
 		Real64 Cp( Cpo ); // Cp used // Will be changed if PCM
-		Real64 kt( 0.0 );
+        Real64 kt( 0.0 );
 		auto const & matFD_TempEnth( matFD.TempEnth );
 		assert( matFD_TempEnth.u2() >= 3 );
 		auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 		Real64 RhoS( mat.Density );
 		if ( mat.phaseChange ) {
-			adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt );
-			ktA1 = mat.phaseChange->getConductivity( TDT_ip );
+            adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt );
+            ktA1 = mat.phaseChange->getConductivity( TDT_ip );
 			ktA2 = mat.phaseChange->getConductivity( TDT_mi );
 		} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 			EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
@@ -1645,10 +1645,10 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard Liesen
-		//	   DATE WRITTEN   November, 2003
-		//	   MODIFIED	   May 2011, B. Griffith, P. Tabares,  add first order fully implicit, bug fixes, cleanup
-		//	   RE-ENGINEERED  Curtis Pedersen, Changed to Implicit mode and included enthalpy.  FY2006
+		//       AUTHOR         Richard Liesen
+		//       DATE WRITTEN   November, 2003
+		//       MODIFIED       May 2011, B. Griffith, P. Tabares,  add first order fully implicit, bug fixes, cleanup
+		//       RE-ENGINEERED  Curtis Pedersen, Changed to Implicit mode and included enthalpy.  FY2006
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// calculate finite difference heat transfer for nodes that interface two different material layers inside construction
@@ -1749,7 +1749,7 @@ namespace HeatBalFiniteDiffManager {
 
 					// Check for PCM second layer
 					if ( mat2.phaseChange ) {
-						adjustPropertiesForPhaseChange( i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2 );
+                        adjustPropertiesForPhaseChange( i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2 );
 					} else if ( ( matFD_sum < 0.0 ) && ( matFD2_sum > 0.0 ) ) { // Phase change material Layer2, Use TempEnth Data
 						Real64 const Enth2Old( terpld( matFD2_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth2New( terpld( matFD2_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
@@ -1784,7 +1784,7 @@ namespace HeatBalFiniteDiffManager {
 
 					// Check for PCM layer before R layer
 					if ( mat.phaseChange ) {
-						adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp1, RhoS1, kt1 );
+                        adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp1, RhoS1, kt1 );
 					} else if ( ( matFD_sum > 0.0 ) && ( matFD2_sum < 0.0 ) ) { // Phase change material Layer1, Use TempEnth Data
 						Real64 const Enth1Old( terpld( matFD_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth1New( terpld( matFD_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
@@ -1859,10 +1859,10 @@ namespace HeatBalFiniteDiffManager {
 					} // Phase change material check
 
 					if ( mat.phaseChange ) {
-						adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp1, RhoS1, kt1 );
+                        adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp1, RhoS1, kt1 );
 					}
 					if ( mat2.phaseChange ) {
-						adjustPropertiesForPhaseChange( i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2 );
+                        adjustPropertiesForPhaseChange( i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2 );
 					}
 
 					Real64 const Delt_Delx1( Delt * Delx1 );
@@ -1929,12 +1929,12 @@ namespace HeatBalFiniteDiffManager {
 	)
 	{
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Richard Liesen
-		//	   DATE WRITTEN   November, 2003
-		//	   MODIFIED	   B. Griffith, P. Tabares, May 2011, add first order fully implicit, bug fixes, cleanup
-		//					  November 2011 P. Tabares fixed problems with adiabatic walls/massless walls
-		//					  November 2011 P. Tabares fixed problems PCM stability problems
-		//	   RE-ENGINEERED  C. O. Pedersen 2006
+		//       AUTHOR         Richard Liesen
+		//       DATE WRITTEN   November, 2003
+		//       MODIFIED       B. Griffith, P. Tabares, May 2011, add first order fully implicit, bug fixes, cleanup
+		//                      November 2011 P. Tabares fixed problems with adiabatic walls/massless walls
+		//                      November 2011 P. Tabares fixed problems PCM stability problems
+		//       RE-ENGINEERED  C. O. Pedersen 2006
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculate the heat transfer at the node on the surfaces inside face (facing zone)
@@ -1969,7 +1969,7 @@ namespace HeatBalFiniteDiffManager {
 		Real64 const Tia( MAT( surface.Zone ) );
 
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		//	Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
+		//    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
 		auto TDT_i( TDT( i ) );
 		Real64 const QFac( NetLWRadToSurfFD + QHtRadSysSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD + QRadThermInFD + QCoolingPanelSurfFD );
 		if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
@@ -2008,8 +2008,8 @@ namespace HeatBalFiniteDiffManager {
 					if ( kt1 != 0.0 ) kt =+ kt1 * ( ( TDT_i + TDT_m ) / 2.0 - 20.0 );
 				}
 
-				Real64 RhoS( mat.Density );
-				auto const TD_i( TD( i ) );
+                Real64 RhoS( mat.Density );
+                auto const TD_i( TD( i ) );
 				Real64 const Cpo( mat.SpecHeat );
 				Real64 Cp( Cpo ); // Will be changed if PCM
 				auto const & matFD_TempEnth( matFD.TempEnth );
@@ -2017,7 +2017,7 @@ namespace HeatBalFiniteDiffManager {
 				auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 				if ( mat.phaseChange ) {
 					adjustPropertiesForPhaseChange( i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt );
-				} else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
+                } else if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 					EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 					EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 					if ( ( std::abs( EnthNew( i ) - EnthOld( i ) ) > smalldiff ) && ( std::abs( TDT_i - TD_i ) > smalldiff ) ) {
@@ -2076,10 +2076,10 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 Linda Lawrie
-		//	   DATE WRITTEN   August 2012
-		//	   MODIFIED	   na
-		//	   RE-ENGINEERED  na
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   August 2012
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Provides a single entry point for checking surface temperature limits as well as
@@ -2169,8 +2169,8 @@ namespace HeatBalFiniteDiffManager {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//	   AUTHOR		 M.J. Witte
-		//	   DATE WRITTEN   Sept-Nov 2015
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   Sept-Nov 2015
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculate flux at each condFD node
 		using General::RoundSigDigits;
@@ -2206,21 +2206,21 @@ namespace HeatBalFiniteDiffManager {
 		}
 	}
 
-	void
-	adjustPropertiesForPhaseChange(
-			int finiteDifferenceLayerIndex,
-			int surfaceIndex,
-			const DataHeatBalance::MaterialProperties & materialDefinition,
-			Real64 temperaturePrevious,
-			Real64 temperatureUpdated,
-			Real64 & updatedSpecificHeat,
-			Real64 & updatedDensity,
-			Real64 & updatedThermalConductivity
-	) {
-		updatedSpecificHeat = materialDefinition.phaseChange->getCurrentSpecificHeat( temperaturePrevious, temperatureUpdated, SurfaceFD( surfaceIndex ).PhaseChangeTemperatureReverse( finiteDifferenceLayerIndex ), SurfaceFD( surfaceIndex ).PhaseChangeStateOld( finiteDifferenceLayerIndex ), SurfaceFD( surfaceIndex ).PhaseChangeState( finiteDifferenceLayerIndex ) );
-		updatedDensity = materialDefinition.phaseChange->getDensity( temperaturePrevious );
-		updatedThermalConductivity = materialDefinition.phaseChange->getConductivity( temperatureUpdated );
-	}
+    void
+    adjustPropertiesForPhaseChange(
+            int finiteDifferenceLayerIndex,
+            int surfaceIndex,
+            const DataHeatBalance::MaterialProperties & materialDefinition,
+            Real64 temperaturePrevious,
+            Real64 temperatureUpdated,
+            Real64 & updatedSpecificHeat,
+            Real64 & updatedDensity,
+            Real64 & updatedThermalConductivity
+    ) {
+        updatedSpecificHeat = materialDefinition.phaseChange->getCurrentSpecificHeat( temperaturePrevious, temperatureUpdated, SurfaceFD( surfaceIndex ).PhaseChangeTemperatureReverse( finiteDifferenceLayerIndex ), SurfaceFD( surfaceIndex ).PhaseChangeStateOld( finiteDifferenceLayerIndex ), SurfaceFD( surfaceIndex ).PhaseChangeState( finiteDifferenceLayerIndex ) );
+        updatedDensity = materialDefinition.phaseChange->getDensity( temperaturePrevious );
+        updatedThermalConductivity = materialDefinition.phaseChange->getConductivity( temperatureUpdated );
+    }
 
 
 } // HeatBalFiniteDiffManager
