@@ -25,8 +25,6 @@
 !
 ! Building:                There are 3 zones (living space, garage and attic). The living zone is conditioned.
 !                          The other two zones are unconditioned.
-!                          Supply ducts are located in the attic zone and return ducts are located in the garage zone.
-!                          Supply leaks are terminated in the attic zone, while return leaks originate in the garage.
 !                          Building aspect ratio: 1:1.6
 !
 ! Floor Area:        186 m^2 (2000 ft^2)
@@ -69,15 +67,13 @@
 ! Compact Schedules:              Yes
 ! Solar Distribution:             FullInteriorAndExterior
 !
-! HVAC:                           A unitary system of UNITARYSYSTEM:HEATPUMP:AIRTOAIR provides space cooling and heating.
-!                                 The system has a supplemental heating coil as Coil:Heating:Fuel.
-!                                 Thermostat setting at 22C for space heating and 26.6C for space cooling.
+! HVAC:                           Two AirLoopHVAC:Unitary:Furnace:HeatCool systems provide space cooling and heating.
+!                                 Thermostat setting at 21.1C for space heating and 23.9C for space cooling.
 !
 ! Zonal Equipment:                Living Zone - AirTerminal:SingleDuct:Uncontrolled (2)
-! Central Air Handling Equipment: Yes (2)
+! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      Yes
 ! Coils:                          Coil:Cooling:DX:SingleSpeed
-!                                 Coil:Heating:Electric
 !                                 Coil:Heating:Fuel
 Version,8.8;
 
@@ -104,7 +100,7 @@ SimulationControl,
     Yes;                     !- Run Simulation for Weather File Run Periods
 
 RunPeriod,
-    ,                        !- Name
+    Jan14,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     1,                       !- End Month
@@ -117,7 +113,7 @@ RunPeriod,
     Yes;                     !- Use Weather File Snow Indicators
 
 RunPeriod,
-    ,                        !- Name
+    May14,                        !- Name
     5,                       !- Begin Month
     14,                      !- Begin Day of Month
     5,                       !- End Month
@@ -130,7 +126,7 @@ RunPeriod,
     Yes;                     !- Use Weather File Snow Indicators
 
 RunPeriod,
-    ,                        !- Name
+    Jul07,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     7,                       !- End Month
@@ -1286,16 +1282,17 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
     Fan:OnOff,               !- Supply Fan Object Type
     FurnaceAC1 Supply Fan,   !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Electric,   !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FurnaceAC1 Heating Coil, !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FurnaceAC1 Cooling Coil, !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
-Coil:Heating:Electric,
+Coil:Heating:Fuel,
     FurnaceAC1 Heating Coil, !- Name
     ,                        !- Availability Schedule Name
-    1,                       !- Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     FurnaceAC1 Supply Fan Outlet,  !- Air Inlet Node Name
     FurnaceAC1 Heating Coil Outlet;  !- Air Outlet Node Name
@@ -1506,16 +1503,17 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
     Fan:OnOff,               !- Supply Fan Object Type
     FurnaceAC2 Supply Fan,   !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    Coil:Heating:Electric,   !- Heating Coil Object Type
+    Coil:Heating:Fuel,       !- Heating Coil Object Type
     FurnaceAC2 Heating Coil, !- Heating Coil Name
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FurnaceAC2 Cooling Coil, !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
-Coil:Heating:Electric,
+Coil:Heating:Fuel,
     FurnaceAC2 Heating Coil, !- Name
     ,                        !- Availability Schedule Name
-    1,                       !- Efficiency
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     FurnaceAC2 Supply Fan Outlet,  !- Air Inlet Node Name
     FurnaceAC2 Heating Coil Outlet;  !- Air Outlet Node Name
