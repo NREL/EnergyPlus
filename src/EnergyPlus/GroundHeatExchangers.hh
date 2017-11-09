@@ -114,6 +114,9 @@ namespace GroundHeatExchangers {
 
 		pipePropsStruct() :
 			outDia( 0.0 ),
+			innerDia( 0.0 ),
+			outRadius( 0.0 ),
+			innerRadius( 0.0 ),
 			thickness( 0.0 )
 		{}
 	};
@@ -402,6 +405,9 @@ namespace GroundHeatExchangers {
 
 		void
 		calcShortTimestepGFunctions();
+
+		void
+		calcLongTimestepGFunctions();
 
 		void
 		calcGFunctions();

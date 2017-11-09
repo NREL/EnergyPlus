@@ -356,6 +356,8 @@ namespace GroundHeatExchangers {
 			thisProps->pipe.outDia += thisBH->props->pipe.outDia / numBH;
 			thisProps->pipe.thickness += thisBH->props->pipe.thickness / numBH;
 
+			thisProps->pipe.innerDia += ( thisBH->props->pipe.outDia - 2 * thisBH->props->pipe.thickness ) / numBH;
+
 			thisRF->myBorholes.push_back( thisBH );
 		}
 
@@ -606,12 +608,7 @@ namespace GroundHeatExchangers {
 	void
 	GLHEVert::calcGFunctions()
 	{
-
 		using namespace DataSystemVariables;
-
-		int const numDaysInYear( 365 );
-		using DataGlobals::HoursInDay;
-		using DataGlobals::SecInHour;
 
 		if ( gFunctionsExist ) {
 			// No g-functions to calculate
@@ -629,8 +626,32 @@ namespace GroundHeatExchangers {
 		}
 
 		// No other choice than to calculate the g-functions here
-
 		calcShortTimestepGFunctions();
+		calcLongTimestepGFunctions();
+		combineShortAndLongTimestepGFunctions();
+
+		gFunctionsExist = true;
+
+		// save data for later
+		if ( !DisableCaching ) {
+			myCacheData["Response Factors"]["time"] = myRespFactors->time;
+			myCacheData["Response Factors"]["LNTTS"] = myRespFactors->LNTTS;
+			myCacheData["Response Factors"]["GFNC"] = myRespFactors->GFNC;
+			writeCache();
+		}
+	}
+
+	//******************************************************************************
+
+	void
+	GLHEVert::calcLongTimestepGFunctions()
+	{
+
+		int const numDaysInYear( 365 );
+		using DataGlobals::HoursInDay;
+		using DataGlobals::SecInHour;
+
+
 
 		// Minimum simulation time for which finite line source method is applicable
 		Real64 const lntts_min_for_long_timestep = -8.5;
@@ -684,21 +705,6 @@ namespace GroundHeatExchangers {
 
 			DisplayString( "...progress: " + ss.str() + "%");
 
-		}
-
-		gFunctionsExist = true;
-
-		combineShortAndLongTimestepGFunctions();
-
-		// add g-function data to cache
-		myCacheData["Response Factors"]["time"] = myRespFactors->time;
-		myCacheData["Response Factors"]["LNTTS"] = myRespFactors->LNTTS;
-		myCacheData["Response Factors"]["GFNC"] = myRespFactors->GFNC;
-
-		// save data for later
-
-		if ( !DisableCaching ) {
-			writeCache();
 		}
 	}
 
@@ -1030,7 +1036,7 @@ namespace GroundHeatExchangers {
 		myRespFactors->LNTTS.dimension( GFNC_combined.size(), 0.0 );
 		myRespFactors->GFNC.dimension( GFNC_combined.size(), 0.0 );
 
-		for ( int index = 0; index < GFNC_combined.size(); ++index ) {
+		for ( unsigned int index = 0; index < GFNC_combined.size(); ++index ) {
 			myRespFactors->time[index] = exp( LNTTS_combined[index] ) * t_s;
 			myRespFactors->LNTTS[index] = LNTTS_combined[index];
 			myRespFactors->GFNC[index] = GFNC_combined[index];
@@ -2948,13 +2954,12 @@ namespace GroundHeatExchangers {
 	Real64
 	GLHEVert::calcPipeConvectionResistance()
 	{
-		// Calculates the convection resistance using Gnielinski and Petukov, in [k/(W/m)]
+		// Calculates the convection resistance using Gnielinski and Petukov, in [K/(W/m)]
 
 		// Gneilinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
 		// International Chemical Engineering 16(1976), pp. 359-368.
 
 		using FluidProperties::GetSpecificHeatGlycol;
-		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetViscosityGlycol;
 		using FluidProperties::GetConductivityGlycol;
 		using DataPlant::PlantLoop;
@@ -2967,7 +2972,6 @@ namespace GroundHeatExchangers {
 
 		Real64 cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		Real64 kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-		Real64 fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		Real64 fluidViscosity = GetViscosityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
 		// Smoothing fit limits

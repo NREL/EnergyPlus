@@ -1992,7 +1992,7 @@
     1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
     2.66667E-02,              !- Pipe Out Diameter {m}
     2.41285E-03,              !- Pipe Thickness {m}
-    2.53977E-02;              !- U-Tube Distance {m}
+    5.1225E-02;               !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Vertical Ground Heat Exchanger Ground Temps, !- Undisturbed Ground Temperature Model Name
