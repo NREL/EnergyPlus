@@ -3702,7 +3702,6 @@ namespace ZoneEquipmentManager {
 					} else {
 						plr = 0.0;
 					}
-					plr = energy.TotalOutputRequired / availCap;
 				} else {
 					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
 						if ( thisZEqList.CoolingPriority( equipNum ) > 0 ) availCap += thisZEqList.CoolingCapacity( equipNum );
@@ -3777,7 +3776,6 @@ namespace ZoneEquipmentManager {
 						plr = 0.0;
 						numOperating = 0;
 					}
-					plr = energy.TotalOutputRequired / availCap;
 				} else {
 					for ( int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum ) {
 						// For cooling capacities and TotalOutputRequired are negative
