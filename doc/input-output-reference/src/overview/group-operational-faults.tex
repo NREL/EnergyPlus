@@ -17,9 +17,9 @@ To date, the main practitioner use of EnergyPlus has been for new construction d
 
 The users in these cases are practitioners, not power users, so it is needed to implement the fault models using conventional EnergyPlus objects rather than the EMS, which, in any case, could only be used to model limited types of faults.
 
-\subsection{Operational Fault Objects}\label{operational-fault-objects}
+\subsection{Overview of Operational Fault Objects}\label{operational-fault-objects}
 
-EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, and (3) heating and cooling coil fouling faults.
+EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, (3) fouling or scaling at air side or water side components (e.g., heating and cooling coil, air filter, cooling tower), (4) sensor faults with plant components.
 
 The objects used by EnergyPlus to model the faults are as follows:
 
@@ -40,6 +40,16 @@ The objects used by EnergyPlus to model the faults are as follows:
   FaultModel:ThermostatOffset
 \item
   FaultModel:HumidistatOffset
+\item
+  FaultModel:Fouling:AirFilter
+\item
+  FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+\item
+  FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+\item
+  FaultModel:Fouling:CoolingTower
+\item
+  FaultModel:TemperatureSensorOffset:CoilSupplyAir
 \end{itemize}
 
 \subsection{FaultModel:TemperatureSensorOffset:OutdoorAir}\label{faultmodeltemperaturesensoroffsetoutdoorair}
@@ -238,7 +248,7 @@ This field defines outside surface area of the cooling or heating coil. The unit
 
 This field specifies the inside to outside surface area ratio of the cooling or heating coil.
 
-IDF examples:
+\paragraph{IDF Examples}
 
 \begin{lstlisting}
 
@@ -353,9 +363,11 @@ This field defines the reference offset value of the humidistat. This field is r
 
 This field provides the name of a Thermostat Offset Fault object that causes the humidistat offset fault. It should be the name of a FaultModel:ThermostatOffset object. This field is required for the Type ThermostatOffsetDependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
 
-\subsection{An example of IDF codes for the thermostat/humidistat offset fault models:}\label{an-example-of-idf-codes-for-the-thermostathumidistat-offset-fault-models}
+\paragraph{IDF Examples}\label{an-example-of-idf-codes-for-the-thermostathumidistat-offset-fault-models}
 
 \begin{lstlisting}
+! IDF examples:
+! example faults for the thermostat/humidistat offset
 
 FaultModel:ThermostatOffset,
   Ther_Offset_Zone1,   !- Name
@@ -413,9 +425,11 @@ This field provides the name of a schedule that describes the pressure rise vari
 
 This field provides the name of a fan curve for the fan associated with the fault. The curve describes the relationship between the fan pressure rise and air flow rate. This is used to estimate the variations of the fan air flow rate in the faulty cases, given the Pressure Rise Variation Schedule. For variable speed fans, the curve should be the one corresponding to the maximum fan speed. The fan curve should cover the design operational point specified in the corresponding fan object. It is also required that the faulty fan operatinal state point falls within the fan selection range that is monotonically decreasing.
 
-\subsection{An example of IDF codes for the fouling air filter fault models:}\label{an-example-of-idf-codes-for-the-fouling-air-filter-fault-models}
+\paragraph{IDF Examples}\label{an-example-of-idf-codes-for-the-fouling-air-filter-fault-models}
 
 \begin{lstlisting}
+! IDF examples:
+! example faults for the fouling air filter 
 
 FaultModel:Fouling:AirFilter,
   DF_VAV_1_Fan,             !- Name
@@ -461,3 +475,498 @@ FaultModel:Fouling:AirFilter,
   VAV_1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
   Fan Energy;              !- End-Use Subcategory
 \end{lstlisting}
+
+\subsection{FaultModel:TemperatureSensorOffset:ChillerSupplyWater}\label{faultmodeltemperaturesensoroffsetchillersupplywater}
+
+This object defines the operational fault of chiller supply water temperature sensor offset.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
+
+This field defines the chiller object type that this fault is associated with. Choices are from a list of applicable chiller types, including Chiller:Electric, Chiller:Electric:EIR, Chiller:Electric:ReformulatedEIR,  Chiller:ConstantCOP, Chiller:EngineDriven, Chiller:CombustionTurbine, Chiller:Absorption, Chiller:Absorption:Indirect.
+
+\paragraph{Field: Chiller Object Name}\label{field-chiller-object-name}
+
+This field defines the name of the chiller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Reference Sensor Offset}\label{field-reference-sensor-offset}
+
+This field defines the reference offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the chiller supply water temperature sensor offset
+
+  Chiller:Electric:ReformulatedEIR,
+    MainChiller,             !- Name
+    AUTOSIZE,                !- Reference Capacity {W}
+    5.5,                     !- Reference COP {W/W}
+    6.67,                    !- Reference Leaving Chilled Water Temperature {C}
+    35,                      !- Reference Leaving Condenser Water Temperature {C}
+    AutoSize,                !- Reference Chilled Water Flow Rate {m3/s}
+    AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
+    WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
+    WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+    ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    0.1,                     !- Minimum Part Load Ratio
+    1,                       !- Maximum Part Load Ratio
+    1,                       !- Optimum Part Load Ratio
+    0.2,                     !- Minimum Unloading Ratio
+    CoolSys1 Pump-CoolSys1 ChillerNode 1,  !- Chilled Water Inlet Node Name
+    CoolSys1 Supply Equipment Outlet Node 1,  !- Chilled Water Outlet Node Name
+    CoolSys1 Chiller Water Inlet Node 1,  !- Condenser Inlet Node Name
+    CoolSys1 Chiller Water Outlet Node 1,  !- Condenser Outlet Node Name
+    1,                       !- Fraction of Compressor Electric Consumption Rejected by Condenser
+    2,                       !- Leaving Chilled Water Lower Temperature Limit {C}
+    LeavingSetpointModulated,!- Chiller Flow Mode Type
+    ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
+    ,                        !- Heat Recovery Inlet Node Name
+    ,                        !- Heat Recovery Outlet Node Name
+    0.5;                     !- Sizing Factor
+
+  FaultModel:TemperatureSensorOffset:ChillerSupplyWater,
+    Fault_SWT_MainChiller,   !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Chiller:Electric:ReformulatedEIR,   !- Chiller Object Type
+    MainChiller,             !- Chiller Object Name
+    2.0;                     !- Reference Sensor Offset {deltaC}
+
+\end{lstlisting}
+
+
+\subsection{FaultModel:TemperatureSensorOffset:CondenserSupplyWater}\label{faultmodeltemperaturesensoroffsetcondensersupplywater}
+
+This object defines the operational fault of condenser supply water temperature sensor offset.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Cooling Tower Object Type}\label{field-tower-object-type}
+
+This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, CoolingTower:VariableSpeed, and CoolingTower:VariableSpeed:MERKEL.
+
+\paragraph{Field: Cooling Tower Object Name}\label{field-tower-object-name}
+
+This field defines the name of the cooling tower object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Reference Sensor Offset}\label{field-reference-sensor-offset}
+
+This field defines the reference offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the condenser supply water temperature sensor offset
+
+  CoolingTower:TwoSpeed,
+    Cond Tower 1,            !- Name
+    Condenser Tower 1 Outlet Node,  !- Water Inlet Node Name
+    Condenser Tower 2 Outlet Node,  !- Water Outlet Node Name
+    ,                        !- Design Water Flow Rate {m3/s}
+    8.0,                     !- High Fan Speed Air Flow Rate {m3/s}
+    500,                     !- High Fan Speed Fan Power {W}
+    ,                        !- High Fan Speed U-Factor Times Area Value {W/K}
+    4.0,                     !- Low Fan Speed Air Flow Rate {m3/s}
+    ,                        !- Low Fan Speed Air Flow Rate Sizing Factor
+    125,                     !- Low Fan Speed Fan Power {W}
+    ,                        !- Low Fan Speed Fan Power Sizing Factor
+    ,                        !- Low Fan Speed U-Factor Times Area Value {W/K}
+    ,                        !- Low Fan Speed U-Factor Times Area Sizing Factor
+    0.8,                     !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    ,                        !- Free Convection Regime U-Factor Times Area Value {W/K}
+    ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
+    NominalCapacity,         !- Performance Input Method
+    ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    20000.0,                 !- High Speed Nominal Capacity {W}
+    10000.0,                 !- Low Speed Nominal Capacity {W}
+    ,                        !- Low Speed Nominal Capacity Sizing Factor
+    2000.0,                  !- Free Convection Nominal Capacity {W}
+    ;                        !- Free Convection Nominal Capacity Sizing Factor
+  
+  FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
+    Fault_SWT_CoolTower,     !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    CoolingTower:TwoSpeed,!- Cooling Tower Object Type
+    Cond Tower 1,            !- Cooling Tower Object Name
+    5.0;                     !- Reference Sensor Offset {deltaC}
+
+\end{lstlisting}
+
+
+\subsection{FaultModel:Fouling:CoolingTower}\label{faultmodelfoulingcoolingtower}
+
+This object defines the operational fault of fouling cooling towers.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Cooling Tower Object Type}\label{field-tower-object-type}
+
+This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, and CoolingTower:VariableSpeed:MERKEL.
+
+\paragraph{Field: Cooling Tower Object Name}\label{field-tower-object-name}
+
+This field defines the name of the cooling tower object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: UA Reduction Factor}\label{field-ua-reduction-factor}
+
+This field defines the UA reduction factor of the faulty cooling tower. The factor describes the tower UA reduction due to fouling. It is the ratio between the UA value at fouling case and that at fault free case. It is applicable to both the Design UA and Free Convection UA of the tower.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the fouling cooling tower
+
+  CoolingTower:SingleSpeed,
+    Cond Tower1,             !- Name
+    Condenser Tower 1 Inlet Node,  !- Water Inlet Node Name
+    Condenser Tower 1 Outlet Node,  !- Water Outlet Node Name
+    0.0011,                  !- Design Water Flow Rate {m3/s}
+    8.0,                     !- Design Air Flow Rate {m3/s}
+    500,                     !- Design Fan Power {W}
+    175.0,                   !- Design U-Factor Times Area Value {W/K}
+    0.0,                     !- Free Convection Air Flow Rate {m3/s}
+    ,                        !- Free Convection Air Flow Rate Sizing Factor
+    0.0,                     !- Free Convection U-Factor Times Area Value {W/K}
+    ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
+    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
+    ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    ,                        !- Nominal Capacity {W}
+    ,                        !- Free Convection Capacity {W}
+    ;                        !- Free Convection Nominal Capacity Sizing Factor
+
+  FaultModel:Fouling:CoolingTower,
+    Fault_fouling_CoolTower, !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    CoolingTower:SingleSpeed,!- Cooling Tower Object Type
+    Cond Tower1,             !- Cooling Tower Object Name
+    0.7;                     !- UA Reduction Factor
+
+\end{lstlisting}
+
+
+\subsection{FaultModel:Fouling:Boiler}\label{faultmodelfoulingboiler}
+
+This object defines the operational fault of fouling boilers with water-based heat exchangers.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Boiler Object Type}\label{field-boiler-object-type}
+
+This field defines the boiler object type that this fault is associated with. Choices are the boiler types with water-based heat exchangers. 
+
+\paragraph{Field: Boiler Object Name}\label{field-boiler-object-name}
+
+This field defines the name of the boiler object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Fouling Factor}\label{field-fouling-factor}
+
+This field defines the fouling factor of the faulty boiler. The factor indicates the decrease of the nominal capacity of the boiler. It is the ratio between the nominal capacity at fouling case and that at fault free case.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the fouling boilers
+  Boiler:HotWater,
+    HeatSys1 Boiler,         !- Name
+    NATURALGAS,              !- Fuel Type
+    AUTOSIZE,                !- Nominal Capacity {W}
+    0.78,                    !- Nominal Thermal Efficiency
+    LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
+    ,                        !- Normalized Boiler Efficiency Curve Name
+    82.2000,                 !- Design Water Outlet Temperature {C}
+    AUTOSIZE,                !- Design Water Flow Rate {m3/s}
+    0.0,                     !- Minimum Part Load Ratio
+    1.2,                     !- Maximum Part Load Ratio
+    1.0,                     !- Optimum Part Load Ratio
+    HeatSys1 Pump-HeatSys1 BoilerNode,  !- Boiler Water Inlet Node Name
+    HeatSys1 Supply Equipment Outlet Node,  !- Boiler Water Outlet Node Name
+    95.0,                    !- Water Outlet Upper Temperature Limit {C}
+    LeavingSetpointModulated,!- Boiler Flow Mode
+    0.0000,                  !- Parasitic Electric Load {W}
+    1.0000;                  !- Sizing Factor
+
+  FaultModel:Fouling:Boiler,
+    Fault_Fouling_Boiler,    !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Boiler:HotWater,         !- Boiler Object Type
+    HeatSys1 Boiler,         !- Boiler Object Name
+    0.8;                     !- Fouling Factor
+
+\end{lstlisting}
+
+
+\subsection{FaultModel:Fouling:Chiller}\label{faultmodelfoulingchiller}
+
+This object defines the operational fouling fault of chillers with water-cooled condensers.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
+
+This field defines the chiller object type that this fault is associated with. Choices are the chiller types with water-cooled condensers. 
+
+\paragraph{Field: Chiller Object Name}\label{field-chiller-object-name}
+
+This field defines the name of the chiller object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Fouling Factor}\label{field-fouling-factor}
+
+This field defines the fouling factor of the faulty chiller. The factor indicates the decrease of the nominal capacity of the chiller. It is the ratio between the nominal capacity at fouling case and that at fault free case.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the fouling chillers
+
+  Chiller:Electric:ReformulatedEIR,
+    CoolSys1 Chiller 1,      !- Name
+    AUTOSIZE,                !- Reference Capacity {W}
+    5.5,                     !- Reference COP {W/W}
+    6.67,                    !- Reference Leaving Chilled Water Temperature {C}
+    35,                      !- Reference Leaving Condenser Water Temperature {C}
+    AutoSize,                !- Reference Chilled Water Flow Rate {m3/s}
+    AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
+    WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
+    WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+    ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+    0.1,                     !- Minimum Part Load Ratio
+    1,                       !- Maximum Part Load Ratio
+    1,                       !- Optimum Part Load Ratio
+    0.2,                     !- Minimum Unloading Ratio
+    CoolSys1 Pump-CoolSys1 ChillerNode 1,  !- Chilled Water Inlet Node Name
+    CoolSys1 Supply Equipment Outlet Node 1,  !- Chilled Water Outlet Node Name
+    CoolSys1 Chiller Water Inlet Node 1,  !- Condenser Inlet Node Name
+    CoolSys1 Chiller Water Outlet Node 1,  !- Condenser Outlet Node Name
+    1,                       !- Fraction of Compressor Electric Consumption Rejected by Condenser
+    2,                       !- Leaving Chilled Water Lower Temperature Limit {C}
+    LeavingSetpointModulated,!- Chiller Flow Mode Type
+    ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
+    ,                        !- Heat Recovery Inlet Node Name
+    ,                        !- Heat Recovery Outlet Node Name
+    0.5;                     !- Sizing Factor
+
+  FaultModel:Fouling:Chiller,
+    Fault_Fouling_Chiller1,  !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Chiller:Electric:ReformulatedEIR, !- Chiller Object Type
+    CoolSys1 Chiller 1,      !- Chiller Object Name
+    0.8;                     !- Fouling Factor
+
+\end{lstlisting}
+
+
+\subsection{FaultModel:Fouling:EvaporativeCooler}\label{faultmodelfoulingevapcooler}
+
+This object defines the operational fault of the wetted coil evaporative cooler.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Evaporative Cooler Object Type}\label{field-evaporative cooler-object-type}
+
+This field defines the evaporative cooler object type that this fault is associated with. Choices are the wetted coil evaporative coolers. 
+
+\paragraph{Field: Evaporative Cooler Object Name}\label{field-evaporative cooler-object-name}
+
+This field defines the name of the evaporative cooler object associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Fouling Factor}\label{field-fouling-factor}
+
+This field defines the fouling factor of the faulty evaporative cooler. The factor indicates the decrease of the indirect stage efficiency. It is the ratio between the indirect stage efficiency at fouling case and that at fault free case.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the fouling evaporative coolers
+
+  EvaporativeCooler:Indirect:WetCoil,
+    Evaporative Cooler 1,    !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    0.8,                     !- Coil Maximum Efficiency
+    0.16,                    !- Coil Flow Ratio
+    55.,                     !- Recirculating Water Pump Power Consumption {W}
+    0.6,                     !- Secondary Air Fan Flow Rate {m3/s}
+    0.7,                     !- Secondary Air Fan Total Efficiency
+    200.0,                   !- Secondary Air Fan Delta Pressure {Pa}
+    Evap Cooler 1 Unit OA Inlet,  !- Primary Air Inlet Node Name
+    Evap Cooler 1 Fan Inlet Node, !- Primary Air Outlet Node Name
+    Constant,                !- Control Type
+    ,                        !- Water Supply Storage Tank Name
+    Secondary side OA inlet node;  !- Secondary Air Inlet Node Name
+
+  FaultModel:Fouling:EvaporativeCooler,
+    Fault_Fouling_EvapCooler1,!- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    EvaporativeCooler:Indirect:WetCoil, !- Evaporative Cooler Object Type
+    Evaporative Cooler 1,    !- Evaporative Cooler Object Name
+    0.7;                     !- Reference Efficiency Reduction Factor
+
+\end{lstlisting}
+
+
+\subsection{FaultModel:TemperatureSensorOffset:CoilSupplyAir}\label{faultmodeltemperaturesensoroffsetcoilsupplyair}
+
+This object defines the operational fault of supply air temperature sensor offset for the coils with temperature-based control.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This is the user-defined name of the fault.
+
+\paragraph{Field: Availability Schedule Name}
+
+This field provides the name of a schedule that will determine if this fault is applicable. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to 1.0 when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Severity Schedule Name}\label{field-severity-schedule-name}
+
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the user-defined temperature offset. This schedule should be set to a non-zero value when a fault is applicable and 0.0 when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Coil Object Type}\label{field-coil-object-type}
+
+This field defines the coil object type that this fault is associated with. Choices are from a list of applicable coils with temperature-based control, including Coil:Heating:Electric, Coil:Heating:Gas, Coil:Heating:Steam, Coil:Heating:Desuperheater, Coil:Heating:Water, Coil:Cooling:Water, and Coil:Cooling:Water:Detailedgeometry.
+
+\paragraph{Field: Coil Object Name}\label{field-coil-object-name}
+
+This field defines the name of the coil associated with the fault. It should be one of the objects with the defined types.
+
+\paragraph{Field: Water Coil Controller Name}\label{field-water-coil-controller-name}
+
+This field defines the name of the water coil controller associated with the faulty water coil. This field is only required for the water coils, i.e., the coil type is Coil:Heating:Water, Coil:Cooling:Water, or Coil:Cooling:Water:Detailedgeometry.
+
+\paragraph{Field: Reference Sensor Offset}\label{field-reference-sensor-offset}
+
+This field defines the reference offset of the temperature sensor. A positive value means the sensor reads a temperature that is higher than the real value. A negative value means the sensor reads a temperature that is lower than the real value. A 0.0 value means no offset. Default is 0.0. The units are in degrees Celsius.
+
+\paragraph{IDF Examples}
+
+\begin{lstlisting}
+! IDF examples:
+! example faults for the coil supply air temperature sensor offset
+
+  Coil:Cooling:Water,
+    Main Cooling Coil 1,     !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    autosize,                !- Design Water Flow Rate {m3/s}
+    autosize,                !- Design Air Flow Rate {m3/s}
+    autosize,                !- Design Inlet Water Temperature {C}
+    autosize,                !- Design Inlet Air Temperature {C}
+    autosize,                !- Design Outlet Air Temperature {C}
+    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
+    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
+    Main Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name
+    Main Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name
+    Mixed Air Node 1,        !- Air Inlet Node Name
+    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
+    SimpleAnalysis,          !- Type of Analysis
+    CrossFlow;               !- Heat Exchanger Configuration
+
+  Controller:WaterCoil,
+    Central Cooling Coil Controller 1,  !- Name
+    Temperature,             !- Control Variable
+    Reverse,                 !- Action
+    FLOW,                    !- Actuator Variable
+    Main Cooling Coil 1 Outlet Node,  !- Sensor Node Name
+    Main Cooling Coil 1 Water Inlet Node,  !- Actuator Node Name
+    0.002,                   !- Controller Convergence Tolerance {deltaC}
+    autosize,                !- Maximum Actuated Flow {m3/s}
+    0.0;                     !- Minimum Actuated Flow {m3/s}
+
+  FaultModel:TemperatureSensorOffset:CoilSupplyAir,
+    Fault_SAT_CoolCoil1,     !- Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Severity Schedule Name
+    Coil:Cooling:Water,      !- Coil Object Type
+    Main Cooling Coil 1,     !- Coil Object Name
+    Central Cooling Coil Controller 1, !- Water Coil Controller Name
+    2.0;                     !- Reference Sensor Offset {deltaC}
+
+\end{lstlisting}
+

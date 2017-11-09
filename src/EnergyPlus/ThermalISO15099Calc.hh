@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef ThermalISO15099Calc_hh_INCLUDED
 #define ThermalISO15099Calc_hh_INCLUDED
@@ -178,7 +167,8 @@ namespace ThermalISO15099Calc {
 		Array1A< Real64 > ShadeGapKeffConv,
 		Real64 const SDScalar,
 		int const SHGCCalc, // SHGC calculation switch:
-		int & NumOfIterations
+		int & NumOfIterations,
+		Real64 const egdeGlCorrFac // Edge of glass correction factor
 	);
 
 	void
@@ -244,6 +234,7 @@ namespace ThermalISO15099Calc {
 		Array1< Real64 > const & Al,
 		Array1< Real64 > const & Ar,
 		Array1< Real64 > const & Ah,
+		Array1A< Real64 > const & EffectiveOpenness,  // Effective layer openness [m2]
 		Array1< Real64 > const & vvent,
 		Array1< Real64 > const & tvent,
 		Array1_int const & LayerType,
@@ -263,7 +254,8 @@ namespace ThermalISO15099Calc {
 		int const ThermalMod,
 		int const Debug_mode, // Switch for debug output files:
 		Real64 & AchievedErrorTolerance,
-		int & TotalIndex
+		int & TotalIndex,
+		Real64 const edgeGlCorrFac // Edge of glass correction factor
 	);
 
 	void
@@ -373,6 +365,27 @@ namespace ThermalISO15099Calc {
 		Real64 & hrout,
 		Array1< Real64 > & Ra,
 		Array1< Real64 > & Nu
+	);
+
+	void
+	effectiveLayerCond(
+		int const nlayer, 
+		Array1A_int const LayerType,                // Layer type
+		Array1A< Real64 > const scon,               // Layer thermal conductivity
+		Array1A< Real64 > const thick,              // Layer thickness
+		Array2A_int const iprop,                    // Gas type in gaps
+		Array2A< Real64 > const frct,               // Fraction of gas
+		Array1A_int const nmix,                     // Gas mixture
+		Array1A< Real64 > const pressure,           // Gas pressure [Pa]
+		Array1A< Real64 > const wght,               // Molecular weight
+		Array2A< Real64 > const gcon,               // Gas specific conductivity
+		Array2A< Real64 > const gvis,               // Gas specific viscosity
+		Array2A< Real64 > const gcp,                // Gas specific heat
+		Array1A< Real64 > const EffectiveOpenness,  // Layer effective openneess [m2]
+		Array1< Real64 > & theta,                   // Layer surface tempeartures [K]
+		Array1D< Real64 > & sconScaled,             // Layer conductivity divided by thickness
+		int & nperr,                                // Error message flag
+		std::string & ErrorMessage                  // Error message
 	);
 
 	void

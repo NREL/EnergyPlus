@@ -46,7 +46,7 @@
 ! Environmental Emissions: No
 ! Utility Tariffs: No
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Branch Pumps With Common Pipe,  !- Name

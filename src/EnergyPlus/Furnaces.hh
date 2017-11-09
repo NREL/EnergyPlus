@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef Furnaces_hh_INCLUDED
 #define Furnaces_hh_INCLUDED
@@ -217,7 +206,8 @@ namespace Furnaces {
 		Real64 WSHPRuntimeFrac; // Runtime fraction of water source heat pump
 		Real64 CoolPartLoadRatio; // Cooling part load ratio
 		Real64 HeatPartLoadRatio; // Heating part load ratio
-		Real64 MinOATCompressor; // Minimum outdoor operating temperature for heat pump compressor
+		Real64 MinOATCompressorCooling; // Minimum outdoor operating temperature for heat pump compressor
+		Real64 MinOATCompressorHeating; // Minimum outdoor operating temperature for heat pump compressor
 		Real64 MaxOATSuppHeat; // Maximum outdoor dry-bulb temperature for
 		int CondenserNodeNum; // Node number of outdoor condenser/compressor
 		Real64 MaxONOFFCyclesperHour; // Maximum ON/OFF Cycling Rate [cycles/hr]
@@ -364,7 +354,8 @@ namespace Furnaces {
 			WSHPRuntimeFrac( 0.0 ),
 			CoolPartLoadRatio( 0.0 ),
 			HeatPartLoadRatio( 0.0 ),
-			MinOATCompressor( 0.0 ),
+			MinOATCompressorCooling( 0.0 ),
+			MinOATCompressorHeating(0.0),
 			MaxOATSuppHeat( 0.0 ),
 			CondenserNodeNum( 0 ),
 			MaxONOFFCyclesperHour( 0.0 ),
@@ -609,6 +600,7 @@ namespace Furnaces {
 	SimVariableSpeedHP(
 		int const FurnaceNum, // number of the current engine driven Heat Pump being simulated
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		int const AirLoopNum, // index to air loop
 		Real64 const QZnReq, // required zone load
 		Real64 const QLatReq, // required latent load
 		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
@@ -686,6 +678,18 @@ namespace Furnaces {
 		Real64 const QZnReq, // sensible load to be met (W) !unused1208
 		Real64 const MoistureLoad, // moisture load to be met (W)
 		Real64 & PartLoadRatio // coil part-load ratio
+	);
+
+	void
+	SetMinOATCompressor(
+		int const FurnaceNum, // index to furnace
+		std::string const FurnaceName, // name of furnace
+		std::string const cCurrentModuleObject, // type of furnace
+		std::string const CoolingCoilType, // type of cooling coil
+		std::string const CoolingCoilName, // name of cooling coil
+		std::string const HeatingCoilType, // type of heating coil
+		std::string const HeatingCoilName, // name of heating coil
+		bool & ErrorsFound // GetInput logical that errors were found
 	);
 
 } // Furnaces

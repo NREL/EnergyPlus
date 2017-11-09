@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataGlobals_hh_INCLUDED
 #define DataGlobals_hh_INCLUDED
@@ -91,7 +80,7 @@ namespace DataGlobals {
 	extern int const ksRunPeriodWeather;
 	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
 	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-	extern int const ksReadAllWeatherData; // a weather period for reading all weather data proir to the simulation
+	extern int const ksReadAllWeatherData; // a weather period for reading all weather data prior to the simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -104,7 +93,7 @@ namespace DataGlobals {
 	extern Real64 const DegToRadians; // Conversion for Degrees to Radians
 	extern Real64 const RadToDeg; // Conversion for Radians to Degrees
 	extern Real64 const SecInHour; // Conversion for hours to seconds
-	extern Real64 const HoursInDay; // Number of Hourse in Day
+	extern Real64 const HoursInDay; // Number of Hours in Day
 	extern Real64 const SecsInDay; // Number of seconds in Day
 	extern Real64 const BigNumber; // Max Number real used for initializations
 	extern Real64 const rTinyValue; // Tiny value to replace use of TINY(x)
@@ -179,11 +168,13 @@ namespace DataGlobals {
 	extern std::ostream * err_stream; // Internal stream used for err output (used for performance)
 	extern int StdOutputRecordCount; // Count of Standard output records
 	extern int OutputFileInits; // Unit number for the standard Initialization output file
+	extern std::ostream * eio_stream; // Internal stream used for eio output (used for unit tests)
 	extern int OutputFileDebug; // Unit number for debug outputs
 	extern int OutputFileZoneSizing; // Unit number of zone sizing calc output file
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
 	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
+	extern int OutputFileShadingFrac; // Unit number for shading output
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
 	extern int OutputDElightIn; // Unit number for the DElight In file
@@ -221,6 +212,7 @@ namespace DataGlobals {
 	extern bool RedoSizesHVACSimulation; // doing kick off simulation for redoing sizes as part of sizing
 	extern bool FinalSizingHVACSizingSimIteration; // true if this will be no more HVAC sizing sim iterations
 	extern bool AnyEnergyManagementSystemInModel; // true if there is any EMS or Erl in model.  otherwise false
+	extern bool AnyLocalEnvironmentsInModel; //true if there is any local environmental data objected defined in model, otherwise false
 	extern bool AnyPlantInModel; // true if there are any plant or condenser loops in model, otherwise false
 	extern int CacheIPErrorFile; // Cache IP errors until IDF processing done.
 	extern bool AnyIdealCondEntSetPointInModel; // true if there is any ideal condenser entering set point manager in model.

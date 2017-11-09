@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,18 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
-
-// C++ Headers
-#include <cmath>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -99,7 +85,7 @@ namespace TARCOGMain {
 	//  Revision: 7.0.09  (November/15/2011), Simon Vidanovic
 	//   - imrovement: Added error message tolerance (This is necessary to handle error messages in correct way)
 	//  Revision: 7.0.08  (November/15/2011), Simon Vidanovic
-	//   - bug fix: Fixed program crashing when warrning message 1007 occured (output could not fit in string)
+	//   - bug fix: Fixed program crashing when warrning message 1007 occurred (output could not fit in string)
 	//   - feature: relaxation parameter changed
 	//  Revision: 7.0.07  (November/08/2011), Simon Vidanovic
 	//   - feature: Error message (as string) is now return from tarcog
@@ -476,7 +462,8 @@ namespace TARCOGMain {
 		Array1A< Real64 > ShadeGapKeffConv, // Vector of convective keff values for areas above/below
 		Real64 const SDScalar, // Factor of Venetian SD layer contribution to convection
 		int const SHGCCalc, // SHGC calculation switch:
-		int & NumOfIterations // Number of iterations for reacing solution
+		int & NumOfIterations, // Number of iterations for reacing solution
+		Real64 const edgeGlCorrFac // Edge of glass correction factor
 	)
 	{
 
@@ -719,7 +706,7 @@ namespace TARCOGMain {
 		if ( GoAhead( nperr ) ) {
 
 			if ( standard == ISO15099 ) {
-				Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CurGap, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations );
+				Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CurGap, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations, edgeGlCorrFac );
 			} else if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 				Calc_EN673( standard, nlayer, tout, tind, CurGap, thick, scon, emis, totsol, tilt, dir, asol, presure, iprop, frct, nmix, xgcon, xgvis, xgcp, xwght, theta, ufactor, hcin, hin, hout, shgc, nperr, ErrorMessage, ibc, hg, hr, hs, Ra, Nu );
 			} else {
@@ -757,7 +744,7 @@ namespace TARCOGMain {
 
 					//after performed deflection recalculate temperatures with new gap widths
 					if ( standard == ISO15099 ) {
-						Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, GapDefMean, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations );
+						Calc_ISO15099( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, GapDefMean, thick, scon, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, xgcon, xgvis, xgcp, xwght, gama, nmix, SupportPillar, PillarSpacing, PillarRadius, theta, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgas, hrgas, shgc, nperr, ErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, Ra, Nu, ThermalMod, Debug_mode, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, SHGCCalc, NumOfIterations, edgeGlCorrFac );
 					} else if ( ( standard == EN673 ) || ( standard == EN673Design ) ) {
 						Calc_EN673( standard, nlayer, tout, tind, GapDefMean, thick, scon, emis, totsol, tilt, dir, asol, presure, iprop, frct, nmix, xgcon, xgvis, xgcp, xwght, theta, ufactor, hcin, hin, hout, shgc, nperr, ErrorMessage, ibc, hg, hr, hs, Ra, Nu );
 					} else {

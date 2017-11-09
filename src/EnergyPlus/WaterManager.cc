@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -815,50 +804,50 @@ namespace WaterManager {
 			// <SetupOutputVariables here...>, CurrentModuleObject='WaterUse:Storage'
 			for ( Item = 1; Item <= NumWaterStorageTanks; ++Item ) {
 				// this next one is a measure of the state of water in the tank, not a flux of m3 that needs to be summed
-				SetupOutputVariable( "Water System Storage Tank Volume [m3]", WaterStorage( Item ).ThisTimeStepVolume, "System", "Average", WaterStorage( Item ).Name );
-				SetupOutputVariable( "Water System Storage Tank Net Volume Flow Rate [m3/s]", WaterStorage( Item ).NetVdot, "System", "Average", WaterStorage( Item ).Name );
-				SetupOutputVariable( "Water System Storage Tank Inlet Volume Flow Rate [m3/s]", WaterStorage( Item ).VdotToTank, "System", "Average", WaterStorage( Item ).Name );
-				SetupOutputVariable( "Water System Storage Tank Outlet Volume Flow Rate [m3/s]", WaterStorage( Item ).VdotFromTank, "System", "Average", WaterStorage( Item ).Name );
-				SetupOutputVariable( "Water System Storage Tank Mains Water Volume [m3]", WaterStorage( Item ).MainsDrawVol, "System", "Sum", WaterStorage( Item ).Name, _, "MainsWater", "WaterSystem", WaterStorage( Item ).QualitySubCategoryName, "System" );
-				SetupOutputVariable( "Water System Storage Tank Mains Water Volume Flow Rate [m3/s]", WaterStorage( Item ).MainsDrawVdot, "System", "Average", WaterStorage( Item ).Name );
-				SetupOutputVariable( "Water System Storage Tank Water Temperature [C]", WaterStorage( Item ).Twater, "System", "Average", WaterStorage( Item ).Name );
-				SetupOutputVariable( "Water System Storage Tank Overflow Volume Flow Rate [m3/s]", WaterStorage( Item ).VdotOverflow, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Volume", OutputProcessor::Unit::m3, WaterStorage( Item ).ThisTimeStepVolume, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Net Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterStorage( Item ).NetVdot, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Inlet Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterStorage( Item ).VdotToTank, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Outlet Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterStorage( Item ).VdotFromTank, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Mains Water Volume", OutputProcessor::Unit::m3, WaterStorage( Item ).MainsDrawVol, "System", "Sum", WaterStorage( Item ).Name, _, "MainsWater", "WaterSystem", WaterStorage( Item ).QualitySubCategoryName, "System" );
+				SetupOutputVariable( "Water System Storage Tank Mains Water Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterStorage( Item ).MainsDrawVdot, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Water Temperature", OutputProcessor::Unit::C, WaterStorage( Item ).Twater, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Overflow Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterStorage( Item ).VdotOverflow, "System", "Average", WaterStorage( Item ).Name );
 				if ( WaterStorage( Item ).OverflowMode == OverflowDiscarded ) {
-					SetupOutputVariable( "Water System Storage Tank Overflow Water Volume [m3]", WaterStorage( Item ).VolOverflow, "System", "Sum", WaterStorage( Item ).Name );
+					SetupOutputVariable( "Water System Storage Tank Overflow Water Volume", OutputProcessor::Unit::m3, WaterStorage( Item ).VolOverflow, "System", "Sum", WaterStorage( Item ).Name );
 					//     ResourceTypeKey='Water',  &
 					//     EndUseKey='WaterSystems', &
 					//     EndUseSubkey=WaterStorage(item)%QualitySubCategoryName ,&
 					//     GroupKey='System')
 				} else {
-					SetupOutputVariable( "Water System Storage Tank Overflow Water Volume [m3]", WaterStorage( Item ).VolOverflow, "System", "Sum", WaterStorage( Item ).Name );
+					SetupOutputVariable( "Water System Storage Tank Overflow Water Volume", OutputProcessor::Unit::m3, WaterStorage( Item ).VolOverflow, "System", "Sum", WaterStorage( Item ).Name );
 
 				}
-				SetupOutputVariable( "Water System Storage Tank Overflow Temperature [C]", WaterStorage( Item ).TwaterOverflow, "System", "Average", WaterStorage( Item ).Name );
+				SetupOutputVariable( "Water System Storage Tank Overflow Temperature", OutputProcessor::Unit::C, WaterStorage( Item ).TwaterOverflow, "System", "Average", WaterStorage( Item ).Name );
 
 			}
 
 			if ( NumSiteRainFall == 1 ) { // CurrentModuleObject='Site:Precipitation'
-				SetupOutputVariable( "Site Precipitation Rate [m/s]", RainFall.CurrentRate, "System", "Average", "Site:Precipitation" );
-				SetupOutputVariable( "Site Precipitation Depth [m]", RainFall.CurrentAmount, "System", "Sum", "Site:Precipitation" );
+				SetupOutputVariable( "Site Precipitation Rate", OutputProcessor::Unit::m_s, RainFall.CurrentRate, "System", "Average", "Site:Precipitation" );
+				SetupOutputVariable( "Site Precipitation Depth", OutputProcessor::Unit::m, RainFall.CurrentAmount, "System", "Sum", "Site:Precipitation" );
 			}
 
 			if ( NumIrrigation == 1 ) { // CurrentModuleObject='RoofIrrigation'
-				SetupOutputVariable( "Water System Roof Irrigation Scheduled Depth [m]", Irrigation.ScheduledAmount, "System", "Sum", "RoofIrrigation" );
-				SetupOutputVariable( "Water System Roof Irrigation Actual Depth [m]", Irrigation.ActualAmount, "System", "Sum", "RoofIrrigation" );
+				SetupOutputVariable( "Water System Roof Irrigation Scheduled Depth", OutputProcessor::Unit::m, Irrigation.ScheduledAmount, "System", "Sum", "RoofIrrigation" );
+				SetupOutputVariable( "Water System Roof Irrigation Actual Depth", OutputProcessor::Unit::m, Irrigation.ActualAmount, "System", "Sum", "RoofIrrigation" );
 			}
 
 			for ( Item = 1; Item <= NumRainCollectors; ++Item ) { // CurrentModuleObject='WaterUse:RainCollector'
-				SetupOutputVariable( "Water System Rainwater Collector Volume Flow Rate [m3/s]", RainCollector( Item ).VdotAvail, "System", "Average", RainCollector( Item ).Name );
-				SetupOutputVariable( "Water System Rainwater Collector Volume [m3]", RainCollector( Item ).VolCollected, "System", "Sum", RainCollector( Item ).Name, _, "OnSiteWater", "Rainwater", _, "System" );
+				SetupOutputVariable( "Water System Rainwater Collector Volume Flow Rate", OutputProcessor::Unit::m3_s, RainCollector( Item ).VdotAvail, "System", "Average", RainCollector( Item ).Name );
+				SetupOutputVariable( "Water System Rainwater Collector Volume", OutputProcessor::Unit::m3, RainCollector( Item ).VolCollected, "System", "Sum", RainCollector( Item ).Name, _, "OnSiteWater", "Rainwater", _, "System" );
 
 			}
 
 			for ( Item = 1; Item <= NumGroundWaterWells; ++Item ) { // CurrentModuleObject='WaterUse:Well'
-				SetupOutputVariable( "Water System Groundwater Well Requested Volume Flow Rate [m3/s]", GroundwaterWell( Item ).VdotRequest, "System", "Average", GroundwaterWell( Item ).Name );
-				SetupOutputVariable( "Water System Groundwater Well Volume Flow Rate [m3/s]", GroundwaterWell( Item ).VdotDelivered, "System", "Average", GroundwaterWell( Item ).Name );
-				SetupOutputVariable( "Water System Groundwater Well Volume [m3]", GroundwaterWell( Item ).VolDelivered, "System", "Sum", GroundwaterWell( Item ).Name, _, "OnSiteWater", "Wellwater", _, "System" );
-				SetupOutputVariable( "Water System Groundwater Well Pump Electric Power [W]", GroundwaterWell( Item ).PumpPower, "System", "Average", GroundwaterWell( Item ).Name );
-				SetupOutputVariable( "Water System Groundwater Well Pump Electric Energy [J]", GroundwaterWell( Item ).PumpEnergy, "System", "Sum", GroundwaterWell( Item ).Name, _, "Electricity", "WaterSystems", _, "System" );
+				SetupOutputVariable( "Water System Groundwater Well Requested Volume Flow Rate", OutputProcessor::Unit::m3_s, GroundwaterWell( Item ).VdotRequest, "System", "Average", GroundwaterWell( Item ).Name );
+				SetupOutputVariable( "Water System Groundwater Well Volume Flow Rate", OutputProcessor::Unit::m3_s, GroundwaterWell( Item ).VdotDelivered, "System", "Average", GroundwaterWell( Item ).Name );
+				SetupOutputVariable( "Water System Groundwater Well Volume", OutputProcessor::Unit::m3, GroundwaterWell( Item ).VolDelivered, "System", "Sum", GroundwaterWell( Item ).Name, _, "OnSiteWater", "Wellwater", _, "System" );
+				SetupOutputVariable( "Water System Groundwater Well Pump Electric Power", OutputProcessor::Unit::W, GroundwaterWell( Item ).PumpPower, "System", "Average", GroundwaterWell( Item ).Name );
+				SetupOutputVariable( "Water System Groundwater Well Pump Electric Energy", OutputProcessor::Unit::J, GroundwaterWell( Item ).PumpEnergy, "System", "Sum", GroundwaterWell( Item ).Name, _, "Electricity", "WaterSystems", _, "System" );
 
 			}
 

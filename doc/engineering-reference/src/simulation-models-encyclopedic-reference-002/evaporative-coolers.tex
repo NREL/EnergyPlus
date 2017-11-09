@@ -442,7 +442,7 @@ Algorithm to determine cooler operation proceeds as follows
 
 INSERT TABLE
 
-``Modulated'' cases solve for a secondary flow rate using numerical method, such as regula falsi. Residual is formulated by a difference between the dry bulb temperature leaving the cooler and the setpoint. As the solver progress it varies flow rate on the secondary side until the setpoint is met. For each iteration, a new effectiveness is calculated as a function of Flow Ratio. The new flow is used for the \(\left(\dot{m}c_{p}\right)_{min}\) term and the new effectiveness is used to calculate a result for leaving drybulb. The numerical method is the same for dry and wet operation, only the functions will use different curves and state variables to describe performance. The regula falsi solver can vary secondary flow rate, \(\dot{V}_{sec}\) , to drive the following residual to zero:
+``Modulated'' cases solve for a secondary flow rate using numerical method, such as root solver. Residual is formulated by a difference between the dry bulb temperature leaving the cooler and the setpoint. As the solver progress it varies flow rate on the secondary side until the setpoint is met. For each iteration, a new effectiveness is calculated as a function of Flow Ratio. The new flow is used for the \(\left(\dot{m}c_{p}\right)_{min}\) term and the new effectiveness is used to calculate a result for leaving drybulb. The numerical method is the same for dry and wet operation, only the functions will use different curves and state variables to describe performance. The root solver solver can vary secondary flow rate, \(\dot{V}_{sec}\) , to drive the following residual to zero:
 
 \begin{equation}
 \text{residual} = T_{db,out,sys} - T_{db,out,setpoint}

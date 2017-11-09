@@ -3,13 +3,13 @@
 
 // System Environment Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -23,19 +23,43 @@ namespace ObjexxFCL {
 
 // Get Environment Variable
 void
-get_environment_variable( std::string const & name, Optional< std::string > value = _, Optional< int > length = _, Optional< int > status = _, Optional< bool const > trim_name = _ );
+GET_ENVIRONMENT_VARIABLE(
+ std::string const & name,
+ Optional< std::string > value = _,
+ Optional< int > length = _,
+ Optional< int > status = _,
+ Optional< bool const > trim_name = _
+);
 
-// Get Environment Variable Value
-std::string
-get_env_var( std::string const & name );
+// Get Environment Variable
+void
+get_environment_variable(
+ std::string const & name,
+ Optional< std::string > value = _,
+ Optional< int > length = _,
+ Optional< int > status = _,
+ Optional< bool const > trim_name = _
+);
 
-// Get Environment Variable Value
+// Get Environment Variable
+void
+GETENV( std::string const & name, std::string & value );
+
+// Get Environment Variable
 std::string::size_type
-getenvqq( std::string const & name, std::string & value );
+GETENVQQ( std::string const & name, std::string & value );
 
-// Set Environment Variable Value
+// Get Environment Variable
+std::string
+GET_ENV_VAR( std::string const & name );
+
+// Set Environment Variable
 bool
-setenvqq( std::string const & name_eq_value );
+SETENV( std::string const & name, std::string const & value );
+
+// Set Environment Variable
+bool
+SETENVQQ( std::string const & name_eq_value );
 
 } // ObjexxFCL
 

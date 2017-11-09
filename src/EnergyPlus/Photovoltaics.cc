@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -433,6 +422,7 @@ namespace Photovoltaics {
 					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Surface is not exposed to solar, check surface bounday condition" );
 				}
+				PVarray( PVnum ).Zone = GetPVZone( PVarray( PVnum ).SurfacePtr );
 
 				// check surface orientation, warn if upside down
 				if ( ( Surface( SurfNum ).Tilt < -95.0 ) || ( Surface( SurfNum ).Tilt > 95.0 ) ) {
@@ -726,15 +716,15 @@ namespace Photovoltaics {
 			}}
 
 			//set up report variables CurrentModuleObject='Photovoltaics'
-			SetupOutputVariable( "Generator Produced DC Electric Power [W]", PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
-			SetupOutputVariable( "Generator Produced DC Electric Energy [J]", PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
-			SetupOutputVariable( "Generator PV Array Efficiency []", PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Power", OutputProcessor::Unit::W, PVarray( PVnum ).Report.DCPower, "System", "Average", PVarray( PVnum ).Name );
+			SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, PVarray( PVnum ).Report.DCEnergy, "System", "Sum", PVarray( PVnum ).Name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
+			SetupOutputVariable( "Generator PV Array Efficiency", OutputProcessor::Unit::None, PVarray( PVnum ).Report.ArrayEfficiency, "System", "Average", PVarray( PVnum ).Name );
 
 			// CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
 			if ( ( PVarray( PVnum ).PVModelType == iTRNSYSPVModel ) || ( PVarray( PVnum ).PVModelType == iSandiaPVModel ) ) {
-				SetupOutputVariable( "Generator PV Cell Temperature [C]", PVarray( PVnum ).Report.CellTemp, "System", "Average", PVarray( PVnum ).Name );
-				SetupOutputVariable( "Generator PV Short Circuit Current [A]", PVarray( PVnum ).Report.ArrayIsc, "System", "Average", PVarray( PVnum ).Name );
-				SetupOutputVariable( "Generator PV Open Circuit Voltage [V]", PVarray( PVnum ).Report.ArrayVoc, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Cell Temperature", OutputProcessor::Unit::C, PVarray( PVnum ).Report.CellTemp, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Short Circuit Current", OutputProcessor::Unit::A, PVarray( PVnum ).Report.ArrayIsc, "System", "Average", PVarray( PVnum ).Name );
+				SetupOutputVariable( "Generator PV Open Circuit Voltage", OutputProcessor::Unit::V, PVarray( PVnum ).Report.ArrayVoc, "System", "Average", PVarray( PVnum ).Name );
 			}
 
 			// do some checks and setup
@@ -769,6 +759,34 @@ namespace Photovoltaics {
 
 	}
 
+	int
+	GetPVZone( int const SurfNum )
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   Sept 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// Get the zone number for this PV array for use when zone multipliers are applied
+
+		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
+		using DataSurfaces::Surface;
+		using InputProcessor::FindItemInList;
+		
+		int GetPVZone( 0 );
+		
+		if ( SurfNum > 0 ) {
+			GetPVZone = Surface( SurfNum ).Zone;
+				if ( GetPVZone == 0 ) { // might need to get the zone number from the name
+					GetPVZone = FindItemInList( Surface( SurfNum ).ZoneName, Zone, NumOfZones );
+				}
+		}
+		
+		return GetPVZone;
+		
+	}
+	
 	// **************************************
 
 	void
@@ -868,47 +886,28 @@ namespace Photovoltaics {
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Jan. 2004
 		//       MODIFIED       B. Griffith, Aug. 2008
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// collect statements that assign to variables tied to output variables
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
 		using DataSurfaces::Surface;
 		using DataHeatBalFanSys::QPVSysSource;
 		using TranspiredCollector::SetUTSCQdotSource;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		using InputProcessor::FindItemInList;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int thisZone; // working index for zones
 
 		PVarray( PVnum ).Report.DCEnergy = PVarray( PVnum ).Report.DCPower * ( TimeStepSys * SecInHour );
-
+		
 		// add check for multiplier.  if surface is attached to a zone that is on a multiplier
 		// then PV production should be multiplied out as well
 
-		if ( Surface( PVarray( PVnum ).SurfacePtr ).Zone != 0 ) { // might need to apply multiplier
-			thisZone = Surface( PVarray( PVnum ).SurfacePtr ).Zone;
+		thisZone = PVarray( PVnum ).Zone;
+		if ( thisZone != 0 ) { // might need to apply multiplier
 			PVarray( PVnum ).Report.DCEnergy *= ( Zone( thisZone ).Multiplier * Zone( thisZone ).ListMultiplier );
 			PVarray( PVnum ).Report.DCPower *= ( Zone( thisZone ).Multiplier * Zone( thisZone ).ListMultiplier );
 		}

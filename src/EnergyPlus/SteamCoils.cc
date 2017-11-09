@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -73,6 +62,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -435,12 +425,12 @@ namespace SteamCoils {
 
 			//Setup the Simple Heating Coil reporting variables
 			//CurrentModuleObject = "Coil:Heating:Steam"
-			SetupOutputVariable( "Heating Coil Heating Energy [J]", SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Heating Rate [W]", SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate [Kg/s]", SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Inlet Temperature [C]", SteamCoil( CoilNum ).InletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Outlet Temperature [C]", SteamCoil( CoilNum ).OutletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Trap Loss Rate [W]", SteamCoil( CoilNum ).LoopLoss, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Inlet Temperature", OutputProcessor::Unit::C, SteamCoil( CoilNum ).InletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Outlet Temperature", OutputProcessor::Unit::C, SteamCoil( CoilNum ).OutletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Trap Loss Rate", OutputProcessor::Unit::W, SteamCoil( CoilNum ).LoopLoss, "System", "Average", SteamCoil( CoilNum ).Name );
 
 		}
 
@@ -835,7 +825,11 @@ namespace SteamCoils {
 				if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
 					// if coil is part of a terminal unit just use the terminal unit value
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
-						SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurZoneEqNum ).MaxSTVolFlow;
+						if ( CurTermUnitSizingNum > 0 ) {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurTermUnitSizingNum ).MaxSTVolFlow;
+						} else {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = 0.0;
+						}
 						// if coil is part of a zonal unit, calc coil load to get hot Steam flow rate
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
@@ -908,7 +902,8 @@ namespace SteamCoils {
 		// SUBROUTINE INFORMATION:
 		//   AUTHOR         Rahul Chillar
 		//   DATE WRITTEN   Jan 2005
-		//   MODIFIED       Sept. 2012, B. Griffith, add calls to SetComponentFlowRate for plant interactions
+		//   MODIFIED       Sep. 2012, B. Griffith, add calls to SetComponentFlowRate for plant interactions
+		//                  Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset fault model
 		//   RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -925,7 +920,11 @@ namespace SteamCoils {
 		// na
 
 		// Using/Aliasing
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::TempControlTol;
+		using FaultsManager::FaultsCoilSATSensor;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -976,6 +975,15 @@ namespace SteamCoils {
 		SubcoolDeltaTemp = SteamCoil( CoilNum ).DegOfSubcooling;
 		TempSetPoint = SteamCoil( CoilNum ).DesiredOutletTemp;
 
+		//If there is a fault of coil SAT Sensor (zrp_Jul2016)
+		if( SteamCoil( CoilNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			//calculate the sensor offset using fault information
+			int FaultIndex = SteamCoil( CoilNum ).FaultyCoilSATIndex;
+			SteamCoil( CoilNum ).FaultyCoilSATOffset = FaultsCoilSATSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempSetPoint
+			TempSetPoint -= SteamCoil( CoilNum ).FaultyCoilSATOffset;
+		}
+		
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {

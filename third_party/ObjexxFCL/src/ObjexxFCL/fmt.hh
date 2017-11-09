@@ -3,13 +3,13 @@
 
 // Fortran-Compatible Formatted Input/Output Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -44,8 +44,6 @@ class ubyte;
 namespace fmt {
 
 // Types
-typedef  char       *    cstring;
-typedef  char const *  c_cstring;
 typedef  std::size_t  Size;
 
 // Constants
@@ -147,7 +145,7 @@ A( std::string const & s, Size const w = 0ul );
 // cstring
 inline
 std::string
-A( c_cstring const s, Size const w = 0ul )
+A( char const * const s, Size const w = 0ul )
 {
 	return A( std::string( s ), w );
 }
@@ -416,7 +414,7 @@ G( std::string const & s, Size const w = TraitsG< std::string >::w, Size const =
 // General: cstring Specialization
 inline
 std::string
-G( c_cstring const s, Size const w = TraitsG< c_cstring >::w, Size const = 0ul, Size const = 0ul, int const = 0 )
+G( char const * const s, Size const w = TraitsG< char const * >::w, Size const = 0ul, Size const = 0ul, int const = 0 )
 {
 	return A( s, w );
 }
@@ -572,7 +570,7 @@ LD( char const c )
 // List-Directed: string Specialization
 inline
 std::string
-LD( c_cstring const s )
+LD( char const * const s )
 {
 	return std::string( s );
 }

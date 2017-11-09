@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -1786,7 +1775,7 @@ namespace FluidProperties {
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", invalid field" );
 				ShowContinueError( "..." + cAlphaFieldNames( 2 ) + "=\"" + Alphas( 2 ) + "\"." );
-				ShowContinueError( "... Legal values are PropoleneGlycol, EthyleneGlycol or UserDefinedGlycolType." );
+				ShowContinueError( "... Legal values are PropyleneGlycol, EthyleneGlycol or UserDefinedGlycolType." );
 				ErrorsFound = true;
 			}
 			if ( ! GlycolFound ) continue;
@@ -4503,14 +4492,14 @@ namespace FluidProperties {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Performs iterations to calculate the refrigerant temperature corresponding to the given 
+		// Performs iterations to calculate the refrigerant temperature corresponding to the given
 		// enthalpy and pressure.  Works only in superheated region.
 
 		// METHODOLOGY EMPLOYED:
 		// Perform iterations to identify the temperature by calling GetSupHeatEnthalpyRefrig.
 
 		// USE STATEMENTS:
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Return value
 		Real64 ReturnValue;
@@ -4527,7 +4516,7 @@ namespace FluidProperties {
 		Real64 RefTHigh; // High Temperature Value for Ps (max in tables)
 		Real64 RefTSat; // Saturated temperature of the refrigerant. Used to check whether the refrigernat is in the superheat area
 		Real64 Temp; // Temperature of the superheated refrigerant at the given enthalpy and pressure
-		
+
 		if ( GetInput ) {
 			GetFluidPropertiesData();
 			GetInput = false;
@@ -4555,7 +4544,7 @@ namespace FluidProperties {
 		// check temperature data range and attempt to cap if necessary
 		RefTHigh = refrig.PsHighTempValue;
 		RefTSat = GetSatTemperatureRefrig( Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
-		
+
 		if ( TempLow < RefTSat ) {
 			ShowWarningMessage( RoutineName + "Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] temperature lower bound is out of range for superheated refrigerant: values capped **" );
 			ShowContinueError( " Called From:" + CalledFrom );
@@ -4575,7 +4564,7 @@ namespace FluidProperties {
 			TempLow = RefTSat;
 			TempUp = RefTHigh;
 		}
-		
+
 		// check enthalpy data range and attempt to cap if necessary
 		EnthalpyLow = GetSupHeatEnthalpyRefrig( Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
 		EnthalpyHigh = GetSupHeatEnthalpyRefrig( Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom );
@@ -4587,30 +4576,30 @@ namespace FluidProperties {
 			ReturnValue = TempUp;
 			return ReturnValue;
 		}
-		
+
 		//Perform iterations to obtain the temperature level
 		{
 			Array1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
 			Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
 			int const MaxIte( 500 ); // maximum number of iterations
 			int SolFla; // Flag of RegulaFalsi solver
-			
+
 			Par( 1 ) = RefrigNum;
 			Par( 2 ) = Enthalpy;
 			Par( 3 ) = Pressure;
-			
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
+
+			SolveRoot( ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par );
 			ReturnValue = Temp;
 		}
 
 		return ReturnValue;
 
 	}
-	
+
 	Real64
 	GetSupHeatTempRefrigResidual(
 		Real64 const Temp, // temperature of the refrigerant
-		Array1< Real64 > const & Par 
+		Array1< Real64 > const & Par
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -4621,7 +4610,7 @@ namespace FluidProperties {
 
 		// PURPOSE OF THIS FUNCTION:
 		//  Calculates residual function (( Enthalpy_Actual - Enthalpy_Req ) / Enthalpy_Req )
-		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given 
+		//  This method is designed to support , which calculates the refrigerant temperature corresponding to the given
 		//  enthalpy and pressure in superheated region.
 
 		// REFERENCES:
@@ -4654,23 +4643,23 @@ namespace FluidProperties {
 		static std::string const RoutineNameNoSpace( "GetSupHeatTempRefrigResidual" );
 		std::string Refrigerant; // carries in substance name
 		int RefrigNum; // index for refrigerant under consideration
-		Real64 Pressure; // pressure of the refrigerant 
+		Real64 Pressure; // pressure of the refrigerant
 		Real64 Enthalpy_Req; // enthalpy of the refrigerant to meet
 		Real64 Enthalpy_Act; // enthalpy of the refrigerant calculated
-		
+
 		RefrigNum = int( Par( 1 ) );
 		Enthalpy_Req = Par( 2 );
 		Pressure = Par( 3 );
 		Refrigerant = RefrigErrorTracking( RefrigNum ).Name;
 		if ( std::abs( Enthalpy_Req ) < 100.0 ) Enthalpy_Req = sign( 100.0, Enthalpy_Req );
-		
+
 		Enthalpy_Act = GetSupHeatEnthalpyRefrig( Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
-		
+
 		TempResidual = ( Enthalpy_Act - Enthalpy_Req ) / Enthalpy_Req;
 
 		return TempResidual;
 	}
-	
+
 	//*****************************************************************************
 
 	Real64

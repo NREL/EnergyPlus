@@ -53,7 +53,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     FHX House,               !- Name
@@ -175,7 +175,7 @@
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0,                     !- Outdoor Air Flow per Zone {m3/s}
     0.0,                     !- Outdoor Air Flow Air Changes per Hour {1/hr}
-    ;                        !- Outdoor Air Flow Rate Fraction Schedule Name
+    ;                        !- Outdoor Air Schedule Name
 
   Sizing:Zone,
     Basement,                !- Zone or ZoneList Name
@@ -1058,7 +1058,9 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    SequentialLoad;          !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
+    ,                        !- Pressure Simulation Type
+    20;                      !- Loop Circulation Time {minutes}
 
   SetpointManager:Scheduled,
     Main Loop Setpoint Manager,  !- Name

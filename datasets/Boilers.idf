@@ -14,8 +14,12 @@
 ! Normalized boiler efficiency coefficiencts derived from two boilers;
 ! One with 40C supply, 30C return and one with 75C supply, 60C return
 ! Use curve below for a condensing boiler having a nominal thermal efficiency of 0.89.
+! For the curve below, specify EnteringBoiler for the Efficiency Curve Temperature Evaluation Variable
 !
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    8.8;                    !- Version Identifier
 
   Curve:Biquadratic,
     CondensingBoilerEff,     !- Name
@@ -35,6 +39,7 @@
 ! Normalized boiler efficiency coefficients derived from multiple boilers with
 ! different operating temperatures.
 ! Use the curve below for a non-condensing boiler having a nominal thermal efficiency of 0.80.
+! For the curve below, specify LeavingBoiler for the Efficiency Curve Temperature Evaluation Variable
 !
 
   Curve:Bicubic,

@@ -3,13 +3,13 @@
 
 // Cstring: C String Wrapper
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -26,10 +26,6 @@
 #include <utility>
 
 namespace ObjexxFCL {
-
-// Types
-typedef  char       *    cstring;
-typedef  char const *  c_cstring;
 
 // Cstring: C String Wrapper
 //
@@ -74,7 +70,7 @@ public: // Creation
 	}
 
 	// C string Constructor: Implicit Conversion
-	Cstring( c_cstring const s ) :
+	Cstring( char const * const s ) :
 	 str_( new char[ std::strlen( s ) + 1 ] )
 	{
 		std::memcpy( str_, s, std::strlen( s ) + 1 );
@@ -104,7 +100,7 @@ public: // Creation
 
 	// C string + Length Constructor
 	Cstring(
-	 c_cstring const s,
+	 char const * const s,
 	 size_type const len
 	) :
 	 str_( new char[ len + 1 ] )
@@ -163,13 +159,13 @@ public: // Creation
 public: // Conversion
 
 	// C string Conversion
-	operator c_cstring() const
+	operator char const *() const
 	{
 		return str_;
 	}
 
 	// C string Conversion
-	operator cstring &()
+	operator char *()
 	{
 		return str_;
 	}
@@ -201,7 +197,7 @@ public: // Assignment
 
 	// cstring Assignment
 	Cstring &
-	operator =( c_cstring const s )
+	operator =( char const * const s )
 	{
 		size_type const len( std::strlen( s ) + 1 );
 		delete[] str_; str_ = new char[ len ];
@@ -240,7 +236,7 @@ public: // Assignment
 
 	// cstring Append
 	Cstring &
-	operator +=( c_cstring const s )
+	operator +=( char const * const s )
 	{
 		Cstring( *this + s ).swap( *this );
 		return *this;
@@ -291,7 +287,7 @@ public: // Predicate
 
 	// Has any Character of a cstring?
 	bool
-	has_any_of( c_cstring const s ) const;
+	has_any_of( char const * const s ) const;
 
 	// Has any Character of a std::string?
 	bool
@@ -356,11 +352,11 @@ public: // Modifier
 
 	// Left Justify
 	Cstring &
-	left_justify();
+	ljustify();
 
 	// Right Justify
 	Cstring &
-	right_justify();
+	rjustify();
 
 	// Trim Trailing Space
 	Cstring &
@@ -457,7 +453,7 @@ public: // Concatenation
 	// Cstring + cstring
 	friend
 	Cstring
-	operator +( Cstring const & s, c_cstring const t )
+	operator +( Cstring const & s, char const * const t )
 	{
 		size_type const s_len( s.length() );
 		size_type const t_len( std::strlen( t ) );
@@ -470,7 +466,7 @@ public: // Concatenation
 	// cstring + Cstring
 	friend
 	Cstring
-	operator +( c_cstring const s, Cstring const & t )
+	operator +( char const * const s, Cstring const & t )
 	{
 		size_type const s_len( std::strlen( s ) );
 		size_type const t_len( t.length() );
@@ -535,16 +531,16 @@ public: // Generator
 
 	// Left-Justified Copy
 	Cstring
-	left_justified() const
+	ljustified() const
 	{
-		return Cstring( *this ).left_justify();
+		return Cstring( *this ).ljustify();
 	}
 
 	// Right-Justified Copy
 	Cstring
-	right_justified() const
+	rjustified() const
 	{
-		return Cstring( *this ).right_justify();
+		return Cstring( *this ).rjustify();
 	}
 
 	// Space-Trimmed Copy
@@ -596,7 +592,7 @@ public: // Comparison
 	// Cstring == cstring
 	friend
 	bool
-	operator ==( Cstring const & s, c_cstring const t )
+	operator ==( Cstring const & s, char const * const t )
 	{
 		return ( std::strcmp( s.str_, t ) == 0 );
 	}
@@ -604,7 +600,7 @@ public: // Comparison
 	// cstring == Cstring
 	friend
 	bool
-	operator ==( c_cstring const t, Cstring const & s )
+	operator ==( char const * const t, Cstring const & s )
 	{
 		return ( std::strcmp( s.str_, t ) == 0 );
 	}
@@ -612,7 +608,7 @@ public: // Comparison
 	// Cstring != cstring
 	friend
 	bool
-	operator !=( Cstring const & s, c_cstring const t )
+	operator !=( Cstring const & s, char const * const t )
 	{
 		return ( std::strcmp( s.str_, t ) != 0 );
 	}
@@ -620,7 +616,7 @@ public: // Comparison
 	// cstring != Cstring
 	friend
 	bool
-	operator !=( c_cstring const t, Cstring const & s )
+	operator !=( char const * const t, Cstring const & s )
 	{
 		return ( std::strcmp( s.str_, t ) != 0 );
 	}
@@ -697,12 +693,12 @@ public: // Comparison
 	// Cstring == cstring Case-Insensitively?
 	friend
 	bool
-	equali( Cstring const & s, c_cstring const t );
+	equali( Cstring const & s, char const * const t );
 
 	// cstring == Cstring Case-Insensitively?
 	friend
 	bool
-	equali( c_cstring const s, Cstring const & t );
+	equali( char const * const s, Cstring const & t );
 
 	// Cstring == std::string Case-Insensitively?
 	friend
@@ -756,11 +752,11 @@ operator +( Cstring const & s, Cstring const & t );
 
 // Cstring + cstring
 Cstring
-operator +( Cstring const & s, c_cstring const t );
+operator +( Cstring const & s, char const * const t );
 
 // cstring + Cstring
 Cstring
-operator +( c_cstring const s, Cstring const & t );
+operator +( char const * const s, Cstring const & t );
 
 // Cstring + std::string
 Cstring
@@ -784,19 +780,19 @@ operator !=( Cstring const & s, Cstring const & t );
 
 // Cstring == cstring
 bool
-operator ==( Cstring const & s, c_cstring const t );
+operator ==( Cstring const & s, char const * const t );
 
 // cstring == Cstring
 bool
-operator ==( c_cstring const t, Cstring const & s );
+operator ==( char const * const t, Cstring const & s );
 
 // Cstring != cstring
 bool
-operator !=( Cstring const & s, c_cstring const t );
+operator !=( Cstring const & s, char const * const t );
 
 // cstring != Cstring
 bool
-operator !=( c_cstring const t, Cstring const & s );
+operator !=( char const * const t, Cstring const & s );
 
 // Cstring == std::string
 bool
@@ -836,11 +832,11 @@ equali( Cstring const & s, Cstring const & t );
 
 // Cstring == cstring Case-Insensitively?
 bool
-equali( Cstring const & s, c_cstring const t );
+equali( Cstring const & s, char const * const t );
 
 // cstring == Cstring Case-Insensitively?
 bool
-equali( c_cstring const s, Cstring const & t );
+equali( char const * const s, Cstring const & t );
 
 // Cstring == std::string Case-Insensitively?
 bool

@@ -23,7 +23,7 @@
 
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
-  Version,8.6;
+  Version,8.8;
 
   Building,
     Test Harness for MicroCogen,  !- Name
@@ -226,6 +226,7 @@
     ,                        !- Availability Schedule Name
     Garage inlet,            !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.009,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -870,7 +871,7 @@
 
   Output:Variable,*,Generator Fuel Cell Model Iteration Count,timestep;
 
-  Output:Variable,*,Generator Regula Falsi Iteration Count,timestep;
+  Output:Variable,*,Generator Root Solver Iteration Count,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 

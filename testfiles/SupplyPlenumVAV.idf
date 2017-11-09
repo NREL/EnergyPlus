@@ -16,7 +16,7 @@
 !           chillers and purchased cooling.  Priority based controls determine which piece of equipment
 !           tries to meet the load.
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,6;
 
@@ -933,10 +933,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    12.19200,6.096000,0.500000,  !- X,Y,Z ==> Vertex 1 {m}
-    12.19200,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,0.000000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,0.000000,0.500000;  !- X,Y,Z ==> Vertex 4 {m}
+    12.19200,0.000000,0.500000,  !- X,Y,Z ==> Vertex 1 {m}
+    12.19200,0.000000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19200,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    12.19200,6.096000,0.500000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn004:Wall003,           !- Name
@@ -949,10 +949,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.144000,6.096000,0.500000,  !- X,Y,Z ==> Vertex 1 {m}
-    9.144000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,6.096000,0.500000;  !- X,Y,Z ==> Vertex 4 {m}
+    12.19200,6.096000,0.500000,  !- X,Y,Z ==> Vertex 1 {m}
+    12.19200,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    9.144000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    9.144000,6.096000,0.500000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn004:Wall004,           !- Name
@@ -981,10 +981,10 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000000E+00,12.19200,0.500000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.0000000E+00,12.19200,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    9.144000,12.19200,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    9.144000,12.19200,0.500000;  !- X,Y,Z ==> Vertex 4 {m}
+    9.144000,12.19200,0.500000,  !- X,Y,Z ==> Vertex 1 {m}
+    9.144000,12.19200,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000000E+00,12.19200,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000000E+00,12.19200,0.500000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn004:Wall006,           !- Name

@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -72,10 +61,12 @@
 #include <DXCoils.hh>
 #include <General.hh>
 #include <HeatRecovery.hh>
+#include <HVACControllers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
+#include <VariableSpeedCoils.hh>
 #include <WaterCoils.hh>
 
 namespace EnergyPlus {
@@ -301,23 +292,25 @@ namespace HVACHXAssistedCoolingCoil {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using BranchNodeConnections::SetUpCompSets;
+		using BranchNodeConnections::TestCompSet;
+		using DXCoils::GetDXCoilIndex;
+		using HeatRecovery::GetSupplyInletNode;
+		using HeatRecovery::GetSupplyOutletNode;
+		using HeatRecovery::GetSecondaryInletNode;
+		using HeatRecovery::GetSecondaryOutletNode;
+		using HVACControllers::GetControllerNameAndIndex;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::SetUpCompSets;
-		using BranchNodeConnections::TestCompSet;
+		using WaterCoils::GetCoilWaterInletNode;
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
 		auto & GetDXCoilOutletNode( DXCoils::GetCoilOutletNode );
-		using DXCoils::GetDXCoilIndex;
 		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
 		auto & GetWaterCoilOutletNode( WaterCoils::GetCoilOutletNode );
-		using HeatRecovery::GetSupplyInletNode;
-		using HeatRecovery::GetSupplyOutletNode;
-		using HeatRecovery::GetSecondaryInletNode;
-		using HeatRecovery::GetSecondaryOutletNode;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -349,8 +342,9 @@ namespace HVACHXAssistedCoolingCoil {
 		int SupplyAirOutletNode; // supply air outlet node number mined from heat exchanger object (ExchCond structure)
 		int SecondaryAirInletNode; // secondary air inlet node number mined from heat exchanger object (ExchCond structure)
 		int SecondaryAirOutletNode; // secondary air outlet node number mined from heat exchanger object (ExchCond structure)
-		int CoolingCoilInletNodeNum; // outlet node number of cooling coil, used for warning messages
-		int CoolingCoilOutletNodeNum; // outlet node number of cooling coil, used for warning messages
+		int CoolingCoilInletNodeNum; // air outlet node number of cooling coil, used for warning messages
+		int CoolingCoilWaterInletNodeNum; // water coil water inlet node number used to find controller index
+		int CoolingCoilOutletNodeNum; // air outlet node number of cooling coil, used for warning messages
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		Array1D_string AlphArray; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -428,6 +422,22 @@ namespace HVACHXAssistedCoolingCoil {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ErrorsFound = true;
 				}
+			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
+				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
+				CoolingCoilErrFlag = false;
+				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed( AlphArray( 4 ), AlphArray( 5 ), CoolingCoilErrFlag );
+
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ErrorsFound = true;
+				}
+				HXAssistedCoil( HXAssistedCoilNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ErrorsFound = true;
+				}
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				ShowContinueError( "Invalid " + cAlphaFields( 4 ) + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "\"" );
@@ -489,6 +499,36 @@ namespace HVACHXAssistedCoolingCoil {
 					ErrorsFound = true;
 				}
 
+			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+				//         Check node names in heat exchanger and coil objects for consistency
+				CoolingCoilErrFlag = false;
+				CoolingCoilInletNodeNum = VariableSpeedCoils::GetCoilInletNodeVariableSpeed( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				}
+				if ( SupplyAirOutletNode != CoolingCoilInletNodeNum ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
+					ShowContinueError( "The supply air outlet node name in heat exchanger = " + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil inlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"" );
+					ShowContinueError( "Heat exchanger supply air outlet node name=\"" + NodeID( SupplyAirOutletNode ) + "\"" );
+					ShowContinueError( "Cooling coil air inlet node name=\"" + NodeID( CoolingCoilInletNodeNum ) + "\"" );
+					ErrorsFound = true;
+				}
+				CoolingCoilErrFlag = false;
+				CoolingCoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				if ( CoolingCoilErrFlag ) {
+					ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+				}
+				if ( SecondaryAirInletNode != CoolingCoilOutletNodeNum ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
+					ShowContinueError( "Node names are inconsistent in heat exchanger and cooling coil object." );
+					ShowContinueError( "The secondary air inlet node name in heat exchanger =" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName + "\"" );
+					ShowContinueError( "must match the cooling coil air outlet node name in = " + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName + "\"." );
+					ShowContinueError( "Heat exchanger secondary air inlet node name =\"" + NodeID( SecondaryAirInletNode ) + "\"." );
+					ShowContinueError( "Cooling coil air outlet node name =\"" + NodeID( CoolingCoilOutletNodeNum ) + "\"." );
+					ErrorsFound = true;
+				}
 			}
 
 			TestCompSet( HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType, HXAssistedCoil( HXAssistedCoilNum ).Name, NodeID( SupplyAirInletNode ), NodeID( SecondaryAirOutletNode ), "Air Nodes" );
@@ -577,6 +617,8 @@ namespace HVACHXAssistedCoolingCoil {
 				//         Check node names in heat exchanger and coil objects for consistency
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = GetWaterCoilInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				GetControllerNameAndIndex( CoolingCoilWaterInletNodeNum, HXAssistedCoil( HXAssistedCoilNum ).ControllerName, HXAssistedCoil( HXAssistedCoilNum ).ControllerIndex, CoolingCoilErrFlag );
 				if ( CoolingCoilErrFlag ) ShowContinueError( "...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				if ( SupplyAirOutletNode != CoolingCoilInletNodeNum ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
@@ -683,6 +725,9 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 			DXCoilFullLoadOutAirTemp( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 			DXCoilFullLoadOutAirHumRat( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
+		} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+			// 
+		
 		}
 
 	}
@@ -744,11 +789,13 @@ namespace HVACHXAssistedCoolingCoil {
 		static Real64 CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
 		Real64 AirMassFlow; // Inlet air mass flow rate
 		Real64 Error; // Error (exiting coil temp from last iteration minus current coil exiting temp)
+		Real64 ErrorLast; // check for oscillations
 		int Iter; // Number of iterations
 		int CompanionCoilIndexNum; // Index to DX coil
 
 		AirMassFlow = HXAssistedCoil( HXAssistedCoilNum ).MassFlowRate;
 		Error = 1.0; // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)
+		ErrorLast = Error; // initialize variable used to test loop termination
 		Iter = 0; // Initialize iteration counter to zero
 
 		if ( FirstHVACIteration ) CoilOutputTempLast = -99.0; // Initialize coil output temp
@@ -756,7 +803,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
 		Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).MassFlowRate = AirMassFlow;
 
-		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
+		if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 			CompanionCoilIndexNum = HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex;
 		} else {
 			CompanionCoilIndexNum = 0;
@@ -776,15 +823,27 @@ namespace HVACHXAssistedCoolingCoil {
 		// Force at least 2 iterations to pass outlet node information
 		while ( ( std::abs( Error ) > 0.0005 && Iter <= MaxIter ) || Iter < 2 ) {
 
-			SimHeatRecovery( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerIndex, FanOpMode, PartLoadRatio, HXUnitOn, CompanionCoilIndexNum, _, EconomizerFlag );
+			SimHeatRecovery( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerIndex, FanOpMode, PartLoadRatio, HXUnitOn, CompanionCoilIndexNum, _, EconomizerFlag, _, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num );
 
 			if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ) {
 				SimDXCoil( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CompOp, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, FanOpMode, PartLoadRatio, OnOffAirFlow );
+			} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+				Real64 QZnReq( -1.0 ); // Zone load (W), input to variable-speed DX coil
+				Real64 QLatReq( 0.0 ); // Zone latent load, input to variable-speed DX coil
+				Real64 MaxONOFFCyclesperHour( 4.0 ); // Maximum cycling rate of heat pump [cycles/hr]
+				Real64 HPTimeConstant( 0.0 ); // Heat pump time constant [s]
+				Real64 FanDelayTime( 0.0 ); // Fan delay time, time delay for the HP's fan to
+				Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
+				VariableSpeedCoils::SimVariableSpeedCoils( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex, CompOp, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadRatio, HXAssistedCoil( HXAssistedCoilNum ).DXCoilNumOfSpeeds, QZnReq, QLatReq, OnOffAirFlowRatio ); // call vs coil model at top speed.
 			} else {
 				SimulateWaterCoilComponents( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, FirstHVACIteration, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex );
 			}
 
 			Error = CoilOutputTempLast - Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).Temp;
+			if ( Iter > 40 ) { // check for oscillation (one of these being negative and one positive) before hitting max iteration limit
+				if ( Error + ErrorLast < 0.000001 ) Error = 0.0; // result bounced back and forth with same positive and negative result, no possible solution without this check
+			}
+			ErrorLast = Error;
 			CoilOutputTempLast = Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).Temp;
 			++Iter;
 
@@ -1023,7 +1082,12 @@ namespace HVACHXAssistedCoolingCoil {
 		if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 			if ( WhichCoil != 0 ) {
 				// coil does not have capacity in input so mine information from DX cooling coil
-				CoilCapacity = GetDXCoilCapacity( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, errFlag );
+
+				if ( HXAssistedCoil( WhichCoil ).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) {
+					CoilCapacity = GetDXCoilCapacity( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, errFlag );
+				} else if ( HXAssistedCoil( WhichCoil ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
+					CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, errFlag );
+				}
 				if ( errFlag ) {
 					ShowRecurringWarningErrorAtEnd( "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount );
 				}

@@ -241,6 +241,11 @@ This field is optional and is used to provide control over the logic used by the
 
 This field is optional and is used to provide a schedule with alternate setpoints for use with the IndirectHeatAlternateSetpoint mode in the previous field.~ The input field should contain a reference to a schedule object specifying the hot water temperature setpoint {[}°C{]} to use as the ``cut-out'' temperature for control logic at the source side.
 
+\paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-01}
+
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water heater will be assigned to the ``General'' end-use subcategory.
+
+
 \begin{lstlisting}
 
 WaterHeater:Mixed,                     ! Stand-alone electric, outdoor example
@@ -658,7 +663,7 @@ The name of the WaterHeater:Stratified object.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-004}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory~ (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category and also appear in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Tank Volume}\label{field-tank-volume-1-000}
 
@@ -1155,7 +1160,7 @@ To model a heat pump water heater, the input data file must include some combina
 \item
   \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! or \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! (required)
 \item
-  \lstinline!Fan:OnOff! (required)
+  \lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! (required)
 \item
   \lstinline!ZoneHVAC:EquipmentList! (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
 \item
@@ -1260,7 +1265,7 @@ This alpha field contains the name of the specific DX coil (\lstinline!Coil:Wate
 
 \paragraph{Field: Minimum Inlet Air Temperature for Compressor Operation}\label{field-minimum-inlet-air-temperature-for-compressor-operation}
 
-This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to -5°C. If this field is left blank, the default value is 10°C.
+This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. If this field is left blank, the default value is 10°C.
 
 \paragraph{Field: Compressor Location}\label{field-compressor-location}
 
@@ -1272,11 +1277,11 @@ This alpha field contains the name of a schedule that defines the ambient air te
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type-001}
 
-This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choice is Fan: OnOff.
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choices are Fan:SystemModel and Fan:OnOff.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-004}
 
-This alpha field contains the name of the specific fan (\lstinline!Fan:OnOff! object) used by this heat pump water heater.
+This alpha field contains the name of the specific fan (\lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! object) used by this heat pump water heater.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-000}
 
@@ -1360,7 +1365,7 @@ WaterHeater:HeatPump:PumpedCondenser,
       11.0,                    !- Minimum Inlet Air Temperature for Compressor Operation {C}
       Outdoors,                !- Compressor Location
       ,                        !- Compressor Ambient Temperature Schedule Name
-      Fan:OnOff,               !- Fan Object Type
+      Fan:SystemModel,         !- Fan Object Type
       HPWHPlantFan,            !- Fan Name
       BlowThrough,             !- Fan Placement
       ,                        !- On Cycle Parasitic Electric Load {W}
@@ -1379,9 +1384,6 @@ NOTE: branch object required only when tank use inlet nodes are used.
       PlantHeatPumpWaterHeater,!- Component 1 Name
       HPWH Use Inlet Node,     !- Component 1 Inlet Node Name
       HPWH Use Outlet Node;    !- Component 1 Outlet Node Name
-
-
-
 
     WaterHeater:Mixed,
       HPWHPlantTank,           !- Name
@@ -1422,10 +1424,8 @@ NOTE: branch object required only when tank use inlet nodes are used.
       0.98,                    !- Source Side Effectiveness
       autosize;                !- Use Side Design Flow Rate {m3/s}
 
-
     OutdoorAir:Node,
       HPWHPlantTank OA Node;   !- Name
-
 
     Coil:WaterHeating:AirToWaterHeatPump:Pumped,
       HPWHPlantDXCoil,         !- Name
@@ -1457,17 +1457,22 @@ NOTE: branch object required only when tank use inlet nodes are used.
       ,                        !- Heating COP Function of Water Flow Fraction Curve Name
       HPWHPLFFPLR;             !- Part Load Fraction Correlation Curve Name
 
-
-    Fan:OnOff,
-      HPWHPlantFan,            !- Name
-      PlantHPWHSch,            !- Availability Schedule Name
-      0.7,                     !- Fan Total Efficiency
-      100.0,                   !- Pressure Rise {Pa}
-      2.6852,                  !- Maximum Flow Rate {m3/s}
-      0.9,                     !- Motor Efficiency
-      1.0,                     !- Motor In Airstream Fraction
-      HPPlantAirInletNode,     !- Air Inlet Node Name
-      HPPlantFanAirOutletNode; !- Air Outlet Node Name
+    Fan:SystemModel,
+      HPWHPlantFan ,          !- Name
+      PlantHPWHSch ,      !- Availability Schedule Name
+      HPPlantAirInletNode,  !- Air Inlet Node Name
+      HPPlantFanAirOutletNode,  !- Air Outlet Node Name
+      2.2685 ,                   !- Design Maximum Air Flow Rate
+      Discrete ,                   !- Speed Control Method
+      0.0,                         !- Electric Power Minimum Flow Rate Fraction
+      100.0,                        !- Design Pressure Rise
+      0.9 ,                        !- Motor Efficiency
+      1.0 ,                        !- Motor In Air Stream Fraction
+      AUTOSIZE,                    !- Design Electric Power Consumption
+      TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+      ,                            !- Electric Power Per Unit Flow Rate
+      ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
+      0.70;                        !- Fan Total Efficiency
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-025}
@@ -1513,7 +1518,7 @@ To model a wrapped condenser heat pump water, the input data file must include s
 \item
   \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped! (required)
 \item
-  \lstinline!Fan:OnOff! (required)
+  \lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! (required)
 \item
   \lstinline!ZoneHVAC:EquipmentList! (when the HPWH draws some or all of its air from the zone, the heat pump water heater type and name must be in this list)
 \item
@@ -1614,7 +1619,7 @@ This alpha field contains the name of the specific DX coil (\lstinline!Coil:Wate
 
 \paragraph{Field: Minimum Inlet Air Temperature for Compressor Operation}\label{field-minimum-inlet-air-temperature-for-compressor-operation-1}
 
-This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. The minimum inlet air dry-bulb temperature should be greater than or equal to -5°C. If this field is left blank, the default value is 10°C.
+This numeric field contains the minimum inlet air dry-bulb temperature entering the air coil (evaporator) and fan section, in degrees Celsius, below which the heat pump compressor does not operate. If this field is left blank, the default value is 10°C.
 
 \paragraph{Field: Compressor Location}\label{field-compressor-location-1}
 
@@ -1626,11 +1631,11 @@ This alpha field contains the name of a schedule that defines the ambient air te
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type-1}
 
-This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choice is Fan: OnOff.
+This alpha (choice) field contains the type of fan used by this heat pump water heater. Currently, the only valid choices are Fan:SystemModel and Fan:OnOff.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1-000}
 
-This alpha field contains the name of the specific fan (\lstinline!Fan:OnOff! object) used by this heat pump water heater.
+This alpha field contains the name of the specific fan (\lstinline!Fan:SystemModel! or \lstinline!Fan:OnOff! object) used by this heat pump water heater.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-1-000}
 
@@ -1713,7 +1718,7 @@ WaterHeater:HeatPump:WrappedCondenser,
   7.2,                     !- Minimum Inlet Air Temperature for Compressor Operation {C}
   Outdoors,                !- Compressor Location
   ,                        !- Compressor Ambient Temperature Schedule Name
-  Fan:OnOff,               !- Fan Object Type
+  Fan:SystemModel,               !- Fan Object Type
   HPWHPlantFan,            !- Fan Name
   DrawThrough,             !- Fan Placement
   0,                       !- On Cycle Parasitic Electric Load {W}
@@ -1741,93 +1746,93 @@ Branch,
       HPWH Use Outlet Node;    !- Component 1 Outlet Node Name
 
   WaterHeater:Stratified,
-  HPWHPlantTank,           !- Name
-  Water Heater,            !- End-Use Subcategory
-  0.287691,                !- Tank Volume {m3}
-  1.594,                   !- Tank Height {m}
-  VerticalCylinder,        !- Tank Shape
-  ,                        !- Tank Perimeter {m}
-  100,                     !- Maximum Temperature Limit {C}
-  MasterSlave,             !- Heater Priority Control
-  Plant Hot Water Setpoint Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name
-  18.5,                      !- Heater 1 Deadband Temperature Difference {deltaC}
-  4500,                    !- Heater 1 Capacity {W}
-  1.129,                   !- Heater 1 Height {m}
-  Plant Hot Water Setpoint Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name
-  18.5,                      !- Heater 2 Deadband Temperature Difference {deltaC}
-  0,                    !- Heater 2 Capacity {W}
-  0.266,                   !- Heater 2 Height {m}
-  Electricity,             !- Heater Fuel Type
-  1,                       !- Heater Thermal Efficiency
-  8.3,                     !- Off Cycle Parasitic Fuel Consumption Rate {W}
-  Electricity,             !- Off Cycle Parasitic Fuel Type
-  0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-  1,                       !- Off Cycle Parasitic Height {m}
-  8.3,                     !- On Cycle Parasitic Fuel Consumption Rate {W}
-  Electricity,             !- On Cycle Parasitic Fuel Type
-  0,                       !- On Cycle Parasitic Heat Fraction to Tank
-  1,                       !- On Cycle Parasitic Height {m}
-  Outdoors,                !- Ambient Temperature Indicator
-  ,                        !- Ambient Temperature Schedule Name
-  ,                        !- Ambient Temperature Zone Name
-  ,                        !- Ambient Temperature Outdoor Air Node Name
-  0.7878,                  !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}
-  1,                       !- Skin Loss Fraction to Zone
-  ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}
-  1,                       !- Off Cycle Flue Loss Fraction to Zone
-  0.001,                   !- Peak Use Flow Rate {m3/s}
-  ,                        !- Use Flow Rate Fraction Schedule Name
-  ,                        !- Cold Water Supply Temperature Schedule Name
-  HPWH Use Inlet Node,     !- Use Side Inlet Node Name
-  HPWH Use Outlet Node,    !- Use Side Outlet Node Name
-  1,                       !- Use Side Effectiveness
-  0,                       !- Use Side Inlet Height {m}
-  autocalculate,           !- Use Side Outlet Height {m}
-  HPPlantWaterOutletNode,  !- Source Side Inlet Node Name
-  HPPlantWaterInletNode,   !- Source Side Outlet Node Name
-  1,                       !- Source Side Effectiveness
-  0.7,                     !- Source Side Inlet Height {m}
-  0,                       !- Source Side Outlet Height {m}
-  Fixed,                   !- Inlet Mode
-  autosize,                !- Use Side Design Flow Rate {m3/s}
-  autosize,                !- Source Side Design Flow Rate {m3/s}
-  1.5,                     !- Indirect Water Heating Recovery Time {hr}
-  12;                      !- Number of Nodes
+    HPWHPlantTank,           !- Name
+    Water Heater,            !- End-Use Subcategory
+    0.287691,                !- Tank Volume {m3}
+    1.594,                   !- Tank Height {m}
+    VerticalCylinder,        !- Tank Shape
+    ,                        !- Tank Perimeter {m}
+    100,                     !- Maximum Temperature Limit {C}
+    MasterSlave,             !- Heater Priority Control
+    Plant Hot Water Setpoint Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name
+    18.5,                      !- Heater 1 Deadband Temperature Difference {deltaC}
+    4500,                    !- Heater 1 Capacity {W}
+    1.129,                   !- Heater 1 Height {m}
+    Plant Hot Water Setpoint Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name
+    18.5,                      !- Heater 2 Deadband Temperature Difference {deltaC}
+    0,                    !- Heater 2 Capacity {W}
+    0.266,                   !- Heater 2 Height {m}
+    Electricity,             !- Heater Fuel Type
+    1,                       !- Heater Thermal Efficiency
+    8.3,                     !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- Off Cycle Parasitic Fuel Type
+    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
+    1,                       !- Off Cycle Parasitic Height {m}
+    8.3,                     !- On Cycle Parasitic Fuel Consumption Rate {W}
+    Electricity,             !- On Cycle Parasitic Fuel Type
+    0,                       !- On Cycle Parasitic Heat Fraction to Tank
+    1,                       !- On Cycle Parasitic Height {m}
+    Outdoors,                !- Ambient Temperature Indicator
+    ,                        !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    0.7878,                  !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}
+    1,                       !- Skin Loss Fraction to Zone
+    ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}
+    1,                       !- Off Cycle Flue Loss Fraction to Zone
+    0.001,                   !- Peak Use Flow Rate {m3/s}
+    ,                        !- Use Flow Rate Fraction Schedule Name
+    ,                        !- Cold Water Supply Temperature Schedule Name
+    HPWH Use Inlet Node,     !- Use Side Inlet Node Name
+    HPWH Use Outlet Node,    !- Use Side Outlet Node Name
+    1,                       !- Use Side Effectiveness
+    0,                       !- Use Side Inlet Height {m}
+    autocalculate,           !- Use Side Outlet Height {m}
+    HPPlantWaterOutletNode,  !- Source Side Inlet Node Name
+    HPPlantWaterInletNode,   !- Source Side Outlet Node Name
+    1,                       !- Source Side Effectiveness
+    0.7,                     !- Source Side Inlet Height {m}
+    0,                       !- Source Side Outlet Height {m}
+    Fixed,                   !- Inlet Mode
+    autosize,                !- Use Side Design Flow Rate {m3/s}
+    autosize,                !- Source Side Design Flow Rate {m3/s}
+    1.5,                     !- Indirect Water Heating Recovery Time {hr}
+    12;                      !- Number of Nodes
 
   OutdoorAir:Node,
-      HPWHPlantTank OA Node;   !- Name
+    HPWHPlantTank OA Node;   !- Name
 
   Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
-  HPWHPlantDXCoil,               !- Name
-  2349.6,                  !- Rated Heating Capacity {W}
-  2.4,                     !- Rated COP {W/W}
-  0.981,                   !- Rated Sensible Heat Ratio
-  19.72,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
-  13.5,                    !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
-  48.89,                   !- Rated Condenser Water Temperature {C}
-  0.189,                   !- Rated Evaporator Air Flow Rate {m3/s}
-  Yes,                     !- Evaporator Fan Power Included in Rated COP
-  HPPlantFanAirOutletNode, !- Evaporator Air Inlet Node Name
-  HPPlantAirOutletNode,    !- Evaporator Air Outlet Node Name
-  0,                       !- Crankcase Heater Capacity {W}
-  10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
-  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
-  HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
-  ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name
-  HPWH-Htg-COP-fT,         !- Heating COP Function of Temperature Curve Name
-  ,                        !- Heating COP Function of Air Flow Fraction Curve Name
-  HPWH-COP-fPLR;           !- Part Load Fraction Correlation Curve Name
+    HPWHPlantDXCoil,               !- Name
+    2349.6,                  !- Rated Heating Capacity {W}
+    2.4,                     !- Rated COP {W/W}
+    0.981,                   !- Rated Sensible Heat Ratio
+    19.72,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
+    13.5,                    !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
+    48.89,                   !- Rated Condenser Water Temperature {C}
+    0.189,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    Yes,                     !- Evaporator Fan Power Included in Rated COP
+    HPPlantFanAirOutletNode, !- Evaporator Air Inlet Node Name
+    HPPlantAirOutletNode,    !- Evaporator Air Outlet Node Name
+    0,                       !- Crankcase Heater Capacity {W}
+    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
+    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
+    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
+    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name
+    HPWH-Htg-COP-fT,         !- Heating COP Function of Temperature Curve Name
+    ,                        !- Heating COP Function of Air Flow Fraction Curve Name
+    HPWH-COP-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  Fan:OnOff,
-  HPWHPlantFan,            !- Name
-  PlantHPWHSch,            !- Availability Schedule Name
-  0.1722,                  !- Fan Total Efficiency
-  65,                      !- Pressure Rise {Pa}
-  0.2279,                  !- Maximum Flow Rate {m3/s}
-  1,                       !- Motor Efficiency
-  0,                       !- Motor In Airstream Fraction
-  HPPlantAirInletNode,     !- Air Inlet Node Name
-  HPPlantFanAirOutletNode; !- Air Outlet Node Name
+    Fan:OnOff,
+    HPWHPlantFan,            !- Name
+    PlantHPWHSch,            !- Availability Schedule Name
+    0.1722,                  !- Fan Total Efficiency
+    65,                      !- Pressure Rise {Pa}
+    0.2279,                  !- Maximum Flow Rate {m3/s}
+    1,                       !- Motor Efficiency
+    0,                       !- Motor In Airstream Fraction
+    HPPlantAirInletNode,     !- Air Inlet Node Name
+    HPPlantFanAirOutletNode; !- Air Outlet Node Name
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-022}

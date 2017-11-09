@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef TarcogShading_hh_INCLUDED
 #define TarcogShading_hh_INCLUDED
@@ -103,6 +92,7 @@ namespace TarcogShading {
 		Array1_int const & LayerType,
 		Array1< Real64 > & Tgaps,
 		Array1< Real64 > & qv,
+		Array1< Real64 > & hcv,
 		int & nperr,
 		std::string & ErrorMessage,
 		Array1< Real64 > & vfreevent
@@ -204,6 +194,25 @@ namespace TarcogShading {
 		int & nperr,
 		std::string & ErrorMessage,
 		Real64 & speed
+	);
+
+	void
+	updateEffectiveMultipliers(
+		int const nlayer,                  // Number of layers
+		Real64 const width,                // IGU width [m]
+		Real64 const height,               // IGU height [m]
+		Array1A< Real64 > const Atop,      // Top openning area [m2]
+		Array1A< Real64 > const Abot,      // Bottom openning area [m2]
+		Array1A< Real64 > const Al,        // Left side openning area [m2]
+		Array1A< Real64 > const Ar,        // Right side openning area [m2]
+		Array1A< Real64 > const Ah,        // Front side openning area [m2]
+		Array1D< Real64 > & Atop_eff,      // Output - Effective top openning area [m2]
+		Array1D< Real64 > & Abot_eff,      // Output - Effective bottom openning area [m2]
+		Array1D< Real64 > & Al_eff,        // Output - Effective left side openning area [m2]
+		Array1D< Real64 > & Ar_eff,        // Output - Effective right side openning area [m2]
+		Array1D< Real64 > & Ah_eff,        // Output - Effective front side openning area [m2]
+		Array1A_int const LayerType,       // Layer type
+		Array1A< Real64 > const SlatAngle  // Venetian layer slat angle [deg]
 	);
 
 } // TarcogShading

@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -69,7 +58,7 @@
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/random.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <RuntimeLanguageProcessor.hh>
@@ -220,7 +209,7 @@ namespace RuntimeLanguageProcessor {
 		ActualDateAndTimeNum = 0;
 		ActualTimeNum = 0;
 		WarmUpFlagNum = 0;
-	
+
 	}
 
 	void
@@ -1380,7 +1369,7 @@ namespace RuntimeLanguageProcessor {
 						DivFound = false;
 					} else if ( OperatorProcessing && ( NextChar == '-' ) ) {
 						// if operator was deterined last pass and this character is a -, then insert a 0 before the minus and treat as subtraction
-						// example: change "Var == -1" to "Var == 0-1" 
+						// example: change "Var == -1" to "Var == 0-1"
 						OperatorProcessing = false;
 						String.insert( Pos, "0" );
 						++LastPos;
@@ -2106,7 +2095,7 @@ namespace RuntimeLanguageProcessor {
 	}
 
 	ErlValueType
-	EvaluateExpression( 
+	EvaluateExpression(
 		int const ExpressionNum,
 		bool & seriousErrorFound
 	)
@@ -2192,7 +2181,7 @@ namespace RuntimeLanguageProcessor {
 							}
 						}
 					}
-					
+
 				}
 			}
 
@@ -2293,7 +2282,7 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == OperatorRaiseToPower ) {
 				if ( ( Operand( 1 ).Type == ValueNumber ) && ( Operand( 2 ).Type == ValueNumber ) ) {
 					TestValue = std::pow( Operand( 1 ).Number, Operand( 2 ).Number );
-					if ( std::isnan( TestValue ) ) { 
+					if ( std::isnan( TestValue ) ) {
 						// throw Error
 						ReturnValue.Type = ValueError;
 						ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " + TrimSigDigits( Operand( 1 ).Number, 6 ) + " raised to " + TrimSigDigits( Operand( 2 ).Number, 6 );
@@ -2726,6 +2715,7 @@ namespace RuntimeLanguageProcessor {
 		std::string::size_type lbracket;
 		std::string UnitsA;
 		std::string UnitsB;
+		OutputProcessor::Unit curUnit( OutputProcessor::Unit::None );
 		std::string::size_type ptr;
 
 		// FLOW:
@@ -2806,41 +2796,41 @@ namespace RuntimeLanguageProcessor {
 
 			cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
 
-			if (NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+			if (NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 				+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 				+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables > 0) {
-				for (GlobalNum = 1; GlobalNum <= NumUserGlobalVariables 
-					+ NumExternalInterfaceGlobalVariables 
-					+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+				for (GlobalNum = 1; GlobalNum <= NumUserGlobalVariables
+					+ NumExternalInterfaceGlobalVariables
+					+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 					+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables; ++GlobalNum) {
 					// If we process the ExternalInterface actuators, all we need to do is to change the
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
-						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, 
+						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
 							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
-						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas, 
+						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
 							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
-					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
-						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables, 
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 					}
-					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
-						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
-						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables 
-						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables 
+					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
+						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
+						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables 
-							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables, 
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
+							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
 
@@ -3071,7 +3061,7 @@ namespace RuntimeLanguageProcessor {
 						// register the trend pointer in ErlVariable.
 						ErlVariable( VariableNum ).Value.TrendVariable = true;
 						ErlVariable( VariableNum ).Value.TrendVarPointer = TrendNum;
-						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this, 
+						ErlVariable( VariableNum ).Value.initialized = true; // Cannot figure out how to get around needing this,
 					}
 
 					NumTrendSteps = std::floor( rNumericArgs( 1 ) );
@@ -3191,7 +3181,7 @@ namespace RuntimeLanguageProcessor {
 							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
+					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3263,7 +3253,11 @@ namespace RuntimeLanguageProcessor {
 						ErrorsFound = true;
 					}}
 
-					SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					if ( curUnit != OutputProcessor::Unit::unknown ) {
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					} else {
+						SetupOutputVariable( cAlphaArgs( 1 ), OutputProcessor::Unit::customEMS, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _ , _ , _ , _ , _ , _ , _ , _ , _ , UnitsB );
+					}
 					// Last field is index key, no indexing here so mimic weather output data
 
 				} // RuntimeReportVarNum
@@ -3331,7 +3325,7 @@ namespace RuntimeLanguageProcessor {
 							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
+					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3513,7 +3507,7 @@ namespace RuntimeLanguageProcessor {
 						ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
 						ErrorsFound = true;
 					}}
-					
+
 					//Additional End Use Types Only Used for EnergyTransfer
 					if ( ( ResourceTypeString != "EnergyTransfer" ) && ( EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" || EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" || EndUseTypeString == "HeatRecoveryForHeating" ) ) {
 						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid field." );
@@ -3525,9 +3519,9 @@ namespace RuntimeLanguageProcessor {
 					if ( ! lAlphaFieldBlanks( 8 ) ) {
 						EndUseSubCatString = cAlphaArgs( 8 );
 
-						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
 					} else { // no subcat
-						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
 					}
 
 				}

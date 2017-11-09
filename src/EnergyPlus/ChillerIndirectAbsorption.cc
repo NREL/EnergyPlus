@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -77,6 +66,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -154,6 +144,8 @@ namespace ChillerIndirectAbsorption {
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
 	Real64 EnergyLossToEnvironment( 0.0 ); // J - piping energy loss from generator outlet to pump inlet
 	Real64 ChillerONOFFCyclingFrac( 0.0 ); // fraction of time chiller is on
+	
+	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -221,7 +213,6 @@ namespace ChillerIndirectAbsorption {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 		int ChillNum; // Chiller number pointer
 
 		if ( CompIndex != 0 ) {
@@ -623,38 +614,38 @@ namespace ChillerIndirectAbsorption {
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum ) {
-			SetupOutputVariable( "Chiller Electric Power [W]", IndirectAbsorberReport( AbsorberNum ).PumpingPower, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", IndirectAbsorberReport( AbsorberNum ).PumpingEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
-			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", IndirectAbsorberReport( AbsorberNum ).QEvap, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", IndirectAbsorberReport( AbsorberNum ).EvapEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
-			SetupOutputVariable( "Chiller Evaporator Inlet Temperature [C]", IndirectAbsorberReport( AbsorberNum ).EvapInletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Outlet Temperature [C]", IndirectAbsorberReport( AbsorberNum ).EvapOutletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate [kg/s]", IndirectAbsorberReport( AbsorberNum ).Evapmdot, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Electric Power", OutputProcessor::Unit::W, IndirectAbsorberReport( AbsorberNum ).PumpingPower, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Electric Energy", OutputProcessor::Unit::J, IndirectAbsorberReport( AbsorberNum ).PumpingEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, IndirectAbsorberReport( AbsorberNum ).QEvap, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Cooling Energy", OutputProcessor::Unit::J, IndirectAbsorberReport( AbsorberNum ).EvapEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
+			SetupOutputVariable( "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, IndirectAbsorberReport( AbsorberNum ).EvapInletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, IndirectAbsorberReport( AbsorberNum ).EvapOutletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, IndirectAbsorberReport( AbsorberNum ).Evapmdot, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
 
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate [W]", IndirectAbsorberReport( AbsorberNum ).QCond, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy [J]", IndirectAbsorberReport( AbsorberNum ).CondEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
-			SetupOutputVariable( "Chiller Condenser Inlet Temperature [C]", IndirectAbsorberReport( AbsorberNum ).CondInletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Outlet Temperature [C]", IndirectAbsorberReport( AbsorberNum ).CondOutletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Mass Flow Rate [kg/s]", IndirectAbsorberReport( AbsorberNum ).Condmdot, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, IndirectAbsorberReport( AbsorberNum ).QCond, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy", OutputProcessor::Unit::J, IndirectAbsorberReport( AbsorberNum ).CondEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
+			SetupOutputVariable( "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, IndirectAbsorberReport( AbsorberNum ).CondInletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, IndirectAbsorberReport( AbsorberNum ).CondOutletTemp, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, IndirectAbsorberReport( AbsorberNum ).Condmdot, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
 
 			if ( IndirectAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
-				SetupOutputVariable( "Chiller Hot Water Consumption Rate [W]", IndirectAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-				SetupOutputVariable( "Chiller Source Hot Water Energy [J]", IndirectAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "EnergyTransfer", "Cooling", _, "Plant" );
+				SetupOutputVariable( "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, IndirectAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+				SetupOutputVariable( "Chiller Source Hot Water Energy", OutputProcessor::Unit::J, IndirectAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "EnergyTransfer", "Cooling", _, "Plant" );
 			} else {
 				if ( GenInputOutputNodesUsed( AbsorberNum ) ) {
-					SetupOutputVariable( "Chiller Source Steam Rate [W]", IndirectAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-					SetupOutputVariable( "Chiller Source Steam Energy [J]", IndirectAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
+					SetupOutputVariable( "Chiller Source Steam Rate", OutputProcessor::Unit::W, IndirectAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+					SetupOutputVariable( "Chiller Source Steam Energy", OutputProcessor::Unit::J, IndirectAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
 				} else {
-					SetupOutputVariable( "Chiller Source Steam Rate [W]", IndirectAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-					SetupOutputVariable( "Chiller Source Steam Energy [J]", IndirectAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "Steam", "Cooling", _, "Plant" );
+					SetupOutputVariable( "Chiller Source Steam Rate", OutputProcessor::Unit::W, IndirectAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+					SetupOutputVariable( "Chiller Source Steam Energy", OutputProcessor::Unit::J, IndirectAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", IndirectAbsorber( AbsorberNum ).Name, _, "Steam", "Cooling", _, "Plant" );
 				}
 			}
 
-			SetupOutputVariable( "Chiller COP [W/W]", IndirectAbsorberReport( AbsorberNum ).ActualCOP, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Part Load Ratio []", IndirectAbsorberReport( AbsorberNum ).ChillerPartLoadRatio, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Cycling Ratio []", IndirectAbsorberReport( AbsorberNum ).ChillerCyclingFrac, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller COP", OutputProcessor::Unit::W_W, IndirectAbsorberReport( AbsorberNum ).ActualCOP, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Part Load Ratio", OutputProcessor::Unit::None, IndirectAbsorberReport( AbsorberNum ).ChillerPartLoadRatio, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Cycling Ratio", OutputProcessor::Unit::None, IndirectAbsorberReport( AbsorberNum ).ChillerCyclingFrac, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
 
-			SetupOutputVariable( "Chiller Steam Heat Loss Rate [W]", IndirectAbsorberReport( AbsorberNum ).LoopLoss, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Steam Heat Loss Rate", OutputProcessor::Unit::W, IndirectAbsorberReport( AbsorberNum ).LoopLoss, "System", "Average", IndirectAbsorber( AbsorberNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Chiller Nominal Capacity", IndirectAbsorber( AbsorberNum ).Name, "[W]", IndirectAbsorber( AbsorberNum ).NomCap );
@@ -1380,7 +1371,7 @@ namespace ChillerIndirectAbsorption {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         R. Raustad (FSEC)
 		//       DATE WRITTEN   May 2008
-		//       MODIFIED       na
+		//       MODIFIED       Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1395,8 +1386,6 @@ namespace ChillerIndirectAbsorption {
 
 		// Using/Aliasing
 		using namespace FluidProperties;
-		using General::TrimSigDigits;
-		using General::RoundSigDigits;
 		using DataPlant::DeltaTempTol;
 		using DataPlant::PlantLoop;
 		using DataPlant::CompSetPtBasedSchemeType;
@@ -1406,10 +1395,15 @@ namespace ChillerIndirectAbsorption {
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::SecInHour;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
 		using DataGlobals::WarmupFlag;
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::OutBaroPress;
+		using FaultsManager::FaultsChillerSWTSensor;
+		using General::TrimSigDigits;
+		using General::RoundSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -1559,6 +1553,19 @@ namespace ChillerIndirectAbsorption {
 		LoopSideNum = IndirectAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
+		
+		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+		if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+			Real64 EvapOutletTemp_ff = TempEvapOut;
+			
+			//calculate the sensor offset using fault information
+			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
+			//update the TempEvapOut
+			TempEvapOut = max( IndirectAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset ));
+			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+			
+		}
 
 		if ( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr > 0 ) {
 			CapacityfAbsorberTemp = CurveValue( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr, TempCondIn );
@@ -1633,6 +1640,20 @@ namespace ChillerIndirectAbsorption {
 					ShowRecurringWarningErrorAtEnd( "CalcIndirectAbsorberModel: Name=\"" + IndirectAbsorber( ChillNum ).Name + "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.", IndirectAbsorber( ChillNum ).ErrCount2 );
 				}
 			} //End of Constant Variable Flow If Block
+
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = ( IndirectAbsorber( ChillNum ).FlowMode == LeavingSetPointModulated );
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				//PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
+				//PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
+				//ChillerPartLoadRatio = PartLoadRat;
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
+			}
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -1684,6 +1705,7 @@ namespace ChillerIndirectAbsorption {
 					QEvaporator = EvapMassFlowRate * CpFluid * EvapDeltaTemp;
 				}
 			}
+
 			// Checks QEvaporator on the basis of the machine limits.
 			if ( QEvaporator > std::abs( MyLoad ) ) {
 				if ( EvapMassFlowRate > MassFlowTolerance ) {
@@ -1694,6 +1716,16 @@ namespace ChillerIndirectAbsorption {
 					QEvaporator = 0.0;
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
+			}
+		
+			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
+				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
+				int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
+				bool VarFlowFlag = false;
+				FaultsChillerSWTSensor( FaultIndex ).CalFaultChillerSWT( VarFlowFlag, IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset, CpFluid, Node( EvapInletNode ).Temp, EvapOutletTemp, EvapMassFlowRate, QEvaporator );
+				//update corresponding variables at faulty case
+				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
 
 		} //This is the end of the FlowLock Block
@@ -1725,7 +1757,7 @@ namespace ChillerIndirectAbsorption {
 			HeatInputfEvapTemp = 1.0;
 		}
 
-		//Calculate steam input ratio. Inlcude impact of generator and evaporator temperatures
+		//Calculate steam input ratio. Include impact of generator and evaporator temperatures
 		if ( IndirectAbsorber( ChillNum ).GeneratorInputCurvePtr > 0 ) {
 			HeatInputRat = CurveValue( IndirectAbsorber( ChillNum ).GeneratorInputCurvePtr, PartLoadRat ) * HeatInputfCondTemp * HeatInputfEvapTemp;
 		} else {

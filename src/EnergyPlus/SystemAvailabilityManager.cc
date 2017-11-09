@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -72,6 +61,7 @@
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
+#include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -88,6 +78,7 @@
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -141,6 +132,11 @@ namespace SystemAvailabilityManager {
 	int const CycleOnAnyHeatingZone( 6 );
 	int const CycleOnAnyHeatingZoneFansOnly( 7 );
 
+	// Cycling Run Time Control Type
+	int const FixedRunTime( 1 );
+	int const Thermostat( 2 );
+	int const ThermostatWithMinimumRunTime( 3 );
+
 	// Optimum start parameter definations
 	int const ControlZone( 4 );
 	int const MaximumOfZoneList( 5 );
@@ -156,6 +152,9 @@ namespace SystemAvailabilityManager {
 	int const HybridVentMode_Enth( 2 ); // Enthalpy control
 	int const HybridVentMode_DewPoint( 3 ); // Dew point control
 	int const HybridVentMode_OA( 4 ); // Outdoor air control
+	int const HybridVentMode_OperT80( 5 ); // Operative temperature control with 80% acceptability limits
+	int const HybridVentMode_OperT90( 6 ); // Operative temperature control with 90% acceptability limits
+	int const HybridVentMode_CO2( 7 ); // CO2 control
 
 	int const HybridVentCtrl_NoAction( 0 ); // No hybrid ventilation control
 	int const HybridVentCtrl_Open( 1 ); // Open windows or doors
@@ -199,6 +198,10 @@ namespace SystemAvailabilityManager {
 	bool GetHybridInputFlag( true ); // Flag set to make sure you get input once
 	int NumOptStartSysAvailMgrs( 0 );
 	bool BeginOfDayResetFlag( true );
+
+	Real64 CurrentEndTime( 0.0 ); // Current end time
+	Real64 CurrentEndTimeLast( 0.0 ); // last end time
+	Real64 TimeStepSysLast( 0.0 ); // last system time step
 
 	namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
@@ -606,7 +609,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Scheduled Control Status []", SchedSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Scheduled Control Status", OutputProcessor::Unit::None, SchedSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -640,7 +643,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Scheduled On Control Status []", SchedOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOnSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Scheduled On Control Status", OutputProcessor::Unit::None, SchedOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOnSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -674,7 +677,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Scheduled Off Control Status []", SchedOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOffSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Scheduled Off Control Status", OutputProcessor::Unit::None, SchedOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", SchedOffSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -701,7 +704,6 @@ namespace SystemAvailabilityManager {
 				}
 				NCycSysAvailMgrData( SysAvailNum ).Name = cAlphaArgs( 1 );
 				NCycSysAvailMgrData( SysAvailNum ).MgrType = SysAvailMgr_NightCycle;
-
 				NCycSysAvailMgrData( SysAvailNum ).TempTolRange = rNumericArgs( 1 );
 				CyclingTimeSteps = nint( ( rNumericArgs( 2 ) / SecInHour ) * double( NumOfTimeStepInHour ) );
 				CyclingTimeSteps = max( 1, CyclingTimeSteps );
@@ -743,17 +745,33 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}}
 
+				// Cycling Run Time Control Type
+				if ( !lAlphaFieldBlanks( 5 ) ) {
+					{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 5 ) ) );
+					if ( SELECT_CASE_var == "FIXEDRUNTIME" ) {
+						NCycSysAvailMgrData( SysAvailNum ).CycRunTimeCntrlType = FixedRunTime;
+					} else if ( SELECT_CASE_var == "THERMOSTAT" ) {
+						NCycSysAvailMgrData( SysAvailNum ).CycRunTimeCntrlType = Thermostat;
+					} else if ( SELECT_CASE_var == "THERMOSTATWITHMINIMUMRUNTIME" ) {
+						NCycSysAvailMgrData( SysAvailNum ).CycRunTimeCntrlType = ThermostatWithMinimumRunTime;
+					} else {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid" );
+						ShowSevereError( RoutineName + "incorrect value: " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
+						ErrorsFound = true;
+					}}
+				}
+
 				// Control zone or zonelist
-				if ( !lAlphaFieldBlanks( 5 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneListName = cAlphaArgs( 5 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
+				if ( !lAlphaFieldBlanks( 6 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).CtrlZoneListName = cAlphaArgs( 6 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 6 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 5 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 6 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfCtrlZones = NumZones;
@@ -762,23 +780,23 @@ namespace SystemAvailabilityManager {
 								NCycSysAvailMgrData( SysAvailNum ).CtrlZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
 							}
 						} else {
-							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\" not found." );
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 				}
 
 				// Cooling zone or zonelist
-				if ( !lAlphaFieldBlanks( 6 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).CoolingZoneListName = cAlphaArgs( 6 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 6 ), Zone );
+				if ( !lAlphaFieldBlanks( 7 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).CoolingZoneListName = cAlphaArgs( 7 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 6 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 7 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfCoolingZones = NumZones;
@@ -787,23 +805,23 @@ namespace SystemAvailabilityManager {
 								NCycSysAvailMgrData( SysAvailNum ).CoolingZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
 							}
 						} else {
-							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 				}
 
 				// Heating zone or zonelist
-				if ( !lAlphaFieldBlanks( 7 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).HeatingZoneListName = cAlphaArgs( 7 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
+				if ( !lAlphaFieldBlanks( 8 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).HeatingZoneListName = cAlphaArgs( 8 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 8 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 7 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 8 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatingZones = NumZones;
@@ -812,23 +830,23 @@ namespace SystemAvailabilityManager {
 								NCycSysAvailMgrData( SysAvailNum ).HeatingZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
 							}
 						} else {
-							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 				}
 
 				// HeatZnFan zone or zonelist
-				if ( !lAlphaFieldBlanks( 8 ) ){
-					NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZoneListName = cAlphaArgs( 8 );
-					int ZoneNum = FindItemInList( cAlphaArgs( 8 ), Zone );
+				if ( !lAlphaFieldBlanks( 9 ) ){
+					NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZoneListName = cAlphaArgs( 9 );
+					int ZoneNum = FindItemInList( cAlphaArgs( 9 ), Zone );
 					if ( ZoneNum > 0 ){
 						NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = 1;
 						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs.allocate( 1 );
 						NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs( 1 ) = ZoneNum;
 					} else {
 						int ZoneListNum = 0;
-						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 8 ), ZoneList );
+						if ( NumOfZoneLists > 0 ) ZoneListNum = FindItemInList( cAlphaArgs( 9 ), ZoneList );
 						if ( ZoneListNum > 0 ){
 							int NumZones = ZoneList( ZoneListNum ).NumOfZones;
 							NCycSysAvailMgrData( SysAvailNum ).NumOfHeatZnFanZones = NumZones;
@@ -837,13 +855,13 @@ namespace SystemAvailabilityManager {
 								NCycSysAvailMgrData( SysAvailNum ).HeatZnFanZonePtrs( ZoneNumInList ) = ZoneList( ZoneListNum ).Zone( ZoneNumInList );
 							}
 						} else {
-							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\" not found." );
+							ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 				}
 
-				SetupOutputVariable( "Availability Manager Night Cycle Control Status []", NCycSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NCycSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Night Cycle Control Status", OutputProcessor::Unit::None, NCycSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NCycSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 		}
@@ -968,10 +986,10 @@ namespace SystemAvailabilityManager {
 					OptStartSysAvailMgrData( SysAvailNum ).NumPreDays = rNumericArgs( 7 );
 				}
 
-				SetupOutputVariable( "Availability Manager Optimum Start Control Status []", OptStartSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Optimum Start Control Status", OutputProcessor::Unit::None, OptStartSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name );
 
 				// add
-				SetupOutputVariable( "Availability Manager Optimum Start Time Before Occupancy [hr]", OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
+				SetupOutputVariable( "Availability Manager Optimum Start Time Before Occupancy", OutputProcessor::Unit::hr, OptStartSysAvailMgrData( SysAvailNum ).NumHoursBeforeOccupancy, "System", "Average", OptStartSysAvailMgrData( SysAvailNum ).Name, "Daily" );
 
 			}
 
@@ -1017,7 +1035,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Differential Thermostat Control Status []", DiffTSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", DiffTSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Differential Thermostat Control Status", OutputProcessor::Unit::None, DiffTSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", DiffTSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1048,7 +1066,7 @@ namespace SystemAvailabilityManager {
 
 				HiTurnOffSysAvailMgrData( SysAvailNum ).Temp = rNumericArgs( 1 );
 
-				SetupOutputVariable( "Availability Manager High Temperature Turn Off Control Status []", HiTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOffSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager High Temperature Turn Off Control Status", OutputProcessor::Unit::None, HiTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOffSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1080,7 +1098,7 @@ namespace SystemAvailabilityManager {
 
 				HiTurnOnSysAvailMgrData( SysAvailNum ).Temp = rNumericArgs( 1 );
 
-				SetupOutputVariable( "Availability Manager High Temperature Turn On Control Status []", HiTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOnSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager High Temperature Turn On Control Status", OutputProcessor::Unit::None, HiTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", HiTurnOnSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1123,7 +1141,7 @@ namespace SystemAvailabilityManager {
 					LoTurnOffSysAvailMgrData( SysAvailNum ).SchedPtr = 0;
 				}
 
-				SetupOutputVariable( "Availability Manager Low Temperature Turn Off Control Status []", LoTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOffSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Low Temperature Turn Off Control Status", OutputProcessor::Unit::None, LoTurnOffSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOffSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1155,7 +1173,7 @@ namespace SystemAvailabilityManager {
 
 				LoTurnOnSysAvailMgrData( SysAvailNum ).Temp = rNumericArgs( 1 );
 
-				SetupOutputVariable( "Availability Manager Low Temperature Turn On Control Status []", LoTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOnSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Low Temperature Turn On Control Status", OutputProcessor::Unit::None, LoTurnOnSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", LoTurnOnSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -1213,7 +1231,7 @@ namespace SystemAvailabilityManager {
 					ErrorsFound = true;
 				}
 
-				SetupOutputVariable( "Availability Manager Night Ventilation Control Status []", NVentSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Availability Manager Night Ventilation Control Status", OutputProcessor::Unit::None, NVentSysAvailMgrData( SysAvailNum ).AvailStatus, "System", "Average", NVentSysAvailMgrData( SysAvailNum ).Name );
 
 			} // SysAvailNum
 
@@ -2148,8 +2166,14 @@ namespace SystemAvailabilityManager {
 		int ZoneNum;
 		Real64 TempTol;
 		static Array1D_bool ZoneCompNCControlType;
+		int CyclingRunTimeControlType; 
 
-		TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
+		// reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
+		if ( WarmupFlag && BeginDayFlag ) {
+			PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
+			PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps;
+		}
+
 		if ( present( ZoneEquipType ) ) {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
@@ -2168,10 +2192,18 @@ namespace SystemAvailabilityManager {
 			return;
 		}
 
+		CyclingRunTimeControlType = NCycSysAvailMgrData( SysAvailNum ).CycRunTimeCntrlType;
+
+		if ( CyclingRunTimeControlType == FixedRunTime ) {
+			TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
+		} else {
+			TempTol = 0.05;
+		}
+
 		if ( present( ZoneEquipType ) ) {
-			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime ) { // if cycled on
+			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime && ( CyclingRunTimeControlType == FixedRunTime || CyclingRunTimeControlType == ThermostatWithMinimumRunTime ) ) { // if cycled on
 				AvailStatus = CycleOn;
-			} else if ( SimTimeSteps == StopTime ) { // if end of cycle run time, shut down if fan off
+			} else if ( SimTimeSteps == StopTime && CyclingRunTimeControlType == FixedRunTime ) { // if end of cycle run time, shut down if fan off
 				AvailStatus = NoAction;
 			} else {
 
@@ -2202,7 +2234,6 @@ namespace SystemAvailabilityManager {
 
 					} else if ( SELECT_CASE_var1 == SingleHeatCoolSetPoint ) {
 						if ( ( TempTstatAir( ZoneNum ) < TempZoneThermostatSetPoint( ZoneNum ) - TempTol ) || ( TempTstatAir( ZoneNum ) > TempZoneThermostatSetPoint( ZoneNum ) + TempTol ) ) {
-
 							AvailStatus = CycleOn;
 						} else {
 							AvailStatus = NoAction;
@@ -2235,16 +2266,22 @@ namespace SystemAvailabilityManager {
 				}} // end select type of night cycle control
 
 				if ( AvailStatus == CycleOn ) { // reset the start and stop times
-					ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime = SimTimeSteps;
-					ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime = SimTimeSteps + NCycSysAvailMgrData( SysAvailNum ).CyclingTimeSteps;
+					if ( CyclingRunTimeControlType == Thermostat  ) { // Cycling Run Time is ignored
+						ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime = SimTimeSteps;
+						ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime = SimTimeSteps;
+					} else {
+						ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime = SimTimeSteps;
+						ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime = SimTimeSteps + NCycSysAvailMgrData( SysAvailNum ).CyclingTimeSteps;
+					}
+
 				}
 
 			}
 		} else {
-			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime ) { // if cycled on
+			if ( SimTimeSteps >= StartTime && SimTimeSteps < StopTime && ( CyclingRunTimeControlType == FixedRunTime || CyclingRunTimeControlType == ThermostatWithMinimumRunTime ) ) { // if cycled on
 				AvailStatus = NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus;
 				if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == ZoneFansOnly ) AvailStatus = CycleOnZoneFansOnly;
-			} else if ( SimTimeSteps == StopTime ) { // if end of cycle run time, shut down if fan off
+			} else if ( SimTimeSteps == StopTime && CyclingRunTimeControlType == FixedRunTime ) { // if end of cycle run time, shut down if fan off
 				AvailStatus = NoAction;
 			} else {
 
@@ -2344,9 +2381,15 @@ namespace SystemAvailabilityManager {
 				}} // end select type of night cycle control
 
 				if ( ( AvailStatus == CycleOn ) || ( AvailStatus == CycleOnZoneFansOnly ) ) { // reset the start and stop times
-					PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
-					PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps + NCycSysAvailMgrData( SysAvailNum ).CyclingTimeSteps;
 					if ( NCycSysAvailMgrData( SysAvailNum ).CtrlType == ZoneFansOnly ) AvailStatus = CycleOnZoneFansOnly;
+					// issue #6151
+					if ( CyclingRunTimeControlType == Thermostat ) { // Cycling Run Time is ignored
+						PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
+						PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps;
+					} else {
+						PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
+						PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps + NCycSysAvailMgrData( SysAvailNum ).CyclingTimeSteps;
+					}
 				}
 			}
 		}
@@ -2583,11 +2626,15 @@ namespace SystemAvailabilityManager {
 			if ( FanStartTimeTmr == 0.0 ) FanStartTimeTmr = 24.0;
 
 			// Pass the start time to ZoneTempPredictorCorrector
-			for ( I = 1; I <= NumOfZones; ++I ) {
-				if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-					OptStartData.OccStartTime( ZoneEquipConfig( I ).ActualZoneNum ) = FanStartTime;
-					OptStartData.ActualZoneNum( ZoneEquipConfig( I ).ActualZoneNum ) = ZoneEquipConfig( I ).ActualZoneNum;
-				}
+			for ( int counter = 1; counter <= AirToZoneNodeInfo( PriAirSysNum ).NumZonesCooled; ++counter ) {
+				int actZoneNum = ZoneEquipConfig( AirToZoneNodeInfo( PriAirSysNum ).CoolCtrlZoneNums( counter ) ).ActualZoneNum;
+				OptStartData.OccStartTime( actZoneNum ) = FanStartTime;
+				OptStartData.ActualZoneNum( actZoneNum ) = actZoneNum;
+			}
+			for ( int counter = 1; counter <= AirToZoneNodeInfo( PriAirSysNum ).NumZonesHeated; ++counter ) {
+				int actZoneNum = ZoneEquipConfig( AirToZoneNodeInfo( PriAirSysNum ).HeatCtrlZoneNums( counter ) ).ActualZoneNum;
+				OptStartData.OccStartTime( actZoneNum ) = FanStartTime;
+				OptStartData.ActualZoneNum( actZoneNum ) = actZoneNum;
 			}
 
 			if ( DSTIndicator > 0 ) {
@@ -2623,11 +2670,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = false;
 							}
 							AvailStatus = CycleOn;
-							for ( I = 1; I <= NumOfZones; ++I ) {
-								if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-									OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-								}
-							}
+							OptStartMgr.SetOptStartFlag( PriAirSysNum );
 						} else {
 							AvailStatus = NoAction;
 							OSReportVarFlag = true;
@@ -2642,11 +2685,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = false;
 							}
 							AvailStatus = CycleOn;
-							for ( I = 1; I <= NumOfZones; ++I ) {
-								if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-									OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-								}
-							}
+							OptStartMgr.SetOptStartFlag( PriAirSysNum );
 						} else {
 							AvailStatus = NoAction;
 							OSReportVarFlag = true;
@@ -2694,11 +2733,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 								} else if ( PreStartTime < CurrentTime ) {
 									AvailStatus = CycleOn;
@@ -2707,11 +2742,7 @@ namespace SystemAvailabilityManager {
 										NumHoursBeforeOccupancy = DeltaTime;
 										OSReportVarFlag = false;
 									}
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -2724,11 +2755,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 								} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 									if ( OSReportVarFlag ) {
@@ -2737,11 +2764,7 @@ namespace SystemAvailabilityManager {
 									}
 									AvailStatus = CycleOn;
 									CycleOnFlag = true;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -2774,11 +2797,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -2786,11 +2805,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2803,11 +2818,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -2815,11 +2826,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2875,11 +2882,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
@@ -2888,11 +2891,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2905,11 +2904,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
@@ -2918,11 +2913,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2956,11 +2947,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -2968,11 +2955,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -2985,11 +2968,7 @@ namespace SystemAvailabilityManager {
 								OSReportVarFlag = true;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -2997,11 +2976,7 @@ namespace SystemAvailabilityManager {
 								}
 								AvailStatus = CycleOn;
 								CycleOnFlag = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3084,11 +3059,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 									// Calculate the current day actual temperature gradient --------------------------
 									if ( ! WarmupFlag ) {
@@ -3118,11 +3089,7 @@ namespace SystemAvailabilityManager {
 									CycleOnFlag = true;
 									ATGUpdateFlag1 = true;
 									ATGUpdateFlag2 = true;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -3135,11 +3102,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = true;
 								} else if ( CycleOnFlag ) {
 									AvailStatus = CycleOn;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 									if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 									// Calculate the current day actual temperature gradient --------------------------
 									if ( ! WarmupFlag ) {
@@ -3169,11 +3132,7 @@ namespace SystemAvailabilityManager {
 									CycleOnFlag = true;
 									ATGUpdateFlag1 = true;
 									ATGUpdateFlag2 = true;
-									for ( I = 1; I <= NumOfZones; ++I ) {
-										if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-											OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-										}
-									}
+									OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								} else {
 									AvailStatus = NoAction;
 									CycleOnFlag = false;
@@ -3210,11 +3169,7 @@ namespace SystemAvailabilityManager {
 									OSReportVarFlag = false;
 								}
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( ! WarmupFlag ) {
 									if ( ATGUpdateFlag1 ) {
 										ATGUpdateTime1 = CurrentTime;
@@ -3237,11 +3192,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3271,11 +3222,7 @@ namespace SystemAvailabilityManager {
 										}
 									}
 								}
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3285,11 +3232,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3383,11 +3326,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = false;
 							} else if ( CycleOnFlag ) {
 								AvailStatus = CycleOn;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime ) CycleOnFlag = false;
 								// Calculate the current day actual temperature gradient --------------------------
 								if ( ! WarmupFlag ) {
@@ -3417,11 +3356,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3453,11 +3388,7 @@ namespace SystemAvailabilityManager {
 									}
 								}
 								//---------------------------------------------------------------------------------
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 								if ( CurrentTime > FanStartTime && CurrentTime < PreStartTimeTmr ) CycleOnFlag = false;
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
@@ -3468,11 +3399,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3526,11 +3453,7 @@ namespace SystemAvailabilityManager {
 									}
 								}
 								//---------------------------------------------------------------------------------
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3540,11 +3463,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag1 = true;
 								ATGUpdateFlag2 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3576,11 +3495,7 @@ namespace SystemAvailabilityManager {
 									}
 								}
 								//---------------------------------------------------------------------------------
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else if ( PreStartTime < CurrentTime || PreStartTimeTmr < CurrentTime ) {
 								if ( OSReportVarFlag ) {
 									NumHoursBeforeOccupancy = DeltaTime;
@@ -3590,11 +3505,7 @@ namespace SystemAvailabilityManager {
 								CycleOnFlag = true;
 								ATGUpdateFlag2 = true;
 								ATGUpdateFlag1 = true;
-								for ( I = 1; I <= NumOfZones; ++I ) {
-									if ( ZoneEquipConfig( I ).AirLoopNum == PriAirSysNum ) {
-										OptStartData.OptStartFlag( ZoneEquipConfig( I ).ActualZoneNum ) = true;
-									}
-								}
+								OptStartMgr.SetOptStartFlag( PriAirSysNum );
 							} else {
 								AvailStatus = NoAction;
 								CycleOnFlag = false;
@@ -3639,6 +3550,22 @@ namespace SystemAvailabilityManager {
 
 	}
 
+	void
+	DefineOptStartSysAvailManager::SetOptStartFlag(
+		int const AirLoopNum
+	)
+	{
+		// Set the OptStartFlag true for all zones on the air loop
+		auto const & thisAirToZoneNodeInfo( DataAirLoop::AirToZoneNodeInfo( AirLoopNum ) );
+		for ( int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesCooled; ++counter ) {
+			int actZoneNum = DataZoneEquipment::ZoneEquipConfig(thisAirToZoneNodeInfo.CoolCtrlZoneNums( counter ) ).ActualZoneNum;
+			OptStartData.OptStartFlag( actZoneNum ) = true;
+		}
+		for ( int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesHeated; ++counter ) {
+			int actZoneNum = DataZoneEquipment::ZoneEquipConfig( thisAirToZoneNodeInfo.HeatCtrlZoneNums( counter ) ).ActualZoneNum;
+			OptStartData.OptStartFlag( actZoneNum ) = true;
+		}
+	}
 	void
 	CalcNVentSysAvailMgr(
 		int const SysAvailNum, // number of the current scheduled system availability manager
@@ -4124,6 +4051,7 @@ namespace SystemAvailabilityManager {
 		using CurveManager::GetCurveMinMaxValues;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveType;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4212,9 +4140,9 @@ namespace SystemAvailabilityManager {
 				ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" specifies control mode 0 for all entries." );
 				ShowContinueError( "All zones using this " + cAlphaFieldNames( 4 ) + " have no hybrid ventilation control." );
 			}
-			if ( SchedMax > 4.0 ) {
+			if ( SchedMax > 7.0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-				ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\", the maximum schedule value should be 4. However, " );
+				ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\", the maximum schedule value should be 7. However, " );
 				ShowContinueError( "the maximum entered value in the schedule is " + TrimSigDigits( SchedMax, 1 ) );
 				ErrorsFound = true;
 			}
@@ -4224,7 +4152,12 @@ namespace SystemAvailabilityManager {
 				ShowContinueError( "the minimum entered value in the schedule is " + TrimSigDigits( SchedMin, 1 ) );
 				ErrorsFound = true;
 			}
-
+			if ( SchedMax == 7.0 && !Contaminant.CO2Simulation ) {
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
+				ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\", When the schedule value is 7, carbon dioxide (CO2) control is requested. " );
+				ShowContinueError( "However, CO2 simulation is not enabled. Please use ZoneAirContaminantBalance object to simulate CO2." );
+				ErrorsFound = true;
+			}
 			// Read use weather rain indicator
 			if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
 				HybridVentSysAvailMgrData( SysAvailNum ).UseRainIndicator = true;
@@ -4483,6 +4416,13 @@ namespace SystemAvailabilityManager {
 				ErrorsFound = true;
 			}
 
+			if ( !lNumericFieldBlanks( 8 ) ) {
+				HybridVentSysAvailMgrData( SysAvailNum ).MinOperTime = rNumericArgs( 8 );
+			}
+			if ( !lNumericFieldBlanks( 9 ) ) {
+				HybridVentSysAvailMgrData( SysAvailNum ).MinVentTime = rNumericArgs( 9 );
+			}
+
 		} // SysAvailNum
 
 		if ( NumHybridVentSysAvailMgrs > 1 ) {
@@ -4513,11 +4453,29 @@ namespace SystemAvailabilityManager {
 		// Set up output variables
 		for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status []", HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode []", HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status", OutputProcessor::Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode", OutputProcessor::Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 			} else {
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status []", HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
-				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode []", HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Status", OutputProcessor::Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
+				SetupOutputVariable( "Availability Manager Hybrid Ventilation Control Mode", OutputProcessor::Unit::None, HybridVentSysAvailMgrData( SysAvailNum ).ControlMode, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
+			}
+
+			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinOperTime > 0 ) {
+				SetupOutputVariable( "Hybrid Ventilation Control HVAC System Operation Elapsed Time", OutputProcessor::Unit::min, HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+			}
+
+			if ( HybridVentSysAvailMgrData( SysAvailNum ).MinVentTime > 0 ) {
+				SetupOutputVariable( "Hybrid Ventilation Control Natural Ventilation Elapsed Time", OutputProcessor::Unit::min, HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+			}
+
+			if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_OperT80 ) || CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_OperT90 ) ) {
+				SetupOutputVariable( "Hybrid Ventilation Operative Temperature", OutputProcessor::Unit::C, HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Lower Limit Operative Temperature", OutputProcessor::Unit::C, HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+				SetupOutputVariable( "Hybrid Ventilation Upper Limit Operative Temperature", OutputProcessor::Unit::C, HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
+			}
+
+			if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, HybridVentMode_CO2 ) ) {
+				SetupOutputVariable( "Hybrid Ventilation CO2 Concentration", OutputProcessor::Unit::ppm, HybridVentSysAvailMgrData( SysAvailNum ).CO2, "System", "Average", HybridVentSysAvailMgrData( SysAvailNum ).Name );
 			}
 		}
 
@@ -4549,6 +4507,7 @@ namespace SystemAvailabilityManager {
 		using DataHeatBalance::TotVentilation;
 		using DataHeatBalance::Ventilation;
 		using InputProcessor::FindItemInList;
+		using DataHeatBalance::AdaptiveComfortRequested_ASH55;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4565,6 +4524,7 @@ namespace SystemAvailabilityManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // One time flag
+		static bool MyEnvrnFlag( true );
 		int SysAvailNum; // DO loop index for Sys Avail Manager objects
 		int ControlledZoneNum; // Index into the ZoneEquipConfig array
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -4604,9 +4564,16 @@ namespace SystemAvailabilityManager {
 				for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 					if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum ) {
 						HybridVentSysAvailMgrData( SysAvailNum ).ControlledZoneNum = ControlledZoneNum;
+						bool zoneFound = false;
 						if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
 							if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlledZoneNum > 0 ) {
-								if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum != HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum ) {
+								for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+									if ( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum ) {
+										zoneFound = true;
+										break;
+									}
+								}
+								if ( !zoneFound ) {
 									ShowSevereError( cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + ", The controlled zone =" + HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName + " is not served by this Air Loop=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 									ErrorsFound = true;
 								}
@@ -4615,15 +4582,17 @@ namespace SystemAvailabilityManager {
 						}
 					}
 					if ( std::any_of( HybridVentSysAvailMgrData.begin(), HybridVentSysAvailMgrData.end(), []( SystemAvailabilityManager::DefineHybridVentSysAvailManager const & e ){ return e.HybridVentMgrConnectedToAirLoop; } ) ) {
-						if ( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum && HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 ) {
-							for ( HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum ) {
-								if ( ! HybridVentSysAvailMgrData( HybridVentNum ).HybridVentMgrConnectedToAirLoop && ( HybridVentNum != SysAvailNum ) ) {
-									if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == HybridVentSysAvailMgrData( HybridVentNum ).ActualZoneNum && ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum > 0 ) {
-										ShowWarningError( "AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( HybridVentNum ).Name + "\" has the controlled zone name = \"" + HybridVentSysAvailMgrData( HybridVentNum ).ControlZoneName + "\"." );
-										ShowContinueError( "This controlled zone already has hybrid ventilation control through this air loop = \"" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + "\"." );
-										ShowContinueError( "Only AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( SysAvailNum ).Name + "\" will be simulated. Simulation continues..." );
-									} else {
-										HybridVentSysAvailMgrData( HybridVentNum ).SimHybridVentSysAvailMgr = true;
+						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+							if ( ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode) == HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum && HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 ) {
+								for ( HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum ) {
+									if ( ! HybridVentSysAvailMgrData( HybridVentNum ).HybridVentMgrConnectedToAirLoop && ( HybridVentNum != SysAvailNum ) ) {
+										if ( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum == HybridVentSysAvailMgrData( HybridVentNum ).ActualZoneNum && ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum > 0 ) {
+											ShowWarningError( "AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( HybridVentNum ).Name + "\" has the controlled zone name = \"" + HybridVentSysAvailMgrData( HybridVentNum ).ControlZoneName + "\"." );
+											ShowContinueError( "This controlled zone already has hybrid ventilation control through this air loop = \"" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + "\"." );
+											ShowContinueError( "Only AvailabilityManager:HybridVentilation = \"" + HybridVentSysAvailMgrData( SysAvailNum ).Name + "\" will be simulated. Simulation continues..." );
+										} else {
+											HybridVentSysAvailMgrData( HybridVentNum ).SimHybridVentSysAvailMgr = true;
+										}
 									}
 								}
 							}
@@ -4637,6 +4606,16 @@ namespace SystemAvailabilityManager {
 					ShowSevereError( cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + ", The controlled zone is not defined correctly =" + HybridVentSysAvailMgrData( SysAvailNum ).ControlZoneName );
 					ErrorsFound = true;
 				}
+				// check schedule value for adaptive temperature control
+				if ( CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, 5.0 ) || CheckScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr, 6.0 ) ) {
+					if ( !AdaptiveComfortRequested_ASH55 ) {
+						ShowSevereError( "GetHybridVentilationInputs: AvailabilityManager:HybridVentilation =\"" + HybridVentSysAvailMgrData( SysAvailNum ).Name + "\"" );
+						ShowContinueError( "Ventilation Control Mode Schedule Name =\"" + Schedule( HybridVentSysAvailMgrData( SysAvailNum ).ControlModeSchedPtr ).Name + "\", When the schedule value is 5 or 6, operative temperature control is requested. " );
+						ShowContinueError( "However, AdaptiveASH55 is not entered in the Thermal Comfort Model Type fields in the People object." );
+						ErrorsFound = true;
+					}
+				}
+
 			}
 
 			// Ensure an airloop name is not used more than once in the hybrid ventilation control objects
@@ -4680,6 +4659,41 @@ namespace SystemAvailabilityManager {
 			}
 		}
 
+		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
+			for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {
+				HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration = 0.0;
+				HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration = 0.0;
+			}
+			MyEnvrnFlag = false;
+		}
+		if ( !BeginEnvrnFlag ) {
+			MyEnvrnFlag = true;
+		}
+		// check minimum operation time
+		CurrentEndTime = CurrentTime + SysTimeElapsed;
+		if ( CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast ) {
+			for ( SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum ) {
+				if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_NoAction ) {
+					HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration = 0.0;
+					HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration = 0.0;
+				}
+				if ( HybridVentSysAvailMgrData( SysAvailNum ).MinVentTime > 0.0 ) {
+					if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Open ) {
+						HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration += ( CurrentEndTime - CurrentEndTimeLast ) * 60.0;
+						HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration = 0.0;
+					}
+				}
+				if ( HybridVentSysAvailMgrData( SysAvailNum ).MinOperTime > 0.0 ) {
+					if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
+						HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration += ( CurrentEndTime - CurrentEndTimeLast ) * 60.0;
+						HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration = 0.0;
+					}
+				}
+			}
+		}
+		TimeStepSysLast = TimeStepSys;
+		CurrentEndTimeLast = CurrentEndTime;
+
 	}
 
 	void
@@ -4710,6 +4724,7 @@ namespace SystemAvailabilityManager {
 		// Using/Aliasing
 		using namespace DataAirLoop;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataZoneEquipment::NumValidSysAvailZoneComponents;
 		using DataHeatBalFanSys::TempZoneThermostatSetPoint;
 		using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -4733,6 +4748,7 @@ namespace SystemAvailabilityManager {
 		using DataHeatBalance::HybridControlTypeIndiv;
 		using DataHeatBalance::HybridControlTypeClose;
 		using DataHeatBalance::HybridControlTypeGlobal;
+		using DataHeatBalance::MRT;
 		using DataZoneControls::HumidityControlZone;
 		using DataZoneControls::NumHumidityControlZones;
 		using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
@@ -4740,6 +4756,9 @@ namespace SystemAvailabilityManager {
 		using CurveManager::CurveValue;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkControlSimple;
+		using ThermalComfort::runningAverageASH;
+		using DataContaminantBalance::ZoneCO2SetPoint;
+		using DataContaminantBalance::ZoneAirCO2;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4771,154 +4790,234 @@ namespace SystemAvailabilityManager {
 		int ControlledZoneNum; // Index into the ZoneEquipConfig array
 		int SimpleControlType; // Simple control type from a schedule: 0 individual, 1 global
 		int i; // Array index
+		Real64 minAdaTem; // minimum adaptive temperature for adaptive temperature control
+		Real64 maxAdaTem; // maximum adaptive temperature for adaptive temperature control
+		bool KeepStatus; // true, if minimum time operation is needed
+		int ZoneEquipType;
+		int ZoneCompNum;
+		int AirLoopNum;
+		int Num;
+		int AvailStatus;
+
+		KeepStatus = false;
+		if ( HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration > 0.0 && HybridVentSysAvailMgrData( SysAvailNum ).TimeVentDuration <= HybridVentSysAvailMgrData( SysAvailNum ).MinVentTime ) {
+			KeepStatus = true;
+		}
+		if ( HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration > 0.0 && HybridVentSysAvailMgrData( SysAvailNum ).TimeOperDuration <= HybridVentSysAvailMgrData( SysAvailNum ).MinOperTime ) {
+			KeepStatus = true;
+		}
 
 		ControlMode = HybridVentSysAvailMgrData( SysAvailNum ).ControlMode;
 
 		ZoneNum = HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum;
-		HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_NoAction;
+		if ( !KeepStatus ) HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_NoAction;
 		TempExt = Zone( ZoneNum ).OutDryBulbTemp;
 		WindExt = Zone( ZoneNum ).WindSpeed;
+		HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp = 0.0;
+		HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem = 0.0;
+		HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem = 0.0;
 
-		{ auto const SELECT_CASE_var( ControlMode );
+		if ( !KeepStatus ) {
+			{ auto const SELECT_CASE_var( ControlMode );
 
-		if ( SELECT_CASE_var == HybridVentMode_No ) {
-			HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_NoAction;
+			if ( SELECT_CASE_var == HybridVentMode_No ) {
+				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_NoAction;
 
-			// Temperature control
-		} else if ( SELECT_CASE_var == HybridVentMode_Temp ) {
-			if ( TempExt >= HybridVentSysAvailMgrData( SysAvailNum ).MinOutdoorTemp && TempExt <= HybridVentSysAvailMgrData( SysAvailNum ).MaxOutdoorTemp ) {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
-			} else {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-			}
-
-			// Enthalpy control
-		} else if ( SELECT_CASE_var == HybridVentMode_Enth ) {
-			ZoneAirEnthalpy = PsyHFnTdbW( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) );
-			if ( OutEnthalpy >= HybridVentSysAvailMgrData( SysAvailNum ).MinOutdoorEnth && OutEnthalpy <= HybridVentSysAvailMgrData( SysAvailNum ).MaxOutdoorEnth ) {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
-			} else {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-			}
-
-			// Dew point control
-		} else if ( SELECT_CASE_var == HybridVentMode_DewPoint ) {
-			if ( OutDewPointTemp >= HybridVentSysAvailMgrData( SysAvailNum ).MinOutdoorDewPoint && OutDewPointTemp <= HybridVentSysAvailMgrData( SysAvailNum ).MaxOutdoorDewPoint ) {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
-			} else {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-			}
-
-		} else if ( SELECT_CASE_var == HybridVentMode_OA ) {
-			OASetPoint = GetCurrentScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).MinOASchedPtr );
-			ACH = 0.0;
-			HybridVentModeOA = true;
-			if ( ! HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
-				if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
-					HybridVentModeOA = false;
-				}
-			}
-
-			if ( HybridVentSysAvailMgrData( SysAvailNum ).ANControlTypeSchedPtr > 0 && HybridVentModeOA ) {
-				ManageAirflowNetworkBalance( true );
-				ACH = GetZoneInfilAirChangeRate( ZoneNum );
-			}
-			if ( ACH > OASetPoint ) {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
-			} else {
-				HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-			}
-
-		} else {
-			ShowSevereError( cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + ": incorrect Control Type: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
-			ShowFatalError( "Errors found in getting " + cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + " Control mode value" );
-
-		}}
-
-		if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Open ) {
-
-			// Temperature and enthalpy control
-			if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_Temp || HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_Enth ) {
-
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) ); // select on thermostat control
-
-				if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-					if ( MAT( ZoneNum ) < TempZoneThermostatSetPoint( ZoneNum ) ) {
-						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-					}
-
-				} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
-					if ( MAT( ZoneNum ) > TempZoneThermostatSetPoint( ZoneNum ) ) {
-						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-					}
-
-				} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
-					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-					++HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount;
-					if ( HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling. Natural ventilation is not allowed." );
-						ShowContinueErrorTimeStamp( "" );
-					} else {
-						ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": No natural ventilation continues with a ThermostatSetpoint:SingleHeatingOrCooling type...", HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
-					}
-
-				} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
-					if ( ( MAT( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) || ( MAT( ZoneNum ) > ZoneThermostatSetPointHi( ZoneNum ) ) ) {
-						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-					}
-
+				// Temperature control
+			} else if ( SELECT_CASE_var == HybridVentMode_Temp ) {
+				if ( TempExt >= HybridVentSysAvailMgrData( SysAvailNum ).MinOutdoorTemp && TempExt <= HybridVentSysAvailMgrData( SysAvailNum ).MaxOutdoorTemp ) {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
 				} else {
-				}} // end select on thermostat control
-			}
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+				}
 
-			// Dew point control mode
-			if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_DewPoint ) {
-				ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
-				ZoneAirDewPoint = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress );
-				if ( NumHumidityControlZones == 0 ) {
-					++HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount;
-					if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: Dew point control mode is selected, but no ZoneControl:Humidistat object=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
-						ShowContinueError( "The hybrid ventilation control is triggered by outdoor min and max dewpoint only." );
-						ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
-						ShowContinueErrorTimeStamp( "" );
-					} else {
-						ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": no ZoneControl:Humidistat object continues...", HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
+				// Enthalpy control
+			} else if ( SELECT_CASE_var == HybridVentMode_Enth ) {
+				ZoneAirEnthalpy = PsyHFnTdbW( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ) );
+				if ( OutEnthalpy >= HybridVentSysAvailMgrData( SysAvailNum ).MinOutdoorEnth && OutEnthalpy <= HybridVentSysAvailMgrData( SysAvailNum ).MaxOutdoorEnth ) {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+				} else {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+				}
+
+				// Dew point control
+			} else if ( SELECT_CASE_var == HybridVentMode_DewPoint ) {
+				if ( OutDewPointTemp >= HybridVentSysAvailMgrData( SysAvailNum ).MinOutdoorDewPoint && OutDewPointTemp <= HybridVentSysAvailMgrData( SysAvailNum ).MaxOutdoorDewPoint ) {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+				} else {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+				}
+
+			} else if ( SELECT_CASE_var == HybridVentMode_OA ) {
+				OASetPoint = GetCurrentScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).MinOASchedPtr );
+				ACH = 0.0;
+				HybridVentModeOA = true;
+				if ( !HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
+					if ( SimulateAirflowNetwork <= AirflowNetworkControlSimple ) {
+						HybridVentModeOA = false;
 					}
 				}
-				found = false;
-				for ( HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum ) {
-					if ( HumidityControlZone( HStatZoneNum ).ActualZoneNum == ZoneNum ) {
-						found = true;
-						ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HStatZoneNum ).HumidifyingSchedIndex );
-						ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HStatZoneNum ).DehumidifyingSchedIndex );
-						if ( ZoneAirRH > ZoneRHDehumidifyingSetPoint ) { // Need dehumidification
-							WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress );
-							if ( WSetPoint < OutHumRat ) HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-						} else if ( ZoneAirRH < ZoneRHHumidifyingSetPoint ) { // Need humidification
-							WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress );
-							if ( WSetPoint > OutHumRat ) HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
-						} else {
+
+				if ( HybridVentSysAvailMgrData( SysAvailNum ).ANControlTypeSchedPtr > 0 && HybridVentModeOA ) {
+					ManageAirflowNetworkBalance( true );
+					ACH = GetZoneInfilAirChangeRate( ZoneNum );
+				}
+				if ( ACH > OASetPoint ) {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+				} else {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+				}
+
+			} else if ( SELECT_CASE_var == HybridVentMode_OperT80 ) {
+				if ( runningAverageASH >= 10.0 && runningAverageASH <= 33.5 ) {
+					HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+					minAdaTem = 0.31 * runningAverageASH + 14.3;
+					maxAdaTem = 0.31 * runningAverageASH + 21.3;
+					HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem = minAdaTem;
+					HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem = maxAdaTem;
+					if ( HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp <= maxAdaTem && HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp >= minAdaTem ) {
+						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+					} else {
+						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+					}
+				} else {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+				}
+
+			} else if ( SELECT_CASE_var == HybridVentMode_OperT90 ) {
+				if ( runningAverageASH >= 10.0 && runningAverageASH <= 33.5 ) {
+					HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+					minAdaTem = 0.31 * runningAverageASH + 15.3;
+					maxAdaTem = 0.31 * runningAverageASH + 20.3;
+					HybridVentSysAvailMgrData( SysAvailNum ).minAdaTem = minAdaTem;
+					HybridVentSysAvailMgrData( SysAvailNum ).maxAdaTem = maxAdaTem;
+					if ( HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp <= maxAdaTem && HybridVentSysAvailMgrData( SysAvailNum ).OperativeTemp >= minAdaTem ) {
+						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+					} else {
+						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+					}
+				} else {
+					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+				}
+
+			} else if ( SELECT_CASE_var == HybridVentMode_CO2 ) {
+				HybridVentSysAvailMgrData( SysAvailNum ).CO2 = ZoneAirCO2( ZoneNum );
+				if ( ZoneAirCO2( ZoneNum ) > ZoneCO2SetPoint( ZoneNum ) ) {
+					if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {
+						AirLoopNum = HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum;
+						for ( Num = 1; Num <= PriAirSysAvailMgr( HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum ).NumAvailManagers; ++Num ) {
+							SimSysAvailManager( PriAirSysAvailMgr( AirLoopNum ).AvailManagerType( Num ), PriAirSysAvailMgr( AirLoopNum ).AvailManagerName( Num ), PriAirSysAvailMgr( AirLoopNum ).AvailManagerNum( Num ), AirLoopNum, PriAirSysAvailMgr( AirLoopNum ).AvailStatus, AvailStatus );
+						}
+						if ( AvailStatus == CycleOn ) {
 							HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+						} else {
+							HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+						}
+					} else if ( HybridVentSysAvailMgrData( SysAvailNum ).SimHybridVentSysAvailMgr ) {
+						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+						for ( ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType ) {
+							for ( ZoneCompNum = 1; ZoneCompNum <= ZoneComp( ZoneEquipType ).TotalNumComp; ++ZoneCompNum ) {
+								if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( ZoneCompNum ).AvailStatus == CycleOn ) {
+									HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+									break;
+								}
+							}
+						}
+					} else {
+						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Open;
+					}
+				}
+			} else {
+				ShowSevereError( cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + ": incorrect Control Type: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+				ShowFatalError( "Errors found in getting " + cValidSysAvailManagerTypes( HybridVentSysAvailMgrData( SysAvailNum ).MgrType ) + " Control mode value" );
+
+			}}
+
+			if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Open ) {
+
+				// Temperature and enthalpy control
+				if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_Temp || HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_Enth ) {
+
+					{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) ); // select on thermostat control
+
+					if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+						if ( MAT( ZoneNum ) < TempZoneThermostatSetPoint( ZoneNum ) ) {
+							HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+						}
+
+					} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+						if ( MAT( ZoneNum ) > TempZoneThermostatSetPoint( ZoneNum ) ) {
+							HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+						}
+
+					} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+						HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+						++HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount;
+						if ( HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount < 2 ) {
+							ShowWarningError( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling. Natural ventilation is not allowed." );
+							ShowContinueErrorTimeStamp( "" );
+						} else {
+							ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": No natural ventilation continues with a ThermostatSetpoint:SingleHeatingOrCooling type...", HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
+						}
+
+					} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+						if ( ( MAT( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) || ( MAT( ZoneNum ) > ZoneThermostatSetPointHi( ZoneNum ) ) ) {
+							HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+						}
+
+					} else {
+					}} // end select on thermostat control
+				}
+
+				// Dew point control mode
+				if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_DewPoint ) {
+					ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
+					ZoneAirDewPoint = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress );
+					if ( NumHumidityControlZones == 0 ) {
+						++HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount;
+						if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount < 2 ) {
+							ShowWarningError( "Hybrid ventilation control: Dew point control mode is selected, but no ZoneControl:Humidistat object=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+							ShowContinueError( "The hybrid ventilation control is triggered by outdoor min and max dewpoint only." );
+							ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
+							ShowContinueErrorTimeStamp( "" );
+						} else {
+							ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": no ZoneControl:Humidistat object continues...", HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
+						}
+					}
+					found = false;
+					for ( HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum ) {
+						if ( HumidityControlZone( HStatZoneNum ).ActualZoneNum == ZoneNum ) {
+							found = true;
+							ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HStatZoneNum ).HumidifyingSchedIndex );
+							ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HStatZoneNum ).DehumidifyingSchedIndex );
+							if ( ZoneAirRH > ZoneRHDehumidifyingSetPoint ) { // Need dehumidification
+								WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress );
+								if ( WSetPoint < OutHumRat ) HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+							} else if ( ZoneAirRH < ZoneRHHumidifyingSetPoint ) { // Need humidification
+								WSetPoint = PsyWFnTdbRhPb( MAT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress );
+								if ( WSetPoint > OutHumRat ) HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+							} else {
+								HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
+							}
+						}
+					}
+					if ( ! found && NumHumidityControlZones > 0 ) {
+						++HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount;
+						if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount < 2 ) {
+							ShowWarningError( "Hybrid ventilation control: The zone for dew point control mode is different from the zone for ZoneControl:Humidistat=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+							ShowContinueError( "The Zone name for hybrid control is " + Zone( ZoneNum ).Name + ". Humidistat has no impact" );
+							ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
+							ShowContinueErrorTimeStamp( "" );
+						} else {
+							ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + " No humidistat control impact continues...", HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
 						}
 					}
 				}
-				if ( ! found && NumHumidityControlZones > 0 ) {
-					++HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount;
-					if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: The zone for dew point control mode is different from the zone for ZoneControl:Humidistat=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
-						ShowContinueError( "The Zone name for hybrid control is " + Zone( ZoneNum ).Name + ". Humidistat has no impact" );
-						ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
-						ShowContinueErrorTimeStamp( "" );
-					} else {
-						ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + " No humidistat control impact continues...", HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
-					}
+
+				// Outdoor ventilation air control mode
+				if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_OA ) {
+
 				}
-			}
-
-			// Outdoor ventilation air control mode
-			if ( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode == HybridVentMode_OA ) {
-
 			}
 		}
 
@@ -4950,31 +5049,33 @@ namespace SystemAvailabilityManager {
 		if ( HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum > 0 && HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 ) {
 			SimpleControlType = GetCurrentScheduleValue( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr );
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
-				if ( HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ) {
-					// Setup flag for ventilation objects
-					for ( i = 1; i <= TotVentilation; ++i ) {
-						if ( Ventilation( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
-							Ventilation( i ).HybridControlType = HybridControlTypeIndiv;
-							if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
-								Ventilation( i ).HybridControlType = HybridControlTypeClose;
-							} else {
-								if ( SimpleControlType == 1 ) {
-									Ventilation( i ).HybridControlType = HybridControlTypeGlobal;
-									Ventilation( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					if ( HybridVentSysAvailMgrData( SysAvailNum ).AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) ) {
+						// Setup flag for ventilation objects
+						for ( i = 1; i <= TotVentilation; ++i ) {
+							if ( Ventilation( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
+								Ventilation( i ).HybridControlType = HybridControlTypeIndiv;
+								if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
+									Ventilation( i ).HybridControlType = HybridControlTypeClose;
+								} else {
+									if ( SimpleControlType == 1 ) {
+										Ventilation( i ).HybridControlType = HybridControlTypeGlobal;
+										Ventilation( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+									}
 								}
 							}
 						}
-					}
-					// Setup flag for Mixing objects
-					for ( i = 1; i <= TotMixing; ++i ) {
-						if ( Mixing( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
-							Mixing( i ).HybridControlType = HybridControlTypeIndiv;
-							if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
-								Mixing( i ).HybridControlType = HybridControlTypeClose;
-							} else {
-								if ( SimpleControlType == 1 ) {
-									Mixing( i ).HybridControlType = HybridControlTypeGlobal;
-									Mixing( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+						// Setup flag for Mixing objects
+						for ( i = 1; i <= TotMixing; ++i ) {
+							if ( Mixing( i ).ZonePtr == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
+								Mixing( i ).HybridControlType = HybridControlTypeIndiv;
+								if ( HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl == HybridVentCtrl_Close ) {
+									Mixing( i ).HybridControlType = HybridControlTypeClose;
+								} else {
+									if ( SimpleControlType == 1 ) {
+										Mixing( i ).HybridControlType = HybridControlTypeGlobal;
+										Mixing( i ).HybridControlMasterNum = HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr;
+									}
 								}
 							}
 						}

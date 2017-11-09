@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -1090,21 +1079,21 @@ namespace EnergyPlus {
 //				                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
 //				                     "System", "Average",
 //				                     IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Loop Mass Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Condenser Water Mass Flow Rate [kg/s]", IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalCoolingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalSpaceHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Water Heating Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalWaterHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Electric Power [W]", IntegratedHeatPumps( DXCoilNum ).TotalPower, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Rate [W]", IntegratedHeatPumps( DXCoilNum ).TotalLatentLoad, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Rate [W]", IntegratedHeatPumps( DXCoilNum ).Qsource, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump COP []", IntegratedHeatPumps( DXCoilNum ).TotalCOP, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Electric Energy [J]", IntegratedHeatPumps( DXCoilNum ).Energy, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalCooling, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Water Heating Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalWaterHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergyLatent, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
-				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Energy [J]", IntegratedHeatPumps( DXCoilNum ).EnergySource, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Loop Mass Flow Rate", OutputProcessor::Unit::kg_s, IntegratedHeatPumps( DXCoilNum ).AirLoopFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Condenser Water Mass Flow Rate", OutputProcessor::Unit::kg_s, IntegratedHeatPumps( DXCoilNum ).TankSourceWaterMassFlowRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Rate", OutputProcessor::Unit::W, IntegratedHeatPumps( DXCoilNum ).TotalCoolingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Heating Rate", OutputProcessor::Unit::W, IntegratedHeatPumps( DXCoilNum ).TotalSpaceHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Water Heating Rate", OutputProcessor::Unit::W, IntegratedHeatPumps( DXCoilNum ).TotalWaterHeatingRate, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Electric Power", OutputProcessor::Unit::W, IntegratedHeatPumps( DXCoilNum ).TotalPower, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Rate", OutputProcessor::Unit::W, IntegratedHeatPumps( DXCoilNum ).TotalLatentLoad, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Rate", OutputProcessor::Unit::W, IntegratedHeatPumps( DXCoilNum ).Qsource, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump COP", OutputProcessor::Unit::None, IntegratedHeatPumps( DXCoilNum ).TotalCOP, "System", "Average", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Electric Energy", OutputProcessor::Unit::J, IntegratedHeatPumps( DXCoilNum ).Energy, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Total Cooling Energy", OutputProcessor::Unit::J, IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalCooling, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Heating Energy", OutputProcessor::Unit::J, IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Water Heating Energy", OutputProcessor::Unit::J, IntegratedHeatPumps( DXCoilNum ).EnergyLoadTotalWaterHeating, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Air Latent Cooling Energy", OutputProcessor::Unit::J, IntegratedHeatPumps( DXCoilNum ).EnergyLatent, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
+				SetupOutputVariable( "Integrated Heat Pump Source Heat Transfer Energy", OutputProcessor::Unit::J, IntegratedHeatPumps( DXCoilNum ).EnergySource, "System", "Summed", IntegratedHeatPumps( DXCoilNum ).Name );
 			}
 
 		}

@@ -1,10 +1,10 @@
 \section{AirflowNetwork Model}\label{airflownetwork-model}
 
-\subsection{Overview}\label{overview-004}
+\subsection{Overview}\label{afn-overview}
 
-The AirflowNetwork model provides the ability to simulate the performance of an air distribution system, including supply and return leaks, and calculate multizone airflows driven by outdoor wind and forced air during HVAC system operation. The pressure and airflow model described here was developed based on AIRNET (Walton 1989). This detailed model is used to simulate thermal conduction and air leakage losses for constant volume air distribution systems (e.g., in residential or light commercial buildings). The multizone airflow calculations are performed at the HVAC system time step which, among other benefits,.allows for modeling hybrid ventilation systems.
+The AirflowNetwork model provides the ability to simulate the performance of an air distribution system, including supply and return leaks, and calculate multizone airflows driven by outdoor wind and forced air during HVAC system operation. The pressure and airflow model described here was developed based on AIRNET (Walton 1989). This detailed model is used to simulate thermal conduction and air leakage losses for constant volume air distribution systems (e.g., in residential or light commercial buildings). The multizone airflow calculations are performed at the HVAC system time step which, among other benefits, allows for modeling hybrid ventilation systems.
 
-\subsection{Model Description}\label{model-description-001}
+\subsection{Model Description}\label{afn-model-description}
 
 The input object AirflowNetwork:SimulationControl provides access to the airflow network method, which consists of a set of nodes connected by airflow components through linkages. The objects AirflowNetwork:Multizone:Zone, AirflowNetwork:Multizone:ExternalNode, and AirflowNetwork:Distribution:Node represent airflow nodes. The objects AirflowNetwork:Multizone:Surface and AirflowNetwork:Distribution:Linkage represent airflow linkages. The other objects with a relationship between pressure and airflow represent airflow components.
 
@@ -21,7 +21,7 @@ The AirflowNetwork model consists of three sequential steps:
 
 The pressure and airflow calculations determine pressure at each node and airflow through each linkage given wind pressures and forced airflows. Based on the airflow calculated for each linkage, the model then calculates node temperatures and humidity ratios given zone air temperatures and zone humidity ratios.~ Using these node temperatures and humidity ratios, the sensible and latent loads from duct system conduction and leakage are summed for each zone. The sensible and latent loads obtained in this step are then used in the zone energy balance equations to predict HVAC system loads and to calculate the final zone air temperatures, humidity ratios, and pressures.
 
-The present AirflowNetwork model may only be applied to a single heating and cooling system that uses a single air distribution system (a single AirLoopHVAC object). The model excludes the impact of the air and duct system thermal capacitance. The impact of thermal capacity will be addressed in future upgrades to this model.
+The present AirflowNetwork model may only be applied to a single heating and cooling system that uses a single air distribution system (a single AirLoopHVAC object). The model excludes the impact of the air and duct system thermal capacitance.
 
 \subsection{Pressure and Airflow Calculations}\label{pressure-and-airflow-calculations}
 
@@ -35,15 +35,16 @@ Newton's method is used to solve for node air pressures and it requires an initi
   \dot{m}_{i} = C_{i}\rho\frac{\Delta P_i}{\mu}
 \end{equation}
 
-where
+where:
 
-\(\mathop {{m_i}}\limits^ \bullet\) = Air mass flow rate at i-th linkage {[}kg/s{]}
-
-\emph{C\(_{i}\)}~ = Air mass flow coefficient {[}m\(^{3}\){]}
-
-\(\Delta P\) \(_{i}\) = Pressure difference across the i-th linkage {[}Pa{]}
-
-\emph{µ~~~}~~~~~~~~~~~ = Air viscosity {[}Pa-s{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\dot{m}_i$ &= Air mass flow rate at i-th linkage [kg/s] \\
+$C_i$ &= Air mass flow coefficient [m\(^{3}\)] \\
+$\Delta P_i$ &= Pressure difference across the i-th linkage [Pa] \\
+$\mu$ &= Air viscosity [Pa-s] \\
+\\
+\end{tabular}
 
 This initialization handles stack effects very well and tends to establish the proper direction for the airflows. The linear approximation is provided by the laminar regime.
 
@@ -53,9 +54,12 @@ The second initialization method assumes the initial pressures are zero and uses
 
 Conservation of air mass flow rate at each linkage provides the convergence criterion. When the sum of mass flow rates in all the linkages approaches zero within the convergence tolerance, the solution has converged. The solution is assumed to have converged when the sum is less than the convergence value, in order to reduce the number of iterations and obtain sufficient accuracy. There are two convergence criteria used in the AirflowNetwork model: Relative airflow convergence tolerance and Absolute airflow convergence tolerance.
 
-Relative airflow tolerance = \(\frac{\left| \sum \dot m_i \right|}{\sum \dot m_i}\)
-
-Absolute airflow tolerance = \(\left| \sum \dot m_i \right|\)
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+Relative airflow tolerance &= $\frac{\left| \sum \dot{m}_i \right|}{\sum \dot{m}_i}$ \\
+Absolute airflow tolerance &= $\left| \sum \dot{m}_i \right|$ \\
+\\
+\end{tabular}
 
 The relative airflow tolerance is equivalent to the ratio of the absolute value of the sum of all network airflows to the sum of the network airflow magnitudes.~ The absolute airflow tolerance is the summation of the absolute value of all network airflows. The solution has converged when both of these convergence criteria have been met.
 
@@ -64,22 +68,22 @@ The relative airflow tolerance is equivalent to the ratio of the absolute value 
 A linkage used in the AirflowNetwork model has two nodes, inlet and outlet, and is linked by a component which has a relationship between airflow and pressure.~ The pressure difference across each component in a linkage is assumed to be governed by Bernoulli's equation:
 
 \begin{equation}
-\Delta P = \left( {Pn + \frac{{\rho V_n^2}}{2}} \right) - \left( {Pm + \frac{{\rho V_m^2}}{2}} \right) + \rho g\left( {zn - zm} \right)
+\Delta P = \left( {P_n + \frac{{\rho V_n^2}}{2}} \right) - \left( {P_m + \frac{{\rho V_m^2}}{2}} \right) + \rho g\left( {z_n - z_m} \right)
 \end{equation}
 
-~where
+where:
 
-\emph{ΔP}~~~~~~~~~~~ = Total pressure difference between nodes n and m {[}Pa{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\Delta P$ &= Total pressure difference between nodes n and m [Pa] \\
+$P_n, P_m$ &= Entry and exit static pressures [Pa] \\
+$V_n, V_m$ &= Entry and exit airflow velocities [m/s] \\
+$\rho$ &= Air density [kg/m\(^{3}\)] \\
+$g$ &= Acceleration due to gravity [9.81 m/s\(^{2}\)] \\
+$z_n, z_m$ &= Entry and exit elevations [m] \\
+\\
+\end{tabular}
 
-\emph{P\(_{n}\), P\(_{m}\)}~~~~~~~ = Entry and exit static pressures {[}Pa{]}
-
-\emph{V\(_{n}\), V\(_{m}\)}~~~~~~~ = Entry and exit airflow velocities {[}m/s{]}
-
-\emph{ρ~~~}~~~~~~~~~ = Air density {[}kg/m\(^{3}\){]}
-
-\emph{g}~~~~~~~~~~~~~~~ = Acceleration due to gravity {[}9.81 m/s\(^{2}\){]}
-
-\emph{z\(_{n}\), z\(_{m}\)}~~~~~~~~~ = Entry and exit elevations {[}m{]}
 
 By rearranging terms and adding wind pressure impacts, the above equation may be rewritten in the format used by the airflow network model:
 
@@ -87,19 +91,21 @@ By rearranging terms and adding wind pressure impacts, the above equation may be
 \Delta P = {P_n} - {P_m} + {P_S} + {P_W}
 \end{equation}
 
-where
+where:
 
-\emph{P\(_{n}\), P\(_{m}\)} = Total pressures at nodes n and m {[}Pa{]}
-
-\emph{P\(_{S}\)}~~~~~~~~~~~~~ = Pressure difference due to density and height differences {[}Pa{]}
-
-\emph{P\(_{W}\)}~~~~~~~~~~~ = Pressure difference due to wind {[}Pa{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$P_n, P_m$ &= Total pressures at nodes n and m [Pa] \\
+$P_S$ &= Pressure difference due to density and height differences [Pa] \\
+$P_W$ &= Pressure difference due to wind [Pa] \\
+\\
+\end{tabular}
 
 The Input Output Reference provides the relationship between airflow and pressure for the most of the components (Ref.AirflowNetwork Model). The relationship between airflow and pressure for the AirflowNetwork:Multizone:Component:DetailedOpening, AirflowNetwork:Multizone:Component:SimpleOpening, and Air\-flow\-Net\-work:\-Multi\-zone:\-Com\-ponent:\-Horizontal\-Opening objects are provided in detail in this reference.
 
 \begin{figure}[hbtp] % fig 147
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2691.svg.png}
+\includegraphics[width=0.9\linewidth, height=0.9\textheight, keepaspectratio=true]{media/image2691.svg.png}
 \caption{The general problem of gravitational flow through a vertical opening \protect \label{fig:the-general-problem-of-gravitational-flow}}
 \end{figure}
 
@@ -113,7 +119,9 @@ The air density is assumed to be a linear function of height:
 
 The pressure difference is assumed to be linear and simulate the effect of turbulence:
 
-~\(\Delta {P_t} = {P_{t0}} + {b_t}z\)
+\begin{equation}
+\Delta P_t = P_{t0} + b_t z
+\end{equation}
 
 The reference pressures on each side are given at the bottom of the opening. By assuming the Bernoulli hypothesis on both sides, the pressure difference can be defined at any level of z as:
 
@@ -163,13 +171,15 @@ The two real solutions represent three-way flow, which may be written in the fol
 {\dot m_{z2,H}} = {C_d}\theta \int\limits_{z = z2}^{z = H} {\rho \nu (z)Wdz}
 \end{equation}
 
-where
+where:
 
-\emph{C\(_{d}\)}~ = discharge coefficient {[}dimensionless{]}
-
-\emph{θ}~~~ = Area reduction factor {[}dimensionless{]}
-
-\emph{W}~~ = Opening width {[}m{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$C_d$ &= discharge coefficient [dimensionless]\\
+$\theta$ &= Area reduction factor [dimensionless]\\
+$W$ &= Opening width [m]\\
+\\
+\end{tabular}
 
 The discharge coefficient, opening width, opening height, and start height factor are modulated based on opening factors. A detailed description of opening factor calculations may be found in the Input Output Reference (Ref. AirflowNetwork:Multizone:Zone, AirflowNetwork:Multizone:Surface, and
 
@@ -179,7 +189,7 @@ The above calculation procedure is used for a normal rectangular window. For a h
 
 \begin{figure}[hbtp] % fig 148
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2703.png}
+\includegraphics[width=0.9\linewidth, height=0.9\textheight, keepaspectratio=true]{media/image2703.png}
 \caption{Schematic drawing of a horizontally-pivoted window \protect \label{fig:schematic-drawing-of-a-horizontally-pivoted}}
 \end{figure}
 
@@ -195,7 +205,9 @@ h4 = AxisHeight + (WindowHeight - AxisHeight)\cos (\alpha )
 
 When z \textless{} h2 or z \textgreater{} h4, where z is the distance from the bottom of the window, the integration procedure is the same as the procedure for a normal rectangular window. When h2\textless{}z\textless{}h4, the window width W in the above equations is modified as:
 
-~\({W_{pivot}} = \sqrt {\frac{1}{{\frac{1}{{{W^2}}} + \frac{1}{{{{(2(AxisHeight - z)\tan (\alpha ))}^2}}}}}}\)
+\begin{equation}
+W_{pivot} = \sqrt{\frac{1}{{\frac{1}{{{W^2}}} + \frac{1}{{{{(2(AxisHeight - z)\tan (\alpha ))}^2}}}}}}
+\end{equation}
 
 The mass flow rate in the pivoted area becomes:
 
@@ -209,7 +221,7 @@ The schematic drawing of air flow patterns through a simple vertical opening (Ai
 
 \begin{figure}[hbtp] % fig 149
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2708.svg.png}
+\includegraphics[width=0.9\linewidth, height=0.9\textheight, keepaspectratio=true]{media/image2708.svg.png}
 \caption{Schematic of large opening and associated three flow patterns \protect \label{fig:schematic-of-large-opening-and-associated}}
 \end{figure}
 
@@ -223,13 +235,15 @@ Pn\left( y \right) = {P_{0n}} - {\rho_n}gy
 {P_m}(y) = {P_{0m}} - {\rho_m}gy
 \end{equation}
 
-where
+where:
 
-\emph{P\(_{0n}\), P\(_{0m}\)~ =}pressure at nodes (zones) n and m at y = 0, the reference elevation of the opening {[}Pa{]}
-
-\emph{ρ\(_{n}\), ρ\(_{m}\)~ =}air densities of zones n and m {[}kg/m\(^{3}\){]}
-
-\emph{P\(_{n}\), P\(_{m}\)~ =}reference pressures of zones n and m {[}Pa{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$P_{0n}, P_{0m}$ &= pressure at nodes (zones) n and m at y = 0, the reference elevation of the opening [Pa] \\
+$\rho_n, \rho_m$ &= air densities of zones n and m [kg/m\(^{3}\)] \\
+$P_n, P_m$ &= reference pressures of zones n and m [Pa] \\
+\\
+\end{tabular}
 
 It is assumed that the velocity of the airflow as a function of height is given by the orifice equation (Brown and Solvason 1962):
 
@@ -237,11 +251,14 @@ It is assumed that the velocity of the airflow as a function of height is given 
 v(y) = {C_d}\sqrt {2\frac{{{P_n}(y) - {P_m}(y)}}{\rho }}
 \end{equation}
 
-~where
+where:
 
-\emph{C\(_{d}\)} = discharge coefficient {[}dimensionless{]}
-
-\emph{ρ}~~ = density of the air going through the opening {[}kg/m\(^{3}\){]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$C_d$ &= discharge coefficient [dimensionless] \\
+$\rho$ &= density of the air going through the opening [kg/m\(^{3}\)] \\
+\\
+\end{tabular}
 
 The neutral height, Y, where the velocity of the air is zero, may be calculated in the following equation:
 
@@ -275,95 +292,101 @@ For simplicity, a two zone building (upper and lower zones) connected by a large
 
 \begin{figure}[hbtp] % fig 150
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2716.png}
+\includegraphics[width=0.9\linewidth, height=0.9\textheight, keepaspectratio=true]{media/image2716.png}
 \caption{Air movements across a horizontal opening \protect \label{fig:air-movements-across-a-horizontal-opening}}
 \end{figure}
 
-Forced airflows
+\paragraph{Forced airflows}\label{forced-airflows}
 
 The air mass flow rate is determined by the pressure difference across the opening. The relationship between pressure and airflow is the same as AIRNET for a component (see AirflowNetwork:Multizone:Component:SimpleOpening description above). Since the height of the opening is constant, the forced airflow is unidirectional. A positive value for pressure difference indicates flow direction is from the lower zone to the upper zone across the opening, while a negative value represents flow in the opposite direction. The following description addresses forced air mass flow rates and partial derivatives for three possible scenarios of pressure difference:
 
-P\(_{L}\) = P\(_{U}\)
-
-\({\dot m_U}\) = \({\dot m_L}\) = 0
-
-where:
-
-P\(_{L}\)~~~~~~~~~~~~~~ = Air pressure in the lower zone {[}Pa{]}
-
-P\(_{U}\)~~~~~~~~~~~~~ = Air pressure in the upper zone {[}Pa{]}
-
-\({\dot m_U}\) ~~~~~~~~~~~ = Air mass flow rate from the lower zone to the upper zone driven by forced airflow pressure difference {[}kg/s{]}
-
-\({\dot m_L}\) ~~~~~~~~~~~ = Air mass flow rate from the upper zone to the lower zone driven by forced airflow pressure difference {[}kg/s{]}
-
-1)~~~~~~~~~~~P\(_{L}\) \textgreater{} P\(_{U}\)
-
-\({\dot m_U}\) = 0
-
-\begin{equation}
-{\mathop m\limits^ \bullet_L} = {\rho_L}A{C_d}{\left( {\frac{{2\Delta P}}{{{\rho_{ave}}}}} \right)^{0.5}}
-\end{equation}
-
-\begin{equation}
-\frac{{{{\mathop {\partial m}\limits^ \bullet  }_L}}}{{\partial {P_L}}} = {\rho_L}A{C_d}{\left( {\frac{1}{{2\Delta P{\rho_{ave}}}}} \right)^{0.5}}
-\end{equation}
+\textbf{Scenario 1}
+\begin{gather}
+P_L = P_U \\
+\dot{m}_U = \dot{m}_L = 0
+\end{gather}
 
 where:
 
-ρ\(_{L}\)~~ = Air density in the lower zone {[}kg/m\(^{3}\){]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$P_L$ &= Air pressure in the lower zone [Pa] \\
+$P_U$ &= Air pressure in the upper zone [Pa] \\
+$\dot{m}_U$ &= Air mass flow rate from the lower zone to the upper zone driven by forced airflow pressure difference [kg/s]\\
+$\dot{m}_L$ &= Air mass flow rate from the upper zone to the lower zone driven by forced airflow pressure difference [kg/s]\\
+\\
+\end{tabular}
 
-A~~~ = Opening area {[}m\(^{2}\){]}
-
-C\(_{d}\) = Discharge coefficient {[}Dimensionless{]}
-
-ρ\(_{ave}\) = Average air density between the lower and upper zones {[}Pa{]}
-
-ΔP~ = Pressure difference P\(_{L}\) - P\(_{U}\) {[}Pa{]}
-
-2)~~~~~~~~~~~P\(_{L}\) \textless{} P\(_{U}\)
-
-\({\mathop m\limits^ \bullet_{_L}}\) = 0
+\textbf{Scenario 2}
+\begin{gather}
+P_L > P_U
+\dot{m}_U = 0
+\end{gather}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_U} =  - {\rho_U}A{C_d}{\left( {\frac{{2\left| {\Delta P} \right|}}{{{\rho_{ave}}}}} \right)^{0.5}}
+\dot{m}_L = \rho_L A C_d \left( {\frac{2\Delta P}{\rho_{ave}}} \right)^{0.5}
 \end{equation}
 
 \begin{equation}
-\frac{{\partial \mathop {{m_U}}\limits^ \bullet  }}{{\partial {P_L}}} = {\rho_U}A{C_d}{\left( {\frac{1}{{2\left| {\Delta P} \right|{\rho_{ave}}}}} \right)^{0.5}}
+\frac{\partial \dot{m}_L}{\partial {P_L}} = \rho_L A C_d \left( \frac{1}{2\Delta P \rho_{ave}} \right)^{0.5}
 \end{equation}
 
-where\textbf{:}
+where:
 
-ρ\(_{U}\)~~ = Air density in the upper zone {[}kg/m\(^{3}\){]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\rho_L$ &= Air density in the lower zone [kg/m\(^{3}\)]\\
+$A$ &= Opening area [m\(^{2}\)] \\
+$C_d$ &= Discharge coefficient [Dimensionless]\\
+$\rho_{ave}$ &= Average air density between the lower and upper zones [Pa] \\
+$\Delta P$ &= Pressure difference P\(_{L}\) - P\(_{U}\) [Pa]\\
+\\
+\end{tabular}
 
-A~~~ = Opening area {[}m\(^{2}\){]}
+\textbf{Scenario 3}
+\begin{gather}
+P_L < P_U
+\dot{m}_L = 0
+\end{gather}
 
-C\(_{d}\) = Discharge coefficient {[}Dimensionless{]}
+\begin{equation}
+\dot{m}_U =  - {\rho_U}A{C_d}{\left( {\frac{{2\left| {\Delta P} \right|}}{{{\rho_{ave}}}}} \right)^{0.5}}
+\end{equation}
 
-ρ\(_{ave}\) = Average air density between the lower and upper zones {[}Pa{]}
+\begin{equation}
+\frac{{\partial \dot{m}_U}}{{\partial {P_L}}} = {\rho_U}A{C_d}{\left( {\frac{1}{{2\left| {\Delta P} \right|{\rho_{ave}}}}} \right)^{0.5}}
+\end{equation}
 
-ΔP~ = Pressure difference P\(_{L}\) - P\(_{U}\) {[}Pa{]}
+where:
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\rho_U$ &= Air density in the upper zone [kg/m\(^{3}\)]\\
+$A$ &= Opening area [m\(^{2}\)] \\
+$C_{d}$ &= Discharge coefficient [Dimensionless] \\
+$\rho_{ave}$ &= Average air density between the lower and upper zones [Pa] \\
+$\Delta P$ &= Pressure difference P\(_{L}\) - P\(_{U}\) [Pa] \\
+\\
+\end{tabular}
 
 \paragraph{Buoyancy airflows}\label{buoyancy-airflows}
 
 Buoyancy flow only occurs when the air density in the upper zone is greater than the air density in the lower zone. The flow is bi-directional and the amount of upper flow is equal to the lower flow across the opening. The following discussion assumes the air density in the upper zone is greater than the air density in the lower zone. Otherwise, the buoyancy flow rate is equal to zero. It is also assumed that the maximum buoyancy flow occurs when the pressure difference across the opening due to forced airflows is zero. The maximum buoyancy flow may be expressed as a part of Cooper's model:
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{buo,\max }} = {\rho_{ave}}*0.055{\left( {\frac{{g\left| {\Delta \rho } \right|D_{_H}^5}}{{{\rho_{ave}}}}} \right)^{0.5}}
+\dot{m}_{buo,\max} = {\rho_{ave}}\cdot0.055{\left( {\frac{{g\left| {\Delta \rho } \right|D_{_H}^5}}{{{\rho_{ave}}}}} \right)^{0.5}}
 \end{equation}
 
 where:
 
-\({\mathop m\limits^ \bullet_{_{buo,\max }}}\) ~ = Buoyancy mass flow rate at zero forced airflow pressure difference {[}kg/s{]}
-
-g~~~ = Gravity acceleration {[}m/s\(^{2}\){]}
-
-D\(_{H}\) = Hydraulic diameter {[}m{]}
-
-ρ\(_{ave}\) = Average air density between the lower and upper zones {[}kg/m\(^{3}\){]}
-
-Δρ~ = Density difference between the lower and upper zones {[}kg/m\(^{3}\){]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\dot{m}_{buo,\max}$ &= Buoyancy mass flow rate at zero forced airflow pressure difference [kg/s]\\
+$g$ &= Gravity acceleration [m/s\(^{2}\)]\\
+$D_H$ &= Hydraulic diameter [m] \\
+$\rho_{ave}$ &= Average air density between the lower and upper zones [kg/m\(^{3}\)]\\
+$\Delta \rho$ &= Density difference between the lower and upper zones [kg/m\(^{3}\)]\\
+\\
+\end{tabular}
 
 \paragraph{Combined airflows}\label{combined-airflows}
 
@@ -375,111 +398,115 @@ When forced and buoyancy flows co-exist, it is possible to have either unidirect
 
 where:
 
-ΔP\(_{Flood}\) = Purging pressure {[}Pa{]}
-
-g~~~ = Gravity acceleration {[}m/s\(^{2}\){]}
-
-D\(_{H}\) = Hydraulic diameter {[}m{]}
-
-A~~~ = Opening area {[}m\(^{2}\){]}
-
-Δρ~ = Density difference between the lower and upper zones {[}kg/m\(^{3}\){]}
-
-C\(_{Shape}\) = Shape factor {[}dimensionless{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\Delta P_{Flood}$ &= Purging pressure [Pa]\\
+$g$ &= Gravity acceleration [m/s\(^{2}\)]\\
+$D_H$ &= Hydraulic diameter [m]\\
+$A$ &= Opening area [m\(^{2}\)]\\
+$\Delta \rho$ &= Density difference between the lower and upper zones [kg/m\(^{3}\)]\\
+$C_{Shape}$ &= Shape factor [dimensionless]\\
+\\
+\end{tabular}
 
 \begin{equation}
-C_{Shape}^{} = \left\{ \begin{array}{l}0.754\;\;\;{\rm{for}}\;{\rm{a}}\;{\rm{circle}}\;{\rm{opening}}\\0.942(w/D)\;{\rm{for}}\;{\rm{a}}\;{\rm{rectangle}}\;{\rm{opening}}\end{array} \right\}
+C_{Shape} = \left\{ \begin{array}{l}0.754\;\;\;{\rm{for}}\;{\rm{a}}\;{\rm{circle}}\;{\rm{opening}}\\0.942(w/D)\;{\rm{for}}\;{\rm{a}}\;{\rm{rectangle}}\;{\rm{opening}}\end{array} \right\}
 \end{equation}
 
 where:
 
-w~~~ = Opening width {[}m{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$w$ &= Opening width [m]\\
+$D$ &= Opening depth [m]\\
+\\
+\end{tabular}
 
-D~~~ = Opening depth {[}m{]}
-
-As mentioned above, when the air pressure difference between two zones is zero there is the maximum bi-directional flow due to the buoyancy force. When the pressure difference increases from 0 and is less than \textbar{}ΔP\(_{Flood}\)\textbar{}, there is some bi-directional flow across the opening, but less than the maximum flow. If the pressure difference keeps increasing and exceeds \textbar{}ΔP\(_{Flood}\)\textbar{}, there is no bi-directional flow.~ Cooper's model assumes the buoyancy flow varies linearly with pressure difference.
+As mentioned above, when the air pressure difference between two zones is zero there is the maximum bi-directional flow due to the buoyancy force. When the pressure difference increases from 0 and is less than \textbar{}$\Delta P_{Flood}$\textbar{}, there is some bi-directional flow across the opening, but less than the maximum flow. If the pressure difference keeps increasing and exceeds \textbar{}$\Delta P_{Flood}$\textbar{}, there is no bi-directional flow.~ Cooper's model assumes the buoyancy flow varies linearly with pressure difference.
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{buo}} = \left\{ \begin{array}{l}{\mathop m\limits^ \bullet_{buo,\max }}*\left( {1 - \frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}}} \right)\;\,\,If\;\Delta \rho  > 0\;and\;\frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}} < 1\\0\;\,\,\,Otherwise\end{array} \right\}
+\dot{m}_{buo} = \left\{ \begin{array}{l}{\dot{m}_{buo,\max }}\cdot\left( {1 - \frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}}} \right)\;\,\,\mbox{If}\;\Delta \rho  > 0\;\mbox{and}\;\frac{{\left| {\Delta P} \right|}}{{\left| {\Delta {P_{Flood}}} \right|}} < 1\\0\;\,\,\,\mbox{Otherwise}\end{array} \right\}
 \end{equation}
 
 The total air flow across the opening is based on superposition of the forced and buoyancy flows, and may be expressed for three different pressure difference scenarios as follows:
 
-a.~~~~~~~~~~~~~~~~~~~~~~~~~~~~P\(_{L}\) = P\(_{U}\)
+\textbf{a. $P_L = P_U$}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_U}} = {\mathop m\limits^ \bullet_{buo}}
+\dot{m}_U = \dot{m}_{buo}
 \end{equation}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_L}} = {\mathop m\limits^ \bullet_{buo}}
+\dot{m}_L = \dot{m}_{buo}
 \end{equation}
 
 \begin{equation}
-\frac{{{{\mathop {\partial m}\limits^ \bullet  }_L}}}{{\partial {P_L}}} = 0
+\frac{\partial \dot{m}_L}{\partial P_L} = 0
 \end{equation}
 
-b.~~~~~~~~~~~~~~~~~~~~~~~~~~~P\(_{L}\) \textgreater{} P\(_{U}\)
+\textbf{b. $P_L > P_U$}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_U}} = {\mathop m\limits^ \bullet_{buo}}
-\end{equation}
-
-\begin{equation}
-{\mathop m\limits^ \bullet_L} = {\rho_L}A{C_d}{\left( {\frac{{2\Delta P}}{{{\rho_{ave}}}}} \right)^{0.5}} + {\mathop m\limits^ \bullet_{buo}}
+\dot{m}_U = \dot{m}_{buo}
 \end{equation}
 
 \begin{equation}
-\frac{{{{\mathop {\partial m}\limits^ \bullet  }_L}}}{{\partial {P_L}}} = {\rho_L}A{C_d}{\left( {\frac{1}{{2\Delta P{\rho_{ave}}}}} \right)^{0.5}} - \frac{{{{\mathop m\limits^ \bullet  }_{buo,\max }}}}{{\left| {\Delta {P_{Flood}}} \right|}}
+\dot{m}_L = \rho_L A C_d \left( \frac{2 \Delta P}{\rho_{ave}} \right)^{0.5} + \dot{m}_{buo}
+\end{equation}
+
+\begin{equation}
+\frac{\partial \dot{m}_L}{\partial P_L} = \rho_L A C_d \left( \frac{1}{2\Delta P \rho_{ave}} \right )^{0.5} - \frac{\dot{m}_{buo,max}}{|\Delta P_{Flood}|}
 \end{equation}
 
 where:
 
-ρ\(_{L}\)~~ = Air density in the lower zone {[}kg/m\(^{3}\){]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\rho_L$ &= Air density in the lower zone [kg/m\(^{3}\)]\\
+$A$ &= Opening area [m\(^{2}\)]\\
+$C_d$ &= Discharge coefficient [dimensionless]\\
+$Ρ_{ave}$ &= Average air density between the lower and upper zones [Pa]\\
+$\Delta P$ &= Pressure difference P\(_{L}\) - P\(_{U}\) [Pa]\\
+\\
+\end{tabular}
 
-A~~~ = Opening area {[}m\(^{2}\){]}
-
-C\(_{d}\) = Discharge coefficient {[}dimensionless{]}
-
-Ρ\(_{ave}\) = Average air density between the lower and upper zones {[}Pa{]}
-
-ΔP~ = Pressure difference P\(_{L}\) - P\(_{U}\) {[}Pa{]}
-
-c.~~~~~~~~~~~~~~~~~~~~~~~~~~~~P\(_{L}\) \textless{} P\(_{U}\)
+\textbf{c.  $P_L < P_U$}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_{_L}} = {\mathop m\limits^ \bullet_{buo}}
+\dot{m}_L = \dot{m}_{buo}
 \end{equation}
 
 \begin{equation}
-{\mathop m\limits^ \bullet_U} =  - {\rho_U}A{C_d}{\left( {\frac{{2\left| {\Delta P} \right|}}{{{\rho_{ave}}}}} \right)^{0.5}} + {\mathop m\limits^ \bullet_{buo}}
+\dot{m}_U =  - \rho_U A C_d \left( \frac{2\left| \Delta P \right|}{\rho_{ave}} \right)^{0.5} + \dot{m}_{buo}
 \end{equation}
 
 \begin{equation}
-\frac{{\partial \mathop {{m_U}}\limits^ \bullet  }}{{\partial {P_L}}} = {\rho_U}A{C_d}{\left( {\frac{1}{{2\left| {\Delta P} \right|{\rho_{ave}}}}} \right)^{0.5}} + \frac{{{{\mathop m\limits^ \bullet  }_{buo,\max }}}}{{\left| {\Delta {P_{Flood}}} \right|}}
+\frac{\partial \dot{m}_U}{\partial P_L} = \rho_U A C_d \left( \frac{1}{2 \left| \Delta P \right| \rho_{ave}} \right)^{0.5} + \frac{\dot{m}_{buo,max}}{\left| \Delta P_{Flood} \right|}
 \end{equation}
 
-\emph{Sloping plane}
+\paragraph{Sloping Plane}\label{sloping-plane}
 
 \begin{figure}[hbtp] % fig 151
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2741.png}
+\includegraphics[width=0.9\linewidth, height=0.9\textheight, keepaspectratio=true]{media/image2741.png}
 \caption{A Staircase is attached to the horizontal opening. \protect \label{fig:a-staircase-is-attached-to-the-horizontal}}
 \end{figure}
 
 When a staircase is introduced as shown in Figure~\ref{fig:a-staircase-is-attached-to-the-horizontal}, the effective opening area will be used to replace A (opening area) in the above equations. The effective area may be estimated as (Bolmqvist and Sandberg 2004):
 
 \begin{equation}
-{A_{eff}} = A\sin \alpha (1 + \cos \alpha )
+A_{eff} = A\sin \alpha (1 + \cos \alpha )
 \end{equation}
 
 where:
 
-A\(_{eff}\)~ = Effective area of horizontal opening {[}m\(^{2}\){]}
-
-A~~~ = Area of horizontal opening {[}m\(^{2}\){]}
-
-α~~~ = Angle between the stair plane and horizontal opening plane {[}degrees{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$A_{eff}$ &= Effective area of horizontal opening [m\(^{2}\)]\\
+$A$ &= Area of horizontal opening [m\(^{2}\)] \\
+$\alpha$ &= Angle between the stair plane and horizontal opening plane [degrees]\\
+\\
+\end{tabular}
 
 Note: the hydraulic diameter calculation is based on the effective opening area, while the opening depth remains the same.
 
@@ -510,7 +537,7 @@ Combined upward & Total upward flow at P  -P    >  0 (Forced upward + buoyancy d
 
 \begin{figure}[hbtp] % fig 152
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2743.svg.png}
+\includegraphics[width=0.9\linewidth, height=0.9\textheight, keepaspectratio=true]{media/image2743.svg.png}
 \caption{Flow rates at different pressure differences \protect \label{fig:flow-rates-at-different-pressure-differences}}
 \end{figure}
 
@@ -519,49 +546,51 @@ Combined upward & Total upward flow at P  -P    >  0 (Forced upward + buoyancy d
 The wind pressure is determined by Bernoulli's equation, assuming no height change or pressure losses:
 
 \begin{equation}
-{p_w} = {C_p}\rho \frac{{{V_{ref}}^2}}{2}
+p_w = C_p \rho \frac{V_{ref}^2}{2}
 \end{equation}
 
 where:
 
-\emph{p\(_{w}\)}~~~~~~~~~~~ = Wind surface pressure relative to static pressure in undisturbed flow {[}Pa{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$p_w$ &= Wind surface pressure relative to static pressure in undisturbed flow [Pa]\\
+$\rho$ &= Air density [kg/m\(^{3}\)]\\
+$V_{ref}$ &= Reference wind speed at local height [m/s]\\
+$C_p$ &= Wind surface pressure coefficient [dimensionless]\\
+\\
+\end{tabular}
 
-\emph{ρ}~~~~~~~~~~~~~~~ = Air density {[}kg/m\(^{3}\){]}
-
-\emph{V\(_{ref}\)}~~~~~~~~~~~~ = Reference wind speed at local height {[}m/s{]}
-
-\emph{C\(_{p}\)}~~~~~~~~~~~~~ = Wind surface pressure coefficient {[}dimensionless{]}
-
-\emph{V\(_{ref}\)} may be expressed as (Ref, Local Wind Speed Calculations):
-
-\begin{equation}
-{V_{ref}} = {V_{met}}{\left( {\frac{{{\delta_{met}}}}{{{z_{met}}}}} \right)^{{\alpha_{met}}}}{\left( {\frac{z}{\delta }} \right)^\alpha }
-\end{equation}
-
-\emph{C\(_{p}\)} is a function of location on the building envelope and wind direction. When Wind Pressure Coefficient Type = ``INPUT'', the\emph{C\(_{p}\)} values are explicitly defined in the input for AirflowNetwork:Multizone:Wind Pressure Coefficient Values. When Wind Pressure Coefficient Type = ``AVERAGE-SURFACE CALCULATION'' and the building shape is rectangular, the program uses the following equations to calculate wind pressure coefficient (\emph{C\(_{p}\)}) values for different wind directions. For a low rise building, the normalized surface pressure coefficient may be written as (Swami and Chandra 1988):
+$V_{ref}$ may be expressed as (Ref, Local Wind Speed Calculations)
 
 \begin{equation}
-{C_{p,n}} = 0.6*\ln \left[ \begin{array}{l}1.248 - 0.703\sin (\alpha /2) - 1.175{\sin ^2}(\alpha ) + 0.131{\sin ^3}(2\alpha G)\\ + \,0.769\cos (\alpha /2) + 0.07{G^2}{\sin ^2}(\alpha /2) + 0.717{\cos ^2}(\alpha /2)\end{array} \right]
+V_{ref} = V_{met} \left( \frac{\delta_{met}}{z_{met}} \right)^{\alpha_{met}}\left( \frac{z}{\delta} \right)^\alpha
 \end{equation}
 
-where
+$C_p$ is a function of location on the building envelope and wind direction. When Wind Pressure Coefficient Type = ``INPUT'', the $C_p$ values are explicitly defined in the input for AirflowNetwork:Multizone:Wind Pressure Coefficient Values. When Wind Pressure Coefficient Type = ``AVERAGE-SURFACE CALCULATION'' and the building shape is rectangular, the program uses the following equations to calculate wind pressure coefficient ($C_p$) values for different wind directions. For a low rise building, the normalized surface pressure coefficient may be written as (Swami and Chandra 1988):
 
-\emph{C\(_{p,n}\)}~~~~~~~~~~~ = \emph{C\(_{p}\)} value at a given angle between wind direction and the outward normal of the surface under consideration {[}dimensionless{]}
+\begin{equation}
+C_{p,n} = 0.6 \cdot \ln \left[ \begin{array}{l}1.248 - 0.703\sin (\alpha /2) - 1.175{\sin ^2}(\alpha ) + 0.131{\sin ^3}(2\alpha G)\\ + \,0.769\cos (\alpha /2) + 0.07{G^2}{\sin ^2}(\alpha /2) + 0.717{\cos ^2}(\alpha /2)\end{array} \right]
+\end{equation}
 
-α~~~ ~~~~~~~~~~~ = Angle between wind direction and outward normal of wall under consideration {[}deg{]}
+where:
 
-\emph{G}~~ ~~~~~~~~~~~ = Natural log of the ratio of the width of the wall under consideration to the width of the adjacent wall {[}dimensionless{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$C_{p,n}$ &= $C_p$ value at a given angle between wind direction and the outward normal of the surface under consideration [dimensionless]\\
+$\alpha$ &= Angle between wind direction and outward normal of wall under consideration [deg]\\
+$G$ &= Natural log of the ratio of the width of the wall under consideration to the width of the adjacent wall [dimensionless]\\
+$n$ &= Index of incident angle at 30-degree increments\\
+\\
+\end{tabular}
 
-\emph{n} ~~ ~~~~~~~~~~~ = Index of incident angle at 30-degree increments
+For walls of a high rise building, a two-dimensional array of surface-averaged wind pressure coefficients is generated based on wind incident angle and side ratio. The wind pressure coefficients are provided in 2001 ASHRAE Fundamentals Handbook, p.~16.5, Fig. 7, ``Surface Averaged Wall Pressure Coefficients for Tall Buildings''. The original work was performed by Atkins et al. (1979). The incident angle has an increment of 30 degrees. The side ratio values are 0.25, 1.0, and 4.0. For a given incident angle and building aspect ratio, the program uses linear interpolation to calculate the corresponding wind pressure coefficient $C_{p,n}$.
 
-For walls of a high rise building, a two-dimensional array of surface-averaged wind pressure coefficients is generated based on wind incident angle and side ratio. The wind pressure coefficients are provided in 2001 ASHRAE Fundamentals Handbook, p.~16.5, Fig. 7, ``Surface Averaged Wall Pressure Coefficients for Tall Buildings''. The original work was performed by Atkins et al. (1979). The incident angle has an increment of 30 degrees. The side ratio values are 0.25, 1.0, and 4.0. For a given incident angle and building aspect ratio, the program uses linear interpolation to calculate the corresponding wind pressure coefficient \emph{C\(_{p,n}\)}.
-
-For the roof of a high rise building, a two-dimensional array of surface-averaged wind pressure coefficients is also generated based on wind incident angle and side ratio. The wind pressure coefficients are provided in 2001 ASHRAE Fundamentals Handbook, p.~16.6, Fig. 9, ``Surface Averaged Roof Pressure Coefficients for Tall Buildings''. The original work was performed by Holmes (1986). The incident angle has an increment of 30 degrees. The side ratio values are 0.25, 1.0, and 4.0. At a given wind incident angle and building aspect ratio, the program uses linear interpolation to calculate the corresponding wind pressure coefficient \emph{C\(_{p,n}\)}.
+For the roof of a high rise building, a two-dimensional array of surface-averaged wind pressure coefficients is also generated based on wind incident angle and side ratio. The wind pressure coefficients are provided in 2001 ASHRAE Fundamentals Handbook, p.~16.6, Fig. 9, ``Surface Averaged Roof Pressure Coefficients for Tall Buildings''. The original work was performed by Holmes (1986). The incident angle has an increment of 30 degrees. The side ratio values are 0.25, 1.0, and 4.0. At a given wind incident angle and building aspect ratio, the program uses linear interpolation to calculate the corresponding wind pressure coefficient $C_{p,n}$.
 
 The wind surface pressure at the given incident angle can be calculated by combining the above two equations:
 
 \begin{equation}
-{p_{w,n}} = {C_{p,n}}\rho \frac{{{V_{ref}}^2}}{2}
+p_{w,n} = C_{p,n}\rho \frac{V_{ref}^2}{2}
 \end{equation}
 
 \subsubsection{Solution method}\label{solution-method}
@@ -581,13 +610,13 @@ where the correction vector, \{C\}, is computed by the matrix relationship:
 \{B\} is a column vector with each component given by:
 
 \begin{equation}
-{B_n} = \sum\limits_i {\mathop {{m_i}}\limits^ \bullet  }
+B_n = \sum_{i} \dot{m}_i
 \end{equation}
 
-where n is the node number and i indicates all flow paths connecting node n to other nodes, and {[}J{]} is the square Jacobian matrix whose elements are given by:
+where $n$ is the node number and $i$ indicates all flow paths connecting node $n$ to other nodes, and [J] is the square Jacobian matrix whose elements are given by:
 
 \begin{equation}
-{J_{n,m}} = \sum\limits_i {\frac{{\partial \mathop m\limits^ \bullet  }}{{\partial {P_m}}}}
+J_{n,m} = \sum_{i} \frac{\partial \dot{m}}{\partial P_m}
 \end{equation}
 
 \subsubsection{Convergence acceleration}\label{convergence-acceleration}
@@ -595,18 +624,19 @@ where n is the node number and i indicates all flow paths connecting node n to o
 The convergence tolerance is used to check the sum of the mass flow rates by applying mass conservation. The convergence acceleration equation shown below is used to correct the node pressures to more rapidly obtain a solution. By assuming a constant ratio of correction values from one iteration to the next, the following method is applied:
 
 \begin{equation}
-{P_n}^* = {P_n} - {C_n}/(1 - r)
+{P_n}^* = P_n - C_n/(1 - r)
 \end{equation}
 
-where
+where:
 
-\(r\) = the ratio of \(C_{n}\) for the current iteration to its value for the previous iteration {[}dimensionless{]}
-
-\(C_{n}\) = Correction value at the n\(_{th}\) node {[}Pa{]}
-
-\(P_{n}\) = Estimated pressure at the n\(_{th}\) node {[}Pa{]}
-
-\(P_{n}^{*}\) = Corrected pressure at the n\(_{th}\) node used in the next iteration {[}Pa{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$r$ &= the ratio of $C_n$ for the current iteration to its value for the previous iteration [dimensionless]\\
+$C_n$ &= Correction value at the n-th node [Pa]\\
+$P_n$ &= Estimated pressure at the n-th node [Pa]\\
+$P_n^*$ &= Corrected pressure at the n-th node used in the next iteration [Pa]\\
+\\
+\end{tabular}
 
 This method is similar to a Steffensen iteration (Conte and de Boor 1972) which is used as a fixed-point iteration method for individual nonlinear equations.
 
@@ -614,58 +644,61 @@ The iteration correction method presented in the above equation gives a variable
 
 \subsection{Node Temperature Calculations}\label{node-temperature-calculations}
 
+\subsubsection{General}
+
 A brief description of the air node temperature calculation is given below. A detailed description can be found in the work of Swami et al. (1992). The following equation is used to calculate temperature distribution across a duct element at the given airflow rate and inlet air temperature:
 
 \begin{equation}
-\mathop m\limits^ \bullet  {C_p}\frac{{dT}}{{dx}} = UP(T{}_\infty  - T)
+\dot{m} C_p \frac{dT}{dx} = UP(T_\infty  - T)
 \end{equation}
 
-where
+where:
 
-\emph{C\(_{p}\)}~ = Specific heat of airflow {[}J/kg•K{]}
-
-\(\mathop m\limits^ \bullet\) ~ = Airflow rate {[}kg/s{]}
-
-\emph{P}~~~ = Perimeter of a duct element {[}m{]}
-
-\emph{T}~~~ = Temperature as a field variable {[}°C{]}
-
-\(T{}_\infty\) ~~~~~~~~~~~ = Temperature of air surrounding the duct element {[}°C{]}
-
-\emph{U}~~ = Overall heat transfer coefficient {[}W/m\(^{2}\)•K{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$C_p$ &= Specific heat of airflow [J/kg-K]\\
+$\dot{m}$ &= Airflow rate [kg/s]\\
+$P$ &= Perimeter of a duct element [m]\\
+$T$ &= Temperature as a field variable [°C]\\
+$T_\infty$ &= Temperature of air surrounding the duct element [°C]\\
+$U$ &= Overall heat transfer coefficient [W/m\(^{2}\)-K]\\
+\\
+\end{tabular}
 
 \begin{equation}
 U = \frac{1}{{\frac{1}{{{h_i}}} + \frac{1}{{{h_o}}} + \sum {\frac{{{t_j}}}{{{k_j}}}} }}
 \end{equation}
 
-\emph{h\(_{i}\)}~~~~~~~~ = Inside heat transfer coefficient {[}W/m\(^{2}\)•K{]}
-
-\emph{h\(_{o}\)} = Outside heat transfer coefficient {[}W/m\(^{2}\)•K{]}
-
-\emph{t\(_{j}\)}~~~~~~~~~ = Thickness at j-th layer {[}m{]}
-
-\emph{k\(_{j}\)}~~~~~~~~~ = Thermal conductivity at j-th layer {[}W/m•K{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$h_i$ &= Inside heat transfer coefficient [W/m\(^{2}\)-K]\\
+$h_o$ &= Outside heat transfer coefficient [W/m\(^{2}\)-K]\\
+$t_j$ &= Thickness at j-th layer [m]\\
+$k_j$ &= Thermal conductivity at j-th layer [W/m-K]\\
+\\
+\end{tabular}
 
 The outlet air temperature at the end of the duct (x = L) is:
 
 \begin{equation}
-{T_o} = {T_\infty } + ({T_i} - {T_\infty })*\exp \left( { - \frac{{UA}}{{\mathop {m{C_p}}\limits^ \bullet  }}} \right)
+T_o = T_\infty + (T_i - T_\infty) \cdot \exp \left(- \frac{UA}{\dot{m} C_p} \right)
 \end{equation}
 
-where
+where:
 
-~~~~~ \emph{T\(_{i}\)}~~~~~~~~ = Inlet air temperature {[}°C{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$T_i$ &= Inlet air temperature [°C]\\
+$T_o$ &= Outlet air temperature [°C]\\
+$T_\infty$ &= Temperature of air surrounding the duct element [°C]\\
+$A$ &= Surface area (Perimeter * Length) [m\(^{2}\)]\\
+\\
+\end{tabular}
 
-~~~~~ \emph{T\(_{o}\)}~~~~~~~~ = Outlet air temperature {[}°C{]}
-
-~~~~~ \emph{T\(_{∞}\)}~~~~~~~ = Temperature of air surrounding the duct element {[}°C{]}
-
-~~~~~ \emph{A}~~~~~~~~~ = Surface area (Perimeter * Length) {[}m\(^{2}\){]}
-
-The heat transfer by convection to ambient, \emph{Q}, is:
+The heat transfer by convection to ambient, $Q$, is:
 
 \begin{equation}
-Q = \mathop m\limits^ \bullet  {C_p}({T_\infty } - {T_i})\left[ {1 - \exp \left( { - \frac{{UA}}{{\mathop {m{C_p}}\limits^ \bullet  }}} \right)} \right]
+Q = \dot{m} {C_p}(T_\infty- T_i)\left[1 - \exp \left( - \frac{UA}{\dot{m} C_p} \right) \right]
 \end{equation}
 
 The outlet air temperature can be calculated using the above equation at the given inlet air temperature. Since the inlet temperature at one linkage is the outlet temperature for the connected linkage, the outlet air temperatures at all nodes are solved simultaneously. A square linear system assembled by the AirflowNetwork model is expressed below:
@@ -674,81 +707,114 @@ The outlet air temperature can be calculated using the above equation at the giv
 \{ M\} [T] = [B]
 \end{equation}
 
-where
+where:
 
-~~~~~ \{M\}~~~~~~ = Airflow matrix
-
-~~~~~ {[}T{]}~~~~~~~ = Temperature vector
-
-~~~~~ {[}B{]}~~~~~~~ = Given boundary conditions
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\{M\}$ &= Airflow matrix\\
+$[T]$ &= Temperature vector\\
+$[B]$ &= Given boundary conditions\\
+\\
+\end{tabular}
 
 The zone air temperatures and primary air loop component (fan and coils) outlet conditions are used as prescribed conditions in the AirflowNetwork model. In addition, the temperature difference across zone loop components (terminal units) is held constant during the calculations. For example, thermal zone temperatures calculated during the previous system time step are used as prescribed temperatures when calculating all other node temperatures. The zone air temperature is assumed constant (prescribed) throughout the AirflowNetwork iterative solution. The fan and coil outlet air temperatures, and terminal unit temperature differences are assumed constant within an AirflowNetwork iteration. The sensible heat gains calculated during the AirflowNetwork solution are then used to predict a new zone air temperature.
+
+\subsubsection{Duct Radiation}
+
+The duct-surface user-defined view factors object defines the view factor from the duct to the zone surfaces. Because the view factors, duct surface area, and temperatures are known, the heat gain to the duct can be directly calculated and applied to the duct air heat balance to determine the outlet temperature. The duct heat gain is then treated as a direct heat loss from each participating surface. Once the heat loss to the duct for each surface is calculated, the surface temperatures are adjusted to maintain the surface energy balance.
+
+Radiation is treated as point loads heat source/sink on the zone surfaces and the duct.  These point loads will be added or subtracted using the same implementation strategy as the convective load for the ducts to the zone air.  The radiative rate of energy transfer between the duct (d) and a given surface (s) for two grey surfaces can be written as shown below.
+
+
+\begin{equation}
+\dot{Q}_{d\rightarrow s} = \frac{\sigma (T^4_d - T^4_s)}{\frac{1 - \epsilon_d}{f_e A_d \epsilon_d} + \frac{1}{f_e A_d F_{d\rightarrow s}}+\frac{1 - \epsilon_s}{A_s \epsilon_s}}
+\end{equation}
+
+where:
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\sigma$ &= Steffan-Boltzmann constant [W/m\(^{2}\)-K\(^{4}\)] \\
+$T_d$ &= Duct surface temperature [C] \\
+$T_s$ &= Zone surface temperature [C] \\ 
+$\epsilon_d$ &= Duct grey body emissivity [-] \\
+$\epsilon_s$ &= Zone surface grey body emissivity [-] \\
+$A_d$ &= Duct surface area [m\(^{2}\)] \\
+$A_s$ &= Zone surface area [m\(^{2}\)] \\
+$f_e$ &= Duct exposure fraction [-] \\
+$F_{d\rightarrow s}$ &= Duct-to-surface view factor \\
+\\
+\end{tabular}
 
 \subsection{Node Humidity Ratio Calculations}\label{node-humidity-ratio-calculations}
 
 A brief description of the air node humidity ratio calculation is given below. A detailed description can found in the work of Swami et al. (1992). The following equation is used to calculate humidity ratio distribution across a duct element at the given airflow rate and inlet air humidity ratio:
 
 \begin{equation}
-\mathop m\limits^ \bullet  \frac{{dW}}{{dx}} = {U_m}P(W{}_\infty  - W)
+\dot{m} \frac{dW}{dx} = U_m P(W_\infty - W)
 \end{equation}
 
-where
+where:
 
-\(\mathop m\limits^ \bullet\) ~~~~~~~~~~~~ = Airflow rate {[}kg/s{]}
-
-\emph{P~~~}~~~~~~~~~~~ = Perimeter of a duct element {[}m{]}
-
-\emph{W~~}~~~~~~~~~~~ = Humidity ratio {[}kg/kg{]}
-
-\(W{}_\infty\) ~~~~~~~~~~ = Humidity ratio of air surrounding the duct element {[}kg/kg{]}
-
-\emph{U\(_{m}\)}~~~~~~~~~~~~ = Overall moisture transfer coefficient {[}kg/m\(^{2}\)•s{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\dot{m}$ &= Airflow rate [kg/s]\\
+$P$ &= Perimeter of a duct element [m]\\
+$W$ &= Humidity ratio [kg/kg]\\
+$W_\infty$ &= Humidity ratio of air surrounding the duct element [kg/kg]\\
+$U_m$ &= Overall moisture transfer coefficient [kg/m\(^{2}\)-s]\\
+\\
+\end{tabular}
 
 \begin{equation}
-{U_m} = \frac{1}{{\frac{1}{{{h_{m,i}}}} + \frac{1}{{{h_{m,o}}}} + \sum {\frac{{{t_j}}}{{{D_j}}}} }}
+U_m = \frac{1}{\frac{1}{h_{m,i}} + \frac{1}{h_{m,o}} + \sum {\frac{t_j}{D_j}} }
 \end{equation}
 
-\emph{h\(_{m,i}\)} ~~~~~~~~~~~ = Inside moisture transfer coefficient {[}kg/m\(^{2}\)•s{]}
-
-\emph{h\(_{m,o}\)} = Outside moisture transfer coefficient {[}kg/m\(^{2}\)•s{]}
-
-\emph{t\(_{j}\)}~~~~~~~~~~~~~~~ = Thickness at j-th layer {[}m{]}
-
-D\(_{j}\)~~~~~~~~~~~~~~ = Moisture diffusivity at j-th layer {[}kg/m•s{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$h_{m,i}$ &= Inside moisture transfer coefficient [kg/m\(^{2}\)-s]\\
+$h_{m,o}$ &= Outside moisture transfer coefficient [kg/m\(^{2}\)-s]\\
+$t_j$ &= Thickness at j-th layer [m]\\
+$D_j$ &= Moisture diffusivity at j-th layer [kg/m-s]\\
+\\
+\end{tabular}
 
 The outlet air humidity ratio at the end of the duct (x = L) is:
 
 \begin{equation}
-{W_o} = {W_\infty } + ({W_i} - {W_\infty })*\exp \left( { - \frac{{{U_m}A}}{{\mathop m\limits^ \bullet  }}} \right)
+W_o = W_\infty + (W_i - W_\infty) \cdot \exp \left(- \frac{U_m A}{\dot{m}} \right)
 \end{equation}
 
-where
+where:
 
-\emph{W\(_{i}\)}~~~~~~~~~~~~~ = Inlet air humidity ratio {[}kg/kg{]}
-
-\emph{W\(_{o}\)}~~~~~~~~~~~ = Outlet air humidity ratio {[}kg/kg{]}
-
-\emph{A}~~~~~~~~~~~~~~~ = Surface area (Perimeter * Length) {[}m\(^{2}\){]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$W_i$ &= Inlet air humidity ratio [kg/kg]\\
+$W_o$ &= Outlet air humidity ratio [kg/kg]\\
+$A$ &= Surface area (Perimeter * Length) [m\(^{2}\)]\\
+\\
+\end{tabular}
 
 The moisture transfer by convection to ambient, \emph{Q\(_{m}\)}, is
 
 \begin{equation}
-{Q_m} = \mathop m\limits^ \bullet  ({W_\infty } - {W_i})\left[ {1 - \exp \left( { - \frac{{{U_m}A}}{{\mathop m\limits^ \bullet  }}} \right)} \right]
+Q_m = \dot{m} \cdot (W_\infty - W_i)\left[ 1 - \exp \left(- \frac{U_m A}{\dot{m}} \right) \right]
 \end{equation}
 
 The outlet air humidity ratio can be calculated using the above equation at the given inlet air humidity ratio. Since the inlet humidity ratio at one linkage is the outlet humidity ratio for the connected linkage, the outlet air humidity ratio at all nodes are solved simultaneously. A square linear system assembled by the AirflowNetwork model is expressed below:
 
 \begin{equation}
-\{ {M_m}\} [W] = [{B_m}]
+\{M_m\} [W] = [B_m]
 \end{equation}
 
-where
-
-\{M\(_{m}\)\}~~~~~~~~~~~ = Airflow matrix
-
-{[}W{]}~~~~~~~~~~~~ = Humidity ratio vector
-
-{[}B\(_{m}\){]}~~~~~~~~~~~~~~~~~~~~~~~ = Given boundary conditions
+where:
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\{M_m\}$ &= Airflow matrix\\
+$[W]$ &= Humidity ratio vector\\
+$[B_m]$ &= Given boundary conditions\\
+\\
+\end{tabular}
 
 The zone air humidity ratios and primary air loop component (fan and coils) outlet conditions are used as prescribed conditions in the AirflowNetwork model. For example, thermal zone humidity ratios calculated during the previous system time step are used as prescribed humidity ratios when calculating all other node humidity ratios. The zone air humidity ratio is assumed constant (prescribed) throughout the AirflowNetwork iterative solution. The coil outlet air humidity ratio is assumed constant within an AirflowNetwork iteration. The latent heat gains calculated during the AirflowNetwork solution are then used to predict a new zone air humidity ratio.
 
@@ -757,74 +823,71 @@ The zone air humidity ratios and primary air loop component (fan and coils) outl
 The zone sensible and latent loads calculated in the AirflowNetwork model consist of multizone, duct conduction and leakage. In addition, the impact of infiltration and mixing is accounted for in this calculation. The multizone load only includes incoming airflows from outside (infiltration) and other adjacent zones (mixing) with and without forced-air fan operation. It is divided into two terms: variable and constant. The constant term is the sum of the mass flow rate multiplied by the specific heat for both infiltration and mixing. The variable term includes the impact of zone and outdoor air temperature. Each of these terms is used in the zone energy balance equation. The sensible load items from the multizone load calculations may be written as follows:
 
 \begin{equation}
-MC{P_{airflow}} = \mathop {{m_{\inf }}}\limits^\cdot  {C_p} + \sum {\left( {\mathop {{m_{mix}}}\limits^\cdot  {C_p}} \right)}
+MCP_{airflow} = \dot{m}_{inf} {C_p} + \sum \left( {\dot{m}_{mix} C_p} \right)
 \end{equation}
 
 \begin{equation}
-MCP{T_{airflow}} = \mathop {{m_{\inf }}}\limits^\cdot  {C_p}{T_{amb}} + \sum {\left( {\mathop {{m_{mix}}}\limits^\cdot  {C_p}{T_{zone}}} \right)}
+MCPT_{airflow} = \dot{m}_{inf} C_p T_{amb} + \sum \left( \dot{m}_{mix} C_p T_{zone} \right)
 \end{equation}
 
-where
+where:
 
-\emph{MCP\(_{airflow}\)} = Sum of air mass flow rate multiplied by specific heat for infiltration and mixing {[}W/K{]}
-
-\emph{MCPT\(_{airflow}\)} = Sum of air mass flow rate multiplied by specific heat and temperature for infiltration and mixing {[}W{]}
-
-\({\mathop m\limits^\cdot_{\inf }}\) ~~~~~~~~~~ = Incoming air mass flow rate from outdoors {[}kg/s{]}
-
-\({\mathop m\limits^\cdot_{mix}}\) ~~~~~~~~~ = Incoming air mass flow rate from adjacent zones {[}kg/s{]}
-
-\emph{T\(_{amb}\)}~~~~~~~~~~~ = Outdoor air dry-bulb temperature {[}°C{]}
-
-\emph{T\(_{zone}\)}~~~~~~~~~~ = Adjacent zone air temperature {[}°C{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$MCP_{airflow}$ &= Sum of air mass flow rate multiplied by specific heat for infiltration and mixing [W/K]\\
+$MCPT_{airflow}$ &= Sum of air mass flow rate multiplied by specific heat and temperature for infiltration and mixing [W]\\
+$\dot{m}_{inf}$ &= Incoming air mass flow rate from outdoors [kg/s]\\
+$\dot{m}_{mix}$ &= Incoming air mass flow rate from adjacent zones [kg/s]\\
+$T_{amb}$ &= Outdoor air dry-bulb temperature [°C]\\
+$T_{zone}$ &= Adjacent zone air temperature [°C]\\
+\\
+\end{tabular}
 
 The latent load items from multizone load calculations may be written as follows:
 
 \begin{equation}
-{M_{airflow}} = \mathop {{m_{\inf }}}\limits^\cdot   + \sum {\mathop {{m_{mix}}}\limits^\cdot  }
+M_{airflow} = \dot{m}_{inf} + \sum \dot{m}_{mix}
 \end{equation}
 
 \begin{equation}
-M{W_{airflow}} = \mathop {{m_{\inf }}}\limits^\cdot  {W_{amb}} + \sum {\mathop {{m_{mix}}}\limits^\cdot  } {W_{zone}}
+MW_{airflow} = \dot{m}_{inf} W_{amb} + \sum \dot{m}_{mix} W_{zone}
 \end{equation}
 
-where
+where:
 
-\emph{M\(_{airflow}\)} = Sum of air mass flow rates for infiltration and mixing {[}kg/s{]}
-
-\emph{MW\(_{airflow}\)} = Sum of air mass flow rate multiplied by humidity ratio for infiltration and mixing {[}kg/s{]}
-
-\({\mathop m\limits^\cdot_{\inf }}\) ~~~~~~~~~~ = Incoming air mass flow rate from outdoors {[}kg/s{]}
-
-\({\mathop m\limits^\cdot_{mix}}\) ~~~~~~~~~ = Incoming air mass flow rate from adjacent zones {[}kg/s{]}
-
-\emph{W\(_{amb}\)}~~~~~~~~~~ = Outdoor air humidity ratio {[}kg/kg{]}
-
-\emph{W\(_{zone}\)}~~~~~~~~~ = Adjacent zone air humidity ratio {[}kg/kg{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$M_{airflow}$ &= Sum of air mass flow rates for infiltration and mixing [kg/s]\\
+$MW_{airflow}$ &= Sum of air mass flow rate multiplied by humidity ratio for infiltration and mixing [kg/s]\\
+$\dot{m}_{inf}$ &= Incoming air mass flow rate from outdoors [kg/s]\\
+$\dot{m}_{mix}$ &= Incoming air mass flow rate from adjacent zones [kg/s]\\
+$W_{amb}$ &= Outdoor air humidity ratio [kg/kg]\\
+$W_{zone}$ &= Adjacent zone air humidity ratio [kg/kg]\\
+\\
+\end{tabular}
 
 The air distribution system (ADS) loads due to duct conduction and leakage depend on the air distribution system component (e.g., duct) location. The air distribution system sensible and latent loads are calculated for each zone as follows:
 
 \begin{equation}
-{Q_{ADS,i}} = \sum\limits_j {{Q_{cond(i,j)}} + } \sum\limits_j {{Q_{leak(i,j)}}}
+Q_{ADS,i} = \sum_{j} Q_{cond(i,j)} + \sum_{j} Q_{leak(i,j)}
 \end{equation}
 
 \begin{equation}
-{Q_{ADS,m,i}} = \sum\limits_j {{Q_{cond,m(i,j)}} + } \sum\limits_j {{Q_{leak,m(i,j)}}}
+Q_{ADS,m,i} = \sum_{j} Q_{cond,m(i,j)} + \sum_{j} Q_{leak,m(i,j)}
 \end{equation}
 
-where
+where:
 
-\emph{Q\(_{ADS,i}\)}~~~~~~~~ = Total sensible load in the i-th zone due to ADS losses {[}W{]}
-
-\emph{Q\(_{cond(ij)}\)}~~~~~~ = Duct wall conduction loss at the j-th duct located in the i-th zone {[}W{]}
-
-\emph{Q\(_{leak(ij)}\)}~~~~~~~ = Sensible supply leak loss at the j-th linkage located in the i-th zone {[}W{]}
-
-\emph{Q\(_{ADS,m,i}\)}~~~~~~ = Total latent load in the i-th zone due to ADS losses {[}kg/s{]}
-
-\emph{Q\(_{cond,m(ij)}\)} = Duct wall vapor diffusion loss at the j-th duct located in the i-th zone {[}kg/s{]}
-
-\emph{Q\(_{leak,m(ij)}\)} = Latent supply leak loss at the j-th linkage located in the i-th zone {[}kg/s{]}
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$Q_{ADS,i}$ &= Total sensible load in the i-th zone due to ADS losses [W]\\
+$Q_{cond(ij)}$ &= Duct wall conduction loss at the j-th duct located in the i-th zone [W]\\
+$Q_{leak(ij)}$ &= Sensible supply leak loss at the j-th linkage located in the i-th zone [W]\\
+$Q_{ADS,m,i}$ &= Total latent load in the i-th zone due to ADS losses [kg/s]\\
+$Q_{cond,m(ij)}$ &= Duct wall vapor diffusion loss at the j-th duct located in the i-th zone [kg/s]\\
+$Q_{leak,m(ij)}$ &= Latent supply leak loss at the j-th linkage located in the i-th zone [kg/s]\\
+\\
+\end{tabular}
 
 \subsection{Impacts of Supply Air Constant Volume Fan Control on Load: Cycling vs.~Continuous}\label{impacts-of-supply-air-constant-volume-fan-control-on-load-cycling-vs.continuous}
 
@@ -838,7 +901,13 @@ Airflow
 
 Airflow = Airflow during ADS on cycle * ADS Part-load ratio + Airflow during ADS off cycle * (1.0 -- ADS Part-load ratio)
 
-where ADS = Air Distribution System
+where:
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$ADS$ &= Air Distribution System\\
+\\
+\end{tabular}
 
 Zone load
 
@@ -854,47 +923,49 @@ The AirflowNetwork model currently also allows a variable air volume fan type as
 
 In general, the supply fan air flow rate in a VAV central system is determined by a sum of terminal flow rates when the AirflowNetwork model is not applied. When the AirflowNetwork model is applied and the supply air fan flow rate is given, each terminal flow is determined by pressure resistance of each supply air pathway. It is possible that the delivered air flow rate from the pressure resistance at each terminal may be totally different from the desired flow rate determined by terminal units. Therefore, it is not easy to meet both requirements. The following compromised approach, including possible supply and return leaks in an air distribution system, is implemented.
 
-1.~Set up terminal airflows in the AirflowNetwork module based on the SimVAV subroutine in the HVACSingleDuctSystem module.
-
-2.~~~~Require AirflowNetwork:Distribution:Component:LeakageRatio objects to define supply leaks, so that the values of the Effective Leakage Ratio field are used to decide the supply fan flow rates. The base of the ratio will be actual supply fan flow rate, instead of the maximum fan flow rate used in the constant volume fan systems.
-
-3.~~~~Assign the supply fan airflow rate based on the sum of all terminal flow rates and all supply leak ratios until it reaches the maximum fan flow rate
+\begin{enumerate}
+\item Set up terminal airflows in the AirflowNetwork module based on the SimVAV subroutine in the HVACSingleDuctSystem module.
+\item Require AirflowNetwork:Distribution:Component:LeakageRatio objects to define supply leaks, so that the values of the Effective Leakage Ratio field are used to decide the supply fan flow rates. The base of the ratio will be actual supply fan flow rate, instead of the maximum fan flow rate used in the constant volume fan systems.
+\item Assign the supply fan airflow rate based on the sum of all terminal flow rates and all supply leak ratios until it reaches the maximum fan flow rate
 
 \begin{equation}
-{\dot m_{fan}} = \frac{{\mathop \sum \nolimits_i^n {{\dot m}_{i,terminal}}}}{{1 - \mathop \sum \nolimits_j^k {F_j}}}
+\dot{m}_{fan} = \frac{\sum_i^n \dot{m}_{i,terminal}}{1 - \sum_j^k F_j}
 \end{equation}
 
-where
+where:
 
-\({\dot m_{fan}}\) ~~~~~~~~~ = The supply fan flow rate
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\dot{m}_{fan}$ &= The supply fan flow rate\\
+$\dot{m}_{i,terminal}$ &= The flow rate at the ith terminal, which is determined in the subroutine SimVAV in the HVACSingleDuctSystem module\\
+$n$ &= Number of terminals\\
+$F_j$ &= The fraction of the supply fan flow rate at the j-th supply leak, given in the AirflowNetwork:Distribution:Component:LeakageRatio objects.\\
+$k$ &= Number of supply leaks\\
+\\
+\end{tabular}
 
-\({\dot m_{i,terminal}}\) ~~~ = The flow rate at the ith terminal, which is determined in the subroutine SimVAV in the HVACSingleDuctSystem module
+\item If the calculated supply fan flow rate is above the maximum limit of the supply fan flow rate, and the supply leak ratios remain the same, the supply fan flow rate is set to the maximum limit, and the terminal flow rates are reduced proportionally weighted by a ratio of the maximum supply fan flow rate by input to the calculated supply fan flow rate. Therefore, a sum of all terminal rates and all supply leak rates is equal to the maximum supply fan rate.
 
-n~~~ = Number of terminals
-
-\({F_j}\) = The fraction of the supply fan flow rate at the jth supply leak, given in the AirflowNetwork:Distribution:Component:LeakageRatio objects.
-
-k~~~ = Number of supply leaks
-
-4.~~~~If the calculated supply fan flow rate is above the maximum limit of the supply fan flow rate, and the supply leak ratios remain the same, the supply fan flow rate is set to the maximum limit, and the terminal flow rates are reduced proportionally weighted by a ratio of the maximum supply fan flow rate by input to the calculated supply fan flow rate. Therefore, a sum of all terminal rates and all supply leak rates is equal to the maximum supply fan rate. \textbf{\emph{~}}
+\end{enumerate}
 
 \begin{equation}
 R = \frac{{{{\dot m}_{fan,max}}}}{{{{\dot m}_{fan,cal}}}}
 \end{equation}
 
 \begin{equation}
-{\dot m_{i,terminal,final}} = {\dot m_{i,terminal}}*R
+{\dot m_{i,terminal,final}} = {\dot m_{i,terminal}}\cdot R
 \end{equation}
 
-where
+where:
 
-R~~~ = The ratio of the maximum fan flow rate given in the inputs to the requested fan flow rate based on the above equation
-
-\({\dot m_{fan,max}}\) ~~~~~ = The maximum supply fan flow rate by input
-
-\({\dot m_{fan,cal}}\) ~~~~~~ = The calculated supply fan flow rate
-
-\({\dot m_{i,terminal,final}}\) ~~~~~~~~~~ = The final flow rate at each terminal adjusted by the ratio
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$R$ &= The ratio of the maximum fan flow rate given in the inputs to the requested fan flow rate based on the above equation\\
+$\dot{m}_{fan,max}$ &= The maximum supply fan flow rate by input\\
+$\dot{m}_{fan,cal}$ &= The calculated supply fan flow rate\\
+$\dot{m}_{i,terminal,final}$ &= The final flow rate at each terminal adjusted by the ratio\\
+\\
+\end{tabular}
 
 \subsection{Airflow Calculation Procedure using inputs of Intrazone nodes and linkages}\label{airflow-calculation-procedure-using-inputs-of-intrazone-nodes-and-linkages}
 
@@ -908,7 +979,7 @@ The revised zone temperature update equation becomes:
 
 {\scriptsize
 \begin{equation}
-T_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {\mathop {{Q_i}}\limits^ \bullet  }  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}{T_{si}} + MCPTairflow + {{\mathop m\limits^ \bullet  }_{sys}}{C_p}{T_{{\rm{supply}}}} + QADS,z - \left( {\frac{{{C_z}}}{{\delta t}}} \right)\left( { - 3T_z^{t - \delta t} + \frac{3}{2}T_z^{t - 2\delta t} - \frac{1}{3}T_z^{t - 3\delta t}} \right)}}{{\left( {\frac{{11}}{6}} \right)\frac{{{C_z}}}{{\delta t}} + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} A + MCPairflow + {{\mathop m\limits^ \bullet  }_{sys}}C}}
+T_z^t = \frac{\sum_{i=1}^{N_{sl}} \dot{Q}_i + \sum_{i-1}^{N_{surfaces}} h_i A_i T_{si} + MCPT_{airflow} + \dot{m}_{sys} C_p T_{supply} + QADS_z - \left( \frac{C_z}{\delta t} \right ) \left(-3 T_z^{t-\delta t} + \frac{3}{2} T_z^{t-2\delta t} -\frac{1}{3} T_z^{t-3\delta t} \right )}{\frac{11}{6} \frac{C_z}{\delta t} + \sum_{i=1}^{N_{surfaces}} h_i A + MCP_{airflow} + \dot{m}_{sys} C}
 \end{equation}}
 
 Where MCPT\(_{airflow}\) is the sum of mass flow rate multiplied by specific heat and temperature for infiltration and mixing, Q\(_{ADS,z}\) is the added total sensible load in the zone due to Air Distribution System losses, and MCP\(_{airflow}\) is the sum of mass flow rate multiplied by specific heat for infiltration and mixing as calculated in the AirflowNetwork model described above.
@@ -916,7 +987,7 @@ Where MCPT\(_{airflow}\) is the sum of mass flow rate multiplied by specific hea
 The revised coefficient (B) used in the zone humidity ratio calculation is shown below:
 
 \begin{equation}
-B = \sum {k{g_{mas{s_{{\rm{Sched Loads}}}}}}}  + M{W_{airflow}} + {\dot m_{sy{s_{in}}}}{W_{sys}} + \sum\limits_{i = 1}^{surfs} {{A_i}{h_{mi}}{\rho_{ai{r_z}}}{W_{surf{s_i}}}}  + QADS,m,z
+B = \sum kg_{mass,sched-loads} + MW_{airflow} + \dot{m}_{sys,in} W_{sys} + \sum_{i = 1}^{surf_s} A_i h_{mi} \rho_{air_z} W_{surf_{s_i}} + QADS_{m,z}
 \end{equation}
 
 Where MW\(_{airflow}\) is the sum of mass flow rate multiplied by humidity ratio for infiltration and mixing and Q\(_{ADS,m,z\\}\)is the added total latent (moisture) load in the zone due to Air Distribution System losses from the AirflowNetwork model described above. This coefficient is used in the prediction of moisture as described in the section ``Moisture Predictor-Corrector'' found elsewhere in this document.
@@ -924,6 +995,277 @@ Where MW\(_{airflow}\) is the sum of mass flow rate multiplied by humidity ratio
 \subsection{Model Output}\label{model-output}
 
 The available outputs from the AirflowNetwork model are described in the EnergyPlus Input Output Reference manual.
+
+\subsection{Single Sided Wind Pressure Coefficient Algorithm}
+
+The approach in the single sided (SS) model is based on correlating the flow rate into
+the room through one or more openings with local flow conditions at the openings. These
+are in one fa\c{c}ade of a rectangular building of width WB, depth DB and height HB.
+There is a vertical wind profile $U(z)$ approaching the building, which generates a
+local flow $U_L$ parallel to the fa\c{c}ade (whose value depends on location, building
+geometry and wind direction).
+
+Consider first the 2-aperture case, where air flows in through one opening of area
+$A_\textup{in}$ and exits through another of equal area. Let us denote the flow rate
+of ambient air into the room by $Q$, and define a dimensionless flow rate $Q'$ by
+\begin{equation}
+Q'=Q/(A_\textup{in} U_\textup{ref}),
+\end{equation}
+where $U_\textup{ref}$ is a reference velocity taken as the undisturbed wind speed
+$U(z_\textup{ref})$ at a reference height $z_\textup{ref} = 10 \textup{m}$. There is a
+pressure difference $\Delta p(t)$ between the two opening locations, with time-averaged
+mean value $\overline{\Delta p}$ and standard deviation $\sigma_{\Delta p}$.
+
+There are three principal mechanisms determining the flow rate:
+
+\begin{enumerate}[label=(\alph*)]
+\item Mean pressure difference:  a non-zero mean value for the difference in pressure
+at the two opening locations, $\overline{\Delta p}$, drives a flow that scales as
+$\overline{\Delta p}^{1/2}$.\label{ss-mean-mech}
+\item Unsteady pressure difference: turbulence drives a fluctuating pressure difference
+between the two openings, resulting in a net addition of air from the outside. This is
+characterized by the standard deviation of the pressure difference signal,
+$\sigma_{\Delta p}$ and the associated flow rate adds to that arising from
+$\overline{\Delta p}$. It includes periodic Strouhal forcing (`pumping') at relevant
+wind angles. Note that this contribution is non-zero even when the mean pressure
+difference is zero.\label{ss-unsteady-mech}
+\item Shear layer mechanism: when there is small or zero mean pressure difference
+between the two opening locations, the local flow parallel to the fa\c{c}ade causes a
+mixing layer to grow over the length of the opening resulting in the incorporation of
+ambient air. This scales with $U_L$.\label{ss-shear-mech}
+\end{enumerate}
+
+Our model therefore views the flow rate as comprising contributions from each of these
+as appropriate, i.e. 
+\begin{equation}
+Q'=\left[a_p |\Delta c_p |+a_\sigma \sigma_{\Delta c_p} \right]^{1/2}+a_s U_L'
+\end{equation}
+where $a_p$, $a_\sigma$ and $a_s$ are constants, the mean and fluctuating pressure
+difference terms have been written as pressure coefficients
+\begin{equation}
+\Delta c_p=\frac{\overline{\Delta p}}{\frac{1}{2} \rho U_\textup{ref}^2},
+\end{equation}
+\begin{equation}
+\sigma_{\Delta c_p}=\frac{\sigma_{\Delta p}}{\frac{1}{2} \rho U_\textup{ref}^2},
+\end{equation}
+$\rho$ being the ambient air density, and
+\begin{equation}
+U_L'=\frac{U_L}{U_\textup{ref}}.
+\end{equation}
+
+The pressure-difference mechanisms \ref{ss-mean-mech} and \ref{ss-unsteady-mech} are
+dominant for the 2-opening case and \ref{ss-shear-mech} is negligible, while, in
+contrast, in the case of a single opening, shear is dominant. Hence we take $a_s=0$ for
+2-opening cases and $a_p = a_\sigma = 0$ for one opening. Henceforth we focus on the
+2-opening case, although a procedure is given at the end of the section for how to
+approximate a greater number by just two.
+
+Figure \ref{fig:ss-plan-view-two-openings} shows the geometry of this case in plan view.
+The two openings are a distance $s$ apart in a fa\c{c}ade of width WB whose normal has
+azimuthal angle $\varphi_n$. The wind azimuthal direction is $\varphi_w$, so that its
+direction relative to the fa\c{c}ade is 
+\begin{equation}
+\theta=\varphi_w-\varphi_n.
+\end{equation}
+In these definitions, $\ang{0} \leq \varphi_n, \varphi_w \leq \ang{360}$, while
+$|\theta| \leq \ang{180}$. Note that if $\theta$ initially falls outside the range
+indicated it should be replaced by $\operatorname{sgn}(\theta) \left[|\theta| - \ang{360}\right]$.
+
+According to the above discussion, the flow rate is modeled as comprising two terms,
+arising, respectively, from the mean and fluctuating components of the pressure
+difference between the two aperture locations:
+\begin{equation}\label{eqn:ss-flow-two-terms}
+Q'=\left(a_p |\Delta c_p |+a_\sigma \sigma_{\Delta c_p} \right)^{1/2}
+\end{equation}
+
+\begin{figure}[hbtp] % fig 1
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ss-figure1.png}
+\caption{Plan view of building with 2-opening fa\c{c}ade. \protect \label{fig:ss-plan-view-two-openings}}
+\end{figure}
+
+There are two parts to deriving the detailed form of the model:
+\begin{enumerate}
+\item Express the mean and fluctuating pressures in terms of other physical quantities
+that are more readily accessible. EnergyPlus does not have the information on variations
+in pressure that is needed to compute $\Delta c_p$ and $\sigma_{\Delta c_p}$. Analysis
+of wind tunnel pressure data (Linden et al., 2013) allows for the derivation of simple
+expressions for these quantities in terms of the wind direction and opening separation
+$s$.\label{ss-item-the-first}
+\item Find the coefficients $a_p$ and $a_\sigma$. This is achieved here by analysis of
+ventilation rate data (Linden et al., 2013), and using linear regression on the
+data.\label{ss-item-the-second}
+\end{enumerate}
+
+\subsubsection{Estimation of pressure difference coefficients}
+The analysis of pressure data carried out showed that the contributions to the
+right-hand side of Equation \ref{eqn:ss-flow-two-terms} can be written to first order
+as
+\begin{equation}
+\Delta c_p=f(s',\theta)
+\end{equation}
+and
+\begin{equation}
+\sigma_{\Delta c_p}=g(s',\theta)
+\end{equation}
+where the dimensionless separation $s' = s/\textup{WB}$,
+\begin{equation}
+f(s',\theta)=s'\cdot\Pi(θ),
+\end{equation}
+and
+\begin{equation}
+g(s',\theta)=\Sigma_0+s'\cdot\Sigma(\theta).
+\end{equation}
+That is, to a first approximation the pressure difference mean and standard deviation vary linearly with opening separation, each modulated by its own function of relative wind angle $\theta$.
+
+The formulae for the components are as follows.
+\begin{equation}\label{eqn:ss-first-formula}
+\Pi(\theta) = 
+\begin{cases}
+0.44\operatorname{sgn}(\theta)\sin(2.67|\theta|),& |\theta| \leq \theta_0 \\
+-0.69 \operatorname{sgn}(\theta)\sin(288-1.6|\theta|),& \theta_0\leq|\theta|\leq\ang{180}.
+\end{cases}
+\end{equation}
+\begin{equation}\label{eqn:ss-second-formula}
+\theta_0 = \ang{67.5}
+\end{equation}
+\begin{equation}\label{eqn:ss-third-formula}
+\Sigma(\theta) = 0.423 - 1.63\times 10^{-3}|\theta|
+\end{equation}
+\begin{equation}\label{eqn:ss-last-formula}
+\Sigma_0=0.24
+\end{equation}
+
+Figures \ref{fig:ss-figure-2-upper} and \ref{fig:ss-figure-2-lower} show an example of $\Delta c_p$ and $\sigma_{\Delta c_p}$ generated by Equations \ref{eqn:ss-first-formula} through \ref{eqn:ss-last-formula}, respectively, compared with the data.
+%
+\begin{figure}[hbtp] % fig 2
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ss-chart1.png}
+\caption{Mean pressure difference, $\Delta c_p$ predicted by Equations \ref{eqn:ss-first-formula} and \ref{eqn:ss-second-formula}, compared with experimental data. The fa\c{c}ade containing the openings is facing South and the separation is large ($s' = 0.85$). \protect \label{fig:ss-figure-2-upper}}
+\end{figure}
+%
+\begin{figure}[hbtp] % fig 2
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ss-chart2.png}
+\caption{Standard deviation of pressure difference, $\sigma_{\Delta c_p}$, predicted by Equations \ref{eqn:ss-third-formula} and \ref{eqn:ss-last-formula}, compared with experimental data. The fa\c{c}ade containing the openings is facing South and the separation is large ($s' = 0.85$). \protect \label{fig:ss-figure-2-lower}}
+\end{figure}
+
+This completes item \ref{ss-item-the-first} above, i.e. the approximation of the two pressure coefficient terms in Equation \ref{eqn:ss-flow-two-terms} in terms of the dimensionless opening separation and the relative wind angle. There remains item \ref{ss-item-the-second}, i.e. fitting the flow rate data to the formula-generated pressure parameters to determine the constants $a_p$ and $a_\sigma$. When this was carried out, the best fit was found to occur with $a_p = 0.173$ and $a_\sigma = 0.042$. Figure \ref{fig:ss-figure-3-in-original} shows the comparison between the flow rate prediction and the experimental data.
+
+Combining with the previous results we have
+\begin{equation}\label{eqn:ss-combined-eqn}
+\frac{Q}{A_\text{in} U_\text{ref}}=\left(0.01+\left[0.173 |\Pi(\theta)|+0.042 \Sigma(\theta)\right]s'\right)^{1/2}
+\end{equation}
+
+The flow Q is defined to be positive when opening \#1 is the inlet and opening \#2 is the outlet. Since $\Delta p$ is defined as $p_1-p_2$, this can occur when $\Delta c_p > 0$, which in turn corresponds to certain relative wind angles, i.e.
+\begin{equation}
+\begin{gathered}
+Q < 0\ \text{otherwise}\\ 			
+Q > 0\ \text{if}\ \ang{0} < \theta < \theta_0\ \text{or}\  \ang{-180} < \theta < -\theta_0
+\end{gathered}
+\end{equation}
+
+Note that the sense of $Q$ is not necessarily well-defined for all such angles, e.g.
+when the unsteady contribution in Equation \ref{eqn:ss-flow-two-terms} is significant:
+nevertheless, we retain this definition for all angles.
+
+\begin{figure}[hbtp] % fig 3
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ss-figure3.png}
+\caption{Comparison of predicted flow rates with experimental data. Each graph shows experimental data (red diamonds) plotted against model prediction (gray squares). Cases in the left-hand column, (a)-(c), are for $s'=0.75$, those in right-hand column, (d)-(f), $s'=0.32$. The three rows are for 2-story isolated, 4-story isolated and 2-story with low density surroundings, respectively. \protect \label{fig:ss-figure-3-in-original}}
+\end{figure}
+
+\subsubsection{Inversion of flow rate to equivalent pressure difference}
+Finally, we invert the flow rate to obtain the equivalent pressure difference. The purpose of this procedure is to allow incorporation of the model into the network airflow part of EnergyPlus, which requires pressure coefficients to calculate the flow rate: in this way the model will become essentially transparent to the user.
+A nodal representation of the 2-aperture single-sided case is shown in Figure \ref{fig:ss-pressure-network-two-openings}.
+
+\begin{figure}[hbtp] % fig 4
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ss-figure4.png}
+\caption{Pressure network for 2-opening single-sided room. \protect \label{fig:ss-pressure-network-two-openings}}
+\end{figure}
+
+Here, 0 is the  ambient, 1 is at the upstream outer surface, 2 is at the downstream outer surface, and R is the room.
+
+Let the openings have areas $A_1$ and $A_2$, not necessarily equal, and a discharge coefficient $C_d$, which is assumed equal, and let $Q$ be the flow rate through the system. Then it can be shown that the pressure difference between the two openings, $\Delta p_{12}$, is related to the flow rate by
+\begin{equation}\label{eqn:ss-delta-p-1-2}
+\frac{\Delta p_{12}}{\frac{1}{2}\rho V^2} = \frac{1}{C_d^2}\left(\frac{Q/A_\text{eff}}{V}\right)^2
+\end{equation}
+where the effective area $A_\text{eff}$ is defined by
+\begin{equation}
+A_\text{eff}=\frac{A_1 A_2}{\left(A_1^2+A_2^2\right)^{1/2}}
+\end{equation}
+and $V$ is a reference velocity. The left-hand side of Equation \ref{eqn:ss-delta-p-1-2} is a pressure coefficient, $\Delta c_{p,12}^{E+}$, say, and our task is to express this in terms of the flow rate in Equation \ref{eqn:ss-combined-eqn} but using the definition of a pressure coefficient appropriate to EnergyPlus.
+
+The first step is to re-write Equation \ref{eqn:ss-delta-p-1-2} as follows:
+\begin{equation}
+\Delta c_{p,12}^{E+} = \frac{1}{C_d^2}  \left(\frac{A_\text{in}}{A_\text{eff}}\right)^2 \left(\frac{U_\text{ref}}{V}\right)^2 Q'^2
+\end{equation}
+where $Q' = Q/(A_\text{in}U_\text{ref})$ is the non-dimensional flow rate of Equation \ref{eqn:ss-combined-eqn}, which is expressed in terms of $Q$, the window area $A_\text{in}$ and the wind speed at 10 m height, $U_\text{ref}$.
+
+The factor $\left(A_\text{in}/A_\text{eff}\right)^2 = 2$, since $A_1 = A_2 = A_\text{in}$, and therefore $A_\text{eff} = A_\text{in}/\sqrt{2}$. The factor $(U_\text{ref}/V)$ relating the velocity scale used in the correlation with that used in the EnergyPlus pressure coefficient may be simplified by noting the following.
+
+EnergyPlus assumes the surface pressure due to wind, $p_w$, is derived from a pressure
+coefficient $C_p$ using the local wind speed at \textit{window height}, $V_\text{ref}(z_win)$,
+i.e.
+\begin{equation}
+p_w=\rho_a \left[V_\text{ref}(z_\text{win}\right]^2 C_p/2
+\end{equation}
+Hence the reference velocity $V =  V_\text{ref}(z_\text{win})$.
+
+EnergyPlus characterizes the vertical wind profile as a power law in z, defined in terms of the local atmospheric boundary layer depth $\delta$ and a power law exponent $\alpha$. EnergyPlus also uses an ``interpolation'' formula to derive the above local wind speed from that measured at the meteorological site, $U_\text{met}$, according to
+\begin{equation}
+V_\text{ref}(z)= U_\text{met} \left(\frac{\delta_\text{met}}{z}\right)^{\alpha_\text{met}}
+\left(\frac{z}{\delta}\right)^\alpha
+\end{equation}
+where the subscript ``met'' denotes conditions at the meteorological site, and the default values are $z_\text{met} = 10\ \text{m}$, $\delta_\text{met} = 270\ \text{m}$ and $\alpha_\text{met} = 0.14$. The user can change the site parameters from their default values.
+
+The correlation in Equation \ref{eqn:ss-combined-eqn} assumes the reference velocity is the wind speed at 10 m, which will be taken as the local velocity at the building, $V_\text{ref}(10)$.
+Combining these results, the pressure coefficient representing the difference in pressure between the two openings is given by
+\begin{equation}
+\Delta c_{p,12}^{E+} = \frac{1}{C_d^2} \left[ \frac{V_\text{ref}(10)}{V_\text{ref}(z_\text{win})} \right]^2 \left(0.02+\left[0.346 |\Pi(\theta)|+0.084 \Sigma(\theta)\right]∙s'\right)
+\end{equation}
+where the velocity ratio
+\begin{equation}
+\frac{V_\text{ref}(10)}{V_\text{ref}(z_\text{win})} = \left(\frac{10}{z_\text{win}}\right)^\alpha
+\end{equation}
+
+Thus, if we assign a pressure coefficient $+0.5\Delta c_{p,12}^{E+}$ to opening 1 and $-0.5\Delta c_{p,12}^{E+}$ to opening 2, then this will provide the necessary pressure difference to give the flow in \ref{eqn:ss-combined-eqn} in a network context.
+
+Note: the pressure coefficient $\Delta c_{p,12}^{E+}$ refers to the difference in pressure between the two openings and is defined in terms of the wind speed at window height. If this is to be combined with a background pressure coefficient for the fa\c{c}ade it is important to ensure the two are defined using the same reference velocity.
+
+\begin{figure}[hbtp] % fig 5
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ss-figure5.png}
+\caption{Local velocity as function of wind angle for wind tunnel data analyzed. On the 2-story graph `WP85' refers to Warren and Parkins (1985), whose measurement location is most closely matched by the ``Center'' curve. \protect \label{fig:ss-local-velocity}}
+\end{figure}
+%
+\begin{figure}[hbtp] % fig 6
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ss-figure6.png}
+\caption{Wind tunnel data, averaged over all cases, plotted with curve to fit data. \protect \label{fig:ss-wind-tunnel-data}}
+\end{figure}
+
+\subsubsection{Testing/Validation/Data Source(s)}
+The SS model was developed using wind tunnel pressure and flow rate data acquired by CPP Wind Engineering \& Air Quality Consultants, who carried out two series of tests: (a) Closed Box tests, with a sealed building, to obtain pressure and velocity data and (b) Ventilation tests, with one or two apertures open, to obtain flow rate data. See Linden et al. (2013) for full details.
+
+Each experimental configuration consisted of a cuboidal building with or without a set of blocks representing nearby buildings. 
+
+\begin{itemize}
+\item Building: either 2-story, with WB = 47.5 cm, DB = 19.3 cm, HB = 9.9 cm, or 4-story, with HB = 19.8 cm. The model has a nominal scale of 1:70 (based on earlier tests).
+\item Environment: building either isolated or at center of a 3 x 3 array of equal-sized blocks, which were of same aspect ratio and either low (2-story height) or high (4-story height), and with either narrow spacing (approximately 0.5WB between blocks) or wide spacing (approximately WB), giving a total of 5 different environments.
+\item Approach flow: suburban boundary layer, approximately 10 m/s at 1 m height. The model was mounted on a turntable allowing any desired wind direction to be used. Increments of $\ang{11.25}$ and $\ang{22.5}$ were used for the Closed Box and Ventilation runs, respectively.
+\item Room and openings: the building envelope contained a second-floor room of dimensions WRM = 45.9 cm, DRM = 17.7 cm and HRM = 5.0 cm. A total of 15 opening positions were available, distributed around the room. These were sealed for the Closed Box tests but opened in various combinations for the Ventilation runs. 
+\item Sensors: 56 pressure transducers, arranged around the opening positions, including 32 at mid-opening height, recorded static pressure, while hot film sensors at 6 different positions recorded flow speed near the surface. For Ventilation runs the decay in concentration of a tracer was measured at two locations inside the room.
+\end{itemize}
+
+The data used to develop the model consisted of 6 scenarios: 3 building/environment cases,
+\begin{itemize}
+\item 2-story isolated building
+\item 4-story isolated building
+\item 2-story building with low, widely-spaced blocks
+\end{itemize}
+combined with 2 choices of opening position on the South (long) fa\c{c}ade, namely wide separation ($s' = 0.75$) and medium separation ($s' = 0.32$). 
 
 \subsection{Occupant Ventilation Control}\label{occupant-ventilation-control}
 
@@ -1038,16 +1380,11 @@ Step 3: Setpoint check
 There are 5 temperature control types. The following types are available:
 
 \begin{itemize}
-\item
-  No control: Bypass
-\item
-  Single heating setpoint: If Tzon \textgreater{} setpoint, go to next step. Otherwise, return false.
-\item
-  Single cooling setpoint: If Tzon \textless{} setpoint, go to next step. Otherwise, return false.
-\item
-  Single heating and cooling setpoint: no action by returning false
-\item
-  Dual heating and setpoints: If heating setpoint \textless{} Tzon \textless{} Cooling setpoint, go to next step. Otherwise, return false.
+\item No control: Bypass
+\item Single heating setpoint: If Tzon \textgreater{} setpoint, go to next step. Otherwise, return false.
+\item Single cooling setpoint: If Tzon \textless{} setpoint, go to next step. Otherwise, return false.
+\item Single heating and cooling setpoint: no action by returning false
+\item Dual heating and setpoints: If heating setpoint \textless{} Tzon \textless{} Cooling setpoint, go to next step. Otherwise, return false.
 \end{itemize}
 
 Step 4: Select bypass or opening probability check
@@ -1098,36 +1435,43 @@ Pressure control is achieved by varying either zone exhaust fan flow rate in a c
 
 	In general, the zero flow rate of either exhaust fan or relief node will generate the maximum zone pressure, while the maximum flow rate of either exhaust fan or relief node will produce the minimum zone pressure. 
 
-2. If the setpoint pressure is between the maximum zone pressure caused by zero exhaust fan or relief node flow rate and the minimum zone pressure caused by maximum exhaust fan flow rate or outdoor air flow rate, then the AirflowNetwork model will use Regula Falsi to find a solution with calculated zone exhaust fan flow rate or relief node flow rate. Otherwise, the pressure setpoint will not be met. 
+2. If the setpoint pressure is between the maximum zone pressure caused by zero exhaust fan or relief node flow rate and the minimum zone pressure caused by maximum exhaust fan flow rate or outdoor air flow rate, then the AirflowNetwork model will use root solver to find a solution with calculated zone exhaust fan flow rate or relief node flow rate. Otherwise, the pressure setpoint will not be met. 
 
 3. If both maximum and minimum pressures are higher than the setpoint, the maximum exhaust or outdoor flow rate will be forced. 
 
 4. If both maximum and minimum pressures are lower than the setpoint, then zero flow rate will be forced.
 
-\subsection{References}\label{references-004}
+\subsection{References}\label{afn-references}
 
 Atkins, R. E., J. A. Peterka, and J. E. Cermak. 1979. ``Averaged pressure coefficients for rectangular buildings,'' Wind Engineering, Proceedings of the Fifth International Conference 7:369-80, Fort Collins, CO. Pergamon Press, NY.
 
-Bolmqvist, C. and M. Sandberg, 2004, ``Air Movements through Horizontal Openings in Buildings -- A Model Study,'' International Journal of Ventilation, Vol. 3, No. 1, pp.~1-9
+Awbi, H. B. 2003. Ventilation of Buildings (2\textsuperscript{nd} Edition). Routledge.
 
-COMIS Fundamentals. 1990. Edited by Helmut E. Feustel and Alison Rayner-Hooson, LBL-28560, Lawrence Berkeley Laboratory, Berkeley, CA
+Bolmqvist, C. and M. Sandberg, 2004, ``Air Movements through Horizontal Openings in Buildings -- A Model Study,'' International Journal of Ventilation, Vol. 3, No. 1, pp.~1-9.
+
+COMIS Fundamentals. 1990. Edited by Helmut E. Feustel and Alison Rayner-Hooson, LBL-28560, Lawrence Berkeley Laboratory, Berkeley, California.
 
 Conte, S. D. and C de Boor. 1972.Elementary Numerical Analysis: an Algorithmic Approach, McGraw-Hill.
 
-Cooper, L., 1989, ``Calculation of the Flow Through a Horizontal Ceiling/Floor Vent,'' NISTIR 89-4052, National Institute of Standards and Technology, Gaithersburg, MD
+Cooper, L., 1989, ``Calculation of the Flow Through a Horizontal Ceiling/Floor Vent,'' NISTIR 89-4052, National Institute of Standards and Technology, Gaithersburg, Maryland.
 
-Dols, W. S. \& G. N. Walton. 2002. ``CONTAMW 2.0 User Manual,'' NISTIR 6921, National Institute of Standards and Technology, Gaithersburg , Maryland
+Dols, W. S. and G. N. Walton. 2002. ``CONTAMW 2.0 User Manual,'' NISTIR 6921, National Institute of Standards and Technology, Gaithersburg , Maryland.
 
-Holmes, J. D. 1986. Wind Loads on low-rise buildings: The structural and environmental effects of wind on buildings and structures, Chapter 12, Faculty of Engineering, Monash University, Melbourne, Australia
+Holmes, J. D. 1986. Wind Loads on low-rise buildings: The structural and environmental effects of wind on buildings and structures, Chapter 12, Faculty of Engineering, Monash University, Melbourne, Australia.
 
-Marais, J. M. \& C. Teichmann, ``Window Simulation Methods Required for Manual Window Ventilated Buildings,'' Fifth German-Austrian IBPSA Conference, September 22-24, 2014, RWTH Aachen University, Germany
+Linden, P., D. Banks, N. Daish, M. Fountain, G. Gross, A. Honnekeri, M. Pigman, R. Thomas, K. Adams, 
+S. Brunswick, S. Dutton, R. Gerard, P. Haves, M. Hovanec, P. Switenki, Y. Zhai, E. Arens, G. Carrilho da Gra\c{c}a, W. Fisk, F. Gillan, M. Hill, T. Lawton, G. Szakats, and H. Zhang. 2016. ``Natural Ventilation for Energy Savings in California Commercial Buildings,'' CEC-500-2016-039, California Energy Commission.
+
+Marais, J. M. and C. Teichmann, ``Window Simulation Methods Required for Manual Window Ventilated Buildings,'' Fifth German-Austrian IBPSA Conference, September 22-24, 2014, RWTH Aachen University, Germany.
 
 Swami, M. V. and S. Chandra. 1988. Correlations for pressure distribution on buildings and calculation of natural-ventilation airflow, ASHRAE Transactions 94(1988) (Pt 1), pp.~243-266.
 
-Swami, M. V., L. Gu, \& V. Vasanth. 1992. ``Integration of Radon and Energy Models for Building,'' FSEC-CR-553-92, Florida Solar Energy Center, Cocoa, Florida
+Swami, M. V., L. Gu, and V. Vasanth. 1992. ``Integration of Radon and Energy Models for Building,'' FSEC-CR-553-92, Florida Solar Energy Center, Cocoa, Florida.
 
-Tan, Q. and Y. Jaluria, 1992, ``Flow through Horizontal Vents as Related to Compartment Fire Environments,'' NIST-GCR-92-607, National Institute of Standards and Technology, Gaithersburg, Maryland
+Tan, Q. and Y. Jaluria, 1992, ``Flow through Horizontal Vents as Related to Compartment Fire Environments,'' NIST-GCR-92-607, National Institute of Standards and Technology, Gaithersburg, Maryland.
 
-Walton, G. N. 1989. ``AIRNET -- A Computer Program for Building Airflow Network Modeling,'' NISTIR 89-4072, National Institute of Standards and Technology, Gaithersburg, Maryland
+Walton, G. N. 1989. ``AIRNET -- A Computer Program for Building Airflow Network Modeling,'' NISTIR 89-4072, National Institute of Standards and Technology, Gaithersburg, Maryland.
 
-Walton, G. N. \& W. S. Dols. 2003. ``CONTAM 2.1 Supplemental User Guide and Program Documentation,'' NISTIR 7049, National Institute of Standards and Technology, Gaithersburg, Maryland
+Walton, G. N. and W. S. Dols. 2003. ``CONTAM 2.1 Supplemental User Guide and Program Documentation,'' NISTIR 7049, National Institute of Standards and Technology, Gaithersburg, Maryland.
+
+Warren, P.R. and Parkins, L.M. (1985) Single-sided ventilation through open windows. In Proceedings of the ASHRAE/DOE/BTECC Conference on Thermal Performance of the Exterior Envelopes of Buildings III, December 2-5, 1985, Clearwater Beach, Florida, pp. 209-228.

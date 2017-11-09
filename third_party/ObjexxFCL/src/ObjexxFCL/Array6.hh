@@ -3,13 +3,13 @@
 
 // Array6: Row-Major 6D Array Abstract Base Class
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -83,9 +83,13 @@ public: // Types
 	using Super::npos;
 	using Super::overlap;
 	using Super::size;
+
+protected: // Types
+
 	using Super::size_of;
 	using Super::slice_k;
 	using Super::swapB;
+
 	using Super::data_;
 	using Super::sdata_;
 	using Super::shift_;
@@ -1308,7 +1312,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1323,7 +1327,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1338,7 +1342,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1353,7 +1357,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1368,7 +1372,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1383,7 +1387,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1398,7 +1402,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1413,7 +1417,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1428,7 +1432,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1443,7 +1447,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1458,7 +1462,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1473,7 +1477,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1488,7 +1492,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1503,7 +1507,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1518,7 +1522,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1533,7 +1537,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1548,7 +1552,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1563,7 +1567,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1578,7 +1582,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1593,7 +1597,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1608,7 +1612,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1623,7 +1627,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1638,7 +1642,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1653,7 +1657,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1668,7 +1672,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1683,7 +1687,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1698,7 +1702,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1713,7 +1717,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1728,7 +1732,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1743,7 +1747,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1758,7 +1762,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1773,7 +1777,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -1788,7 +1792,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1803,7 +1807,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1818,7 +1822,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1833,7 +1837,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1848,7 +1852,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1863,7 +1867,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1878,7 +1882,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1893,7 +1897,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1908,7 +1912,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1923,7 +1927,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1938,7 +1942,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1953,7 +1957,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -1968,7 +1972,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -1983,7 +1987,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -1998,7 +2002,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2013,7 +2017,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2028,7 +2032,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2043,7 +2047,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2058,7 +2062,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2073,7 +2077,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2088,7 +2092,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2103,7 +2107,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2118,7 +2122,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2133,7 +2137,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, int const i3, int const i4, IS const & s5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2148,7 +2152,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2163,7 +2167,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2178,7 +2182,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2193,7 +2197,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, int const i5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2208,7 +2212,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, int const i3, int const i4, IS const & s5, int const i6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2223,7 +2227,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, int const i3, int const i4, int const i5, IS const & s6 ) const
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2252,7 +2256,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2267,7 +2271,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2282,7 +2286,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2297,7 +2301,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2312,7 +2316,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2327,7 +2331,7 @@ public: // Slice Proxy Generators
 	Array5S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2342,7 +2346,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2357,7 +2361,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2372,7 +2376,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2387,7 +2391,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2402,7 +2406,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2417,7 +2421,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2432,7 +2436,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2447,7 +2451,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2462,7 +2466,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2477,7 +2481,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2492,7 +2496,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2507,7 +2511,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2522,7 +2526,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2537,7 +2541,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2552,7 +2556,7 @@ public: // Slice Proxy Generators
 	Array4S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2567,7 +2571,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2582,7 +2586,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2597,7 +2601,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2612,7 +2616,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2627,7 +2631,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2642,7 +2646,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2657,7 +2661,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2672,7 +2676,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2687,7 +2691,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2702,7 +2706,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2717,7 +2721,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -2732,7 +2736,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2747,7 +2751,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2762,7 +2766,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2777,7 +2781,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2792,7 +2796,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2807,7 +2811,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2822,7 +2826,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2837,7 +2841,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2852,7 +2856,7 @@ public: // Slice Proxy Generators
 	Array3S< T >
 	operator ()( IS const & s1, IS const & s2, IS const & s3, int const i4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2867,7 +2871,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, IS const & s2, int const i3, int const i4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2882,7 +2886,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, IS const & s3, int const i4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2897,7 +2901,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, int const i3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2912,7 +2916,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2927,7 +2931,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -2942,7 +2946,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, IS const & s3, int const i4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2957,7 +2961,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, int const i3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -2972,7 +2976,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -2987,7 +2991,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -3002,7 +3006,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, IS const & s3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -3017,7 +3021,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -3032,7 +3036,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -3047,7 +3051,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -3062,7 +3066,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );
@@ -3077,7 +3081,7 @@ public: // Slice Proxy Generators
 	Array2S< T >
 	operator ()( int const i1, int const i2, int const i3, int const i4, IS const & s5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		DS const d5( I5_, s5, z );
@@ -3092,7 +3096,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( IS const & s1, int const i2, int const i3, int const i4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -3107,7 +3111,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, IS const & s2, int const i3, int const i4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -3122,7 +3126,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, IS const & s3, int const i4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -3137,7 +3141,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, int const i3, IS const & s4, int const i5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		k += slice_k( I5_, i5, z );
@@ -3152,7 +3156,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, int const i3, int const i4, IS const & s5, int const i6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		k += slice_k( I6_, i6 );
 		DS const d5( I5_, s5, z );
@@ -3167,7 +3171,7 @@ public: // Slice Proxy Generators
 	Array1S< T >
 	operator ()( int const i1, int const i2, int const i3, int const i4, int const i5, IS const & s6 )
 	{
-		int k( -shift_ );
+		std::int64_t k( -shift_ );
 		size_type z( z6_ );
 		DS const d6( I6_, s6 );
 		k += slice_k( I5_, i5, z );

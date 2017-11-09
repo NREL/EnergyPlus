@@ -2,8 +2,9 @@
 ! Basic file description:  Basic test for zone water-to-air heat pump.  Mass walls.  Regular slab floor.
 !                          Regular roof.  No Windows.
 !
-! Highlights:              Example of zone HVAC system (WSHP) with dedicated outdoor air system (DOAS)
-!
+! Highlights:              Example of zone HVAC system (WSHP) with dedicated outdoor air system (DOAS).
+!                          A AirTerminal:SingleDuct:Uncontrolled specifies outdoor air flow rate for the zone with OutDoor Air Method = Sum in 
+!                          DesignSpecification:OutdoorAir.
 !
 ! Simulation Location/Run: Denver Stapleton Intl Arpt CO USA WMO=724690, 2 design days, 1 run period,
 !                          Run Control executes two design days (see RUN PERIOD object)
@@ -85,7 +86,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,8.8;
 
   Timestep,4;
 
@@ -113,7 +114,7 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    annual,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -336,7 +337,7 @@
     0.0625,                  !- Minimum Outdoor Air Flow Rate {m3/s}
     0.0625,                  !- Maximum Outdoor Air Flow Rate {m3/s}
     NoEconomizer,            !- Economizer Control Type
-    ,                        !- Economizer Control Action Type
+    ModulateFlow,            !- Economizer Control Action Type
     23.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}
     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
     13.5,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
@@ -344,7 +345,7 @@
     14.,                     !- Economizer Minimum Limit Dry-Bulb Temperature {C}
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
-    OAFractionSched,         !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Outdoor Air Schedule Name
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
@@ -366,7 +367,9 @@
     Zone1DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 1 OA Inlet Node,    !- Zone Supply Air Node Name
-    0.0625;                  !- Maximum Air Flow Rate {m3/s}
+    0.0625,                  !- Maximum Air Flow Rate {m3/s}
+    SZ DSOA SPACE1-1;  !- Design Specification Outdoor Air Object Name 3
+
 
   Schedule:Compact,
     OAFractionSched,         !- Name
@@ -425,9 +428,9 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
-    flow/person,             !- Outdoor Air Method
-    0.0125,                  !- Outdoor Air Flow per Person {m3/s-person}
-    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    SUM,                     !- Outdoor Air Method
+    0.00015,                  !- Outdoor Air Flow per Person {m3/s-person}
+    0.00005,                   !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   People,
@@ -670,7 +673,7 @@
     0.0,                     !- Cooling Outdoor Air Flow Rate {m3/s}
     0.0,                     !- Heating Outdoor Air Flow Rate {m3/s}
     ,                        !- No Load Outdoor Air Flow Rate {m3/s}
-    Fan:OnOff,               !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone 1 Fan,              !- Supply Air Fan Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
     Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
@@ -766,16 +769,22 @@
     0.690793651,             !- Heating Power Consumption Coefficient 4
     0.0;                     !- Heating Power Consumption Coefficient 5
 
-  Fan:OnOff,
+  Fan:SystemModel,
     Zone 1 Fan,              !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    300.0,                   !- Pressure Rise {Pa}
-    Autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     Sys 1 Mixed Air Node,    !- Air Inlet Node Name
-    Sys 1 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+    Sys 1 Cooling Coil Air Inlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7;                     !- Fan Total Efficiency
 
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name

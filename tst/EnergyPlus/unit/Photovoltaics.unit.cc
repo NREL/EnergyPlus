@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::ElectricPowerServiceManager Unit Tests
 
@@ -63,6 +52,9 @@
 
 // EnergyPlus Headers
 #include <Photovoltaics.hh>
+#include <DataPhotovoltaics.hh>
+#include <DataHeatBalance.hh>
+#include <DataSurfaces.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -85,3 +77,62 @@ TEST_F( EnergyPlusFixture, PV_Sandia_AirMassAtHighZenith )
 	EXPECT_NEAR( airMass, 26.24135, 0.1 );
 
 }
+
+TEST_F( EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero )
+{
+	// unit test for issue #6222, test to make sure zone index in surface on which PV is placed is not zero so zone multiplier is applied properly
+	
+	EnergyPlus::DataPhotovoltaics::PVarray.deallocate();
+	DataHeatBalance::Zone.deallocate();
+	DataSurfaces::Surface.deallocate();
+	
+	EnergyPlus::DataPhotovoltaics::PVarray.allocate( 3 );
+	DataHeatBalance::Zone.allocate( 2 );
+	DataSurfaces::Surface.allocate( 3 );
+	
+	DataGlobals::NumOfZones = 2;
+	DataHeatBalance::Zone( 1 ).Name = "Zone1";
+	DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
+	DataHeatBalance::Zone( 1 ).Multiplier = 5.0;
+	DataHeatBalance::Zone( 2 ).Name = "Zone2";
+	DataHeatBalance::Zone( 2 ).ListMultiplier = 10.0;
+	DataHeatBalance::Zone( 2 ).Multiplier = 1.0;
+	
+	EnergyPlus::DataPhotovoltaics::NumPVs = 3;
+	EnergyPlus::DataPhotovoltaics::PVarray( 1 ).SurfacePtr = 1;
+	EnergyPlus::DataPhotovoltaics::PVarray( 1 ).CellIntegrationMode = -9999;
+	EnergyPlus::DataPhotovoltaics::PVarray( 2 ).SurfacePtr = 2;
+	EnergyPlus::DataPhotovoltaics::PVarray( 2 ).CellIntegrationMode = -9999;
+	EnergyPlus::DataPhotovoltaics::PVarray( 3 ).SurfacePtr = 3;
+	EnergyPlus::DataPhotovoltaics::PVarray( 3 ).CellIntegrationMode = -9999;
+
+	DataSurfaces::Surface( 1 ).Zone = 1;
+	DataSurfaces::Surface( 1 ).ZoneName = "Zone1";
+	DataSurfaces::Surface( 2 ).Zone = 0;
+	DataSurfaces::Surface( 2 ).ZoneName = "Zone2";
+	DataSurfaces::Surface( 3 ).Zone = 0;
+	DataSurfaces::Surface( 3 ).ZoneName = "None";
+	
+	// Test 1: Zone 1--PV has multiplier, Zone index already set
+	EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Report.DCPower = 1000.0;
+	EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Zone = Photovoltaics::GetPVZone( EnergyPlus::DataPhotovoltaics::PVarray( 1 ).SurfacePtr );
+	Photovoltaics::ReportPV( 1 );
+	EXPECT_EQ( EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Zone, 1 );
+	EXPECT_NEAR( EnergyPlus::DataPhotovoltaics::PVarray( 1 ).Report.DCPower, 5000.0, 0.1 );
+	
+	// Test 2: Zone 2--PV has multiplier, Zone index not set yet
+	EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Report.DCPower = 1000.0;
+	EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Zone = Photovoltaics::GetPVZone( EnergyPlus::DataPhotovoltaics::PVarray( 2 ).SurfacePtr );
+	Photovoltaics::ReportPV( 2 );
+	EXPECT_EQ( EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Zone, 2 );
+	EXPECT_NEAR( EnergyPlus::DataPhotovoltaics::PVarray( 2 ).Report.DCPower, 10000.0, 0.1 );
+	
+	// Test 3: Zone 3--PV not attached to any zone, Zone Index does not get set
+	EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Report.DCPower = 1000.0;
+	EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Zone = Photovoltaics::GetPVZone( EnergyPlus::DataPhotovoltaics::PVarray( 3 ).SurfacePtr );
+	Photovoltaics::ReportPV( 3 );
+	EXPECT_EQ( EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Zone, 0 );
+	EXPECT_NEAR( EnergyPlus::DataPhotovoltaics::PVarray( 3 ).Report.DCPower, 1000.0, 0.1 );
+
+}
+

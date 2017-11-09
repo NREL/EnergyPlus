@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -111,7 +100,7 @@ namespace EvaporativeFluidCoolers {
 
 	// METHODOLOGY EMPLOYED:
 	// Based on cooling tower by Shirey, Raustad: Dec 2000; Shirey, Sept 2002
-	
+
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::KelvinConv;
@@ -937,24 +926,24 @@ namespace EvaporativeFluidCoolers {
 		// Set up output variables
 		// CurrentModuleObject='EvaporativeFluidCooler:SingleSpeed'
 		for ( EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers; ++EvapFluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 			// Added for fluid bypass
-			SetupOutputVariable( "Cooling Tower Bypass Fraction []", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BypassFraction, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Bypass Fraction", OutputProcessor::Unit::None, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BypassFraction, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
 		}
 
 		// CurrentModuleObject='EvaporativeFluidCooler:TwoSpeed'
 		for ( EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers; ++EvapFluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 
 		}
 
@@ -962,25 +951,25 @@ namespace EvaporativeFluidCoolers {
 		// CurrentModuleObject='EvaporativeFluidCooler:*'
 		for ( EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers; ++EvapFluidCoolerNum ) {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).SuppliedByWaterSystem ) {
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
-				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
-				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
 			} else { // Evaporative fluid cooler water from mains and gets metered
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
-				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
 			}
 
-			SetupOutputVariable( "Cooling Tower Water Evaporation Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Evaporation Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Drift Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Drift Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Blowdown Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Blowdown Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Evaporation Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Evaporation Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Drift Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Drift Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Blowdown Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Blowdown Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
 		} // loop all evaporative fluid coolers
 
 	}
@@ -1220,7 +1209,7 @@ namespace EvaporativeFluidCoolers {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -1467,7 +1456,7 @@ namespace EvaporativeFluidCoolers {
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 						ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1555,7 +1544,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1610,7 +1599,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1727,7 +1716,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
@@ -1772,7 +1761,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating EvaporativeFluidCooler UA" );
 					ShowFatalError( "Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );

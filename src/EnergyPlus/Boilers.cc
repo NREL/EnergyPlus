@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cassert>
@@ -77,6 +66,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
@@ -530,6 +520,11 @@ namespace Boilers {
 				Boiler( BoilerNum ).FlowMode = NotModulated;
 			}}
 
+			if ( NumAlphas > 7 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 8 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since it appears this way in existing output files.
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -537,20 +532,20 @@ namespace Boilers {
 		}
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			SetupOutputVariable( "Boiler Heating Rate [W]", BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Heating Energy [J]", BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
+			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Heating Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
 			if ( SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", "Boiler", "Plant" );
-			SetupOutputVariable( "Boiler Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Ancillary Electric Power [W]", BoilerReport( BoilerNum ).ParasiticElecPower, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Ancillary Electric Energy [J]", BoilerReport( BoilerNum ).ParasiticElecConsumption, "System", "Sum", Boiler( BoilerNum ).Name, _, "ELECTRICITY", "Heating", "Boiler Parasitic", "Plant" );
-			SetupOutputVariable( "Boiler Part Load Ratio []", BoilerReport( BoilerNum ).BoilerPLR, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
+			SetupOutputVariable( "Boiler Inlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Outlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Ancillary Electric Power", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).ParasiticElecPower, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Ancillary Electric Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).ParasiticElecConsumption, "System", "Sum", Boiler( BoilerNum ).Name, _, "ELECTRICITY", "Heating", "Boiler Parasitic", "Plant" );
+			SetupOutputVariable( "Boiler Part Load Ratio", OutputProcessor::Unit::None, BoilerReport( BoilerNum ).BoilerPLR, "System", "Average", Boiler( BoilerNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Boiler Nominal Capacity", Boiler( BoilerNum ).Name, "[W]", Boiler( BoilerNum ).NomCap );
 			}
@@ -739,8 +734,6 @@ namespace Boilers {
 				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Boiler( BoilerNum ).TempDesBoilerOut, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
-				if ( ! Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = Boiler( BoilerNum ).NomCap;
-
 			} else {
 				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
 
@@ -792,7 +785,6 @@ namespace Boilers {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpBoilerVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * Boiler( BoilerNum ).SizFac;
-				if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = Boiler( BoilerNum ).VolFlowRate;
 			} else {
 				if ( Boiler( BoilerNum ).VolFlowRateWasAutoSized ) tmpBoilerVolFlowRate = 0.0;
 			}
@@ -867,8 +859,9 @@ namespace Boilers {
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   April 1999
 		//       MODIFIED       Taecheol Kim,May 2000
-		//                      R. Raustad - FSEC, June 2008: added boiler efficiency curve object
-		//                      B. Griffith - NREL, Aug 2011: added switch for temperature to use in curve
+		//                      Jun. 2008, R. Raustad, FSEC. Added boiler efficiency curve object
+		//                      Aug. 2011, B. Griffith, NREL. Added switch for temperature to use in curve
+		//                      Nov. 2016, R. Zhang, LBNL. Applied the boiler fouling fault model
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -883,16 +876,18 @@ namespace Boilers {
 		// REFERENCES:
 
 		// Using/Aliasing
-		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::WarmupFlag;
-
-		using FluidProperties::GetSpecificHeatGlycol;
-		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using CurveManager::CurveValue;
-		using General::TrimSigDigits;
-		using PlantUtilities::SetComponentFlowRate;
+		using DataBranchAirLoopPlant::ControlType_SeriesActive;
+		using DataGlobals::BeginEnvrnFlag;
+		using DataGlobals::DoingSizing;
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::WarmupFlag;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
+		using FaultsManager::FaultsBoilerFouling;
+		using FluidProperties::GetSpecificHeatGlycol;
+		using General::TrimSigDigits;
+		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -947,7 +942,22 @@ namespace Boilers {
 			if ( EquipFlowCtrl == ControlType_SeriesActive ) BoilerMassFlowRate = Node( BoilerInletNode ).MassFlowRate;
 			return;
 		}
-
+		
+		//If there is a fault of boiler fouling (zrp_Nov2016)
+		if( Boiler( BoilerNum ).FaultyBoilerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
+			int FaultIndex = Boiler( BoilerNum ).FaultyBoilerFoulingIndex;
+			Real64 NomCap_ff = BoilerNomCap;
+			Real64 BoilerEff_ff = BoilerEff;
+			
+			//calculate the Faulty Boiler Fouling Factor using fault information
+			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFoulingFactor();
+			
+			//update the boiler nominal capacity at faulty cases
+			BoilerNomCap = NomCap_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
+			BoilerEff = BoilerEff_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
+			
+		}
+ 
 		//Set the current load equal to the boiler load
 		BoilerLoad = MyLoad;
 

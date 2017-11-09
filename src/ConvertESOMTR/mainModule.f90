@@ -430,6 +430,7 @@ enddo
 !'check to make sure the entire file wasn't treated as the data dictionary
 If (lineOfESO /= 'End of Data Dictionary') Then
   Call reportError('Entire ESO file treated as data dictionary - check for End of Data Dictionary line.')
+  stop
 Else
   write(3,'(A)')  trim(lineOfESO) !output the End of Data Dictionary line
 End If

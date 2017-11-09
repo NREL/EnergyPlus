@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -437,28 +426,28 @@ namespace CoolTower {
 		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );
 
 		for ( CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum ) {
-			SetupOutputVariable( "Zone Cooltower Sensible Heat Loss Energy [J]", CoolTowerSys( CoolTowerNum ).SenHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Sensible Heat Loss Rate [W]", CoolTowerSys( CoolTowerNum ).SenHeatPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Energy [J]", CoolTowerSys( CoolTowerNum ).LatHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Rate [W]", CoolTowerSys( CoolTowerNum ).LatHeatPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Air Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTAirVol, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Current Density Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Standard Density Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Air Mass [kg]", CoolTowerSys( CoolTowerNum ).CoolTAirMass, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Air Mass Flow Rate [kg/s]", CoolTowerSys( CoolTowerNum ).AirMassFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Air Inlet Temperature [C]", CoolTowerSys( CoolTowerNum ).InletDBTemp, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Air Inlet Humidity Ratio [kgWater/kgDryAir]", CoolTowerSys( CoolTowerNum ).InletHumRat, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Air Outlet Temperature [C]", CoolTowerSys( CoolTowerNum ).OutletTemp, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Air Outlet Humidity Ratio [kgWater/kgDryAir]", CoolTowerSys( CoolTowerNum ).OutletHumRat, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Pump Electric Power [W]", CoolTowerSys( CoolTowerNum ).PumpElecPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Pump Electric Energy [J]", CoolTowerSys( CoolTowerNum ).PumpElecConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name, _, "Electric", "Cooling", _, "System" );
+			SetupOutputVariable( "Zone Cooltower Sensible Heat Loss Energy", OutputProcessor::Unit::J, CoolTowerSys( CoolTowerNum ).SenHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Sensible Heat Loss Rate", OutputProcessor::Unit::W, CoolTowerSys( CoolTowerNum ).SenHeatPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Energy", OutputProcessor::Unit::J, CoolTowerSys( CoolTowerNum ).LatHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Rate", OutputProcessor::Unit::W, CoolTowerSys( CoolTowerNum ).LatHeatPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Air Volume", OutputProcessor::Unit::m3, CoolTowerSys( CoolTowerNum ).CoolTAirVol, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Current Density Air Volume Flow Rate", OutputProcessor::Unit::m3_s, CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Standard Density Air Volume Flow Rate", OutputProcessor::Unit::m3_s, CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Air Mass", OutputProcessor::Unit::kg, CoolTowerSys( CoolTowerNum ).CoolTAirMass, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Air Mass Flow Rate", OutputProcessor::Unit::kg_s, CoolTowerSys( CoolTowerNum ).AirMassFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Air Inlet Temperature", OutputProcessor::Unit::C, CoolTowerSys( CoolTowerNum ).InletDBTemp, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Air Inlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, CoolTowerSys( CoolTowerNum ).InletHumRat, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Air Outlet Temperature", OutputProcessor::Unit::C, CoolTowerSys( CoolTowerNum ).OutletTemp, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Air Outlet Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, CoolTowerSys( CoolTowerNum ).OutletHumRat, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Pump Electric Power", OutputProcessor::Unit::W, CoolTowerSys( CoolTowerNum ).PumpElecPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Pump Electric Energy", OutputProcessor::Unit::J, CoolTowerSys( CoolTowerNum ).PumpElecConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name, _, "Electric", "Cooling", _, "System" );
 			if ( CoolTowerSys( CoolTowerNum ).CoolTWaterSupplyMode == WaterSupplyFromMains ) {
-				SetupOutputVariable( "Zone Cooltower Water Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Cooltower Mains Water Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name, _, "MainsWater", "Cooling", _, "System" );
+				SetupOutputVariable( "Zone Cooltower Water Volume", OutputProcessor::Unit::m3, CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Cooltower Mains Water Volume", OutputProcessor::Unit::m3, CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name, _, "MainsWater", "Cooling", _, "System" );
 			} else if ( CoolTowerSys( CoolTowerNum ).CoolTWaterSupplyMode == WaterSupplyFromTank ) {
-				SetupOutputVariable( "Zone Cooltower Water Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Cooltower Storage Tank Water Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Cooltower Starved Mains Water Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTWaterStarvMakeup, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name, _, "MainsWater", "Cooling", _, "System" );
+				SetupOutputVariable( "Zone Cooltower Water Volume", OutputProcessor::Unit::m3, CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Cooltower Storage Tank Water Volume", OutputProcessor::Unit::m3, CoolTowerSys( CoolTowerNum ).CoolTWaterConsump, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Cooltower Starved Mains Water Volume", OutputProcessor::Unit::m3, CoolTowerSys( CoolTowerNum ).CoolTWaterStarvMakeup, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name, _, "MainsWater", "Cooling", _, "System" );
 			}
 		}
 

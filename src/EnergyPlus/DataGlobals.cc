@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <ostream>
@@ -113,7 +102,7 @@ namespace DataGlobals {
 	int const ksRunPeriodWeather( 3 );
 	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
 	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
-	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data proir to the simulation
+	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data prior to the simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -126,10 +115,10 @@ namespace DataGlobals {
 	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
 	Real64 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
-	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
+	Real64 const HoursInDay( 24.0 ); // Number of Hours in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
-	Real64 const BigNumber( huge( 1.0 ) ); // Max Number real used for initializations
-	Real64 const rTinyValue( epsilon( 1.0 ) ); // Tiny value to replace use of TINY(x)
+	Real64 const BigNumber( HUGE_( 1.0 ) ); // Max Number real used for initializations
+	Real64 const rTinyValue( EPSILON( 1.0 ) ); // Tiny value to replace use of TINY(x)
 	std::string::size_type const MaxNameLength( 100 ); // Maximum Name Length in Characters -- should be the same
 	// as MaxAlphaArgLength in InputProcessor module
 
@@ -201,11 +190,13 @@ namespace DataGlobals {
 	std::ostream * err_stream( nullptr ); // Internal stream used for err output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
 	int OutputFileInits( 0 ); // Unit number for the standard Initialization output file
+	std::ostream * eio_stream( nullptr ); // Internal stream used for eio output (used for unit tests)
 	int OutputFileDebug( 0 ); // Unit number for debug outputs
 	int OutputFileZoneSizing( 0 ); // Unit number of zone sizing calc output file
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
 	int OutputFileMeters( 0 ); // Unit number for meters output
 	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
+	int OutputFileShadingFrac( 0 ); // Unit number for shading output
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
 	int OutputDElightIn( 0 ); // Unit number for the DElight In file
@@ -243,6 +234,7 @@ namespace DataGlobals {
 	bool RedoSizesHVACSimulation( false ); // doing kick off simulation for redoing sizes as part of sizing
 	bool FinalSizingHVACSizingSimIteration( false ); //when doing HVAC sizing Simulation
 	bool AnyEnergyManagementSystemInModel( false ); // true if there is any EMS or Erl in model.  otherwise false
+	bool AnyLocalEnvironmentsInModel( false ); //true if there is any local environmental data objected defined in model, otherwise false
 	bool AnyPlantInModel( false ); // true if there are any plant or condenser loops in model, otherwise false
 	int CacheIPErrorFile( 0 ); // Cache IP errors until IDF processing done.
 	bool AnyIdealCondEntSetPointInModel( false ); // true if there is any ideal condenser entering set point manager in model.
@@ -297,6 +289,7 @@ namespace DataGlobals {
 		OutputFileZoneSizing = 0;
 		OutputFileSysSizing = 0;
 		OutputFileMeters = 0;
+		OutputFileShadingFrac = 0;
 		StdMeterRecordCount = 0;
 		OutputFileBNDetails = 0;
 		ZoneSizingCalc = false;
@@ -332,6 +325,7 @@ namespace DataGlobals {
 		RedoSizesHVACSimulation = false;
 		FinalSizingHVACSizingSimIteration = false;
 		AnyEnergyManagementSystemInModel = false;
+		AnyLocalEnvironmentsInModel = false;
 		AnyPlantInModel = false;
 		CacheIPErrorFile = 0;
 		AnyIdealCondEntSetPointInModel = false;
@@ -347,6 +341,7 @@ namespace DataGlobals {
 		eso_stream = nullptr;
 		mtr_stream = nullptr;
 		err_stream = nullptr;
+		eio_stream = nullptr;
 		delightin_stream = nullptr;
 	}
 

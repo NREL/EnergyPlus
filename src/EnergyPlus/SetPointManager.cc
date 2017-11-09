@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -542,7 +531,7 @@ namespace SetPointManager {
 	}
 
 	void
-	GetSetPointManagerInputData( 
+	GetSetPointManagerInputData(
 		bool & ErrorsFound )
 	{
 
@@ -1068,6 +1057,10 @@ namespace SetPointManager {
 			OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
+			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
+			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
@@ -2648,8 +2641,8 @@ namespace SetPointManager {
 		}
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
-			SetupOutputVariable( "Setpoint Manager Warmest Temperature Critical Zone Number []", WarmestSetPtMgrTempFlow( SetPtMgrNum ).CritZoneNum, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
-			SetupOutputVariable( "Setpoint Manager Warmest Temperature Turndown Flow Fraction []", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Turndown, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
+			SetupOutputVariable( "Setpoint Manager Warmest Temperature Critical Zone Number", OutputProcessor::Unit::None, WarmestSetPtMgrTempFlow( SetPtMgrNum ).CritZoneNum, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
+			SetupOutputVariable( "Setpoint Manager Warmest Temperature Turndown Flow Fraction", OutputProcessor::Unit::None, WarmestSetPtMgrTempFlow( SetPtMgrNum ).Turndown, "System", "Average", WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name );
 		}
 
 		// Input the Condenser Entering Set Point Managers
@@ -3400,7 +3393,11 @@ namespace SetPointManager {
 						ShowContinueError( "Node=\"" + NodeID( SingZoneRhSetPtMgr( SetPtMgrNum ).ZoneNodeNum ) + "\", not found in any controlled Zone" );
 						ErrorsFound = true;
 					} else {
-						AirLoopNum = ZoneEquipConfig( ConZoneNum ).AirLoopNum;
+						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ConZoneNum ).NumInletNodes; ++zoneInNode ) {
+							if ( SingZoneRhSetPtMgr( SetPtMgrNum ).ZoneInletNodeNum == ZoneEquipConfig( ConZoneNum ).InletNode( zoneInNode ) ) {
+								AirLoopNum = ZoneEquipConfig( ConZoneNum ).InletNodeAirLoopNum( zoneInNode );
+							}
+						}
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr( SetPtMgrNum ).Name + "\", Zone not on air loop:" );
 							ShowContinueError( "Controlled Zone not on air loop, Zone=" + ZoneEquipConfig( ConZoneNum ).ZoneName );
@@ -3489,9 +3486,11 @@ namespace SetPointManager {
 							ColdestSetPtMgr( SetPtMgrNum ).AirLoopNum = AirLoopNum;
 						}
 						if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated == 0 ) {
-							ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no zones with heating found:" );
-							ShowContinueError( "Air Loop provides no heating, Air Loop=\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
-							ErrorsFound = true;
+							if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled == 0 ) {
+								ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no zones with heating or cooling found:" );
+								ShowContinueError( "Air Loop provides no heating or cooling, Air Loop=\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
+								ErrorsFound = true;
+							}
 						}
 					} else {
 						ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", no AirLoopHVAC objects found:" );
@@ -3922,11 +3921,14 @@ namespace SetPointManager {
 
 			for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum ) {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= OutAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
+					OutAirSetPtMgr( SetPtMgrNum ).calculate();
 					NodeNum = OutAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						// Call the CALC routine, with an optional argument to only set
-						// the initialization NODE(:)% setpoint, and not the OutAirSetPtMgr(:)%SetPt
-						OutAirSetPtMgr( SetPtMgrNum ).calculate( NodeNum, true );
+						Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
+					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
+						Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
+					} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
+						Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPt;
 					}
 				}
 			}
@@ -4670,10 +4672,7 @@ namespace SetPointManager {
 	}
 
 	void
-	DefineOutsideAirSetPointManager::calculate(
-		Optional_int_const NodeNum, // When Init Calls this routine, it passes the cur node number
-		Optional_bool_const InitFlag // When Init Calls this routine, it passes True
-	)
+	DefineOutsideAirSetPointManager::calculate()
 	{
 
 		// SUBROUTINE ARGUMENTS:
@@ -4694,13 +4693,9 @@ namespace SetPointManager {
 		Real64 OutHighTemp;
 		Real64 SetTempAtOutLow;
 		Real64 SetTempAtOutHigh;
-		int SchedPtr;
-		Real64 SetPt;
 
-		SchedPtr = this->SchedPtr;
-
-		if ( SchedPtr > 0 ) {
-			SchedVal = GetCurrentScheduleValue( SchedPtr );
+		if ( this->SchedPtr > 0 ) {
+			SchedVal = GetCurrentScheduleValue( this->SchedPtr );
 		} else {
 			SchedVal = 0.0;
 		}
@@ -4717,14 +4712,7 @@ namespace SetPointManager {
 			SetTempAtOutHigh = this->OutHighSetPt1;
 		}
 
-		SetPt = CalcSetPoint(OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
-
-		if ( present( InitFlag ) ) {
-			Node( NodeNum ).TempSetPoint = SetPt; //Setpoint for Initial Routine
-		} else {
-			this->SetPt = SetPt; //Setpoint for Calc Routine
-		}
-
+		this->SetPt = CalcSetPoint( OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh );
 	}
 
 	Real64
@@ -5631,23 +5619,46 @@ namespace SetPointManager {
 		TotHeatLoad = 0.0;
 		SetPointTemp = this->MinSetTemp;
 
-		for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated; ++ZonesHeatedIndex ) {
-			CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedIndex );
-			ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).HeatZoneInletNodes( ZonesHeatedIndex );
-			ZoneNode = ZoneEquipConfig( CtrlZoneNum ).ZoneNode;
-			ZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
-			ZoneMassFlowMax = Node( ZoneInletNode ).MassFlowRateMax;
-			ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
-			ZoneTemp = Node( ZoneNode ).Temp;
-			ZoneSetPointTemp = this->MinSetTemp;
-			if ( ZoneLoad > 0.0 ) {
-				TotHeatLoad += ZoneLoad;
-				CpAir = PsyCpAirFnWTdb( Node( ZoneInletNode ).HumRat, Node( ZoneInletNode ).Temp );
-				if ( ZoneMassFlowMax > SmallMassFlow ) {
-					ZoneSetPointTemp = ZoneTemp + ZoneLoad / ( CpAir * ZoneMassFlowMax );
+		if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated > 0 ) {
+			// dual-duct heated only zones
+			for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated; ++ZonesHeatedIndex ) {
+				CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedIndex );
+				ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).HeatZoneInletNodes( ZonesHeatedIndex );
+				ZoneNode = ZoneEquipConfig( CtrlZoneNum ).ZoneNode;
+				ZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
+				ZoneMassFlowMax = Node( ZoneInletNode ).MassFlowRateMax;
+				ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
+				ZoneTemp = Node( ZoneNode ).Temp;
+				ZoneSetPointTemp = this->MinSetTemp;
+				if ( ZoneLoad > 0.0 ) {
+					TotHeatLoad += ZoneLoad;
+					CpAir = PsyCpAirFnWTdb( Node( ZoneInletNode ).HumRat, Node( ZoneInletNode ).Temp );
+					if (ZoneMassFlowMax > SmallMassFlow) {
+						ZoneSetPointTemp = ZoneTemp + ZoneLoad / ( CpAir * ZoneMassFlowMax );
+					}
 				}
+				SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
 			}
-			SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
+		} else {
+			// single-duct or central heated and cooled zones 
+			for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++ZonesHeatedIndex ) {
+				CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedIndex );
+				ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).CoolZoneInletNodes( ZonesHeatedIndex );
+				ZoneNode = ZoneEquipConfig( CtrlZoneNum ).ZoneNode;
+				ZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
+				ZoneMassFlowMax = Node( ZoneInletNode ).MassFlowRateMax;
+				ZoneLoad = ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired;
+				ZoneTemp = Node( ZoneNode ).Temp;
+				ZoneSetPointTemp = this->MinSetTemp;
+				if ( ZoneLoad > 0.0 ) {
+					TotHeatLoad += ZoneLoad;
+					CpAir = PsyCpAirFnWTdb( Node( ZoneInletNode ).HumRat, Node( ZoneInletNode ).Temp );
+					if ( ZoneMassFlowMax > SmallMassFlow ) {
+						ZoneSetPointTemp = ZoneTemp + ZoneLoad / ( CpAir * ZoneMassFlowMax );
+					}
+				}
+				SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
+			}
 		}
 
 		SetPointTemp = min( this->MaxSetTemp, max( SetPointTemp, this->MinSetTemp ) );
@@ -6132,7 +6143,7 @@ namespace SetPointManager {
 			ZoneHum = Node( ZoneNode ).HumRat;
 			SumMdotTot += ZoneMassFlowRate;
 			SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
-			// For humidification the mositure load is positive
+			// For humidification the moisture load is positive
 			if ( MoistureLoad > 0.0 ) {
 				SumMdot += ZoneMassFlowRate;
 				SumMoistureLoad += MoistureLoad;
@@ -6218,7 +6229,7 @@ namespace SetPointManager {
 			ZoneHum = Node( ZoneNode ).HumRat;
 			SumMdotTot += ZoneMassFlowRate;
 			SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
-			// For dehumidification the mositure load is negative
+			// For dehumidification the moisture load is negative
 			if ( MoistureLoad < 0.0 ) {
 				SumMdot += ZoneMassFlowRate;
 				SumMoistureLoad += MoistureLoad;
@@ -6295,7 +6306,7 @@ namespace SetPointManager {
 			MoistureLoad = ZoneSysMoistureDemand( CtrlZoneNum ).OutputRequiredToHumidifyingSP;
 			ZoneHum = Node( ZoneNode ).HumRat;
 			ZoneSetPointHum = this->MinSetHum;
-			// For humidification the mositure load is positive
+			// For humidification the moisture load is positive
 			if ( MoistureLoad > 0.0 ) {
 				SumMoistureLoad += MoistureLoad;
 				if ( ZoneMassFlowRate > SmallMassFlow ) {
@@ -6377,7 +6388,7 @@ namespace SetPointManager {
 			ZoneHum = Node( ZoneNode ).HumRat;
 			ZoneSetPointHum = this->MaxSetHum;
 
-			// For dehumidification the mositure load is negative
+			// For dehumidification the moisture load is negative
 			if ( MoistureLoad < 0.0 ) {
 				SumMoistureLoad += MoistureLoad;
 				if ( ZoneMassFlowRate > SmallMassFlow ) {
@@ -6645,7 +6656,7 @@ namespace SetPointManager {
 		Real64 NormDsnCondFlow( 0.0 ); // Normalized design condenser flow for cooling towers, m3/s per watt
 		Real64 Twr_DesignWB( 0.0 ); // The cooling tower design inlet air wet bulb temperature, C
 		Real64 Dsn_CondMinThisChiller( 0.0 ); // Design Minimum Condenser Entering for current chillers this timestep
-		Real64 temp_MinLiftTD( 0.0 ); // Intermeidate variable associated with lift (TCond entering - Tevap leaving) TD
+		Real64 temp_MinLiftTD( 0.0 ); // Intermediate variable associated with lift (TCond entering - Tevap leaving) TD
 		Real64 Des_Load( 0.0 ); // array of chiller design loads
 		Real64 Act_Load( 0.0 ); // array of chiller actual loads
 		Real64 ALW( 0.0 ); // Actual load weighting of each chiller, W
@@ -6743,7 +6754,7 @@ namespace SetPointManager {
 
 			// ***** Optimal Temperature Calculation *****
 			// In this section the optimal temperature is computed along with the minimum
-			// design wet bulb temp and the mimimum actual wet bulb temp.
+			// design wet bulb temp and the minimum actual wet bulb temp.
 			// Min_DesignWB = ACoef1 + ACoef2*OaWb + ACoef3*WPLR + ACoef4*TwrDsnWB + ACoef5*NF
 			DCESPMMin_DesignWB = CurveValue( this->MinTwrWbCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow );
 
@@ -6816,8 +6827,8 @@ namespace SetPointManager {
 		static Real64 EvapOutletTemp( 0.0 ); // Evaporator water outlet temperature (C)
 		static Real64 CondTempLimit( 0.0 ); // Condenser entering water temperature setpoint lower limit
 		static Real64 CurLoad( 0.0 ); // Current cooling load, W
-		static Real64 TotEnergy( 0.0 ); // Totoal energy consumptions at this time step
-		static Real64 TotEnergyPre( 0.0 ); // Totoal energy consumptions at the previous time step
+		static Real64 TotEnergy( 0.0 ); // Total energy consumptions at this time step
+		static Real64 TotEnergyPre( 0.0 ); // Total energy consumptions at the previous time step
 		static bool RunSubOptCondEntTemp( false );
 		static bool RunFinalOptCondEntTemp( false );
 
@@ -6836,7 +6847,7 @@ namespace SetPointManager {
 
 			if ( CurLoad > 0 ) {
 
-				// Calculate the minimum condenser inlet temperature boundry for set point
+				// Calculate the minimum condenser inlet temperature boundary for set point
 				if ( this->TypeNum == TypeOf_Chiller_Absorption || this->TypeNum == TypeOf_Chiller_CombTurbine || this->TypeNum == TypeOf_Chiller_Electric || this->TypeNum == TypeOf_Chiller_ElectricReformEIR || this->TypeNum == TypeOf_Chiller_EngineDriven ) {
 					EvapOutletTemp = Node( PlantLoop( this->LoopIndexPlantSide ).LoopSide( SupplySide ).Branch( this->BranchIndexPlantSide ).Comp( this->ChillerIndexPlantSide ).NodeNumOut ).Temp;
 				} else {
@@ -7178,7 +7189,7 @@ namespace SetPointManager {
 		Array1D_int VarIndexes; // Variable Numbers
 		Array1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
 		Array1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
-		Array1D_string UnitsStrings; // UnitsStrings for each variable
+		Array1D < OutputProcessor::Unit> unitsForVar; // units from enum for each variable
 		Array1D_int ResourceTypes; // ResourceTypes for each variable
 		Array1D_string EndUses; // EndUses for each variable
 		Array1D_string Groups; // Groups for each variable
@@ -7204,13 +7215,13 @@ namespace SetPointManager {
 		VarIndexes.allocate( NumVariables );
 		VarTypes.allocate( NumVariables );
 		IndexTypes.allocate( NumVariables );
-		UnitsStrings.allocate( NumVariables );
+		unitsForVar.allocate( NumVariables );
 		ResourceTypes.allocate( NumVariables );
 		EndUses.allocate( NumVariables );
 		Groups.allocate( NumVariables );
 		Names.allocate( NumVariables );
 
-		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 		this->ChllrVarType = VarTypes( 1 );
 		this->ChllrVarIndex = VarIndexes( 1 );
 
@@ -7220,13 +7231,13 @@ namespace SetPointManager {
 		VarIndexes.allocate( NumVariables );
 		VarTypes.allocate( NumVariables );
 		IndexTypes.allocate( NumVariables );
-		UnitsStrings.allocate( NumVariables );
+		unitsForVar.allocate( NumVariables );
 		ResourceTypes.allocate( NumVariables );
 		EndUses.allocate( NumVariables );
 		Groups.allocate( NumVariables );
 		Names.allocate( NumVariables );
 
-		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 		this->ChlPumpVarType = VarTypes( 1 );
 		this->ChlPumpVarIndex = VarIndexes( 1 );
 
@@ -7237,13 +7248,13 @@ namespace SetPointManager {
 			VarIndexes.allocate( NumVariables );
 			VarTypes.allocate( NumVariables );
 			IndexTypes.allocate( NumVariables );
-			UnitsStrings.allocate( NumVariables );
+			unitsForVar.allocate( NumVariables );
 			ResourceTypes.allocate( NumVariables );
 			EndUses.allocate( NumVariables );
 			Groups.allocate( NumVariables );
 			Names.allocate( NumVariables );
 
-			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+			GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 			this->ClTowerVarType.push_back( VarTypes( 1 ) );
 			this->ClTowerVarIndex.push_back( VarIndexes( 1 ) );
 
@@ -7255,13 +7266,13 @@ namespace SetPointManager {
 		VarIndexes.allocate( NumVariables );
 		VarTypes.allocate( NumVariables );
 		IndexTypes.allocate( NumVariables );
-		UnitsStrings.allocate( NumVariables );
+		unitsForVar.allocate( NumVariables );
 		ResourceTypes.allocate( NumVariables );
 		EndUses.allocate( NumVariables );
 		Groups.allocate( NumVariables );
 		Names.allocate( NumVariables );
 
-		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+		GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 		this->CndPumpVarType = VarTypes( 1 );
 		this->CndPumpVarIndex = VarIndexes( 1 );
 
@@ -7405,11 +7416,13 @@ namespace SetPointManager {
 			for ( CtrlNodeIndex = 1; CtrlNodeIndex <= OutAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) { // Loop over the list of nodes wanting
 				// setpoints from this setpoint manager
 				NodeNum = OutAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
-
 				if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
 					Node( NodeNum ).TempSetPoint = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the setpoint
+				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxTemp ) {
+					Node( NodeNum ).TempSetPointHi = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the high temperature setpoint
+				} else if ( OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MinTemp ) {
+					Node( NodeNum ).TempSetPointLo = OutAirSetPtMgr( SetPtMgrNum ).SetPt; // Set the low temperature setpoint
 				}
-
 			}
 
 		}
@@ -7885,10 +7898,10 @@ namespace SetPointManager {
 
 		IsNodeOnSetPtManager = false;
 
-		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
-			if ( SetPtType == SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode ) {
-				for ( NumNode = 1; NumNode <= SchSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++NumNode ) {
-					if ( NodeNum == SchSetPtMgr( SetPtMgrNum ).CtrlNodes( NumNode ) ) {
+		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum ) {
+			if ( SetPtType == AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode ) {
+				for ( NumNode = 1; NumNode <= AllSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++NumNode ) {
+					if ( NodeNum == AllSetPtMgr( SetPtMgrNum ).CtrlNodes( NumNode ) ) {
 						IsNodeOnSetPtManager = true;
 						break;
 					}
@@ -8212,11 +8225,10 @@ namespace SetPointManager {
 			for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SchSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 				if ( CntrlNodeNum == SchSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ) ) {
 					if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_HumRat ) {
-						HumRatCntrlType = iCtrlVarType_HumRat;
+						return iCtrlVarType_HumRat;
 					} else if ( SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxHumRat ) {
-						HumRatCntrlType = iCtrlVarType_MaxHumRat;
+						return iCtrlVarType_MaxHumRat;
 					}
-					return HumRatCntrlType;
 				}
 			}
 		}

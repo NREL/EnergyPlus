@@ -5,7 +5,7 @@
 ! The response of the borehole/ground is found from the 'G-function' that is
 ! defined in the input as series of 'n' pairs of values (LNTTSn, GNFCn).
 ! It is important to note that the G-functions have to be calculated for
-! specific GHE configurations and borehole resitance, length and borehole/
+! specific GHE configurations and borehole resistance, length and borehole/
 ! length ratio. That is, the parameters for the units vary with each design.
 ! The data in this file are intended as examples/samples and may not represent
 ! actual designs.
@@ -21,6 +21,9 @@
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 !************ LINE CONFIGURATION: 1 x 2, line, Standard Grout *****************
 ! The G-function is defined by the following data pairs
+
+!  Version,
+!    8.8;                    !- Version Identifier
 
   GroundHeatExchanger:Vertical,
     Vertical GHE 1x2 Std,    !- Name

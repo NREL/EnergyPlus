@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -625,18 +614,18 @@ namespace SteamBaseboardRadiator {
 		// Setup Report variables for the Coils
 		for ( BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum ) {
 			// CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Steam'
-			SetupOutputVariable( "Baseboard Total Heating Rate [W]", SteamBaseboard( BaseboardNum ).TotPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).TotPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Convective Heating Rate [W]", SteamBaseboard( BaseboardNum ).ConvPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Rate [W]", SteamBaseboard( BaseboardNum ).RadPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Total Heating Energy [J]", SteamBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
-			SetupOutputVariable( "Baseboard Convective Heating Energy [J]", SteamBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Radiant Heating Energy [J]", SteamBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Energy [J]", SteamBaseboard( BaseboardNum ).Energy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
-			SetupOutputVariable( "Baseboard Steam Rate [W]", SteamBaseboard( BaseboardNum ).Power, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Mass Flow Rate [kg/s]", SteamBaseboard( BaseboardNum ).SteamMassFlowRate, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Inlet Temperature [C]", SteamBaseboard( BaseboardNum ).SteamInletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
-			SetupOutputVariable( "Baseboard Steam Outlet Temperature [C]", SteamBaseboard( BaseboardNum ).SteamOutletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Convective Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).ConvPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).RadPower, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).TotEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Convective Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).ConvEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).RadEnergy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Energy", OutputProcessor::Unit::J, SteamBaseboard( BaseboardNum ).Energy, "System", "Sum", SteamBaseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Steam Rate", OutputProcessor::Unit::W, SteamBaseboard( BaseboardNum ).Power, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, SteamBaseboard( BaseboardNum ).SteamMassFlowRate, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Inlet Temperature", OutputProcessor::Unit::C, SteamBaseboard( BaseboardNum ).SteamInletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Steam Outlet Temperature", OutputProcessor::Unit::C, SteamBaseboard( BaseboardNum ).SteamOutletTemp, "System", "Average", SteamBaseboard( BaseboardNum ).EquipID );
 		}
 
 	}
@@ -908,7 +897,7 @@ namespace SteamBaseboardRadiator {
 							if ( SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 								CheckZoneSizing( CompType, CompName );
 								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							}
 							TempSize = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
@@ -920,7 +909,7 @@ namespace SteamBaseboardRadiator {
 							CheckZoneSizing( CompType, CompName );
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							DataFracOfAutosizedHeatingCapacity = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 							TempSize = AutoSize;
 							DataScalableCapSizingON = true;
 						} else {
@@ -930,7 +919,7 @@ namespace SteamBaseboardRadiator {
 						DesCoilLoad = TempSize;
 						DataScalableCapSizingON = false;
 					} else {
-						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+						DesCoilLoad = 0.0; // FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
 					}
 
 

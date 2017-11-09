@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
@@ -499,48 +488,48 @@ namespace MicroCHPElectricGenerator {
 			//setup report variables
 			for ( GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum ) {
 
-				SetupOutputVariable( "Generator Off Mode Time [s]", MicroCHP( GeneratorNum ).Report.OffModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Standby Mode Time [s]", MicroCHP( GeneratorNum ).Report.StandyByModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Warm Up Mode Time [s]", MicroCHP( GeneratorNum ).Report.WarmUpModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Normal Operating Mode Time [s]", MicroCHP( GeneratorNum ).Report.NormalModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Cool Down Mode Time [s]", MicroCHP( GeneratorNum ).Report.CoolDownModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Off Mode Time", OutputProcessor::Unit::s, MicroCHP( GeneratorNum ).Report.OffModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Standby Mode Time", OutputProcessor::Unit::s, MicroCHP( GeneratorNum ).Report.StandyByModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Warm Up Mode Time", OutputProcessor::Unit::s, MicroCHP( GeneratorNum ).Report.WarmUpModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Normal Operating Mode Time", OutputProcessor::Unit::s, MicroCHP( GeneratorNum ).Report.NormalModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Cool Down Mode Time", OutputProcessor::Unit::s, MicroCHP( GeneratorNum ).Report.CoolDownModeTime, "System", "Sum", MicroCHP( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Produced Electric Power [W]", MicroCHP( GeneratorNum ).Report.ACPowerGen, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Electric Energy [J]", MicroCHP( GeneratorNum ).Report.ACEnergyGen, "System", "Sum", MicroCHP( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
-				SetupOutputVariable( "Generator Produced Thermal Rate [W]", MicroCHP( GeneratorNum ).Report.QdotHR, "system", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", MicroCHP( GeneratorNum ).Report.TotalHeatEnergyRec, "system", "Sum", MicroCHP( GeneratorNum ).Name, _, "ENERGYTRANSFER", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.ACPowerGen, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, MicroCHP( GeneratorNum ).Report.ACEnergyGen, "System", "Sum", MicroCHP( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.QdotHR, "system", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, MicroCHP( GeneratorNum ).Report.TotalHeatEnergyRec, "system", "Sum", MicroCHP( GeneratorNum ).Name, _, "ENERGYTRANSFER", "COGENERATION", _, "Plant" );
 
-				SetupOutputVariable( "Generator Electric Efficiency []", MicroCHP( GeneratorNum ).Report.ElectEfficiency, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Thermal Efficiency []", MicroCHP( GeneratorNum ).Report.ThermalEfficiency, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Gross Input Heat Rate [W]", MicroCHP( GeneratorNum ).Report.QdotGross, "system", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Steady State Engine Heat Generation Rate [W]", MicroCHP( GeneratorNum ).Report.Qgenss, "system", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Electric Efficiency", OutputProcessor::Unit::None, MicroCHP( GeneratorNum ).Report.ElectEfficiency, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Thermal Efficiency", OutputProcessor::Unit::None, MicroCHP( GeneratorNum ).Report.ThermalEfficiency, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Gross Input Heat Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.QdotGross, "system", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Steady State Engine Heat Generation Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.Qgenss, "system", "Average", MicroCHP( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Engine Heat Exchange Rate [W]", MicroCHP( GeneratorNum ).Report.QdotHX, "system", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Air Mass Flow Rate [kg/s]", MicroCHP( GeneratorNum ).Report.MdotAir, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Fuel Molar Flow Rate [kmol/s]", MicroCHP( GeneratorNum ).Report.NdotFuel, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Fuel Mass Flow Rate [kg/s]", MicroCHP( GeneratorNum ).Report.MdotFuel, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Engine Heat Exchange Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.QdotHX, "system", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Air Mass Flow Rate", OutputProcessor::Unit::kg_s, MicroCHP( GeneratorNum ).Report.MdotAir, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel Molar Flow Rate", OutputProcessor::Unit::kmol_s, MicroCHP( GeneratorNum ).Report.NdotFuel, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel Mass Flow Rate", OutputProcessor::Unit::kg_s, MicroCHP( GeneratorNum ).Report.MdotFuel, "System", "Average", MicroCHP( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Engine Temperature [C]", MicroCHP( GeneratorNum ).Report.Tengine, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Coolant Inlet Temperature [C]", MicroCHP( GeneratorNum ).Report.HeatRecInletTemp, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Coolant Outlet Temperature [C]", MicroCHP( GeneratorNum ).Report.HeatRecOutletTemp, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Engine Temperature", OutputProcessor::Unit::C, MicroCHP( GeneratorNum ).Report.Tengine, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Coolant Inlet Temperature", OutputProcessor::Unit::C, MicroCHP( GeneratorNum ).Report.HeatRecInletTemp, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Coolant Outlet Temperature", OutputProcessor::Unit::C, MicroCHP( GeneratorNum ).Report.HeatRecOutletTemp, "System", "Average", MicroCHP( GeneratorNum ).Name );
 
 				// this next one needs to be reconciled with non-gas fuel constituents.
 				//   need custom resourceTypeKey or something for user defined fuel compositions.
-				SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", MicroCHP( GeneratorNum ).Report.FuelEnergyHHV, "System", "Sum", MicroCHP( GeneratorNum ).Name, _, "Gas", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, MicroCHP( GeneratorNum ).Report.FuelEnergyHHV, "System", "Sum", MicroCHP( GeneratorNum ).Name, _, "Gas", "COGENERATION", _, "Plant" );
 
-				SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", MicroCHP( GeneratorNum ).Report.FuelEnergyUseRateHHV, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.FuelEnergyUseRateHHV, "System", "Average", MicroCHP( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Fuel LHV Basis Energy [J]", MicroCHP( GeneratorNum ).Report.FuelEnergyLHV, "System", "Sum", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Fuel LHV Basis Rate [W]", MicroCHP( GeneratorNum ).Report.FuelEnergyUseRateLHV, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel LHV Basis Energy", OutputProcessor::Unit::J, MicroCHP( GeneratorNum ).Report.FuelEnergyLHV, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel LHV Basis Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.FuelEnergyUseRateLHV, "System", "Average", MicroCHP( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Fuel Compressor Electric Power [W]", MicroCHP( GeneratorNum ).Report.FuelCompressPower, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Fuel Compressor Electric Energy [J]", MicroCHP( GeneratorNum ).Report.FuelCompressEnergy, "System", "Sum", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Fuel Compressor Skin Heat Loss Rate [W]", MicroCHP( GeneratorNum ).Report.FuelCompressSkinLoss, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel Compressor Electric Power", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.FuelCompressPower, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J, MicroCHP( GeneratorNum ).Report.FuelCompressEnergy, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel Compressor Skin Heat Loss Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.FuelCompressSkinLoss, "System", "Average", MicroCHP( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Rate [W]", MicroCHP( GeneratorNum ).Report.SkinLossPower, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Energy [J]", MicroCHP( GeneratorNum ).Report.SkinLossEnergy, "System", "Sum", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Convection Heat Transfer Rate [W]", MicroCHP( GeneratorNum ).Report.SkinLossConvect, "System", "Average", MicroCHP( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Radiation Heat Transfer Rate [W]", MicroCHP( GeneratorNum ).Report.SkinLossRadiat, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.SkinLossPower, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Energy", OutputProcessor::Unit::J, MicroCHP( GeneratorNum ).Report.SkinLossEnergy, "System", "Sum", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Convection Heat Transfer Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.SkinLossConvect, "System", "Average", MicroCHP( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Radiation Heat Transfer Rate", OutputProcessor::Unit::W, MicroCHP( GeneratorNum ).Report.SkinLossRadiat, "System", "Average", MicroCHP( GeneratorNum ).Name );
 
 				if ( MicroCHP( GeneratorNum ).ZoneID > 0 ) {
 					SetupZoneInternalGain( MicroCHP( GeneratorNum ).ZoneID, "Generator:MicroCHP", MicroCHP( GeneratorNum ).Name, IntGainTypeOf_GeneratorMicroCHP, MicroCHP( GeneratorNum ).Report.SkinLossConvect, _, MicroCHP( GeneratorNum ).Report.SkinLossRadiat );

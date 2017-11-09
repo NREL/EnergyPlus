@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -636,7 +625,7 @@ namespace RoomAirModelUserTempPattern {
 		}
 
 		if ( SetupOutputFlag( ZoneNum ) ) {
-			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient [K/m]", AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
+			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient", OutputProcessor::Unit::K_m, AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
 
 			SetupOutputFlag( ZoneNum ) = false;
 		}
@@ -1058,7 +1047,6 @@ namespace RoomAirModelUserTempPattern {
 		Real64 CpAir; // Air heat capacity [J/kg-K]
 		Real64 TempRetAir; // Return air temperature [C]
 		Real64 TempZoneAir; // Zone air temperature [C]
-		int ReturnNode; // Node number of controlled zone's return air
 		int ZoneNode; // Node number of controlled zone
 		int SurfNum; // Surface number
 		Real64 MassFlowRA; // Return air mass flow [kg/s]
@@ -1087,14 +1075,15 @@ namespace RoomAirModelUserTempPattern {
 			Node( AirPatternZoneInfo( ZoneNum ).ZoneNodeID ).Temp = AirPatternZoneInfo( ZoneNum ).Tleaving;
 		}
 
-		if ( AirPatternZoneInfo( ZoneNum ).ReturnAirNodeID != 0 ) {
+		int zoneEquipNum = Zone( ZoneNum ).ZoneEqNum;
+		for ( int nodeCount = 1; nodeCount <= DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).NumReturnNodes; ++nodeCount ) {
 			//BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
-			ReturnNode = AirPatternZoneInfo( ZoneNum ).ReturnAirNodeID;
+			int ReturnNode = DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).ReturnNode( nodeCount );
 			ZoneNode = AirPatternZoneInfo( ZoneNum ).ZoneNodeID;
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 			//RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
 			// Add sensible heat gain from refrigerated cases with under case returns
-			SumAllReturnAirConvectionGains( ZoneNum, QRetAir );
+			SumAllReturnAirConvectionGains( ZoneNum, QRetAir, ReturnNode );
 
 			CpAir = PsyCpAirFnWTdb( Node( ZoneNode ).HumRat, Node( ZoneNode ).Temp );
 
@@ -1110,11 +1099,13 @@ namespace RoomAirModelUserTempPattern {
 			WinGapTtoRA = 0.0;
 			WinGapFlowTtoRA = 0.0;
 
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
-				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
-					FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
-					WinGapFlowToRA += FlowThisTS;
-					WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+			if ( DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).ZoneHasAirFlowWindowReturn ) {
+				for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
+						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
+						WinGapFlowToRA += FlowThisTS;
+						WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+					}
 				}
 			}
 			if ( WinGapFlowToRA > 0.0 ) WinGapTtoRA = WinGapFlowTtoRA / WinGapFlowToRA;
@@ -1168,21 +1159,21 @@ namespace RoomAirModelUserTempPattern {
 			// humidity ratio
 			if ( ! Zone( ZoneNum ).NoHeatToReturnAir ) {
 				if ( MassFlowRA > 0 ) {
-					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, ReturnNode );
 					Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat + ( SumRetAirLatentGainRate / ( H2OHtOfVap * MassFlowRA ) );
 				} else {
 					// If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
 					Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat;
 					RefrigCaseCredit( ZoneNum ).LatCaseCreditToZone += RefrigCaseCredit( ZoneNum ).LatCaseCreditToHVAC;
 					// shouldn't the HVAC term be zeroed out then?
-					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+					SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, 0 );
 					ZoneLatentGain( ZoneNum ) += SumRetAirLatentGainRate;
 				}
 			} else {
 				Node( ReturnNode ).HumRat = Node( ZoneNode ).HumRat;
 				RefrigCaseCredit( ZoneNum ).LatCaseCreditToZone += RefrigCaseCredit( ZoneNum ).LatCaseCreditToHVAC;
 				// shouldn't the HVAC term be zeroed out then?
-				SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate );
+				SumAllReturnAirLatentGains( ZoneNum, SumRetAirLatentGainRate, ReturnNode );
 				ZoneLatentGain( ZoneNum ) += SumRetAirLatentGainRate;
 			}
 

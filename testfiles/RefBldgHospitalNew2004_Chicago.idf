@@ -88,7 +88,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 55
 
-  Version,8.6;
+  Version,8.8;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -440,10 +440,6 @@
     0.39;                    !- Solar Heat Gain Coefficient
 
 ! ***COMMON CONSTRUCTIONS AND MATERIALS***
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
 
   Construction,
     AIR-WALL,                !- Name
@@ -4430,8 +4426,8 @@
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.1440,33.5820,12.8049,  !- X,Y,Z ==> Vertex 1 {m}
-    9.1440,33.5820,8.5366,  !- X,Y,Z ==> Vertex 2 {m}
+    9.1440,33.5280,12.8049,  !- X,Y,Z ==> Vertex 1 {m}
+    9.1440,33.5280,8.5366,  !- X,Y,Z ==> Vertex 2 {m}
     9.1440,10.6680,8.5366,  !- X,Y,Z ==> Vertex 3 {m}
     9.1440,10.6680,12.8049;  !- X,Y,Z ==> Vertex 4 {m}
 
@@ -4562,8 +4558,8 @@
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.1440,33.5820,17.0732,  !- X,Y,Z ==> Vertex 1 {m}
-    9.1440,33.5820,12.8049,  !- X,Y,Z ==> Vertex 2 {m}
+    9.1440,33.5280,17.0732,  !- X,Y,Z ==> Vertex 1 {m}
+    9.1440,33.5280,12.8049,  !- X,Y,Z ==> Vertex 2 {m}
     9.1440,10.6680,12.8049,  !- X,Y,Z ==> Vertex 3 {m}
     9.1440,10.6680,17.0732;  !- X,Y,Z ==> Vertex 4 {m}
 
@@ -19384,6 +19380,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -19392,6 +19389,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -19400,6 +19398,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -19408,6 +19407,7 @@
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   SetpointManager:Scheduled,
@@ -20241,6 +20241,10 @@
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name

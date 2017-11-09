@@ -3,13 +3,13 @@
 
 // TypeTraits: Type Traits Template
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -62,36 +62,36 @@ EXTENDS_TYPE_OF( A const &, B const & )
 template< class B, class A >
 inline
 bool
-is_a( A const & a )
+is_a( A const & )
 {
-	return ( dynamic_cast< B const * >( &a ) != nullptr );
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 // is_a: Type Test for non-const Reference Argument
 template< class B, class A >
 inline
 bool
-is_a( A & a )
+is_a( A & )
 {
-	return ( dynamic_cast< B * >( &a ) != nullptr );
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 // is_a: Type Test for const Pointer Argument
 template< class B, class A >
 inline
 bool
-is_a( A const * a )
+is_a( A const * )
 {
-	return ( dynamic_cast< B const * >( a ) != nullptr );
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 // is_a: Type Test for non-const Pointer Argument
 template< class B, class A >
 inline
 bool
-is_a( A * a )
+is_a( A * )
 {
-	return ( dynamic_cast< B * >( a ) != nullptr );
+	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
 // TypeTraits: Type Traits Template
@@ -126,7 +126,7 @@ struct TypeTraits
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -169,7 +169,7 @@ struct TypeTraits< char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -212,7 +212,7 @@ struct TypeTraits< signed char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -255,7 +255,7 @@ struct TypeTraits< unsigned char >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -298,7 +298,7 @@ struct TypeTraits< bool >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -341,7 +341,7 @@ struct TypeTraits< byte >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -384,7 +384,7 @@ struct TypeTraits< ubyte >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -427,7 +427,7 @@ struct TypeTraits< short int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -470,7 +470,7 @@ struct TypeTraits< unsigned short int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -513,7 +513,7 @@ struct TypeTraits< int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -556,7 +556,7 @@ struct TypeTraits< unsigned int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -599,7 +599,7 @@ struct TypeTraits< long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -642,7 +642,7 @@ struct TypeTraits< unsigned long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -685,7 +685,7 @@ struct TypeTraits< long long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -728,7 +728,7 @@ struct TypeTraits< unsigned long long int >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
 	static std::streamsize const precision = 0; // Precision
@@ -771,10 +771,14 @@ struct TypeTraits< float >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
+#ifdef OBJEXXFCL_TYPETRAITS_EXTRA_PRECISION
+	static std::streamsize const precision = 9; // Precision
+#else
 	static std::streamsize const precision = 8; // Precision
+#endif
 	static Size const width = 15; // Field width
 	static int const iwidth = 15; // Field width
 	static Size const loc_2_crossover = 200u; // Array 2D min/max location crossover
@@ -814,10 +818,14 @@ struct TypeTraits< double >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
+#ifdef OBJEXXFCL_TYPETRAITS_EXTRA_PRECISION
+	static std::streamsize const precision = 17; // Precision
+#else
 	static std::streamsize const precision = 16; // Precision
+#endif
 	static Size const width = 23; // Field width
 	static int const iwidth = 23; // Field width
 	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
@@ -857,10 +865,14 @@ struct TypeTraits< long double >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
+#ifdef OBJEXXFCL_TYPETRAITS_EXTRA_PRECISION
+	static std::streamsize const precision = 34; // Precision
+#else
 	static std::streamsize const precision = 33; // Precision
+#endif
 	static Size const width = 42; // Field width
 	static int const iwidth = 42; // Field width
 	static Size const loc_2_crossover = ( sizeof( traits_type ) >= 16 ? 125u : 150u ); // Array 2D min/max location crossover
@@ -901,10 +913,14 @@ struct TypeTraits< std::complex< float > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
+#ifdef OBJEXXFCL_TYPETRAITS_EXTRA_PRECISION
+	static std::streamsize const precision = 9; // Precision
+#else
 	static std::streamsize const precision = 8; // Precision
+#endif
 	static Size const width = 33; // Field width
 	static int const iwidth = 33; // Field width
 	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
@@ -945,10 +961,14 @@ struct TypeTraits< std::complex< double > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
+#ifdef OBJEXXFCL_TYPETRAITS_EXTRA_PRECISION
+	static std::streamsize const precision = 17; // Precision
+#else
 	static std::streamsize const precision = 16; // Precision
+#endif
 	static Size const width = 49; // Field width
 	static int const iwidth = 49; // Field width
 	static Size const loc_2_crossover = 150u; // Array 2D min/max location crossover
@@ -989,10 +1009,14 @@ struct TypeTraits< std::complex< long double > >
 		return debug_value();
 #else
 		return initial_value();
-#endif // OBJEXXFCL_ARRAY_INIT_DEBUG
+#endif
 	}
 
+#ifdef OBJEXXFCL_TYPETRAITS_EXTRA_PRECISION
+	static std::streamsize const precision = 34; // Precision
+#else
 	static std::streamsize const precision = 33; // Precision
+#endif
 	static Size const width = 83; // Field width
 	static int const iwidth = 83; // Field width
 	static Size const loc_2_crossover = 100u; // Array 2D min/max location crossover

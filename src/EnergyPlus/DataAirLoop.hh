@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataAirLoop_hh_INCLUDED
 #define DataAirLoop_hh_INCLUDED
@@ -106,11 +95,11 @@ namespace DataAirLoop {
 	{
 		// Members
 		std::string AirLoopName; // Name of Primary Air System
-		int NumReturnNodes; // Number of return nodes connected to system
+		int NumReturnNodes; // Number of return nodes entering primary air system (currently limited to 1 node)
 		int NumSupplyNodes; // number of supply nodes exiting primary air system
 		int NumZonesCooled; // number of zones cooled by this primary air system
 		int NumZonesHeated; // number of zones heated by this primary air system
-		Array1D_int ZoneEquipReturnNodeNum; // Zone Equip side return air node numbers
+		Array1D_int ZoneEquipReturnNodeNum; // Zone Equip side return air node numbers (currently limited to 1 node)
 		Array1D_int ZoneEquipSupplyNodeNum; // Zone equip side supply air node numbers
 		Array1D_int AirLoopReturnNodeNum; // Air loop side return air node numbers
 		Array1D_int AirLoopSupplyNodeNum; // Air loop side supply air node numbers
@@ -120,6 +109,8 @@ namespace DataAirLoop {
 		Array1D_int HeatZoneInletNodes; // Zone inlet node numbers of zones heated by this air loop
 		Array1D_int TermUnitCoolInletNodes; // Air terminal unit cooling inlet node numbers for this air loop
 		Array1D_int TermUnitHeatInletNodes; // Air terminal unit heating inlet node numbers for this air loop
+		Array1D_int TermUnitCoolSizingIndex; // Air terminal sizing numbers for zones cooled by this air loop
+		Array1D_int TermUnitHeatSizingIndex; // Air terminal sizing numbers for zones heated by this air loop
 		Array1D_int SupplyDuctType; // 1=main, 2=cooling, 3=heating, 4=other
 
 		// Default Constructor
@@ -190,6 +181,7 @@ namespace DataAirLoop {
 		// Members
 		std::string OACtrlName; // name of OA controller
 		int OACtrlNum; // index of OA controller
+		int OASysNum; // index of OA System
 		bool CyclingFan; // TRUE if currently the air loop supply fan is cycling
 		bool AnyContFan; // TRUE if at any time supply fan is continuous
 		int CycFanSchedPtr; // index of schedule indicating whether fan is cycling or continuous in a unitary system
@@ -219,12 +211,15 @@ namespace DataAirLoop {
 		bool CoolingActiveFlag; // true whenever the air loop cooling coil is operating
 		bool HeatingActiveFlag; // true whenever the air loop heating coil is operating
 		bool OASysComponentsSimulated; // - true after OA components have been simulated
+		Real64 ZoneExhMassFlow; // zone exhaust flow rate not accounted for by zone inlet flow
 		bool AirLoopDCVFlag; // TRUE if the air loop has OA Controller specifying a Mechanical controller with DCV
+		int AirLoopPass; // number of air loop passes during iteration
 		// - internal flag only
 
 		// Default Constructor
 		AirLoopControlData() :
 			OACtrlNum( 0 ),
+			OASysNum( 0 ),
 			CyclingFan( false ),
 			AnyContFan( false ),
 			CycFanSchedPtr( 0 ),
@@ -254,7 +249,9 @@ namespace DataAirLoop {
 			CoolingActiveFlag( false ),
 			HeatingActiveFlag( false ),
 			OASysComponentsSimulated( false ),
-			AirLoopDCVFlag( true )
+			ZoneExhMassFlow( 0.0 ),
+			AirLoopDCVFlag( true ),
+			AirLoopPass( 0 )
 		{}
 
 	};
@@ -262,30 +259,29 @@ namespace DataAirLoop {
 	struct AirLoopFlowData // Derived type for air loop flow information
 	{
 		// Members
-		Real64 ZoneExhaust; // total of zone exhaust air mass flow rate for this loop [kg/s]
-		Real64 ZoneExhaustBalanced; // zone exhaust air that is balanced by simple air flow for loop [kg/s]
 		Real64 DesSupply; // design supply air mass flow rate for loop [kg/s]
+		Real64 DesReturnFrac; // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
 		Real64 SysToZoneDesFlowRatio; // System design flow divided by the sum of the zone design flows
 		Real64 ReqSupplyFrac; // required flow (as a fraction of DesSupply) set by a manager
 		Real64 MinOutAir; // minimum outside air mass flow rate [kg/s]
 		Real64 MaxOutAir; // maximum outside air mass flow rate [kg/s]
 		Real64 OAMinFrac; // minimum outside air flow fraction this time step
 		Real64 Previous; // Previous mass air flow rate for this loop [kg/s]
-		Real64 SupFlow; // supply air flow rate [kg/s]
-		Real64 RetFlow; // return air flow rate [kg/s]
-		Real64 RetFlow0; // sum of zone return flows before adjusting for total loop exhaust
-		Real64 RecircFlow; // sum of zone plenum recirculated flows
+		Real64 SupFlow; // supply air flow rate (includes LeakFlow) [kg/s]
+		Real64 ZoneRetFlow; // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
+		Real64 ZoneRetFlowRatio; // ratio for adjusting zone return flows for excess zone exhaust
+		Real64 SysRetFlow; // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
+		Real64 RecircFlow; // sum of zone plenum recirculated flows [kg/s]
+		Real64 LeakFlow; // sum of air distribution leak flows to return plenum [kg/s]
+		Real64 ExcessZoneExhFlow; // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
 		Real64 FanPLR; // Operating PLR of air loop fan
 		Real64 OAFrac; // fraction of outside air to mixed air mass flow rate
-		Real64 ZoneMixingFlow; // total zone mixing net flow used to cap the return flow
-		Real64 RetFlowAdjustment; // difference between user-specified return flow and default return flow
 		bool FlowError; // error flag for flow error message
 
 		// Default Constructor
 		AirLoopFlowData() :
-			ZoneExhaust( 0.0 ),
-			ZoneExhaustBalanced( 0.0 ),
 			DesSupply( 0.0 ),
+			DesReturnFrac( 1.0 ),
 			SysToZoneDesFlowRatio( 0.0 ),
 			ReqSupplyFrac( 1.0 ),
 			MinOutAir( 0.0 ),
@@ -293,13 +289,14 @@ namespace DataAirLoop {
 			OAMinFrac( 0.0 ),
 			Previous( 0.0 ),
 			SupFlow( 0.0 ),
-			RetFlow( 0.0 ),
-			RetFlow0( 0.0 ),
+			ZoneRetFlow( 0.0 ),
+			ZoneRetFlowRatio( 1.0 ),
+			SysRetFlow( 0.0 ),
 			RecircFlow( 0.0 ),
+			LeakFlow( 0.0 ),
+			ExcessZoneExhFlow( 0.0 ),
 			FanPLR( 0.0 ),
 			OAFrac( 0.0 ),
-			ZoneMixingFlow( 0.0 ),
-			RetFlowAdjustment( 0.0 ),
 			FlowError( false )
 		{}
 

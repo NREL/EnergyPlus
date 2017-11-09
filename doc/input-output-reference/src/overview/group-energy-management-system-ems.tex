@@ -57,7 +57,7 @@ This object maps an Erl variable to a control actuator elsewhere in EnergyPlus. 
 
 \paragraph{Field: Name}\label{field-name-1-012}
 
-The field contains a unique name for the actuator that becomes the name of a variable for use in Erl programs. No spaces are allowed in the object name. This name will be a global variable in Erl programs and cannot duplicate any other global scope Erl variable.
+The field contains a unique name for the actuator that becomes the name of a variable for use in Erl programs. No spaces or other special characters including dash, plus, and minus, are allowed in the object name. This name will be a global variable in Erl programs and cannot duplicate any other global scope Erl variable.
 
 \paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name}
 
@@ -191,7 +191,7 @@ The object definition is very simple. There is a name followed by lines of Erl p
 
 \paragraph{Field: Name}\label{field-name-3-010}
 
-This field is the unique name of the Erl program. The name can be used to call the program to run from another program or subroutine. No spaces are allowed in the name.
+This field is the unique name of the Erl program. The name can be used to call the program to run from another program or subroutine. No spaces or other special characters such as plus, minus, dash, are allowed in the name.
 
 \paragraph{Field Set: Program lines 1 to N}\label{field-set-program-lines-1-to-n}
 
@@ -238,7 +238,7 @@ The EnergyManagementSystem:Subroutine object contains a block of code written in
 
 \paragraph{Field: Name}\label{field-name-4-009}
 
-The name uniquely identifying the subroutine. The name can be used to call the subroutine to run from a program or another subroutine or even itself. No spaces are allowed in the name.
+The name uniquely identifying the subroutine. The name can be used to call the subroutine to run from a program or another subroutine or even itself. No spaces or other special characters such as minus, dash, plus, are allowed in the name.
 
 \paragraph{Field set: Lines 1 to N}\label{field-set-lines-1-to-n}
 
@@ -282,7 +282,7 @@ The EnergyManagementSystem:GlobalVariable object declares one or more global var
 
 \paragraph{Field: Erl Variable (1..N) Name}\label{field-erl-variable-1..n-name}
 
-The name becomes the global Erl variable name that can be referenced in the \emph{EnergyPlus Runtime Language}. No spaces are allowed in the object name. The name must be unique across all global scope variables including those declared as sensor and actuators and the built-in variables.
+The name becomes the global Erl variable name that can be referenced in the \emph{EnergyPlus Runtime Language}. No spaces or other special characters are allowed in the object name. The name must be unique across all global scope variables including those declared as sensor and actuators and the built-in variables.
 
 IDF examples using this object follow:
 
@@ -482,7 +482,7 @@ This field is used to specify the end use category that should be assigned to th
 
 \subsubsection{Field: End-Use Subcategory}\label{field-end-use-subcategory}
 
-This field is used to specify the end use subcategory that will be assigned to the output variable. EnergyPlus reporting includes the breakdown of how resources are used across different end uses with added breakdown for the different subcategories within a particular end use. This user can define his or her own subcategories and enter them in this field. If left blank, then no subcategory classification is made and the output is included in the general subcategory for the end use category determined in the previous field.
+This field is used to specify the end use subcategory that will be assigned to the output variable. EnergyPlus reporting includes the breakdown of how resources are used across different end uses with added breakdown for the different subcategories within a particular end use. This user can define his or her own subcategories and enter them in this field. Subcategories are reported in the ABUPS End Uses by Subcategory table and also appear in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If left blank, then no subcategory classification is made and the output is included in the general subcategory for the end use category determined in the previous field.
 
 \subsubsection{Field: Units}\label{field-units-1}
 
@@ -512,7 +512,7 @@ The EnergyManagementSystem:TrendVariable object declares a global trend EMS vari
 
 \paragraph{Field: Name}\label{field-name-7-005}
 
-The object name becomes the global EMS trend variable name that can be referenced in the \emph{EnergyPlus Runtime Language}. No spaces are allowed in the name. Then name must be unique across all global scope variables including those declared as sensor and actuators and the built-in variables.
+The object name becomes the global EMS trend variable name that can be referenced in the \emph{EnergyPlus Runtime Language}. No spaces or any other special characters are allowed in the name. Then name must be unique across all global scope variables including those declared as sensor and actuators and the built-in variables.
 
 \paragraph{Field: EMS Variable Name}\label{field-ems-variable-name-2}
 
@@ -546,7 +546,7 @@ The EMS also provides a method to obtain static data from elsewhere in the model
 
 \paragraph{Field: Name}\label{field-name-8-005}
 
-This field contains a unique name for the internal variable that becomes the name of a variable for use in Erl programs. No spaces are allowed in the name. This name will be a global variable in Erl programs and cannot duplicate any other global scope EMS variable.
+This field contains a unique name for the internal variable that becomes the name of a variable for use in Erl programs. No spaces, dashes, plus symbols, minus symbols, or other special characters are allowed in the name. This name will be a global variable in Erl programs and cannot duplicate any other global scope EMS variable.
 
 \paragraph{Field: Internal Data Index Key Name}\label{field-internal-data-index-key-name}
 
@@ -574,7 +574,7 @@ The EMS provides a method for reusing curve and table input objects from elsewhe
 
 \paragraph{Field: Name}\label{field-name-9-005}
 
-This field contains a unique name for the index variable that becomes the name of a variable for use in Erl programs. No spaces are allowed in the name. This name will be a global variable in Erl programs and cannot duplicate any other global scope EMS variable. The variable will be filled by the EMS system to have a value that points to the curve or table object named in the following field.
+This field contains a unique name for the index variable that becomes the name of a variable for use in Erl programs. No special characters (including spaces) are allowed in the name. This name will be a global variable in Erl programs and cannot duplicate any other global scope EMS variable. The variable will be filled by the EMS system to have a value that points to the curve or table object named in the following field.
 
 \paragraph{Field: Curve or Table Object Name}\label{field-curve-or-table-object-name}
 
@@ -597,7 +597,7 @@ The EMS provides actuators for overriding the type of construction used by a sur
 
 \paragraph{Field: Name}\label{field-name-10-004}
 
-This field contains a unique name for the index variable that becomes the name of a variable for use in Erl programs. No spaces are allowed in the name. This name will be a global variable in Erl programs and cannot duplicate any other global scope EMS variable. The variable will be filled by the EMS system to have a value that points to the Construction object named in the following field.
+This field contains a unique name for the index variable that becomes the name of a variable for use in Erl programs. No spaces or characters like dashes, minuses, plus symbols, are allowed in the name. This name will be a global variable in Erl programs and cannot duplicate any other global scope EMS variable. The variable will be filled by the EMS system to have a value that points to the Construction object named in the following field.
 
 \paragraph{Field: Construction Object Name}\label{field-construction-object-name}
 

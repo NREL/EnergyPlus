@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataDefineEquip_hh_INCLUDED
 #define DataDefineEquip_hh_INCLUDED
@@ -97,8 +86,7 @@ namespace DataDefineEquip {
 	extern int const SingleDuctConstVolCooledBeam;
 	extern int const DualDuctVAVOutdoorAir;
 	extern int const SingleDuctUserDefined;
-	extern int const SingleDuctInletATMixer;
-	extern int const SingleDuctSupplyATMixer;
+	extern int const SingleDuctATMixer;
 	extern int const SingleDuctConstVolFourPipeBeam;
 
 	// DERIVED TYPE DEFINITIONS
@@ -122,20 +110,26 @@ namespace DataDefineEquip {
 		std::shared_ptr< AirTerminalUnit > airTerminalPtr;
 		Array1D_string EquipName; // name of subcomponent
 		Array1D_int EquipIndex;
+		int AirTerminalSizingSpecIndex; // index to DesignSpecification:AirTerminal:Sizing obect
+		int TermUnitSizingNum; // index to TermUnitSizing and TermUnitFinalZoneSizing for this air distribution unit
 		Real64 UpStreamLeakFrac; // upstream nominal leakage fraction
 		Real64 DownStreamLeakFrac; // downstream constant leakage fraction
 		Real64 MassFlowRateUpStrLk; // current air mass flow rate of the upstream leak [kg/s]
 		Real64 MassFlowRateDnStrLk; // current air mass flow rate of the downstream leak [kg/s]
-		Real64 MassFlowRateTU; // current air mass flow rate tjrough the terminal unit [kg/s]
+		Real64 MassFlowRateTU; // current air mass flow rate through the terminal unit [kg/s]
 		Real64 MassFlowRateZSup; // current air mass flow rate of zone supply air [kg/s]
 		Real64 MassFlowRateSup; // current air mass flow rate of supply air upstream of upstream leak [kg/s]
+		Real64 MassFlowRatePlenInd; // current air mass flow rate of induced air from plenum [kg/s]
 		Real64 MaxAvailDelta; // change in max avail mass low rate due to leaks [kg/s]
 		Real64 MinAvailDelta; // change in min avail mass low rate due to leaks [kg/s]
-		int InletNodeNum; // index of inlet node
+		int InletNodeNum; // index of inlet node 1
+		int InletNodeNum2; // index of inlet node 2 (used for dual duct airterminals)
 		int ZoneEqNum; // index of zone equipment object for this terminal unit
+		int AirLoopNum; // index to airloop that this terminal unit is connected to
 		Real64 LeakLoadMult; // zome load multiplier to adjust for downstream leak
 		bool UpStreamLeak; // if true, there is an upstream leak
 		bool DownStreamLeak; // if true, there is an downstream leak
+		int RetPlenumNum; // return plenum number that this ADU can leak to, zero if none
 		int ZoneNum; // index of the zone object for this terminal unit
 	 	bool AccountForDOAS; // if true user has asked for DOAS
 		Real64 HeatRate; // [W]
@@ -153,6 +147,8 @@ namespace DataDefineEquip {
 			airTerminalPtr( nullptr ),
 			EquipName( MaxZoneAirComponents ),
 			EquipIndex( MaxZoneAirComponents, 0 ),
+			AirTerminalSizingSpecIndex( 0 ),
+			TermUnitSizingNum( 0 ),
 			UpStreamLeakFrac( 0.0 ),
 			DownStreamLeakFrac( 0.0 ),
 			MassFlowRateUpStrLk( 0.0 ),
@@ -160,13 +156,17 @@ namespace DataDefineEquip {
 			MassFlowRateTU( 0.0 ),
 			MassFlowRateZSup( 0.0 ),
 			MassFlowRateSup( 0.0 ),
+			MassFlowRatePlenInd( 0.0 ),
 			MaxAvailDelta( 0.0 ),
 			MinAvailDelta( 0.0 ),
 			InletNodeNum( 0 ),
+			InletNodeNum2( 0 ),
 			ZoneEqNum( 0 ),
+			AirLoopNum( 0 ),
 			LeakLoadMult( 0.0 ),
 			UpStreamLeak( false ),
 			DownStreamLeak( false ),
+			RetPlenumNum( 0 ),
 			ZoneNum( 0 ),
 			AccountForDOAS( false ),
 			HeatRate( 0.0 ),

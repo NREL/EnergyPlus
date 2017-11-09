@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <ExteriorEnergyUse.hh>
@@ -253,7 +242,6 @@ namespace ExteriorEnergyUse {
 		int NumFuelEq; // Temporary -- number of ExteriorFuelEquipment statements
 		int NumWtrEq; // Temporary -- number of ExteriorWaterEquipment statements
 		std::string TypeString; // Fuel Type string (returned from Validation)
-		std::string ConUnits; // String for Fuel Consumption units (allow Water)
 		std::string EndUseSubcategoryName;
 		bool ErrorInName;
 		bool IsBlank;
@@ -328,9 +316,10 @@ namespace ExteriorEnergyUse {
 				SetupEMSActuator( "ExteriorLights", ExteriorLights( Item ).Name, "Electric Power", "W", ExteriorLights( Item ).PowerActuatorOn, ExteriorLights( Item ).PowerActuatorValue );
 			}
 
-			SetupOutputVariable( "Exterior Lights Electric Power [W]", ExteriorLights( Item ).Power, "Zone", "Average", ExteriorLights( Item ).Name );
+			SetupOutputVariable( "Exterior Lights Electric Power", OutputProcessor::Unit::W, ExteriorLights( Item ).Power, "Zone", "Average", ExteriorLights( Item ).Name );
 
-			SetupOutputVariable( "Exterior Lights Electric Energy [J]", ExteriorLights( Item ).CurrentUse, "Zone", "Sum", ExteriorLights( Item ).Name, _, "Electricity", "Exterior Lights", EndUseSubcategoryName );
+			SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, ExteriorLights( Item ).CurrentUse, "Zone", "Sum", ExteriorLights( Item ).Name, _, "Electricity", "Exterior Lights", EndUseSubcategoryName );
+
 
 			// entries for predefined tables
 			PreDefTableEntry( pdchExLtPower, ExteriorLights( Item ).Name, ExteriorLights( Item ).DesignLevel );
@@ -377,15 +366,11 @@ namespace ExteriorEnergyUse {
 				ErrorsFound = true;
 			} else {
 				if ( ExteriorEquipment( NumExteriorEqs ).FuelType != WaterUse ) {
-					SetupOutputVariable( "Exterior Equipment Fuel Rate [W]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
-
-					ConUnits = "[J]";
-					SetupOutputVariable( "Exterior Equipment " + TypeString + " Energy " + ConUnits, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
+					SetupOutputVariable( "Exterior Equipment Fuel Rate", OutputProcessor::Unit::W, ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
+					SetupOutputVariable( "Exterior Equipment " + TypeString + " Energy", OutputProcessor::Unit::J, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
 				} else {
-					SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate [m3/s]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
-
-					ConUnits = "[m3]";
-					SetupOutputVariable( "Exterior Equipment " + TypeString + " Volume " + ConUnits, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
+					SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate", OutputProcessor::Unit::m3_s, ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
+					SetupOutputVariable( "Exterior Equipment " + TypeString + " Volume", OutputProcessor::Unit::m3, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
 				}
 
 			}
@@ -464,10 +449,10 @@ namespace ExteriorEnergyUse {
 
 			ExteriorEquipment( NumExteriorEqs ).DesignLevel = rNumericArgs( 1 );
 
-			SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate [m3/s]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
+			SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate", OutputProcessor::Unit::m3_s, ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
 
-			SetupOutputVariable( "Exterior Equipment Water Volume [m3]", ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "Water", "ExteriorEquipment", EndUseSubcategoryName );
-			SetupOutputVariable( "Exterior Equipment Mains Water Volume [m3]", ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "MainsWater", "ExteriorEquipment", EndUseSubcategoryName );
+			SetupOutputVariable( "Exterior Equipment Water Volume", OutputProcessor::Unit::m3, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "Water", "ExteriorEquipment", EndUseSubcategoryName );
+			SetupOutputVariable( "Exterior Equipment Mains Water Volume", OutputProcessor::Unit::m3, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "MainsWater", "ExteriorEquipment", EndUseSubcategoryName );
 		}
 
 		if ( ErrorsFound ) {

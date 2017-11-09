@@ -1,12 +1,12 @@
 // ObjexxFCL::Array Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -14,7 +14,14 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
+#endif
 #include <ObjexxFCL/Array.all.hh>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers
@@ -79,7 +86,7 @@ TEST( ArrayTest, Assignment2DRedimensionDifferentValueType )
 {
 	Array2D_int A( 3, 3, 33 );
 	Array2D_double B( IR( 0, 4 ), IR( 0, 4 ), 4.4 );
-	A = B;
+	A = B; // Causes VC++ C4244 warning
 	EXPECT_TRUE( eq( Array2D_int( IR( 0, 4 ), IR( 0, 4 ), 4 ), A ) );
 }
 
@@ -198,9 +205,9 @@ TEST( ArrayTest, Redimension2D )
 	A.redimension( 5, 5, 55 ); // Redimension by index ranges
 	EXPECT_EQ( IR( 1, 5 ), A.I1() );
 	EXPECT_EQ( IR( 1, 5 ), A.I2() );
-	EXPECT_EQ( 5U, A.size1() );
-	EXPECT_EQ( 5U, A.size2() );
-	EXPECT_EQ( 5U * 5U, A.size() );
+	EXPECT_EQ( 5u, A.size1() );
+	EXPECT_EQ( 5u, A.size2() );
+	EXPECT_EQ( 5u * 5u, A.size() );
 	for ( int i1 = A.l1(); i1 <= A.u1(); ++i1 ) {
 		for ( int i2 = A.l2(); i2 <= A.u2(); ++i2 ) {
 			if ( i1 <= 4 && i2 <= 4 ) {
@@ -263,6 +270,14 @@ TEST( ArrayTest, Swap3D )
 	for ( std::size_t i = 0; i < A.size(); ++i ) {
 		EXPECT_EQ( 55, A[ i ] );
 	}
+}
+
+TEST( ArrayTest, Pow2D )
+{
+	Array2D_int A( 3, 3, 12 );
+	Array2D_int B( pow( A, 2 ) );
+	Array2D_int S( 3, 3, 144 );
+	EXPECT_TRUE( eq( S, B ) );
 }
 
 TEST( ArrayTest, Cshift2DDim1 )
@@ -350,14 +365,6 @@ TEST( ArrayTest, Sum2DDim2 )
 {
 	Array2D_int A( 3, 3, reshape( { 11, 12, 13, 21, 22, 23, 31, 32, 33 }, std::array< int, 2 >{ { 3, 3 } } ) );
 	EXPECT_TRUE( eq( Array1D_int( 3, { 36, 66, 96 } ), sum( A, 2 ) ) );
-}
-
-TEST( ArrayTest, Pow2D )
-{
-	Array2D_int A( 3, 3, 12 );
-	Array2D_int B( pow( A, 2 ) );
-	Array2D_int S( 3, 3, 144 );
-	EXPECT_TRUE( eq( S, B ) );
 }
 
 TEST( ArrayTest, Matmul11 )

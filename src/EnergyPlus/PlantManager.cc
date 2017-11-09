@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <algorithm>
@@ -465,7 +454,7 @@ namespace PlantManager {
 					}
 				}
 			} else {
-				ShowWarningError( "Input error: " + cAlphaFieldNames( 2 ) + '=' + Alpha( 2 ) + "entered, in " + CurrentModuleObject + '=' + Alpha( 1 ) );
+				ShowWarningError( "Input error: " + cAlphaFieldNames( 2 ) + '=' + Alpha( 2 ) + " entered, in " + CurrentModuleObject + '=' + Alpha( 1 ) );
 				ShowContinueError( "Will default to Water." );
 
 				this_loop.FluidType = NodeType_Water;
@@ -492,7 +481,12 @@ namespace PlantManager {
 			if ( this_loop.Volume == AutoCalculate ) {
 				this_loop.VolumeWasAutoSized = true;
 			}
-
+			// circulation time used to autocalculate loop volume
+			if ( lNumericFieldBlanks( 6 ) ) {
+				this_loop.CirculationTime = 2.0 ; // default
+			} else {
+				this_loop.CirculationTime = Num( 6 );
+			}
 
 			// Load the Loop Inlet and Outlet Nodes and Connection Info (Alpha(7-10) are related to the supply side)
 			this_supply_side.NodeNameIn = Alpha( 6 );
@@ -718,7 +712,7 @@ namespace PlantManager {
 		// outside the IF statement.
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 
-			SetupOutputVariable( "Plant System Cycle On Off Status []", PlantAvailMgr( LoopNum ).AvailStatus, "Plant", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant System Cycle On Off Status", OutputProcessor::Unit::None, PlantAvailMgr( LoopNum ).AvailStatus, "Plant", "Average", PlantLoop( LoopNum ).Name );
 
 		}
 
@@ -2022,18 +2016,18 @@ namespace PlantManager {
 				CurrentModuleObject = "Cond Loop";
 			}
 			// CurrentModuleObject='Plant/Condenser Loop'
-			SetupOutputVariable( "Plant Supply Side Cooling Demand Rate [W]", PlantReport( LoopNum ).CoolingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Heating Demand Rate [W]", PlantReport( LoopNum ).HeatingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Inlet Mass Flow Rate [kg/s]", PlantReport( LoopNum ).InletNodeFlowrate, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Cooling Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).CoolingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Heating Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).HeatingDemand, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Inlet Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantReport( LoopNum ).InletNodeFlowrate, "System", "Average", PlantLoop( LoopNum ).Name );
 
-			SetupOutputVariable( "Plant Supply Side Inlet Temperature [C]", PlantReport( LoopNum ).InletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Outlet Temperature [C]", PlantReport( LoopNum ).OutletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Inlet Temperature", OutputProcessor::Unit::C, PlantReport( LoopNum ).InletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Outlet Temperature", OutputProcessor::Unit::C, PlantReport( LoopNum ).OutletNodeTemperature, "System", "Average", PlantLoop( LoopNum ).Name );
 
-			SetupOutputVariable( "Plant Supply Side Not Distributed Demand Rate [W]", PlantReport( LoopNum ).DemandNotDispatched, "System", "Average", PlantLoop( LoopNum ).Name );
-			SetupOutputVariable( "Plant Supply Side Unmet Demand Rate [W]", PlantReport( LoopNum ).UnmetDemand, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Not Distributed Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).DemandNotDispatched, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Plant Supply Side Unmet Demand Rate", OutputProcessor::Unit::W, PlantReport( LoopNum ).UnmetDemand, "System", "Average", PlantLoop( LoopNum ).Name );
 
 			// Debug variables -- used by OSU developers
-			SetupOutputVariable( "Debug Plant Loop Bypass Fraction []", PlantReport( LoopNum ).BypassFrac, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Debug Plant Loop Bypass Fraction", OutputProcessor::Unit::None, PlantReport( LoopNum ).BypassFrac, "System", "Average", PlantLoop( LoopNum ).Name );
 			//    CALL SetupOutputVariable('Debug SSInletNode Flowrate[kg/s]', &
 			//           PlantReport(LoopNum)%InletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
 			//    CALL SetupOutputVariable('Debug SSInletNode Temperature[C]', &
@@ -2042,26 +2036,26 @@ namespace PlantManager {
 			//           PlantReport(LoopNum)%OutletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
 			//    CALL SetupOutputVariable('Debug SSOutletNode Temperature[C]', &
 			//           PlantReport(LoopNum)%OutletNodeTemperature,'System','Average',PlantLoop(LoopNum)%Name)
-			SetupOutputVariable( "Debug Plant Last Simulated Loop Side []", PlantReport( LoopNum ).LastLoopSideSimulated, "System", "Average", PlantLoop( LoopNum ).Name );
+			SetupOutputVariable( "Debug Plant Last Simulated Loop Side", OutputProcessor::Unit::None, PlantReport( LoopNum ).LastLoopSideSimulated, "System", "Average", PlantLoop( LoopNum ).Name );
 		}
 
 		// setup more variables inside plant data structure
 		// CurrentModuleObject='Plant/Condenser Loop(Advanced)'
 		if ( DisplayAdvancedReportVariables ) {
 			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
-				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature [C]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
-				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate [W]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
- 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time [hr]", PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Temperature", OutputProcessor::Unit::C, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Temperature", OutputProcessor::Unit::C, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_TankTemp, "System", "Average", PlantLoop( LoopNum ).Name );
+				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Transport Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Transport Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Heat Storage Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Heat Storage Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Demand Side Lumped Capacitance Excessive Storage Time", OutputProcessor::Unit::hr, PlantLoop( LoopNum ).LoopSide( DemandSide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
+ 				SetupOutputVariable( "Plant Supply Side Lumped Capacitance Excessive Storage Time", OutputProcessor::Unit::hr, PlantLoop( LoopNum ).LoopSide( SupplySide ).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum", PlantLoop( LoopNum ).Name );
 				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 							if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).CurOpSchemeType != DemandOpSchemeType ) {
-								SetupOutputVariable( "Plant Component Distributed Demand Rate [W]", PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad, "System", "Average", PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Name );
+								SetupOutputVariable( "Plant Component Distributed Demand Rate", OutputProcessor::Unit::W, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).MyLoad, "System", "Average", PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).Name );
 							}
 						}
 					}
@@ -3291,8 +3285,9 @@ namespace PlantManager {
 
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
-			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::ResizePlantLoopLevelSizes and SizingAnalysisObjects::ResolveDesignFlowRate
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if (PlantFinalSizesOkayToReport) {
 				if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 					// condenser loop vs plant loop breakout needed.
@@ -3455,8 +3450,9 @@ namespace PlantManager {
 
 		// Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
 		if ( PlantLoop( LoopNum ).VolumeWasAutoSized ) {
-			// Although there is no longer a stability requirement (mass can be zero), autosizing is formulated the same way.
-			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * TimeStepZoneSec / 0.8;
+			// There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
+			// Note this calculation also appears in PlantManager::SizePlantLoop and SizingAnalysisObjects::ResolveDesignFlowRate
+			PlantLoop( LoopNum ).Volume = PlantLoop( LoopNum ).MaxVolFlowRate * PlantLoop( LoopNum ).CirculationTime * 60.0;
 			if ( PlantLoop( LoopNum ).TypeOfLoop == LoopType_Plant ) {
 				// condenser loop vs plant loop breakout needed.
 				ReportSizingOutput( "PlantLoop", PlantLoop( LoopNum ).Name, "Plant Loop Volume [m3]", PlantLoop( LoopNum ).Volume );
@@ -4404,6 +4400,10 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgSlinky ) { //            = 91
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 
