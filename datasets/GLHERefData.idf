@@ -47,7 +47,7 @@
     1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
     0.0267,                   !- Pipe Out Diameter {m}
     0.00243,                  !- Pipe Thickness {m}
-    0.0254;                   !- U-Tube Distance {m}
+    0.047;                    !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Vertical GHE 1x2 Std Ground Temps, !- Undisturbed Ground Temperature Model Name
@@ -241,7 +241,7 @@
     1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
     0.0267,                   !- Pipe Out Diameter {m}
     0.00243,                  !- Pipe Thickness {m}
-    0.0254;                   !- U-Tube Distance {m}
+    0.047;                    !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Vertical GHE 1x2 Enhanced Ground Temps, !- Undisturbed Ground Temperature Model Name
@@ -435,7 +435,7 @@
     1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
     0.0267,                   !- Pipe Out Diameter {m}
     0.00243,                  !- Pipe Thickness {m}
-    0.0254;                   !- U-Tube Distance {m}
+    0.047;                    !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Vertical GHE 4x4 Std Ground Temps, !- Undisturbed Ground Temperature Model Name
@@ -629,7 +629,7 @@
     1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
     0.0267,                   !- Pipe Out Diameter {m}
     0.00243,                  !- Pipe Thickness {m}
-    0.0254;                   !- U-Tube Distance {m}
+    0.047;                    !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Vertical GHE 4x4 Enhanced Ground Temps, !- Undisturbed Ground Temperature Model Name
@@ -823,7 +823,7 @@
     1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
     0.0267,                   !- Pipe Out Diameter {m}
     0.00243,                  !- Pipe Thickness {m}
-    0.0254;                   !- U-Tube Distance {m}
+    0.047;                    !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Vertical GHE 8x8 Std Ground Temps, !- Undisturbed Ground Temperature Model Name
@@ -1017,7 +1017,7 @@
     1.542E+06,                !- Pipe Thermal Heat Capacity {J/m3-K}
     0.0267,                   !- Pipe Out Diameter {m}
     0.00243,                  !- Pipe Thickness {m}
-    0.0254;                   !- U-Tube Distance {m}
+    0.047;                    !- U-Tube Distance {m}
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
     Vertical GHE 8x8 Enhanced Ground Temps, !- Undisturbed Ground Temperature Model Name

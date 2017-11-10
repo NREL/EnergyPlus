@@ -610,8 +610,8 @@ namespace GroundHeatExchangers {
 	{
 		using namespace DataSystemVariables;
 
+		// No g-functions to calculate
 		if ( gFunctionsExist ) {
-			// No g-functions to calculate
 			return;
 		}
 
@@ -620,8 +620,8 @@ namespace GroundHeatExchangers {
 			readCache();
 		}
 
+		// g-functions already exist from previous run
 		if ( gFunctionsExist ) {
-			// g-functions already exist from previous run
 			return;
 		}
 
@@ -650,8 +650,6 @@ namespace GroundHeatExchangers {
 		int const numDaysInYear( 365 );
 		using DataGlobals::HoursInDay;
 		using DataGlobals::SecInHour;
-
-
 
 		// Minimum simulation time for which finite line source method is applicable
 		Real64 const lntts_min_for_long_timestep = -8.5;
