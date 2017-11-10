@@ -2879,7 +2879,7 @@ namespace GroundHeatExchangers {
 		// Calculates the total internal thermal resistance of the borehole using the first-order multipole method.
 
 		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
-		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
 
 		// Equation 26
 
@@ -2904,7 +2904,7 @@ namespace GroundHeatExchangers {
 		// Calculates grout resistance. Use for validation.
 
 		// Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
-		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
+		// for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
 
 		// Equation 3
 
