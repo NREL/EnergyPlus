@@ -1032,10 +1032,11 @@
     ZONE 1 INLETS,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 1 NODE,             !- Zone Air Node Name
-    ZONE 1 OUTLET;           !- Zone Return Air Node Name
+    ZONE 1 OUTLET;           !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 1 EQUIPMENT,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 1 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1092,10 +1093,11 @@
     ZONE 2 INLETS,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 2 NODE,             !- Zone Air Node Name
-    ZONE 2 OUTLET;           !- Zone Return Air Node Name
+    ZONE 2 OUTLET;           !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 2 EQUIPMENT,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 2 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1152,10 +1154,11 @@
     ZONE 3 INLETS,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 3 NODE,             !- Zone Air Node Name
-    ZONE 3 OUTLET;           !- Zone Return Air Node Name
+    ZONE 3 OUTLET;           !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 3 EQUIPMENT,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 3 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1212,10 +1215,11 @@
     ZONE 4 INLETS,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 4 NODE,             !- Zone Air Node Name
-    ZONE 4 OUTLET;           !- Zone Return Air Node Name
+    ZONE 4 OUTLET;           !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 4 EQUIPMENT,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 4 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

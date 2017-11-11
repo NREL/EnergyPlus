@@ -2821,7 +2821,7 @@
     Inlets_SouthZone_1stFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_SouthZone_1stFloor,  !- Zone Air Node Name
-    OutletNode_SouthZone_1stFloor;  !- Zone Return Air Node Name
+    OutletNode_SouthZone_1stFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NorthZone_1stFloor,      !- Zone Name
@@ -2829,7 +2829,7 @@
     Inlets_NorthZone_1stFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_NorthZone_1stFloor,  !- Zone Air Node Name
-    OutletNode_NorthZone_1stFloor;  !- Zone Return Air Node Name
+    OutletNode_NorthZone_1stFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SouthZone_2ndFloor,      !- Zone Name
@@ -2837,7 +2837,7 @@
     Inlets_SouthZone_2ndFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_SouthZone_2ndFloor,  !- Zone Air Node Name
-    OutletNode_SouthZone_2ndFloor;  !- Zone Return Air Node Name
+    OutletNode_SouthZone_2ndFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NorthZone_2ndFloor,      !- Zone Name
@@ -2845,10 +2845,11 @@
     Inlets_NorthZone_2ndFloor,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     AirNode_NorthZone_2ndFloor,  !- Zone Air Node Name
-    OutletNode_NorthZone_2ndFloor;  !- Zone Return Air Node Name
+    OutletNode_NorthZone_2ndFloor;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_1stFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_SouthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2856,6 +2857,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_1stFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_NorthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2863,6 +2865,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_2ndFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_SouthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2870,6 +2873,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_2ndFloor,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     DirectAir_NorthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

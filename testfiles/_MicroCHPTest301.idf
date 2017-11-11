@@ -201,10 +201,11 @@
     Garage inlet,            !- Zone Air Inlet Node or NodeList Name
     Micro CHP Air Inlet Node,!- Zone Air Exhaust Node or NodeList Name
     Garage Air Node,         !- Zone Air Node Name
-    Garage return;           !- Zone Return Air Node Name
+    Garage return;           !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

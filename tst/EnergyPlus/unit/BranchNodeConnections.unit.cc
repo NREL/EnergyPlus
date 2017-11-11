@@ -988,6 +988,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			" Space Eq,                 !- Name",
+			" SequentialLoad,           !- Load Distribution Scheme",
 			" ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			" Space ATU,                   !- Zone Equipment 1 Name",
 			" 1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -1021,6 +1022,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			" Spacex10 Eq,              !- Name",
+			" SequentialLoad,           !- Load Distribution Scheme",
 			" ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			" Spacex10 ATU,                !- Zone Equipment 1 Name",
 			" 1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -1998,6 +2000,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			" Space Eq,                 !- Name",
+			" SequentialLoad,           !- Load Distribution Scheme",
 			" ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			" Space ATU,                   !- Zone Equipment 1 Name",
 			" 1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -2031,6 +2034,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			" Spacex10 Eq,              !- Name",
+			" SequentialLoad,           !- Load Distribution Scheme",
 			" ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			" Spacex10 ATU,                !- Zone Equipment 1 Name",
 			" 1,                        !- Zone Equipment 1 Cooling Sequence",

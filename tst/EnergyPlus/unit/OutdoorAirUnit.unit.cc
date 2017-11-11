@@ -122,6 +122,7 @@ namespace EnergyPlus {
 			" ",
 			"ZoneHVAC:EquipmentList,",
 			"  SPACE1-1 Eq,             !- Name",
+			"  SequentialLoad,          !- Load Distribution Scheme",
 			"  ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type",
 			"  Zone1OutAir,             !- Zone Equipment 1 Name",
 			"  1,                       !- Zone Equipment 1 Cooling Sequence",

@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -2675,6 +2676,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 		"  ",
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3007,6 +3009,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VSDXCoilSizing ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  GasHeat DXAC Furnace 1,  !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3381,6 +3384,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  ",
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3799,6 +3803,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetBadSupplyAirMethodInput ) {
 		"  ",
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3989,6 +3994,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  SPACE2-1 Equipment,                                      !- Name",
+		"  SequentialLoad,                                          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem,                               !- Zone Equipment Object Type",
 		"  Sys 2 Furnace DX Cool MultiSpd Unitary System,           !- Zone Equipment Name",
 		"  1,                                                       !- Zone Equipment Cooling Sequence",
@@ -4472,6 +4478,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilSizing ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,                                          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  Multispeed DXAC,         !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -5189,6 +5196,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  ",
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,                                          !- Load Distribution Scheme",
 		"  AirTerminal:SingleDuct:Uncontrolled, !- Zone Equipment 1 Object Type",
 		"  Zone2DirectAir,          !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -5881,7 +5889,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	GetZoneData( ErrorsFound ); // read zone data
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
-	GetZoneEquipmentData1( ); // read zone equipment configuration and list objects
+	GetZoneEquipmentData( ); // read zone equipment configuration and list objects
+	DirectAirManager::GetDirectAirInput();
 
 	BranchInputManager::ManageBranchInput( ); // just gets input and returns.
 
@@ -5898,8 +5907,6 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	TempControlledZone.allocate( NumTempControlledZones );
 	TempControlledZone( NumTempControlledZones ).ActualZoneNum = 1;
 
-	ZoneEquipList.allocate( 1 );
-	ZoneEquipList( 1 ).EquipIndex.allocate( 1 );
 	ZoneEquipList( 1 ).EquipIndex( 1 ) = 1; // initialize equipment index for ZoneHVAC
 
 	HVACUnitarySystem::GetInputFlag = true;
@@ -5939,7 +5946,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	AirLoopControlInfo.allocate( 1 );
 	DataGlobals::SysSizingCalc = true;
 
-	UnitarySystem( 1 ).ZoneInletNode = 3;
+	UnitarySystem( 1 ).ZoneInletNode = DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 );
 
 	Schedule( 1 ).CurrentValue = 1.0;
 
@@ -6119,6 +6126,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXCoilHeatRecoveryHandling ) 
 
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,                                          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  Multispeed DXAC,         !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -6987,6 +6995,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,                                          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  WSHP Furnace,            !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -7371,6 +7380,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,           !- Name",
+		"  SequentialLoad,                                          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  ASHRAE Model HVAC,        !- Zone Equipment 1 Name",
 		"  1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -7881,6 +7891,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultispeedDXHeatingCoilOnly ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,                                          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  Multispeed DXAC,         !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",

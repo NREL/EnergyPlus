@@ -371,6 +371,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
     ! changes for this version
 
+             CASE('ZONEHVAC:EQUIPMENTLIST')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1)=InArgs(1)
+                 OutArgs(2) = 'SequentialLoad'
+                 OutArgs(3:CurArgs+1)=InArgs(2:CurArgs)
+                 CurArgs = CurArgs + 1
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

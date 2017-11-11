@@ -13,7 +13,6 @@
 !
 ! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 !                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
-
 ! Building:                There are 3 zones (living space, garage and attic). The living zone is conditioned.
 !                          The other two zones are unconditioned.
 !                          Supply ducts are located in the attic zone and return ducts are located in the garage zone.
@@ -134,7 +133,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -1406,23 +1404,22 @@
     WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   OutdoorAir:Node,
-    OutdoorAirNode:0001,          !- Name
-	,                             !- Height Above Ground
-	OutdoorAirNodeDryBulb:0001,   !- Drybulb Temperature Schedule Name 
-	,                             !- Wetbulb Schedule Name
-	,                             !- Wind Speed Schedule Name
-	,                             !- Wind Direction Schedule Name 
-	NFacade_WPCValue,
-	No,
-	Absolute;
-	
+    OutdoorAirNode:0001,     !- Name
+    ,                        !- Height Above Ground {m}
+    OutdoorAirNodeDryBulb:0001,  !- Drybulb Temperature Schedule Name
+    ,                        !- Wetbulb Schedule Name
+    ,                        !- Wind Speed Schedule Name
+    ,                        !- Wind Direction Schedule Name
+    NFacade_WPCValue,        !- Wind Pressure Coefficient Curve Name
+    No,                      !- Symmetric Wind Pressure Coefficient Curve
+    Absolute;                !- Wind Angle Type
+
   Schedule:Compact,
-    OutdoorAirNodeDryBulb:0001,   !- Name
-    Any Number,                   !- Schedule Type Limits Name
-    Through: 12/31,               !- Field 1
-    For: AllDays,                 !- Field 2
-    Until: 24:00,35.0;            !- Field 3
-	
+    OutdoorAirNodeDryBulb:0001,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,35.0;       !- Field 3
 
   AirflowNetwork:MultiZone:WindPressureCoefficientArray,
     Every 30 Degrees,        !- Name
@@ -1831,10 +1828,11 @@
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone Node,               !- Zone Air Node Name
-    Zone Outlet Node;        !- Zone Return Air Node Name
+    Zone Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
