@@ -180,7 +180,7 @@ namespace EnergyPlus {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Finds correct envrionment for reading all weather data. Loops over all weather data in weather file
+		// Finds correct environment for reading all weather data. Loops over all weather data in weather file
 		//	and data structure containing daily average of required weather data.
 
 		// USE STATEMENTS:
@@ -236,8 +236,8 @@ namespace EnergyPlus {
 		Environment( NumOfEnvrn ).KindOfEnvrn = ksReadAllWeatherData;
 		RPReadAllWeatherData = true;
 		WeathSimReq = true;
-		RunPeriodInput( TotRunPers ).StartDate = JulianDay( 1, 1, 0 );
-		RunPeriodInput( TotRunPers ).EndDate = JulianDay( 12, 31, 0 );
+		RunPeriodInput( TotRunPers ).startJulianDate = 1;  //JulianDay( 1, 1, 0 );
+		RunPeriodInput( TotRunPers ).endJulianDate = 365;  //JulianDay( 12, 31, 0 );
 		RunPeriodInput( TotRunPers ).MonWeekDay = 0;
 
 		SetupEnvironmentTypes();

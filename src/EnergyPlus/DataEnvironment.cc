@@ -110,6 +110,10 @@ namespace DataEnvironment {
 	int DayOfWeekTomorrow; // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
 	int DayOfYear; // Current day of the year (01JAN=1, 02JAN=2, ...)
 	int DayOfYear_Schedule; // Schedule manager always assumes leap years...
+	int Month; // Current calendar month
+	int MonthTomorrow; // Tomorrow's calendar month
+	int Year; // Current calendar year of the simulation
+	int YearTomorrow; // Tomorrow's calendar year of the simulation
 	Real64 DifSolarRad; // Current sky diffuse solar horizontal irradiance
 	bool EMSDifSolarRadOverrideOn( false ); // EMS flag for sky diffuse solar horizontal irradiance
 	Real64 EMSDifSolarRadOverrideValue; // EMS override value for sky diffuse solar horizontal irradiance
@@ -131,8 +135,6 @@ namespace DataEnvironment {
 	bool IsSnow; // Snow on the ground for this time interval
 	Real64 Latitude; // Latitude of building location
 	Real64 Longitude; // Longitude of building location
-	int Month; // Current calendar month
-	int MonthTomorrow; // Tomorrow's calendar month
 	Real64 OutBaroPress; // Current outdoor air barometric pressure
 	Real64 OutDryBulbTemp; // Current outdoor air dry bulb temperature
 	bool EMSOutDryBulbOverrideOn( false ); // EMS flag for outdoor air dry bulb temperature
@@ -159,8 +161,6 @@ namespace DataEnvironment {
 	bool EMSWindSpeedOverrideOn( false ); // EMS flag for outdoor air wind speed
 	Real64 EMSWindSpeedOverrideValue; // EMS override value for outdoor air wind speed
 	Real64 WaterMainsTemp; // Current water mains temperature
-	int Year; // Current calendar year of the simulation
-	int YearTomorrow; // Tomorrow's calendar year of the simulation
 	Array1D< Real64 > SOLCOS( 3 ); // Solar direction cosines at current time step
 	Real64 CloudFraction; // Fraction of sky covered by clouds
 	Real64 HISKF; // Exterior horizontal illuminance from sky (lux).
@@ -177,6 +177,7 @@ namespace DataEnvironment {
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
 	std::string EnvironmentName; // Current environment name (longer for weather file names)
 	std::string WeatherFileLocationTitle; // Location Title from Weather File
+	std::string currentTimestamp; // Current timestamp info in ISO8601 format yyyy-mm-ddThh:mm:ss
 	std::string CurMnDyHr; // Current Month/Day/Hour timestamp info
 	std::string CurMnDy; // Current Month/Day timestamp info
 	int CurEnvirNum; // current environment number

@@ -79,6 +79,15 @@ namespace OutputProcessor {
 	extern int const ReportMonthly; // Write out at end of month (must be determined)
 	extern int const ReportSim; // Write out once per environment 'EndEnvrnFlag'
 
+	enum class ReportingFrequency { Each = -1, // Write out each time UpdatedataandReport is called
+		TimeStep, // Write out at 'EndTimeStepFlag'
+		Hourly, // Write out at 'EndHourFlag'
+		Daily, // Write out at 'EndDayFlag'
+		Monthly, // Write out at end of month (must be determined)
+		Yearly,
+		Environment // Write out once per environment 'EndEnvrnFlag'
+	};
+
 	extern int const ReportVDD_No; // Don't report the variable dictionaries in any form
 	extern int const ReportVDD_Yes; // Report the variable dictionaries in "report format"
 	extern int const ReportVDD_IDF; // Report the variable dictionaries in "IDF format"

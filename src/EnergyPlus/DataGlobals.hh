@@ -80,7 +80,7 @@ namespace DataGlobals {
 	extern int const ksRunPeriodWeather;
 	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
 	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-	extern int const ksReadAllWeatherData; // a weather period for reading all weather data proir to the simulation
+	extern int const ksReadAllWeatherData; // a weather period for reading all weather data prior to the simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -152,6 +152,7 @@ namespace DataGlobals {
 	// (last time step of last hour of last day of environ which is a design day)
 	extern bool EndDayFlag; // True at the end of each day (last time step of last hour of day)
 	extern bool EndHourFlag; // True at the end of each hour (last time step of hour)
+	extern bool EndYearFlag; // True at the end of each year, for the entire last day of the year
 	extern int PreviousHour; // Previous Hour Index
 	extern int HourOfDay; // Counter for hours in a simulation day
 	extern Real64 WeightPreviousHour; // Weighting of value for previous hour

@@ -84,6 +84,10 @@ namespace DataEnvironment {
 	extern int DayOfWeekTomorrow; // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
 	extern int DayOfYear; // Current day of the year (01JAN=1, 02JAN=2, ...)
 	extern int DayOfYear_Schedule; // Schedule manager always assumes leap years...
+	extern int Month; // Current calendar month
+	extern int MonthTomorrow; // Tomorrow's calendar month
+	extern int Year; // Current calendar year of the simulation
+	extern int YearTomorrow; // Tomorrow's calendar year of the simulation
 	extern Real64 DifSolarRad; // Current sky diffuse solar horizontal irradiance
 	extern bool EMSDifSolarRadOverrideOn; // EMS flag for sky diffuse solar horizontal irradiance
 	extern Real64 EMSDifSolarRadOverrideValue; // EMS override value for sky diffuse solar horizontal irradiance
@@ -105,8 +109,6 @@ namespace DataEnvironment {
 	extern bool IsSnow; // Snow on the ground for this time interval
 	extern Real64 Latitude; // Latitude of building location
 	extern Real64 Longitude; // Longitude of building location
-	extern int Month; // Current calendar month
-	extern int MonthTomorrow; // Tomorrow's calendar month
 	extern Real64 OutBaroPress; // Current outdoor air barometric pressure
 	extern Real64 OutDryBulbTemp; // Current outdoor air dry bulb temperature
 	extern bool EMSOutDryBulbOverrideOn; // EMS flag for outdoor air dry bulb temperature
@@ -133,8 +135,6 @@ namespace DataEnvironment {
 	extern bool EMSWindSpeedOverrideOn; // EMS flag for outdoor air wind speed
 	extern Real64 EMSWindSpeedOverrideValue; // EMS override value for outdoor air wind speed
 	extern Real64 WaterMainsTemp; // Current water mains temperature
-	extern int Year; // Current calendar year of the simulation
-	extern int YearTomorrow; // Tomorrow's calendar year of the simulation
 	extern Array1D< Real64 > SOLCOS; // Solar direction cosines at current time step
 	extern Real64 CloudFraction; // Fraction of sky covered by clouds
 	extern Real64 HISKF; // Exterior horizontal illuminance from sky (lux).
@@ -151,6 +151,7 @@ namespace DataEnvironment {
 	extern Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
 	extern std::string EnvironmentName; // Current environment name (longer for weather file names)
 	extern std::string WeatherFileLocationTitle; // Location Title from Weather File
+	extern std::string currentTimestamp; // Current timestamp info in ISO8601 format yyyy-mm-ddThh:mm:ss
 	extern std::string CurMnDyHr; // Current Month/Day/Hour timestamp info
 	extern std::string CurMnDy; // Current Month/Day timestamp info
 	extern int CurEnvirNum; // current environment number
