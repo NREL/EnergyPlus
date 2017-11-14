@@ -225,6 +225,8 @@ namespace CoolingPanelSimple {
 
 		if ( CompIndex > 0 ) {
 
+			auto & ThisCP( CoolingPanel( CoolingPanelNum ) );
+			
 			InitCoolingPanel( CoolingPanelNum, ControlledZoneNum, FirstHVACIteration );
 
 			QZnReq = ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputReqToCoolSP;
@@ -232,17 +234,17 @@ namespace CoolingPanelSimple {
 			// On the first HVAC iteration the system values are given to the controller, but after that
 			// the demand limits are in place and there needs to be feedback to the Zone Equipment
 			if ( FirstHVACIteration ) {
-				MaxWaterFlow = CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax;
+				MaxWaterFlow = ThisCP.WaterMassFlowRateMax;
 				MinWaterFlow = 0.0;
 			} else {
-				MaxWaterFlow = Node( CoolingPanel( CoolingPanelNum ).WaterInletNode ).MassFlowRateMaxAvail;
-				MinWaterFlow = Node( CoolingPanel( CoolingPanelNum ).WaterInletNode ).MassFlowRateMinAvail;
+				MaxWaterFlow = Node( ThisCP.WaterInletNode ).MassFlowRateMaxAvail;
+				MinWaterFlow = Node( ThisCP.WaterInletNode ).MassFlowRateMinAvail;
 			}
 
-			{ auto const SELECT_CASE_var( CoolingPanel( CoolingPanelNum ).EquipType );
+			{ auto const SELECT_CASE_var( ThisCP.EquipType );
 
 			if ( SELECT_CASE_var == TypeOf_CoolingPanel_Simple ) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-				CoolingPanel( CoolingPanelNum ).CalcCoolingPanel( CoolingPanelNum );
+				ThisCP.CalcCoolingPanel( CoolingPanelNum );
 			} else {
 				ShowSevereError( "SimCoolingPanelSimple: Errors in CoolingPanel=" + CoolingPanel( CoolingPanelNum ).EquipID );
 				ShowContinueError( "Invalid or unimplemented equipment type=" + TrimSigDigits( CoolingPanel( CoolingPanelNum ).EquipType ) );
@@ -250,7 +252,7 @@ namespace CoolingPanelSimple {
 
 			}}
 
-			PowerMet = CoolingPanel( CoolingPanelNum ).TotPower;
+			PowerMet = ThisCP.TotPower;
 
 			UpdateCoolingPanel( CoolingPanelNum );
 
