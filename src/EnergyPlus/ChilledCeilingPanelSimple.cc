@@ -691,7 +691,6 @@ namespace CoolingPanelSimple {
 		static bool ZoneEquipmentListChecked( false );
 		static Array1D_bool MyEnvrnFlag;
 		int Loop;
-		int WaterInletNode;
 		int ZoneNode;
 		int ZoneNum;
 		Real64 rho; // local fluid density
@@ -724,21 +723,24 @@ namespace CoolingPanelSimple {
 			
 		}
 
-		if ( CoolingPanel( CoolingPanelNum ).ZonePtr <= 0 ) CoolingPanel( CoolingPanelNum ).ZonePtr = ZoneEquipConfig( ControlledZoneNumSub ).ActualZoneNum;
+		auto & ThisCP( CoolingPanel( CoolingPanelNum ) );
+		auto & ThisInNode( Node( ThisCP.WaterInletNode ) );
+		
+		if ( ThisCP.ZonePtr <= 0 ) ThisCP.ZonePtr = ZoneEquipConfig( ControlledZoneNumSub ).ActualZoneNum;
 
 		// Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
 			ZoneEquipmentListChecked = true;
 			for ( Loop = 1; Loop <= NumCoolingPanels; ++Loop ) {
-				if ( CheckZoneEquipmentList( cCMO_CoolingPanel_Simple, CoolingPanel( Loop ).EquipID ) ) continue;
-				ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( Loop ).EquipID + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+				if ( CheckZoneEquipmentList( cCMO_CoolingPanel_Simple, ThisCP.EquipID ) ) continue;
+				ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + ThisCP.EquipID + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
 
 		if ( SetLoopIndexFlag( CoolingPanelNum ) ) {
 			if ( allocated( PlantLoop ) ) {
 				errFlag = false;
-				ScanPlantLoopsForObject( CoolingPanel( CoolingPanelNum ).EquipID, CoolingPanel( CoolingPanelNum ).EquipType, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum, CoolingPanel( CoolingPanelNum ).CompNum, _, _, _, _, _, errFlag );
+				ScanPlantLoopsForObject( ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
 				}
@@ -753,10 +755,10 @@ namespace CoolingPanelSimple {
 				MySizeFlagCoolPanel( CoolingPanelNum ) = false;
 				
 				//set design mass flow rates
-				if ( CoolingPanel( CoolingPanelNum ).WaterInletNode > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
-					CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax = rho * CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax;
-					InitComponentNodes( 0.0, CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax, CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterOutletNode, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum, CoolingPanel( CoolingPanelNum ).CompNum );
+				if ( ThisCP.WaterInletNode > 0 ) {
+					rho = GetDensityGlycol( PlantLoop( ThisCP.LoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( ThisCP.LoopNum ).FluidIndex, RoutineName );
+					ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
+					InitComponentNodes( 0.0, ThisCP.WaterMassFlowRateMax, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum );
 				}
 			}
 		}
@@ -765,22 +767,21 @@ namespace CoolingPanelSimple {
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CoolingPanelNum ) ) {
 			// Initialize
-			WaterInletNode = CoolingPanel( CoolingPanelNum ).WaterInletNode;
 
-			rho = GetDensityGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( ThisCP.LoopNum ).FluidName, InitConvTemp, PlantLoop( ThisCP.LoopNum ).FluidIndex, RoutineName );
 
-			CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax = rho * CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax;
+			ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
-			InitComponentNodes( 0.0, CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax, CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterOutletNode, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum, CoolingPanel( CoolingPanelNum ).CompNum );
+			InitComponentNodes( 0.0, ThisCP.WaterMassFlowRateMax, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum );
 
-			Node( WaterInletNode ).Temp = 7.0;
+			ThisInNode.Temp = 7.0;
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( ThisCP.LoopNum ).FluidName, ThisInNode.Temp, PlantLoop( ThisCP.LoopNum ).FluidIndex, RoutineName );
 
-			Node( WaterInletNode ).Enthalpy = Cp * Node( WaterInletNode ).Temp;
-			Node( WaterInletNode ).Quality = 0.0;
-			Node( WaterInletNode ).Press = 0.0;
-			Node( WaterInletNode ).HumRat = 0.0;
+			ThisInNode.Enthalpy = Cp * ThisInNode.Temp;
+			ThisInNode.Quality = 0.0;
+			ThisInNode.Press = 0.0;
+			ThisInNode.HumRat = 0.0;
 
 			ZeroSourceSumHATsurf = 0.0;
 			CoolingPanelSource = 0.0;
@@ -797,7 +798,7 @@ namespace CoolingPanelSimple {
 		}
 
 		if ( BeginTimeStepFlag && FirstHVACIteration ) {
-			ZoneNum = CoolingPanel( CoolingPanelNum ).ZonePtr;
+			ZoneNum = ThisCP.ZonePtr;
 			ZeroSourceSumHATsurf( ZoneNum ) = SumHATsurf( ZoneNum );
 			CoolingPanelSrcAvg( CoolingPanelNum ) = 0.0;
 			LastCoolingPanelSrc( CoolingPanelNum ) = 0.0;
@@ -806,19 +807,18 @@ namespace CoolingPanelSimple {
 		}
 
 		// Do the every time step initializations
-		WaterInletNode = CoolingPanel( CoolingPanelNum ).WaterInletNode;
 		ZoneNode = ZoneEquipConfig( ControlledZoneNumSub ).ZoneNode;
-		CoolingPanel( CoolingPanelNum ).WaterMassFlowRate = Node( WaterInletNode ).MassFlowRate;
-		CoolingPanel( CoolingPanelNum ).WaterInletTemp = Node( WaterInletNode ).Temp;
-		CoolingPanel( CoolingPanelNum ).WaterInletEnthalpy = Node( WaterInletNode ).Enthalpy;
-		CoolingPanel( CoolingPanelNum ).TotPower = 0.0;
-		CoolingPanel( CoolingPanelNum ).Power = 0.0;
-		CoolingPanel( CoolingPanelNum ).ConvPower = 0.0;
-		CoolingPanel( CoolingPanelNum ).RadPower = 0.0;
-		CoolingPanel( CoolingPanelNum ).TotEnergy = 0.0;
-		CoolingPanel( CoolingPanelNum ).Energy = 0.0;
-		CoolingPanel( CoolingPanelNum ).ConvEnergy = 0.0;
-		CoolingPanel( CoolingPanelNum ).RadEnergy = 0.0;
+		ThisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
+		ThisCP.WaterInletTemp = ThisInNode.Temp;
+		ThisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;
+		ThisCP.TotPower = 0.0;
+		ThisCP.Power = 0.0;
+		ThisCP.ConvPower = 0.0;
+		ThisCP.RadPower = 0.0;
+		ThisCP.TotEnergy = 0.0;
+		ThisCP.Energy = 0.0;
+		ThisCP.ConvEnergy = 0.0;
+		ThisCP.RadEnergy = 0.0;
 
 	}
 
