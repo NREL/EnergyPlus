@@ -211,9 +211,7 @@ namespace CoolingPanelSimple {
 		{}
 
 		void
-		CalcCoolingPanel(
-			int const CoolingPanelNum
-		);
+		CalcCoolingPanel( int const CoolingPanelNum );
 		
 		void
 		SetCoolingPanelControlTemp(
@@ -223,6 +221,9 @@ namespace CoolingPanelSimple {
 		
 		bool
 		SizeCoolingPanelUA( );
+
+		void
+		ReportCoolingPanel( );
 		
 	};
 
@@ -278,9 +279,6 @@ namespace CoolingPanelSimple {
 
 	void
 	DistributeCoolingPanelRadGains();
-
-	void
-	ReportCoolingPanel( int const CoolingPanelNum );
 
 	Real64
 	SumHATsurf( int const ZoneNum ); // Zone number

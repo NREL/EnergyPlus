@@ -254,7 +254,7 @@ namespace CoolingPanelSimple {
 
 			UpdateCoolingPanel( CoolingPanelNum );
 
-			ReportCoolingPanel( CoolingPanelNum );
+			CoolingPanel( CoolingPanelNum ).ReportCoolingPanel( );
 
 		} else {
 			ShowFatalError( "SimCoolingPanelSimple: Unit not found=" + EquipName );
@@ -1575,33 +1575,36 @@ namespace CoolingPanelSimple {
 		// Initialize arrays
 		QCoolingPanelSurf = 0.0;
 		QCoolingPanelToPerson = 0.0;
-
+		
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 
-			ZoneNum = CoolingPanel( CoolingPanelNum ).ZonePtr;
+			auto & ThisCP( CoolingPanel( CoolingPanelNum ) );
+			
+			ZoneNum = ThisCP.ZonePtr;
 			if ( ZoneNum <= 0 ) continue;
-			QCoolingPanelToPerson( ZoneNum ) += CoolingPanelSource( CoolingPanelNum ) * CoolingPanel( CoolingPanelNum ).FracDistribPerson;
+			QCoolingPanelToPerson( ZoneNum ) += CoolingPanelSource( CoolingPanelNum ) * ThisCP.FracDistribPerson;
 
-			for ( RadSurfNum = 1; RadSurfNum <= CoolingPanel( CoolingPanelNum ).TotSurfToDistrib; ++RadSurfNum ) {
-				SurfNum = CoolingPanel( CoolingPanelNum ).SurfacePtr( RadSurfNum );
-				if ( Surface( SurfNum ).Area > SmallestArea ) {
-					ThisSurfIntensity = ( CoolingPanelSource( CoolingPanelNum ) * CoolingPanel( CoolingPanelNum ).FracDistribToSurf( RadSurfNum ) / Surface( SurfNum ).Area );
+			for ( RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum ) {
+				SurfNum = ThisCP.SurfacePtr( RadSurfNum );
+				auto & ThisSurf( Surface( SurfNum ) );
+				if ( ThisSurf.Area > SmallestArea ) {
+					ThisSurfIntensity = ( CoolingPanelSource( CoolingPanelNum ) * ThisCP.FracDistribToSurf( RadSurfNum ) / ThisSurf.Area );
 					QCoolingPanelSurf( SurfNum ) += ThisSurfIntensity;
 					// CR 8074, trap for excessive intensity (throws off surface balance )
 					if ( ThisSurfIntensity > MaxRadHeatFlux ) {
 						ShowSevereError( "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected" );
-						ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
-						ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
-						ShowContinueError( "Occurs in " + cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+						ShowContinueError( "Surface = " + ThisSurf.Name );
+						ShowContinueError( "Surface area = " + RoundSigDigits( ThisSurf.Area, 3 ) + " [m2]" );
+						ShowContinueError( "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID );
 						ShowContinueError( "Radiation intensity = " + RoundSigDigits( ThisSurfIntensity, 2 ) + " [W/m2]" );
 						ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple );
 						ShowFatalError( "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected" );
 					}
 				} else {
 					ShowSevereError( "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux" );
-					ShowContinueError( "Surface = " + Surface( SurfNum ).Name );
-					ShowContinueError( "Surface area = " + RoundSigDigits( Surface( SurfNum ).Area, 3 ) + " [m2]" );
-					ShowContinueError( "Occurs in " + cCMO_CoolingPanel_Simple + " = " + CoolingPanel( CoolingPanelNum ).EquipID );
+					ShowContinueError( "Surface = " + ThisSurf.Name );
+					ShowContinueError( "Surface area = " + RoundSigDigits( ThisSurf.Area, 3 ) + " [m2]" );
+					ShowContinueError( "Occurs in " + cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID );
 					ShowContinueError( "Assign a larger surface area or more surfaces in " + cCMO_CoolingPanel_Simple );
 					ShowFatalError( "DistributeCoolingPanelRadGains:  surface not large enough to receive thermal radiation heat flux" );
 
@@ -1613,7 +1616,7 @@ namespace CoolingPanelSimple {
 	}
 
 	void
-	ReportCoolingPanel( int const CoolingPanelNum )
+	CoolingPanelParams::ReportCoolingPanel( )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1625,10 +1628,10 @@ namespace CoolingPanelSimple {
 
 		using DataHVACGlobals::TimeStepSys;
 		
-		CoolingPanel( CoolingPanelNum ).TotEnergy = CoolingPanel( CoolingPanelNum ).TotPower * TimeStepSys * SecInHour;
-		CoolingPanel( CoolingPanelNum ).Energy = CoolingPanel( CoolingPanelNum ).Power * TimeStepSys * SecInHour;
-		CoolingPanel( CoolingPanelNum ).ConvEnergy = CoolingPanel( CoolingPanelNum ).ConvPower * TimeStepSys * SecInHour;
-		CoolingPanel( CoolingPanelNum ).RadEnergy = CoolingPanel( CoolingPanelNum ).RadPower * TimeStepSys * SecInHour;
+		this->TotEnergy  = this->TotPower * TimeStepSys * SecInHour;
+		this->Energy     = this->Power * TimeStepSys * SecInHour;
+		this->ConvEnergy = this->ConvPower * TimeStepSys * SecInHour;
+		this->RadEnergy  = this->RadPower * TimeStepSys * SecInHour;
 
 	}
 
@@ -1669,24 +1672,30 @@ namespace CoolingPanelSimple {
 		SumHATsurf = 0.0;
 
 		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
-			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+			
+			auto & ThisSurf( Surface( SurfNum ) );
+			
+			if ( ! ThisSurf.HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
-			Area = Surface( SurfNum ).Area;
+			Area = ThisSurf.Area;
 
-			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
+			if ( ThisSurf.Class == SurfaceClass_Window ) {
+				
+				auto & ThisSurfWin( SurfaceWindow( SurfNum ) );
+				
+				if ( ThisSurfWin.ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
 					// The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-					Area += SurfaceWindow( SurfNum ).DividerArea;
+					Area += ThisSurfWin.DividerArea;
 				}
 
-				if ( SurfaceWindow( SurfNum ).FrameArea > 0.0 ) {
+				if ( ThisSurfWin.FrameArea > 0.0 ) {
 					// Window frame contribution
-					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * SurfaceWindow( SurfNum ).FrameTempSurfIn;
+					SumHATsurf += HConvIn( SurfNum ) * ThisSurfWin.FrameArea * ( 1.0 + ThisSurfWin.ProjCorrFrIn ) * ThisSurfWin.FrameTempSurfIn;
 				}
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceWindow( SurfNum ).ShadingFlag != IntShadeOn && SurfaceWindow( SurfNum ).ShadingFlag != IntBlindOn ) {
+				if ( ThisSurfWin.DividerArea > 0.0 && ThisSurfWin.ShadingFlag != IntShadeOn && ThisSurfWin.ShadingFlag != IntBlindOn ) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
+					SumHATsurf += HConvIn( SurfNum ) * ThisSurfWin.DividerArea * ( 1.0 + 2.0 * ThisSurfWin.ProjCorrDivIn ) * ThisSurfWin.DividerTempSurfIn;
 				}
 			}
 
