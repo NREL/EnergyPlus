@@ -211,6 +211,11 @@ namespace CoolingPanelSimple {
 		{}
 
 		void
+		CalcCoolingPanel(
+			int const CoolingPanelNum
+		);
+		
+		void
 		SetCoolingPanelControlTemp(
 			Real64 & ControlTemp,
 			int const ZoneNum
@@ -265,11 +270,6 @@ namespace CoolingPanelSimple {
 	bool
  	SizeCoolingPanelUA(
 		int const CoolingPanelNum
-	);
-
-	void
-	CalcCoolingPanel(
-		int & CoolingPanelNum
 	);
 
 	void
