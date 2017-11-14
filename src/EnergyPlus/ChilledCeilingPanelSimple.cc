@@ -1021,15 +1021,13 @@ namespace CoolingPanelSimple {
 		RegisterPlantCompDesignFlow( ThisCP.WaterInletNode, ThisCP.WaterVolFlowRateMax );
 
 		bool SizeCoolingPanelUASuccess;
-		SizeCoolingPanelUASuccess = SizeCoolingPanelUA( CoolingPanelNum );
+		SizeCoolingPanelUASuccess = ThisCP.SizeCoolingPanelUA( );
 		if ( ! SizeCoolingPanelUASuccess ) ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
 
 	}
 
 	bool
-	SizeCoolingPanelUA(
-		int const CoolingPanelNum
-	)
+	CoolingPanelParams::SizeCoolingPanelUA( )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1053,11 +1051,11 @@ namespace CoolingPanelSimple {
 
 		SizeCoolingPanelUA = true;
 		Cp = 4120.0; // Just an approximation, don't need to get an exact number
-		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
+		MDot = this->RatedWaterFlowRate;
 		MDotXCp = Cp * MDot;
-		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
-		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
-		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+		Qrated = this->ScaledCoolingCapacity;
+		Tinletr = this->RatedWaterTemp;
+		Tzoner = this->RatedZoneAirTemp;
 		if ( std::abs( Tinletr - Tzoner ) < 0.5 ) {
 			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * 0.5 ); // Avoid a divide by zero error
 		} else {
@@ -1067,7 +1065,7 @@ namespace CoolingPanelSimple {
 			// close to unity with some graciousness given in case the approximation of Cp causes a problem
 			RatCapToTheoMax = 0.9999;
 		} else if (RatCapToTheoMax >= 1.1 ) {
-			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a cooling capacity that is greater than the maximum possible value." );
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID + "] has a cooling capacity that is greater than the maximum possible value." );
 			ShowContinueError( "The result of this is that a UA value is impossible to calculate." );
 			ShowContinueError( "Check the rated input for temperatures, flow, and capacity for this unit." );
 			ShowContinueError( "The ratio of the capacity to the rated theoretical maximum must be less than unity." );
@@ -1075,17 +1073,17 @@ namespace CoolingPanelSimple {
 			ShowContinueError( "Compare the rated capacity in your input to the product of the rated mass flow rate, Cp of water, and the difference between the rated temperatures." );
 			ShowContinueError( "If the rated capacity is higher than this product, then the cooling panel would violate the Second Law of Thermodynamics." );
 			SizeCoolingPanelUA = false;
-			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+			this->UA = 1.0;
 		}
 		if ( Tinletr >= Tzoner ) {
-			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
 			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
 			SizeCoolingPanelUA = false;
-			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+			this->UA = 1.0;
 		} else {
-			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - RatCapToTheoMax );
-			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-				ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+			this->UA = -MDotXCp * log( 1.0 - RatCapToTheoMax );
+			if ( this->UA <= 0.0 ) {
+				ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + this->EquipID + "] has a zero or negative calculated UA value." );
 				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
 				SizeCoolingPanelUA = false;
 			}

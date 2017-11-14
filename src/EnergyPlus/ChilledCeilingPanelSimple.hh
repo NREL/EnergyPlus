@@ -221,6 +221,9 @@ namespace CoolingPanelSimple {
 			int const ZoneNum
 		);
 		
+		bool
+		SizeCoolingPanelUA( );
+		
 	};
 
 	struct CoolingPanelSysNumericFieldData
@@ -264,11 +267,6 @@ namespace CoolingPanelSimple {
 	);
 
 	void SizeCoolingPanel(
-		int const CoolingPanelNum
-	);
-
-	bool
- 	SizeCoolingPanelUA(
 		int const CoolingPanelNum
 	);
 
