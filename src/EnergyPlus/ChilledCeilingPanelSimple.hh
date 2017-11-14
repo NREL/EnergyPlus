@@ -210,6 +210,12 @@ namespace CoolingPanelSimple {
 			CoolingPanelInletTempFlowReSimIndex( 0 )
 		{}
 
+		void
+		SetCoolingPanelControlTemp(
+			Real64 & ControlTemp,
+			int const ZoneNum
+		);
+		
 	};
 
 	struct CoolingPanelSysNumericFieldData
@@ -265,14 +271,6 @@ namespace CoolingPanelSimple {
 	CalcCoolingPanel(
 		int & CoolingPanelNum
 	);
-
-	void
-	SetCoolingPanelControlTemp(
-		Real64 & ControlTemp,
-		int const CoolingPanelNum,
-		 int const ZoneNum
-	);
-
 
 	void
 	UpdateCoolingPanel( int const CoolingPanelNum );

@@ -1291,7 +1291,7 @@ namespace CoolingPanelSimple {
 			
 			if ( CoolingPanelOn ) {
 			
-				SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
+				CoolingPanel( CoolingPanelNum ).SetCoolingPanelControlTemp( ControlTemp, ZoneNum );
 				
 				SetPointTemp = GetCurrentScheduleValue( CoolingPanel( CoolingPanelNum ).ColdSetptSchedPtr );
 				OffTempCool = SetPointTemp - 0.5 * CoolingPanel( CoolingPanelNum ).ColdThrottlRange;
@@ -1379,9 +1379,8 @@ namespace CoolingPanelSimple {
 	}
 
 	void
-	SetCoolingPanelControlTemp(
+	CoolingPanelParams::SetCoolingPanelControlTemp(
 		Real64 & ControlTemp,
-		int const CoolingPanelNum,
 		int const ZoneNum
 	)
 	{
@@ -1398,7 +1397,7 @@ namespace CoolingPanelSimple {
 		using DataHeatBalance::Zone;
 		using DataHeatBalFanSys::MAT;
 
-		{ auto const SELECT_CASE_var( CoolingPanel( CoolingPanelNum ).ControlType );
+		{ auto const SELECT_CASE_var( this->ControlType );
 			if ( SELECT_CASE_var == MATControl ) {
 				ControlTemp = MAT( ZoneNum );
 			} else if ( SELECT_CASE_var == MRTControl ) {
@@ -1411,7 +1410,7 @@ namespace CoolingPanelSimple {
 				ControlTemp = Zone( ZoneNum ).OutWetBulbTemp;
 			} else { // Should never get here
 				ControlTemp = MAT( ZoneNum );
-				ShowSevereError( "Illegal control type in cooling panel system: " + CoolingPanel( CoolingPanelNum ).EquipID );
+				ShowSevereError( "Illegal control type in cooling panel system: " + this->EquipID );
 				ShowFatalError( "Preceding condition causes termination." );
 			}
 		}
