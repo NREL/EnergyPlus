@@ -1466,17 +1466,22 @@ namespace CoolingPanelSimple {
 		LastSysTimeElapsed( CoolingPanelNum ) = SysTimeElapsed;
 		LastTimeStepSys( CoolingPanelNum ) = TimeStepSys;
 
-		WaterInletNode = CoolingPanel( CoolingPanelNum ).WaterInletNode;
-		WaterOutletNode = CoolingPanel( CoolingPanelNum ).WaterOutletNode;
+		auto & ThisCP( CoolingPanel( CoolingPanelNum ) );
+		
+		WaterInletNode = ThisCP.WaterInletNode;
+		WaterOutletNode = ThisCP.WaterOutletNode;
+		
+		auto & ThisInNode( Node( WaterInletNode ) );
+		auto & ThisOutNode( Node( WaterOutletNode ) );
 
 		// Set the outlet water nodes for the panel
 		SafeCopyPlantNode( WaterInletNode, WaterOutletNode );
-		Node( WaterOutletNode ).Temp = CoolingPanel( CoolingPanelNum ).WaterOutletTemp;
-		Node( WaterOutletNode ).Enthalpy = CoolingPanel( CoolingPanelNum ).WaterOutletEnthalpy;
-		Node( WaterInletNode ).MassFlowRate = CoolingPanel( CoolingPanelNum ).WaterMassFlowRate;
-		Node( WaterOutletNode ).MassFlowRate = CoolingPanel( CoolingPanelNum ).WaterMassFlowRate;
-		Node( WaterInletNode ).MassFlowRateMax = CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax;
-		Node( WaterOutletNode ).MassFlowRateMax = CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax;
+		ThisOutNode.Temp = ThisCP.WaterOutletTemp;
+		ThisOutNode.Enthalpy = ThisCP.WaterOutletEnthalpy;
+		ThisInNode.MassFlowRate = ThisCP.WaterMassFlowRate;
+		ThisOutNode.MassFlowRate = ThisCP.WaterMassFlowRate;
+		ThisInNode.MassFlowRateMax = ThisCP.WaterMassFlowRateMax;
+		ThisOutNode.MassFlowRateMax = ThisCP.WaterMassFlowRateMax;
 
 	}
 
