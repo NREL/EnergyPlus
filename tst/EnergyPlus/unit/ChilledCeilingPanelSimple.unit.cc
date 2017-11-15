@@ -161,4 +161,27 @@ namespace EnergyPlus {
 		EXPECT_EQ( SizeCoolingPanelUASuccess, false );
 		
 	}
+	
+	TEST_F( EnergyPlusFixture, ReportCoolingPanel )
+	{
+		int CoolingPanelNum; // Cooling panel number
+		
+		CoolingPanelNum = 1;
+		
+		CoolingPanelSimple::CoolingPanel.allocate( CoolingPanelNum );
+		
+		// Test the new output for running the values through the Report subroutine
+		CoolingPanel( CoolingPanelNum ).TotPower  = -10.0;
+		CoolingPanel( CoolingPanelNum ).Power = -9.0;
+		CoolingPanel( CoolingPanelNum ).ConvPower = -4.0;
+		CoolingPanel( CoolingPanelNum ).RadPower  = -5.0;
+		CoolingPanel( CoolingPanelNum ).ReportCoolingPanel( );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).TotPower, 10.0, 1.0 );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).Power, 9.0, 1.0 );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).ConvPower, 4.0, 1.0 );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).RadPower, 5.0, 1.0 );
+		
+	}
+
 }
+

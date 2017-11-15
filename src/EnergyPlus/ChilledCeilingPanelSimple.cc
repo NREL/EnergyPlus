@@ -1630,6 +1630,16 @@ namespace CoolingPanelSimple {
 
 		using DataHVACGlobals::TimeStepSys;
 		
+		// All of the power numbers are negative for cooling.  This is because they will have a negative
+		// or cooling impact on the surfaces/zones.  However, the output variables are noted as cooling.
+		// So, their sign should be positive if actually cooling and we need to reverse the sign here.
+		// This should not have an impact on any of the internal variables or the heat balances because
+		// those use other variables.
+		this->TotPower  = -this->TotPower;
+		this->Power     = -this->Power;
+		this->ConvPower = -this->ConvPower;
+		this->RadPower  = -this->RadPower;
+
 		this->TotEnergy  = this->TotPower * TimeStepSys * SecInHour;
 		this->Energy     = this->Power * TimeStepSys * SecInHour;
 		this->ConvEnergy = this->ConvPower * TimeStepSys * SecInHour;
