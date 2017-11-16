@@ -213,9 +213,10 @@ However, this could lead to many variables (16+) needed in the function call.
 
 It may be better to pass an array of variables to minimize the function parameters:
 
-    CalcSZVAVModel( EquipType, EquipName, QZnReq, SZVAVInputs );
+    CalcSZVAVModel( EquipType, EquipName, QZnReq, SZVAVInputs, SZVAVOutputs );
     where:
     SZVAVInputs = an Array1D of all necessary information.
+    SZVAVOutputs = an Array1D of information passed back to the model
 
 Within the common routine would be a segregation of equipment types. For example, where an equipment model would need to be called, the calc routine specific to the equipment type is called.
 
@@ -425,14 +426,13 @@ Similar changes to ZoneHVAC:PackagedTerminalHeatPump.<br>
          \key SingleZoneVAV
          \default None
     N7 , \field Minimum Supply Air Temperature in Cooling Mode
-         \note For Capacity Control Method = SingleZoneVAV, enter the minimum air temperature in cooling mode.
-         \note When Control Type = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed.
+         \note For Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed.
          \type real
          \minimum 0.0
          \autosizable
          \default autosize
     N8 ; \field Maximum Supply Air Temperature in Heating Mode
-         \note For Capacity Control Method = SingleZoneVAV, enter the maximum air temperature in heating mode.
+         \note For Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed.
          \type real
          \minimum 0.0
          \autosizable
@@ -456,6 +456,55 @@ No transition required unless fields are inserted within existing object fields.
 
 NA
 
+## Design Document ##
 
+Lines 7126-7531 of HVACUnitarySystem.cc contain the latest model for SZVAV. This code will be moved to a unique function and revised to make all equipment specific data available for read/write.
+
+For example:
+
+The code at lines 7126-7531 will be moved to function CalcSZVAVModel. The function parameters for input and output will be passed using arrays. A reference to the equipment model array will also be passed to allow read/write of data to specific equipment models. The code in UnitarySystem starts like this. As you can see, the member variables are already set to local variables for use in the model. This is good and can preface the call to the common function in any equipment model. These variables will be written to the SZVAVInputs array as discussed later.
+
+		// use the ASHRAE 90.1 method of reduced fan speed at low loads
+		if ( UnitarySystem( UnitarySysNum ).simASHRAEModel ) {
+
+			// set up mode specific variables to use in common function calls
+			if ( CoolingLoad ) {
+				maxCoilFluidFlow = UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow;
+				maxOutletTemp = UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout;
+				minAirMassFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirMassFlow;
+				maxAirMassFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow;
+				lowSpeedFanRatio = UnitarySystem( UnitarySysNum ).LowSpeedCoolFanRatio;
+				coilFluidInletNode = UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode;
+				coilFluidOutletNode = UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum;
+				coilLoopNum = UnitarySystem( UnitarySysNum ).CoolCoilLoopNum;
+
+However, there are places where information needs to be passed to the model in other locations within the equipment model code. For example, in this section of the existing SZVAV model, a member variable (*CoilWaterFlowRatio) is set so it can be used elsewhere:
+
+			if ( CoolingLoad ) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
+				// set the water flow ratio so water coil gets proper flow
+				UnitarySystem( UnitarySysNum ).CoolCoilWaterFlowRatio = maxCoilFluidFlow / UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow;
+				CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+			} else {
+				UnitarySystem( UnitarySysNum ).HeatCoilWaterFlowRatio = maxCoilFluidFlow / UnitarySystem( UnitarySysNum ).MaxHeatCoilFluidFlow;
+				CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+			}
+
+
+To write to equipment model member variables, a reference to the member array would need to be passed to the function.
+
+    auto & SZVAVModel( FanCoil[ FanCoilNum ] );
+    auto & SZVAVModel( UnitarySystem[ UnitarySystemNum ] );
+    auto & SZVAVModel( PTUnit[ PTUnitNum ] );
+
+Where this reference would be passed to the function as an argument:
+
+    void CalcSZVAVModel( 
+        Array1D< Real64 > SZVAVModel, // reference to equipment model
+        static Array1D< Real64 > SZVAVInputs, // SZVAV inputs
+        <Array1D< Real64 > SZVAVOutputs ) {} // SZVAV outputs
+
+This use of a reference would require that the member variable names in FourPipeFanCoil, UnitarySystem, and PTUnit match. This method would also reduce or eliminate the size of or need for SZVAVInputs and SZVAVOutputs.
+
+Once the common function is operational in UnitarySystem, the call to this new function will be added to the packaged terminal unit model.
 
 
