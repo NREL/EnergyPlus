@@ -232,7 +232,7 @@
     USE Heat Supply Heating Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowSupplyUnMixedDemandMixed,  !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     HeatingSetpointModulated,!- Control Type
     Use heat Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -430,7 +430,7 @@
     USE Cool Supply Cooling Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowBothUnMixed,    !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     CoolingSetpointModulated,!- Control Type
     Use Cool Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -640,7 +640,7 @@
     TRANSFER Supply Heating Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     ParallelFlow,            !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     HeatingSetpointModulated,!- Control Type
     TRANSFER Supply Heating Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -670,7 +670,7 @@
     TRANSFER Supply Cooling Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     ParallelFlow,            !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     CoolingSetpointModulated,!- Control Type
     TRANSFER Supply Cooling Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}

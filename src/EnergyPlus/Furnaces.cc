@@ -400,6 +400,7 @@ namespace Furnaces {
 		HXUnitOn = false;
 		OnOffAirFlowRatio = 0.0;
 		// here we need to deal with sequenced zone equip
+		ZoneLoad = 0.0;
 		if ( Furnace( FurnaceNum ).ZoneSequenceCoolingNum > 0 && Furnace( FurnaceNum ).ZoneSequenceHeatingNum > 0 ) {
 			ZoneLoadToCoolSPSequenced = ZoneSysEnergyDemand( Furnace( FurnaceNum ).ControlZoneNum ).SequencedOutputRequiredToCoolingSP( Furnace( FurnaceNum ).ZoneSequenceCoolingNum );
 			ZoneLoadToHeatSPSequenced = ZoneSysEnergyDemand( Furnace( FurnaceNum ).ControlZoneNum ).SequencedOutputRequiredToHeatingSP( Furnace( FurnaceNum ).ZoneSequenceHeatingNum );
@@ -4427,7 +4428,6 @@ namespace Furnaces {
 		// calculation (kg/kg)
 		Real64 DeltaMassRate; // Difference of mass flow rate between
 		// inlet node and system outlet node
-		int i; // index to get the zone inlet node
 		Real64 MassFlowRate; // mass flow rate to calculate loss
 		Real64 MaxTemp; // Maximum temperature used in latent loss calculation
 		std::string FanType; // used in warning messages
@@ -4439,7 +4439,6 @@ namespace Furnaces {
 		static bool FlowFracFlagReady( true ); // one time flag for calculating flow fraction through controlled zone
 		static Real64 SumOfMassFlowRateMax( 0.0 ); // the sum of mass flow rates at inlet to zones in an airloop
 		static Real64 CntrlZoneTerminalUnitMassFlowRateMax( 0.0 ); // Maximum mass flow rate through controlled zone terminal unit
-		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
 
 		static bool ErrorsFound( false ); // flag returned from mining call
 		static Real64 mdot( 0.0 ); // local temporary for mass flow rate (kg/s)
@@ -4719,22 +4718,19 @@ namespace Furnaces {
 		}
 
 		if ( allocated( ZoneEquipConfig ) && MyCheckFlag( FurnaceNum ) ) {
-			for ( i = 1; i <= NumOfZones; ++i ) {
-				if ( Furnace( FurnaceNum ).ControlZoneNum == ZoneEquipConfig( i ).ActualZoneNum ) {
-					//setup furnace zone equipment sequence information based on finding an air terminal
-					if ( ZoneEquipConfig( i ).EquipListIndex > 0 ) {
-						for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
-							if ( ( ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).EquipType_Num( EquipNum ) == AirDistUnit_Num ) || ( ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).EquipType_Num( EquipNum ) == DirectAir_Num ) ) {
-								Furnace( FurnaceNum ).ZoneSequenceCoolingNum = ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).CoolingPriority( EquipNum );
-								Furnace( FurnaceNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).HeatingPriority( EquipNum );
-							}
-						}
-					}
-				}
+			int zoneNum = Zone( Furnace( FurnaceNum ).ControlZoneNum ).ZoneEqNum;
+			int zoneInlet = Furnace( FurnaceNum ).ZoneInletNode;
+			int coolingPriority = 0;
+			int heatingPriority = 0;
+			//setup furnace zone equipment sequence information based on finding matching air terminal
+			if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
+				ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
+				Furnace( FurnaceNum ).ZoneSequenceCoolingNum = coolingPriority;
+				Furnace( FurnaceNum ).ZoneSequenceHeatingNum = heatingPriority;
 			}
 			MyCheckFlag( FurnaceNum ) = false;
-			if ( Furnace( FurnaceNum ).ZoneInletNode == 0 ) {
-				ShowSevereError( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\": The zone inlet node in the controlled zone (" + Zone( Furnace( FurnaceNum ).ControlZoneNum ).Name + ") is not found." );
+			if ( Furnace( FurnaceNum ).ZoneSequenceCoolingNum == 0 ) {
+				ShowSevereError( cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " \"" + Furnace( FurnaceNum ).Name + "\": No matching air terminal found in the zone equipment list for zone = " + Zone( Furnace( FurnaceNum ).ControlZoneNum ).Name + "." );
 				ShowFatalError( "Subroutine InitFurnace: Errors found in getting " + cFurnaceTypes( Furnace( FurnaceNum ).FurnaceType_Num ) + " input.  Preceding condition(s) causes termination." );
 			}
 		}
@@ -4951,7 +4947,7 @@ namespace Furnaces {
 						};
 
 						// Check flow rates in other speeds and ensure flow rates are not above the max flow rate
-						for ( i = NumOfSpeedCooling - 1; i >= 1; --i ) {
+						for ( int i = NumOfSpeedCooling - 1; i >= 1; --i ) {
 							if ( Furnace( FurnaceNum ).CoolVolumeFlowRate( i ) > Furnace( FurnaceNum ).CoolVolumeFlowRate( i + 1 ) ) {
 								ShowContinueError( " The MSHP system flow rate when cooling is required is reset to the flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
 								ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + Furnace( FurnaceNum ).Name );
@@ -4972,7 +4968,7 @@ namespace Furnaces {
 								IntegratedHeatPumps( Furnace( FurnaceNum ).CoolingCoilIndex ).MaxHeatAirMassFlow = Furnace( FurnaceNum ).FanVolFlow * StdRhoAir;
 							};
 
-							for ( i = NumOfSpeedHeating - 1; i >= 1; --i ) {
+							for ( int i = NumOfSpeedHeating - 1; i >= 1; --i ) {
 								if ( Furnace( FurnaceNum ).HeatVolumeFlowRate( i ) > Furnace( FurnaceNum ).HeatVolumeFlowRate( i + 1 ) ) {
 									ShowContinueError( " The MSHP system flow rate when heating is required is reset to the flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
 									ShowContinueError( " Occurs in " + CurrentModuleObject + " system = " + Furnace( FurnaceNum ).Name );
@@ -4989,13 +4985,13 @@ namespace Furnaces {
 					}
 					RhoAir = StdRhoAir;
 					// set the mass flow rates from the reset volume flow rates
-					for ( i = 1; i <= NumOfSpeedCooling; ++i ) {
+					for ( int i = 1; i <= NumOfSpeedCooling; ++i ) {
 						Furnace( FurnaceNum ).CoolMassFlowRate( i ) = RhoAir * Furnace( FurnaceNum ).CoolVolumeFlowRate( i );
 						if ( Furnace( FurnaceNum ).FanVolFlow > 0.0 ) {
 							Furnace( FurnaceNum ).MSCoolingSpeedRatio( i ) = Furnace( FurnaceNum ).CoolVolumeFlowRate( i ) / Furnace( FurnaceNum ).FanVolFlow;
 						}
 					}
-					for ( i = 1; i <= NumOfSpeedHeating; ++i ) {
+					for ( int i = 1; i <= NumOfSpeedHeating; ++i ) {
 						Furnace( FurnaceNum ).HeatMassFlowRate( i ) = RhoAir * Furnace( FurnaceNum ).HeatVolumeFlowRate( i );
 						if ( Furnace( FurnaceNum ).FanVolFlow > 0.0 ) {
 							Furnace( FurnaceNum ).MSHeatingSpeedRatio( i ) = Furnace( FurnaceNum ).HeatVolumeFlowRate( i ) / Furnace( FurnaceNum ).FanVolFlow;
@@ -5034,6 +5030,8 @@ namespace Furnaces {
 		// Check ventilation/fan load for constant fan systems to see if load to be met changes
 		// Same IF logic used in Subroutine SetAverageAirFlow to determine if unit is ON or OFF
 
+		QToCoolSetPt = 0.0;
+		QToHeatSetPt = 0.0;
 		if ( OpMode == ContFanCycCoil && GetCurrentScheduleValue( Furnace( FurnaceNum ).SchedPtr ) > 0.0 && ( ( GetCurrentScheduleValue( Furnace( FurnaceNum ).FanAvailSchedPtr ) > 0.0 || TurnFansOn ) && !TurnFansOff ) ) {
 
 			if ( Furnace( FurnaceNum ).NumOfSpeedCooling > 0 ) {

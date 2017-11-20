@@ -1094,7 +1094,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_4,                  !- Zone Air Node Name
-    NODE_5;                  !- Zone Return Air Node Name
+    NODE_5;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1102,7 +1102,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_6,                  !- Zone Air Node Name
-    NODE_7;                  !- Zone Return Air Node Name
+    NODE_7;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1110,10 +1110,11 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_8,                  !- Zone Air Node Name
-    NODE_9;                  !- Zone Return Air Node Name
+    NODE_9;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1121,6 +1122,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone2Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1128,6 +1130,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone3Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1160,7 +1163,7 @@
     ,                        !- Outdoor Air Economizer Type
     ,                        !- Heat Recovery Type
     ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
-    ;                        !- Design Specification ZoneHVAC Sizing Object Name
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone2Air,                !- Name
@@ -1189,7 +1192,7 @@
     ,                        !- Outdoor Air Economizer Type
     ,                        !- Heat Recovery Type
     ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
-    ;                        !- Design Specification ZoneHVAC Sizing Object Name
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone3Air,                !- Name
@@ -1218,7 +1221,7 @@
     ,                        !- Outdoor Air Economizer Type
     ,                        !- Heat Recovery Type
     ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
-    ;                        !- Design Specification ZoneHVAC Sizing Object Name
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
 
   NodeList,
     Zone1Inlets,             !- Name
