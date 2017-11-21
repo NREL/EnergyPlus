@@ -102,7 +102,7 @@ namespace DataSystemVariables {
 
 	std::string const DDOnlyEnvVar( "DDONLY" ); // Only run design days
 	std::string const ReverseDDEnvVar( "REVERSEDD" ); // Reverse DD during run
-	std::string const DisableCachingEnvVar( "DISABLECACHING" );
+	std::string const DisableGLHECachingEnvVar( "DISABLEGLHECACHING" );
 	std::string const FullAnnualSimulation( "FULLANNUALRUN" ); // Generate annual run
 	std::string const cDeveloperFlag( "DeveloperFlag" );
 	std::string const cDisplayAllWarnings( "DisplayAllWarnings" );
@@ -144,7 +144,7 @@ namespace DataSystemVariables {
 	// MODULE VARIABLE DECLARATIONS:
 	bool DDOnly( false ); // TRUE if design days (sizingperiod:*) only are to be run.
 	bool ReverseDD( false ); // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
-	bool DisableCaching( false ); // TRUE if caching is to be disabled, for example, during unit tests.
+	bool DisableGLHECaching( false ); // TRUE if caching is to be disabled, for example, during unit tests.
 	bool FullAnnualRun( false ); // TRUE if full annual simulation is to be run.
 	bool DeveloperFlag( false ); // TRUE if developer flag is turned on. (turns on more displays to console)
 	bool TimingFlag( false ); // TRUE if timing flag is turned on. (turns on more timing displays to console)

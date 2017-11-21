@@ -176,7 +176,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc )
 	// Situation when correction is applied
 	thisGLHE.myRespFactors->gRefRatio = 2.0;
 	thisGFunc = thisGLHE.getGFunc( time );
-	EXPECT_NEAR( 2.5 + 0.6931, thisGFunc, 0.0001);
+	EXPECT_NEAR( 2.5 + 0.6931, thisGFunc, 0.0001 );
 
 }
 
@@ -248,7 +248,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchange
 
 TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check )
 {
-	std::string const idf_objects = delimited_string({
+	std::string const idf_objects = delimited_string( {
 		"GroundHeatExchanger:Vertical:Properties,",
 		"	GHE-1 Props,        !- Name",
 		"	1,                  !- Depth of Top of Borehole {m}",
@@ -261,7 +261,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check )
 		"	0.0267,             !- Pipe Outer Diameter {m}",
 		"	0.00243,            !- Pipe Thickness {m}",
 		"	0.04556;            !- U-Tube Distance {m}"
-	});
+	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
@@ -287,7 +287,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check )
 
 TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check )
 {
-	std::string const idf_objects = delimited_string({
+	std::string const idf_objects = delimited_string( {
 		"GroundHeatExchanger:Vertical:Properties,",
 		"	GHE-1 Props,        !- Name",
 		"	1,                  !- Depth of Top of Borehole {m}",
@@ -481,7 +481,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check
 
 TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Check )
 {
-	std::string const idf_objects = delimited_string({
+	std::string const idf_objects = delimited_string( {
 		"GroundHeatExchanger:Vertical:Properties,",
 		"	GHE-1 Props,        !- Name",
 		"	1,                  !- Depth of Top of Borehole {m}",
@@ -519,7 +519,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Che
 
 TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_IDF_Check )
 {
-	std::string const idf_objects = delimited_string({
+	std::string const idf_objects = delimited_string( {
 		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
 		"	KATemps,                 !- Name",
 		"	1.8,                     !- Soil Thermal Conductivity {W/m-K}",
@@ -781,7 +781,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check 
 		"	2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
 		"	,					!- Response Factors Object Name",
 		"	GHE-Array;			!- !- GHE Array Object Name"
-	});
+	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
@@ -873,7 +873,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_C
 		"	GHE-2,              !- GHE Borehole Definition 2",
 		"	GHE-3,              !- GHE Borehole Definition 3",
 		"	GHE-4;              !- GHE Borehole Definition 4"
-	});
+	} );
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
@@ -1192,7 +1192,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check )
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -1300,7 +1300,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_r
 		"	GHE-Array;          !- GHE Array Object Name"
 	} );
 
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
@@ -1361,7 +1361,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor )
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -1677,7 +1677,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_r
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -1982,7 +1982,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance )
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -2279,7 +2279,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -2578,7 +2578,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -2877,7 +2877,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -3176,7 +3176,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalRes
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -3475,7 +3475,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalRes
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );
@@ -3774,7 +3774,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalRes
 	} );
 
 	// Envr variable
-	DisableCaching = true;
+	DisableGLHECaching = true;
 
 	// Setup
 	ASSERT_FALSE( process_idf( idf_objects ) );

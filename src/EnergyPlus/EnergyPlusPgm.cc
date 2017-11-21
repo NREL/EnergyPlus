@@ -311,8 +311,8 @@ EnergyPlusPgm( std::string const & filepath )
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
 	ReverseDD = env_var_on( cEnvValue ); // Yes or True
 
-	get_environment_variable( DisableCachingEnvVar, cEnvValue );
-	DisableCaching = env_var_on( cEnvValue ); // Yes or True
+	get_environment_variable( DisableGLHECachingEnvVar, cEnvValue );
+	DisableGLHECaching = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
@@ -349,7 +349,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
-	if ( DisableCaching ) ReportDuringWarmup = true; // force to true for standard runs runs
+	if ( DisableGLHECaching ) ReportDuringWarmup = true; // force to true for standard runs runs
 
 	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
 	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True

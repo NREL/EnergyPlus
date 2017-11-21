@@ -68585,7 +68585,11 @@ FluidCooler:TwoSpeed,
        \type node
 
 GroundHeatExchanger:System,
+        \memo Models vertical ground heat exchangers systems using the response factor approach
+        \memo developed by Eskilson. Response factors are calculated using a finite line source
+        \memo model assuming uniform heat flux at the borehole wall.
         \extensible:1
+        \min-fields 9
   A1,   \field Name
         \required-field
         \type alpha
@@ -68936,6 +68940,8 @@ GroundHeatExchanger:System,
         \object-list GroundHeatExchangerVerticalSingleNames
 
 GroundHeatExchanger:Vertical:Properties,
+        \memo Properties for vertical ground heat exchanger systems
+        \min-fields 11
   A1,   \field Name
         \required-field
         \type alpha
@@ -69035,7 +69041,9 @@ GroundHeatExchanger:Vertical:Single,
         \units m
 
 GroundHeatExchanger:ResponseFactors,
+        \memo Response factor definitions from third-party tool, commonly referred to a "g-functions"
         \extensible:2
+        \min-fields 5
   A1,   \field Name
         \required-field
         \type alpha

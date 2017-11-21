@@ -324,6 +324,15 @@ namespace GroundHeatExchangers {
 		Real64
 		interpGFunc( Real64 );
 
+		void
+		makeThisGLHECacheAndCompareWithFileCache();
+
+		virtual void
+		makeThisGLHECacheStruct()=0;
+
+		virtual void
+		readCacheFileAndCompareWithThisGLHECache()=0;
+
 		void onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
 
 		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
@@ -427,13 +436,13 @@ namespace GroundHeatExchangers {
 		);
 
 		void
-		makeCache();
+		makeThisGLHECacheStruct();
 
 		void
-		readCache();
+		readCacheFileAndCompareWithThisGLHECache();
 
 		void
-		writeCache();
+		writeGLHECacheToFile();
 
 		Real64
 		calcBHAverageResistance();
@@ -587,6 +596,12 @@ namespace GroundHeatExchangers {
 		getGFunc(
 			Real64 const time
 		);
+
+		void
+		makeThisGLHECacheStruct();
+
+		void
+		readCacheFileAndCompareWithThisGLHECache();
 
 	};
 
