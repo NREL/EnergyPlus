@@ -1441,7 +1441,7 @@
     Core_ZN Inlet Nodes,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_ZN Air Node,        !- Zone Air Node Name
-    Core_ZN Return Air Node Name;  !- Zone Return Air Node Name
+    Core_ZN Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Core_ZN Inlet Nodes,     !- Name
@@ -1449,6 +1449,7 @@
 
   ZoneHVAC:EquipmentList,
     Core_ZN Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Core_ZN Direct Air,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1924,7 +1925,7 @@
     Perimeter_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_1 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_1 Inlet Nodes,  !- Name
@@ -1932,6 +1933,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2304,7 +2306,7 @@
     Perimeter_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_2 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_2 Inlet Nodes,  !- Name
@@ -2312,6 +2314,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_2 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2716,7 +2719,7 @@
     Perimeter_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_3 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_3 Inlet Nodes,  !- Name
@@ -2724,6 +2727,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3096,7 +3100,7 @@
     Perimeter_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_4 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_4 Inlet Nodes,  !- Name
@@ -3104,6 +3108,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5191,7 +5196,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerPeakEnergyCharge,  !- Name
+    SummerPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     PeakEnergy,              !- Source Variable
     Summer,                  !- Season
@@ -5199,7 +5204,7 @@
     0.0858;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakEnergyCharge,  !- Name
+    SummerOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Summer,                  !- Season
@@ -5207,7 +5212,7 @@
     0.0484;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderEnergyCharge,  !- Name
+    SummerShoulderEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     ShoulderEnergy,          !- Source Variable
     Summer,                  !- Season
@@ -5215,7 +5220,7 @@
     0.0706;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -5223,7 +5228,7 @@
     0.04925;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DeferredAccountingEnergyCharge,  !- Name
+    DeferredAccountingEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5231,7 +5236,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FacilitiesDemandCharge,  !- Name
+    FacilitiesDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5239,7 +5244,7 @@
     2.94;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterDemandCharge,      !- Name
+    WinterDemandCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Winter,                  !- Season
@@ -5247,7 +5252,7 @@
     0.50;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeakDemandCharge,!- Name
+    SummerOnPeakDemandCharge,!- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     PeakDemand,              !- Source Variable
     Summer,                  !- Season
@@ -5255,7 +5260,7 @@
     8.36;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderDemandCharge,  !- Name
+    SummerShoulderDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     ShoulderDemand,          !- Source Variable
     Summer,                  !- Season
@@ -5263,7 +5268,7 @@
     0.43;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand1000kw,         !- Name
+    MinDemand1000kw,         !- Utility Cost Qualify Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5273,7 +5278,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Qualify,
-    MinEnergy3500kwh,        !- Name
+    MinEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5283,7 +5288,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5333,7 +5338,7 @@
     Until: 24:00,3;          !- Field 11
 
   UtilityCost:Charge:Simple,
-    SummerPeakEnergyCharge,  !- Name
+    SummerPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     PeakEnergy,              !- Source Variable
     Summer,                  !- Season
@@ -5341,7 +5346,7 @@
     0.0889;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakEnergyCharge,  !- Name
+    SummerOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Summer,                  !- Season
@@ -5349,7 +5354,7 @@
     0.0502;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderEnergyCharge,  !- Name
+    SummerShoulderEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     ShoulderEnergy,          !- Source Variable
     Summer,                  !- Season
@@ -5357,7 +5362,7 @@
     0.0725;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -5365,7 +5370,7 @@
     0.0509;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DeferredAccountingEnergyCharge,  !- Name
+    DeferredAccountingEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5373,7 +5378,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FacilitiesDemandCharge,  !- Name
+    FacilitiesDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5381,7 +5386,7 @@
     2.74;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterDemandCharge,      !- Name
+    WinterDemandCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Winter,                  !- Season
@@ -5389,7 +5394,7 @@
     0.25;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeakDemandCharge,!- Name
+    SummerOnPeakDemandCharge,!- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     PeakDemand,              !- Source Variable
     Summer,                  !- Season
@@ -5397,7 +5402,7 @@
     7.16;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderDemandCharge,  !- Name
+    SummerShoulderDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     ShoulderDemand,          !- Source Variable
     Summer,                  !- Season
@@ -5405,7 +5410,7 @@
     0.39;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand300kw,          !- Name
+    MinDemand300kw,          !- Utility Cost Qualify Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5415,7 +5420,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Qualify,
-    MinEnergy3500kwh,        !- Name
+    MinEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5425,7 +5430,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Qualify,
-    MaxDemand1000kw,         !- Name
+    MaxDemand1000kw,         !- Utility Cost Qualify Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5435,7 +5440,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5461,7 +5466,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualElectConsumpCharge,!- Name
+    AnnualElectConsumpCharge,!- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5469,7 +5474,7 @@
     0.0646;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualDefferredAccountingCharge,  !- Name
+    AnnualDefferredAccountingCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5477,7 +5482,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualFacilitiesDemandCharge,  !- Name
+    AnnualFacilitiesDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5485,7 +5490,7 @@
     3.77;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualDemandCharge,      !- Name
+    AnnualDemandCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5493,7 +5498,7 @@
     1.1;                     !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand300kw,          !- Name
+    MaxDemand300kw,          !- Utility Cost Qualify Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5503,7 +5508,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Qualify,
-    MinEnergy3500kwh,        !- Name
+    MinEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5513,7 +5518,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5539,7 +5544,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualElectConsumpCharge,!- Name
+    AnnualElectConsumpCharge,!- Utility Cost Charge Simple Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5547,7 +5552,7 @@
     0.0783;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualDefferredAccountingCharge,  !- Name
+    AnnualDefferredAccountingCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5555,7 +5560,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand300kw,          !- Name
+    MaxDemand300kw,          !- Utility Cost Qualify Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5565,7 +5570,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Qualify,
-    MaxEnergy3500kwh,        !- Name
+    MaxEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5575,7 +5580,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5601,7 +5606,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     NV_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5626,7 +5631,7 @@
     7.24;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NV_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5777,9 +5782,10 @@
 
   Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;
 
-  Output:Variable,*,SURFACE CONSTRUCTION INDEX ,timestep;
+  Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;
 
-  Output:Diagnostics, DisplayAdvancedReportVariables;
+  Output:Diagnostics,
+    DisplayAdvancedReportVariables;  !- Key 1
 
 !  Thermochromic Window Constructions and Erl pointer variables.
 

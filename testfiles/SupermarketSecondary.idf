@@ -56,7 +56,7 @@
 !           block covered with gypsum board on each surface. The roof is a built up roof with 1/2 in slag over 3/8 in
 !           felt and membrane with R-11 insulation over 6 in lightweight concrete, an air gap separates the interior
 !           acoustical tiles. The windows are single pane 6mm clear and double pane 6mm clear with 6mm air gap.
-!           The window to wall ratio is approxomately 0.0016.
+!           The window to wall ratio is approximately 0.0016.
 !
 !           The building is oriented due north with front of building facing east.
 !
@@ -1420,6 +1420,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1427,6 +1428,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1440,7 +1442,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SalesFloor Node,         !- Zone Air Node Name
-    SalesFloor Outlet Node;  !- Zone Return Air Node Name
+    SalesFloor Outlet Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     BackRoom,                !- Zone Name
@@ -1448,7 +1450,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     BackRoom Node,           !- Zone Air Node Name
-    BackRoom Outlet Node;    !- Zone Return Air Node Name
+    BackRoom Outlet Node;    !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -2731,7 +2733,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:SATURATED ===========
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     PRESSURE,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2755,7 +2757,7 @@
     0.3664E+07,0.3810E+07,0.3961E+07,0.4116E+07,0.4277E+07,0.4990E+07;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2779,7 +2781,7 @@
     0.3104E+06,0.3143E+06,0.3183E+06,0.3225E+06,0.3271E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2803,7 +2805,7 @@
     0.4120E+06,0.4107E+06,0.4091E+06,0.4072E+06,0.4048E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2827,7 +2829,7 @@
     0.8937E+03,0.8754E+03,0.8555E+03,0.8335E+03,0.8088E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2851,7 +2853,7 @@
     0.1954E+03,0.2083E+03,0.2227E+03,0.2390E+03,0.2579E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2875,7 +2877,7 @@
     0.2181E+04,0.2340E+04,0.2550E+04,0.2840E+04,0.3272E+04,0.0000E+00;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -5558,7 +5560,7 @@
     27.85,28.85,29.85,30.35,30.85,30.95;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Pressure,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -5569,7 +5571,7 @@
     6.8683E+06,7.0268E+06,7.1890E+06,7.2700E+06,7.3555E+06,7.3725E+06;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -5580,7 +5582,7 @@
     2.8875E+05,2.9502E+05,3.0305E+05,3.0865E+05,3.1836E+05,3.2341E+05;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -5591,7 +5593,7 @@
     3.8205E+05,3.7573E+05,3.6687E+05,3.6023E+05,3.4794E+05,3.4148E+05;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Density,                 !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -5602,7 +5604,7 @@
     6.5869E+02,6.3369E+02,5.9986E+02,5.7509E+02,5.3030E+02,5.0687E+02;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Density,                 !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -5613,7 +5615,7 @@
     2.8615E+02,3.0815E+02,3.3900E+02,3.6232E+02,4.0642E+02,4.3064E+02;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -5624,7 +5626,7 @@
     1.1053E+04,1.5786E+04,3.0233E+04,5.8411E+04,3.8691E+05,2.1906E+06;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name

@@ -22,7 +22,7 @@
 !           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
-!           The windows are double pane 6mm clear with 6mm air gap.  The window to wall ratio is approxomately 0.29.
+!           The windows are double pane 6mm clear with 6mm air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -140,14 +140,14 @@
     Sys 1 Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    23125.6,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    23125.6,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
     0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -160,7 +160,7 @@
     EIR VS WaterFrac Test,   !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -173,7 +173,7 @@
     EIR VS WaterFrac Test,   !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -186,7 +186,7 @@
     EIR VS WaterFrac Test,   !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -199,7 +199,7 @@
     EIR VS WaterFrac Test,   !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -212,7 +212,7 @@
     EIR VS WaterFrac Test,   !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -225,7 +225,7 @@
     EIR VS WaterFrac Test,   !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -238,7 +238,7 @@
     EIR VS WaterFrac Test,   !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -251,7 +251,7 @@
     EIR VS WaterFrac Test,   !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -264,7 +264,7 @@
     EIR VS WaterFrac Test,   !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -286,11 +286,11 @@
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    19156.73,                !- Rated Heating Capacity At Selected Nominal Speed Level {w}
+    19156.73,                !- Rated Heating Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
+    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
@@ -302,7 +302,7 @@
     EIRH VS WaterFrac Test,  !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
-    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
+    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
@@ -314,7 +314,7 @@
     EIRH VS WaterFrac Test,  !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
+    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
@@ -326,7 +326,7 @@
     EIRH VS WaterFrac Test,  !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
-    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
+    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
@@ -338,7 +338,7 @@
     EIRH VS WaterFrac Test,  !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
-    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
+    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
@@ -350,7 +350,7 @@
     EIRH VS WaterFrac Test,  !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
-    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
+    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
@@ -362,7 +362,7 @@
     EIRH VS WaterFrac Test,  !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
-    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
+    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
@@ -374,7 +374,7 @@
     EIRH VS WaterFrac Test,  !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
-    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
+    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
@@ -386,7 +386,7 @@
     EIRH VS WaterFrac Test,  !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
-    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
+    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
@@ -398,7 +398,7 @@
     EIRH VS WaterFrac Test,  !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
-    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
+    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
@@ -448,14 +448,14 @@
     Sys 2 Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    11562.8,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    11562.8,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
     0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -468,7 +468,7 @@
     EIR VS WaterFrac Test,   !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -481,7 +481,7 @@
     EIR VS WaterFrac Test,   !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -494,7 +494,7 @@
     EIR VS WaterFrac Test,   !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -507,7 +507,7 @@
     EIR VS WaterFrac Test,   !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -520,7 +520,7 @@
     EIR VS WaterFrac Test,   !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -533,7 +533,7 @@
     EIR VS WaterFrac Test,   !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -546,7 +546,7 @@
     EIR VS WaterFrac Test,   !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -559,7 +559,7 @@
     EIR VS WaterFrac Test,   !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -572,7 +572,7 @@
     EIR VS WaterFrac Test,   !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -594,11 +594,11 @@
     Sys 2 SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    10078.365,               !- Rated Heating Capacity At Selected Nominal Speed Level {w}
+    10078.365,               !- Rated Heating Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
+    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
@@ -610,7 +610,7 @@
     EIRH VS WaterFrac Test,  !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
-    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
+    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
@@ -622,7 +622,7 @@
     EIRH VS WaterFrac Test,  !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
+    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
@@ -634,7 +634,7 @@
     EIRH VS WaterFrac Test,  !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
-    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
+    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
@@ -646,7 +646,7 @@
     EIRH VS WaterFrac Test,  !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
-    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
+    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
@@ -658,7 +658,7 @@
     EIRH VS WaterFrac Test,  !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
-    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
+    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
@@ -670,7 +670,7 @@
     EIRH VS WaterFrac Test,  !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
-    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
+    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
@@ -682,7 +682,7 @@
     EIRH VS WaterFrac Test,  !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
-    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
+    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
@@ -694,7 +694,7 @@
     EIRH VS WaterFrac Test,  !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
-    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
+    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
@@ -706,7 +706,7 @@
     EIRH VS WaterFrac Test,  !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
-    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
+    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
@@ -756,14 +756,14 @@
     Sys 3 Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    23125.6,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    23125.6,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
     0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -776,7 +776,7 @@
     EIR VS WaterFrac Test,   !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -789,7 +789,7 @@
     EIR VS WaterFrac Test,   !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -802,7 +802,7 @@
     EIR VS WaterFrac Test,   !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -815,7 +815,7 @@
     EIR VS WaterFrac Test,   !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -828,7 +828,7 @@
     EIR VS WaterFrac Test,   !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -841,7 +841,7 @@
     EIR VS WaterFrac Test,   !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -854,7 +854,7 @@
     EIR VS WaterFrac Test,   !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -867,7 +867,7 @@
     EIR VS WaterFrac Test,   !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -880,7 +880,7 @@
     EIR VS WaterFrac Test,   !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -902,11 +902,11 @@
     Sys 3 SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    19156.73,                !- Rated Heating Capacity At Selected Nominal Speed Level {w}
+    19156.73,                !- Rated Heating Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
+    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
@@ -918,7 +918,7 @@
     EIRH VS WaterFrac Test,  !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
-    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
+    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
@@ -930,7 +930,7 @@
     EIRH VS WaterFrac Test,  !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
+    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
@@ -942,7 +942,7 @@
     EIRH VS WaterFrac Test,  !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
-    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
+    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
@@ -954,7 +954,7 @@
     EIRH VS WaterFrac Test,  !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
-    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
+    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
@@ -966,7 +966,7 @@
     EIRH VS WaterFrac Test,  !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
-    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
+    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
@@ -978,7 +978,7 @@
     EIRH VS WaterFrac Test,  !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
-    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
+    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
@@ -990,7 +990,7 @@
     EIRH VS WaterFrac Test,  !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
-    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
+    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1002,7 +1002,7 @@
     EIRH VS WaterFrac Test,  !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
-    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
+    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1014,7 +1014,7 @@
     EIRH VS WaterFrac Test,  !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
-    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
+    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1064,14 +1064,14 @@
     Sys 4 Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    11562.8,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    11562.8,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
     0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1084,7 +1084,7 @@
     EIR VS WaterFrac Test,   !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1097,7 +1097,7 @@
     EIR VS WaterFrac Test,   !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1110,7 +1110,7 @@
     EIR VS WaterFrac Test,   !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1123,7 +1123,7 @@
     EIR VS WaterFrac Test,   !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1136,7 +1136,7 @@
     EIR VS WaterFrac Test,   !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1149,7 +1149,7 @@
     EIR VS WaterFrac Test,   !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1162,7 +1162,7 @@
     EIR VS WaterFrac Test,   !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1175,7 +1175,7 @@
     EIR VS WaterFrac Test,   !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1188,7 +1188,7 @@
     EIR VS WaterFrac Test,   !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1210,11 +1210,11 @@
     Sys 4 SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    10078.365,               !- Rated Heating Capacity At Selected Nominal Speed Level {w}
+    10078.365,               !- Rated Heating Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
+    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1226,7 +1226,7 @@
     EIRH VS WaterFrac Test,  !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
-    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
+    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1238,7 +1238,7 @@
     EIRH VS WaterFrac Test,  !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
+    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1250,7 +1250,7 @@
     EIRH VS WaterFrac Test,  !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
-    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
+    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1262,7 +1262,7 @@
     EIRH VS WaterFrac Test,  !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
-    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
+    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1274,7 +1274,7 @@
     EIRH VS WaterFrac Test,  !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
-    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
+    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1286,7 +1286,7 @@
     EIRH VS WaterFrac Test,  !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
-    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
+    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1298,7 +1298,7 @@
     EIRH VS WaterFrac Test,  !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
-    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
+    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1310,7 +1310,7 @@
     EIRH VS WaterFrac Test,  !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
-    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
+    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1322,7 +1322,7 @@
     EIRH VS WaterFrac Test,  !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
-    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
+    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1372,14 +1372,14 @@
     Sys 5 Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    23125.6,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    23125.6,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
     0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1392,7 +1392,7 @@
     EIR VS WaterFrac Test,   !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
-    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1405,7 +1405,7 @@
     EIR VS WaterFrac Test,   !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1418,7 +1418,7 @@
     EIR VS WaterFrac Test,   !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
-    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1431,7 +1431,7 @@
     EIR VS WaterFrac Test,   !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
-    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {w}
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1444,7 +1444,7 @@
     EIR VS WaterFrac Test,   !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
-    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1457,7 +1457,7 @@
     EIR VS WaterFrac Test,   !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
-    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {w}
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1470,7 +1470,7 @@
     EIR VS WaterFrac Test,   !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
-    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {w}
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1483,7 +1483,7 @@
     EIR VS WaterFrac Test,   !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
-    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1496,7 +1496,7 @@
     EIR VS WaterFrac Test,   !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
-    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {w}
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1518,11 +1518,11 @@
     Sys 5 SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    19156.73,                !- Rated Heating Capacity At Selected Nominal Speed Level {w}
+    19156.73,                !- Rated Heating Capacity At Selected Nominal Speed Level {W}
     1.0,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
     VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
-    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
+    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1534,7 +1534,7 @@
     EIRH VS WaterFrac Test,  !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
-    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
+    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1546,7 +1546,7 @@
     EIRH VS WaterFrac Test,  !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
-    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
+    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1558,7 +1558,7 @@
     EIRH VS WaterFrac Test,  !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
-    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
+    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1570,7 +1570,7 @@
     EIRH VS WaterFrac Test,  !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
-    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
+    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1582,7 +1582,7 @@
     EIRH VS WaterFrac Test,  !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
-    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
+    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1594,7 +1594,7 @@
     EIRH VS WaterFrac Test,  !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
-    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
+    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1606,7 +1606,7 @@
     EIRH VS WaterFrac Test,  !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
-    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
+    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1618,7 +1618,7 @@
     EIRH VS WaterFrac Test,  !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
-    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
+    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
@@ -1630,7 +1630,7 @@
     EIRH VS WaterFrac Test,  !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
     0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
     Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
-    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
+    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
@@ -3779,10 +3779,11 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3967,10 +3968,11 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4148,10 +4150,11 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4329,10 +4332,11 @@
     Zone4Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 4 Node,             !- Zone Air Node Name
-    Zone 4 Outlet Node;      !- Zone Return Air Node Name
+    Zone 4 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone4DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4510,10 +4514,11 @@
     Zone5Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 5 Node,             !- Zone Air Node Name
-    Zone 5 Outlet Node;      !- Zone Return Air Node Name
+    Zone 5 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone5Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone5DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

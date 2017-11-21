@@ -1088,7 +1088,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     297.0,                   !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.000,                   !- Fraction Latent
     0.500,                   !- Fraction Radiant
     0.000;                   !- Fraction Lost

@@ -1997,10 +1997,11 @@
     ZONE1Inlet,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE1 Node,              !- Zone Air Node Name
-    ZONE1 Outlet Node;       !- Zone Return Air Node Name
+    ZONE1 Outlet Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZONE1 AHU,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

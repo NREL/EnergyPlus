@@ -25,7 +25,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -2273,7 +2273,7 @@
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2281,7 +2281,7 @@
     SPACE2-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2289,7 +2289,7 @@
     SPACE3-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2297,7 +2297,7 @@
     SPACE4-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2305,10 +2305,11 @@
     SPACE5-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2316,6 +2317,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2323,6 +2325,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2330,6 +2333,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2337,6 +2341,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3632,7 +3637,7 @@
     80.000,82.000,84.000,86.000,88.000,96.145;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     PRESSURE,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3656,7 +3661,7 @@
     0.3664E+07,0.3810E+07,0.3961E+07,0.4116E+07,0.4277E+07,0.4990E+07;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3680,7 +3685,7 @@
     0.3104E+06,0.3143E+06,0.3183E+06,0.3225E+06,0.3271E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3704,7 +3709,7 @@
     0.4120E+06,0.4107E+06,0.4091E+06,0.4072E+06,0.4048E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3728,7 +3733,7 @@
     0.8937E+03,0.8754E+03,0.8555E+03,0.8335E+03,0.8088E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3752,7 +3757,7 @@
     0.1954E+03,0.2083E+03,0.2227E+03,0.2390E+03,0.2579E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3776,7 +3781,7 @@
     0.2181E+04,0.2340E+04,0.2550E+04,0.2840E+04,0.3272E+04,0.0000E+00;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name

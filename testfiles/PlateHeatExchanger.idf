@@ -24,7 +24,7 @@
 !           There is a single window in the West Zone south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -1992,7 +1992,7 @@
     PHE Supply Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.0033,                  !- Loop Supply Side Design Flow Rate {m3/s}
     CounterFlow,             !- Heat Exchange Model Type
-    571,                     !- Heat Exchanger U-Factor Times Area Value {W/k}
+    571,                     !- Heat Exchanger U-Factor Times Area Value {W/K}
     UncontrolledOn,          !- Control Type
     ,                        !- Heat Exchanger Setpoint Node Name
     ,                        !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -2262,7 +2262,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -2270,7 +2270,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -2278,10 +2278,11 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2289,6 +2290,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2296,6 +2298,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2612,7 +2615,7 @@
     80.000,82.000,84.000,86.000,88.000,96.145;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     PRESSURE,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2636,7 +2639,7 @@
     0.3664E+07,0.3810E+07,0.3961E+07,0.4116E+07,0.4277E+07,0.4990E+07;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2660,7 +2663,7 @@
     0.3104E+06,0.3143E+06,0.3183E+06,0.3225E+06,0.3271E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2684,7 +2687,7 @@
     0.4120E+06,0.4107E+06,0.4091E+06,0.4072E+06,0.4048E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2708,7 +2711,7 @@
     0.8937E+03,0.8754E+03,0.8555E+03,0.8335E+03,0.8088E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2732,7 +2735,7 @@
     0.1954E+03,0.2083E+03,0.2227E+03,0.2390E+03,0.2579E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -2756,7 +2759,7 @@
     0.2181E+04,0.2340E+04,0.2550E+04,0.2840E+04,0.3272E+04,0.0000E+00;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name

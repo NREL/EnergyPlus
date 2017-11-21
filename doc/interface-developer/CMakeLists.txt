@@ -1,6 +1,6 @@
 
 # to get the list of input files, go to the root of the document folder, and:
-# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/acknowledgements/|g' | sed 's/$/.tex/g'
+# grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${CMAKE_SOURCE_DIR}/doc/acknowledgments/|g' | sed 's/$/.tex/g'
 SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/header.tex
   ${CMAKE_SOURCE_DIR}/doc/interface-developer/interface-developer.tex
@@ -24,7 +24,7 @@ SET( INCLUDED_TEX
   ${CMAKE_BINARY_DIR}/doc-build/title.tex
 )
 
-# to get the list of inluded images, go to the root of the document folder and:
+# to get the list of included images, go to the root of the document folder and:
 # grep -r '\\includegraphics' * | cut -d ':' -f 2 | rev | cut -d '{' -f 1 | rev | cut -d '}' -f 1 | sed 's/^/  /g' | sort -n -t'.' -k 1.14
 SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/interface-developer/media/image001.png

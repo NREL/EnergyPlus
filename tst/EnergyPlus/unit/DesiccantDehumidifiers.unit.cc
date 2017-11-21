@@ -2321,6 +2321,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE1-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2328,6 +2329,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2335,6 +2337,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE3-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE3-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2342,6 +2345,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3753,6 +3757,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -4923,6 +4928,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -6340,6 +6346,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",

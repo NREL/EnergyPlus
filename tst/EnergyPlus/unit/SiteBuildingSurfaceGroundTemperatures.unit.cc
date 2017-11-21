@@ -62,7 +62,6 @@ using namespace EnergyPlus::GroundTemperatureManager;
 TEST_F( EnergyPlusFixture, SiteBuildingSurfaceGroundTempTest )
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:BuildingSurface,",
 		"	21.00,	!- January",
 		"	22.00,	!- February",
@@ -72,14 +71,14 @@ TEST_F( EnergyPlusFixture, SiteBuildingSurfaceGroundTempTest )
 		"	26.00,	!- June",
 		"	27.00,	!- July",
 		"	28.00,	!- August",
-		"	29.00,	!- Septeber",
+		"	29.00,	!- September",
 		"	30.00,	!- October",
 		"	31.00,	!- November",
 		"	32.00;	!- December",
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	
+
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

@@ -110,6 +110,7 @@ TEST_F( EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1 ) {
 		"  ",
 		"ZoneHVAC:EquipmentList,",
 		"  Zone2Equipment,          !- Name",
+		"  SequentialLoad,          !- Load Distribution Scheme",
 		"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 		"  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
 		"  1,                       !- Zone Equipment 1 Cooling Sequence",
