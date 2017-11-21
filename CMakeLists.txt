@@ -268,4 +268,6 @@ if (BUILD_DOCS)
     # and if it doesn't, clearly state why it fails
     message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
   endif()
+  set(TEX_INTERACTION "batchmode" CACHE STRING "Choose the interaction mode for TeX." FORCE)
+  set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
 endif()
