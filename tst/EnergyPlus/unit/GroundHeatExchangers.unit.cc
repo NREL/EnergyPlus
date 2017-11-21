@@ -267,7 +267,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check )
 
 	GetGroundHeatExchangerInput();
 
-	EXPECT_EQ( 1, vertPropsVector.size() );
+	EXPECT_EQ( 1u, vertPropsVector.size() );
 
 	auto & thisProp( vertPropsVector[0] );
 
@@ -464,7 +464,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check
 
 	GetGroundHeatExchangerInput();
 
-	EXPECT_EQ( 1, responseFactorsVector.size() );
+	EXPECT_EQ( 1u, responseFactorsVector.size() );
 
 	auto & thisRF( responseFactorsVector[0] );
 
@@ -507,7 +507,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Che
 
 	GetGroundHeatExchangerInput();
 
-	EXPECT_EQ( 1, vertArraysVector.size() );
+	EXPECT_EQ( 1u, vertArraysVector.size() );
 
 	auto & thisArray( vertArraysVector[0] );
 
@@ -716,9 +716,9 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors
 
 	GetGroundHeatExchangerInput();
 
-	EXPECT_EQ( 1, vertPropsVector.size() );
-	EXPECT_EQ( 1, responseFactorsVector.size() );
-	EXPECT_EQ( 1, verticalGLHE.size() );
+	EXPECT_EQ( 1u, vertPropsVector.size() );
+	EXPECT_EQ( 1u, responseFactorsVector.size() );
+	EXPECT_EQ( 1u, verticalGLHE.size() );
 
 	auto & thisRF( responseFactorsVector[0] );
 	auto & thisGLHE( verticalGLHE[0] );
@@ -787,9 +787,9 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check 
 
 	GetGroundHeatExchangerInput();
 
-	EXPECT_EQ( 1, vertPropsVector.size() );
-	EXPECT_EQ( 1, vertArraysVector.size() );
-	EXPECT_EQ( 1, verticalGLHE.size() );
+	EXPECT_EQ( 1u, vertPropsVector.size() );
+	EXPECT_EQ( 1u, vertArraysVector.size() );
+	EXPECT_EQ( 1u, verticalGLHE.size() );
 
 	auto & thisArray( vertArraysVector[0] );
 	auto & thisGLHE( verticalGLHE[0] );
@@ -879,9 +879,9 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_C
 
 	GetGroundHeatExchangerInput();
 
-	EXPECT_EQ( 2, vertPropsVector.size() );
-	EXPECT_EQ( 4, singleBoreholesVector.size() );
-	EXPECT_EQ( 1, verticalGLHE.size() );
+	EXPECT_EQ( 2u, vertPropsVector.size() );
+	EXPECT_EQ( 4u, singleBoreholesVector.size() );
+	EXPECT_EQ( 1u, verticalGLHE.size() );
 
 	auto & thisGLHE( verticalGLHE[0] );
 

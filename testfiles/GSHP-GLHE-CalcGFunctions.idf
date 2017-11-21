@@ -602,6 +602,7 @@
 
   ZoneHVAC:EquipmentList,
     Main Floor Equipment,    !- Name
+    ,                        !- Load Distribution Scheme
     ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 1 Object Type
     Main Floor WAHP,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
