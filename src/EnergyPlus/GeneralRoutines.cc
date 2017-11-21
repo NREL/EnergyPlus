@@ -194,6 +194,7 @@ ControlCompOutput(
 	bool WaterCoilAirFlowControl; // True if controlling air flow through water coil, water flow fixed
 	int SimCompNum; // internal number for case statement
 	static Real64 HalvingPrec( 0.0 ); // precision of halving algorithm
+	bool BBConvergeCheckFlag; // additional check on convergence specifically for radiant/convective baseboard units
 
 	struct IntervalHalf
 	{
@@ -592,6 +593,20 @@ ControlCompOutput(
 			ZoneInterHalf.MinResult = 0.0;
 			break;
 		}
+		if ( !Converged ) {
+			BBConvergeCheckFlag = BBConvergeCheck( SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow );
+			if ( BBConvergeCheckFlag ) {
+				//Set to converged controller
+				Converged = true;
+				ZoneInterHalf.MaxFlowCalc = true;
+				ZoneInterHalf.MinFlowCalc = false;
+				ZoneInterHalf.NormFlowCalc = false;
+				ZoneInterHalf.MinFlowResult = false;
+				ZoneInterHalf.MaxResult = 1.0;
+				ZoneInterHalf.MinResult = 0.0;
+				break;
+			}
+		}
 
 		++Iter;
 		if ( ( Iter > MaxIter ) && ( ! WarmupFlag ) ) {
@@ -616,6 +631,50 @@ ControlCompOutput(
 
 }
 
+bool
+BBConvergeCheck(
+	int const SimCompNum,
+	Real64 const MaxFlow,
+	Real64 const MinFlow
+)
+{
+
+	// FUNCTION INFORMATION:
+	//       AUTHOR         Rick Strand
+	//       DATE WRITTEN   November 2017
+	
+	// PURPOSE OF THIS SUBROUTINE:
+	// This is an additional check for the radiant/convective baseboard units
+	// to see if they are converged or the flow is sufficiently converged to
+	// procede with the simulation.  With the radiant component to these systems,
+	// the impact on the load met is more difficult to calculate and the impact
+	// on the actual system output is not as well behaved as for convective
+	// systems.  This additional check avoids excessive iterations and max
+	// iteration warnings and provides sufficiently converged results.  It is
+	// only called from ControlCompOutput.
+
+	// Return Value
+	bool BBConvergeCheck;
+	
+	// SUBROUTINE PARAMETER DEFINITIONS:
+	static Real64 const BBIterLimit( 0.00001 );
+
+	if ( SimCompNum != 5 && SimCompNum != 6 ) {
+		// For all zone equipment except radiant/convective baseboard (steam and water) units:
+		BBConvergeCheck = false;
+	} else {
+		// For steam and water radiant/convective baseboard units:
+		if ( ( MaxFlow - MinFlow ) > BBIterLimit ) {
+			BBConvergeCheck = false;
+		} else {
+			BBConvergeCheck = true;
+		}
+	}
+	
+	return BBConvergeCheck;
+	
+}
+	
 void
 CheckSysSizing(
 	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
