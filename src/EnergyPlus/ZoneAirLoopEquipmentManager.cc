@@ -157,7 +157,7 @@ namespace ZoneAirLoopEquipmentManager {
 		bool const FirstHVACIteration,
 		Real64 & SysOutputProvided,
 		Real64 & NonAirSysOutput,
-		Real64 & LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
+		Real64 & LatOutputProvided, // Latent add/removal supplied by air dist unit (kg/s), dehumid = negative
 		int const ActualZoneNum,
 		int & ControlledZoneNum,
 		int & CompIndex

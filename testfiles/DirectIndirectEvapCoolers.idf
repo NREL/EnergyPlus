@@ -2550,7 +2550,7 @@
     units_gr_lf Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     units_gr_lf Air Node,    !- Zone Air Node Name
-    units_gr_lf Return Air Node Name;  !- Zone Return Air Node Name
+    units_gr_lf Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     units_gr_lf Inlet Nodes, !- Name
@@ -2558,6 +2558,7 @@
 
   ZoneHVAC:EquipmentList,
     units_gr_lf Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     units_gr_lf Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3080,7 +3081,7 @@
     units_gr_rt Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     units_gr_rt Air Node,    !- Zone Air Node Name
-    units_gr_rt Return Air Node Name;  !- Zone Return Air Node Name
+    units_gr_rt Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     units_gr_rt Inlet Nodes, !- Name
@@ -3088,6 +3089,7 @@
 
   ZoneHVAC:EquipmentList,
     units_gr_rt Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     units_gr_rt Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3436,7 +3438,7 @@
     unit_s_g Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     unit_s_g Air Node,       !- Zone Air Node Name
-    unit_s_g Return Air Node Name;  !- Zone Return Air Node Name
+    unit_s_g Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     unit_s_g Inlet Nodes,    !- Name
@@ -3444,6 +3446,7 @@
 
   ZoneHVAC:EquipmentList,
     unit_s_g Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     unit_s_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3792,7 +3795,7 @@
     unit_n_g Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     unit_n_g Air Node,       !- Zone Air Node Name
-    unit_n_g Return Air Node Name;  !- Zone Return Air Node Name
+    unit_n_g Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     unit_n_g Inlet Nodes,    !- Name
@@ -3800,6 +3803,7 @@
 
   ZoneHVAC:EquipmentList,
     unit_n_g Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     unit_n_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

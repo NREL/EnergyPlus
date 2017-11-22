@@ -1041,6 +1041,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone2Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
 		"    Zone2UnitHeat,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1215,6 +1216,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone2Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
 		"    Zone2UnitHeat,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1847,6 +1849,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"    Main Zone Equipment,     !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Main Zone ATU,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
