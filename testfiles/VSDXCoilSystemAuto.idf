@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   CoilSystem:Heating:DX,
     HeatPump DX Coil 1,      !- Name
