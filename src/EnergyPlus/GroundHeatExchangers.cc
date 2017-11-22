@@ -1889,11 +1889,13 @@ namespace GroundHeatExchangers {
 		static bool firstTime( true );
 
 		// Calculate G-Functions
-		if ( firstTime ) {
-			makeThisGLHECacheAndCompareWithFileCache();
-			if ( !gFunctionsExist ) {
-				calcGFunctions();
-				gFunctionsExist = true;
+		if( firstTime ) {
+			if( !gFunctionsExist ) {
+				makeThisGLHECacheAndCompareWithFileCache();
+				if( !gFunctionsExist ) {
+					calcGFunctions();
+					gFunctionsExist = true;
+				}
 			}
 			firstTime = false;
 		}
@@ -2589,9 +2591,8 @@ namespace GroundHeatExchangers {
 						errorsFound = true;
 						ShowSevereError( "GroundHeatExchanger:ResponseFactors object not found." );
 					}
-
 				} else if( !DataIPShortCuts::lAlphaFieldBlanks( 7 ) ) {
-					// Response factors come from eplusout.glhe or use array object to calculate them
+					// Response factors come from array object
 					thisGLHE.myRespFactors = BuildAndGetResponseFactorObjectFromArray( GetVertArray( DataIPShortCuts::cAlphaArgs( 7 ) ) );
 
 					if( !thisGLHE.myRespFactors ) {
@@ -2947,9 +2948,12 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "calcBHResistance" );
 
-		Real64 const cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-
-		return calcBHAverageResistance() + 1 / ( 3 * calcBHTotalInternalResistance() ) * pow_2( bhLength / ( massFlowRate * cpFluid ) );
+		if ( massFlowRate <= 0.0 ) {
+			return 0;
+		} else {
+			Real64 const cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+			return calcBHAverageResistance() + 1 / ( 3 * calcBHTotalInternalResistance() ) * pow_2( bhLength / ( massFlowRate * cpFluid ) );
+		}
 	}
 
 	//******************************************************************************
