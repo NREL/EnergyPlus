@@ -45,8 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::SortAndStringUtilities Unit Tests
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -59,7 +57,6 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, BBConvergeCheckTest )
 	{
-	// R.Strand - November 2017
 
 	int SimCompNum;
 	Real64 MaxFlow;
@@ -71,43 +68,43 @@ namespace EnergyPlus {
 	MaxFlow = 1.0;
 	MinFlow = 0.99999999;
 	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_EQ( FunctionResult, false );
+	EXPECT_FALSE( FunctionResult );
 
 	// Test 2: Also not a radiant/convective baseboard unit
 	SimCompNum = 10;
 	MaxFlow = 1.0;
 	MinFlow = 0.99999999;
 	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_EQ( FunctionResult, false );
+	EXPECT_FALSE( FunctionResult );
 
 	// Test 3: One of the radiant/convective baseboard units but Max and Min too different
 	SimCompNum = 5;
 	MaxFlow = 1.0;
 	MinFlow = 0.9;
 	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_EQ( FunctionResult, false );
-	
+	EXPECT_FALSE( FunctionResult );
+
 	// Test 4: One of the radiant/convective baseboard units and Max and Min almost the same
 	SimCompNum = 5;
 	MaxFlow = 1.0;
 	MinFlow = 0.9999999;
 	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_EQ( FunctionResult, true );
+	EXPECT_TRUE( FunctionResult );
 
 	// Test 5: The other radiant/convective baseboard units but Max and Min too different
 	SimCompNum = 6;
 	MaxFlow = 1.0;
 	MinFlow = 0.9;
 	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_EQ( FunctionResult, false );
-		
+	EXPECT_FALSE( FunctionResult );
+
 	// Test 6: The other radiant/convective baseboard units and Max and Min almost the same
 	SimCompNum = 6;
 	MaxFlow = 1.0;
 	MinFlow = 0.9999999;
 	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_EQ( FunctionResult, true );
-	
+	EXPECT_TRUE( FunctionResult );
+
 	}
 
 }

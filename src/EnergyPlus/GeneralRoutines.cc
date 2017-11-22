@@ -101,6 +101,19 @@ namespace EnergyPlus {
 
 static gio::Fmt fmtLD( "*" );
 
+// Integer constants for different system types handled by the routines in this file
+int const ParallelPIUReheatNum( 1 );
+int const SeriesPIUReheatNum( 2 );
+int const HeatingCoilWaterNum( 3 );
+int const BBWaterConvOnlyNum( 4 );
+int const BBSteamRadConvNum( 5 );
+int const BBWaterRadConvNum( 6 );
+int const FourPipeFanCoilNum( 7 );
+int const OutdoorAirUnitNum( 8 );
+int const UnitHeaterNum( 9 );
+int const UnitVentilatorNum( 10 );
+int const VentilatedSlabNum( 11 );
+	
 void
 ControlCompOutput(
 	std::string const & CompName, // the component Name
@@ -486,7 +499,7 @@ ControlCompOutput(
 		}
 
 		switch ( SimCompNum ) { //Tuned If block changed to switch
-		case 1: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
+		case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -495,7 +508,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 2: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
+		case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -504,7 +517,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 3: // 'COIL:HEATING:WATER'
+		case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
 			// Simulate reheat coil for the VAV system
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -519,56 +532,56 @@ ControlCompOutput(
 			}
 			break;
 
-		case 4: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
+		case BBWaterConvOnlyNum: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
 			// Simulate baseboard
 			SimHWConvective( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 5: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
+		case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
 			// Simulate baseboard
 			CalcSteamBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 6: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
+		case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
 			// Simulate baseboard
 			CalcHWBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 7: // 'ZONEHVAC:FOURPIPEFANCOIL'
+		case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
 			// Simulate fancoil unit
 			Calc4PipeFanCoil( CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 8: //'ZONEHVAC:OUTDOORAIRUNIT'
+		case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
 			// Simulate outdoor air unit components
 			CalcOAUnitCoilComps( CompNum, FirstHVACIteration, EquipIndex, LoadMet ); //Autodesk:OPTIONAL EquipIndex used without PRESENT check
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 9: // 'ZONEHVAC:UNITHEATER'
+		case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
 			// Simulate unit heater components
 			CalcUnitHeaterComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 10: // 'ZONEHVAC:UNITVENTILATOR'
+		case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
 			// Simulate unit ventilator components
 			CalcUnitVentilatorComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 11: // 'ZONEHVAC:VENTILATEDSLAB'
+		case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
 			// Simulate unit ventilator components
 			CalcVentilatedSlabComps( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
@@ -658,8 +671,8 @@ BBConvergeCheck(
 	
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	static Real64 const BBIterLimit( 0.00001 );
-
-	if ( SimCompNum != 5 && SimCompNum != 6 ) {
+	
+	if ( SimCompNum != BBSteamRadConvNum && SimCompNum != BBWaterRadConvNum ) {
 		// For all zone equipment except radiant/convective baseboard (steam and water) units:
 		BBConvergeCheck = false;
 	} else {
