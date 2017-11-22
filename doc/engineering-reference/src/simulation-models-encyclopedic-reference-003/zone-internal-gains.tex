@@ -156,7 +156,9 @@ PCPUDesign = PDesign * (1 - PFanFracDesign)
 
 PFanDesign = PDesign * PFanFracDesign
 
-For each time step, the air inlet temperature is calculated depending on the type of air node connection.
+For each time step,  the air inlet and outlet temperature is calculated depending on the type of air flow calculation method. Considering data centers are different from normal well-mixed zones due to the uneven air distribution, two methods are implemented to calculate the IT inlet temperature and zone return air temperature, FlowFromSystem and FlowControlWithApproachTemperatures. Specifically, the IT inlet temperature differs from AHU supply air temperature, and the actual AHU return air temperature differs from the regular return air temperature when the zone is well mixed.
+
+When using FlowFromSystem, the zone is assumed to be well-mixed. The air inlet temperature is calculated depending on the type of air node connection.
 
 TAirIn:
 
@@ -225,6 +227,41 @@ SHI = (TAirIn -- TAirSupply) / (TAirOut - TAirSupply)
 The zone average ITE supply heat index is weighted by the air flow rate of each ITE object.
 
 SHIZone = ∑ {[}VAir * (TAirIn -- TAirSupply){]} / ∑ {[}VAir * (TAirOut - TAirSupply){]}
+
+
+If FlowControlWithApproachTemperatures is chosen, Two indices are introduced to represent the deviation: (1) Supply approach temperature ($\delta T_{supply}$) and (2) Return approach temperature ($\delta T_{return}$). The two temperature differences indicate to what degree the air flow management of data centers affects the air distribution, and how much they deviate from the regular well-mixed zone scenario.
+
+$\delta T_{supply}=T_{in}-T_{supply}$
+
+$\delta T_{return}=T_{return}-T_{return-mixed}$
+
+Where, 
+
+$T_{in}$: IT equipment inlet temperature
+
+$T_{supply}$: AHU supply air temperature
+
+$T_{return}$: The actual AHU return air temperature
+
+$T_{airzone}$: The calculated zone air temperature (or return air temperature) if the room is well-mixed
+
+The two approach temperatures can be calculated by CFD tools for typical IT load levels and air flow management of data centers, or provided by measurement data or lookup tables. 
+
+It should be noted that, when FlowControlWithApproachTemperatures is chosen, 
+
+(1) The inputs of Air Inlet Connection Type, Design Recirculation Fraction and Recirculation Function of Loading and Supply Temperature Curve Name are ignored.
+
+(2) For multiple ITE objects defined for one zone, the same calculation method should apply. 
+
+(3) Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
+
+When FlowControlWithApproachTemperatures method is applied, during sizing and simulation, as the zone is assumed to be unevenly distributed, the supply air flow rate is calculated as:
+
+${\dot m_{sys}} = {Q_{sys}}/({C_{p,air}} \cdot ({T_{in}} - {T_{return}}))$,
+
+where $T_{return}$ is the weighted return air temperature from all ITE objects in the zone. 
+
+In this case, in the controlled zones with ITE objects, unlike the original thermostat setpoint control logic, the well-mixed zone temperature is not controlled. The actual controlled object is the supply air temperature. So when using this method, the user input of zone cooling setpoint is ignored and the unmet hour for cooling does not apply.
 
 \subsection{Heat Gain from Baseboard Heat}\label{heat-gain-from-baseboard-heat}
 

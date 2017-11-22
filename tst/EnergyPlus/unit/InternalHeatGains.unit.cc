@@ -65,6 +65,7 @@
 #include <InternalHeatGains.hh>
 #include <OutputReportTabular.hh>
 #include <ScheduleManager.hh>
+#include <DataZoneEquipment.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -637,9 +638,14 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 	ASSERT_FALSE( ErrorsFound );
 	DataHeatBalFanSys::MAT.allocate( 1 );
 	DataHeatBalFanSys::ZoneAirHumRat.allocate( 1 );
+	DataHeatBalance::ZnRpt.allocate( 1 );
+	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
 
 	DataHeatBalFanSys::MAT( 1 ) = 24.0;
 	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.008;
+	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneHasAirFlowWindowReturn = false;
+	DataHeatBalance::ZnRpt( 1 ).LtsRetAirGainRate = 0.0;
+
 	InternalHeatGains::GetInternalHeatGainsInput();
 
 	DataLoopNode::Node( 1 ).Temp = 45.0;

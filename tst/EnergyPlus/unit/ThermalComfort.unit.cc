@@ -99,6 +99,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
 	TimeStepZone = 0.25;
 	ThermalComfortInASH55.allocate( NumOfZones );
 	ThermalComfortInASH55( 1 ).ZoneIsOccupied = true;
+	Zone.allocate( NumOfZones );
 
 	// SingleHeatingSetPoint thermostat
 

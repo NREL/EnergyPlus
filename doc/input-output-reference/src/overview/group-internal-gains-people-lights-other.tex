@@ -2206,6 +2206,12 @@ The name of this object.
 
 This field is the name of the thermal zone (ref: Zone) which contains this ElectricEquipment:ITE:AirCooled object.
 
+\paragraph{Field: Air Flow Calculation Method}\label{field-air-flow-calculation-method}
+
+This field specifies the method used to calculate the IT inlet temperature and zone return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution. When FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
+
+The default method is FlowFromSystem.
+
 \paragraph{Field: Design Power Input Calculation Method}\label{field-design-power-input-calculation-method}
 
 This field is a key/choice field that tells which of the next two fields are filled and is descriptive of the method for calculating the nominal electric power input to the ITE. The key/choices are:
@@ -2278,6 +2284,8 @@ ZoneAirNode = This option is used if there is no containment and the ITE air inl
 
 RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. RoomAirModelType and RoomAir:Node).
 
+This field is only used when Air Flow Calculation Method is FlowFromSystem.
+
 \paragraph{Field: Air Inlet Room Air Model Node Name}\label{field-air-inlet-room-air-model-node-name}
 
 Specifies the name of a room air model node (ref. RoomAir:Node) which is the air inlet to this equipment. This field is required if the Air Node Connection Type = RoomAirModel.
@@ -2288,15 +2296,15 @@ Specifies the node name of a room air model node (ref. RoomAir:Node) which is th
 
 \paragraph{Field: Supply Air Node Name}\label{field-supply-air-node-name}
 
-Specifies the node name of the supply air inlet node service this ITE. If the Air Node Connection Type = AdjustedSupply ,then this field is required, and the conditions at this node will be used to determine the ITE air inlet conditions. This field is also required if reporting of the Supply Heat Index is desired.
+Specifies the node name of the supply air inlet node service this ITE. If the Air Node Connection Type = AdjustedSupply ,then this field is required, and the conditions at this node will be used to determine the ITE air inlet conditions. This field is also required if reporting of the Supply Heat Index is desired. Also required if Calculation Method = FlowControlWithApproachTemperatures.
 
 \paragraph{Field: Design Recirculation Fraction}\label{field-design-recirculation-fraction}
 
-Specifies the recirculation fraction for this equipment at design conditions. This field is used only if the Air Node Connection Type = AdjustedSupply. The recirculation fraction is defined as the ratio of recirculated air flow to total air flow entering the ITE. Recirculation is dependent upon many factors including rack and containment configuration. The default is 0.0 (no recirculation).
+Specifies the recirculation fraction for this equipment at design conditions. This field is used only if the Air Node Connection Type = AdjustedSupply. The recirculation fraction is defined as the ratio of recirculated air flow to total air flow entering the ITE. Recirculation is dependent upon many factors including rack and containment configuration. The default is 0.0 (no recirculation). This field is only used when Air Flow Calculation Method = FlowFromSystem.
 
 \paragraph{Field: Recirculation Function of Loading and Supply Temperature Curve Name}\label{field-recirculation-function-of-loading-and-supply-temperature-curve-name}
 
-The name of a two-variable curve or table lookup object which modifies the Design Recirculation Fraction as a function of CPU loading (x) and supply air node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature). This field is used only if the Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve is assumed to always equal 1.0.
+The name of a two-variable curve or table lookup object which modifies the Design Recirculation Fraction as a function of CPU loading (x) and supply air node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature). This field is used only if the Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve is assumed to always equal 1.0. This field is only used when Air Flow Calculation Method = FlowFromSystem.
 
 \paragraph{Field: Design Electric Power Supply Efficiency}\label{field-design-electric-power-supply-efficiency}
 
@@ -2322,6 +2330,22 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the electric power supply power consumption. A new meter for reporting is created for each unique subcategory (ref: Output:Meter object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-UPS
 
+\paragraph{Field: Supply Temperature Difference}\label{field-supply-temperature-difference}
+
+The difference of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+
+\paragraph{Field: Supply Temperature Difference Schedule}\label{field-supply-temperature-difference-schedule}
+
+The difference schedule of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+
+\paragraph{Field: Return Temperature Difference}\label{field-return-temperature-difference}
+
+The difference of the unit outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+
+\paragraph{Field: Return Temperature Difference Schedule}\label{field-return-temperature-difference-schedule}
+
+The difference schedule of the unit outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -2329,6 +2353,7 @@ An IDF example:
 ElectricEquipment:ITE:AirCooled,
   Data Center Servers,     !- Name
   Main Zone,               !- Zone Name
+  FlowFromSystem,      !- Air Flow Calculation Method
   Watts/Unit,              !- Design Power Input Calculation Method
   500,                     !- Watts per Unit {W}
   200,                     !- Number of Units
@@ -2354,6 +2379,44 @@ ElectricEquipment:ITE:AirCooled,
   ITE-CPU,                 !- CPU End-Use Subcategory
   ITE-Fans,                !- Fan End-Use Subcategory
   ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
+\end{lstlisting}
+
+Another IDF example when Air Flow Calculation Method = FlowControlWithApproachTemperatures:
+
+\begin{lstlisting}
+  ElectricEquipment:ITE:AirCooled,
+    SmallDataCenter ComputerRoom Elec Equip,     !- Name
+    ComputerRoom ZN,                             !- Zone Name
+    FlowControlWithApproachTemperatures,         !- Air Flow Calculation Method
+    Watts/Area,                      !- Design Power Input Calculation Method
+    ,                                !- Watts per Unit {W}
+    ,                                !- Number of Units
+    430.556416668389,                !- Watts per Zone Floor Area {W/m2}
+    Data Center Operation Schedule,  !- Design Power Input Schedule Name
+    DataCenter Equipment_SCH,  !- CPU Loading  Schedule Name
+    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
+    0.4,                     !- Design Fan Power Input Fraction
+    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}
+    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name
+    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name
+    15,                      !- Design Entering Air Temperature {C}
+    A3,                      !- Environmental Class
+    AdjustedSupply,          !- Air Inlet Connection Type
+    ,                        !- Air Inlet Room Air Model Node Name
+    ,                        !- Air Outlet Room Air Model Node Name
+    Node 6, 			     !- Supply Air Node Name
+    0,                     !- Design Recirculation Fraction
+    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name
+    0.9,                     !- Design Electric Power Supply Efficiency
+    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+    1,                       !- Fraction of Electric Power Supply Losses to Zone
+    ITE-CPU,                 !- CPU End-Use Subcategory
+    ITE-Fans,                !- Fan End-Use Subcategory
+    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
+    3,                       !- field Supply Approach Temperature
+    ,                        !- field Supply Approach Temperature Schedule
+    -3,                      !- field Return Approach Temperature 
+    ;                        !- field Return Approach Temperature Schedule
 \end{lstlisting}
 
 ElectricEquipment:ITE:AirCooled Outputs
