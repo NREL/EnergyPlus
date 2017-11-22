@@ -135,7 +135,7 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
-    Yes,                      !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
@@ -2918,9 +2918,9 @@
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
     ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
-    0,                       !- field Supply Approach Temperature
+    2,                       !- field Supply Approach Temperature
     ,                        !- field Supply Approach Temperature Schedule
-    -2,                      !- field Return Approach Temperature 
+    0,                      !- field Return Approach Temperature 
     ;                        !- field Return Approach Temperature Schedule
 
   Schedule:Compact,

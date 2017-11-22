@@ -2348,7 +2348,7 @@ namespace InternalHeatGains {
 						ZoneITEq( Loop ).FlowControlWithApproachTemps = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).NoHeatToReturnAir = false;
-						if ( DataZoneEquipment::ZoneEquipConfig( ZoneITEq( Loop ).ZonePtr ).ZoneHasAirFlowWindowReturn || ZnRpt( ZoneITEq( Loop ).ZonePtr ).LtsRetAirGainRate > 0.0 ) {
+						if ( ZnRpt.size() > 0 && ZnRpt( ZoneITEq( Loop ).ZonePtr ).LtsRetAirGainRate > 0.0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
 							ShowContinueError( "Other return air heat gains from window or lights are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures." );
 							ErrorsFound = true;
