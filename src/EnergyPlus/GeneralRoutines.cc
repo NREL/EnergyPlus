@@ -102,18 +102,20 @@ namespace EnergyPlus {
 static gio::Fmt fmtLD( "*" );
 
 // Integer constants for different system types handled by the routines in this file
-int const ParallelPIUReheatNum( 1 );
-int const SeriesPIUReheatNum( 2 );
-int const HeatingCoilWaterNum( 3 );
-int const BBWaterConvOnlyNum( 4 );
-int const BBSteamRadConvNum( 5 );
-int const BBWaterRadConvNum( 6 );
-int const FourPipeFanCoilNum( 7 );
-int const OutdoorAirUnitNum( 8 );
-int const UnitHeaterNum( 9 );
-int const UnitVentilatorNum( 10 );
-int const VentilatedSlabNum( 11 );
-	
+enum GeneralRoutinesEquipNums {
+	ParallelPIUReheatNum = 1,
+	SeriesPIUReheatNum = 2,
+	HeatingCoilWaterNum = 3,
+	BBWaterConvOnlyNum = 4,
+	BBSteamRadConvNum = 5,
+	BBWaterRadConvNum = 6,
+	FourPipeFanCoilNum = 7,
+	OutdoorAirUnitNum = 8,
+	UnitHeaterNum = 9,
+	UnitVentilatorNum = 10,
+	VentilatedSlabNum = 11
+};
+
 void
 ControlCompOutput(
 	std::string const & CompName, // the component Name
