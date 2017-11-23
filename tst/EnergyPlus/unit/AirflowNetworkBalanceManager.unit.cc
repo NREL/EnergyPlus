@@ -2981,7 +2981,7 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFactors ) {
 
 		std::string const idf_objects = delimited_string( {
-			"  Version,8.8;",
+			"  Version,8.9;",
 			
 			"  SimulationControl,",
 			"    No,                      !- Do Zone Sizing Calculation",
@@ -7964,7 +7964,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, TestExternalNodesWithLocalAirNode ) {
 		std::string const idf_objects = delimited_string({
-			"Version,8.8;",
+			"Version,8.9;",
 			"Material,",
 			"  A1 - 1 IN STUCCO,        !- Name",
 			"  Smooth,                  !- Roughness",
@@ -8657,7 +8657,7 @@ namespace EnergyPlus {
 
 	TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided) {
 		std::string const idf_objects = delimited_string({
-			"Version,8.8;",
+			"Version,8.9;",
 			"SimulationControl,",
 			"  No,                      !- Do Zone Sizing Calculation",
 			"  No,                      !- Do System Sizing Calculation",
