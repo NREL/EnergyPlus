@@ -293,11 +293,14 @@ namespace ThermalComfort {
 		int TotAngleFacSurfaces; // Total number of surfaces
 		std::string ZoneName; // Name of zone the system is serving
 		int ZonePtr; // Point to this zone in the Zone derived type
+		Array1D< Real64 > SurfaceEmissivity; // Thermal emissivity of surface inside face
+		Real64 SumSurfaceEmissAngleFactor; // Sum of all products of surface emissivities and angle factor
 
 		// Default Constructor
 		AngleFactorData() :
 			TotAngleFacSurfaces( 0 ),
-			ZonePtr( 0 )
+			ZonePtr( 0 ),
+			SumSurfaceEmissAngleFactor( 0.0 )
 		{}
 
 	};
@@ -354,6 +357,12 @@ namespace ThermalComfort {
 
 	Real64
 	CalcAngleFactorMRT( int const AngleFacNum );
+	
+	Real64
+	CalcSurfaceWeightedMRT(
+		int const ZoneNum,
+		int const SurfNum
+	);
 
 	Real64
 	CalcSatVapPressFromTemp( Real64 const Temp );
