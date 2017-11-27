@@ -53,8 +53,14 @@
 // C++ Headers
 
 // EnergyPlus Headers
+#include <BaseboardElectric.hh>
+#include <DataGlobals.hh>
+#include <DataSurfaces.hh>
+#include <DataZoneEquipment.hh>
+#include <HeatBalanceManager.hh>
 #include <ConvectionCoefficients.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+#include <SurfaceGeometry.hh>
+#include <UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -96,6 +102,118 @@ TEST_F( EnergyPlusFixture, ConvectionCoefficientsTest_ConvectionCofficients )
 
 	Hc = CalcBeausoleilMorrisonMixedUnstableCeiling( DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate, ZoneNum );
 	EXPECT_NEAR( -8.09685, Hc, 0.0001 );
+
+}
+
+TEST_F( EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassification )
+{
+
+	std::string const idf_objects = delimited_string( {
+		" Version,8.8;",
+
+		"  Zone,",
+		"    Zone 1,                  !- Name",
+		"    0,                       !- Direction of Relative North {deg}",
+		"    0,                       !- X Origin {m}",
+		"    0,                       !- Y Origin {m}",
+		"    0;                       !- Z Origin {m}",
+
+		"  SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+
+		"  ZoneHVAC:EquipmentConnections,",
+		"    Zone 1,                  !- Zone Name",
+		"    Zone 1 Eq,               !- Zone Conditioning Equipment List Name",
+		"    ,                        !- Zone Air Inlet Node or NodeList Name",
+		"    ,                        !- Zone Air Exhaust Node or NodeList Name",
+		"    SPACE2-1 Node,           !- Zone Air Node Name",
+		"    SPACE2-1 ret node;       !- Zone Return Air Node Name",
+
+		"  ZoneHVAC:EquipmentList,",
+		"    Zone 1 Eq,               !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
+		"    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 1 Object Type",
+		"    Zone 1 Baseboard,        !- Zone Equipment 1 Name",
+		"    1,                       !- Zone Equipment 1 Cooling Sequence",
+		"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+		" ZoneHVAC:Baseboard:Convective:Electric,",
+		"    Zone 1 Baseboard,        !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    HeatingDesignCapacity,   !- Heating Design Capacity Method",
+		"    1000.0,                  !- Heating Design Capacity {W}",
+		"    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+		"    ,                        !- Fraction of Autosized Heating Design Capacity",
+		"    0.97;                    !- Efficiency",
+
+		"  BuildingSurface:Detailed,",
+		"    RIGHT-1,                 !- Name",
+		"    WALL,                    !- Surface Type",
+		"    WALL-1,                  !- Construction Name",
+		"    Zone 1,                  !- Zone Name",
+		"    Outdoors,                !- Outside Boundary Condition",
+		"    ,                        !- Outside Boundary Condition Object",
+		"    SunExposed,              !- Sun Exposure",
+		"    WindExposed,             !- Wind Exposure",
+		"    0.50000,                 !- View Factor to Ground",
+		"    4,                       !- Number of Vertices",
+		"    30.5,0.0,2.4,  !- X,Y,Z ==> Vertex 1 {m}",
+		"    30.5,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"    30.5,15.2,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"    30.5,15.2,2.4;  !- X,Y,Z ==> Vertex 4 {m}",
+
+		"  Construction,",
+		"    WALL-1,                  !- Name",
+		"    GP01;                    !- Outside Layer",
+
+		"  Material,",
+		"    GP01,                    !- Name",
+		"    MediumSmooth,            !- Roughness",
+		"    1.2700000E-02,           !- Thickness {m}",
+		"    0.1600000,               !- Conductivity {W/m-K}",
+		"    801.0000,                !- Density {kg/m3}",
+		"    837.0000,                !- Specific Heat {J/kg-K}",
+		"    0.9000000,               !- Thermal Absorptance",
+		"    0.7500000,               !- Solar Absorptance",
+		"    0.7500000;               !- Visible Absorptance",
+
+	} );
+
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+	bool errorsFound( false );
+	HeatBalanceManager::GetProjectControlData( errorsFound ); // read project control data
+	EXPECT_FALSE( errorsFound ); // expect no errors
+
+	errorsFound = false;
+	HeatBalanceManager::GetMaterialData( errorsFound ); // read material data
+	EXPECT_FALSE( errorsFound ); // expect no errors
+
+	errorsFound = false;
+	HeatBalanceManager::GetConstructData( errorsFound ); // read construction data
+	EXPECT_FALSE( errorsFound ); // expect no errors
+
+	HeatBalanceManager::GetZoneData( errorsFound );
+	ASSERT_FALSE( errorsFound );
+
+	// Need these for GetSurfaceData
+	SurfaceGeometry::CosZoneRelNorth.allocate( 1 );
+	SurfaceGeometry::SinZoneRelNorth.allocate( 1 );
+	SurfaceGeometry::CosZoneRelNorth( 1 ) = std::cos( -DataHeatBalance::Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
+	SurfaceGeometry::SinZoneRelNorth( 1 ) = std::sin( -DataHeatBalance::Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
+	SurfaceGeometry::CosBldgRelNorth = 1.0;
+	SurfaceGeometry::SinBldgRelNorth = 0.0;
+
+	SurfaceGeometry::GetSurfaceData( errorsFound );
+	ASSERT_FALSE( errorsFound );
+
+	DataZoneEquipment::GetZoneEquipmentData1();
+
+	BaseboardElectric::GetBaseboardInput();
+
+	DataGlobals::ZoneSizingCalc = true;
+	int SurfNum = 1;
+	DynamicIntConvSurfaceClassification( SurfNum ) ; 
+	EXPECT_EQ( DataSurfaces::Surface( SurfNum ).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
 }
 
