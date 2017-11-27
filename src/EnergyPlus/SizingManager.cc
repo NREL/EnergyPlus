@@ -1403,7 +1403,7 @@ namespace SizingManager {
 	void
 	DetermineSystemPopulationDiversity(){
 		// determine Pz sum, Ps, and D for each air system for standard 62.1
-		DisplayString( "TRACE(R) 3D Plus: Process Concurrent People by Air System" );
+		DisplayString( "Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System" );
 
 		// First get the design (max) level of people in all zones connected to air loop
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
@@ -1423,117 +1423,67 @@ namespace SizingManager {
 			}
 		}
 
-		// now march through all timesteps for each runperiod to find the concurrent max 
-		// if the input file has no RuPeriod objects, then use the design days.  
-		
-		bool ErrorsFound( false );
-		ResetEnvironmentCounter();
-		int EnvCount = 0;
-		WarmupFlag = false;
-		bool Available( true );
-		DoingSizing = false; // unset this to march thru run periods
-		while ( Available ) {
+		// now march through all zone timesteps for entire year to find the concurrent max 
+		int DaysInYear( 366 ); //assume leap year
+		int dayOfWeekType( 1 ); // assume year starts on Sunday
+		WeatherManager::CalcSpecialDayTypes();
+		for ( int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop ) { // loop over all days in year
+			DataEnvironment::HolidayIndex =  WeatherManager::SpecialDayTypes( DayLoop );
+			DataEnvironment::DayOfYear_Schedule = DayLoop;
+			DataEnvironment::DayOfWeek = dayOfWeekType;
+			++dayOfWeekType;
+			if ( dayOfWeekType > 7 ) dayOfWeekType = 1;
+			for ( int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay ) { // loop over all hours in day
+				DataGlobals::HourOfDay = hrOfDay; // avoid crash in schedule manager
+				for ( int TS = 1; TS <= NumOfTimeStepInHour; ++TS ) { // loop over all timesteps in hour
+					DataGlobals::TimeStep = TS; // avoid crash in schedule manager
+					Real64 TSfraction( 0.0 );
+					if ( NumOfTimeStepInHour > 0.0 ) TSfraction = 1.0 / double( NumOfTimeStepInHour );
+					for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // loop over all the air systems
+						int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
+						if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
+						if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) {
 
-		// sum up concurrent people at each timestep and find the max. 
-			GetNextEnvironment( Available, ErrorsFound );
-
-			if ( ! Available ) break;
-			if ( ErrorsFound ) break;
-
-			if (KindOfSim == ksHVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
-
-			if (KindOfSim == ksHVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
-
-			if ( SimulationManager::RunPeriodsInInput && ( KindOfSim != ksRunPeriodWeather ) ) continue; // want to only run regular run periods, but if there are not any let the design environments run
-
-			++EnvCount;
-			BeginEnvrnFlag = true;
-			EndEnvrnFlag = false;
-			DayOfSim = 0;
-
-			while ( ( DayOfSim < NumOfDayInEnvrn ) ) { // Begin day loop ...
-
-				++DayOfSim;
-				BeginDayFlag = true;
-				EndDayFlag = false;
-
-				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
-
-					BeginHourFlag = true;
-					EndHourFlag = false;
-
-					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
-
-						BeginTimeStepFlag = true;
-
-
-						// Set the End__Flag variables to true if necessary.  Note that
-						// each flag builds on the previous level.  EndDayFlag cannot be
-						// .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
-						// EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
-						// Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
-						// SubTimeStepFlags can/will be set/reset in the HVAC Manager.
-
-						if ( TimeStep == NumOfTimeStepInHour ) {
-							EndHourFlag = true;
-							if ( HourOfDay == 24 ) {
-								EndDayFlag = true;
-								if ( DayOfSim == NumOfDayInEnvrn ) {
-									EndEnvrnFlag = true;
-								}
-							}
-						}
-
-						ManageWeather();
-
-						for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-							int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
-							if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
-							if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) {
-
-								// Loop over all zones connected to air loop
-								Real64 TotConcurrentPeopleOnSys = 0.0;
-								for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
-									int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( zoneNumOnLoop );
+							// Loop over all zones connected to air loop
+							Real64 TotConcurrentPeopleOnSys = 0.0;
+							for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
+								int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( zoneNumOnLoop );
 									
-									for ( int PeopleNum = 1; PeopleNum <= DataHeatBalance::TotPeople; ++PeopleNum ) {
-										if ( DataHeatBalance::People( PeopleNum ).ZonePtr == FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ) {
-											Real64 PeopleInZone = ( DataHeatBalance::People( PeopleNum ).NumberOfPeople * DataHeatBalance::Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).Multiplier * DataHeatBalance::Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).ListMultiplier );
-											Real64 schMultiplier = ScheduleManager::GetCurrentScheduleValue( DataHeatBalance::People( PeopleNum ).NumberOfPeoplePtr );
-											PeopleInZone = PeopleInZone * schMultiplier;
-											TotConcurrentPeopleOnSys += PeopleInZone;
-										}
+								for ( int PeopleNum = 1; PeopleNum <= DataHeatBalance::TotPeople; ++PeopleNum ) {
+									if ( DataHeatBalance::People( PeopleNum ).ZonePtr == FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ) {
+										Real64 PeopleInZone = ( DataHeatBalance::People( PeopleNum ).NumberOfPeople * DataHeatBalance::Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).Multiplier * DataHeatBalance::Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).ListMultiplier );
+										Real64 schMultiplier = ScheduleManager::LookUpScheduleValue( DataHeatBalance::People( PeopleNum ).NumberOfPeoplePtr, hrOfDay, TS );
+										PeopleInZone = PeopleInZone * schMultiplier;
+										TotConcurrentPeopleOnSys += PeopleInZone;
 									}
 								}
-								if ( TotConcurrentPeopleOnSys >= DataSizing::PsBySys( AirLoopNum ) ) {
-									DataSizing::PsBySys( AirLoopNum ) = TotConcurrentPeopleOnSys; // store max concurrent occupancy on system
-									// store timing description of Last occurance of max
-									DataSizing::PeakPsOccurrenceDateTimeStringBySys( AirLoopNum ) = DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
-									DataSizing::PeakPsOccurrenceEnvironmentStringBySys( AirLoopNum ) = DataEnvironment::EnvironmentName;
+							}
+							if ( TotConcurrentPeopleOnSys >= DataSizing::PsBySys( AirLoopNum ) ) {
+								DataSizing::PsBySys( AirLoopNum ) = TotConcurrentPeopleOnSys; // store max concurrent occupancy on system
+								// store timing description of Last occurance of max
+								int Month( 0 );
+								int DayOfMonth( 0 );
+								General::InvJulianDay( DayLoop, Month, DayOfMonth, 1 );
+								std::string MonthDayString;
+								static gio::Fmt MnDyFmt( "(I2.2,'/',I2.2)" );
+								gio::write( MonthDayString, MnDyFmt ) << Month << DayOfMonth;
+								Real64 TimeHrsFraction = ( double( hrOfDay ) - 1.0 ) + double( TS ) * TSfraction;
+								int TimeHrsInt =  int ( TimeHrsFraction );
+								int TimeMinsInt = nint( ( TimeHrsFraction - TimeHrsInt ) * 60.0 );
+								if ( TimeMinsInt == 60 ) {
+									++TimeHrsInt;
+									TimeMinsInt = 0;
 								}
-
-							} // if autosizied and VRP
-						} // air loops
-
-						BeginHourFlag = false;
-						BeginDayFlag = false;
-						BeginEnvrnFlag = false;
-						BeginSimFlag = false;
-						BeginFullSimFlag = false;
-
-					} // TimeStep loop
-
-					PreviousHour = HourOfDay;
-
-				} // ... End hour loop.
-
-			} // ... End day loop.
-
-		} // ... End environment loop.
-
-		// reset enviornment cycle counter used for multiple years for all environments, so day types are not corrupted during subsequent cycles
-		for ( int EnvironNum = 1; EnvironNum <= WeatherManager::NumOfEnvrn; ++ EnvironNum ) {
-			WeatherManager::Environment( EnvironNum ).CurrentCycle = 0;
+								static gio::Fmt TStmpFmti( "(I2.2,':',I2.2)" );
+								std::string timeStamp;
+								gio::write( timeStamp, TStmpFmti ) << TimeHrsInt << TimeMinsInt;
+								DataSizing::PeakPsOccurrenceDateTimeStringBySys( AirLoopNum ) = MonthDayString + ' ' + timeStamp;
+								DataSizing::PeakPsOccurrenceEnvironmentStringBySys( AirLoopNum ) = "Full Year Schedule";
+							}
+						} // if autosizied and VRP
+					} // air loops
+				}
+			}
 		}
 
 		// compute D for standard 62.1 by system
@@ -1545,9 +1495,6 @@ namespace SizingManager {
 			}
 			DBySys( AirLoopNum ) = min( 1.0, DBySys( AirLoopNum ) );
 		}
-		// reset flag
-		DoingSizing = true;
-
 
 	}
 
