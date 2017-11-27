@@ -15,7 +15,7 @@
 ! Infiltration:
 !   * Infiltration air flow rate is guessed as a small value.
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -69,7 +69,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
-  Timestep,1;
+  Timestep,4;
   
   WindowsCalculationEngine,
     ExternalWindowsModel;
@@ -95,6 +95,69 @@
     Yes,                     !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
+    
+! Chicago Ohare Intl Ap_IL_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
+! Coldest Month=JAN
+! Chicago Ohare Intl Ap_IL_USA Annual Heating 99.6%, MaxDB=-20°C
+
+  SizingPeriod:DesignDay,
+    Chicago Ohare Intl Ap Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -20,                     !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -20,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    98934.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+! Chicago Ohare Intl Ap Annual Cooling Design Conditions Wind Speed=5.2m/s Wind Dir=230
+! Hottest Month=JUL
+! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.3°C MWB=23.7°C
+
+  SizingPeriod:DesignDay,
+    Chicago Ohare Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    33.3,                    !- Maximum Dry-Bulb Temperature {C}
+    10.5,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23.7,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    98934.,                  !- Barometric Pressure {Pa}
+    5.2,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.455,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    2.05;                    !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -264,10 +327,6 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
   Construction,
-    Medium Furniture,        !- Name
-    MediumFurniture;         !- Outside Layer
-
-  Construction,
     Room Ceiling,            !- Name
     Plywood - 3/8 in,        !- Outside Layer
     2x6 Wood Stud R19,       !- Layer 2
@@ -354,6 +413,9 @@
     Until 24:00,21,          !- Field 7
     For: AllOtherDays,       !- Field 9
     Until: 24:00,21;         !- Field 10
+    
+  ScheduleTypeLimits,
+    Number;              !- Name
 
 !-   ===========  ALL OBJECTS IN CLASS: THERMOSTATSETPOINT:DUALSETPOINT ===========
 
@@ -397,6 +459,7 @@
 
   ZoneHVAC:EquipmentList,
     Room 102 EQUIPMENT,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Room 102 Ideal Loads,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -541,7 +604,7 @@
   Output:Variable,Room 102 Window,Surface Window Net Heat Transfer Rate,Timestep;
   Output:Variable,Room 102 Window,Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate,Timestep;
   Output:Variable,Room 102 Window,Surface Inside Face Convection Heat Gain Rate,Timestep;
-  Output:Variable,Room 102 Window,Surface Window Inside Face Shade Zone Convection Heat Gain Rate,Timestep;
+  !Output:Variable,Room 102 Window,Surface Window Inside Face Shade Zone Convection Heat Gain Rate,Timestep;
   Output:Variable,Room 102 Window,Surface Inside Face Convection Heat Transfer Coefficient,Timestep;
   
   Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate, Timestep;
@@ -571,14 +634,6 @@
   
   Output:Diagnostics,
     DisplayAdvancedReportVariables;
-    
-  Output:VariableDictionary,
-    regular;
-
-  Output:Table:SummaryReports,
-    AllMonthly,              !- Report 1 Name
-    WindowACReportMonthly,   !- Report 2 Name
-    EnvelopeSummary;         !- Report 3 Name
 
 !       Window Material/Construction file with spectral data in IDF format
 !-----------------------------------------------------
@@ -609,11 +664,6 @@
     GlzSys_1,                !- Name
     Glass_102_LayerAvg;      !- Outside Layer
 
-  CONSTRUCTION,
-    GlzSys_1_withShade,      !- Name
-    Glass_102_LayerAvg,      !- Outside Layer
-    Shade_1;                 !- Layer 2
-
   WindowMaterial:Shade,
     Shade_1,                 !- Name
     0.35,                    !- Solar Transmittance {dimensionless}
@@ -630,18 +680,3 @@
     0.0,                     !- Left-Side Opening Multiplier
     0.0,                     !- Right-Side Opening Multiplier
     0;                       !- Airflow Permeability {dimensionless}
-
-  WindowProperty:ShadingControl,
-    ShdSys_Control,          !- Name
-    InteriorShade,           !- Shading Type
-    GlzSys_1_withShade,      !- Construction with Shading Name
-    AlwaysOn,                !- Shading Control Type
-    ,                        !- Schedule Name
-    0,                       !- Setpoint {W/m2, W or deg C}
-    NO,                      !- Shading Control Is Scheduled
-    NO,                      !- Glare Control Is Active
-    ,                        !- Shading Device Material Name
-    FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
-    ,                        !- Slat Angle Schedule Name
-    0;                       !- Setpoint 2 {W/m2 or deg C}
-
