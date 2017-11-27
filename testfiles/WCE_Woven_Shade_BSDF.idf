@@ -599,7 +599,6 @@
   Output:Variable,Room 102 Window,Surface Inside Face Temperature,Timestep;
   Output:Variable,Room 102 Window,Surface Outside Face Temperature,Timestep;
   Output:Variable,Room 102 Window,Surface Window Total Absorbed Shortwave Radiation Rate Layer 1,Timestep;
-  Output:Variable,Room 102 Window,Surface Outside Face Beam Solar Incident Angle Cosine Value, Timestep;
   
   Output:Variable,Room 102 Window,Surface Window Gap Convective Heat Transfer Rate,Timestep;
   Output:Variable,Room 102 Window,Surface Window Net Heat Transfer Rate,Timestep;
@@ -628,10 +627,6 @@
   Output:Variable,Room 102 Window,Surface Outside Face Incident Beam Solar Radiation Rate per Area,Timestep;
   Output:Variable,Room 102 Window,Surface Outside Face Beam Solar Incident Angle Cosine Value,Timestep;
   Output:Variable,Room 102 Window,Surface Window BSDF Beam Direction Number,Timestep;
-  
-  Output:Variable,*,Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate,Timestep;
-  Output:Variable,*,Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate,Timestep;
-  Output:Variable,*,Zone Mean Air Temperature,Timestep;
   
   Output:Diagnostics,
     DisplayAdvancedReportVariables;
