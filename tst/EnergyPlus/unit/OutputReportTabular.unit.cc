@@ -873,6 +873,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 		" ",
 		"ZoneHVAC:EquipmentList,",
 		" Space Eq,                 !- Name",
+		" SequentialLoad,           !- Load Distribution Scheme",
 		" ZoneHVAC:WindowAirConditioner, !- Zone Equipment 1 Object Type",
 		" WindAC,                   !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -880,6 +881,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 		" ",
 		"ZoneHVAC:EquipmentList,",
 		" Spacex10 Eq,              !- Name",
+		" SequentialLoad,           !- Load Distribution Scheme",
 		" ZoneHVAC:WindowAirConditioner, !- Zone Equipment 1 Object Type",
 		" WindACx10,                !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -2336,6 +2338,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 		"ZoneHVAC:EquipmentList,",
 		" Space Eq,                 !- Name",
+		" SequentialLoad,           !- Load Distribution Scheme",
 		" ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 		" Space ATU,                   !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -2369,6 +2372,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 		"ZoneHVAC:EquipmentList,",
 		" Spacex10 Eq,              !- Name",
+		" SequentialLoad,           !- Load Distribution Scheme",
 		" ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 		" Spacex10 ATU,                !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",

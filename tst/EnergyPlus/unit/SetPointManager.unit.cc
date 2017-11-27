@@ -862,6 +862,7 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    SPACE1-1 Eq,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1165,7 +1166,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
 	bool ErrorsFound = false;
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.8;",
+		"Version,8.9;",
 
 		"  SetpointManager:OutdoorAirReset,",
 		"    Hot Water Loop Setpoint Manager,  !- Name",
@@ -1224,7 +1225,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest )
 	bool ErrorsFound = false;
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.8;",
+		"Version,8.9;",
 
 		"  SetpointManager:OutdoorAirReset,",
 		"    Hot Water Loop Setpoint Manager,  !- Name",

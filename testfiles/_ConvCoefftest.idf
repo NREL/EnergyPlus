@@ -10,7 +10,7 @@
 ! Modified: Conforms with Beta 4 input
 ! 2 design days to facilitate reverse DD testing.
 
-  Version,8.8;
+  Version,8.9;
 
   Site:Location,
     ATLANTA,                 !- Name
@@ -527,12 +527,13 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_2,                  !- Zone Air Node Name
-    NODE_3;                  !- Zone Return Air Node Name
+    NODE_3;                  !- Zone Return Air Node or NodeList Name
 
         !List equipment in simulation order
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
