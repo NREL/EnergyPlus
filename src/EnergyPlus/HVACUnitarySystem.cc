@@ -1265,10 +1265,8 @@ namespace HVACUnitarySystem {
 		Real64 MinHumRat; // Minimum humidity ratio for sensible capacity calculation (kg/kg)
 		Real64 DeltaMassRate; // DIFference of mass flow rate between
 		// inlet node and system outlet node
-		int i; // index to get the zone inlet node
 		Real64 MassFlowRate; // mass flow rate to calculate loss
 		Real64 MaxTemp; // Maximum temperature used in latent loss calculation
-		int EquipNum( 0 ); // local DO loop index for zone equipment
 		Real64 rho;
 		Real64 QZnReq;
 		Real64 QActual;
@@ -1397,22 +1395,23 @@ namespace HVACUnitarySystem {
 		}
 
 		if ( allocated( ZoneEquipConfig ) && MyCheckFlag( UnitarySysNum ) ) {
-			for ( i = 1; i <= NumOfZones; ++i ) {
-				if ( UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
-					if ( UnitarySystem( UnitarySysNum ).ControlZoneNum == ZoneEquipConfig( i ).ActualZoneNum ) {
-						//setup unitary system zone equipment sequence information based on finding an air terminal
-						if ( ZoneEquipConfig( i ).EquipListIndex > 0 ) {
-							for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
-								if ( ( ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).EquipType_Num( EquipNum ) == AirDistUnit_Num ) || ( ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).EquipType_Num( EquipNum ) == DirectAir_Num ) ) {
-									UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).CoolingPriority( EquipNum );
-									UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = ZoneEquipList( ZoneEquipConfig( i ).EquipListIndex ).HeatingPriority( EquipNum );
-								}
-							}
-						}
-					}
+			if ( UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
+				int zoneNum = Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).ZoneEqNum;
+				int zoneInlet = UnitarySystem( UnitarySysNum ).ZoneInletNode;
+				int coolingPriority = 0;
+				int heatingPriority = 0;
+				//setup zone equipment sequence information based on finding matching air terminal
+				if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
+					ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
+					UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum = coolingPriority;
+					UnitarySystem( UnitarySysNum ).ZoneSequenceHeatingNum = heatingPriority;
+				}
+				MyCheckFlag( UnitarySysNum ) = false;
+				if ( UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum == 0 ) {
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": No matching air terminal found in the zone equipment list for zone = " + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + "." );
+					ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  Preceding condition(s) causes termination." );
 				}
 			}
-			MyCheckFlag( UnitarySysNum ) = false;
 			if ( UnitarySystem( UnitarySysNum ).ZoneInletNode == 0 ) {
 				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": The zone inlet node in the controlled zone (" + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + ") is not found." );
 				ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  Preceding condition(s) causes termination." );

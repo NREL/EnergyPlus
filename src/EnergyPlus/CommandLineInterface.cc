@@ -354,6 +354,7 @@ ProcessArgs(int argc, const char * argv[])
 	outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
 	outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
 	outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";
+	outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
 	outputEddFileName = outputFilePrefix + normalSuffix + ".edd";
 	outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
 	outputSlnFileName = outputFilePrefix + normalSuffix + ".sln";

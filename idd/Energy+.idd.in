@@ -41862,10 +41862,18 @@ ZoneHVAC:EquipmentList,
        \memo should be assigned Heating Sequence = 1 and Cooling Sequence = 1.  Any other equipment should
        \memo be assigned sequence 2 or higher so that it will see the net load after the DOAS air is added
        \memo to the zone.
+       \min-fields 6
   A1 , \field Name
        \required-field
        \reference ZoneEquipmentLists
-  A2 , \field Zone Equipment 1 Object Type
+  A2 , \field Load Distribution Scheme
+       \type choice
+       \key SequentialLoad
+       \key UniformLoad
+       \key UniformPLR
+       \key SequentialUniformPLR
+       \default SequentialLoad
+  A3 , \field Zone Equipment 1 Object Type
        \begin-extensible
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
@@ -41902,23 +41910,23 @@ ZoneHVAC:EquipmentList,
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
        \required-field
-  A3 , \field Zone Equipment 1 Name
+  A4 , \field Zone Equipment 1 Name
        \required-field
        \type object-list
        \object-list ZoneEquipmentNames
   N1 , \field Zone Equipment 1 Cooling Sequence
        \required-field
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N2 , \field Zone Equipment 1 Heating or No-Load Sequence
        \required-field
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A4 , \field Zone Equipment 2 Object Type
+  A5 , \field Zone Equipment 2 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -41953,7 +41961,7 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A5 , \field Zone Equipment 2 Name
+  A6 , \field Zone Equipment 2 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N3 , \field Zone Equipment 2 Cooling Sequence
@@ -41963,10 +41971,10 @@ ZoneHVAC:EquipmentList,
        \note when the zone thermostat requests cooling
   N4 , \field Zone Equipment 2 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A6 , \field Zone Equipment 3 Object Type
+  A7 , \field Zone Equipment 3 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42001,20 +42009,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A7 , \field Zone Equipment 3 Name
+  A8 , \field Zone Equipment 3 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N5 , \field Zone Equipment 3 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N6 , \field Zone Equipment 3 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A8 , \field Zone Equipment 4 Object Type
+  A9 , \field Zone Equipment 4 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42049,20 +42057,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A9 , \field Zone Equipment 4 Name
+  A10, \field Zone Equipment 4 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N7 , \field Zone Equipment 4 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N8 , \field Zone Equipment 4 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A10, \field Zone Equipment 5 Object Type
+  A11, \field Zone Equipment 5 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42097,20 +42105,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A11, \field Zone Equipment 5 Name
+  A12, \field Zone Equipment 5 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N9 , \field Zone Equipment 5 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N10, \field Zone Equipment 5 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A12, \field Zone Equipment 6 Object Type
+  A13, \field Zone Equipment 6 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42145,20 +42153,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A13, \field Zone Equipment 6 Name
+  A14, \field Zone Equipment 6 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N11, \field Zone Equipment 6 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N12, \field Zone Equipment 6 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A14, \field Zone Equipment 7 Object Type
+  A15, \field Zone Equipment 7 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42193,20 +42201,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A15, \field Zone Equipment 7 Name
+  A16, \field Zone Equipment 7 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N13, \field Zone Equipment 7 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N14, \field Zone Equipment 7 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A16, \field Zone Equipment 8 Object Type
+  A17, \field Zone Equipment 8 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42241,20 +42249,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A17, \field Zone Equipment 8 Name
+  A18, \field Zone Equipment 8 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N15, \field Zone Equipment 8 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N16, \field Zone Equipment 8 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A18, \field Zone Equipment 9 Object Type
+  A19, \field Zone Equipment 9 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42289,20 +42297,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A19, \field Zone Equipment 9 Name
+  A20, \field Zone Equipment 9 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N17, \field Zone Equipment 9 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N18, \field Zone Equipment 9 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A20, \field Zone Equipment 10 Object Type
+  A21, \field Zone Equipment 10 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42337,20 +42345,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A21, \field Zone Equipment 10 Name
+  A22, \field Zone Equipment 10 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N19, \field Zone Equipment 10 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N20, \field Zone Equipment 10 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A22, \field Zone Equipment 11 Object Type
+  A23, \field Zone Equipment 11 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42385,20 +42393,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A23, \field Zone Equipment 11 Name
+  A24, \field Zone Equipment 11 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N21, \field Zone Equipment 11 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N22, \field Zone Equipment 11 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A24, \field Zone Equipment 12 Object Type
+  A25, \field Zone Equipment 12 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42433,20 +42441,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A25, \field Zone Equipment 12 Name
+  A26, \field Zone Equipment 12 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N23, \field Zone Equipment 12 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N24, \field Zone Equipment 12 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A26, \field Zone Equipment 13 Object Type
+  A27, \field Zone Equipment 13 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42481,20 +42489,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A27, \field Zone Equipment 13 Name
+  A28, \field Zone Equipment 13 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N25, \field Zone Equipment 13 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N26, \field Zone Equipment 13 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A28, \field Zone Equipment 14 Object Type
+  A29, \field Zone Equipment 14 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42529,20 +42537,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A29, \field Zone Equipment 14 Name
+  A30, \field Zone Equipment 14 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N27, \field Zone Equipment 14 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N28, \field Zone Equipment 14 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A30, \field Zone Equipment 15 Object Type
+  A31, \field Zone Equipment 15 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42577,20 +42585,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A31, \field Zone Equipment 15 Name
+  A32, \field Zone Equipment 15 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N29, \field Zone Equipment 15 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N30, \field Zone Equipment 15 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A32, \field Zone Equipment 16 Object Type
+  A33, \field Zone Equipment 16 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42625,20 +42633,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A33, \field Zone Equipment 16 Name
+  A34, \field Zone Equipment 16 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N31, \field Zone Equipment 16 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N32, \field Zone Equipment 16 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A34, \field Zone Equipment 17 Object Type
+  A35, \field Zone Equipment 17 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42673,20 +42681,20 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A35, \field Zone Equipment 17 Name
+  A36, \field Zone Equipment 17 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N33, \field Zone Equipment 17 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N34, \field Zone Equipment 17 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
-  A36, \field Zone Equipment 18 Object Type
+  A37, \field Zone Equipment 18 Object Type
        \type choice
        \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
        \key ZoneHVAC:AirDistributionUnit
@@ -42721,17 +42729,17 @@ ZoneHVAC:EquipmentList,
        \key WaterHeater:HeatPump:WrappedCondenser
        \key HeatExchanger:AirToAir:FlatPlate
        \key AirLoopHVAC:UnitarySystem
-  A37, \field Zone Equipment 18 Name
+  A38, \field Zone Equipment 18 Name
        \type object-list
        \object-list ZoneEquipmentNames
   N35, \field Zone Equipment 18 Cooling Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests cooling
   N36; \field Zone Equipment 18 Heating or No-Load Sequence
        \type integer
-       \minimum 1
+       \minimum 0
        \note Specifies the zone equipment simulation order
        \note when the zone thermostat requests heating or no load
 
@@ -68577,16 +68585,15 @@ FluidCooler:TwoSpeed,
   A5 ; \field Outdoor Air Inlet Node Name
        \type node
 
-GroundHeatExchanger:Vertical,
- \min-fields 20
- \extensible:2 - repeat last field, remembering to remove ; from "inner" fields.
- \memo Variable short time step vertical ground heat exchanger model based on
- \memo Yavuztruk, C., J.D.Spitler. 1999. A Short Time Step response Factor Model for
- \memo Vertical Ground Loop Heat Exchangers
- \memo The Fluid Type in the associated condenser loop must be same for which the
- \memo g-functions below are calculated.
+GroundHeatExchanger:System,
+        \memo Models vertical ground heat exchangers systems using the response factor approach
+        \memo developed by Eskilson. Response factors are calculated using a finite line source
+        \memo model assuming uniform heat flux at the borehole wall.
+        \extensible:1
+        \min-fields 9
   A1,   \field Name
         \required-field
+        \type alpha
         \reference-class-name validPlantEquipmentTypes
         \reference validPlantEquipmentNames
         \reference-class-name validCondenserEquipmentTypes
@@ -68605,479 +68612,857 @@ GroundHeatExchanger:Vertical,
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
-  N2,   \field Number of Bore Holes
+  A4,  \field Undisturbed Ground Temperature Model Type
         \required-field
-        \type integer
-        \minimum> 0.0
-  N3,   \field Bore Hole Length
+        \type choice
+        \key Site:GroundTemperature:Undisturbed:FiniteDifference
+        \key Site:GroundTemperature:Undisturbed:KusudaAchenbach
+        \key Site:GroundTemperature:Undisturbed:Xing
+  A5,  \field Undisturbed Ground Temperature Model Name
         \required-field
-        \type real
-        \minimum> 0.0
-        \units m
-  N4,   \field Bore Hole Radius
-        \required-field
-        \type real
-        \minimum> 0.0
-        \units m
-  N5,   \field Ground Thermal Conductivity
+        \type object-list
+        \object-list UndisturbedGroundTempModels
+  N2,   \field Ground Thermal Conductivity
         \required-field
         \type real
         \minimum> 0.0
         \units W/m-K
-  N6,   \field Ground Thermal Heat Capacity
+  N3,   \field Ground Thermal Heat Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units J/m3-K
-  N7,   \field Ground Temperature
+  A6,   \field GHE:Vertical:ResponseFactors Object Name
+        \type object-list
+        \object-list GroundHeatExchangerVerticalResponseFactorNames
+  A7,   \field GHE:Vertical:Array Object Name
+        \type object-list
+        \object-list GroundHeatExchangerVerticalArrayNames
+  A8,   \field GHE:Vertical:Single Object Name 1
+        \begin-extensible
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A9,   \field GHE:Vertical:Single Object Name 2
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A10,  \field GHE:Vertical:Single Object Name 3
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A11,  \field GHE:Vertical:Single Object Name 4
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A12,  \field GHE:Vertical:Single Object Name 5
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A13,  \field GHE:Vertical:Single Object Name 6
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A14,  \field GHE:Vertical:Single Object Name 7
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A15,  \field GHE:Vertical:Single Object Name 8
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A16,  \field GHE:Vertical:Single Object Name 9
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A17,  \field GHE:Vertical:Single Object Name 10
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A18,  \field GHE:Vertical:Single Object Name 11
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A19,  \field GHE:Vertical:Single Object Name 12
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A20,  \field GHE:Vertical:Single Object Name 13
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A21,  \field GHE:Vertical:Single Object Name 14
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A22,  \field GHE:Vertical:Single Object Name 15
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A23,  \field GHE:Vertical:Single Object Name 16
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A24,  \field GHE:Vertical:Single Object Name 17
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A25,  \field GHE:Vertical:Single Object Name 18
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A26,  \field GHE:Vertical:Single Object Name 19
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A27,  \field GHE:Vertical:Single Object Name 20
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A28,  \field GHE:Vertical:Single Object Name 21
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A29,  \field GHE:Vertical:Single Object Name 22
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A30,  \field GHE:Vertical:Single Object Name 23
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A31,  \field GHE:Vertical:Single Object Name 24
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A32,  \field GHE:Vertical:Single Object Name 25
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A33,  \field GHE:Vertical:Single Object Name 26
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A34,  \field GHE:Vertical:Single Object Name 27
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A35,  \field GHE:Vertical:Single Object Name 28
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A36,  \field GHE:Vertical:Single Object Name 29
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A37,  \field GHE:Vertical:Single Object Name 30
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A38,  \field GHE:Vertical:Single Object Name 31
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A39,  \field GHE:Vertical:Single Object Name 32
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A40,  \field GHE:Vertical:Single Object Name 33
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A41,  \field GHE:Vertical:Single Object Name 34
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A42,  \field GHE:Vertical:Single Object Name 35
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A43,  \field GHE:Vertical:Single Object Name 36
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A44,  \field GHE:Vertical:Single Object Name 37
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A45,  \field GHE:Vertical:Single Object Name 38
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A46,  \field GHE:Vertical:Single Object Name 39
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A47,  \field GHE:Vertical:Single Object Name 40
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A48,  \field GHE:Vertical:Single Object Name 41
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A49,  \field GHE:Vertical:Single Object Name 42
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A50,  \field GHE:Vertical:Single Object Name 43
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A51,  \field GHE:Vertical:Single Object Name 44
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A52,  \field GHE:Vertical:Single Object Name 45
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A53,  \field GHE:Vertical:Single Object Name 46
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A54,  \field GHE:Vertical:Single Object Name 47
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A55,  \field GHE:Vertical:Single Object Name 48
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A56,  \field GHE:Vertical:Single Object Name 49
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A57,  \field GHE:Vertical:Single Object Name 50
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A58,  \field GHE:Vertical:Single Object Name 51
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A59,  \field GHE:Vertical:Single Object Name 52
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A60,  \field GHE:Vertical:Single Object Name 53
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A61,  \field GHE:Vertical:Single Object Name 54
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A62,  \field GHE:Vertical:Single Object Name 55
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A63,  \field GHE:Vertical:Single Object Name 56
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A64,  \field GHE:Vertical:Single Object Name 57
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A65,  \field GHE:Vertical:Single Object Name 58
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A66,  \field GHE:Vertical:Single Object Name 59
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A67,  \field GHE:Vertical:Single Object Name 60
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A68,  \field GHE:Vertical:Single Object Name 61
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A69,  \field GHE:Vertical:Single Object Name 62
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A70,  \field GHE:Vertical:Single Object Name 63
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A71,  \field GHE:Vertical:Single Object Name 64
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A72,  \field GHE:Vertical:Single Object Name 65
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A73,  \field GHE:Vertical:Single Object Name 66
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A74,  \field GHE:Vertical:Single Object Name 67
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A75,  \field GHE:Vertical:Single Object Name 68
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A76,  \field GHE:Vertical:Single Object Name 69
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A77,  \field GHE:Vertical:Single Object Name 70
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A78,  \field GHE:Vertical:Single Object Name 71
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A79,  \field GHE:Vertical:Single Object Name 72
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A80,  \field GHE:Vertical:Single Object Name 73
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A81,  \field GHE:Vertical:Single Object Name 74
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A82,  \field GHE:Vertical:Single Object Name 75
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A83,  \field GHE:Vertical:Single Object Name 76
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A84,  \field GHE:Vertical:Single Object Name 77
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A85,  \field GHE:Vertical:Single Object Name 78
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A86,  \field GHE:Vertical:Single Object Name 79
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A87,  \field GHE:Vertical:Single Object Name 80
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A88,  \field GHE:Vertical:Single Object Name 81
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A89,  \field GHE:Vertical:Single Object Name 82
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A90,  \field GHE:Vertical:Single Object Name 83
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A91,  \field GHE:Vertical:Single Object Name 84
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A92,  \field GHE:Vertical:Single Object Name 85
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A93,  \field GHE:Vertical:Single Object Name 86
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A94,  \field GHE:Vertical:Single Object Name 87
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A95,  \field GHE:Vertical:Single Object Name 88
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A96,  \field GHE:Vertical:Single Object Name 89
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A97,  \field GHE:Vertical:Single Object Name 90
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A98,  \field GHE:Vertical:Single Object Name 91
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A99,  \field GHE:Vertical:Single Object Name 92
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A100, \field GHE:Vertical:Single Object Name 93
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A101, \field GHE:Vertical:Single Object Name 94
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A102, \field GHE:Vertical:Single Object Name 95
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A103, \field GHE:Vertical:Single Object Name 96
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A104, \field GHE:Vertical:Single Object Name 97
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A105, \field GHE:Vertical:Single Object Name 98
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A106, \field GHE:Vertical:Single Object Name 99
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+  A107; \field GHE:Vertical:Single Object Name 100
+        \type object-list
+        \object-list GroundHeatExchangerVerticalSingleNames
+
+GroundHeatExchanger:Vertical:Properties,
+        \memo Properties for vertical ground heat exchanger systems
+        \min-fields 11
+  A1,   \field Name
+        \required-field
+        \type alpha
+        \reference GroundHeatExchangerVerticalPropertiesNames
+  N1,   \field Depth of Top of Borehole
+        \required-field
+        \type real
+        \units m-K
+        \minimum 0.0
+  N2,   \field Borehole Length
         \required-field
         \type real
         \minimum> 0.0
-        \units C
-  N8,   \field Grout Thermal Conductivity
+        \units m
+  N3,   \field Borehole Diameter
+        \required-field
+        \type real
+        \minimum> 0.0
+        \units m
+  N4,   \field Grout Thermal Conductivity
         \required-field
         \type real
         \minimum> 0.0
         \units W/m-K
-  N9,   \field Pipe Thermal Conductivity
+  N5,   \field Grout Thermal Heat Capacity
+        \required-field
+        \type real
+        \minimum> 0.0
+        \units J/m3-K
+  N6,   \field Pipe Thermal Conductivity
         \required-field
         \type real
         \minimum> 0.0
         \units W/m-K
-  N10,  \field Pipe Out Diameter
+  N7,   \field Pipe Thermal Heat Capacity
+        \required-field
+        \type real
+        \minimum> 0.0
+        \units J/m3-K
+  N8,   \field Pipe Outer Diameter
         \required-field
         \type real
         \minimum> 0.0
         \units m
         \ip-units in
-  N11,  \field U-Tube Distance
-        \required-field
-        \type real
-        \minimum> 0.0
-        \units m
-  N12,  \field Pipe Thickness
+  N9,   \field Pipe Thickness
         \required-field
         \type real
         \minimum> 0.0
         \units m
         \ip-units in
-  N13,  \field Maximum Length of Simulation
+  N10;  \field U-Tube Distance
+        \required-field
+        \type real
+        \minimum> 0.0
+        \units m
+
+GroundHeatExchanger:Vertical:Array,
+  A1,   \field Name
+        \required-field
+        \type alpha
+        \reference GroundHeatExchangerVerticalArrayNames
+  A2,   \field GHE:Vertical:Properties Object Name
+        \required-field
+        \type object-list
+        \object-list GroundHeatExchangerVerticalPropertiesNames
+  N1,   \field Number of Boreholes in X-Direction
         \required-field
         \type integer
+        \minimum 1
+  N2,   \field Number of Boreholes in Y-Direction
+        \required-field
+        \type integer
+        \minimum 1
+  N3;   \field Borehole Spacing
+        \required-field
+        \type real
         \minimum> 0.0
-        \units years
-  N14,  \field G-Function Reference Ratio
+        \units m
+
+GroundHeatExchanger:Vertical:Single,
+  A1,   \field Name
+        \required-field
+        \type alpha
+        \reference GroundHeatExchangerVerticalSingleNames
+  A2,   \field GHE:Vertical:Properties Object Name
+        \required-field
+        \type object-list
+        \object-list GroundHeatExchangerVerticalPropertiesNames
+  N1,   \field X-Location
+        \required-field
+        \type real
+        \units m
+  N2;   \field Y-Location
+        \required-field
+        \type real
+        \units m
+
+GroundHeatExchanger:ResponseFactors,
+        \memo Response factor definitions from third-party tool, commonly referred to a "g-functions"
+        \extensible:2
+        \min-fields 5
+  A1,   \field Name
+        \required-field
+        \type alpha
+        \reference GroundHeatExchangerVerticalResponseFactorNames
+  A2,   \field GHE:Vertical:Properties Object Name
+        \required-field
+        \type object-list
+        \object-list GroundHeatExchangerVerticalPropertiesNames
+  N1,   \field Number of Boreholes
+        \type integer
+        \required-field
+  N2,   \field G-Function Reference Ratio
         \type real
         \minimum> 0.0
         \units dimensionless
         \default 0.0005
-  N15,  \field Number of Data Pairs of the G Function
-        \required-field
-        \type integer
-        \minimum 1
-        \maximum 100
-  N16,  \field G-Function Ln(T/Ts) Value 1
+  N3,   \field g-Function Ln(T/Ts) Value 1
         \begin-extensible
         \required-field
         \type real
-  N17,  \field G-Function G Value 1
+  N4,   \field g-Function g Value 1
         \required-field
         \type real
-  N18,  \field G-Function Ln(T/Ts) Value 2
+  N5,   \field g-Function Ln(T/Ts) Value 2
         \type real
-  N19,  \field G-Function G Value 2
+  N6,   \field g-Function g Value 2
         \type real
-  N20,  \field G-Function Ln(T/Ts) Value 3
+  N7,   \field g-Function Ln(T/Ts) Value 3
         \type real
-  N21,  \field G-Function G Value 3
+  N8,   \field g-Function g Value 3
         \type real
-  N22,  \field G-Function Ln(T/Ts) Value 4
+  N9,   \field g-Function Ln(T/Ts) Value 4
         \type real
-  N23,  \field G-Function G Value 4
+  N10,   \field g-Function g Value 4
         \type real
-  N24,  \field G-Function Ln(T/Ts) Value 5
+  N11,  \field g-Function Ln(T/Ts) Value 5
         \type real
-  N25,  \field G-Function G Value 5
+  N12,  \field g-Function g Value 5
         \type real
-  N26,  \field G-Function Ln(T/Ts) Value 6
+  N13,  \field g-Function Ln(T/Ts) Value 6
         \type real
-  N27,  \field G-Function G Value 6
+  N14,  \field g-Function g Value 6
         \type real
-  N28,  \field G-Function Ln(T/Ts) Value 7
+  N15,  \field g-Function Ln(T/Ts) Value 7
         \type real
-  N29,  \field G-Function G Value 7
+  N16,  \field g-Function g Value 7
         \type real
-  N30,  \field G-Function Ln(T/Ts) Value 8
+  N17,  \field g-Function Ln(T/Ts) Value 8
         \type real
-  N31,  \field G-Function G Value 8
+  N18,  \field g-Function g Value 8
         \type real
-  N32,  \field G-Function Ln(T/Ts) Value 9
+  N19,  \field g-Function Ln(T/Ts) Value 9
         \type real
-  N33,  \field G-Function G Value 9
+  N20,  \field g-Function g Value 9
         \type real
-  N34,  \field G-Function Ln(T/Ts) Value 10
+  N21,  \field g-Function Ln(T/Ts) Value 10
         \type real
-  N35,  \field G-Function G Value 10
+  N22,  \field g-Function g Value 10
         \type real
-  N36,  \field G-Function Ln(T/Ts) Value 11
+  N23,  \field g-Function Ln(T/Ts) Value 11
         \type real
-  N37,  \field G-Function G Value 11
+  N24,  \field g-Function g Value 11
         \type real
-  N38,  \field G-Function Ln(T/Ts) Value 12
+  N25,  \field g-Function Ln(T/Ts) Value 12
         \type real
-  N39,  \field G-Function G Value 12
+  N26,  \field g-Function g Value 12
         \type real
-  N40,  \field G-Function Ln(T/Ts) Value 13
+  N27,  \field g-Function Ln(T/Ts) Value 13
         \type real
-  N41,  \field G-Function G Value 13
+  N28,  \field g-Function g Value 13
         \type real
-  N42,  \field G-Function Ln(T/Ts) Value 14
+  N29,  \field g-Function Ln(T/Ts) Value 14
         \type real
-  N43,  \field G-Function G Value 14
+  N30,  \field g-Function g Value 14
         \type real
-  N44,  \field G-Function Ln(T/Ts) Value 15
+  N31,  \field g-Function Ln(T/Ts) Value 15
         \type real
-  N45,  \field G-Function G Value 15
+  N32,  \field g-Function g Value 15
         \type real
-  N46,  \field G-Function Ln(T/Ts) Value 16
+  N33,  \field g-Function Ln(T/Ts) Value 16
         \type real
-  N47,  \field G-Function G Value 16
+  N34,  \field g-Function g Value 16
         \type real
-  N48,  \field G-Function Ln(T/Ts) Value 17
+  N35,  \field g-Function Ln(T/Ts) Value 17
         \type real
-  N49,  \field G-Function G Value 17
+  N36,  \field g-Function g Value 17
         \type real
-  N50,  \field G-Function Ln(T/Ts) Value 18
+  N37,  \field g-Function Ln(T/Ts) Value 18
         \type real
-  N51,  \field G-Function G Value 18
+  N38,  \field g-Function g Value 18
         \type real
-  N52,  \field G-Function Ln(T/Ts) Value 19
+  N39,  \field g-Function Ln(T/Ts) Value 19
         \type real
-  N53,  \field G-Function G Value 19
+  N40,  \field g-Function g Value 19
         \type real
-  N54,  \field G-Function Ln(T/Ts) Value 20
+  N41,  \field g-Function Ln(T/Ts) Value 20
         \type real
-  N55,  \field G-Function G Value 20
+  N42,  \field g-Function g Value 20
         \type real
-  N56,  \field G-Function Ln(T/Ts) Value 21
+  N43,  \field g-Function Ln(T/Ts) Value 21
         \type real
-  N57,  \field G-Function G Value 21
+  N44,  \field g-Function g Value 21
         \type real
-  N58,  \field G-Function Ln(T/Ts) Value 22
+  N45,  \field g-Function Ln(T/Ts) Value 22
         \type real
-  N59,  \field G-Function G Value 22
+  N46,  \field g-Function g Value 22
         \type real
-  N60,  \field G-Function Ln(T/Ts) Value 23
+  N47,  \field g-Function Ln(T/Ts) Value 23
         \type real
-  N61,  \field G-Function G Value 23
+  N48,  \field g-Function g Value 23
         \type real
-  N62,  \field G-Function Ln(T/Ts) Value 24
+  N49,  \field g-Function Ln(T/Ts) Value 24
         \type real
-  N63,  \field G-Function G Value 24
+  N50,  \field g-Function g Value 24
         \type real
-  N64,  \field G-Function Ln(T/Ts) Value 25
+  N51,  \field g-Function Ln(T/Ts) Value 25
         \type real
-  N65,  \field G-Function G Value 25
+  N52,  \field g-Function g Value 25
         \type real
-  N66,  \field G-Function Ln(T/Ts) Value 26
+  N53,  \field g-Function Ln(T/Ts) Value 26
         \type real
-  N67,  \field G-Function G Value 26
+  N54,  \field g-Function g Value 26
         \type real
-  N68,  \field G-Function Ln(T/Ts) Value 27
+  N55,  \field g-Function Ln(T/Ts) Value 27
         \type real
-  N69,  \field G-Function G Value 27
+  N56,  \field g-Function g Value 27
         \type real
-  N70,  \field G-Function Ln(T/Ts) Value 28
+  N57,  \field g-Function Ln(T/Ts) Value 28
         \type real
-  N71,  \field G-Function G Value 28
+  N58,  \field g-Function g Value 28
         \type real
-  N72,  \field G-Function Ln(T/Ts) Value 29
+  N59,  \field g-Function Ln(T/Ts) Value 29
         \type real
-  N73,  \field G-Function G Value 29
+  N60,  \field g-Function g Value 29
         \type real
-  N74,  \field G-Function Ln(T/Ts) Value 30
+  N61,  \field g-Function Ln(T/Ts) Value 30
         \type real
-  N75,  \field G-Function G Value 30
+  N62,  \field g-Function g Value 30
         \type real
-  N76,  \field G-Function Ln(T/Ts) Value 31
+  N63,  \field g-Function Ln(T/Ts) Value 31
         \type real
-  N77,  \field G-Function G Value 31
+  N64,  \field g-Function g Value 31
         \type real
-  N78,  \field G-Function Ln(T/Ts) Value 32
+  N65,  \field g-Function Ln(T/Ts) Value 32
         \type real
-  N79,  \field G-Function G Value 32
+  N66,  \field g-Function g Value 32
         \type real
-  N80,  \field G-Function Ln(T/Ts) Value 33
+  N67,  \field g-Function Ln(T/Ts) Value 33
         \type real
-  N81,  \field G-Function G Value 33
+  N68,  \field g-Function g Value 33
         \type real
-  N82,  \field G-Function Ln(T/Ts) Value 34
+  N69,  \field g-Function Ln(T/Ts) Value 34
         \type real
-  N83,  \field G-Function G Value 34
+  N70,  \field g-Function g Value 34
         \type real
-  N84,  \field G-Function Ln(T/Ts) Value 35
+  N71,  \field g-Function Ln(T/Ts) Value 35
         \type real
-  N85,  \field G-Function G Value 35
+  N72,  \field g-Function g Value 35
         \type real
-  N86,  \field G-Function Ln(T/Ts) Value 36
+  N73,  \field g-Function Ln(T/Ts) Value 36
         \type real
-  N87,  \field G-Function G Value 36
+  N74,  \field g-Function g Value 36
         \type real
-  N88,  \field G-Function Ln(T/Ts) Value 37
+  N75,  \field g-Function Ln(T/Ts) Value 37
         \type real
-  N89,  \field G-Function G Value 37
+  N76,  \field g-Function g Value 37
         \type real
-  N90,  \field G-Function Ln(T/Ts) Value 38
+  N77,  \field g-Function Ln(T/Ts) Value 38
         \type real
-  N91,  \field G-Function G Value 38
+  N78,  \field g-Function g Value 38
         \type real
-  N92,  \field G-Function Ln(T/Ts) Value 39
+  N79,  \field g-Function Ln(T/Ts) Value 39
         \type real
-  N93,  \field G-Function G Value 39
+  N80,  \field g-Function g Value 39
         \type real
-  N94,  \field G-Function Ln(T/Ts) Value 40
+  N81,  \field g-Function Ln(T/Ts) Value 40
         \type real
-  N95,  \field G-Function G Value 40
+  N82,  \field g-Function g Value 40
         \type real
-  N96,  \field G-Function Ln(T/Ts) Value 41
+  N83,  \field g-Function Ln(T/Ts) Value 41
         \type real
-  N97,  \field G-Function G Value 41
+  N84,  \field g-Function g Value 41
         \type real
-  N98,  \field G-Function Ln(T/Ts) Value 42
+  N85,  \field g-Function Ln(T/Ts) Value 42
         \type real
-  N99, \field G-Function G Value 42
+  N86,  \field g-Function g Value 42
         \type real
-  N100, \field G-Function Ln(T/Ts) Value 43
+  N87,  \field g-Function Ln(T/Ts) Value 43
         \type real
-  N101, \field G-Function G Value 43
+  N88,  \field g-Function g Value 43
         \type real
-  N102, \field G-Function Ln(T/Ts) Value 44
+  N89,  \field g-Function Ln(T/Ts) Value 44
         \type real
-  N103, \field G-Function G Value 44
+  N90,  \field g-Function g Value 44
         \type real
-  N104, \field G-Function Ln(T/Ts) Value 45
+  N91,  \field g-Function Ln(T/Ts) Value 45
         \type real
-  N105, \field G-Function G Value 45
+  N92,  \field g-Function g Value 45
         \type real
-  N106, \field G-Function Ln(T/Ts) Value 46
+  N93,  \field g-Function Ln(T/Ts) Value 46
         \type real
-  N107, \field G-Function G Value 46
+  N94,  \field g-Function g Value 46
         \type real
-  N108, \field G-Function Ln(T/Ts) Value 47
+  N95,  \field g-Function Ln(T/Ts) Value 47
         \type real
-  N109, \field G-Function G Value 47
+  N96,  \field g-Function g Value 47
         \type real
-  N110, \field G-Function Ln(T/Ts) Value 48
+  N97,  \field g-Function Ln(T/Ts) Value 48
         \type real
-  N111, \field G-Function G Value 48
+  N98,  \field g-Function g Value 48
         \type real
-  N112, \field G-Function Ln(T/Ts) Value 49
+  N99,  \field g-Function Ln(T/Ts) Value 49
         \type real
-  N113, \field G-Function G Value 49
+  N100, \field g-Function g Value 49
         \type real
-  N114, \field G-Function Ln(T/Ts) Value 50
+  N101, \field g-Function Ln(T/Ts) Value 50
         \type real
-  N115, \field G-Function G Value 50
+  N102, \field g-Function g Value 50
         \type real
-  N116, \field G-Function Ln(T/Ts) Value 51
+  N103, \field g-Function Ln(T/Ts) Value 51
         \type real
-  N117, \field G-Function G Value 51
+  N104, \field g-Function g Value 51
         \type real
-  N118, \field G-Function Ln(T/Ts) Value 52
+  N105, \field g-Function Ln(T/Ts) Value 52
         \type real
-  N119, \field G-Function G Value 52
+  N106, \field g-Function g Value 52
         \type real
-  N120, \field G-Function Ln(T/Ts) Value 53
+  N107, \field g-Function Ln(T/Ts) Value 53
         \type real
-  N121, \field G-Function G Value 53
+  N108, \field g-Function g Value 53
         \type real
-  N122, \field G-Function Ln(T/Ts) Value 54
+  N109, \field g-Function Ln(T/Ts) Value 54
         \type real
-  N123, \field G-Function G Value 54
+  N110, \field g-Function g Value 54
         \type real
-  N124, \field G-Function Ln(T/Ts) Value 55
+  N111, \field g-Function Ln(T/Ts) Value 55
         \type real
-  N125, \field G-Function G Value 55
+  N112, \field g-Function g Value 55
         \type real
-  N126, \field G-Function Ln(T/Ts) Value 56
+  N113, \field g-Function Ln(T/Ts) Value 56
         \type real
-  N127, \field G-Function G Value 56
+  N114, \field g-Function g Value 56
         \type real
-  N128, \field G-Function Ln(T/Ts) Value 57
+  N115, \field g-Function Ln(T/Ts) Value 57
         \type real
-  N129, \field G-Function G Value 57
+  N116, \field g-Function g Value 57
         \type real
-  N130, \field G-Function Ln(T/Ts) Value 58
+  N117, \field g-Function Ln(T/Ts) Value 58
         \type real
-  N131, \field G-Function G Value 58
+  N118, \field g-Function g Value 58
         \type real
-  N132, \field G-Function Ln(T/Ts) Value 59
+  N119, \field g-Function Ln(T/Ts) Value 59
         \type real
-  N133, \field G-Function G Value 59
+  N120, \field g-Function g Value 59
         \type real
-  N134, \field G-Function Ln(T/Ts) Value 60
+  N121, \field g-Function Ln(T/Ts) Value 60
         \type real
-  N135, \field G-Function G Value 60
+  N122, \field g-Function g Value 60
         \type real
-  N136, \field G-Function Ln(T/Ts) Value 61
+  N123, \field g-Function Ln(T/Ts) Value 61
         \type real
-  N137, \field G-Function G Value 61
+  N124, \field g-Function g Value 61
         \type real
-  N138, \field G-Function Ln(T/Ts) Value 62
+  N125, \field g-Function Ln(T/Ts) Value 62
         \type real
-  N139, \field G-Function G Value 62
+  N126, \field g-Function g Value 62
         \type real
-  N140, \field G-Function Ln(T/Ts) Value 63
+  N127, \field g-Function Ln(T/Ts) Value 63
         \type real
-  N141, \field G-Function G Value 63
+  N128, \field g-Function g Value 63
         \type real
-  N142, \field G-Function Ln(T/Ts) Value 64
+  N129, \field g-Function Ln(T/Ts) Value 64
         \type real
-  N143, \field G-Function G Value 64
+  N130, \field g-Function g Value 64
         \type real
-  N144, \field G-Function Ln(T/Ts) Value 65
+  N131, \field g-Function Ln(T/Ts) Value 65
         \type real
-  N145, \field G-Function G Value 65
+  N132, \field g-Function g Value 65
         \type real
-  N146, \field G-Function Ln(T/Ts) Value 66
+  N133, \field g-Function Ln(T/Ts) Value 66
         \type real
-  N147, \field G-Function G Value 66
+  N134, \field g-Function g Value 66
         \type real
-  N148, \field G-Function Ln(T/Ts) Value 67
+  N135, \field g-Function Ln(T/Ts) Value 67
         \type real
-  N149, \field G-Function G Value 67
+  N136, \field g-Function g Value 67
         \type real
-  N150, \field G-Function Ln(T/Ts) Value 68
+  N137, \field g-Function Ln(T/Ts) Value 68
         \type real
-  N151, \field G-Function G Value 68
+  N138, \field g-Function g Value 68
         \type real
-  N152, \field G-Function Ln(T/Ts) Value 69
+  N139, \field g-Function Ln(T/Ts) Value 69
         \type real
-  N153, \field G-Function G Value 69
+  N140, \field g-Function g Value 69
         \type real
-  N154, \field G-Function Ln(T/Ts) Value 70
+  N141, \field g-Function Ln(T/Ts) Value 70
         \type real
-  N155, \field G-Function G Value 70
+  N142, \field g-Function g Value 70
         \type real
-  N156, \field G-Function Ln(T/Ts) Value 71
+  N143, \field g-Function Ln(T/Ts) Value 71
         \type real
-  N157, \field G-Function G Value 71
+  N144, \field g-Function g Value 71
         \type real
-  N158, \field G-Function Ln(T/Ts) Value 72
+  N145, \field g-Function Ln(T/Ts) Value 72
         \type real
-  N159, \field G-Function G Value 72
+  N146, \field g-Function g Value 72
         \type real
-  N160, \field G-Function Ln(T/Ts) Value 73
+  N147, \field g-Function Ln(T/Ts) Value 73
         \type real
-  N161, \field G-Function G Value 73
+  N148, \field g-Function g Value 73
         \type real
-  N162, \field G-Function Ln(T/Ts) Value 74
+  N149, \field g-Function Ln(T/Ts) Value 74
         \type real
-  N163, \field G-Function G Value 74
+  N150, \field g-Function g Value 74
         \type real
-  N164, \field G-Function Ln(T/Ts) Value 75
+  N151, \field g-Function Ln(T/Ts) Value 75
         \type real
-  N165, \field G-Function G Value 75
+  N152, \field g-Function g Value 75
         \type real
-  N166, \field G-Function Ln(T/Ts) Value 76
+  N153, \field g-Function Ln(T/Ts) Value 76
         \type real
-  N167, \field G-Function G Value 76
+  N154, \field g-Function g Value 76
         \type real
-  N168, \field G-Function Ln(T/Ts) Value 77
+  N155, \field g-Function Ln(T/Ts) Value 77
         \type real
-  N169, \field G-Function G Value 77
+  N156, \field g-Function g Value 77
         \type real
-  N170, \field G-Function Ln(T/Ts) Value 78
+  N157, \field g-Function Ln(T/Ts) Value 78
         \type real
-  N171, \field G-Function G Value 78
+  N158, \field g-Function g Value 78
         \type real
-  N172, \field G-Function Ln(T/Ts) Value 79
+  N159, \field g-Function Ln(T/Ts) Value 79
         \type real
-  N173, \field G-Function G Value 79
+  N160, \field g-Function g Value 79
         \type real
-  N174, \field G-Function Ln(T/Ts) Value 80
+  N161, \field g-Function Ln(T/Ts) Value 80
         \type real
-  N175, \field G-Function G Value 80
+  N162, \field g-Function g Value 80
         \type real
-  N176, \field G-Function Ln(T/Ts) Value 81
+  N163, \field g-Function Ln(T/Ts) Value 81
         \type real
-  N177, \field G-Function G Value 81
+  N164, \field g-Function g Value 81
         \type real
-  N178, \field G-Function Ln(T/Ts) Value 82
+  N165, \field g-Function Ln(T/Ts) Value 82
         \type real
-  N179, \field G-Function G Value 82
+  N166, \field g-Function g Value 82
         \type real
-  N180, \field G-Function Ln(T/Ts) Value 83
+  N167, \field g-Function Ln(T/Ts) Value 83
         \type real
-  N181, \field G-Function G Value 83
+  N168, \field g-Function g Value 83
         \type real
-  N182, \field G-Function Ln(T/Ts) Value 84
+  N169, \field g-Function Ln(T/Ts) Value 84
         \type real
-  N183, \field G-Function G Value 84
+  N170, \field g-Function g Value 84
         \type real
-  N184, \field G-Function Ln(T/Ts) Value 85
+  N171, \field g-Function Ln(T/Ts) Value 85
         \type real
-  N185, \field G-Function G Value 85
+  N172, \field g-Function g Value 85
         \type real
-  N186, \field G-Function Ln(T/Ts) Value 86
+  N173, \field g-Function Ln(T/Ts) Value 86
         \type real
-  N187, \field G-Function G Value 86
+  N174, \field g-Function g Value 86
         \type real
-  N188, \field G-Function Ln(T/Ts) Value 87
+  N175, \field g-Function Ln(T/Ts) Value 87
         \type real
-  N189, \field G-Function G Value 87
+  N176, \field g-Function g Value 87
         \type real
-  N190, \field G-Function Ln(T/Ts) Value 88
+  N177, \field g-Function Ln(T/Ts) Value 88
         \type real
-  N191, \field G-Function G Value 88
+  N178, \field g-Function g Value 88
         \type real
-  N192, \field G-Function Ln(T/Ts) Value 89
+  N179, \field g-Function Ln(T/Ts) Value 89
         \type real
-  N193, \field G-Function G Value 89
+  N180, \field g-Function g Value 89
         \type real
-  N194, \field G-Function Ln(T/Ts) Value 90
+  N181, \field g-Function Ln(T/Ts) Value 90
         \type real
-  N195, \field G-Function G Value 90
+  N182, \field g-Function g Value 90
         \type real
-  N196, \field G-Function Ln(T/Ts) Value 91
+  N183, \field g-Function Ln(T/Ts) Value 91
         \type real
-  N197, \field G-Function G Value 91
+  N184, \field g-Function g Value 91
         \type real
-  N198, \field G-Function Ln(T/Ts) Value 92
+  N185, \field g-Function Ln(T/Ts) Value 92
         \type real
-  N199, \field G-Function G Value 92
+  N186, \field g-Function g Value 92
         \type real
-  N200, \field G-Function Ln(T/Ts) Value 93
+  N187, \field g-Function Ln(T/Ts) Value 93
         \type real
-  N201, \field G-Function G Value 93
+  N188, \field g-Function g Value 93
         \type real
-  N202, \field G-Function Ln(T/Ts) Value 94
+  N189, \field g-Function Ln(T/Ts) Value 94
         \type real
-  N203, \field G-Function G Value 94
+  N190, \field g-Function g Value 94
         \type real
-  N204, \field G-Function Ln(T/Ts) Value 95
+  N191, \field g-Function Ln(T/Ts) Value 95
         \type real
-  N205, \field G-Function G Value 95
+  N192, \field g-Function g Value 95
         \type real
-  N206, \field G-Function Ln(T/Ts) Value 96
+  N193, \field g-Function Ln(T/Ts) Value 96
         \type real
-  N207, \field G-Function G Value 96
+  N194, \field g-Function g Value 96
         \type real
-  N208, \field G-Function Ln(T/Ts) Value 97
+  N195, \field g-Function Ln(T/Ts) Value 97
         \type real
-  N209, \field G-Function G Value 97
+  N196, \field g-Function g Value 97
         \type real
-  N210, \field G-Function Ln(T/Ts) Value 98
+  N197, \field g-Function Ln(T/Ts) Value 98
         \type real
-  N211, \field G-Function G Value 98
+  N198, \field g-Function g Value 98
         \type real
-  N212, \field G-Function Ln(T/Ts) Value 99
+  N199, \field g-Function Ln(T/Ts) Value 99
         \type real
-  N213, \field G-Function G Value 99
+  N200, \field g-Function g Value 99
         \type real
-  N214, \field G-Function Ln(T/Ts) Value 100
+  N201, \field g-Function Ln(T/Ts) Value 100
         \type real
-  N215; \field G-Function G Value 100
+  N202; \field g-Function g Value 100
         \type real
 
 GroundHeatExchanger:Pond,

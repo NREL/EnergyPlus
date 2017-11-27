@@ -141,6 +141,7 @@ namespace DataStringGlobals {
 	std::string inputWeatherFileName;
 	std::string outputAdsFileName("eplusADS.out");
 	std::string outputDfsFileName("eplusout.dfs");
+	std::string outputGLHEFileName("eplusout.glhe");
 	std::string outputDelightInFileName("eplusout.delightin");
 	std::string outputDelightOutFileName("eplusout.delightout");
 	std::string outputDelightEldmpFileName("eplusout.delighteldmp");

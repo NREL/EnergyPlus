@@ -123,6 +123,7 @@ namespace EnergyPlus {
 			
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone1Equipment,          !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    Zone1TermReheat,         !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -249,6 +250,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE1-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -341,6 +343,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone1Equipment,          !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    Zone1TermReheat,         !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -459,6 +462,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE1-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",

@@ -60,7 +60,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,6;
 
@@ -509,10 +509,11 @@
     Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main Zone Node,          !- Zone Air Node Name
-    Main Zone Outlet Node;   !- Zone Return Air Node Name
+    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Main Zone Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Main Zone Direct Air,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

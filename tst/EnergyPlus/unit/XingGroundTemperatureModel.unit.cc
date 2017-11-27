@@ -58,11 +58,10 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
- 
+
 TEST_F( EnergyPlusFixture, XingGroundTempsModelTest )
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:Undisturbed:Xing,",
 		"	Test,			!- Name of object",
 		"	1.08,			!- Soil Thermal Conductivity {W/m-K}",
@@ -76,7 +75,7 @@ TEST_F( EnergyPlusFixture, XingGroundTempsModelTest )
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	
+
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

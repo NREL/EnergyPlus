@@ -27,7 +27,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -1845,10 +1845,11 @@
     SPACE5-1 Supply Inlet,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE5-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1949,10 +1950,11 @@
     SPACE1-1 Supply Inlet,   !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 PIU Secondary From Zone,  !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE1-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2068,10 +2070,11 @@
     SPACE2-1 Supply Inlet,   !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 PIU Secondary From Zone,  !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE2-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2187,10 +2190,11 @@
     SPACE3-1 Supply Inlet,   !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 PIU Secondary From Zone,  !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE3-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE3-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2306,10 +2310,11 @@
     SPACE4-1 Supply Inlet,   !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 PIU Secondary From Zone,  !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE4-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE4-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3868,7 +3873,7 @@
     Comm Elec;               !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeakEnergyCharge,!- Name
+    SummerOnPeakEnergyCharge,!- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     PeakEnergy,              !- Source Variable
     Summer,                  !- Season
@@ -3876,7 +3881,7 @@
     0.0447;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakEnergyCharge,  !- Name
+    SummerOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Summer,                  !- Season
@@ -3884,7 +3889,7 @@
     0.0255;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterOnPeakEnergyCharge,!- Name
+    WinterOnPeakEnergyCharge,!- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     PeakEnergy,              !- Source Variable
     Winter,                  !- Season
@@ -3892,7 +3897,7 @@
     0.0447;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    winterOffPeakEnergyCharge,  !- Name
+    winterOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Winter,                  !- Season
@@ -3900,7 +3905,7 @@
     0.0255;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    winterOnPeakDemandCharge,!- Name
+    winterOnPeakDemandCharge,!- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     PeakDemand,              !- Source Variable
     Winter,                  !- Season
@@ -3908,7 +3913,7 @@
     5.448;                   !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    winterOffPeakDemandCharge,  !- Name
+    winterOffPeakDemandCharge,  !- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     OffPeakDemand,           !- Source Variable
     Winter,                  !- Season
@@ -3916,7 +3921,7 @@
     0.0;                     !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeakDemandCharge,!- Name
+    SummerOnPeakDemandCharge,!- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     PeakDemand,              !- Source Variable
     Summer,                  !- Season
@@ -3924,7 +3929,7 @@
     7.95;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakDemandCharge,  !- Name
+    SummerOffPeakDemandCharge,  !- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     OffPeakDemand,           !- Source Variable
     Summer,                  !- Season
@@ -3932,7 +3937,7 @@
     0.0;                     !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakDemandCharge,  !- Name
+    SummerOffPeakDemandCharge,  !- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     OffPeakDemand,           !- Source Variable
     Summer,                  !- Season
@@ -3940,7 +3945,7 @@
     0.0;                     !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualDemandCharge,      !- Name
+    AnnualDemandCharge,      !- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -3948,7 +3953,7 @@
     1.14;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    taxofSevenPercent,       !- Name
+    taxofSevenPercent,       !- Utility Cost Charge Simple Name
     WiscPubServ_CG-20-SmallCommercial,  !- Tariff Name
     SubTotal,                !- Source Variable
     annual,                  !- Season
