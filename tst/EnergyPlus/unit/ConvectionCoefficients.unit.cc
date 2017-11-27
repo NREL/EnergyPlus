@@ -58,6 +58,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <HeatBalanceManager.hh>
+#include <HeatBalanceSurfaceManager.hh>
 #include <ConvectionCoefficients.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
@@ -205,6 +206,8 @@ TEST_F( EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClass
 
 	SurfaceGeometry::GetSurfaceData( errorsFound );
 	ASSERT_FALSE( errorsFound );
+	HeatBalanceManager::AllocateHeatBalArrays();
+	HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
 	DataZoneEquipment::GetZoneEquipmentData1();
 
@@ -216,5 +219,4 @@ TEST_F( EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClass
 	EXPECT_EQ( DataSurfaces::Surface( SurfNum ).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
 }
-
 
