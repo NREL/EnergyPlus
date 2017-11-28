@@ -321,14 +321,14 @@ namespace HeatBalFiniteDiffManager {
 
 	void
 	adjustPropertiesForPhaseChange(
-			int finiteDifferenceLayerIndex,
-			int surfaceIndex,
-			const DataHeatBalance::MaterialProperties & materialDefinition,
-			Real64 temperaturePrevious,
-			Real64 temperatureUpdated,
-			Real64 & updatedSpecificHeat,
-			Real64 & updatedDensity,
-			Real64 & updatedThermalConductivity
+		int finiteDifferenceLayerIndex,
+		int surfaceIndex,
+		const DataHeatBalance::MaterialProperties & materialDefinition,
+		Real64 temperaturePrevious,
+		Real64 temperatureUpdated,
+		Real64 & updatedSpecificHeat,
+		Real64 & updatedDensity,
+		Real64 & updatedThermalConductivity
 	);
 
 } // HeatBalFiniteDiffManager
