@@ -729,7 +729,7 @@ namespace EnergyPlus {
 	{
 
 		std::string const idf_objects = delimited_string({
-			"  Version,8.8;",
+			"  Version,8.9;",
 
 			"  Building,",
 			"    House with Local Air Nodes,  !- Name",
@@ -1221,7 +1221,7 @@ namespace EnergyPlus {
 		// Test eio output for HVACSystemRootFindingAlgorithm
 
 		std::string const idf_objects = delimited_string( {
-			"Version,8.8;",
+			"Version,8.9;",
 			"Building,",
 			"My Building, !- Name",
 			"30., !- North Axis{ deg }",
@@ -1255,7 +1255,7 @@ namespace EnergyPlus {
 		// Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
 		std::string const idf_objects = delimited_string( {
-			"Version,8.8;",
+			"Version,8.9;",
 			"Building,",
 			"My Building, !- Name",
 			"30., !- North Axis{ deg }",

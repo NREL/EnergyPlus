@@ -207,6 +207,20 @@ Note that a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled 
 
 Unique identifying name.
 
+\paragraph{Field: Load Distribution Scheme}\label{field-load-distribution-scheme-000}
+
+The Load Distribution Scheme selects the algorithm used to allocate the current zone load across the zone equipment. There are four choices: SequentialLoad, UniformLoad, UniformPLR, and SequentialUniformPLR. The default is SequentialLoad. In all cases, the equipment operates in the order specifed by the Zone Equipment Cooling Sequence and Heating or No-Load Sequence fields.
+
+\begin{itemize}
+\item
+  SequentialLoad loads each piece of available equipment sequentially with the full remaining load. 
+\item
+  UniformLoad evenly distributes the total load equally among all available components on the equipment list for the current load type. 
+\item
+  UniformPLR evenly distributes the total load among all available components on the equipment list for the current load type at a uniform part load ratio (PLR). 
+\item
+  SequentialUniformPLR determines how many of the available components are required to meet the current load, then distributes the load at a uniform part load ratio (PLR).
+\end{itemize}
 \paragraph{Field Set (Zone Equipment: Object Type, Name, Cooling Sequence, Heating or No-Load Sequence)}\label{field-set-zone-equipment-object-type-name-cooling-sequence-heating-or-no-load-sequence}
 
 This set is used together in order to sequence the equipment for heating and cooling. The \#1 sequence equipment will try to meet the entire demand with its capacity and then pass the results on to the \#2 and so on for both heating and cooling. This field set is extensible by duplicating the last four fields.

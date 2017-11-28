@@ -78,7 +78,7 @@
 !
 ! HVAC:                           ZoneHVAC:IdealLoadsAirSystem (with return plenum) serves each zone
 !
-! Zonal Equipment:                ZoneHVAC:IdealLoadsAirSystem 
+! Zonal Equipment:                ZoneHVAC:IdealLoadsAirSystem
 ! Central Air Handling Equipment: No
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              Yes
@@ -99,9 +99,10 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
-  Output:Diagnostics,DisplayExtraWarnings;
+  Output:Diagnostics,
+    DisplayExtraWarnings;    !- Key 1
 
   Building,
     Building,                !- Name
@@ -161,30 +162,30 @@
     CONTINUOUS;              !- Numeric Type
 
   RunPeriod,
-    RP1,
+    RP1,                     !- Name
     1,                       !- Begin Month
-    14,                      !- Begin Day Of Month
+    14,                      !- Begin Day of Month
     1,                       !- End Month
-    14,                      !- End Day Of Month
-    Tuesday,                 !- Day Of Week For Start Day
-    Yes,                     !- Use WeatherFile Holidays/Special Days
-    Yes,                     !- Use WeatherFile DaylightSavingPeriod
+    14,                      !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use WeatherFile Rain Indicators
-    Yes;                     !- Use WeatherFile Snow Indicators
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RP2,
+    RP2,                     !- Name
     7,                       !- Begin Month
-    7,                       !- Begin Day Of Month
+    7,                       !- Begin Day of Month
     7,                       !- End Month
-    7,                       !- End Day Of Month
-    Tuesday,                 !- Day Of Week For Start Day
-    Yes,                     !- Use WeatherFile Holidays/Special Days
-    Yes,                     !- Use WeatherFile DaylightSavingPeriod
+    7,                       !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use WeatherFile Rain Indicators
-    Yes;                     !- Use WeatherFile Snow Indicators
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -1886,36 +1887,41 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
-    ZONE 1 Ideal Loads,            !- Zone Equipment 1 Name
+    ZONE 1 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
-    ZONE 2 Ideal Loads,            !- Zone Equipment 1 Name
+    ZONE 2 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
-    ZONE 3 Ideal Loads,            !- Zone Equipment 1 Name
+    ZONE 3 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
-    ZONE 4 Ideal Loads,            !- Zone Equipment 1 Name
+    ZONE 4 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
-    ZONE 5 Ideal Loads,            !- Zone Equipment 1 Name
+    ZONE 5 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
@@ -1932,11 +1938,11 @@
     SPACE5-1 Ex Node;        !- Inlet 5 Node Name
 
   NodeList,
-    Plenum Ex Node List,    !- Name
-    Plenum Ex Node 2,       !- Node 2 Name
-    Plenum Ex Node 3,       !- Node 3 Name
-    Plenum Ex Node 4,       !- Node 4 Name
-    Plenum Ex Node 5;       !- Node 5 Name
+    Plenum Ex Node List,     !- Name
+    Plenum Ex Node 2,        !- Node 1 Name
+    Plenum Ex Node 3,        !- Node 2 Name
+    Plenum Ex Node 4,        !- Node 3 Name
+    Plenum Ex Node 5;        !- Node 4 Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE1-1,                !- Zone Name
@@ -1944,7 +1950,7 @@
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 Ex Node,        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    Ret Node 1;              !- Zone Return Air Node Name
+    Ret Node 1;              !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -1952,7 +1958,7 @@
     SPACE2-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Ex Node,        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    Ret Node 2;              !- Zone Return Air Node Name
+    Ret Node 2;              !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -1960,7 +1966,7 @@
     SPACE3-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Ex Node,        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    Ret Node 3;              !- Zone Return Air Node Name
+    Ret Node 3;              !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -1968,7 +1974,7 @@
     SPACE4-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 Ex Node,        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    Ret Node 4;              !- Zone Return Air Node Name
+    Ret Node 4;              !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -1976,15 +1982,14 @@
     SPACE5-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 Ex Node,        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    Ret Node 5;              !- Zone Return Air Node Name
-
+    Ret Node 5;              !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 1 Ideal Loads,      !- Name
     ,                        !- Availability Schedule Name
     SPACE1-1 In Node,        !- Zone Supply Air Node Name
     SPACE1-1 Ex Node,        !- Zone Exhaust Air Node Name
-    Plenum Ex Node 1,        !- System Air Inlet Node Name
+    Plenum Ex Node 1,        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2013,7 +2018,7 @@
     ,                        !- Availability Schedule Name
     SPACE2-1 In Node,        !- Zone Supply Air Node Name
     SPACE2-1 Ex Node,        !- Zone Exhaust Air Node Name
-    Plenum Ex Node 2,        !- System Air Inlet Node Name
+    Plenum Ex Node 2,        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2042,7 +2047,7 @@
     ,                        !- Availability Schedule Name
     SPACE3-1 In Node,        !- Zone Supply Air Node Name
     SPACE3-1 Ex Node,        !- Zone Exhaust Air Node Name
-    Plenum Ex Node 3,        !- System Air Inlet Node Name
+    Plenum Ex Node 3,        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2071,7 +2076,7 @@
     ,                        !- Availability Schedule Name
     SPACE4-1 In Node,        !- Zone Supply Air Node Name
     SPACE4-1 Ex Node,        !- Zone Exhaust Air Node Name
-    Plenum Ex Node 4,        !- System Air Inlet Node Name
+    Plenum Ex Node 4,        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2100,7 +2105,7 @@
     ,                        !- Availability Schedule Name
     SPACE5-1 In Node,        !- Zone Supply Air Node Name
     SPACE5-1 Ex Node,        !- Zone Exhaust Air Node Name
-    Plenum Ex Node 5,        !- System Air Inlet Node Name
+    Plenum Ex Node 5,        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2200,7 +2205,6 @@
     Htg-SetP-Sch,            !- Heating Setpoint Temperature Schedule Name
     Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name
 
-
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
@@ -2210,46 +2214,64 @@
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
   Output:Variable,Plenum Ex Node 1,System Node Temperature,hourly;
+
   Output:Variable,Plenum Ex Node 1,System Node Mass Flow Rate,hourly;
 
   Output:Variable,Plenum Ex Node 2,System Node Temperature,hourly;
+
   Output:Variable,Plenum Ex Node 2,System Node Mass Flow Rate,hourly;
 
   Output:Variable,Plenum Ex Node 3,System Node Temperature,hourly;
+
   Output:Variable,Plenum Ex Node 3,System Node Mass Flow Rate,hourly;
 
   Output:Variable,Plenum Ex Node 4,System Node Temperature,hourly;
+
   Output:Variable,Plenum Ex Node 4,System Node Mass Flow Rate,hourly;
 
   Output:Variable,Plenum Ex Node 5,System Node Temperature,hourly;
+
   Output:Variable,Plenum Ex Node 5,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE1-1 Ex Node,System Node Temperature,hourly;
+
   Output:Variable,SPACE1-1 Ex Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE2-1 Ex Node,System Node Temperature,hourly;
+
   Output:Variable,SPACE2-1 Ex Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE3-1 Ex Node,System Node Temperature,hourly;
+
   Output:Variable,SPACE3-1 Ex Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE4-1 Ex Node,System Node Temperature,hourly;
+
   Output:Variable,SPACE4-1 Ex Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 Ex Node,System Node Temperature,hourly;
+
   Output:Variable,SPACE5-1 Ex Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,*,Zone Ideal Loads Supply Air Sensible Heating Rate,hourly;
-  Output:Variable,*,Zone Ideal Loads Supply Air Sensible Cooling Rate,hourly;
-  Output:Variable,*,Zone Ideal Loads Supply Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
 
-  Output:Variable,*,Zone Air Heat Balance Internal Convective Heat Gain Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Zone Air Heat Balance Surface Convection Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Zone Air Heat Balance Interzone Air Transfer Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Zone Air Heat Balance Outdoor Air Transfer Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Zone Air Heat Balance System Air Transfer Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Zone Air Heat Balance System Convective Heat Gain Rate,hourly; !- HVAC Average [W]
-  Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Zone Ideal Loads Supply Air Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Mass Flow Rate,hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Internal Convective Heat Gain Rate,hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Surface Convection Rate,hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Interzone Air Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Outdoor Air Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Air Heat Balance System Air Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Air Heat Balance System Convective Heat Gain Rate,hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,hourly;
 
   Output:VariableDictionary,IDF;
 
