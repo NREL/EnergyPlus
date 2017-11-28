@@ -1842,7 +1842,7 @@ namespace ThermalComfort {
 		//          method here is the same as CalculateZoneMRT.
 		
 		// Using/Aliasing
-		using DataHeatBalSurface::TempSurfIn;
+		using DataHeatBalSurface::TH;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using DataHeatBalance::Construct;
@@ -1878,17 +1878,17 @@ namespace ThermalComfort {
 		SumAET = 0.0;
 		for ( SurfNum2 = Zone( ZoneNum ).SurfaceFirst; SurfNum2 <= Zone( ZoneNum ).SurfaceLast; ++SurfNum2 ) {
 			if ( ( Surface( SurfNum2 ).HeatTransSurf ) && ( SurfNum2 != SurfNum ) ) {
-				SumAET += SurfaceAE( SurfNum2 ) * TempSurfIn( SurfNum2 );
+				SumAET += SurfaceAE( SurfNum2 ) * TH( 2, 1, SurfNum2 );
 			}
 		}
 		
 		// Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
 		if ( ZoneAESum( ZoneNum ) > 0.01 ) {
-			CalcSurfaceWeightedMRT = 0.5 * ( TempSurfIn( SurfNum ) + ( SumAET / ZoneAESum( ZoneNum ) ) );
+			CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + ( SumAET / ZoneAESum( ZoneNum ) ) );
 		} else {
 			ShowWarningError( "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone( ZoneNum ).Name + "\"" );
 			ShowContinueError( "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone." );
-			CalcSurfaceWeightedMRT = 0.5 * ( TempSurfIn( SurfNum ) + MAT( ZoneNum ) );
+			CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + MAT( ZoneNum ) );
 		}
 
 		return CalcSurfaceWeightedMRT;
