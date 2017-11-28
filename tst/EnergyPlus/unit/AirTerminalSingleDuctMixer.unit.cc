@@ -76,6 +76,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 // EnergyPlus Headers
@@ -7293,6 +7294,7 @@ namespace EnergyPlus {
 		SizingManager::GetOARequirements();
 		SizingManager::GetZoneSizingInput();
 		GetZoneEquipmentData1();
+		ZoneEquipmentManager::SetUpZoneSizingArrays();
 		GetZoneAirLoopEquipment();
 		GetATMixers();
 
@@ -7305,7 +7307,9 @@ namespace EnergyPlus {
 		EXPECT_EQ( "SPACE1-2 DOAS AIR TERMINAL", SysATMixer( 2 ).Name ); // single duct air terminal mixer name
 		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 2 ).MixerType ); // air terminal mixer connection type 
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 2 ).EquipType( 1 ) ); // Air distribution unit equipment type
-		EXPECT_EQ( 1, SysATMixer( 2 ).OARequirementsPtr ); // design spec OA pointer - for both mixers this pointer should be 1 
+		// design spec OA pointer - for both mixers this pointer should be 1
+		// before the fix, this was 2 which later caused an array bounds error
+		EXPECT_EQ( 1, SysATMixer( 2 ).OARequirementsPtr );
 
 	}
 }
