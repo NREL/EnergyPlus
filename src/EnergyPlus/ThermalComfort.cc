@@ -1852,6 +1852,7 @@ namespace ThermalComfort {
 		
 		// Local variables
 		int SurfNum2; // surface number used in "for" loop
+		int ZoneNum2; // zone number index
 		Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
 		static Array1D< Real64 > SurfaceAE; // Product of area and emissivity for each surface
 		static Array1D< Real64 > ZoneAESum; // Sum of area times emissivity for all zone surfaces
@@ -1866,8 +1867,9 @@ namespace ThermalComfort {
 			for ( SurfNum2 = 1; SurfNum2 <= TotSurfaces; ++SurfNum2 ) {
 				if ( Surface( SurfNum2 ).HeatTransSurf ) {
 					SurfaceAE( SurfNum2 ) = Surface( SurfNum2 ).Area * Construct( Surface( SurfNum2 ).Construction ).InsideAbsorpThermal;
+					ZoneNum2 = Surface( SurfNum2 ).Zone;
 					// Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be accounted for
-					if ( ( ZoneNum > 0 ) && ( SurfNum2 != SurfNum ) ) ZoneAESum( ZoneNum ) += SurfaceAE( SurfNum2 );
+					if ( ( ZoneNum2 > 0 ) && ( SurfNum2 != SurfNum ) ) ZoneAESum( ZoneNum2 ) += SurfaceAE( SurfNum2 );
 				}
 			}
 		}
