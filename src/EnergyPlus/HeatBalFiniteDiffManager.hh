@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <DataHeatBalance.hh>
 
 namespace EnergyPlus {
 
@@ -316,6 +317,18 @@ namespace HeatBalFiniteDiffManager {
 	CheckFDSurfaceTempLimits(
 		int const SurfNum, // surface number
 		Real64 const CheckTemperature // calculated temperature, not reset
+	);
+
+	void
+	adjustPropertiesForPhaseChange(
+			int finiteDifferenceLayerIndex,
+			int surfaceIndex,
+			const DataHeatBalance::MaterialProperties & materialDefinition,
+			Real64 temperaturePrevious,
+			Real64 temperatureUpdated,
+			Real64 & updatedSpecificHeat,
+			Real64 & updatedDensity,
+			Real64 & updatedThermalConductivity
 	);
 
 } // HeatBalFiniteDiffManager
