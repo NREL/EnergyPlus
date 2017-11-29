@@ -51,7 +51,7 @@
 
 #include <string>
 #include <list>
-#include <math.h>
+#include <cmath>
 //#include <windows.h>
 #include <ScheduleManager.hh>
 #include <General.hh>
@@ -65,12 +65,38 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-using namespace std;
+
 
 namespace EnergyPlus {//***************
 
 	namespace HybridEvapCoolingModel {
-		using namespace std;
+		// Module containing the EvaporativeCoolers simulation routines
+
+		// MODULE INFORMATION:
+		//       AUTHOR         Spencer Dutton
+		//       DATE WRITTEN   May 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS MODULE:
+		// To encapsulate the data and algorithms required for the HybridUnitaryHVAC system. 
+
+		// METHODOLOGY EMPLOYED:
+		// uses 6D lookup tables to provide performance data that describe 8 key performance metrics .
+
+		//Supply Air Temperature, Supply Air Humidity Ratio, Electric Power, Supply Fan Electric Power, External Static Pressure
+		//System Second Fuel Consumption, System Third Fuel Consumption, System Water Use
+
+		//Lookups include
+
+
+		// REFERENCES: none
+
+		// OTHER NOTES: none
+
+		// USE STATEMENTS:
+		// Use statements for data only modules
+		// Using/Aliasing
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::NumOfSysTimeSteps;
 		using DataHVACGlobals::NumOfSysTimeStepsLastZoneTimeStep;
@@ -86,13 +112,18 @@ namespace EnergyPlus {//***************
 		using EnergyPlus::CurveManager::GetNormalPoint;
 		using ScheduleManager::GetCurrentScheduleValue;
 		typedef int* MyType;
-		map<string, string> testop;
-#define  DEF_Tdb 0
-#define  DEF_RH 1
 
-#define  TEMP_CURVE 0 
-#define  W_CURVE 1
-#define  POWER_CURVE 2
+		#define  DEF_Tdb 0
+		#define  DEF_RH 1
+
+		#define  TEMP_CURVE 0 
+		#define  W_CURVE 1
+		#define  POWER_CURVE 2
+		#define  SUPPLY_FAN_POWER 3
+		#define  EXTERNAL_STATIC_PRESSURE 4
+		#define  SECOND_FUEL_USE 5
+		#define  THIRD_FUEL_USE 6
+		#define  WATER_USE 7
 
 		CMode::CMode() : 
 			ModeID(0.0),
@@ -116,7 +147,7 @@ namespace EnergyPlus {//***************
 
 		bool CMode::InitializeOutsideAirTemperatureConstraints(Real64 min, Real64 max)
 		{
-			//note If this field is blank, there will be no lower constraint on outside air temperature
+			//note If this field is blank, there should be no lower constraint on outside air temperature
 			Minimum_Outside_Air_Temperature = min;
 			Maximum_Outside_Air_Temperature = max;
 			return true;
@@ -135,7 +166,6 @@ namespace EnergyPlus {//***************
 		{
 			//minimum 0.00,maximum 100.00, units percent, Mode0 will not be considered when the outside air relative humidity is below the value in this field.
 			// note If this field is blank, the lower constraint on outside air relative humidity will be 0.00% (default 0.00), the upper constraint on outside air relative humidity will be 100.00%, (default 100.00)
-
 			Minimum_Outside_Air_Relative_Humidity = min;
 			Maximum_Outside_Air_Relative_Humidity = max;
 			return true;
@@ -189,8 +219,35 @@ namespace EnergyPlus {//***************
 			if (curve_pointer >= 0) return true;
 			else  return false;
 		}
-		Real64 CMode::CalculateCurveVal(Real64 X_0, Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curveType)
+		Real64 CMode::CalculateCurveVal( Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curveType)
 		{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Spencer Maxwell Dutton
+		//       DATE WRITTEN   October 2017 
+		//       MODIFIED       
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Returns the normalized or scaled output from the performance curve as specified by curveType.  6 independent variables are required. 
+
+		// METHODOLOGY EMPLOYED:
+		// Makes a call to the curve manager, then multiplies the result by either the NormalizationReference for intensive variables or by the scaling Correction
+		// for extensive variables.
+		// The Normalization reference is specified as a model input, the Correction is equal to the ScaledSystemMaximumSupplyAirMassFlowRate, which is calculated 
+		// as  Correction=ScaledSystemMaximumSupplyAirMassFlowRate= SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity, where SystemMaximumSupplyAirFlowRate, and ScalingFactor are 
+		// model inputs.
+		// The following tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure,
+		// The following tables are for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption, Third Fuel Consumption, Water Use Lookup Table
+		// 
+		// X_1 is the outside air temperature (Tosa), X_2 is the outside humidity ratio (Wosa), 
+		// X_3 return air temp (Tra),X_4 return humidity ratio Wra,
+		// X_5 supply air mass flow rate, Msa, X_6 outside air fraction OSAF
+		// the curveType 
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
 			Real64 Y_val = 0;
 
 			switch (curveType)
@@ -217,13 +274,64 @@ namespace EnergyPlus {//***************
 			case POWER_CURVE:
 
 				if (ValidPointer(Psa_curve_pointer))
-				{
+				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
 					Y_val = Correction*CurveValue(Psa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
 					Y_val = 0;//or set a more reasonable default
 				}
 				break;
+			case SUPPLY_FAN_POWER:
+				 
+				if (ValidPointer(SFPsa_curve_pointer))
+				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+					Y_val = Correction*CurveValue(SFPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+				}
+				else {
+					Y_val = 0;//or set a more reasonable default
+				}
+				break;
+			case EXTERNAL_STATIC_PRESSURE:
+
+				if (ValidPointer(ESPsa_curve_pointer))
+				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+					Y_val = NormalizationReference*CurveValue(ESPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+				}
+				else {
+					Y_val = 0;//or set a more reasonable default
+				}
+				break;
+			case SECOND_FUEL_USE:
+				
+				if (ValidPointer(SFUsa_curve_pointer))
+				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+					Y_val = Correction*CurveValue(SFUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+				}
+				else {
+					Y_val = 0;//or set a more reasonable default
+				}
+				break;
+			case THIRD_FUEL_USE:
+
+				if (ValidPointer(TFUsa_curve_pointer))
+				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+					Y_val = Correction*CurveValue(TFUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+				}
+				else {
+					Y_val = 0;//or set a more reasonable default
+				}
+				break;
+			case WATER_USE:
+
+				if (ValidPointer(WUsa_curve_pointer))
+				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+					Y_val = Correction*CurveValue(WUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+				}
+				else {
+					Y_val = 0;//or set a more reasonable default
+				}
+				break;
+
 			default:
 				break;
 			}
@@ -232,7 +340,22 @@ namespace EnergyPlus {//***************
 		}
 		void CMode::InitializeCurve(int curveType, int curve_ID)
 		{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Spencer Maxwell Dutton
+		//       DATE WRITTEN   October 2017 
+		//       MODIFIED       
+		//       RE-ENGINEERED  na
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// Sets the curve ID assigned by the curve manager for the specific lookup Table, to a member variable. 
+
+		// METHODOLOGY EMPLOYED:
+		// 
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
 			switch (curveType)
 			{
 			case TEMP_CURVE:
@@ -244,6 +367,21 @@ namespace EnergyPlus {//***************
 			case POWER_CURVE:
 				Psa_curve_pointer = curve_ID;
 				break;
+			case SUPPLY_FAN_POWER:
+				SFPsa_curve_pointer = curve_ID;
+				break;
+			case EXTERNAL_STATIC_PRESSURE:
+				ESPsa_curve_pointer = curve_ID;
+				break;
+			case SECOND_FUEL_USE:
+				SFUsa_curve_pointer = curve_ID;
+				break;
+			case THIRD_FUEL_USE:
+				TFUsa_curve_pointer = curve_ID;
+				break;
+			case WATER_USE:
+				WUsa_curve_pointer = curve_ID;
+				break;
 			default:
 				break;
 			}
@@ -251,6 +389,29 @@ namespace EnergyPlus {//***************
 
 		bool CMode::GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Generates a matrix of all possible combinations of OSAF and supply air mass flow rates. 
+
+			// METHODOLOGY EMPLOYED:
+			// Calculate the range of supply air mass flow rate (SAMF) and OSAF the mode can operate under.
+			// Calculate a step size to increment through the ranges of SAMF and OSAF, based on the ResolutionMsa and 
+			// ResolutionOSAs respectively (these are hard coded in the constructor, this is an important consideration 
+			// because the number of increments greatly effects the simulation run time).
+			// 
+			// if the range is smaller than the minimum resolution,  then use the minimum resolution size as the minimum range over which to iterate
+			// this should have the effect of keeping the number of solutions constant even if the range size varies.
+
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			Real64 deltaMsa = Max_Msa - Min_Msa;
 			Real64 deltaOAF = Max_OAF - Min_OAF;
 			if (deltaMsa < ResolutionMsa)
@@ -264,7 +425,6 @@ namespace EnergyPlus {//***************
 			Real64 Msastep_size = (deltaMsa * ResolutionMsa);
 			Real64 OAFsteps_size = (deltaOAF * ResolutionOSA);
 
-
 			for (Real64 Msa_val = Max_Msa; Msa_val >= Min_Msa; Msa_val = Msa_val - Msastep_size)
 			{
 				for (Real64 OAF_val = Max_OAF; OAF_val >= Min_OAF; OAF_val = OAF_val - OAFsteps_size)
@@ -277,6 +437,23 @@ namespace EnergyPlus {//***************
 		}
 		bool CMode::ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Check to make sure that there is not a misalignment between the number of modes spcified in the idf, and the number of mode objects generated.
+
+			// METHODOLOGY EMPLOYED:
+			// Each mode has a fixed number of Numbers and Alphas inputs to process. So the total number of inputs for all the operating modes 
+			// should be less than total number of parameters. Also the ModeID increment should never exceed the number the maximum number of modes
+			// specified in the idf (OpperatingModes)
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			int alphas_len = Alphas.size();
 			int numbers_len = Numbers.size();
 			int OpperatingModes = Numbers(4);
@@ -292,100 +469,49 @@ namespace EnergyPlus {//***************
 			}
 			return true;
 		}
-		bool CMode::ParseMode0(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject)
+
+		bool Model::ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject)
 		{
-			if (!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject))
-			{
-				//this error should never really occur under normal operation of the model, as the model will only attempt to injest the number of modes specified in the IDF 
-				ShowSevereError("There was a misalignment between the number of modes spcified in the idf and the number of mode objects generated, in" + cCurrentModuleObject);
-				return false;
-			}
-
-			bool ErrorsFound = false;
-			int inter_Alpha = BLOCK_HEADER_OFFSET_Alpha + MODE_BLOCK_OFFSET_Alpha * ModeID;
-			
-			std::ostringstream strs;
-			strs << ModeID;
-
-			int curveID = -1;
-			if (lAlphaBlanks(inter_Alpha - 1)) {
-				ModeName = "Mode" + strs.str();
-			}
-			else
-			{
-				ModeName = Alphas(inter_Alpha - 1);
-			}
-
-			curveID = -1;
-			if (lAlphaBlanks(inter_Alpha)) {
-				InitializeCurve(TEMP_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default when called
-			}
-			else
-			{
-				curveID = GetCurveIndex(Alphas(inter_Alpha));
-				if (curveID == 0) {
-					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-					ShowContinueError("Entered in " + cCurrentModuleObject);
-					ErrorsFound = true;
-					InitializeCurve(TEMP_CURVE, -1);
-				}
-				else { InitializeCurve(TEMP_CURVE, curveID); }
-
-			}
-
-			inter_Alpha = inter_Alpha + 1;
-
-			//A20, \field Mode0 Supply Air Humidity Ratio Lookup Table Name
-			curveID = -1;
-			if (lAlphaBlanks(inter_Alpha)) {
-				InitializeCurve(W_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
-			}
-			else
-			{
-				curveID = GetCurveIndex(Alphas(inter_Alpha));
-				if (curveID == 0) {
-					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-					ShowContinueError("Entered in " + cCurrentModuleObject);
-					ErrorsFound = true;
-					InitializeCurve(W_CURVE, -1);
-				}
-				else { InitializeCurve(W_CURVE, curveID); }
-
-			}
-			inter_Alpha = inter_Alpha + 1;
-			//A21, \field Mode0 System Electric Power Lookup Table Name
-			curveID = -1;
-			if (lAlphaBlanks(inter_Alpha)) {
-				InitializeCurve(POWER_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default when called
-			}
-			else
-			{
-				curveID = GetCurveIndex(Alphas(inter_Alpha));
-				if (curveID == 0) {
-					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-					ShowContinueError("Entered in " + cCurrentModuleObject);
-					ErrorsFound = true;
-					InitializeCurve(POWER_CURVE, -1);
-				}
-				else { InitializeCurve(POWER_CURVE, curveID); }
-
-			}
-			//A21, \field Mode0 Supply Fan Electric Power Lookup Table Name
-			//A22, \field Mode0 External Static Pressure Lookup Table Name
-			//A23, \field Mode0 System Second Fuel Consumption Lookup Table Name
-			//A24, \field Mode0 System Third Fuel Consumption Lookup Table Name
-			//A25, \field Mode0 System Water Use Lookup Table Name
-
-			return false;
+			CMode newMode;
+			bool error = newMode.ParseMode(ModeCounter, &OperatingModes, ScaledSystemMaximumSupplyAirMassFlowRate, Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
+			ModeCounter++;
+			return error;
 		}
-		bool CMode::ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject)
+
+		bool CMode::ParseMode(int ModeCounter, std::vector<CMode>* OperatingModes, Real64 scaledCorrection, Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Does the processing of each of the seperate modes
+
+			// METHODOLOGY EMPLOYED:
+			// As the number of modes defined in the idf is not known until its read in, this method uses two counters to keep track of the inputs in the 
+			// Alphas and Numbers arrays. Three constants are used, BLOCK_HEADER_OFFSET_Alpha, BLOCK_HEADER_OFFSET_Number and MODE1_BLOCK_OFFSET_Number
+			// if ever additional input parameters are added to the idf these offset counters would have to be adjusted accordingly.
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+			ModeID = ModeCounter;
+			Correction = scaledCorrection;
+			NormalizationReference = GetNormalPoint(1);
+			if (NormalizationReference == -1)
+			{
+				NormalizationReference = 1;
+			}
+			
 			if (!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject))
 			{
 				ShowSevereError("There was a misalignment between the number of modes spcified in the idf and the number of mode objects generated, in" + cCurrentModuleObject);
 				return false;
 			}
-			int inter_Number;
+			int inter_Number; 
 			bool ErrorsFound = false;
 			int inter_Alpha = BLOCK_HEADER_OFFSET_Alpha + MODE_BLOCK_OFFSET_Alpha * ModeID;
 			if (ModeID == 1)
@@ -463,14 +589,104 @@ namespace EnergyPlus {//***************
 
 			}
 			//A22, \field Mode0 Supply Fan Electric Power Lookup Table Name
-			//A23, \field Mode0 External Static Pressure Lookup Table Name
-			//A24, \field Mode0 System Second Fuel Consumption Lookup Table Name
-			//A25, \field Mode0 System Third Fuel Consumption Lookup Table Name
-			//A26, \field Mode0 System Water Use Lookup Table Name
+			inter_Alpha = inter_Alpha + 1;
+			curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(SUPPLY_FAN_POWER, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject);
+					ErrorsFound = true;
+					InitializeCurve(SUPPLY_FAN_POWER, -1);
+				}
+				else { InitializeCurve(SUPPLY_FAN_POWER, curveID); }
 
+			}
+			//A23, \field Mode0 External Static Pressure Lookup Table Name
+			inter_Alpha = inter_Alpha + 1;
+			curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(EXTERNAL_STATIC_PRESSURE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject);
+					ErrorsFound = true;
+					InitializeCurve(EXTERNAL_STATIC_PRESSURE, -1);
+				}
+				else { InitializeCurve(EXTERNAL_STATIC_PRESSURE, curveID); }
+
+			}
+			//  
+			//A24, \field Mode0 System Second Fuel Consumption Lookup Table Nam
+			inter_Alpha = inter_Alpha + 1;
+			curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(SECOND_FUEL_USE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject);
+					ErrorsFound = true;
+					InitializeCurve(SECOND_FUEL_USE, -1);
+				}
+				else { InitializeCurve(SECOND_FUEL_USE, curveID); }
+
+			}
+			//A25, \field Mode0 System Third Fuel Consumption Lookup Table Name
+			inter_Alpha = inter_Alpha + 1;
+			curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(THIRD_FUEL_USE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject);
+					ErrorsFound = true;
+					InitializeCurve(THIRD_FUEL_USE, -1);
+				}
+				else { InitializeCurve(THIRD_FUEL_USE, curveID); }
+
+			}
+			//A26, \field Mode0 System Water Use Lookup Table Name
+			inter_Alpha = inter_Alpha + 1;
+			curveID = -1;
+			if (lAlphaBlanks(inter_Alpha)) {
+				InitializeCurve(WATER_USE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+			}
+			else
+			{
+				curveID = GetCurveIndex(Alphas(inter_Alpha));
+				if (curveID == 0) {
+					ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
+					ShowContinueError("Entered in " + cCurrentModuleObject);
+					ErrorsFound = true;
+					InitializeCurve(WATER_USE, -1);
+				}
+				else { InitializeCurve(WATER_USE, curveID); }
+
+			}
+			if (ModeID == 0)
+			{
+				(*OperatingModes).push_back(*this);
+				return ErrorsFound;
+			}
 			//N6, \field Mode0  Minimum Outside Air Temperature
 			//N7, \field Mode0  Maximum Outside Air Temperature
-			bool ok = InitializeOutsideAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1)); 
+			bool ok = InitializeOutsideAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
 			if (!ok) {
 				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
 				ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -540,13 +756,31 @@ namespace EnergyPlus {//***************
 				ShowContinueError("Entered in " + cCurrentModuleObject);
 				ErrorsFound = true;
 			}
-
+			(*OperatingModes).push_back(*this);
 			return ErrorsFound;
 		}
+		
 
 
 		bool CMode::MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHosa)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// To check to see if this mode of operation is able to operate given the specified outdoor environmental conditions.
+
+			// METHODOLOGY EMPLOYED:
+			// Constraining certain modes to only operate over certain environmental conditions gives the user greater control in which
+			// modes the algorithm selects.
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			bool OATempConstraintmet = false;
 			bool OAHRConstraintmet = false;
 			bool OARHConstraintmet = false;
@@ -575,9 +809,25 @@ namespace EnergyPlus {//***************
 			}
 		}
 
-		bool Model::MeetsSupplyAirTOC(Real64 Tosa)
+		bool Model::MeetsSupplyAirTOC(Real64 Tsupplyair)
 		{
-		
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// To check to see if this this particular setting (combination of mode, OSAF and Msa) meets the required minumum
+			// supply air temperature specified in the schedules
+
+			// METHODOLOGY EMPLOYED:
+			// Checks the minimum and maximum supply air temperatures and tests to see if the proposed supply air temperature is in the acceptable range.
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing		
 			Real64 MinSAT = 10;
 			Real64 MaxSAT = 20;
 			if (TsaMin_schedule_pointer > 0) {
@@ -586,13 +836,31 @@ namespace EnergyPlus {//***************
 			if (TsaMax_schedule_pointer > 0) {
 				MaxSAT = GetCurrentScheduleValue(TsaMax_schedule_pointer);
 			}
-			if (Tosa < MinSAT || Tosa > MaxSAT)
+			if (Tsupplyair < MinSAT || Tsupplyair > MaxSAT)
 				return false;
 			return true;
 		}
 
-		bool Model::MeetsSupplyAirRHOC(Real64 Wosa)
+		bool Model::MeetsSupplyAirRHOC(Real64 SupplyW)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// To check to see if this this particular setting (combination of mode, OSAF and Msa) meets the required minumum
+			// supply air relative humidity specified in the schedules
+
+			// METHODOLOGY EMPLOYED:
+			// Checks the scheduled minimum and maximum supply air RH and tests to see if the proposed supply air RH is in the acceptable range.
+
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			Real64 MinRH = 0;
 			Real64 MaxRH = 1;
 			if (RHsaMin_schedule_pointer > 0) {
@@ -601,7 +869,7 @@ namespace EnergyPlus {//***************
 			if (RHsaMax_schedule_pointer > 0) {
 				MaxRH = GetCurrentScheduleValue(RHsaMax_schedule_pointer);
 			}
-			if (Wosa < MinRH || Wosa > MaxRH)
+			if (SupplyW < MinRH || SupplyW > MaxRH)
 				return false;
 			return true;
 		}
@@ -640,6 +908,15 @@ namespace EnergyPlus {//***************
 			SystemLatentHeatingEnergy(0.0),
 			RequestedLoadToHeatingSetpoint(0.0),
 			RequestedLoadToCoolingSetpoint(0.0),
+			SupplyFanElectricPower(0.0),
+			SupplyFanElectricEnergy(0.0),
+			SecondaryFuelConsumptionRate(0.0),
+			SecondaryFuelConsumption(0.0),
+			ThirdFuelConsumptionRate(0.0),
+			ThirdFuelConsumption(0.0),
+			WaterConsumptionRate(0.0),
+			WaterConsumption(0.0),
+			ExternalStaticPressure(0.0),
 			RequestedHumdificationMass(0.0),
 			RequestedHumdificationLoad(0.0),
 			RequestedHumdificationEnergy(0.0),
@@ -713,23 +990,17 @@ namespace EnergyPlus {//***************
 			count_DidWeMeetLoad = 0;
 			count_DidWeNotMeetLoad = 0;
 			// vector below used store the modes in each timestep that don't meet humidity or temperature limits, used in warnings
-			vector<int> temp(25);
+			std::vector<int> temp(25);
 			SAT_OC_MetinMode_v= temp;
 			SAHR_OC_MetinMode_v= temp;
 			
 			int MAXIMUM_OPERATIONAL_SETTINGS = 5;
 			ModeCounter = 0;
-			//these are the three setting types currently implimented, pOptimal is the setting that meets conditioning load. 
-			pStandBy = new CSetting;
-			pOptimal= new CSetting;
 			
+			DebugBreak = 9; // remove
+	
+			CurrentOperatingSettings.resize(5);
 
-			for (int i = 0; i< MAXIMUM_OPERATIONAL_SETTINGS; i++)
-			{
-				CSetting * pointer= new CSetting();
-				pointer->ElectricalPower = 0;
-				CurrentOperatingSettings.push_back(pointer);
-			}
 			InitializeModelParams();
 		}
 		
@@ -766,38 +1037,49 @@ namespace EnergyPlus {//***************
 			RequestedDeHumdificationMass = 0;
 			RequestedDeHumdificationLoad = 0;
 			RequestedDeHumdificationEnergy = 0;
-			PrimaryMode = 0;
-			PrimaryModeRuntimeFraction = 0;
-
 		}
 
 		void Model::InitializeModelParams()
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Reset calculation values 
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			ResetOutputs();
+			PrimaryMode = 0;
+			PrimaryModeRuntimeFraction = 0;
 			optimal_EnvCondMet = false;
 			Tsa = 0;
 			//reset the power use to a high value, this is replaced during the calculation keeping the "best" setting. 
-			pOptimal->ElectricalPower = IMPLAUSIBLE_POWER;
+			//pOptimal.ElectricalPower = IMPLAUSIBLE_POWER;
 			RunningPeakCapacity_EnvCondMet = false;
 			Settings.clear();
 		}
 
 		Model::~Model()                 
 		{
-			list<CModeSolutionSpace*>::iterator iter;
-			for (iter = SolutionSpaces.begin(); iter != SolutionSpaces.end(); ++iter) {
+			for (auto iter = SolutionSpaces.begin(); iter != SolutionSpaces.end(); ++iter) {
 				CModeSolutionSpace* p = (*iter);
 				delete p;
-			}
+			} 
 			
-			list<CSetting*>::iterator iterSettings;
-			for (iterSettings = Settings.begin(); iterSettings != Settings.end(); ++iterSettings) {
-				CSetting* ps = (*iterSettings);
-				delete ps;
+			for (auto iterSettings = Settings.begin(); iterSettings != Settings.end(); ++iterSettings) {
+				 (*iterSettings).reset();
 			}
-			CurrentOperatingSettings.clear();
-
 		}
+
 		CMode::~CMode()  
 		{
 	
@@ -807,19 +1089,26 @@ namespace EnergyPlus {//***************
 		{
 			return ID;
 		}
-
-		CMode* Model::AddNewOperatingMode(Real64 scaledCorrection)
-		{
-			CMode* pMode = new CMode;
-			pMode->ModeID = ModeCounter;
-			pMode->Correction = scaledCorrection;
-			pMode->NormalizationReference = GetNormalPoint(1);
-			ModeCounter++;
-			OperatingModes.push_back(pMode);
-			return pMode;
-		}
+	
 		void Model::Initialize(int ZoneNumber)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Specify solution space resolution, and populate the solution spaces in each mode
+
+			// METHODOLOGY EMPLOYED:
+			// Solution spaces are the matrices of possible settings settings (combination of OSA fraction and supply air mass flow rate) 
+			// This method calls the GenerateSolutionSpace for each of the modes defined in the idf. 
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+
 			ZoneNum = ZoneNumber;
 			if (Initialized){
 				return;
@@ -830,20 +1119,12 @@ namespace EnergyPlus {//***************
 			ResolutionOSA = 0.2; //OSAF as absolute fraction (not %)
 		
 			//Iterate through modes of operation generating a matrix of OSAF and Msa to test in the algorithm.
-			list<CMode*>::iterator iterModes;
-
+			std::vector<CMode>::iterator iterModes;
 			for (iterModes = OperatingModes.begin(); iterModes != OperatingModes.end(); ++iterModes) {
-				CMode* Mode = (*iterModes);
-				Mode->GenerateSolutionSpace(ResolutionMsa, ResolutionOSA);
+				(*iterModes).GenerateSolutionSpace(ResolutionMsa, ResolutionOSA);
 			}
+
 			Initialized = true;
-		}
-
-
-		void Model::ModelLog(std::string fmi_logmessage)
-		{
-			std::string logmessage(fmi_logmessage);
-			cout << logmessage;
 		}
 
 
@@ -859,10 +1140,22 @@ namespace EnergyPlus {//***************
 		
 		Real64 Model::Sat_press(Real64 Tdb)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
 			// Function to compute saturation vapor pressure in [kPa]
+
+			// METHODOLOGY EMPLOYED:
 			//ASHRAE Fundamentals handbood (2005) p 6.2, equation 5 and 6
 			//   Tdb = Dry bulb temperature [degC]
 			// Valid from -100C to 200 C
+
+			// REFERENCES:
+			// na
 
 			Real64  C1 = -5674.5359;
 			Real64  C2 = 6.3925247;
@@ -896,12 +1189,26 @@ namespace EnergyPlus {//***************
 
 		Real64 Model::CalcHum_ratio_W(Real64 Tdb, Real64 RH, Real64 P)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
 			// Function to calculate humidity ratio [kg H2O/kg air]
 			// Given dry bulb and wet bulb temperature inputs [degC]
+
+			// METHODOLOGY EMPLOYED:
 			// ASHRAE Fundamentals handbood (2005)
-			//   Tdb = Dry bulb temperature [degC]
-			//   RH = Relative Humidity [Fraction or %]
-			//   P = Ambient Pressure [kPa]
+			// Tdb = Dry bulb temperature [degC]
+			// RH = Relative Humidity [Fraction or %]
+			// P = Ambient Pressure [kPa] 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 
 			Real64 Pws = Sat_press(Tdb);
 			Real64 Hum_rat = 0.62198 * RH * Pws / (P - RH * Pws);   // Equation 22, 24, p6.8
@@ -910,6 +1217,7 @@ namespace EnergyPlus {//***************
 
 		Real64 Model::CheckVal_W(Real64 W)
 		{
+			//
 			if ((W > 1) || (W < 0))
 			{
 				ShowWarningError("Humidity ratio exceeded realistic range, check performance curve");
@@ -925,28 +1233,51 @@ namespace EnergyPlus {//***************
 			return T;
 		}
 
-
-
-		bool Model::SetStandByMode(CMode* pMode0, CSetting *pStandBy, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra)
+		bool Model::SetStandByMode(CMode* pMode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Set the supply air mass flow rate, power use, and all the other parameters for a setting. 
+
+			// METHODOLOGY EMPLOYED:
+			// Uses the relevant lookup take to specify the parameters, or uses default conditions.
+			// In setting the supply air temperature for now just use return air future improvement will use look up table
+
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			CModeSolutionSpace* solutionspace = &(pMode0->sol);
 			int solution_map_sizeX = solutionspace->PointX.size();
 			Real64 NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same, this is explained in the IO reference
+			if (NormalizationReference == -1)
+			{
+				NormalizationReference = 1;
+				return true;
+			}
 
 			if (solution_map_sizeX > 0)
 			{
 				Real64 MsaRatio = solutionspace->PointX[0];
 				Real64 Msa = NormalizationReference * MsaRatio;
 				Real64 OSAF = solutionspace->PointY[0];
-				Real64 ElectricalPower = pMode0->CalculateCurveVal(1, Tosa, Wosa, Tra, Wra, Msa, OSAF, POWER_CURVE);
-				pStandBy->ElectricalPower = ElectricalPower;
-				pStandBy->Supply_Air_Mass_Flow_Rate = Msa;
-				pStandBy->Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
-				pStandBy->Outside_Air_Fraction = OSAF;
-				// for now just use return air but should use look up table
-				pStandBy->SupplyAirTemperature = Tra;
-				pStandBy->SupplyAirW = Wra;
-				pStandBy->Mode = 0;
+				Real64 ElectricalPower = pMode0->CalculateCurveVal( Tosa, Wosa, Tra, Wra, Msa, OSAF, POWER_CURVE);
+				oStandBy.ElectricalPower = ElectricalPower;
+				oStandBy.Supply_Air_Mass_Flow_Rate = Msa;
+				oStandBy.ScaledSupply_Air_Mass_Flow_Rate = Msa;
+				oStandBy.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio*ScaledSystemMaximumSupplyAirMassFlowRate;
+				oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio*ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+				oStandBy.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
+				oStandBy.Outside_Air_Fraction = OSAF;
+				oStandBy.SupplyAirTemperature = Tra;
+				oStandBy.SupplyAirW = Wra;
+				oStandBy.Mode = 0;
 			}
 			else
 			{
@@ -956,82 +1287,147 @@ namespace EnergyPlus {//***************
 			return false;
 		}
 
+
 		Real64 Model::CalculateTimeStepAverage(SYSTEMOUTPUTS val)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Calculates the resultant supply air conditions when the system operates in 
+			// multiple settings within a timestep. 
+
+			// METHODOLOGY EMPLOYED:
+			// For longer simulation timesteps this model can consider partial runtime fractions
+			// operating in different settings for a fraction of the total simulation time step reducing the likelyhood of over conditioning.
+			// Intensive variables that do not depend on system size (like temperature, pressure,etc), and extensive variables (variable whose values depend on the quantity of substance) are handled differently
+			//  
+			// Extensive variables ( Mass Flow, Volume flow, Fuel use etc), are averaged weighted by the amount of time spent in each setting.
+			// for example if then system operates for 25% of the time with a mass flow of 4kg/s, and 75% of the time at a mass flow of 0kg/s then the resultant 
+			// time step average mass flow rate would be  1 kg/s.
+
+			// Intensive values in each part runtime fraction are first multiplied by the Scaled Supply Air Mass Flow Rate for each setting
+			// and then once all the various runtime fractions are added up, the resultant is divided by the overal time step average Scaled Supply Air Mass Flow Rate
+			// 
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			Real64 averagedVal = 0;
 			Real64 MassFlowDependentDenominator = 0;
 			Real64 value = 0;
-			list<CSetting*>::iterator iterOperatingSettings;
+			std::vector<CSetting>::iterator iterOperatingSettings;
 			iterOperatingSettings = CurrentOperatingSettings.begin();
-			CSetting* StandbyMode = (*iterOperatingSettings);
+			CSetting StandbyMode = (*iterOperatingSettings);
 			for (; iterOperatingSettings != CurrentOperatingSettings.end(); ++iterOperatingSettings) {
-				CSetting* po = (*iterOperatingSettings);
+				CSetting po = (*iterOperatingSettings);
 				// add up part runtime fractions
 				switch (val)
 				{
 					case SYSTEMOUTPUTS::VENTILATION_AIR_V:  
-						value = po->Supply_Air_Ventilation_Volume;
+						value = po.ScaledSupply_Air_Ventilation_Volume;
 						break;
 					case SYSTEMOUTPUTS::SYSTEM_FUEL_USE:  
-						value = po->ElectricalPower;
+						value = po.ElectricalPower;
+						break;
+					case SYSTEMOUTPUTS::OSUPPLY_FAN_POWER:
+						value = po.SupplyFanElectricPower;
+						break;
+					case SYSTEMOUTPUTS::OSECOND_FUEL_USE:
+						value = po.SecondaryFuelConsumptionRate;
+						break;
+					case SYSTEMOUTPUTS::OTHIRD_FUEL_USE:
+						value = po.ThirdFuelConsumptionRate;
+						break;
+					case SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE:
+						value = po.ExternalStaticPressure* po.ScaledSupply_Air_Mass_Flow_Rate;
+						break;
+					case SYSTEMOUTPUTS::OWATER_USE:
+						value = po.WaterConsumptionRate;
 						break;
 					case SYSTEMOUTPUTS::SUPPLY_AIR_TEMP: 
-						value = po->SupplyAirTemperature * po->Supply_Air_Mass_Flow_Rate; 
+						value = po.SupplyAirTemperature * po.ScaledSupply_Air_Mass_Flow_Rate;
 						break;
 					case SYSTEMOUTPUTS::MIXED_AIR_TEMP:  
-						value = po->Mixed_Air_Temperature * po->Supply_Air_Mass_Flow_Rate;
+						value = po.Mixed_Air_Temperature * po.ScaledSupply_Air_Mass_Flow_Rate;
 						break;
 					case SYSTEMOUTPUTS::SUPPLY_MASS_FLOW:  
-						value = po->Supply_Air_Mass_Flow_Rate; 
+						value = po.ScaledSupply_Air_Mass_Flow_Rate; 
 						break;
 					case SYSTEMOUTPUTS::SUPPLY_AIR_HR:  
-						value = po->SupplyAirW * po->Supply_Air_Mass_Flow_Rate; 
+						value = po.SupplyAirW * po.ScaledSupply_Air_Mass_Flow_Rate;
 						break;
 					case SYSTEMOUTPUTS::MIXED_AIR_HR:  
-						value = po->Mixed_Air_W * po->Supply_Air_Mass_Flow_Rate; 
+						value = po.Mixed_Air_W * po.ScaledSupply_Air_Mass_Flow_Rate;
 						break;
 						
 				}
-				Real64 part_run = po->Runtime_Fraction;
+				Real64 part_run = po.Runtime_Fraction;
 				averagedVal = averagedVal + value*part_run; 
-				MassFlowDependentDenominator = po->Supply_Air_Mass_Flow_Rate*part_run + MassFlowDependentDenominator;
+				MassFlowDependentDenominator = po.ScaledSupply_Air_Mass_Flow_Rate*part_run + MassFlowDependentDenominator;
 			}
+			//
 			switch (val)
 			{
 				case SYSTEMOUTPUTS::SUPPLY_AIR_TEMP:  
 					if (MassFlowDependentDenominator==0)
 					{
-						averagedVal = StandbyMode->SupplyAirTemperature;
+						averagedVal = StandbyMode.SupplyAirTemperature;
 					}
 					else averagedVal = averagedVal/ MassFlowDependentDenominator; break;
-				case SYSTEMOUTPUTS::SUPPLY_MASS_FLOW:
-					break;
-				case SYSTEMOUTPUTS::VENTILATION_AIR_V:
-					break;	
+				case SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE:
+					if (MassFlowDependentDenominator == 0)
+					{
+						averagedVal = StandbyMode.ExternalStaticPressure;
+					}
+					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
 				case SYSTEMOUTPUTS::SUPPLY_AIR_HR:  
 					if (MassFlowDependentDenominator == 0)
 					{
-						averagedVal = StandbyMode->SupplyAirW;
+						averagedVal = StandbyMode.SupplyAirW;
 					}
 					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
 				case SYSTEMOUTPUTS::MIXED_AIR_TEMP:  
 					if (MassFlowDependentDenominator == 0)
 					{
-						averagedVal = StandbyMode->Mixed_Air_Temperature;
+						averagedVal = StandbyMode.Mixed_Air_Temperature;
 					}
 					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
 				case SYSTEMOUTPUTS::MIXED_AIR_HR: 
 					if (MassFlowDependentDenominator == 0)
 					{
-						averagedVal = StandbyMode->Mixed_Air_W;
+						averagedVal = StandbyMode.Mixed_Air_W;
 					}
 					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
+				default:
+					break;
 			}
 			return averagedVal;
 		}
 
 		Real64 Model::CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Calculates the minimum runtime fraction in a given setting needed to meet the
+			// sensible cooling, sensible heating, dehumidification and humidification loads
+			// and ventilation loads.
+
+			// METHODOLOGY EMPLOYED:
+			// Calculate the minimum runtime fractions for each load that needs to be met and find the lowest of those runtime fractions. 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			Real64 PLHumidRatio, PLDehumidRatio, PLVentRatio, PLSensibleCoolingRatio, PLSensibleHeatingRatio, PartRuntimeFraction;
 			PLHumidRatio=PLDehumidRatio = PLVentRatio = PLSensibleCoolingRatio = PLSensibleHeatingRatio = 0;
 
@@ -1084,7 +1480,68 @@ namespace EnergyPlus {//***************
 
 		int Model::SetOperatingSetting(CStepInputs StepIns)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Dutton
+			//       DATE WRITTEN   May 2017
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// This subroutine determines the set of operating settings for the HybridUniaryHVAC 
+			// It is called from Model::doStep, the main calculation step
+			// at the system time step.
+
+			// METHODOLOGY EMPLOYED:
+			// 1) Clear out the set of operating settings from the previous time step.
+			// 2) Iterate through each operating mode and weed out modes that are not intended to operate in current environmental conditions.    
+			//		-> For each mode that is viable iterate thought the solution space and identify settings that meet the ventilation requirements 
+			//      -> settings that do are stored in the a container (Settings)
+			// 3) Iterate through all the settings in Settings
+			//
+			// 4) Calculate the setting zone sensible cooling and heating load and humidifcation and dehumidifcation. 
+			// 5) Test to see if conditioning and humidification loads are met. 
+			// 6) Calculate setting power consumption, use the setting delivered ventilation and loads to calculate the
+			// 7) minimum runtime fraction needed to meet those loads, then assuming that part runtime fraction calculate the setting part run time power use.
+			// 8)   If the setting meets both the conditioning and humidification loads then test to see if its optimal in terms of energy use.
+			//  		->if so, save that setting as the current optimal.
+			//  		->if not ignore it.
+			//  	If the setting failed ot meet either the conditioning or humidification loads, then
+			//  	-> firstly check to see if no previous other setting (in this calculation step) has met both the load and humidification requirements
+			//  			-> if so
+			//  				-> check if this setting meets the conditioning load (only) 
+			//  					-> if so
+			//  						->check to see if this setting is better at meeting the dehumidification or humidification lad than any previous setting this step.
+			//  						-> if its not, ignore it.
+			// 		  				-> if not 
+			// 		  					->check to see if any previous setting met the conditioning load 
+			// 		  						->if not:
+			// 		  							->see if this setting is better at meeting the conditioning load than any previous setting this calculation step.
+			// 		  								-> if so save as current optimal
+			// 		  								-> if its not, ignore it.
+			// 		  						-> if so: then ignore it.
+			//  			->if not, then a previous setting is better than this one by default, and so ignore it. 
+			// 9) Identify error states if the no setting meets the environmental conditions, or the supply air humidity or temperature constraints. 
+			// 10) if we met the load set operating settings to be a combination of the optimal setting at the minium required runtime fraction 
+			// 11) if we partly met the load then do the best we can and run full out in that optimal setting.
+			// 12) if we didn't even partially meet the load make sure the operational settings are just the standby mode.
+			// 13) generate summary statistics for warnings.
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			using General::RoundSigDigits;
+			// Locals
+			// SUBROUTINE ARGUMENT DEFINITIONS:
+			// The CStepInputs are defined in the CStepInputs class definition.
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			// na
+			// INTERFACE BLOCK SPECIFICATIONS
+			// na
+			// DERIVED TYPE DEFINITIONS
+			// na
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			bool DidWeMeetLoad = false;
 			bool DidWeMeetHumidificaiton = false;
 			bool DidWePartlyMeetLoad = false;
@@ -1106,7 +1563,12 @@ namespace EnergyPlus {//***************
 			Real64 PreviousMaxiumConditioningOutput = 0;
 			Real64 PreviousMaxiumHumidOrDehumidOutput = 0;
 			std::string ObjectID = Name.c_str();
-			
+			int size = CurrentOperatingSettings.size();
+			CSetting empty_setting;
+			for (int i = 0; i < size; i++) 
+			{
+				CurrentOperatingSettings[i] = empty_setting;
+			}
 			if (StepIns.RHosa > 1) 
 			{ 
 				ShowSevereError("Unitary hybrid system error, required relative humidity value 0-1, called in object" + ObjectID + ".Check inputs" ); 
@@ -1126,27 +1588,14 @@ namespace EnergyPlus {//***************
 
 			MinOA_Msa = StepIns.MinimumOA; // Set object version of minimum VR Kg/s
 			
-			DehumidificationRequested = false;
-			HumidificationRequested = false;
-
-			// Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
-			if (StepIns.ZoneDehumidificationLoad < 0)
-			{
-				DehumidificationRequested = true;
-			}
-			// Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
-			if (StepIns.ZoneMoistureLoad > 0)
-			{
-				HumidificationRequested = true;
-			}
-
-			std::list<CMode*>::const_iterator iterator;
+		
+			std::vector<CMode>::const_iterator iterator;
 			iterator = OperatingModes.begin();
 			++iterator;
 			for (; iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
 			{
-				CMode* pMode = *iterator;
-				CModeSolutionSpace* solutionspace = &(pMode->sol);
+				CMode Mode = *iterator;
+				CModeSolutionSpace* solutionspace = &(Mode.sol);
 				bool SAHR_OC_MetinMode = false;
 				bool SAT_OC_MetinMode = false;
 				int solution_map_sizeX = solutionspace->PointX.size() - 1;
@@ -1158,7 +1607,7 @@ namespace EnergyPlus {//***************
 					return -2;
 				}
 				// Check that in this mode the //Outside Air Relative Humidity(0 - 100 % )	//Outside Air Humidity Ratio(g / g)//Outside Air Temperature(°C)
-				if (pMode->MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) 
+				if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) 
 				{
 					EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
 				}
@@ -1170,24 +1619,30 @@ namespace EnergyPlus {//***************
 				if (EnvironmentConditionsMet)
 				{
 					Real64 NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same.
+					if (NormalizationReference == -1)
+					{
+						NormalizationReference = 1;
+						return true;
+					}
 					for (point_number = 0; point_number != solution_map_sizeX; point_number++) // within each mode go though all the combinations of solution spaces.
 					{
 						//Supply Air Mass Flow Rate(kg / s)
 						//Outside Air Fraction(0 - 1)
-						CSetting* pCandidateSetting = new CSetting;
+						
 						MsaRatio = solutionspace->PointX[point_number];// fractions of rated mass flow rate, so for some modes this might be low but others hi
 						OSAF = solutionspace->PointY[point_number];
 						Msa = NormalizationReference * MsaRatio;
+						Real64 Supply_Air_Ventilation_Volume = 0;
 						//Calculate the ventilation mass flow rate
 						Mvent = Msa * OSAF;
 
 						if (StdRhoAir > 1)
 						{
-							pCandidateSetting->Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
+							Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
 						}
 						else
 						{
-							pCandidateSetting->Supply_Air_Ventilation_Volume = Mvent / 1.225;  //stored as volumetric flow for reporting
+							Supply_Air_Ventilation_Volume = Mvent / 1.225;  //stored as volumetric flow for reporting
 						}
 
 						if (Mvent > MinOA_Msa)
@@ -1204,7 +1659,7 @@ namespace EnergyPlus {//***************
 							//all these points meet the minimum VR requirement
 							solutionspace->PointMeta[point_number] = 1;
 							// Calculate prospective supply air temperature
-							Tsa = pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, TEMP_CURVE);
+							Tsa = Mode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, TEMP_CURVE);
 							// Check it meets constraints
 							if (MeetsSupplyAirTOC(Tsa))
 							{
@@ -1215,7 +1670,7 @@ namespace EnergyPlus {//***************
 								SAT_OC_Met = false;
 							}
 							// Calculate prospective supply air Humidity Ratio
-							Wsa = pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, W_CURVE);
+							Wsa = Mode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, W_CURVE);
 							//Return Air Relative Humidity(0 - 100 % ) //Return Air Humidity Ratio(g / g)
 							if (MeetsSupplyAirRHOC(Wsa))
 							{
@@ -1228,15 +1683,20 @@ namespace EnergyPlus {//***************
 
 							if (SARH_OC_Met && SAT_OC_Met)
 							{
-								pCandidateSetting->Mode = pMode->ModeID;
+								std::shared_ptr< CSetting > pCandidateSetting = std::shared_ptr< CSetting >(new CSetting());
+								pCandidateSetting->Supply_Air_Ventilation_Volume = Supply_Air_Ventilation_Volume;
+								pCandidateSetting->Mode = Mode.ModeID;
 								pCandidateSetting->Outside_Air_Fraction = OSAF;
 								pCandidateSetting->Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
-								pCandidateSetting->Supply_Air_Mass_Flow_Rate = Msa;
-								pCandidateSetting->pMode = pMode;
+								pCandidateSetting->Supply_Air_Mass_Flow_Rate = Msa; //scaled mass flow rate
+								pCandidateSetting->ScaledSupply_Air_Mass_Flow_Rate = MsaRatio*ScaledSystemMaximumSupplyAirMassFlowRate;
+								pCandidateSetting->ScaledSupply_Air_Ventilation_Volume = MsaRatio*ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+								pCandidateSetting->oMode = Mode;
 								pCandidateSetting->SupplyAirTemperature = Tsa;
 								pCandidateSetting->SupplyAirW = Wsa;
-								pCandidateSetting->Mode = pMode->ModeID;
-								Settings.push_back(pCandidateSetting);
+								pCandidateSetting->Mode = Mode.ModeID;
+								
+								Settings.push_back(std::move(pCandidateSetting));
 							}
 						}
 					}
@@ -1246,30 +1706,32 @@ namespace EnergyPlus {//***************
 					// Keep an account of the number of times the supply air temperature and humidity constraints were not met for a given mode but only do this when its not warmup. 
 					if (!SAT_OC_MetinMode)
 					{
-						SAT_OC_MetinMode_v[pMode->ModeID] = SAT_OC_MetinMode_v[pMode->ModeID] + 1;	
+						SAT_OC_MetinMode_v[Mode.ModeID] = SAT_OC_MetinMode_v[Mode.ModeID] + 1;	
 					}
-					if (!SAHR_OC_MetinMode)
+					if (!SAHR_OC_MetinMode) 
 					{
-						SAHR_OC_MetinMode_v[pMode->ModeID] = SAHR_OC_MetinMode_v[pMode->ModeID] + 1;
+						SAHR_OC_MetinMode_v[Mode.ModeID] = SAHR_OC_MetinMode_v[Mode.ModeID] + 1;
 					}
 				}
 				modenumber++;
 			}
-
-			std::list<CSetting*>::const_iterator iteratorSetting;
-			for (iteratorSetting = Settings.begin(); iteratorSetting != Settings.end(); ++iteratorSetting) // iterate though the modes.
+	
+			
+			for (auto iteratorSetting = Settings.begin(); iteratorSetting != Settings.end(); ++iteratorSetting) // iterate though the modes.
 			{
-				CSetting * pSetting = *iteratorSetting;
 				//Calculate the delta H 
-				OSAF = pSetting->Outside_Air_Fraction;
-				Msa = pSetting->Supply_Air_Mass_Flow_Rate;
-				Tsa = pSetting->SupplyAirTemperature;
-				modenumber = pSetting->Mode;
-				Wsa = pSetting->SupplyAirW;
+				OSAF = (*iteratorSetting)->Outside_Air_Fraction;
+				Msa = (*iteratorSetting)->Supply_Air_Mass_Flow_Rate;
+				Real64 ScaledMsa = (*iteratorSetting)->ScaledSupply_Air_Mass_Flow_Rate;
+
+				// send the scales Msa to calculate energyies and the unscaled for sending to curves.
+				Tsa = (*iteratorSetting)->SupplyAirTemperature;
+				modenumber = (*iteratorSetting)->Mode;
+				Wsa = (*iteratorSetting)->SupplyAirW;
 				Tma = StepIns.Tra + OSAF * (StepIns.Tosa - StepIns.Tra);
 				Wma = Wra + OSAF * (Wosa - Wra);
-				pSetting->Mixed_Air_Temperature = Tma;
-				pSetting->Mixed_Air_W = Wma;
+				(*iteratorSetting)->Mixed_Air_Temperature = Tma;
+				(*iteratorSetting)->Mixed_Air_W = Wma;
 			    
 				Hma = PsyHFnTdbW(Tma, Wma); 
 				// Calculate Enthalpy of return air
@@ -1282,34 +1744,37 @@ namespace EnergyPlus {//***************
 				Real64 ReturnAirCP = PsyCpAirFnWTdb(Wra, StepIns.Tra) / 1000;
 				Real64 OutsideAirCP = PsyCpAirFnWTdb(Wosa, StepIns.Tosa) / 1000;
 				
+				// Calculations below of system cooling and heating capacity are ultimately reassessed when the resultant part runtime fraction is assessed.
+				// However its valuable that they are calculated here to at least provide a check. 
+
 				//System Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA + OSAF*(cpOSA-cpRA) + cpSA) {kJ/kg-C} * (T_RA + OSAF*(T_OSA - T_RA)  - T_SA) 
 				//System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
 				//System Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA + OSAF*(h_OSA - h_RA) - h_SA) {kJ/kgDryAir}
 				Real64 SystemCp = ReturnAirCP + OSAF*(OutsideAirCP - ReturnAirCP) + SupplyAirCp;
-				Real64 SensibleSystem = Msa*0.5* SystemCp * (Tma - Tsa);//kw  dynamic cp
-				Real64 MsaDry = Msa*(1 - Wsa);
+				Real64 SensibleSystem = ScaledMsa*0.5* SystemCp * (Tma - Tsa);//kw  dynamic cp
+				Real64 MsaDry = ScaledMsa*(1 - Wsa);
 				Real64 LatentSystem  = 2257 * MsaDry*(Wma - Wsa);
 				// Total system cooling
-				TotalSystem = (Hma - Hsa) * Msa / 1000;    
+				TotalSystem = (Hma - Hsa) * ScaledMsa / 1000;
 				// Perform latent check
 				Real64 latentCheck = TotalSystem - SensibleSystem;
 				
 				//Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
 				//Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
 				//Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}
-				Real64 SensibleRoomORZone = Msa*0.5*(SupplyAirCp + ReturnAirCP) * (StepIns.Tra - Tsa);//kw  dynamic cp
+				Real64 SensibleRoomORZone = ScaledMsa*0.5*(SupplyAirCp + ReturnAirCP) * (StepIns.Tra - Tsa);//kw  dynamic cp
 				Real64 latentRoomORZone = 2257 * MsaDry*(Wra - Wsa);
 				// Total room cooling
-				Real64 TotalRoomORZone = (Hra - Hsa) * Msa / 1000;     
+				Real64 TotalRoomORZone = (Hra - Hsa) * ScaledMsa / 1000;
 				//Perform latent check 
 				Real64 latentRoomORZoneCheck = TotalRoomORZone - SensibleRoomORZone;
 
-				pSetting->TotalSystem = TotalSystem;
-				pSetting->SensibleSystem = SensibleSystem;
-				pSetting->LatentSystem = LatentSystem;
-				pSetting->TotalZone = TotalRoomORZone;
-				pSetting->SensibleZone = SensibleRoomORZone;
-				pSetting->LatentZone = latentRoomORZone;
+				(*iteratorSetting)->TotalSystem = TotalSystem;
+				(*iteratorSetting)->SensibleSystem = SensibleSystem;
+				(*iteratorSetting)->LatentSystem = LatentSystem;
+				(*iteratorSetting)->TotalZone = TotalRoomORZone;
+				(*iteratorSetting)->SensibleZone = SensibleRoomORZone;
+				(*iteratorSetting)->LatentZone = latentRoomORZone;
 
 				bool Conditioning_load_met = false;
 				if (CoolingRequested && (SensibleRoomORZone > StepIns.RequestedCoolingLoad))
@@ -1326,12 +1791,13 @@ namespace EnergyPlus {//***************
 				}
 
 				bool Humidification_load_met = false;
-				//bool Humidification_load_met = false;
-				Real64 RequestedHumdificationLoad_kw = RequestedHumdificationLoad / 1000;
-				if (DehumidificationRequested && latentRoomORZone > RequestedHumdificationLoad_kw)
+
+				Real64 RequestedDeHumdificationLoad_kw = StepIns.ZoneDehumidificationLoad / 1000;
+				if (DehumidificationRequested && latentRoomORZone > RequestedDeHumdificationLoad_kw)
 				{
 					Humidification_load_met = true;
 				}
+				Real64 RequestedHumdificationLoad_kw = StepIns.ZoneMoistureLoad / 1000;
 				if (HumidificationRequested && latentRoomORZone < RequestedHumdificationLoad_kw)
 				{
 					Humidification_load_met = true;
@@ -1342,9 +1808,15 @@ namespace EnergyPlus {//***************
 					Humidification_load_met = true;
 				}
 	
-				Real64 Y_val = pSetting->pMode->CalculateCurveVal(1, StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, POWER_CURVE); //fix modenumber not set
+				Real64 Y_val = (*iteratorSetting)->oMode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, POWER_CURVE); //fix modenumber not set
 				ElectricalPower = Y_val;  // [Kw] calculations for fuel in Kw
-				pSetting->ElectricalPower = ElectricalPower;
+				(*iteratorSetting)->ElectricalPower = ElectricalPower;
+		
+				(*iteratorSetting)->SupplyFanElectricPower = (*iteratorSetting)->oMode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, SUPPLY_FAN_POWER);
+				(*iteratorSetting)->ExternalStaticPressure = (*iteratorSetting)->oMode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, EXTERNAL_STATIC_PRESSURE);
+				(*iteratorSetting)->SecondaryFuelConsumptionRate = (*iteratorSetting)->oMode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, SECOND_FUEL_USE);
+				(*iteratorSetting)->ThirdFuelConsumptionRate = (*iteratorSetting)->oMode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, THIRD_FUEL_USE);
+				(*iteratorSetting)->WaterConsumptionRate = (*iteratorSetting)->oMode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, Msa, OSAF, WATER_USE);
 
 				//Calculate EIR and SHR
 				EIR = ElectricalPower / TotalSystem; 
@@ -1352,25 +1824,25 @@ namespace EnergyPlus {//***************
 
 				// Calculate partload fraction required to meet all requirements
 				Real64 PartRuntimeFraction = 0;
-				PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa, pSetting->Supply_Air_Ventilation_Volume*StdRhoAir, StepIns.RequestedCoolingLoad, StepIns.RequestedHeatingLoad, SensibleRoomORZone, StepIns.ZoneDehumidificationLoad, StepIns.ZoneMoistureLoad, latentRoomORZone);//
+				PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa, (*iteratorSetting)->Supply_Air_Ventilation_Volume*StdRhoAir, StepIns.RequestedCoolingLoad, StepIns.RequestedHeatingLoad, SensibleRoomORZone, StepIns.ZoneDehumidificationLoad, StepIns.ZoneMoistureLoad, latentRoomORZone);//
 			
 				Real64 RunFractionTotalFuel = ElectricalPower*PartRuntimeFraction; // fraction can be above 1 meaning its not able to do it completely in a time step.
-				pSetting->Runtime_Fraction=PartRuntimeFraction;
-
+				(*iteratorSetting)->Runtime_Fraction=PartRuntimeFraction;
+	
 				if (Conditioning_load_met && Humidification_load_met)
 				{
 					//store best performing mode
 					if (RunFractionTotalFuel < pOptimal_RunFractionTotalFuel)
 					{
 						pOptimal_RunFractionTotalFuel = RunFractionTotalFuel;
-						pOptimal = pSetting;
+						pOptimal = *(*iteratorSetting);
 						DidWeMeetLoad = true;
 						DidWeMeetHumidificaiton = true;
 					}
 				}
 				else
 				{
-					if (!DidWeMeetLoad && DidWeMeetHumidificaiton)
+					if (!DidWeMeetLoad && !DidWeMeetHumidificaiton)
 					{
 						bool store_best_attempt = false;
 
@@ -1411,7 +1883,7 @@ namespace EnergyPlus {//***************
 						if (store_best_attempt)
 						{
 							pOptimal_RunFractionTotalFuel = RunFractionTotalFuel;
-							pOptimal = pSetting;
+							pOptimal = *(*iteratorSetting);
 							DidWePartlyMeetLoad = true;
 						}
 					}
@@ -1434,50 +1906,46 @@ namespace EnergyPlus {//***************
 				count_SAT_OC_MetOnce++;
 				ErrorCode = 3;
 			}
-
+			// if we met the load set operating settings to be a combination of the optimal setting at the minium required runtime fraction 
 			if (DidWeMeetLoad)
 			{
 				//add first setting to operating modes
 				ErrorCode = 0;
-				list<CSetting*>::iterator iterOperatingSettings = CurrentOperatingSettings.begin();
-				CSetting* pSetting = *iterOperatingSettings;
-				*pSetting = *pOptimal;
-				
-				PrimaryModeRuntimeFraction=pOptimal->Runtime_Fraction;
-				iterOperatingSettings++;
-				pStandBy->Runtime_Fraction = (1 - PrimaryModeRuntimeFraction );
-				if (pStandBy->Runtime_Fraction < 0)
+				//save the optimal setting in the 
+				CurrentOperatingSettings[0] = pOptimal;
+				PrimaryModeRuntimeFraction=pOptimal.Runtime_Fraction;
+				oStandBy.Runtime_Fraction = (1 - PrimaryModeRuntimeFraction );
+				if (oStandBy.Runtime_Fraction < 0)
 				{
-					pStandBy->Runtime_Fraction = 0;
+					oStandBy.Runtime_Fraction = 0;
 				}
-				// add standby mode
-				pSetting = *iterOperatingSettings;
-				*pSetting = *pStandBy;
+				CurrentOperatingSettings[1] = oStandBy;
 			}
 			else
 			{
+			// if we partly met the load then do the best we can and run full out in that optimal setting. 
 				if (!DidWeMeetLoad && DidWePartlyMeetLoad)
 				{
 					ErrorCode = 0;
 					count_DidWeNotMeetLoad++;
-					if (pOptimal->ElectricalPower == IMPLAUSIBLE_POWER)
+					if (pOptimal.ElectricalPower == IMPLAUSIBLE_POWER)
 					{
 						ShowWarningError("Model was not able to provide cooling for a time step, called in HybridEvapCooling:dostep");
-						pOptimal->ElectricalPower = 0;
+						pOptimal.ElectricalPower = 0;
 					}
-					list<CSetting*>::iterator iterOperatingSettings2 = CurrentOperatingSettings.begin();
-					CSetting* pSetting = *iterOperatingSettings2;
-					*pSetting = *pOptimal;
-					pSetting->Runtime_Fraction = 1;
-					PrimaryMode = pSetting->Mode;
+					pOptimal.Runtime_Fraction = 1;
+					CurrentOperatingSettings[0] = pOptimal;
+					PrimaryMode = pOptimal.Mode;
 					PrimaryModeRuntimeFraction = 1;
 				}
+			//if we didn't even partially meet the load make sure the operational settings are just the standby mode.
 				else
 				{
-					list<CSetting*>::iterator iterOperatingSettings2 = CurrentOperatingSettings.begin();
-					CSetting* pSetting = *iterOperatingSettings2;
-					*pSetting = *pStandBy;
+					oStandBy.Runtime_Fraction=1;
+
+					CurrentOperatingSettings[0] = oStandBy;
 					ErrorCode = -1;
+					StandBy = true;
 					count_DidWeNotMeetLoad++;
 				}
 			}
@@ -1510,50 +1978,76 @@ namespace EnergyPlus {//***************
 
 		int Model::CurrentPrimaryMode()
 		{
-			list<CSetting*>::iterator iterOperatingSettings;
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// retunrs the primary mode of operation 
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+			
 			if (CurrentOperatingSettings.size() > 0)
 			{
-				iterOperatingSettings = CurrentOperatingSettings.begin();
-				CSetting* pPrimaryMode = (*iterOperatingSettings);
-				return pPrimaryMode->Mode;
+				return CurrentOperatingSettings[0].Mode;
 			}
 			else return -1;
 		}
 		Real64 Model::CurrentPrimaryRuntimeFraction()
 		{
-			list<CSetting*>::iterator iterOperatingSettings;
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// returns the runtime fraction of the primary setting.
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			if (CurrentOperatingSettings.size() > 0)
 			{
-				iterOperatingSettings = CurrentOperatingSettings.begin();
-				CSetting* pPrimaryMode = (*iterOperatingSettings);
-				return pPrimaryMode->Runtime_Fraction;
+				return CurrentOperatingSettings[0].Runtime_Fraction;
 			}
 			else return -1;
-		
 		}
-		//doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful in unit testing
-		void Model::doStep(Real64 Tosa, Real64 Tra, Real64 RHosa, Real64 RHra, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR)
+		void Model::DetermineCoolingVentilationOrHumidificationNeeds(CStepInputs &StepIns)
 		{
-			MinOA_Msa = DesignMinVR;// as mass flow kg/s
-			CStepInputs StepIns;
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017 
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
 
-			RequestedHumdificationMass = OutputRequiredToHumidify;
-			RequestedHumdificationLoad = OutputRequiredToHumidify * 2257; // [W];
-			RequestedHumdificationEnergy = OutputRequiredToHumidify * 2257 * TimeStepSys * SecInHour; // [W]
+			// PURPOSE OF THIS SUBROUTINE:
+			// Sets member boolean variables to establish if the Cooling, Heating, ventilation or dehumidifcation needs are met. 
 
-			RequestedDeHumdificationMass = OutputRequiredToDehumidify;
-			RequestedDeHumdificationLoad = OutputRequiredToDehumidify * 2257; // [W]; 
-			RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * 2257 * TimeStepSys * SecInHour; // [W] 
+			// METHODOLOGY EMPLOYED:
+			// 
 
-			StepIns.RequestedCoolingLoad = -RequestedCoolingLoad / 1000; //convert to kw Cooling possitive now, heating negitive
-			StepIns.RequestedHeatingLoad = -RequestedHeatingLoad / 1000;
-			// values from function call are copied here to a containter class, this helps with the unit tests so we always know what values need to be set
-			StepIns.Tosa = Tosa; StepIns.Tra = Tra; StepIns.RHosa = RHosa; StepIns.RHra = RHra; StepIns.ZoneMoistureLoad = RequestedHumdificationLoad;  StepIns.ZoneDehumidificationLoad = RequestedDeHumdificationLoad; StepIns.MinimumOA = MinOA_Msa;
-			Real64 Wosa = CalcHum_ratio_W(Tosa, RHosa, 101.325);
-			Real64 Wra = CalcHum_ratio_W(Tra, RHra, 101.325);
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			CoolingRequested = false;
 			HeatingRequested = false;
 			VentilationRequested = false;
+			DehumidificationRequested = false;
+			HumidificationRequested = false;
 			// establish if conditioning needed 
 			if (StepIns.RequestedCoolingLoad >= MINIMUM_LOAD_TO_ACTIVATE)
 			{
@@ -1567,49 +2061,138 @@ namespace EnergyPlus {//***************
 			}
 			// establish if ventilation needed 
 			if (MinOA_Msa > 0) VentilationRequested = true;
+			// Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
+			if (StepIns.ZoneDehumidificationLoad < 0)
+			{
+				DehumidificationRequested = true;
+				StepIns.ZoneMoistureLoad = 0;
+			}
+			// Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
+			if (StepIns.ZoneMoistureLoad > 0)
+			{
+				StepIns.ZoneDehumidificationLoad = 0;
+				HumidificationRequested = true;
+			}
+		}
 
-			std::list<CMode*>::const_iterator iterator;
+		//doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful in unit testing
+		void Model::doStep(
+			Real64 RequestedCoolingLoad, // in joules, cooling load as negitive
+			Real64 RequestedHeatingLoad, // in joules, heating load as positive
+			Real64 OutputRequiredToHumidify, // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
+			Real64 OutputRequiredToDehumidify, // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
+			Real64 DesignMinVR) //mass flow rate of design ventilation air kg/s
+		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Dutton
+			//       DATE WRITTEN   May 2017
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// This subroutine Model::doStep, the main calculation steps
+			//1)Collate required inputs into a CStepInputs, this helps with the unit tests 
+			//   so we always know what values need to be set.
+			//2)Calculate W humidity ratios for outdoor air and return air.
+			//3)Sets boolean values for each potential conditioning requirement;
+			//  CoolingRequested, HeatingRequested, VentilationRequested, DehumidificationRequested, HumidificationRequested 
+			//4)Take the first operating mode which is always standby and calculate the NormalizationReference 
+			//  and then use curves to determine performance metrics for the standby mode including energy use and other outputs
+			//5)Test system availbility status and go into standby if unit is off or not needed (booleans listed in 3 are all false)
+			//6) Set the operating conditions and respective part load fractions.
+			//7) Set timestep average outlet condition, considering all operating conditions and runtimes.
+			// METHODOLOGY EMPLOYED:
+			// na
+
+			// REFERENCES:
+			// na
+			// remove
+			if ((DataGlobals::HourOfDay == DebugBreak) && !WarmupFlag)
+			{
+				int k = 1;//debug step
+			}
+			// set requested loads to output variables
+			RequestedHumdificationMass = OutputRequiredToHumidify;
+			RequestedHumdificationLoad = OutputRequiredToHumidify * 2257 / 1000; // [kW];
+			RequestedHumdificationEnergy = OutputRequiredToHumidify * 2257 * TimeStepSys * SecInHour; // [j]
+
+			RequestedDeHumdificationMass = OutputRequiredToDehumidify;
+			RequestedDeHumdificationLoad = OutputRequiredToDehumidify * 2257; // [kW]; 
+			RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * 2257 * TimeStepSys * SecInHour; // [j] 
+
+			MinOA_Msa = DesignMinVR;// as mass flow kg/s
+
+			//Collate all the inputs required for calculation into one local data structure CStepInputs, this helps with the unit tests so we always know what values need to be set
+			CStepInputs StepIns;
+			StepIns.Tosa= SecInletTemp;// degrees C
+			StepIns.Tra = InletTemp;//degrees C
+			StepIns.RHosa = SecInletRH;// RH as 0-1
+			StepIns.RHra = InletRH;
+			// For historical reasons cooling is  possitive, heating negitive throughout the calculation
+			StepIns.RequestedCoolingLoad = -RequestedCoolingLoad / 1000; //convert to kw Cooling possitive now, heating negitive
+			StepIns.RequestedHeatingLoad = -RequestedHeatingLoad / 1000; //convert to kw Cooling possitive now, heating negitive
+	
+			StepIns.ZoneMoistureLoad = RequestedHumdificationLoad;  StepIns.ZoneDehumidificationLoad = RequestedDeHumdificationLoad; 
+			StepIns.MinimumOA = DesignMinVR;
+			// calculate W humidity ratios for outdoor air and return air
+			Real64 Wosa = CalcHum_ratio_W(StepIns.Tosa, StepIns.RHosa, 101.325);
+			Real64 Wra = CalcHum_ratio_W(StepIns.Tra, StepIns.RHra, 101.325);
+			// Sets boolean values for each potential conditioning requirement;  CoolingRequested, HeatingRequested, VentilationRequested, DehumidificationRequested, HumidificationRequested 
+			DetermineCoolingVentilationOrHumidificationNeeds(StepIns);
+			// Take the first operating mode which is always standby and calculate the NormalizationReference 
+			// and then use curves to determine performance metrics for the standby mode including energy use and other outputs
+			std::vector<CMode>::const_iterator iterator;
 			iterator = OperatingModes.begin();
-
-			if (SetStandByMode(*iterator, pStandBy, Tosa, Wosa, Tra, Wra))
+			CMode Mode = *iterator;
+			// 
+			if (SetStandByMode(&Mode, StepIns.Tosa, Wosa, StepIns.Tra, Wra))
 			{
 				std::string ObjectID = Name.c_str();
 				ShowSevereError("Standby mode not defined correctly, as the mode is defined there are zero combinations of acceptible outside air fractions and supply air mass flow rate, called in object " + ObjectID);
 			}
-			// test availbility status 
+			// Test system availbility status 
 			UnitOn = 1;
+			 StandBy = false;
 			if (GetCurrentScheduleValue(SchedPtr) <= 0) {
 				UnitOn = 0;
 			}
-			// go into standby if unit is off or not needed
-			if (((!CoolingRequested && !HeatingRequested) && !VentilationRequested) || !UnitOn)
+			// Go into standby if unit is off or not needed
+			if (((!CoolingRequested && !HeatingRequested) && !VentilationRequested &&!HumidificationRequested &&!DehumidificationRequested) || !UnitOn) // what about humid / dehumid
 			{
-				pStandBy->Runtime_Fraction = 1;
-				list<CSetting*>::iterator iterOperatingSettings = CurrentOperatingSettings.begin();
-				CSetting* pSetting = *iterOperatingSettings;
-				*pSetting = *pStandBy;
+				StandBy = true;
+				oStandBy.Runtime_Fraction = 1;
+				CurrentOperatingSettings[0]= oStandBy;
 				ErrorCode = 0;
 				PrimaryMode = 0;
 				PrimaryModeRuntimeFraction = 0;
 			}
 			else
 			{
+				// set the operating conditions and respective part load fractions.
 				ErrorCode = SetOperatingSetting(StepIns);
 			}
+			
+			Real64 QTotZoneOut = 0;
+			Real64 QSensZoneOut = 0;
+			Real64 QLatentZoneOut = 0;
 
-			if (ErrorCode == 0)
+			Real64 QTotSystemOut = 0;
+			Real64 QSensSystemOut = 0;
+			Real64 QLatentSystemOut = 0;
+			// Even if its off or in standby we still need to continue to calculate standby loads
+			// All powers are calculated in Watts amd energies in Joules
+			if (!StandBy)
 			{
-				SupplyVentilationAir = CalculateTimeStepAverage(SYSTEMOUTPUTS::VENTILATION_AIR_V);
-
+				SupplyVentilationVolume = CalculateTimeStepAverage(SYSTEMOUTPUTS::VENTILATION_AIR_V);
 				if (StdRhoAir > 1)
 				{
-					SupplyVentilationVolume = SupplyVentilationAir / StdRhoAir;
+					SupplyVentilationAir = SupplyVentilationVolume * StdRhoAir;
 				}
 				else
 				{
-					SupplyVentilationVolume = SupplyVentilationAir / 1.225;
+					SupplyVentilationAir = SupplyVentilationVolume * 1.225;
 				}
-
+				// set timestep average outlet condition, considering all operating conditions and runtimes.
 				OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
 				OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR));
 
@@ -1632,7 +2215,7 @@ namespace EnergyPlus {//***************
 				{
 					averageOSAF = SupplyVentilationAir / OutletMassFlowRate;
 				}
-				else 
+				else
 				{
 					std::string ObjectID = Name.c_str();
 					if (CoolingRequested || HeatingRequested)
@@ -1641,114 +2224,125 @@ namespace EnergyPlus {//***************
 					}
 					averageOSAF = 1;
 				}
+				//Calculate timestep average unit and system 
 				PrimaryMode = CurrentPrimaryMode();
 				PrimaryModeRuntimeFraction = CurrentPrimaryRuntimeFraction();
-
-				Real64 QTotZoneOut = 0;
-				Real64 QSensZoneOut = 0;
-				Real64 QLatentZoneOut = 0;
-
-				Real64 QTotSystemOut = 0;
-				Real64 QSensSystemOut = 0;
-				Real64 QLatentSystemOut = 0;
 				Real64 Outletcp = PsyCpAirFnWTdb(OutletHumRat, OutletTemp) / 1000;
-				Real64 Returncp = PsyCpAirFnWTdb(Wra, Tra) / 1000;
-				Real64 Outdoorcp = PsyCpAirFnWTdb(Wosa, Tosa) / 1000;
+				Real64 Returncp = PsyCpAirFnWTdb(Wra, StepIns.Tra) / 1000;
+				Real64 Outdoorcp = PsyCpAirFnWTdb(Wosa, StepIns.Tosa) / 1000;
+				//Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
+				//Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
+				//Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}		
+				QSensZoneOut = 1000 * OutletMassFlowRate* 0.5* (Returncp + Outletcp)*(StepIns.Tra - OutletTemp);// 
+				Real64 OutletMassFlowRateDry = OutletMassFlowRate*(1 - Wsa);
+				QLatentZoneOut = 1000 * 2257 * OutletMassFlowRateDry* (InletHumRat - OutletHumRat);
+				QTotZoneOut = OutletMassFlowRateDry * (InletEnthalpy - OutletEnthalpy);
+				Real64 QLatentCheck = QTotZoneOut - QSensZoneOut;
 
-				// All powers are calculated in Watts amd energies in Joules
-				if (CoolingRequested || HeatingRequested || DehumidificationRequested || HumidificationRequested)
+				//System Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA + OSAF*(cpOSA-cpRA) + cpSA) {kJ/kg-C} * (T_RA + OSAF*(T_OSA - T_RA)  - T_SA) 
+				//System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
+				//System Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA + OSAF*(h_OSA - h_RA) - h_SA) {kJ/kgDryAir}
+
+				Real64 SystemTimeStepCp = Returncp + averageOSAF*(Outdoorcp - Returncp) + Outletcp;//cpRA + OSAF*(cpOSA-cpRA) + cpSA
+				Real64 SystemTimeStepW = InletHumRat + averageOSAF*(Wosa - Wra) - OutletHumRat;//HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA
+				Real64 SystemTimeStepT = StepIns.Tra + averageOSAF*(StepIns.Tosa - StepIns.Tra) - OutletTemp;//T_RA + OSAF *(T_OSA - T_RA) - T_SA
+				QSensSystemOut = 1000 * 0.5* SystemTimeStepCp *OutletMassFlowRate* SystemTimeStepT;//kw  dynamic cp
+				
+				QLatentSystemOut = 1000 * 2257 * OutletMassFlowRateDry*SystemTimeStepW;
+				QTotSystemOut = OutletMassFlowRateDry * (MixedAirEnthalpy - OutletEnthalpy);
+				QLatentCheck = QTotSystemOut - QSensSystemOut;
+
+				// reset outputs 
+				ResetOutputs();
+				//set UNIT outputs for cooling and heating 
+				if (QTotZoneOut > 0) // zone cooling is possitive, else remain zero
+				{	UnitTotalCoolingRate = std::abs(QTotZoneOut);
+					UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour;
+				}
+				else
+				{	UnitTotalHeatingRate = std::abs(QTotZoneOut);
+					UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * SecInHour;
+				}
+					
+				if (QSensZoneOut > 0) // zone cooling is possitive, else remain zero
+				{	UnitSensibleCoolingRate = std::abs(QSensZoneOut);
+					UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
+				}
+				else
+				{	UnitSensibleHeatingRate = std::abs(QSensZoneOut);
+					UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * SecInHour;
+				}
+
+				if((UnitTotalCoolingRate - UnitSensibleCoolingRate)>0)
 				{
-					//Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
-					//Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
-					//Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}		
-					QSensZoneOut = 1000 * OutletMassFlowRate* 0.5* (Returncp + Outletcp)*(InletTemp - OutletTemp);// 
-					QLatentZoneOut = 1000 * 2257 * OutletMassFlowRate* (InletHumRat - OutletHumRat);
-					QTotZoneOut = OutletMassFlowRate * (InletEnthalpy - OutletEnthalpy);
-					Real64 QLatentCheck = QTotZoneOut - QSensZoneOut;
+					UnitLatentCoolingRate = UnitTotalCoolingRate - UnitSensibleCoolingRate;
+					UnitLatentCoolingEnergy = UnitTotalCoolingEnergy - UnitSensibleCoolingEnergy;
+				}
+				if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) < 0)
+				{	UnitLatentHeatingRate = UnitTotalHeatingRate - UnitSensibleHeatingRate;
+					UnitLatentHeatingEnergy = UnitTotalHeatingEnergy - UnitSensibleHeatingEnergy;
+				}
 
-					//System Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA + OSAF*(cpOSA-cpRA) + cpSA) {kJ/kg-C} * (T_RA + OSAF*(T_OSA - T_RA)  - T_SA) 
-					//System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
-					//System Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA + OSAF*(h_OSA - h_RA) - h_SA) {kJ/kgDryAir}
+				//set SYSTEM outputs
+				if (QTotSystemOut > 0) // system cooling
+				{	SystemTotalCoolingRate = std::abs(QTotSystemOut);
+					SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * SecInHour;
+				}
+				else
+				{	SystemTotalHeatingRate = std::abs(QTotSystemOut);
+					SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * SecInHour;
+				}
 
-					Real64 SystemTimeStepCp = Returncp + averageOSAF*(Outdoorcp - Returncp) + Outletcp;//cpRA + OSAF*(cpOSA-cpRA) + cpSA
-					Real64 SystemTimeStepW = InletHumRat + averageOSAF*(Wosa - Wra) - OutletHumRat;//HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA
-					Real64 SystemTimeStepT = Tra + averageOSAF*(Tosa - Tra) - OutletTemp;//T_RA + OSAF *(T_OSA - T_RA) - T_SA
-					QSensSystemOut = 1000 * 0.5* SystemTimeStepCp *OutletMassFlowRate* SystemTimeStepT;//kw  dynamic cp
-					QLatentSystemOut = 1000 * 2257 * OutletMassFlowRate*SystemTimeStepW;
-					QTotSystemOut = OutletMassFlowRate * (MixedAirEnthalpy - OutletEnthalpy);
-					QLatentCheck = QTotSystemOut - QSensSystemOut;
+				if(QSensSystemOut> 0) //system sensible cooling
+				{
+					SystemSensibleCoolingRate = std::abs(QSensSystemOut);
+					SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * SecInHour;
 				}
 				else
 				{
-					QTotZoneOut = 0;
-					QSensZoneOut = 0;
-					QLatentZoneOut = 0;
-					QTotSystemOut = 0;
-					QSensSystemOut = 0;
-					QLatentSystemOut = 0;
-
+					SystemSensibleHeatingRate = std::abs(QSensSystemOut);
+					SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * SecInHour;
 				}
-				//set cooling specific outputs
-				if (CoolingRequested)
+				if(( SystemTotalCoolingRate - SystemSensibleCoolingRate)>0)
 				{
-					UnitTotalCoolingRate = std::abs(QTotZoneOut);
-					UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour;
-					UnitSensibleCoolingRate = std::abs(QSensZoneOut);
-					UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
-					UnitLatentCoolingRate = UnitTotalCoolingRate - UnitSensibleCoolingRate;
-					UnitLatentCoolingEnergy = UnitTotalCoolingEnergy - UnitSensibleCoolingEnergy;
-
-					SystemTotalCoolingRate = std::abs(QTotSystemOut);
-					SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * SecInHour;
-					SystemSensibleCoolingRate = std::abs(QSensSystemOut);
-					SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * SecInHour;
 					SystemLatentCoolingRate = SystemTotalCoolingRate - SystemSensibleCoolingRate;
 					SystemLatentCoolingEnergy = SystemTotalCoolingEnergy - SystemSensibleCoolingEnergy;
 				}
-				else
+				if ((SystemTotalHeatingRate - SystemSensibleHeatingRate) < 0)
 				{
-					UnitTotalCoolingRate = UnitTotalCoolingEnergy = UnitSensibleCoolingRate = UnitSensibleCoolingEnergy = UnitLatentCoolingRate = UnitLatentCoolingEnergy = 0;
-					SystemTotalCoolingRate = SystemTotalCoolingEnergy = SystemSensibleCoolingRate = SystemSensibleCoolingEnergy = SystemLatentCoolingRate = SystemLatentCoolingEnergy = 0;
-
-				}
-				// set heating specific outputs 
-				if (HeatingRequested)
-				{
-					UnitTotalHeatingRate = std::abs(QTotZoneOut);
-					UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * SecInHour;
-					UnitSensibleHeatingRate = std::abs(QSensZoneOut);
-					UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * SecInHour;
-					UnitLatentHeatingRate = UnitTotalHeatingRate - UnitSensibleHeatingRate;
-					UnitLatentHeatingEnergy = UnitTotalHeatingEnergy - UnitSensibleHeatingEnergy;
-
-					SystemTotalHeatingRate = std::abs(QTotSystemOut);
-					SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * SecInHour;
-					SystemSensibleHeatingRate = std::abs(QSensSystemOut);
-					SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * SecInHour;
 					SystemLatentHeatingRate = SystemTotalHeatingRate - SystemSensibleHeatingRate;
 					SystemLatentHeatingEnergy = SystemTotalHeatingEnergy - SystemSensibleHeatingEnergy;
 				}
-				else
-				{
-					UnitTotalHeatingRate = UnitTotalHeatingEnergy = UnitSensibleHeatingRate = UnitSensibleHeatingEnergy = UnitLatentHeatingRate = UnitLatentHeatingEnergy = 0;
-					SystemTotalHeatingRate = SystemTotalHeatingEnergy = SystemSensibleHeatingRate = SystemSensibleHeatingEnergy = SystemLatentHeatingRate = SystemLatentHeatingEnergy = 0;
-
-				}
+				// set timestep outputs calculated considering different runtime fractions.
+				SupplyFanElectricPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER);
+				SupplyFanElectricEnergy = SupplyFanElectricPower*TimeStepSys * SecInHour;
+				SecondaryFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
+				SecondaryFuelConsumption = SecondaryFuelConsumptionRate*TimeStepSys * SecInHour;
+				ThirdFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
+				ThirdFuelConsumption = ThirdFuelConsumptionRate*TimeStepSys * SecInHour;
+				WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
+				WaterConsumption = WaterConsumptionRate*TimeStepSys * SecInHour;
+				ExternalStaticPressure=CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
+					
+					
 				// fuel use in calculation is in Kw, powers are typically output in EP in Watts, so do conversion here. 
 				FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
 				FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
 			}
-			else
+			else // unit is in standby so reset conditioning outputs
 			{
-				OutletRH = InletRH;
-				OutletHumRat = InletHumRat;
-				OutletEnthalpy = InletEnthalpy;
-				OutletTemp = InletTemp;
-				OutletMassFlowRate = InletMassFlowRate;
-				PrimaryMode = 0;
-				PrimaryModeRuntimeFraction = 0;
+				QTotZoneOut = 0;
+				QSensZoneOut = 0;
+				QLatentZoneOut = 0;
+				QTotSystemOut = 0;
+				QSensSystemOut = 0;
+				QLatentSystemOut = 0;
+				// reset outputs 
 				ResetOutputs();
+				FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
+				FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
 			}
+	
 		}
 
 	}

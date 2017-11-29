@@ -91,7 +91,7 @@
 
 #define  TEMP_CURVE 0 
 #define  W_CURVE 1
-#define  POWER_CURVE 2
+#define  POWER_CURVE 2 
 
 namespace EnergyPlus {//***************
 
@@ -111,7 +111,6 @@ namespace EnergyPlus {//***************
 		int NumZoneHybridEvap(0);
 		Array1D_bool CheckZoneHybridEvapName;
 		bool GetInputZoneHybridEvap(true);
-		//ConfigFile* pConfig = new ConfigFile;
 		//Begin routines for zone HVAC Hybrid Evaporative cooler unit
 		//_______________________________________________________________________________________________________________________
 		//***************
@@ -124,6 +123,22 @@ namespace EnergyPlus {//***************
 				int & CompIndex // index to zone hvac unit
 				)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017  
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// 
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			using InputProcessor::FindItemInList;
 			using General::TrimSigDigits;
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -192,7 +207,22 @@ namespace EnergyPlus {//***************
 				int const ZoneNum // number of zone being served
 				)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017  
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
 
+			// PURPOSE OF THIS SUBROUTINE:
+			// 
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing			
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
 			using DataGlobals::TimeStep;
@@ -278,6 +308,22 @@ namespace EnergyPlus {//***************
 				Real64 & LatentOutputProvided // Latent add/removal  (kg/s), dehumid = negative
 				)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017  
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// 
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 			using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 			using DataHVACGlobals::TimeStepSys;
@@ -316,12 +362,30 @@ namespace EnergyPlus {//***************
 			{
 				DesignMinVRMassFlow = DesignMinVR *  1.225;
 			}
-			ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
+			//ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
+			ZoneHybridUnitaryAirConditioner(UnitNum).doStep( ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
+
 		}
 
 		void
 			ReportZoneHybridUnitaryAirConditioners(int const UnitNum)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017  
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// 
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
 			ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode = ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode;
@@ -336,6 +400,22 @@ namespace EnergyPlus {//***************
 		void
 			GetInputZoneHybridUnitaryAirConditioners(bool & Errors)
 		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Spencer Maxwell Dutton
+			//       DATE WRITTEN   October 2017  
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// 
+
+			// METHODOLOGY EMPLOYED:
+			// 
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
 			using BranchNodeConnections::TestCompSet;
 			using namespace ScheduleManager;
 			using DataGlobals::ScheduleAlwaysOn;
@@ -442,12 +522,12 @@ namespace EnergyPlus {//***************
 						ErrorsFound = true;
 					}
 						
-						//A8, \field Method to Choose Value of Controlled Inputs
+					//A8, \field Method to Choose Value of Controlled Inputs
 
-						//A9, \field Return Air Node Name
-						//A10, \field Outside Air Node Name
-						//A11, \field Supply Air Node Name
-						//A12, \field Relief Node Name
+					//A9, \field Return Air Node Name
+					//A10, \field Outside Air Node Name
+					//A11, \field Supply Air Node Name
+					//A12, \field Relief Node Name
 					ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 					ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode = GetOnlySingleNode(Alphas(10), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent);
 					ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode = GetOnlySingleNode(Alphas(11), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent); 
@@ -455,18 +535,19 @@ namespace EnergyPlus {//***************
 					TestCompSet(CurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
 					TestCompSet(CurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
 						
-						//N1, \field System Maximum Supply AirFlow Rate
+					//N1, \field System Maximum Supply AirFlow Rate
 					ZoneHybridUnitaryAirConditioner(UnitLoop).SystemMaximumSupplyAirFlowRate = Numbers(1);
 
-						//N2, \field External Static Pressure at System Maximum Supply Air Flow Rate
+					//N2, \field External Static Pressure at System Maximum Supply Air Flow Rate
 						
 					//In each time step, the result for system power, fan power, gas use, water user, or supply airflow rate will be determined as :
 					//TableValue * SysMaxSupply * ScalingFactor
-						//N3, \field Scaling Factor
+					//N3, \field Scaling Factor
 					ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(3);
-					// the two numbers above are used to generate a overal scaling factor 
+					// the two numbers above are used to generate a overal scaling factor  
 					if (DataEnvironment::StdRhoAir > 1)
 					{
+						// SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity;
 						ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = Numbers(1)*Numbers(3)*DataEnvironment::StdRhoAir;
 					}
 					else
@@ -474,7 +555,6 @@ namespace EnergyPlus {//***************
 						ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = Numbers(1)*Numbers(3)*1.225;  
 					}
 					
-					CMode* pMode;
 						//N4, \field Number of Operating Modes
 					int Numberofoperatingmodes = 0;
 					if (lNumericBlanks(4)) {
@@ -492,7 +572,6 @@ namespace EnergyPlus {//***************
 						//A16, \field Objective Function Minimizes
 
 						//A17, \ OA requiremnt pointer
-	
 					ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = FindItemInList(Alphas(17), OARequirements);
 					if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
 						ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
@@ -503,18 +582,8 @@ namespace EnergyPlus {//***************
 						ZoneHybridUnitaryAirConditioner(UnitLoop).OutdoorAir = true;
 					}
 					
-
-					pMode = ZoneHybridUnitaryAirConditioner(UnitLoop).AddNewOperatingMode(ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate);
-					ErrorsFound = pMode->ParseMode0(Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
-					if (ErrorsFound) {
-						ShowFatalError(RoutineName + "Errors found parsing modes");
-						ShowContinueError("... Preceding condition causes termination.");
-						break;
-					}
-
-					for (int modeIter = 1; modeIter <= Numberofoperatingmodes; ++modeIter) {
-						pMode= ZoneHybridUnitaryAirConditioner(UnitLoop).AddNewOperatingMode(ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate);
-						ErrorsFound = pMode->ParseMode(Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
+					for (int modeIter = 0; modeIter <= Numberofoperatingmodes; ++modeIter) {
+						ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
 						if (ErrorsFound) {
 							ShowFatalError(RoutineName + "Errors found parsing modes");
 							ShowContinueError("... Preceding condition causes termination.");
@@ -591,29 +660,42 @@ namespace EnergyPlus {//***************
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Moisture Transfer Rate[kg/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationMass, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Rate[W]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationLoad, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Tansfer Energy[J]", ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationEnergy, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-					
-				std::list<CSetting*>::iterator iterOperatingSettings;
+				
+
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electric Power[W]", ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyFanElectricPower, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electric Energy[J]", ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyFanElectricEnergy, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Secondary Fuel Consumption Rate[W]", ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumptionRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Secondary Fuel Consumption[J]", ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumption, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption Rate[W]", ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumptionRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption[J]", ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumption, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption Rate[m3 / hr]", ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumptionRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption[m3]", ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumption, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC External Static Pressure[Pa]", ZoneHybridUnitaryAirConditioner(UnitLoop).ExternalStaticPressure, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+
+				std::vector<CSetting>::iterator iterOperatingSettings;
 				int index=0;
-				for (iterOperatingSettings = ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.begin(); iterOperatingSettings != ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.end(); ++iterOperatingSettings)
+				int size= ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.size();
+
+				for (int i = 0; i< size; i++)
 				{
-					CSetting* po = (*iterOperatingSettings);
+					CSetting *po = &ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings[i];			
 					std::ostringstream strs;
 					strs << "Zone Hybrid Unitary HVAC Runtime Fraction in Setting "<<index<<" []";
-					SetupOutputVariable(strs.str(), po->Runtime_Fraction,"HVAC", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable(strs.str(), po->Runtime_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
 					strs << "Zone Hybrid Unitary HVAC Mode in Setting "<<index<<" []";
-					SetupOutputVariable(strs.str(), po->Mode,"HVAC", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable(strs.str(), po->Mode,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
 					strs << "Zone Hybrid Unitary HVAC Outside Air Fraction in Setting "<<index<<" []";
-					SetupOutputVariable(strs.str(), po->Outside_Air_Fraction,"HVAC", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable(strs.str(), po->Outside_Air_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
 					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting "<<index<<" [kg/s]";
-					SetupOutputVariable(strs.str(), po->Supply_Air_Mass_Flow_Rate,"HVAC", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable(strs.str(), po->Supply_Air_Mass_Flow_Rate,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
 					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting "<<index<<" []";
-					SetupOutputVariable(strs.str(), po->Supply_Air_Mass_Flow_Rate_Ratio,"HVAC", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable(strs.str(), po->Supply_Air_Mass_Flow_Rate_Ratio,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
-					index++;
+					index++; 
 				}
 			
 			}

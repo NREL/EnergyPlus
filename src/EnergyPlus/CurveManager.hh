@@ -531,7 +531,7 @@ namespace CurveManager {
 	std::string
 	GetCurveName( int const CurveIndex ); // index of curve in curve array
 
-	double GetNormalPoint(int const CurveIndex);
+	Real64 GetNormalPoint(int const CurveIndex);
 
 	int
 	GetCurveIndex( std::string const & CurveName ); // name of the curve

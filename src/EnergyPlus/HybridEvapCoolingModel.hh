@@ -66,8 +66,8 @@ namespace EnergyPlus {
 
 	namespace HybridEvapCoolingModel {
 
-		enum class SYSTEMOUTPUTS { VENTILATION_AIR_V, SUPPLY_MASS_FLOW, SYSTEM_FUEL_USE, SUPPLY_AIR_TEMP, MIXED_AIR_TEMP, SUPPLY_AIR_HR, MIXED_AIR_HR};
-		
+		enum class SYSTEMOUTPUTS { VENTILATION_AIR_V, SUPPLY_MASS_FLOW, SYSTEM_FUEL_USE, SUPPLY_AIR_TEMP, MIXED_AIR_TEMP, SUPPLY_AIR_HR, MIXED_AIR_HR, OSUPPLY_FAN_POWER, OSECOND_FUEL_USE, OTHIRD_FUEL_USE, OWATER_USE, OEXTERNAL_STATIC_PRESSURE};
+
 		class CModeSolutionSpace
 		{
 		public:
@@ -95,6 +95,12 @@ namespace EnergyPlus {
 			int Tsa_curve_pointer;
 			int HRsa_curve_pointer;
 			int Psa_curve_pointer;
+			int SFPsa_curve_pointer;
+			int ESPsa_curve_pointer;
+			int SFUsa_curve_pointer;
+			int TFUsa_curve_pointer;
+			int WUsa_curve_pointer;
+
 			Real64 Max_Msa;
 			Real64 Min_Msa;
 			Real64 Min_OAF;
@@ -121,11 +127,9 @@ namespace EnergyPlus {
 
 			bool ValidPointer(int curve_pointer);
 			bool ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
-			bool ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
-			bool ParseMode0(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
-		
+			bool ParseMode(int ModeCounter, std::vector<CMode>* OperatingModes3, Real64 correction, Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
 			void InitializeCurve( int curveType, int CurveID);
-			Real64 CalculateCurveVal(Real64 X_0, Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
+			Real64 CalculateCurveVal( Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
 			bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
 			bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
 			bool InitializeOutsideAirTemperatureConstraints(Real64 min, Real64 max);
@@ -143,13 +147,16 @@ namespace EnergyPlus {
 		class CSetting
 		{
 		public:
-			CSetting() :Runtime_Fraction(0), Mode(0), Outside_Air_Fraction(0), Supply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
-				SupplyAirTemperature(0), Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), pMode(NULL){}
-			Real64 Runtime_Fraction;
-			Real64 Mode;
-			Real64 Outside_Air_Fraction;
-			Real64 Supply_Air_Mass_Flow_Rate;
+			CSetting() :Runtime_Fraction(0), Mode(0), Outside_Air_Fraction(0), Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
+				SupplyAirTemperature(0), Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), 
+				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0) {}
+			Real64 Runtime_Fraction;															  
+			Real64 Mode;																		  
+			Real64 Outside_Air_Fraction;														  
+			Real64 Supply_Air_Mass_Flow_Rate;													  
+			Real64 ScaledSupply_Air_Mass_Flow_Rate;
 			Real64 Supply_Air_Ventilation_Volume;
+			Real64 ScaledSupply_Air_Ventilation_Volume;
 			Real64 Supply_Air_Mass_Flow_Rate_Ratio;
 			Real64 SupplyAirTemperature;
 			Real64 Mixed_Air_Temperature;
@@ -162,8 +169,14 @@ namespace EnergyPlus {
 			Real64 SensibleZone;
 			Real64 LatentZone;
 			Real64 ElectricalPower;
+			Real64 SupplyFanElectricPower;	   //
+			Real64 SecondaryFuelConsumptionRate;//
+			Real64 ThirdFuelConsumptionRate;   //
+			Real64 WaterConsumptionRate;	   //
+			Real64 ExternalStaticPressure;	   //
+
 			// add other fuels, or change name to be fuel
-			CMode* pMode;
+			CMode oMode;
 			CSetting& operator=(CSetting other)
 			{
 				using std::swap;
@@ -173,6 +186,8 @@ namespace EnergyPlus {
 				swap(Supply_Air_Mass_Flow_Rate, other.Supply_Air_Mass_Flow_Rate);
 				swap(Supply_Air_Ventilation_Volume, other.Supply_Air_Ventilation_Volume);
 				swap(Supply_Air_Mass_Flow_Rate_Ratio, other.Supply_Air_Mass_Flow_Rate_Ratio);
+				swap(ScaledSupply_Air_Mass_Flow_Rate, other.ScaledSupply_Air_Mass_Flow_Rate);
+				swap(ScaledSupply_Air_Ventilation_Volume, other.ScaledSupply_Air_Ventilation_Volume);
 				swap(SupplyAirTemperature, other.SupplyAirTemperature);
 				swap(Mixed_Air_Temperature, other.Mixed_Air_Temperature);
 				swap(SupplyAirW, other.SupplyAirW);
@@ -184,9 +199,12 @@ namespace EnergyPlus {
 				swap(SensibleZone, other.SensibleZone);
 				swap(LatentZone, other.LatentZone);
 				swap(ElectricalPower, other.ElectricalPower);
-				swap(pMode, other.pMode);
-				
-				// repeat for other member variables;
+				swap(SupplyFanElectricPower, other.SupplyFanElectricPower);
+				swap(SecondaryFuelConsumptionRate, other.SecondaryFuelConsumptionRate);
+				swap(ThirdFuelConsumptionRate, other.ThirdFuelConsumptionRate);
+				swap(WaterConsumptionRate, other.WaterConsumptionRate);
+				swap(ExternalStaticPressure, other.ExternalStaticPressure);
+				swap(oMode, other.oMode);
 				return *this;
 			}
 		};
@@ -195,7 +213,15 @@ namespace EnergyPlus {
 		{
 			public:
 			CStepInputs() : Tosa(0), Tra(0), RHosa(0), RHra(0), RequestedCoolingLoad(0), RequestedHeatingLoad(0), ZoneMoistureLoad(0), ZoneDehumidificationLoad(0), MinimumOA(0) {}
-			Real64 Tosa; Real64 Tra; Real64 RHosa; Real64 RHra; Real64 RequestedCoolingLoad; Real64 RequestedHeatingLoad; Real64 ZoneMoistureLoad; Real64 ZoneDehumidificationLoad; Real64 MinimumOA ;
+			Real64 Tosa; 
+			Real64 Tra;
+			Real64 RHosa;
+			Real64 RHra; 
+			Real64 RequestedCoolingLoad;
+			Real64 RequestedHeatingLoad; 
+			Real64 ZoneMoistureLoad; 
+			Real64 ZoneDehumidificationLoad;
+			Real64 MinimumOA ;
 		};
 
 		class Model                   // begin declaration of the class
@@ -240,6 +266,16 @@ namespace EnergyPlus {
 			Real64 SystemSensibleHeatingEnergy;// system sensible heating energy [J]
 			Real64 SystemLatentHeatingRate;	   // system latent heating rate [W]
 			Real64 SystemLatentHeatingEnergy;  // system latent heating energy [J]
+			Real64 SupplyFanElectricPower;	   //
+			Real64 SupplyFanElectricEnergy;    //
+			Real64 SecondaryFuelConsumptionRate;//
+			Real64 SecondaryFuelConsumption;   //
+			Real64 ThirdFuelConsumptionRate;   //
+			Real64 ThirdFuelConsumption;	   //
+			Real64 WaterConsumptionRate;	   //
+			Real64 WaterConsumption;		   //
+			Real64 ExternalStaticPressure;	   //
+
 			Real64 RequestedLoadToHeatingSetpoint;
 			Real64 RequestedLoadToCoolingSetpoint;
 			Real64  RequestedHumdificationMass;
@@ -256,6 +292,7 @@ namespace EnergyPlus {
 			Real64 PrimaryModeRuntimeFraction;
 			Real64 averageOSAF;
 			int ErrorCode;
+			bool StandBy;
 			int InletNode;
 			int OutletNode;
 			int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
@@ -310,38 +347,37 @@ namespace EnergyPlus {
 			std::vector<int> Tsa_curve_pointer;
 			std::vector<int>  HRsa_curve_pointer;
 			std::vector<int>  Psa_curve_pointer;
-			std::list<CMode*> OperatingModes;
-			std::list<CSetting*> CurrentOperatingSettings;
+			std::vector<CMode>  OperatingModes;
+			std::vector<CSetting> CurrentOperatingSettings;
+			int DebugBreak;
 
-			CSetting *pOptimal;
-			CSetting *pStandBy;
+			CSetting pOptimal;
+			CSetting oStandBy;
 
-			std::list<CSetting*> Settings;
+			std::list <std::shared_ptr< CSetting >> Settings;
 			//methods
 			int CurrentPrimaryMode();
 			Real64 CurrentPrimaryRuntimeFraction();
 			Real64 CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone);
-
+			bool ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
 			int GetID();            // accessor function
 			void SetID(int vID) { ID = vID; };    // accessor function
-			void doStep(Real64 Tosa, Real64 Tra, Real64 RHosa, Real64 RHra, Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
+			//void doStep(Real64 Tosa, Real64 Tra, Real64 RHosa, Real64 RHra, Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
+			void doStep(Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
 			void Initialize(int ZoneNumber);
-			CMode* AddNewOperatingMode(Real64 correction);
 			void InitializeModelParams();
 			void ResetOutputs();
-			void ModelLog(std::string fmuLocation);
 			Real64 CalcHum_ratio_W(Real64 Tdb, Real64 RH, Real64 P);
 			bool MeetsSupplyAirTOC(Real64 Tosa);
 			bool MeetsSupplyAirRHOC(Real64 Wosa);
 			Real64 CheckVal_T(Real64 T);
 			Real64 CheckVal_W(Real64 W);
-			bool SetStandByMode(CMode* pMode0, CSetting *pStandBy, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
+			bool SetStandByMode(CMode* pMode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
 			Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
 			int SetOperatingSetting(CStepInputs StepIns);
+			void DetermineCoolingVentilationOrHumidificationNeeds(CStepInputs& StepIns);
 			Real64 Sat_press(Real64 Tdb);
 			Real64 Part_press(Real64 P, Real64 W);
-			
-		
 		
 		private:                   // begin private section
 			int ID;              // member variable

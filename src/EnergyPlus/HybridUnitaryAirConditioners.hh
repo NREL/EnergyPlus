@@ -54,7 +54,7 @@
 #include <DataGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <HybridEvapCoolingModel.hh>
-
+ 
 namespace EnergyPlus {
 
 	namespace HybridUnitaryAirConditioners {
@@ -87,7 +87,7 @@ namespace EnergyPlus {
 
 		void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
 		double Sat_press(double Tdb);
-		double Part_press(double P, double W);
+		double Part_press(double P, double W); 
 		Model* HandleToHybridUnitaryAirConditioner(int UnitNum);
 
 	}

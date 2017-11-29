@@ -5982,7 +5982,7 @@ Label999: ;
 		else {
 			std::string s = std::to_string(CurveIndex);
 			ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
-			return 1;
+			return -1;
 		}
 		
 	}
