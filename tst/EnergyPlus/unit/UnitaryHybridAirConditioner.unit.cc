@@ -88,8 +88,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-
-
 #include <fstream>
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::DataContaminantBalance;
@@ -147,17 +145,13 @@ namespace EnergyPlus {
 	}
 
 
-	TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Calculation) {
+	TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest_Calculation) {
 
 		using namespace InputProcessor;
 		std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/datasets/Example_1Zone_1Hybrid_MuntersEPX5000.idf");
 		std::string string = delimited_string(snippet);
 		ASSERT_FALSE(process_idf(string));
-
-		#define  TEMP_CURVE 0 
-		#define  W_CURVE 1
-		#define  POWER_CURVE 2
-
+		// setup environment
 		bool ErrorsFound(false);
 		GetZoneData(ErrorsFound);
 		EXPECT_FALSE(ErrorsFound);
@@ -174,14 +168,11 @@ namespace EnergyPlus {
 		DataEnvironment::HolidayIndex = 0;
 		using General::JulianDay;
 		DataGlobals::WarmupFlag = false;
-
 		DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
-
 		ScheduleManager::UpdateScheduleValues();
 		Real64 SysMassFlow(0.0); // System supply mass flow rate [kg/s]
 		Real64 OAMassFlow(0.0); // OA mass flow rate [kg/s]
 								// Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
-
 		DataHeatBalance::Zone(1).FloorArea = 232.26;
 		DataEnvironment::StdRhoAir = 1.225;
 		DataHeatBalance::ZoneIntGain.allocate(1);
@@ -193,23 +184,24 @@ namespace EnergyPlus {
 		bool UseMinOASchFlag = true;
 		int OARequirementsPtr = 1;
 
-		//other stuff
+		//Setup performnace tables
 		CurveManager::GetCurveInputData(ErrorsFound);
 		EXPECT_FALSE(ErrorsFound);
 		using namespace EnergyPlus::DataEnvironment;
-
+		// process schedules
 		ProcessScheduleInput(); // read schedules
-
 		UpdateScheduleValues();
+		//Get Unitary system
 		GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
+		// All to get OA requiremetns
+		GetOARequirements();
 
-		GetOARequirements(); // get the OA requirements object
-		
 		EXPECT_FALSE(ErrorsFound);
+		// Initialize unit
 		InitZoneHybridUnitaryAirConditioners(1, 1);
 		Model * pZoneHybridUnitaryAirConditioner = HandleToHybridUnitaryAirConditioner(1);
-
-		Real64  Tosa, Tra, Wra, Wosa, RHosa, RHra, RequestedLoad, DesignMinVR, Requestedheating, RequestedCooling,Requested_Humidification, Requested_Dehumidification;
+		// setup local variables for model inputs
+		Real64  Tosa, Tra, Wra, Wosa, RHosa, RHra, RequestedLoad, DesignMinVR, Requestedheating, RequestedCooling, Requested_Humidification, Requested_Dehumidification;
 		RHosa = 0;
 		std::string TimeDate;
 		int modenumber = 0;
@@ -217,90 +209,180 @@ namespace EnergyPlus {
 		MsaRatio = OSAF = 1;
 		int lineN = 0;
 
-		Requestedheating = RequestedCooling= Requested_Humidification = Requested_Dehumidification = 0;
-
-		// There are a few input files that can be used in this unit test. Replace the file below with 
-		std::vector<std::string> lines = getAllLinesInFile2(configured_source_directory() + "/datasets/InputData_Mixed.csv"); 																							 //line input format: time, Outside Air Temperature(C),	Outside Air Relative Humidity(1 - 100 % ),	Outside Air Humidity Ratio(-)
+		Requestedheating = RequestedCooling = Requested_Humidification = Requested_Dehumidification = 0;
 		Real64 NormalizationReference = 3.0176;
-		int Msa = NormalizationReference* MsaRatio;
-		int scaler = pZoneHybridUnitaryAirConditioner->ScalingFactor;
-		ofstream myfile;
-		myfile.open(configured_source_directory() + "/datasets/OutputData.csv");
 
-		std::list<CMode*>::const_iterator iterator_mode;
-		std::vector<std::string>::const_iterator iterator_line;
-		iterator_line = lines.begin();
-		iterator_line++;
+// Scenario 1: Hi Cooling
+		bool Fail = false;
+		DesignMinVR = 1.622720855; 
+		Tra= 22.93929413; 
+		Tosa = 26.67733333;
+		RHra= 17.3042157; 
+		RHosa = 13.1602401; 
+		Requestedheating = -122396.255; //Watts
+		RequestedCooling = -58469.99445; // Watts
+		// Equivalent to a Zone Predicted Sensible Load to Setpoint Heat Transfer Rate [W] of -58470 w. 
+		// A positive value indicates a heating load, a negative value indicates a cooling load.
+		Requested_Humidification = Requested_Dehumidification = 0;
+		Wra=pZoneHybridUnitaryAirConditioner->CalcHum_ratio_W(Tra, RHra/100, 101.325);
+		Wosa = pZoneHybridUnitaryAirConditioner->CalcHum_ratio_W(Tosa, RHosa/100, 101.325);
+		pZoneHybridUnitaryAirConditioner->InletTemp = Tra;
+		pZoneHybridUnitaryAirConditioner->InletHumRat = Wra;
+		pZoneHybridUnitaryAirConditioner->InletEnthalpy = PsyHFnTdbRhPb(Tra, RHra / 100, 101325, "test");
+		pZoneHybridUnitaryAirConditioner->InletPressure = 101325;
+		pZoneHybridUnitaryAirConditioner->InletRH = RHra/100;
+		pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+		pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
+		pZoneHybridUnitaryAirConditioner->SecInletEnthalpy = PsyHFnTdbRhPb(Tosa, RHosa / 100, 101325, "test");
+		pZoneHybridUnitaryAirConditioner->SecInletPressure = 101325;
+		pZoneHybridUnitaryAirConditioner->SecInletRH = RHosa/100;
+		pZoneHybridUnitaryAirConditioner->Initialize(1);
+		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+		
+		pZoneHybridUnitaryAirConditioner->doStep( RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
-		myfile << "Date" << ", Inputs, " << "Requested Sensible Heat Transfer Rate (W)," << "Tosa (C)" << ", " << "Wosa (kgW/kgDryAir)" << ", " << "Minimum OA requested" << ", Outputs" << ",Primary Mode ID" << ", " << "Primary Mode RF" << ", " << "Error code" << ", " << "Msa" << ", " << "Tsa" << ", " << "Wsa" << ", " << "Power" << "," << "Delivered Unit Sensible Cooling (W)" << "," << "Delivered Unit Sensible Heatinging (W)" << "," << "Expected Outputs:,ExpectedSupplyAirTemperature" << "," << "ExpectedSupplyAirHumidityRatio" << "," << "ExpectedTotalElectricPower" << "," << "ExpectedMode" << "," << "ExpectedSupplyAirMassFlowRate" << ", " << "ExpectedSupplyAirVolumeFlowRate" << ", " << "ExpectedSensibleSystemCoolingCapacity" << ", " << "ExpectedLatentSystemCoolingCapacity" << ", " << "ExpectedTotalSystemCoolingCapacity" << ", " << ",\n";
+		// output results
+		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
+		Real64 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
+		Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
+		Real64 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
+		Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
+		Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+		Real64 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
+		Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
+		Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
+		Real64 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
+		Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
+		Real64 ElectricPower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
+		Real64 SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;	   //
+		Real64 SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;    //
+		Real64 SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate;///
+		Real64 SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;   //
+		Real64 ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;   //
+		Real64 ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;	   //
+		Real64 WaterConsumptionRate = pZoneHybridUnitaryAirConditioner->WaterConsumptionRate;	   //
+		Real64 WaterConsumption = pZoneHybridUnitaryAirConditioner->WaterConsumption;		   //
+		Real64 ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;	   //
+		pZoneHybridUnitaryAirConditioner->Initialize(1);
+		// checks 
+		if (Ventilation>Msa) Fail = true;
+		if (returnOSAF !=1) Fail = true;
+		if (deliveredSC<=0) Fail = true;
+		if (deliveredSH!=0) Fail = true;
+		if (Tsa>Tra) Fail = true;
 
-		for (; iterator_line != lines.end(); ++iterator_line) // iterate though the modes.
-		{
-			std::ostringstream s;
-			lineN++;
-			if (lineN == 10000) break;
-			std::string str = *iterator_line;
-			std::vector<std::string> linesplit = parseLine(str);
-			TimeDate = linesplit.at(0);
-			Tosa = atof((linesplit.at(1)).c_str());
-			Real64 RHosa = atof((linesplit.at(2)).c_str());
-			Wosa = atof((linesplit.at(3)).c_str());//humidity ratio
-			RequestedLoad = 1000 * atof((linesplit.at(4)).c_str());
-			Requestedheating = RequestedCooling = 0;
-			if (RequestedLoad > 0) Requestedheating = RequestedLoad; //load in W
-			if (RequestedLoad<0) RequestedCooling= RequestedLoad;
+// Scenario 2: high cooling larger system
+		pZoneHybridUnitaryAirConditioner->Initialize(1);
+		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+		pZoneHybridUnitaryAirConditioner->ScalingFactor = pZoneHybridUnitaryAirConditioner->ScalingFactor * 2;
+		pZoneHybridUnitaryAirConditioner->ScaledSystemMaximumSupplyAirMassFlowRate= pZoneHybridUnitaryAirConditioner->ScaledSystemMaximumSupplyAirMassFlowRate * 2;
+		pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
-			Real64 ExpectedSupplyAirTemperature, ExpectedSupplyAirHumidityRatio, ExpectedTotalElectricPower, ExpectedFanPower;
-			ExpectedSupplyAirTemperature = atof((linesplit.at(5)).c_str());
-			ExpectedSupplyAirHumidityRatio = atof((linesplit.at(7)).c_str());
-			ExpectedTotalElectricPower = atof((linesplit.at(9)).c_str());
-			std::string ModeName = (linesplit.at(10)).c_str();
-			//Supply Air Mass Flow Rate(kg / s)	Supply Air Volume Flow Rate(m3 / s)	Sensible System Cooling Capacity(kW)	Latent System Cooling Capacity(kW)	Total System Cooling Capacity(kW)
-			Real64 ExpectedSupplyAirMassFlowRate = atof((linesplit.at(11)).c_str());
-			Real64 ExpectedSupplyAirVolumeFlowRate = atof((linesplit.at(12)).c_str());
-			Real64 ExpectedSensibleSystemCoolingCapacity = atof((linesplit.at(13)).c_str());
-			Real64 ExpectedLatentSystemCoolingCapacity = atof((linesplit.at(14)).c_str());
-			Real64 ExpectedTotalSystemCoolingCapacity = atof((linesplit.at(14)).c_str());
-			DesignMinVR = ExpectedSupplyAirMassFlowRate;
-			Tra = 24;
-			Wra = Wosa; //Humidity Ratio kgw/kga)
-			RHra = 100 * PsyRhFnTdbWPb(Tra, Wra, 101325);
-			Real64 newRHosa = PsyRhFnTdbWPb(Tosa, Wosa, 101325);
+		// output results
+		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
+		 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
+		 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
+		 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
+		 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
+		 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+		 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
+		 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
+		 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
+		 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
+		 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
+		 SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;	   //
+		 SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;    //
+		 SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate;///
+		 SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;   //
+		 ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;   //
+		 ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;	   //
+		 WaterConsumptionRate = pZoneHybridUnitaryAirConditioner->WaterConsumptionRate;	   //
+		 WaterConsumption = pZoneHybridUnitaryAirConditioner->WaterConsumption;		   //
+		 ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;	   //
+		// checks 
+		if (Ventilation>Msa) Fail = true;
+		if (returnOSAF != 1) Fail = true;
+		if (deliveredSC <= 0) Fail = true;
+		if (deliveredSH != 0) Fail = true;
+		if (Tsa>Tra) Fail = true;
+		
+// Scenario 3: Outside of env conditions. should go to standby and have standby energy
+		pZoneHybridUnitaryAirConditioner->Initialize(1);
+		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+		pZoneHybridUnitaryAirConditioner->SecInletTemp = 150;
+		pZoneHybridUnitaryAirConditioner->SecInletHumRat = 0;
+		
+		pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
+		ElectricPower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
+		// checks 
+		if (modenumber != 0) Fail = true;
+		
+// Scenario 4: Low Cooling
+		pZoneHybridUnitaryAirConditioner->Initialize(1);
+		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+		Fail = false;
+		DesignMinVR = 1.622720855; 
+		Tra = 23.00655455; //
+		Tosa = 26.67733333;
+		RHra = 17.3791073; 
+		RHosa = 13.1602401;
+		Requestedheating = -64358.68966; //- 
+		RequestedCooling = -633.6613591 ; //W
 
-			s << TimeDate << ", Inputs," << RequestedLoad << ", " << Tosa << ", " << Wosa << "," << DesignMinVR << ",";
+		/// add all the corre correct values to set in pZoneHybridUnitaryAirConditioner
+		pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+		pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
+		pZoneHybridUnitaryAirConditioner->doStep( RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
-			pZoneHybridUnitaryAirConditioner->InletTemp = Tra;
+		// output results
+		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
+		primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
+		Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
+		Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
+		Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
+		Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+		ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
+		deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
+		deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
+		Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
+		returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
+		// checks 
+		if (Ventilation>Msa) Fail = true;
+		if (returnOSAF != 1) Fail = true;
+		if (deliveredSC <= 0) Fail = true;
+		if (deliveredSH != 0) Fail = true;
+		if (Tsa>Tra) Fail = true;
 
-			pZoneHybridUnitaryAirConditioner->InletHumRat = Wra;
-			pZoneHybridUnitaryAirConditioner->InletEnthalpy = PsyHFnTdbRhPb(Tra, RHra / 100, 101325, "test");
-			pZoneHybridUnitaryAirConditioner->InletPressure = 101325;
-			pZoneHybridUnitaryAirConditioner->InletRH = RHra;
-			pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
-			pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
-			pZoneHybridUnitaryAirConditioner->SecInletEnthalpy = PsyHFnTdbRhPb(Tosa, RHosa / 100, 101325, "test");
-			pZoneHybridUnitaryAirConditioner->SecInletPressure = 101325;
-			pZoneHybridUnitaryAirConditioner->SecInletRH = RHosa; 
-			pZoneHybridUnitaryAirConditioner->Initialize(1);
+// Scenario 5: No Conditioning
+		DesignMinVR = 1.622720855;
+		Tra = 21.83325675; 
+		Tosa = 26.67733333;
+		RHra = 18.894394; 
+		RHosa = 13.1602401;
+		Requestedheating = -55795.8058; 
+		RequestedCooling = 8171.47128 ; 
+		pZoneHybridUnitaryAirConditioner->Initialize(1);
+		pZoneHybridUnitaryAirConditioner->doStep( RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
-			// Main simulation step
-			pZoneHybridUnitaryAirConditioner->doStep(Tosa, Tra, RHosa / 100, RHra / 100, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
-			// output results
-			modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
-			Real64 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
-			Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
-			Real64 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
-			Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-			Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
-			Real64 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
-			Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
-			Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
-			s << "Outputs, mode:" << modenumber << ", " << primaryRuntime << ", " << ErrorCode << ", " << Msa << ", " << Tsa << ", " << Wsa << "," << Y_val << "," << deliveredSC << "," << deliveredSH << ",";
-			s << "Expected Outputs: ," << ExpectedSupplyAirTemperature << "," << ExpectedSupplyAirHumidityRatio << "," << ExpectedTotalElectricPower << "," << ModeName << "," << ExpectedSupplyAirMassFlowRate << "," << ExpectedSupplyAirVolumeFlowRate << "," << ExpectedSensibleSystemCoolingCapacity << "," << ExpectedLatentSystemCoolingCapacity << "," << ExpectedTotalSystemCoolingCapacity;
+		// output results
+		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
+		primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
+		Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
+		Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
+		Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
+		Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+		ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
+		deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
+		deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
+		Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
+		returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
+		// checks 
+		if (Ventilation>Msa) Fail = true;
+		if (returnOSAF != 1) Fail = true;
+		if (Tsa<Tra) Fail = true;
 
-			s << "\n";
-			myfile << s.str();
-		}
-		myfile.close();
+
 	}
 
 }
