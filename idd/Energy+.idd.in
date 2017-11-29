@@ -33371,7 +33371,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \memo that mixes zone air with the specified amount of outdoor air and then adds or removes
        \memo heat and moisture at 100% efficiency in order to meet the specified controls. Energy
        \memo use is reported as DistrictHeating and DistrictCooling.
-       \min-fields 26
+       \min-fields 27
   A1 , \field Name
        \required-field
        \reference ZoneEquipmentNames
