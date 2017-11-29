@@ -1041,66 +1041,66 @@ Lee KH, Schiavon S. 2013. Influence of three dynamic predictive clothing insulat
 
 \subsection{Mean Radiant Temperature Calculation}\label{mean-radiant-temperature-calculation}
 
-There are three options to calculate mean radiant temperature in the thermal comfort models. One is the zone averaged MRT, another is the surface weighted MRT, and the other is angle factor MRT. The zone averaged MRT is calculated on the assumption that a person is in the center of a space, whereas the surface weighted MRT is calculated in consideration of the surface that a person is closest to, and the angle factor MRT is calculated based on angle factors between a person and the different surfaces in a space. Here, the surface weighted MRT is the average temperature of the selected surface and zone averaged MRT and is intended to represent conditions in the limit as a person gets closer and closer to a particular surface.~ In that limit, half of the person's radiant field will be dominated by that surface and the other half will be exposed to the rest of the zone.~ Note that the surface weighted MRT is only an approximation. The angle factor MRT is the mean temperature of the surrounding surface temperatures weighted according to the magnitude of the respective angle factors and allows the user to more accurately predict thermal comfort at a particular location within a space.
+There are three options to calculate mean radiant temperature in the thermal comfort models. One is the zone averaged MRT, another is the surface weighted MRT, and the other is angle factor MRT. The zone averaged MRT is calculated on the assumption that a person is in the center of a space, whereas the surface weighted MRT is calculated in consideration of the surface that a person is closest to, and the angle factor MRT is calculated based on angle factors between a person and the different surfaces in a space. Here, the surface weighted MRT is the average temperature of the selected surface and zone averaged MRT for the remaining surfaces in the zone and is intended to represent conditions in the limit as a person gets closer and closer to a particular surface.~ In that limit, half of the person's radiant field will be dominated by that surface and the other half will be exposed to the rest of the zone.~ Note that the surface weighted MRT is only an approximation. The angle factor MRT is the mean temperature of the surrounding surface temperatures weighted according to the magnitude of the respective angle factors and allows the user to more accurately predict thermal comfort at a particular location within a space.
 
 % table 84
-\begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
+\begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}}
 \caption{Nomenclature and variable list for MRT calculation \label{table:nomenclature-and-variable-list-for-mrt}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range
+\tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature and variable list for MRT calculation} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range  
+\tabularnewline
 \midrule
 \endhead
 
-T\(_{r}\) & Mean radiant temperature & °C & - & RadTemp \tabularnewline
-T\(_{r-avg}\) & Zone averaged radiant temperature & °C & - & ZoneRadTemp \tabularnewline
-T\(_{surf}\) & Surface temperature & °C & - & SurfaceTemp \tabularnewline
-F\(_{surf}\) & Angle factor between person and surface & - & 0-1 & AngleFactor \tabularnewline
+T\(_{r}\) & Mean radiant temperature & °C & - \tabularnewline
+T\(_{r-avg}\) & Zone averaged radiant temperature & °C & -  \tabularnewline
+T\(_{surf}\) & Surface temperature & °C & -  \tabularnewline
+F\(_{surf}\) & Angle factor between person and surface & - & 0-1  \tabularnewline
 \bottomrule
 \end{longtable}
 
 \subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-3}
 
-The zone averaged MRT is calculated without weighting any surface temperature of the space.
+The radiant temperature for the "zone averaged" option is simply calculated from the zone mean radiant temperature (MRT) without weighting any surface temperature of the zone more than the standard MRT calculation.
 
 \begin{equation}
 {T_r} = {T_{r - avg}}
 \end{equation}
 
-RadTemp = MRT(ZoneNum)
-
-The surface weighted MRT is the average temperature of the zone averaged MRT and the temperature of the surface that a person is closest to.
+where the standard MRT is calculated using the following equation summed over all zone surfaces:
 
 \begin{equation}
-{T_r} = ({T_{r - avg}} + {T_{surf}})/2
+{T_{r - avg}} = \frac{\sum{{{\epsilon}_{i}}{{A}_{i}}{{T}_{i}}}}{\sum{{{\epsilon}_{i}}{{A}_{i}}}}
 \end{equation}
 
-ZoneRadTemp = MRT(ZoneNum)
-
-SurfaceTemp = GetSurfaceTemp(People(PeopleNum)\%SurfacePtr)
-
-RadTemp = (ZoneRadTemp + SurfaceTemp)/2.0
-
-The angle factor MRT is the mean value of surrounding surface temperatures weighted by the size of the respective angle factors between a person and each surface.
+In the surface weighted option, the radiant temperature is the average temperature of the modified zone averaged MRT and the temperature of the surface that a person is closest to.
 
 \begin{equation}
-{T_r} = {T_{surf - 1}}{F_{surf - 1}} + {T_{surf - 2}}{F_{surf - 2}} + ......... + {T_{surf - n}}{F_{surf - n}}
+{T_r} = ({T_{r - avg*}} + {T_{surf}})/2
 \end{equation}
 
-SurfTempAngleFacSummed = SurfTempAngleFacSummed \&
+where the modified zone averaged MRT is calculated the same way as the standard MRT except that the surface closest to the person is left out of the summation:
 
-\begin{itemize}
-\tightlist
-\item
-  SurfaceTemp * AngleFactorList(AngleFacNum)\%AngleFactor(SurfNum)
-\end{itemize}
+\begin{equation}
+{T_{r - avg*}} = \frac{\sum{{{\epsilon}_{i*}}{{A}_{i*}}{{T}_{i*}}}}{\sum{{{\epsilon}_{i*}}{{A}_{i*}}}}
+\end{equation}
 
-RadTemp = SurfTempAngleFacSummed
+where when i is equal to the surface being used for weighting it is not included in either summation.
+
+When the angle factor option is requested, the radiant temperature is the mean value of surrounding surface temperatures weighted by the surface emissivity, the size of the respective angle factors between a person and each surface, and the temperature to the fourth power for the surface.
+
+\begin{equation}
+{T_r} = \frac{\sum{{\epsilon_{i}}{F_{i}}{\PB{{T_{i}}}^4}}}{\sum{{\epsilon_{i}}{F_{i}}}}
+\end{equation}
+
+If all surfaces have the same emissivity that is close to unity, the emissivities in the above equation can be ignored.  However, since this is not always the case, the emissivity terms must be included in the above equation.  In addition, the temperatures to the fourth power in the above equation could be simplified to linear temperatures when the temperatures of the surfaces are fairly close.  However, as these temperatures get further apart, this linear approximation becomes increasingly poor.  As a result, since there is no guarantee that inside face surface temperatures will be close, the fourth order temperature terms are used to calculate the radiant temperature.
 
 \subsection{References}\label{references-1-012}
 
