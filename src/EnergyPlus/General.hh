@@ -61,6 +61,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <HVACUnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -87,6 +88,23 @@ namespace General {
 	//PUBLIC  ErfFunction
 
 	// Functions
+
+	void
+	calcSZVAVModel(
+		HVACUnitarySystem::UnitarySystemData SZVAVModel,
+		int const & UnitarySysNum,
+		bool const & FirstHVACIteration,
+		bool const & CoolingLoad,
+		bool const & HeatingLoad,
+		Real64 const & ZoneLoad,
+		Real64 & OnOffAirFlowRatio,
+		int const & AirLoopNum,
+		bool const & HXUnitOn,
+		int const & CompressorONFlag,
+		Real64 const & FullSensibleOutput,
+		Real64 const & NoLoadOutletTemp,
+		Real64 const & FullLoadAirOutletTemp
+	);
 
 	void
 	SolveRoot(
