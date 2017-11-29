@@ -303,6 +303,7 @@
 !      V/K                    =>   V/F                 0.555555555555556
 !      W                      =>   Btu/h               3.4121412858518
 !      W/((m3/s)-Pa)          =>   W/((gal/min)-ftH20) 0.188582274697355
+!      W/((m3/s)-Pa)          =>   W/((ft3/min)-inH2O) 0.117556910599482
 !      W/(m3/s)               =>   W/(ft3/min)         0.0004719475
 !      W/K                    =>   Btu/h-F             1.89563404769544
 !      W/m                    =>   Btu/h-ft            1.04072
@@ -23573,6 +23574,7 @@ AirflowNetwork:MultiZone:Surface,
   A3, \field External Node Name
       \type object-list
       \object-list ExternalNodeNames
+      \object-list OutdoorAirNodeNames
       \note Used if Wind Pressure Coefficient Type = Input in the AirflowNetwork:SimulationControl object,
       \note otherwise this field may be left blank.
   N1, \field Window/Door Opening Factor, or Crack Factor
@@ -33369,7 +33371,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \memo that mixes zone air with the specified amount of outdoor air and then adds or removes
        \memo heat and moisture at 100% efficiency in order to meet the specified controls. Energy
        \memo use is reported as DistrictHeating and DistrictCooling.
-       \min-fields 26
+       \min-fields 27
   A1 , \field Name
        \required-field
        \reference ZoneEquipmentNames
@@ -33396,6 +33398,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \note The Zone Supply Air Node Name must match a zone inlet air node name for the zone where this
        \note Ideal Loads Air System is connected. The Zone Exhaust Air Node Name must match an inlet air
        \note node name of an AirloopHVAC:ReturnAirPlenum object.
+       \type node
   N1 , \field Maximum Heating Supply Air Temperature
        \units C
        \minimum> 0
@@ -61698,7 +61701,7 @@ OutdoorAir:Node,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
-  A3 , \field Wetbulb Schedule Name
+  A3 , \field Wetbulb Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
