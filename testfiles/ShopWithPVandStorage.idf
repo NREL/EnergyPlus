@@ -53,7 +53,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                Yes, circa 2004, Reliant , TX
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,6;
 
@@ -1233,7 +1233,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     184.1006,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -1291,7 +1291,7 @@
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_1 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Name
@@ -1299,6 +1299,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1593,7 +1594,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     143.1654,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -1651,7 +1652,7 @@
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_2 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Name
@@ -1659,6 +1660,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1953,7 +1955,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     184.1006,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -2011,7 +2013,7 @@
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_3 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Name
@@ -2019,6 +2021,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2313,7 +2316,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     143.1654,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -2371,7 +2374,7 @@
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_4 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Name
@@ -2379,6 +2382,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2657,7 +2661,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     260.0734,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -2715,7 +2719,7 @@
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_5 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Name
@@ -2723,6 +2727,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_5 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4548,7 +4553,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerFuelEnergyCharge,  !- Name
+    SummerFuelEnergyCharge,  !- Utility Cost Charge Simple Name
     ReliantEnergy_PTB-LGS_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -4556,7 +4561,7 @@
     0.0823;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    SummerBaseEnergycharge,  !- Name
+    SummerBaseEnergycharge,  !- Utility Cost Charge Block Name
     ReliantEnergy_PTB-LGS_LargeGeneral,  !- Tariff Name
     TotalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -4569,7 +4574,7 @@
     0.0048;                  !- Block 2 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterFuelEnergyCharge,  !- Name
+    WinterFuelEnergyCharge,  !- Utility Cost Charge Simple Name
     ReliantEnergy_PTB-LGS_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -4577,7 +4582,7 @@
     0.0485;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandCharge,      !- Name
+    AnnualDemandCharge,      !- Utility Cost Charge Block Name
     ReliantEnergy_PTB-LGS_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -4590,7 +4595,7 @@
     6.14;                    !- Block 2 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand400kw,          !- Name
+    MinDemand400kw,          !- Utility Cost Qualify Name
     ReliantEnergy_PTB-LGS_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -4600,7 +4605,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPtTwoFivePercent,  !- Name
+    TaxofEightPtTwoFivePercent,  !- Utility Cost Charge Simple Name
     ReliantEnergy_PTB-LGS_LargeGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4626,7 +4631,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerFuelEnergyCharge,  !- Name
+    SummerFuelEnergyCharge,  !- Utility Cost Charge Simple Name
     ReliantEnergy_PTB-MGS_MiscGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -4634,7 +4639,7 @@
     0.0823;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    SummerBaseEnergycharge,  !- Name
+    SummerBaseEnergycharge,  !- Utility Cost Charge Block Name
     ReliantEnergy_PTB-MGS_MiscGeneral,  !- Tariff Name
     TotalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -4649,7 +4654,7 @@
     0.0055;                  !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterFuelEnergyCharge,  !- Name
+    WinterFuelEnergyCharge,  !- Utility Cost Charge Simple Name
     ReliantEnergy_PTB-MGS_MiscGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -4657,7 +4662,7 @@
     0.0485;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    SummerBaseEnergycharge,  !- Name
+    SummerBaseEnergycharge,  !- Utility Cost Charge Block Name
     ReliantEnergy_PTB-MGS_MiscGeneral,  !- Tariff Name
     TotalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -4672,7 +4677,7 @@
     0.0055;                  !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandCharge,      !- Name
+    AnnualDemandCharge,      !- Utility Cost Charge Block Name
     ReliantEnergy_PTB-MGS_MiscGeneral,  !- Tariff Name
     TotalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -4685,7 +4690,7 @@
     3.04;                    !- Block 2 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand400kw,          !- Name
+    MaxDemand400kw,          !- Utility Cost Qualify Name
     ReliantEnergy_PTB-MGS_MiscGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -4695,7 +4700,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPtTwoFivePercent,  !- Name
+    TaxofEightPtTwoFivePercent,  !- Utility Cost Charge Simple Name
     ReliantEnergy_PTB-MGS_MiscGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4759,7 +4764,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     TX_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4784,7 +4789,7 @@
     7.99;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPtTwoFivePercent,  !- Name
+    TaxofEightPtTwoFivePercent,  !- Utility Cost Charge Simple Name
     TX_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

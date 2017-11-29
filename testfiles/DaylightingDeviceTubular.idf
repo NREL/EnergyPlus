@@ -15,7 +15,7 @@
 ! FCW, 6/17/04: changed height for daylighting illuminance map from 0.0m to 0.8m to correspond
 !               to reference point height
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Tubular Daylighting Device Example,  !- Name
@@ -985,7 +985,7 @@
     Daylit Zone Inlets,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Daylit Zone Air Node,    !- Zone Air Node Name
-    Daylit Zone Return Node; !- Zone Return Air Node Name
+    Daylit Zone Return Node; !- Zone Return Air Node or NodeList Name
 
   ThermostatSetpoint:SingleHeatingOrCooling,
     Heating Cooling Setpoint,!- Name
@@ -1000,6 +1000,7 @@
 
   ZoneHVAC:EquipmentList,
     Daylit Zone Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Daylit Zone Air,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1044,7 +1045,7 @@
     Standard Zone Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Standard Zone Air Node,  !- Zone Air Node Name
-    Standard Zone Return Node;  !- Zone Return Air Node Name
+    Standard Zone Return Node;  !- Zone Return Air Node or NodeList Name
 
   ThermostatSetpoint:SingleHeatingOrCooling,
     Heating Cooling Setpoint,!- Name
@@ -1059,6 +1060,7 @@
 
   ZoneHVAC:EquipmentList,
     Standard Zone Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Standard Zone Air,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

@@ -363,7 +363,7 @@ namespace DirectAirManager {
 				// DesignSpecification:AirTerminal:Sizing name
 				DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaFieldBlanks( 6 )) {
-					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( cAlphaArgs( 5 ), DataSizing::AirTerminalSizingSpec );
+					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( cAlphaArgs( 6 ), DataSizing::AirTerminalSizingSpec );
 					if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex == 0 ) {
 						ShowSevereError(cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + DirectAir( DirectAirNum ).cObjectName );

@@ -568,6 +568,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone1Equipment,          !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Zone1DirectAir,          !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1545,6 +1546,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone1Equipment,          !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Zone1DirectAir,          !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
