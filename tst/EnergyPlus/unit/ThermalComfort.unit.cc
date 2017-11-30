@@ -818,26 +818,32 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT )
 	AngleFactorList.allocate( 1 );
 	AngleFactorList( 1 ).TotAngleFacSurfaces = 3;
 	AngleFactorList( 1 ).SurfacePtr.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
-	AngleFactorList( 1 ).SurfaceEmissivity.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
 	AngleFactorList( 1 ).AngleFactor.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
-	
+
 	AngleFactorList( 1 ).SurfacePtr( 1 ) = 1;
 	AngleFactorList( 1 ).SurfacePtr( 2 ) = 2;
 	AngleFactorList( 1 ).SurfacePtr( 3 ) = 3;
-	AngleFactorList( 1 ).SurfaceEmissivity( 1 ) = 1.0;
-	AngleFactorList( 1 ).SurfaceEmissivity( 2 ) = 0.9;
-	AngleFactorList( 1 ).SurfaceEmissivity( 3 ) = 0.8;
 	AngleFactorList( 1 ).AngleFactor( 1 ) = 0.5;
 	AngleFactorList( 1 ).AngleFactor( 2 ) = 0.3;
 	AngleFactorList( 1 ).AngleFactor( 3 ) = 0.2;
-	AngleFactorList( 1 ).SumSurfaceEmissAngleFactor = 0.93;
-
+	
 	TH.deallocate();
 	TotSurfaces = AngleFactorList( 1 ).TotAngleFacSurfaces;
 	TH.allocate( 2, 2, TotSurfaces );
+	Surface.deallocate();
+	Construct.deallocate();
+	Surface.allocate( TotSurfaces );
+	Construct.allocate( TotSurfaces );
+
 	TH( 2, 1, 1 ) = 20.0;
 	TH( 2, 1, 2 ) = 15.0;
 	TH( 2, 1, 3 ) = 10.0;
+	Surface( 1 ).Construction = 1;
+	Surface( 2 ).Construction = 2;
+	Surface( 3 ).Construction = 3;
+	Construct( 1 ).InsideAbsorpThermal = 1.0;
+	Construct( 2 ).InsideAbsorpThermal = 0.9;
+	Construct( 3 ).InsideAbsorpThermal = 0.8;
 
 	RadTemp = CalcAngleFactorMRT( 1 );
 	EXPECT_NEAR( RadTemp, 16.9, 0.1 );

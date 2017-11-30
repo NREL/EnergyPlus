@@ -1730,14 +1730,11 @@ namespace ThermalComfort {
 			thisAngFacList.SurfaceName.allocate( thisAngFacList.TotAngleFacSurfaces );
 			thisAngFacList.SurfacePtr.allocate( thisAngFacList.TotAngleFacSurfaces );
 			thisAngFacList.AngleFactor.allocate( thisAngFacList.TotAngleFacSurfaces );
-			thisAngFacList.SurfaceEmissivity.allocate( thisAngFacList.TotAngleFacSurfaces );
 
 			for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
 				thisAngFacList.SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
 				thisAngFacList.SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
 				thisAngFacList.AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
-				thisAngFacList.SurfaceEmissivity( SurfNum ) = Construct( Surface( thisAngFacList.SurfacePtr( SurfNum ) ).Construction ).InsideAbsorpThermal;
-				thisAngFacList.SumSurfaceEmissAngleFactor += thisAngFacList.SurfaceEmissivity( SurfNum ) * thisAngFacList.AngleFactor( SurfNum );
 				// Error trap for surfaces that do not exist or surfaces not in the zone
 				if ( thisAngFacList.SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( SurfNum + 2 ) + ", entered value=" + cAlphaArgs( SurfNum + 2 ) );
@@ -1800,6 +1797,8 @@ namespace ThermalComfort {
 
 		// Using/Aliasing
 		using DataHeatBalSurface::TH;
+		using DataSurfaces::Surface;
+		using DataHeatBalance::Construct;
 
 		// Return value
 		Real64 CalcAngleFactorMRT;
@@ -1813,17 +1812,23 @@ namespace ThermalComfort {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SurfNum;
 		Real64 SurfTempEmissAngleFacSummed;
+		Real64 SumSurfaceEmissAngleFactor;
+		Real64 SurfEAF;
 
 		SurfTempEmissAngleFacSummed = 0.0;
+		SumSurfaceEmissAngleFactor = 0.0;
+		SurfEAF = 0.0;
 
 		auto & thisAngFacList( AngleFactorList( AngleFacNum ) );
 		
 		for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
 			SurfaceTemp = TH( 2, 1, thisAngFacList.SurfacePtr( SurfNum ) ) + KelvinConv;
-			SurfTempEmissAngleFacSummed += thisAngFacList.SurfaceEmissivity( SurfNum ) * thisAngFacList.AngleFactor( SurfNum ) * pow_4( SurfaceTemp );
+			SurfEAF = Construct( Surface( thisAngFacList.SurfacePtr( SurfNum ) ).Construction ).InsideAbsorpThermal * thisAngFacList.AngleFactor( SurfNum );
+			SurfTempEmissAngleFacSummed +=  SurfEAF * pow_4( SurfaceTemp );
+			SumSurfaceEmissAngleFactor += SurfEAF;
 		}
 
-		CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed/thisAngFacList.SumSurfaceEmissAngleFactor) - KelvinConv;
+		CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed/SumSurfaceEmissAngleFactor) - KelvinConv;
 
 		return CalcAngleFactorMRT;
 
@@ -1839,7 +1844,11 @@ namespace ThermalComfort {
 		// Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
 		//          This is necessary for the surface weighted option to not in essence
 		//          double count SurfNum in the MRT calculation.  Other than that, the
-		//          method here is the same as CalculateZoneMRT.
+		//          method here is the same as CalculateZoneMRT.  Once a modified zone
+		//          MRT is calculated, the subroutine then calculates and returns the
+		//          RadTemp (radiant temperature) for use by the thermal comfort routines
+		//          that is the average of the surface temperature to be weighted and
+		//          the modified zone MRT.
 		
 		// Using/Aliasing
 		using DataHeatBalSurface::TH;
@@ -1856,9 +1865,11 @@ namespace ThermalComfort {
 		Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
 		static Array1D< Real64 > SurfaceAE; // Product of area and emissivity for each surface
 		static Array1D< Real64 > ZoneAESum; // Sum of area times emissivity for all zone surfaces
+		static bool FirstTimeError; // Only report the error message one time
 
-		// Initialize ZoneAESum for all zones and SurfaceAE for all surfaces
+		// Initialize ZoneAESum for all zones and SurfaceAE for all surfaces at the start of the simulation
 		if ( FirstTimeSurfaceWeightedFlag ) {
+			FirstTimeError = true;
 			FirstTimeSurfaceWeightedFlag = false;
 			SurfaceAE.allocate( TotSurfaces );
 			ZoneAESum.allocate( NumOfZones );
@@ -1874,11 +1885,15 @@ namespace ThermalComfort {
 			}
 		}
 		
-		// Calculate the sum of area*emissivity*temperature for all surfaces in the zone EXCEPT the surface being weighted
+		// Calculate the sum of area*emissivity and area*emissivity*temperature for all surfaces in the zone EXCEPT the surface being weighted
+		// Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
 		SumAET = 0.0;
+		ZoneAESum( ZoneNum ) = 0.0;
 		for ( SurfNum2 = Zone( ZoneNum ).SurfaceFirst; SurfNum2 <= Zone( ZoneNum ).SurfaceLast; ++SurfNum2 ) {
 			if ( ( Surface( SurfNum2 ).HeatTransSurf ) && ( SurfNum2 != SurfNum ) ) {
+				SurfaceAE( SurfNum2 ) = Surface( SurfNum2 ).Area * Construct( Surface( SurfNum2 ).Construction ).InsideAbsorpThermal;
 				SumAET += SurfaceAE( SurfNum2 ) * TH( 2, 1, SurfNum2 );
+				ZoneAESum( ZoneNum ) += SurfaceAE( SurfNum2 );
 			}
 		}
 		
@@ -1886,9 +1901,12 @@ namespace ThermalComfort {
 		if ( ZoneAESum( ZoneNum ) > 0.01 ) {
 			CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + ( SumAET / ZoneAESum( ZoneNum ) ) );
 		} else {
-			ShowWarningError( "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone( ZoneNum ).Name + "\"" );
-			ShowContinueError( "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone." );
-			CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + MAT( ZoneNum ) );
+			if ( FirstTimeError ) {
+				ShowWarningError( "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone( ZoneNum ).Name + "\"" );
+				ShowContinueError( "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone." );
+				FirstTimeError = false;
+				CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + MAT( ZoneNum ) );
+			}
 		}
 
 		return CalcSurfaceWeightedMRT;
