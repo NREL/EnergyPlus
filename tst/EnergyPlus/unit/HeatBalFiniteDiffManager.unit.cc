@@ -228,6 +228,11 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 10187.3, newSpecificHeat, 0.1 );
 		EXPECT_NEAR( 2250, newDensity, 0.1 );
 		EXPECT_NEAR( 1.65, newThermalConductivity, 0.1 );
+		
+		// deallocate
+		SurfaceFD.deallocate();
+		
+
 	}
 
 }
