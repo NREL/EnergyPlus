@@ -8557,7 +8557,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_SizingWithFans ) {
 	OASysEqSizing.deallocate();
 }
 
-TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputATMixerInlet ) {
+TEST_F( EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet ) {
 
 	std::string const idf_objects = delimited_string( {
 
@@ -8675,6 +8675,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputATMixerInlet ) {
 
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
+	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
 	ASSERT_FALSE( ErrorsFound );
 	GetZoneEquipmentData1();
@@ -8689,7 +8690,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputATMixerInlet ) {
 
 }
 
-TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputATMixerSupply ) {
+TEST_F( EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply ) {
 
 	std::string const idf_objects = delimited_string( {
 
@@ -8807,6 +8808,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputATMixerSupply ) {
 
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
+	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
 	ASSERT_FALSE( ErrorsFound );
 	GetZoneEquipmentData1();
@@ -8821,7 +8823,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputATMixerSupply ) {
 
 }
 
-TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputZoneEquipment ) {
+TEST_F( EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment ) {
 
 	std::string const idf_objects = delimited_string( {
 
@@ -8923,6 +8925,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_GetInputZoneEquipment ) {
 
 	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
 
+	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
 	ASSERT_FALSE( ErrorsFound );
 	GetZoneEquipmentData1();
