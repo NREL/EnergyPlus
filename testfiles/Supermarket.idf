@@ -42,7 +42,7 @@
 !           block covered with gypsum board on each surface. The roof is a built up roof with 1/2 in slag over 3/8 in
 !           felt and membrane with R-11 insulation over 6 in lightweight concrete, an air gap separates the interior
 !           acoustical tiles. The windows are single pane 6mm clear and double pane 6mm clear with 6mm air gap.
-!           The window to wall ratio is approxomately 0.0016.
+!           The window to wall ratio is approximately 0.0016.
 !
 !           The building is oriented due north with front of building facing east.
 !
@@ -123,7 +123,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1370,6 +1370,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1377,6 +1378,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1390,7 +1392,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SalesFloor Node,         !- Zone Air Node Name
-    SalesFloor Outlet Node;  !- Zone Return Air Node Name
+    SalesFloor Outlet Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     BackRoom,                !- Zone Name
@@ -1398,7 +1400,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     BackRoom Node,           !- Zone Air Node Name
-    BackRoom Outlet Node;    !- Zone Return Air Node Name
+    BackRoom Outlet Node;    !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 

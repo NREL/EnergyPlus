@@ -8830,6 +8830,7 @@ DO iZone = 1, numCompactZoneVAV
   !ZONE EQUIPMENT LIST ~ line 64
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  vzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
   CALL AddToObjFld('Zone Equipment Name', base +  vzNameOff,' ATU')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
@@ -9293,6 +9294,7 @@ DO iZone = 1, numCompactZoneFPVAV
   !ZONE EQUIPMENT LIST ~ line 61 of FPVAV tab
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + fpvzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
   CALL AddToObjFld('Zone Equipment Name', base + fpvzNameOff,' ATU')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
@@ -9765,6 +9767,7 @@ DO iZone = 1, numCompactZoneHCVAV
   !ZONE EQUIPMENT LIST ~ line 64
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  hcvzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
   CALL AddToObjFld('Zone Equipment Name', base +  hcvzNameOff,' ATU')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
@@ -13334,6 +13337,7 @@ DO iZone = 1, numCompactZoneUnit
   !ZONE EQUIPMENT LIST
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  uzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   CALL AddToObjStr('Zone Equipment Object Type','AirTerminal:SingleDuct:Uncontrolled')
   CALL AddToObjFld('Zone Equipment Name', base +  uzNameOff,' Air Terminal')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
@@ -18566,6 +18570,7 @@ DO iZone = 1, numCompactZoneConstVol
   !ZONE EQUIPMENT LIST ~ line 64
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  cvzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   IF (reheatCoilType .EQ. ctNone) THEN
     CALL AddToObjStr('Zone Equipment Object Type','AirTerminal:SingleDuct:Uncontrolled')
     CALL AddToObjFld('Zone Equipment Name', base +  cvzNameOff,' Air Terminal')
@@ -20512,6 +20517,7 @@ DO iZone = 1, numCompactZoneDualDuct
   !ZONE EQUIPMENT LIST ~ line 64
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  ddzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
   CALL AddToObjFld('Zone Equipment Name', base +  ddzNameOff,' ATU')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
@@ -22583,6 +22589,7 @@ DO iZone = 1, numCompactZoneVRF
   !ZONE EQUIPMENT LIST ~ line 54
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + vrfzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
 
   NextSequenceNumber = '1'
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -23568,6 +23575,7 @@ DO iZone = 1, numCompactFanCoil
   !ZONE EQUIPMENT LIST ~ line 46
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + fczNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
 
   NextSequenceNumber = '1'
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -24158,6 +24166,7 @@ DO iPurchAir = 1, numCompactPurchAir
   !ZONE EQUIPMENT LIST
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  pazNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:IdealLoadsAirSystem')
   CALL AddToObjFld('Zone Equipment Name', base +  pazNameOff,' Ideal Loads Air System')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
@@ -24345,6 +24354,7 @@ DO iZone = 1, numCompactBaseboard
   !ZONE EQUIPMENT LIST
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + bbzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
   IF (isDedOutAirNameBlank) THEN
     SELECT CASE (baseboardKind)
       CASE (baseboardHotWater)
@@ -24654,6 +24664,7 @@ DO iZone = 1, numCompactPTAC
   !ZONE EQUIPMENT LIST ~ line 54
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + ptaczNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
 
   NextSequenceNumber = '1'
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -25226,6 +25237,7 @@ DO iZone = 1, numCompactPTHP
   !ZONE EQUIPMENT LIST ~ line 54
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + pthpzNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
 
   NextSequenceNumber = '1'
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -29584,6 +29596,7 @@ DO iZone = 1, numCompactWaterAirHP
   !***ZoneHVAC:EquipmentList
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + wahpNameOff,' Equipment')
+  CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
 
   NextSequenceNumber = '1'
   IF (.NOT. isDedOutAirNameBlank) THEN

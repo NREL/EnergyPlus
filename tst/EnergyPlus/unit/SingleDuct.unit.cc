@@ -92,6 +92,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 		"    Zone 1 Return Node;       !- Zone Return Air Node Name",
 		"ZoneHVAC:EquipmentList,",
 		"    Zone 1 Equipment,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Zone 1 ADU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -244,6 +245,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		"    Zone 1 Return Node;       !- Zone Return Air Node Name",
 		"ZoneHVAC:EquipmentList,",
 		"    Zone 1 Equipment,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Zone 1 ADU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -622,6 +624,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space Eq,                !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -635,6 +638,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space2 Eq,               !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1560,6 +1564,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space Eq,                !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1573,6 +1578,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space2 Eq,               !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",

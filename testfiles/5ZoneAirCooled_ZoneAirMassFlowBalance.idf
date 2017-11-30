@@ -31,7 +31,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -2226,7 +2226,7 @@
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2234,7 +2234,7 @@
     SPACE2-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2242,7 +2242,7 @@
     SPACE3-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2250,7 +2250,7 @@
     SPACE4-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2258,7 +2258,7 @@
     SPACE5-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 Exhaust Fan Node,  !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     SPACE1-1 Control,        !- Name
@@ -2338,6 +2338,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2345,6 +2346,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2352,6 +2354,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2359,6 +2362,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2366,6 +2370,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

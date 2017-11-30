@@ -99,6 +99,19 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=10) :: LocalFileExtension=' '
   LOGICAL :: WildMatch
 
+  ! For exposed foundation perimeter objects
+  INTEGER NumPerimObjs
+  INTEGER PArgs
+  INTEGER PerimNum
+  CHARACTER(len=MaxNameLength*2), ALLOCATABLE, DIMENSION(:) :: PFldNames
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: PFldDefaults
+  CHARACTER(len=20), ALLOCATABLE, DIMENSION(:) :: PFldUnits
+  INTEGER PObjMinFlds
+  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PAOrN
+  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PReqFld
+  INTEGER PNumArgs   ! Number of Arguments in a definition
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
+
   LOGICAL :: ConnComp
   LOGICAL :: ConnCompCtrl
   LOGICAL :: FileExist
@@ -112,14 +125,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutScheduleName
   LOGICAL :: isDElightOutVar
 
+  REAL :: GLHETempVal = 0.0
+  INTEGER :: TempArgsNum = 0
+
   LOGICAL :: ErrFlag
 
   INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
   INTEGER :: AlphaNumI
   REAL :: SaveNumber
-
-  ! for Schedule:Compact from 8.8 to 8.9
-  CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -210,6 +223,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF(ALLOCATED(Alphas)) DEALLOCATE(Alphas)
           IF(ALLOCATED(Numbers)) DEALLOCATE(Numbers)
           IF(ALLOCATED(InArgs)) DEALLOCATE(InArgs)
+          IF(ALLOCATED(TempArgs)) DEALLOCATE(TempArgs)
           IF(ALLOCATED(AorN)) DEALLOCATE(AorN)
           IF(ALLOCATED(ReqFld)) DEALLOCATE(ReqFld)
           IF(ALLOCATED(FldNames)) DEALLOCATE(FldNames)
@@ -221,12 +235,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF(ALLOCATED(NwFldDefaults)) DEALLOCATE(NwFldDefaults)
           IF(ALLOCATED(NwFldUnits)) DEALLOCATE(NwFldUnits)
           IF(ALLOCATED(OutArgs)) DEALLOCATE(OutArgs)
+          IF(ALLOCATED(PAorN)) DEALLOCATE(PAorN)
+          IF(ALLOCATED(PReqFld)) DEALLOCATE(PReqFld)
+          IF(ALLOCATED(PFldNames)) DEALLOCATE(PFldNames)
+          IF(ALLOCATED(PFldDefaults)) DEALLOCATE(PFldDefaults)
+          IF(ALLOCATED(PFldUnits)) DEALLOCATE(PFldUnits)
+          IF(ALLOCATED(POutArgs)) DEALLOCATE(POutArgs)
           IF(ALLOCATED(MatchArg)) DEALLOCATE(MatchArg)
           ALLOCATE(Alphas(MaxAlphaArgsFound),Numbers(MaxNumericArgsFound))
           ALLOCATE(InArgs(MaxTotalArgs))
+          ALLOCATE(TempArgs(MaxTotalArgs))
           ALLOCATE(AorN(MaxTotalArgs),ReqFld(MaxTotalArgs),FldNames(MaxTotalArgs),FldDefaults(MaxTotalArgs),FldUnits(MaxTotalArgs))
           ALLOCATE(NwAorN(MaxTotalArgs),NwReqFld(MaxTotalArgs),NwFldNames(MaxTotalArgs),NwFldDefaults(MaxTotalArgs),NwFldUnits(MaxTotalArgs))
+          ALLOCATE(PAorN(MaxTotalArgs),PReqFld(MaxTotalArgs),PFldNames(MaxTotalArgs),PFldDefaults(MaxTotalArgs),PFldUnits(MaxTotalArgs))
           ALLOCATE(OutArgs(MaxTotalArgs))
+          ALLOCATE(POutArgs(MaxTotalArgs))
           ALLOCATE(MatchArg(MaxTotalArgs))
           ALLOCATE(DeleteThisRecord(NumIDFRecords))
           DeleteThisRecord=.false.
@@ -288,6 +311,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CurArgs=NumAlphas+NumNumbers
               InArgs=Blank
               OutArgs=Blank
+              TempArgs=Blank
               NA=0
               NN=0
               DO Arg=1,CurArgs
@@ -353,35 +377,119 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
     ! changes for this version
 
-             CASE('SCHEDULE:DAY:INTERVAL')
-                 ObjectName='Schedule:Day:Interval'
+             CASE('ZONEHVAC:EQUIPMENTLIST')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs=InArgs
-                 IF (SameString(InArgs(3), 'YES')) THEN
-                   OutArgs(3) = 'Average'
-                 ENDIF
+                 OutArgs(1)=InArgs(1)
+                 OutArgs(2) = 'SequentialLoad'
+                 OutArgs(3:CurArgs+1)=InArgs(2:CurArgs)
+                 CurArgs = CurArgs + 1
 
-             CASE('SCHEDULE:DAY:LIST')
-                 ObjectName='Schedule:Day:List'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+              CASE('GROUNDHEATEXCHANGER:VERTICAL')
                  nodiff=.false.
-                 OutArgs=InArgs
-                 IF (SameString(InArgs(3), 'YES')) THEN
-                   OutArgs(3) = 'Average'
-                 ENDIF
+                 ObjectName='GroundHeatExchanger:System'
+                 ! store the date for later
+                 TempArgs=InArgs
+                 TempArgsNum=CurArgs
 
-             CASE('SCHEDULE:COMPACT')
-                 ObjectName='Schedule:Compact'
+                 ! write the GLHE:System object
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs=InArgs
-                 DO Arg=3,CurArgs
-                    UpperInArg = MakeUpperCase(InArgs(Arg))
-                    IF ( ( INDEX(UpperInArg,"INTERPOLATE") .GT. 0 ).AND. (INDEX(UpperInArg,"YES") .GT. 0 ) ) THEN
-                      OutArgs(Arg) = "Interpolate:Average"
-                    ENDIF
-                 ENDDO
+                 OutArgs(1:4)=TempArgs(1:4) ! no change
+                 OutArgs(5)='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                 OutArgs(6)=TRIM(TempArgs(1)) // TRIM(' Ground Temps')
+                 OutArgs(7:8)=TempArgs(8:9)
+                 OutArgs(9)=TRIM(TempArgs(1)) // TRIM(' Response Factors')
+                 CurArgs=9
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the GLHE:Props object
+                 ObjectName='GroundHeatExchanger:Vertical:Properties'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Properties')
+                 OutArgs(2)='1'
+                 OutArgs(3)=TempArgs(6)
+                 !OutArgs(4)=TempArgs(7)
+                 READ(TempArgs(7), *) GLHETempVal
+                 WRITE(OutArgs(4), *) GLHETempVal * 2
+                 OutArgs(5)=TempArgs(11)
+                 OutArgs(6)='3.90E+06'
+                 OutArgs(7)=TempArgs(12)
+                 OutArgs(8)='1.77E+06'
+                 OutArgs(9)=TempArgs(13)
+                 OutArgs(10)=TempArgs(15)
+                 OutArgs(11)=TempArgs(14)
+                 CurArgs=11
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the ground temps object
+                 ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Ground Temps')
+                 OutArgs(2)=TempArgs(8)
+                 OutArgs(3)='920'
+                 GLHETempVal = 0.0
+                 READ(TempArgs(9), *) GLHETempVal
+                 WRITE(OutArgs(4), *) GLHETempVal / 920
+                 OutArgs(5)=TempArgs(10)
+                 OutArgs(6)='3.2'
+                 OutArgs(7)='8'
+                 CurArgs=7
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ObjectName='GroundHeatExchanger:ResponseFactors'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Response Factors')
+                 OutArgs(2)=TRIM(TempArgs(1)) // TRIM(' Properties')
+                 OutArgs(3)=TempArgs(5)
+                 OutArgs(4)=TempArgs(17)
+                 CurArgs=4
+                 I = 0
+                 DO WHILE (.TRUE.)
+                   I = I + 1
+                   CurField = 2*(I-1) + 19
+                   IF (CurField > TempArgsNum) EXIT
+                   OutArgs(CurArgs + 1)=TempArgs(CurField)
+                   OutArgs(CurArgs + 2)=TempArgs(CurField + 1)
+                   CurArgs=CurArgs + 2
+                 END DO
+
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! already written
+                 Written = .true.
+
+               CASE('BRANCH')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 nodiff=.true.
+                 ! replace GLHE object type name
+                 ! object types are on fields: 3, 7, 11, 15, ...
+                 I = 0
+                 DO WHILE (.TRUE.)
+                   I = I + 1
+                   CurField = 4*(I-1) + 3
+                   IF ( CurField > CurArgs ) EXIT
+                   IF ( SameString( InArgs(CurField), "GroundHeatExchanger:Vertical" ) ) THEN
+                     OutArgs(CurField) = "GroundHeatExchanger:System"
+                   END IF
+                 END DO
+
+               CASE('CONDENSEREQUIPMENTLIST')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 nodiff=.true.
+                 ! replace GLHE object type name
+                 ! object types are on fields: 2, 4, 6, 8, ...
+                 I = 0
+                 DO WHILE (.TRUE.)
+                   I = I + 1
+                   CurField = 2*(I-1) + 2
+                   IF ( CurField > CurArgs ) EXIT
+                   IF ( SameString( InArgs(CurField), "GroundHeatExchanger:Vertical" ) ) THEN
+                     OutArgs(CurField) = "GroundHeatExchanger:System"
+                   END IF
+                 END DO
+
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -812,22 +920,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     EXIT
                   ENDIF
                 ENDDO
-
-              CASE('WINDOWMATERIAL:BLIND:EQUIVALENTLAYER')
-                 ObjectName='WindowMaterial:Blind:EquivalentLayer'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1:CurArgs) = InArgs(1:CurArgs)
-                 NoDiff=.true.
-                 SaveNumber=ProcessNumber(OutArgs(6),ErrFlag)
-                 IF (ErrFlag) THEN
-                   CALL ShowSevereError('Invalid Number, WINDOWMATERIAL:BLIND:EQUIVALENTLAYER field 6, Name='//TRIM(OutArgs(1)),Auditf)
-                   WRITE(DifLfn,fmta) '  ! Invalid Number, field 6 {'//TRIM(NwFldNames(6))//'} value='//TRIM(OutArgs(6))
-                 ELSE
-                   IF (SaveNumber >= 90) THEN
-                     SaveNumber = 90.0 - SaveNumber
-                     OutArgs(6) = TrimTrailZeros(SaveNumber)
-                   ENDIF
-                 ENDIF
 
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN

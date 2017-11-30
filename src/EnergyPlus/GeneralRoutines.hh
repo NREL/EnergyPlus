@@ -81,6 +81,13 @@ ControlCompOutput(
 	Optional_int_const BranchIndex = _, // for plant components, plant branch index
 	Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
 );
+	
+bool
+BBConvergeCheck(
+	int const SimCompNum,
+	Real64 const MaxFlow,
+	Real64 const MinFlow
+);
 
 void
 CheckSysSizing(

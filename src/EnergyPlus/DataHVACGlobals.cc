@@ -386,6 +386,7 @@ namespace DataHVACGlobals {
 	bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
+	int MinAirLoopIterationsAfterFirst( 1 ); // minimum number of HVAC iterations after FirstHVACIteration (must be at least 2 for sequenced loads to operate on air loops)
 
 	int const NumZoneHVACTerminalTypes( 37 );
 
@@ -579,6 +580,7 @@ namespace DataHVACGlobals {
 		SimZoneEquipmentFlag = true;
 		SimNonZoneEquipmentFlag = true;
 		ZoneMassBalanceHVACReSim = true;
+		MinAirLoopIterationsAfterFirst = 1;
 		ZoneComp.deallocate();
 		CompSetPtEquip.deallocate();
 		OptStartData = OptStartDataType();
