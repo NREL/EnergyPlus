@@ -698,7 +698,6 @@ namespace ScheduleManager {
 			} else if ( SameString( Alphas( 3 ), "LINEAR" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Linear;
 			} else {
-				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::No;
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
 				ErrorsFound = true;
 			}
@@ -781,7 +780,6 @@ namespace ScheduleManager {
 			} else if ( SameString( Alphas( 3 ), "LINEAR" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Linear;
 			} else {
-				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::No;
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
 				ErrorsFound = true;
 			}
@@ -1185,7 +1183,6 @@ namespace ScheduleManager {
 						} else if ( has( Alphas( NumField ), "LINEAR" ) ) {
 							DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::Linear;
 						} else {
-							DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::No;
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( NumField ) + "\" field=\"" + Alphas( NumField ) + "\"" );
 							ErrorsFound = true;
 						}
@@ -3020,7 +3017,6 @@ namespace ScheduleManager {
 
 		for ( Count = 1; Count <= NumUntils; ++Count ) {
 			Pos = index( Untils( Count ), "UNTIL" );
-			std::string curUntil = Untils( Count ); //debugging line
 			if ( Pos == 0 ) {
 				if ( Untils( Count )[ 5 ] == ':' ) {
 					sFld = 6;
