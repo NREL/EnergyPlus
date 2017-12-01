@@ -659,6 +659,16 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr )
 	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
 	// check that the system is no action mode, zone air temp is outside T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+
+	// Test cycle time reset at beginning of day during warmup
+	DataGlobals::WarmupFlag = true;
+	DataGlobals::BeginDayFlag = true;
+	DataGlobals::SimTimeSteps = 96;
+	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
+	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).StartTime );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).StopTime );
+
 }
 
 TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
@@ -786,5 +796,15 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus );
 	// Check that the system is no action mode, zone air temp is within T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+
+	// Test cycle time reset at beginning of day during warmup
+	DataGlobals::WarmupFlag = true;
+	DataGlobals::BeginDayFlag = true;
+	DataGlobals::SimTimeSteps = 96;
+	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus );
+	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataAirLoop::PriAirSysAvailMgr( PriAirSysNum ).StartTime );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataAirLoop::PriAirSysAvailMgr( PriAirSysNum ).StopTime );
+
 }
 

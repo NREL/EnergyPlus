@@ -134,6 +134,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: AlphaNumI
   REAL :: SaveNumber
 
+  ! for Schedule:Compact from 8.8 to 8.9
+  CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -490,6 +493,35 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    END IF
                  END DO
 
+             CASE('SCHEDULE:DAY:INTERVAL')
+                 ObjectName='Schedule:Day:Interval'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs=InArgs
+                 IF (SameString(InArgs(3), 'YES')) THEN
+                   OutArgs(3) = 'Average'
+                 ENDIF
+
+             CASE('SCHEDULE:DAY:LIST')
+                 ObjectName='Schedule:Day:List'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs=InArgs
+                 IF (SameString(InArgs(3), 'YES')) THEN
+                   OutArgs(3) = 'Average'
+                 ENDIF
+
+             CASE('SCHEDULE:COMPACT')
+                 ObjectName='Schedule:Compact'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs=InArgs
+                 DO Arg=3,CurArgs
+                    UpperInArg = MakeUpperCase(InArgs(Arg))
+                    IF ( ( INDEX(UpperInArg,"INTERPOLATE") .GT. 0 ).AND. (INDEX(UpperInArg,"YES") .GT. 0 ) ) THEN
+                      OutArgs(Arg) = "Interpolate:Average"
+                    ENDIF
+                 ENDDO
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
