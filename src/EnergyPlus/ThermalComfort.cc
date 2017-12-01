@@ -1674,7 +1674,6 @@ namespace ThermalComfort {
 		using namespace DataGlobals;
 		using namespace DataHeatBalance;
 		using DataSurfaces::Surface;
-		using DataHeatBalance::Construct;
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
