@@ -1150,7 +1150,7 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 	// J.Glazer - August 2017
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.8;",
+		"Version,8.9;",
 		" ",
 		"ScheduleTypeLimits,",
 		"  Any Number;              !- Name",

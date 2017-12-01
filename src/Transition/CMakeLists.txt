@@ -54,6 +54,7 @@ list( APPEND VERSIONS 8_5_0 )
 list( APPEND VERSIONS 8_6_0 )
 list( APPEND VERSIONS 8_7_0 )
 list( APPEND VERSIONS 8_8_0 )
+list( APPEND VERSIONS 8_9_0 )
 
 if(APPLE)
   if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
@@ -133,4 +134,5 @@ install( FILES "SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "P
 install( FILES "SupportFiles/Report Variables 8-5-0 to 8-6-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
 install( FILES "SupportFiles/Report Variables 8-6-0 to 8-7-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
 install( FILES "SupportFiles/Report Variables 8-7-0 to 8-8-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-8-0 to 8-9-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
 

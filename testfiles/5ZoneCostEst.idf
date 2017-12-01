@@ -37,7 +37,7 @@
 !
 ! WeatherFilename=USA_IL_Chicago-OHare_TMY2.epw
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,4;
 
@@ -2655,10 +2655,11 @@
     ZN1_S_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN1_S_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN1_S_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN1_S_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN1_S_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN1_S_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2756,10 +2757,11 @@
     ZN2_E_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN2_E_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN2_E_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN2_E_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN2_E_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN2_E_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2857,10 +2859,11 @@
     ZN3_N_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN3_N_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN3_N_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN3_N_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN3_N_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN3_N_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2958,10 +2961,11 @@
     ZN4_W_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN4_W_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN4_W_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN4_W_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN4_W_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN4_W_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3059,10 +3063,11 @@
     ZN5_Core_Space_1 Inlets, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN5_Core_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN5_Core_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN5_Core_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN5_Core_Space_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN5_Core_Space_1 ATU,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4189,5 +4194,4 @@
   Output:Meter,Electricity:HVAC,runperiod;
 
   Output:Meter,Electricity:Plant,runperiod;
-
 

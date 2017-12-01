@@ -210,6 +210,21 @@ namespace CoolingPanelSimple {
 			CoolingPanelInletTempFlowReSimIndex( 0 )
 		{}
 
+		void
+		CalcCoolingPanel( int const CoolingPanelNum );
+		
+		void
+		SetCoolingPanelControlTemp(
+			Real64 & ControlTemp,
+			int const ZoneNum
+		);
+		
+		bool
+		SizeCoolingPanelUA( );
+
+		void
+		ReportCoolingPanel( );
+		
 	};
 
 	struct CoolingPanelSysNumericFieldData
@@ -256,24 +271,6 @@ namespace CoolingPanelSimple {
 		int const CoolingPanelNum
 	);
 
-	bool
- 	SizeCoolingPanelUA(
-		int const CoolingPanelNum
-	);
-
-	void
-	CalcCoolingPanel(
-		int & CoolingPanelNum
-	);
-
-	void
-	SetCoolingPanelControlTemp(
-		Real64 & ControlTemp,
-		int const CoolingPanelNum,
-		 int const ZoneNum
-	);
-
-
 	void
 	UpdateCoolingPanel( int const CoolingPanelNum );
 
@@ -282,9 +279,6 @@ namespace CoolingPanelSimple {
 
 	void
 	DistributeCoolingPanelRadGains();
-
-	void
-	ReportCoolingPanel( int const CoolingPanelNum );
 
 	Real64
 	SumHATsurf( int const ZoneNum ); // Zone number
