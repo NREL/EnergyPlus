@@ -54,7 +54,7 @@
 ! Environmental Emissions:
 ! Utility Tariffs:
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     AutoBuilt Model,         !- Name

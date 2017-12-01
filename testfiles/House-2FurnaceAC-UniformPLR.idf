@@ -75,7 +75,7 @@
 ! System Equipment Autosize:      Yes
 ! Coils:                          Coil:Cooling:DX:SingleSpeed
 !                                 Coil:Heating:Fuel
-Version,8.8;
+Version,8.9;
 
 Building,
     House with 2 Furnace AC, !- Name

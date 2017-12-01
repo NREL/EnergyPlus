@@ -89,7 +89,6 @@ namespace ThermalComfort {
 	//       AUTHOR         Jaewook Lee
 	//       DATE WRITTEN   January 2000
 	//       MODIFIED       Rick Strand (for E+ implementation February 2000)
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
 	// To calculate thermal comfort indices based on the
@@ -99,12 +98,6 @@ namespace ThermalComfort {
 	// For each thermal comfort model type, the subroutines will loop through
 	// the people statements and perform the requested thermal comfort evaluations
 
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
@@ -144,9 +137,9 @@ namespace ThermalComfort {
 	namespace {
 		// clear_state variables
 		bool FirstTimeFlag( true ); // Flag set to make sure you get input once
+		bool FirstTimeSurfaceWeightedFlag( true ); // Flag set to make sure certain calcs related to surface weighted option are only done once
 	}
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
 	Real64 const TAbsConv( KelvinConv ); // Converter for absolute temperature
 	Real64 const ActLevelConv( 58.2 ); // Converter for activity level (1Met = 58.2 W/m2)
@@ -155,8 +148,6 @@ namespace ThermalComfort {
 	Real64 const StefanBoltz( 5.67e-8 ); // Stefan-Boltzmann constant (W/m2K4)
 
 	static std::string const BlankString;
-
-	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	Real64 AbsAirTemp( 0.0 ); // Absolute air temperature; K
@@ -267,6 +258,7 @@ namespace ThermalComfort {
 	clear_state()
 	{
 		FirstTimeFlag = true;
+		FirstTimeSurfaceWeightedFlag = true;
 		runningAverageASH = 0.0;
 		AbsAirTemp = 0.0;
 		AbsCloSurfTemp = 0.0;
@@ -365,39 +357,10 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//     AUTHOR         Rick Strand
 		//     DATE WRITTEN   February 2000
-		//     MODIFIED       na
-		//     RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine manages the various thermal comfort calculations.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus manager methodology.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ASH55Flag( false );
 		static bool CEN15251Flag( false );
-
-		// FLOW:
-		// No input to get because this is already done by other heat balance routines
 
 		if ( FirstTimeFlag ) {
 			InitThermalComfort(); // Mainly sets up output stuff
@@ -439,11 +402,6 @@ namespace ThermalComfort {
 			if ( ASH55Flag ) CalcThermalComfortAdaptiveASH55( false );
 			if ( CEN15251Flag ) CalcThermalComfortAdaptiveCEN15251( false );
 		}
-
-		// No updating needed
-
-		// No other reporting needed
-
 	}
 
 	void
@@ -453,40 +411,10 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//     AUTHOR         Rick Strand
 		//     DATE WRITTEN   February 2000
-		//     MODIFIED       na
-		//     RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine allocates the proper arrays, sets all values to zero,
-		// and sets up the output stuff.
-
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus manager methodology.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop; // DO loop counter
 		std::string CurrentGroupName;
-
-		// FLOW:
 
 		ThermalComfortData.allocate( TotPeople );
 
@@ -587,7 +515,6 @@ namespace ThermalComfort {
 		//                    Brent Griffith modifications for CR 5641 (October 2005)
 		//                    L. Gu, Added optional arguments for thermal comfort control (May 2006)
 		//                    T. Hong, added Fanger PPD (April 2009)
-		//     RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates PMV(Predicted Mean Vote) using the Fanger thermal
@@ -607,20 +534,11 @@ namespace ThermalComfort {
 		// Using/Aliasing
 		using Psychrometrics::PsyPsatFnTemp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIter( 150 ); // Limit of iteration
 		Real64 const StopIterCrit( 0.00015 ); // Stop criteria for iteration
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		Real64 P1; // Intermediate variables to calculate clothed body ratio and clothing temperature
 		Real64 P2; // Intermediate variables to calculate clothed body ratio and clothing temperature
 		Real64 P3; // Intermediate variables to calculate clothed body ratio and clothing temperature
@@ -628,8 +546,6 @@ namespace ThermalComfort {
 		Real64 XF; // Intermediate variables to calculate clothed body ratio and clothing temperature
 		Real64 XN; // Intermediate variables to calculate clothed body ratio and clothing temperature
 		Real64 IntermediateClothing;
-		//    REAL(r64) :: SkinTempComf        ! Skin temperature required to achieve thermal comfort; C
-
 		Real64 PMV; // temporary variable to store calculated Fanger PMV value
 		Real64 PPD; // temporary variable to store calculated Fanger PPD value
 
@@ -854,7 +770,6 @@ namespace ThermalComfort {
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   January 2000
 		//     MODIFIED       Rick Strand (for E+ implementation February 2000)
-		//     RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates PMVET, PMVSET, DISC, and TSENS using the Pierce
@@ -868,13 +783,6 @@ namespace ThermalComfort {
 		// REFERENCES:
 		// Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const CloFac( 0.25 ); // Clothing factor determined experimentally
 		Real64 const EvapEff( 0.9 ); // Evaporative efficiency
@@ -886,14 +794,7 @@ namespace ThermalComfort {
 		Real64 const SweatContConst( 170.0 ); // Proportionality constant for sweat control; g/m2.hr
 		Real64 const VapPressConv( 0.1333227 ); // Vapor pressure converter from torr to Kpa
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		Real64 AirEvapHeatResist; // Evaporative heat resistance of air
 		Real64 ActMet; // Metalbolic rate in MET
 		Real64 ActLevelStart; // Activity level at the start of the minute-by-minute iterations
@@ -948,8 +849,6 @@ namespace ThermalComfort {
 		Real64 TotEvapHeatResist; // Total evaporative heat resistance
 		Real64 UnevapSweat; // Unevaporated sweat; g/m2/hr
 		Real64 IntermediateClothing;
-
-		// FLOW:
 
 		for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
 
@@ -1301,7 +1200,6 @@ namespace ThermalComfort {
 			ThermalComfortData( PeopleNum ).ThermalComfortOpTemp = ( RadTemp + AirTemp ) / 2.0;
 
 		}
-
 	}
 
 	void
@@ -1312,10 +1210,10 @@ namespace ThermalComfort {
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   January 2000
 		//     MODIFIED       Rick Strand (for E+ implementation February 2000)
-		//     RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates TSV using the KSU 2 Node model.
+		
 		// METHODOLOGY EMPLOYED:
 		// This subroutine is based heavily upon the work performed by Dan Maloney for
 		// the BLAST program.  Many of the equations are based on the original Pierce
@@ -1324,28 +1222,13 @@ namespace ThermalComfort {
 		// REFERENCES:
 		// Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const CloEmiss( 0.8 ); // Clothing Emissivity
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		static Array1D< Real64 > Coeff( 2 ); // Coefficients used in Range-Kutta's Method
 		static Array1D< Real64 > Temp( 2 ); // Temperature
 		static Array1D< Real64 > TempChange( 2 ); // Change of temperature
-
 		Real64 BodyWt; // Weight of body, kg
 		Real64 DayNum; // Number of days of acclimation
 		int NumDay; // Loop counter for DayNum
@@ -1368,8 +1251,6 @@ namespace ThermalComfort {
 		Real64 TimeInterval; // Time interval of outputs desired, hr
 		Real64 TSVMax; // Maximum value of thermal sensation vote
 		Real64 IntermediateClothing;
-
-		// FLOW:
 
 		TempIndiceNum = 2;
 
@@ -1522,7 +1403,6 @@ namespace ThermalComfort {
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   January 2000
 		//     MODIFIED       Rick Strand (for E+ implementation February 2000)
-		//     RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// THIS SUBROUTINE CALCULATES HEAT TRANSFER TERMS INVOLVED IN THE
@@ -1537,24 +1417,9 @@ namespace ThermalComfort {
 		// REFERENCES:
 		// Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
-		// USE STATEMENTS:
-		// na
-
 		// Argument array dimensioning
 		Temp.dim( 2 );
 		TempChange.dim( 2 );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 ActLevelTot; // Total activity level
@@ -1740,7 +1605,6 @@ namespace ThermalComfort {
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   January 2000
 		//     MODIFIED       Rick Strand (for E+ implementation February 2000)
-		//     RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This is a subroutine for integration by Runga-Kutta's method.
@@ -1753,26 +1617,10 @@ namespace ThermalComfort {
 		// REFERENCES:
 		// Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
-		// USE STATEMENTS:
-		// na
-
 		// Argument array dimensioning
 		Y.dim( NEQ );
 		DY.dim( NEQ );
 		C.dim( NEQ );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int I;
@@ -1821,16 +1669,6 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   July 2001
-		//     MODIFIED       na
-		//     RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
 
 		// Using/Aliasing
 		using namespace DataGlobals;
@@ -1842,28 +1680,16 @@ namespace ThermalComfort {
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const AngleFacLimit( 0.01 ); // To set the limit of sum of angle factors
 		int const MaxSurfaces( 20 ); // Maximum number of surfaces in each AngleFactor List
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//unused1208  CHARACTER(len=MaxNameLength),  &
-		//        DIMENSION(22)       :: Alphas                  ! Alpha strings from Input Processor
 		Real64 AllAngleFacSummed; // Sum of angle factors in each zone
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus;
 		int Item; // Item to be "gotten"
 		int NumAlphas; // Number of Alphas from InputProcessor
-		//unused1208  REAL(r64), DIMENSION(20)       :: Numbers                 ! Numbers from Input Processor
 		int NumNumbers; // Number of Numbers from Input Processor
 		int NumOfAngleFactorLists; // Number of Angle Factor Lists found in IDF
 		int SurfNum; // Surface number DO loop counter
@@ -1881,47 +1707,48 @@ namespace ThermalComfort {
 		for ( Item = 1; Item <= NumOfAngleFactorLists; ++Item ) {
 
 			AllAngleFacSummed = 0.0;
+			auto & thisAngFacList( AngleFactorList( Item ) );
 
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			AngleFactorList( Item ).Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
-			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );
-			AngleFactorList( Item ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
-			if ( AngleFactorList( Item ).ZonePtr == 0 ) {
+			thisAngFacList.Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
+			thisAngFacList.ZoneName = cAlphaArgs( 2 );
+			thisAngFacList.ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			if ( thisAngFacList.ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - not found" );
 				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
 
-			AngleFactorList( Item ).TotAngleFacSurfaces = NumNumbers;
-			if ( AngleFactorList( Item ).TotAngleFacSurfaces > MaxSurfaces ) {
+			thisAngFacList.TotAngleFacSurfaces = NumNumbers;
+			if ( thisAngFacList.TotAngleFacSurfaces > MaxSurfaces ) {
 				ShowSevereError( cCurrentModuleObject + ": Too many surfaces specified in " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
-			AngleFactorList( Item ).SurfaceName.allocate( AngleFactorList( Item ).TotAngleFacSurfaces );
-			AngleFactorList( Item ).SurfacePtr.allocate( AngleFactorList( Item ).TotAngleFacSurfaces );
-			AngleFactorList( Item ).AngleFactor.allocate( AngleFactorList( Item ).TotAngleFacSurfaces );
+			thisAngFacList.SurfaceName.allocate( thisAngFacList.TotAngleFacSurfaces );
+			thisAngFacList.SurfacePtr.allocate( thisAngFacList.TotAngleFacSurfaces );
+			thisAngFacList.AngleFactor.allocate( thisAngFacList.TotAngleFacSurfaces );
 
-			for ( SurfNum = 1; SurfNum <= AngleFactorList( Item ).TotAngleFacSurfaces; ++SurfNum ) {
-				AngleFactorList( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				AngleFactorList( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
-				AngleFactorList( Item ).AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
+			for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
+				thisAngFacList.SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
+				thisAngFacList.SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
+				thisAngFacList.AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
 				// Error trap for surfaces that do not exist or surfaces not in the zone
-				if ( AngleFactorList( Item ).SurfacePtr( SurfNum ) == 0 ) {
+				if ( thisAngFacList.SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( SurfNum + 2 ) + ", entered value=" + cAlphaArgs( SurfNum + 2 ) );
 					ShowContinueError( "ref " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + " not found in " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
 					ErrorsFound = true;
-				} else if ( AngleFactorList( Item ).ZonePtr != 0 ) { // don't look at invalid zones
+				} else if ( thisAngFacList.ZonePtr != 0 ) { // don't look at invalid zones
 					// Found Surface, is it in same zone tagged for Angle Factor List?
-					if ( AngleFactorList( Item ).ZonePtr != Surface( AngleFactorList( Item ).SurfacePtr( SurfNum ) ).Zone ) {
+					if ( thisAngFacList.ZonePtr != Surface( thisAngFacList.SurfacePtr( SurfNum ) ).Zone ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - mismatch " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"" );
 						ShowContinueError( "... does not match " + cAlphaFieldNames( 2 ) + "=\"" + Zone( Surface( AngleFactorList( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + "\" for " + cAlphaFieldNames( SurfNum + 2 ) + "=\"" + cAlphaArgs( SurfNum + 2 ) + "\"." );
 						ErrorsFound = true;
 					}
 				}
 
-				AllAngleFacSummed += AngleFactorList( Item ).AngleFactor( SurfNum );
+				AllAngleFacSummed += thisAngFacList.AngleFactor( SurfNum );
 
 			}
 
@@ -1965,19 +1792,12 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   July 2001
-		//     MODIFIED       na
-		//     RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// THIS IS A SUBROUTINE TO CALCULATE ANGLE FACTOR MRT
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
+		//     MODIFIED       November 2017 (R Strand): Added fourth power and emissivity to calculation
 
 		// Using/Aliasing
 		using DataHeatBalSurface::TH;
+		using DataSurfaces::Surface;
+		using DataHeatBalance::Construct;
 
 		// Return value
 		Real64 CalcAngleFactorMRT;
@@ -1985,35 +1805,113 @@ namespace ThermalComfort {
 		// Locals
 		Real64 SurfaceTemp;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		Real64 const KelvinConv( 273.15 ); // Conversion from Celsius to Kelvin
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SurfNum;
-		Real64 SurfTempAngleFacSummed;
+		Real64 SurfTempEmissAngleFacSummed;
+		Real64 SumSurfaceEmissAngleFactor;
+		Real64 SurfEAF;
 
-		// FLOW:
+		SurfTempEmissAngleFacSummed = 0.0;
+		SumSurfaceEmissAngleFactor = 0.0;
+		SurfEAF = 0.0;
 
-		SurfTempAngleFacSummed = 0.0;
-
-		for ( SurfNum = 1; SurfNum <= AngleFactorList( AngleFacNum ).TotAngleFacSurfaces; ++SurfNum ) {
-
-			SurfaceTemp = TH( 2, 1, AngleFactorList( AngleFacNum ).SurfacePtr( SurfNum ) );
-			SurfTempAngleFacSummed += SurfaceTemp * AngleFactorList( AngleFacNum ).AngleFactor( SurfNum );
-
+		auto & thisAngFacList( AngleFactorList( AngleFacNum ) );
+		
+		for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
+			SurfaceTemp = TH( 2, 1, thisAngFacList.SurfacePtr( SurfNum ) ) + KelvinConv;
+			SurfEAF = Construct( Surface( thisAngFacList.SurfacePtr( SurfNum ) ).Construction ).InsideAbsorpThermal * thisAngFacList.AngleFactor( SurfNum );
+			SurfTempEmissAngleFacSummed +=  SurfEAF * pow_4( SurfaceTemp );
+			SumSurfaceEmissAngleFactor += SurfEAF;
 		}
 
-		CalcAngleFactorMRT = SurfTempAngleFacSummed;
+		CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed/SumSurfaceEmissAngleFactor) - KelvinConv;
 
 		return CalcAngleFactorMRT;
 
 	}
 
+	Real64
+	CalcSurfaceWeightedMRT(
+		int const ZoneNum,
+		int const SurfNum
+	)
+	{
+		
+		// Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
+		//          This is necessary for the surface weighted option to not in essence
+		//          double count SurfNum in the MRT calculation.  Other than that, the
+		//          method here is the same as CalculateZoneMRT.  Once a modified zone
+		//          MRT is calculated, the subroutine then calculates and returns the
+		//          RadTemp (radiant temperature) for use by the thermal comfort routines
+		//          that is the average of the surface temperature to be weighted and
+		//          the modified zone MRT.
+		
+		// Using/Aliasing
+		using DataHeatBalSurface::TH;
+		using DataSurfaces::Surface;
+		using DataSurfaces::TotSurfaces;
+		using DataHeatBalance::Construct;
+
+		// Return value
+		Real64 CalcSurfaceWeightedMRT;
+		
+		// Local variables
+		int SurfNum2; // surface number used in "for" loop
+		int ZoneNum2; // zone number index
+		Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
+		static Array1D< Real64 > SurfaceAE; // Product of area and emissivity for each surface
+		static Array1D< Real64 > ZoneAESum; // Sum of area times emissivity for all zone surfaces
+		static bool FirstTimeError; // Only report the error message one time
+
+		// Initialize ZoneAESum for all zones and SurfaceAE for all surfaces at the start of the simulation
+		if ( FirstTimeSurfaceWeightedFlag ) {
+			FirstTimeError = true;
+			FirstTimeSurfaceWeightedFlag = false;
+			SurfaceAE.allocate( TotSurfaces );
+			ZoneAESum.allocate( NumOfZones );
+			SurfaceAE = 0.0;
+			ZoneAESum = 0.0;
+			for ( SurfNum2 = 1; SurfNum2 <= TotSurfaces; ++SurfNum2 ) {
+				if ( Surface( SurfNum2 ).HeatTransSurf ) {
+					SurfaceAE( SurfNum2 ) = Surface( SurfNum2 ).Area * Construct( Surface( SurfNum2 ).Construction ).InsideAbsorpThermal;
+					ZoneNum2 = Surface( SurfNum2 ).Zone;
+					// Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be accounted for
+					if ( ( ZoneNum2 > 0 ) && ( SurfNum2 != SurfNum ) ) ZoneAESum( ZoneNum2 ) += SurfaceAE( SurfNum2 );
+				}
+			}
+		}
+		
+		// Calculate the sum of area*emissivity and area*emissivity*temperature for all surfaces in the zone EXCEPT the surface being weighted
+		// Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
+		SumAET = 0.0;
+		ZoneAESum( ZoneNum ) = 0.0;
+		for ( SurfNum2 = Zone( ZoneNum ).SurfaceFirst; SurfNum2 <= Zone( ZoneNum ).SurfaceLast; ++SurfNum2 ) {
+			if ( ( Surface( SurfNum2 ).HeatTransSurf ) && ( SurfNum2 != SurfNum ) ) {
+				SurfaceAE( SurfNum2 ) = Surface( SurfNum2 ).Area * Construct( Surface( SurfNum2 ).Construction ).InsideAbsorpThermal;
+				SumAET += SurfaceAE( SurfNum2 ) * TH( 2, 1, SurfNum2 );
+				ZoneAESum( ZoneNum ) += SurfaceAE( SurfNum2 );
+			}
+		}
+		
+		// Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
+		if ( ZoneAESum( ZoneNum ) > 0.01 ) {
+			CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + ( SumAET / ZoneAESum( ZoneNum ) ) );
+		} else {
+			if ( FirstTimeError ) {
+				ShowWarningError( "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + Zone( ZoneNum ).Name + "\"" );
+				ShowContinueError( "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone." );
+				FirstTimeError = false;
+				CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + MAT( ZoneNum ) );
+			}
+		}
+
+		return CalcSurfaceWeightedMRT;
+
+	}
+	
 	Real64
 	CalcSatVapPressFromTemp( Real64 const Temp )
 	{
@@ -2022,7 +1920,6 @@ namespace ThermalComfort {
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   January 2000
 		//     MODIFIED       Rick Strand (for E+ implementation February 2000)
-		//     RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// THIS IS A FUNCTION TO CALCULATE THE SATURATED VAPOR PRESSURE
@@ -2033,28 +1930,6 @@ namespace ThermalComfort {
 		// the BLAST program.
 		// REFERENCES:
 		// Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// na
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		// FLOW
 
 		Real64 const XT( Temp / 100.0 );
 		return 6.16796 + 358.1855 * pow_2( XT ) - 550.3543 * pow_3( XT ) + 1048.8115 * pow_4( XT );
@@ -2070,7 +1945,6 @@ namespace ThermalComfort {
 		//     DATE WRITTEN   November 2000
 		//     MODIFIED       Rick Strand (for E+ implementation November 2000)
 		//                    Rick Strand (for high temperature radiant heaters March 2001)
-		//     RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
 		// THIS IS A FUNCTION TO CALCULATE EITHER ZONE AVERAGED MRT OR
@@ -2097,9 +1971,6 @@ namespace ThermalComfort {
 		// within a space.  Future additions might include the effect of direct
 		// solar energy on occupants.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalFanSys::QHTRadSysToPerson;
 		using DataHeatBalFanSys::QHWBaseboardToPerson;
@@ -2114,22 +1985,13 @@ namespace ThermalComfort {
 		// Locals
 		Real64 SurfaceTemp;
 
-		// FUNCTION ARGUMENT DEFINITIONS:
 		// FUNCTION PARAMETER DEFINITIONS:
 		Real64 const AreaEff( 1.8 ); // Effective area of a "standard" person in meters squared
-		//  REAL(r64), PARAMETER :: KelvinConv = KelvinConv                ! Conversion from Celsius to Kelvin
 		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ZoneRadTemp;
 
-		// FLOW:
 		{ auto const SELECT_CASE_var( People( PeopleListNum ).MRTCalcType );
 
 		if ( SELECT_CASE_var == ZoneAveraged ) {
@@ -2137,10 +1999,9 @@ namespace ThermalComfort {
 		} else if ( SELECT_CASE_var == SurfaceWeighted ) {
 			ZoneRadTemp = MRT( ZoneNum );
 			SurfaceTemp = TH( 2, 1, People( PeopleListNum ).SurfacePtr );
-			RadTemp = ( ZoneRadTemp + SurfaceTemp ) / 2.0;
+			RadTemp = CalcSurfaceWeightedMRT( ZoneNum, People( PeopleListNum ).SurfacePtr );
 		} else if ( SELECT_CASE_var == AngleFactor ) {
 			RadTemp = CalcAngleFactorMRT( People( PeopleListNum ).AngleFactorListPtr );
-
 		}}
 
 		// If high temperature radiant heater present and on, then must account for this in MRT calculation
@@ -2162,16 +2023,10 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   June 2005
-		//       MODIFIED
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   Determines if the space is within the ASHRAE 55-2004 comfort region
 		//   based on operative temperature and humidity ratio
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
 
 		// Using/Aliasing
 		using OutputReportTabular::isInQuadrilateral;
@@ -2180,18 +2035,6 @@ namespace ThermalComfort {
 		using DataEnvironment::RunPeriodEnvironment;
 		using DataEnvironment::EnvironmentStartEnd;
 		using namespace OutputReportPredefined;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 OperTemp;
@@ -2383,19 +2226,11 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   July 2005
-		//       MODIFIED
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   Report if the setpoint temperature has been met.
 		//   Add calculation of how far away from setpoint and if setpoint was not met
 		//   during all times and during occupancy.
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// USE STATEMENTS:
 
 		// Using/Aliasing
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
@@ -2412,19 +2247,6 @@ namespace ThermalComfort {
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
 		using DataRoomAirModel::AirModel;
 		using DataRoomAirModel::RoomAirModel_Mixing;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 SensibleLoadPredictedNoAdj;
@@ -2576,8 +2398,6 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Tyler Hoyt
 		//       DATE WRITTEN   July 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Sets up and carries out ASHRAE55-2010 adaptive comfort model calculations.
@@ -2600,20 +2420,10 @@ namespace ThermalComfort {
 		using OutputReportTabular::GetColumnUsingTabs;
 		using OutputReportTabular::StrToReal;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		std::string lineIn;
 		std::string lineAvg;
 		std::string epwLine;
@@ -2834,17 +2644,12 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Tyler Hoyt
 		//       DATE WRITTEN   July 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Sets up and carries out CEN-15251 adaptive comfort model calculations.
 		// Output provided are state variables for the Category I, II, and III
 		// limits of the model, the comfort temperature, and the 5-day weighted
 		// moving average of the outdoor air temperature.
-
-		// METHODOLOGY EMPLOYED:
-		//   na
 
 		// Using/Aliasing
 		using DataHVACGlobals::SysTimeElapsed;
@@ -2854,22 +2659,12 @@ namespace ThermalComfort {
 		using OutputReportTabular::GetColumnUsingTabs;
 		using OutputReportTabular::StrToReal;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 const alpha( 0.8 );
 		static Array1D< Real64 > const alpha_pow( { pow_6( alpha ), pow_5( alpha ), pow_4( alpha ), pow_3( alpha ), pow_2( alpha ), alpha, 1.0 } ); // alpha^(7-i)
 		static gio::Fmt fmtA( "(A)" );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		std::string epwLine;
 		static Real64 avgDryBulbCEN( 0.0 );
 		Real64 dryBulb;
@@ -3073,29 +2868,6 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Kwang Ho Lee
 		//       DATE WRITTEN   June 2013
-		//       MODIFIED
-		//       RE-ENGINEERED  na
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// USE STATEMENTS:
-
-		// USE DataRoomAirModel, ONLY: AirModel, RoomAirModel_Mixing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TemporaryVariable;
