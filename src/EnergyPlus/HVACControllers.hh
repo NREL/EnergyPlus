@@ -234,6 +234,7 @@ namespace HVACControllers {
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 		bool BypassControllerCalc; // set true for OA sys water coils
+		int AirLoopControllerIndex; // index to controller on specific air loop
 
 		// Default Constructor
 		ControllerPropsType() :
@@ -278,7 +279,8 @@ namespace HVACControllers {
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
 			FaultyCoilSATOffset( 0.0 ),
-			BypassControllerCalc( false)
+			BypassControllerCalc( false),
+			AirLoopControllerIndex( 0 )
 		{}
 
 	};

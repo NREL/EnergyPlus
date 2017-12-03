@@ -1141,15 +1141,15 @@ namespace SimAirServingZones {
 								}
 							}
 						}
-						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
-						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
-							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
-								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
-								if (SameString( CompType, "Coil:Heating:Water" )) {
-									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
-								}
-							}
-						}
+//						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
+//						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
+//							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
+//								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
+//								if (SameString( CompType, "Coil:Heating:Water" )) {
+//									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
+//								}
+//							}
+//						}
 					}
 				}
 			}
@@ -2723,7 +2723,7 @@ namespace SimAirServingZones {
 			// BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA system
 			// ControllerConvergedFlag is returned true here for water coils in OA system
 			ManageControllers( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ), PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ), FirstHVACIteration, AirLoopNum, iControllerOpColdStart, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController, AllowWarmRestartFlag );
-
+			HVACControllers::ControllerProps( PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ) ).AirLoopControllerIndex = AirLoopControlNum;
 			// Detect whether the speculative warm restart feature is supported by each controller
 			// on this air loop.
 			AirLoopControlInfo( AirLoopNum ).AllowWarmRestartFlag = AirLoopControlInfo( AirLoopNum ).AllowWarmRestartFlag && AllowWarmRestartFlag;
@@ -2930,8 +2930,14 @@ namespace SimAirServingZones {
 		Iter = 0;
 		ControllerConvergedFlag = false;
 		// if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
-		if ( AirLoopControlInfo( AirLoopNum ).EconoActive && PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( ControllerIndex ) ) {
-			ControllerConvergedFlag = true;
+		if ( AirLoopControlInfo( AirLoopNum ).EconoActive ) {
+			if ( HVACControllers::ControllerProps( ControllerIndex ).AirLoopControllerIndex > 0 ) {
+				if ( PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( HVACControllers::ControllerProps( ControllerIndex ).AirLoopControllerIndex ) ) {
+					ControllerConvergedFlag = true;
+				}
+			} else {
+				ControllerConvergedFlag = true;
+			}
 		}
 
 		// For this controller, iterate until convergence
@@ -2941,7 +2947,9 @@ namespace SimAirServingZones {
 
 			ManageControllers( ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpIterate, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
 
-			PrimaryAirSystem( AirLoopNum ).ControlConverged( ControllerIndex ) = ControllerConvergedFlag;
+			if ( HVACControllers::ControllerProps( ControllerIndex ).AirLoopControllerIndex > 0 ) {
+				PrimaryAirSystem( AirLoopNum ).ControlConverged( HVACControllers::ControllerProps( ControllerIndex ).AirLoopControllerIndex ) = ControllerConvergedFlag;
+			}
 
 			if ( !ControllerConvergedFlag ) {
 				// Only check abnormal termination if not yet converged
@@ -2991,7 +2999,9 @@ namespace SimAirServingZones {
 		ManageControllers( ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpEnd, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController );
 
 		// pass convergence of OA system water coils back to SolveAirLoopControllers via PrimaryAirSystem().ControlConverged flag
-		PrimaryAirSystem( AirLoopNum ).ControlConverged( ControllerIndex ) = ControllerConvergedFlag;
+		if ( HVACControllers::ControllerProps( ControllerIndex ).AirLoopControllerIndex > 0 ) {
+			PrimaryAirSystem( AirLoopNum ).ControlConverged( HVACControllers::ControllerProps( ControllerIndex ).AirLoopControllerIndex ) = ControllerConvergedFlag;
+		}
 
 		AirLoopControlInfo( AirLoopNum ).ConvergedFlag = AirLoopControlInfo( AirLoopNum ).ConvergedFlag && ControllerConvergedFlag;
 
