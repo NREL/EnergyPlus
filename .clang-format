@@ -1,8 +1,8 @@
 # Commented out lines are those which are not yet valid
 # in clang-3.8 which ships with Ubuntu
 
-IndentWidth: 2
-AccessModifierOffset: -2
+IndentWidth: 4
+AccessModifierOffset: -4
 ColumnLimit: 140
 CommentPragmas: '^ IWYU pragma:'
 UseTab: Never

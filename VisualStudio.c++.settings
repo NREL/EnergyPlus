@@ -4,10 +4,10 @@
    <ToolsOptions>
       <ToolsOptionsCategory name="TextEditor" RegisteredName="TextEditor">
          <ToolsOptionsSubCategory name="C/C++" RegisteredName="C/C++" PackageName="Text Management Package">
-            <PropertyValue name="TabSize">2</PropertyValue>
+            <PropertyValue name="TabSize">4</PropertyValue>
             <PropertyValue name="IndentStyle">2</PropertyValue>
             <PropertyValue name="InsertTabs">false</PropertyValue>
-            <PropertyValue name="IndentSize">2</PropertyValue>
+            <PropertyValue name="IndentSize">4</PropertyValue>
             <PropertyValue name="BraceCompletion">true</PropertyValue>
          </ToolsOptionsSubCategory>
          <ToolsOptionsSubCategory name="C/C++ Specific" RegisteredName="C/C++ Specific" PackageName="Visual C++ Language Manager Package">
