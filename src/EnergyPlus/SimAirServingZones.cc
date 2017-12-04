@@ -3900,8 +3900,6 @@ namespace SimAirServingZones {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using namespace OutputReportPredefined;
 		using DataHeatBalance::Zone;
-		using DataDefineEquip::AirDistUnit;
-		using DataDefineEquip::NumAirDistUnits;
 		using namespace DataSizing;
 
 		// Locals
