@@ -112,7 +112,6 @@ namespace EconomicTariff {
 	int const conversionGAL ( 9 );
 	int const conversionKGAL ( 10 ); // thousand gallons
 
-	// TODO: @JasonGlazer, I extended this to include the water stuff, not sure if right for LEED or not.
 	Array1D_string const convEneStrings( {0,10}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal" } );
 	Array1D_string const convDemStrings( {0,10}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal" } );
 
@@ -504,7 +503,7 @@ namespace EconomicTariff {
 			// Assign the right conversion factors based on the resource type
 
 			// If it's a water meter
-			// TODO for reviewer: should we set demandConv to 0.0 instead?
+			// We set demandConv to something analogous to m3/h
 			if ( tariff( iInObj ).kindWaterMtr == kindMeterWater ) {
 				//conversion factor
 				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
@@ -514,30 +513,29 @@ namespace EconomicTariff {
 				} else if ( SameString( cAlphaArgs( 3 ), "M3" ) ) {
 					tariff( iInObj ).convChoice = conversionM3;
 					tariff( iInObj ).energyConv = 1.0;
-					tariff( iInObj ).demandConv = 1.0;
+					tariff( iInObj ).demandConv = 3600.0;
 				} else if ( SameString( cAlphaArgs( 3 ), "CCF" ) ) {
 					tariff( iInObj ).convChoice = conversionCCF;
 					tariff( iInObj ).energyConv = 0.35314666721488586;
-					tariff( iInObj ).demandConv = 0.35314666721488586;
+					tariff( iInObj ).demandConv = 0.35314666721488586 * 3600;
 				} else if ( SameString( cAlphaArgs( 3 ), "GAL" ) ) {
 					tariff( iInObj ).convChoice = conversionGAL;
 					tariff( iInObj ).energyConv = 264.1720523602524;
-					tariff( iInObj ).demandConv = 264.1720523602524;
+					tariff( iInObj ).demandConv = 264.1720523602524 * 3600;
 				} else if ( SameString( cAlphaArgs( 3 ), "KGAL" ) ) {
 					tariff( iInObj ).convChoice = conversionKGAL;
 					tariff( iInObj ).energyConv = 0.2641720523602524;
-					tariff( iInObj ).demandConv = 0.2641720523602524;
+					tariff( iInObj ).demandConv = 0.2641720523602524 * 3600;
 				} else {
 					// ERROR: not a valid conversion, default to M3
 					tariff( iInObj ).convChoice= conversionM3;
 					tariff( iInObj ).energyConv = 1.0;
-					tariff( iInObj ).demandConv = 1.0;
+					tariff( iInObj ).demandConv = 3600.0;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 					ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to m^3 (Water resource detected)." );
 				}
 
 			// If it's an electric meter
-			// TODO For reviewer: do we want to actually limit the accepted choices?
 			// Does THERM make sense for an electric meter?
 			// Volumetric units such as MCF or CCF doesn't make sense IMHO
 			// Currently I accept but issue a warning.
