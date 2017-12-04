@@ -26,7 +26,7 @@
 !           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
-!           The windows are double pane 6mm clear with 6mm air gap.  The window to wall ratio is approxomately 0.29.
+!           The windows are double pane 6mm clear with 6mm air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -444,14 +444,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -547,26 +539,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     OCCUPY-1,                !- Name
@@ -2124,7 +2098,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2132,7 +2106,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2140,10 +2114,11 @@
     Zone5Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 5 Node,             !- Zone Air Node Name
-    Zone 5 Outlet Node;      !- Zone Return Air Node Name
+    Zone 5 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2151,6 +2126,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2158,6 +2134,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone5Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone5DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2460,7 +2437,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2468,10 +2445,11 @@
     Zone4Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 4 Node,             !- Zone Air Node Name
-    Zone 4 Outlet Node;      !- Zone Return Air Node Name
+    Zone 4 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2479,6 +2457,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone4DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2678,7 +2657,7 @@
   Branch,
     Condenser Supply GHE Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
-    GroundHeatExchanger:Vertical,  !- Component 1 Object Type
+    GroundHeatExchanger:System,  !- Component 1 Object Type
     Vertical Ground Heat Exchanger,  !- Component 1 Name
     GHE Inlet Node,          !- Component 1 Inlet Node Name
     GHE Outlet Node;         !- Component 1 Outlet Node Name
@@ -2839,98 +2818,117 @@
 
   CondenserEquipmentList,
     All Towers,              !- Name
-    GroundHeatExchanger:Vertical,  !- Equipment 1 Object Type
+    GroundHeatExchanger:System,  !- Equipment 1 Object Type
     Vertical Ground Heat Exchanger;  !- Equipment 1 Name
 
-  GroundHeatExchanger:Vertical,
-    Vertical Ground Heat Exchanger,  !- Name
-    GHE Inlet Node,          !- Inlet Node Name
-    GHE Outlet Node,         !- Outlet Node Name
-    0.00330000,              !- Design Flow Rate {m3/s}
-    120,                     !- Number of Bore Holes
-    76.2,                    !- Bore Hole Length {m}
-    0.635080E-01,            !- Bore Hole Radius {m}
-    0.692626E+00,            !- Ground Thermal Conductivity {W/m-K}
-    0.234700E+07,            !- Ground Thermal Heat Capacity {J/m3-K}
-    13.375,                  !- Ground Temperature {C}
-    0.692626E+00,            !- Grout Thermal Conductivity {W/m-K}
-    0.391312E+00,            !- Pipe Thermal Conductivity {W/m-K}
-    2.66667E-02,             !- Pipe Out Diameter {m}
-    2.53977E-02,             !- U-Tube Distance {m}
-    2.41285E-03,             !- Pipe Thickness {m}
-    2,                       !- Maximum Length of Simulation {years}
-    0.0005,                  !- G-Function Reference Ratio {dimensionless}
-    35,                      !- Number of Data Pairs of the G Function
-    -15.2996,                !- G-Function Ln(T/Ts) Value 1
-    -0.348322,               !- G-Function G Value 1
-    -14.201,                 !- G-Function Ln(T/Ts) Value 2
-    0.022208,                !- G-Function G Value 2
-    -13.2202,                !- G-Function Ln(T/Ts) Value 3
-    0.412345,                !- G-Function G Value 3
-    -12.2086,                !- G-Function Ln(T/Ts) Value 4
-    0.867498,                !- G-Function G Value 4
-    -11.1888,                !- G-Function Ln(T/Ts) Value 5
-    1.357839,                !- G-Function G Value 5
-    -10.1816,                !- G-Function Ln(T/Ts) Value 6
-    1.852024,                !- G-Function G Value 6
-    -9.1815,                 !- G-Function Ln(T/Ts) Value 7
-    2.345656,                !- G-Function G Value 7
-    -8.6809,                 !- G-Function Ln(T/Ts) Value 8
-    2.593958,                !- G-Function G Value 8
-    -8.5,                    !- G-Function Ln(T/Ts) Value 9
-    2.679,                   !- G-Function G Value 9
-    -7.8,                    !- G-Function Ln(T/Ts) Value 10
-    3.023,                   !- G-Function G Value 10
-    -7.2,                    !- G-Function Ln(T/Ts) Value 11
-    3.32,                    !- G-Function G Value 11
-    -6.5,                    !- G-Function Ln(T/Ts) Value 12
-    3.681,                   !- G-Function G Value 12
-    -5.9,                    !- G-Function Ln(T/Ts) Value 13
-    4.071,                   !- G-Function G Value 13
-    -5.2,                    !- G-Function Ln(T/Ts) Value 14
-    4.828,                   !- G-Function G Value 14
-    -4.5,                    !- G-Function Ln(T/Ts) Value 15
-    6.253,                   !- G-Function G Value 15
-    -3.963,                  !- G-Function Ln(T/Ts) Value 16
-    7.894,                   !- G-Function G Value 16
-    -3.27,                   !- G-Function Ln(T/Ts) Value 17
-    11.82,                   !- G-Function G Value 17
-    -2.864,                  !- G-Function Ln(T/Ts) Value 18
-    15.117,                  !- G-Function G Value 18
-    -2.577,                  !- G-Function Ln(T/Ts) Value 19
-    18.006,                  !- G-Function G Value 19
-    -2.171,                  !- G-Function Ln(T/Ts) Value 20
-    22.887,                  !- G-Function G Value 20
-    -1.884,                  !- G-Function Ln(T/Ts) Value 21
-    26.924,                  !- G-Function G Value 21
-    -1.191,                  !- G-Function Ln(T/Ts) Value 22
-    38.004,                  !- G-Function G Value 22
-    -0.497,                  !- G-Function Ln(T/Ts) Value 23
-    49.919,                  !- G-Function G Value 23
-    -0.274,                  !- G-Function Ln(T/Ts) Value 24
-    53.407,                  !- G-Function G Value 24
-    -0.051,                  !- G-Function Ln(T/Ts) Value 25
-    56.632,                  !- G-Function G Value 25
-    0.196,                   !- G-Function Ln(T/Ts) Value 26
-    59.825,                  !- G-Function G Value 26
-    0.419,                   !- G-Function Ln(T/Ts) Value 27
-    62.349,                  !- G-Function G Value 27
-    0.642,                   !- G-Function Ln(T/Ts) Value 28
-    64.524,                  !- G-Function G Value 28
-    0.873,                   !- G-Function Ln(T/Ts) Value 29
-    66.412,                  !- G-Function G Value 29
-    1.112,                   !- G-Function Ln(T/Ts) Value 30
-    67.993,                  !- G-Function G Value 30
-    1.335,                   !- G-Function Ln(T/Ts) Value 31
-    69.162,                  !- G-Function G Value 31
-    1.679,                   !- G-Function Ln(T/Ts) Value 32
-    70.476,                  !- G-Function G Value 32
-    2.028,                   !- G-Function Ln(T/Ts) Value 33
-    71.361,                  !- G-Function G Value 33
-    2.275,                   !- G-Function Ln(T/Ts) Value 34
-    71.79,                   !- G-Function G Value 34
-    3.003,                   !- G-Function Ln(T/Ts) Value 35
-    72.511;                  !- G-Function G Value 35
+  GroundHeatExchanger:System,
+    Vertical Ground Heat Exchanger, !- Name
+    GHE Inlet Node,           !- Inlet Node Name
+    GHE Outlet Node,          !- Outlet Node Name
+    0.00330000,               !- Design Flow Rate {m3/s}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Undisturbed Ground Temperature Model Type
+    Vertical Ground Heat Exchanger Ground Temps, !- Undisturbed Ground Temperature Model Name
+    0.692626E+00,             !- Ground Thermal Conductivity {W/m-K}
+    0.234700E+07,             !- Ground Thermal Heat Capacity {J/m3-K}
+    Vertical Ground Heat Exchanger g-functions; !- Response Factors Object Name
+
+  GroundHeatExchanger:Vertical:Properties,
+    Vertical Ground Heat Exchanger Props, !- Name
+    1,                        !- Depth of Top of Borehole {m}
+    76.2,                     !- Bore Hole Length {m}
+    0.127016,                 !- Borehole Diameter {m}
+    0.692626E+00,             !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,                 !- Grout Thermal Heat Capacity {J/m3-K}
+    0.391312E+00,             !- Pipe Thermal Conductivity {W/m-K}
+    1.77E+06,                 !- Pipe Thermal Heat Capacity {J/m3-K}
+    2.66667E-02,              !- Pipe Out Diameter {m}
+    2.41285E-03,              !- Pipe Thickness {m}
+    5.1225E-02;               !- U-Tube Distance {m}
+
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    Vertical Ground Heat Exchanger Ground Temps, !- Undisturbed Ground Temperature Model Name
+    0.692626E+00,             !- Soil Thermal Conductivity {W/m-K}
+    920,                      !- Soil Density {kg/m3}
+    2551.09,                  !- Soil Specific Heat {J/kg-K}
+    13.375,                   !- Average Soil Surface Temperature {C}
+    3.2,                      !- Average Amplitude of Surface Temperature {deltaC}
+    8;                        !- Phase Shift of Minimum Surface Temperature {days}
+
+  GroundHeatExchanger:ResponseFactors,
+    Vertical Ground Heat Exchanger g-functions, !- Name
+    Vertical Ground Heat Exchanger Props, !- Name
+    120,                      !- Number of Bore Holes
+    0.0005,                   !- G-Function Reference Ratio {dimensionless}
+    -15.2996,                 !- G-Function Ln(T/Ts) Value 1
+    -0.348322,                !- G-Function G Value 1
+    -14.201,                  !- G-Function Ln(T/Ts) Value 2
+    0.022208,                 !- G-Function G Value 2
+    -13.2202,                 !- G-Function Ln(T/Ts) Value 3
+    0.412345,                 !- G-Function G Value 3
+    -12.2086,                 !- G-Function Ln(T/Ts) Value 4
+    0.867498,                 !- G-Function G Value 4
+    -11.1888,                 !- G-Function Ln(T/Ts) Value 5
+    1.357839,                 !- G-Function G Value 5
+    -10.1816,                 !- G-Function Ln(T/Ts) Value 6
+    1.852024,                 !- G-Function G Value 6
+    -9.1815,                  !- G-Function Ln(T/Ts) Value 7
+    2.345656,                 !- G-Function G Value 7
+    -8.6809,                  !- G-Function Ln(T/Ts) Value 8
+    2.593958,                 !- G-Function G Value 8
+    -8.5,                     !- G-Function Ln(T/Ts) Value 9
+    2.679,                    !- G-Function G Value 9
+    -7.8,                     !- G-Function Ln(T/Ts) Value 10
+    3.023,                    !- G-Function G Value 10
+    -7.2,                     !- G-Function Ln(T/Ts) Value 11
+    3.32,                     !- G-Function G Value 11
+    -6.5,                     !- G-Function Ln(T/Ts) Value 12
+    3.681,                    !- G-Function G Value 12
+    -5.9,                     !- G-Function Ln(T/Ts) Value 13
+    4.071,                    !- G-Function G Value 13
+    -5.2,                     !- G-Function Ln(T/Ts) Value 14
+    4.828,                    !- G-Function G Value 14
+    -4.5,                     !- G-Function Ln(T/Ts) Value 15
+    6.253,                    !- G-Function G Value 15
+    -3.963,                   !- G-Function Ln(T/Ts) Value 16
+    7.894,                    !- G-Function G Value 16
+    -3.27,                    !- G-Function Ln(T/Ts) Value 17
+    11.82,                    !- G-Function G Value 17
+    -2.864,                   !- G-Function Ln(T/Ts) Value 18
+    15.117,                   !- G-Function G Value 18
+    -2.577,                   !- G-Function Ln(T/Ts) Value 19
+    18.006,                   !- G-Function G Value 19
+    -2.171,                   !- G-Function Ln(T/Ts) Value 20
+    22.887,                   !- G-Function G Value 20
+    -1.884,                   !- G-Function Ln(T/Ts) Value 21
+    26.924,                   !- G-Function G Value 21
+    -1.191,                   !- G-Function Ln(T/Ts) Value 22
+    38.004,                   !- G-Function G Value 22
+    -0.497,                   !- G-Function Ln(T/Ts) Value 23
+    49.919,                   !- G-Function G Value 23
+    -0.274,                   !- G-Function Ln(T/Ts) Value 24
+    53.407,                   !- G-Function G Value 24
+    -0.051,                   !- G-Function Ln(T/Ts) Value 25
+    56.632,                   !- G-Function G Value 25
+    0.196,                    !- G-Function Ln(T/Ts) Value 26
+    59.825,                   !- G-Function G Value 26
+    0.419,                    !- G-Function Ln(T/Ts) Value 27
+    62.349,                   !- G-Function G Value 27
+    0.642,                    !- G-Function Ln(T/Ts) Value 28
+    64.524,                   !- G-Function G Value 28
+    0.873,                    !- G-Function Ln(T/Ts) Value 29
+    66.412,                   !- G-Function G Value 29
+    1.112,                    !- G-Function Ln(T/Ts) Value 30
+    67.993,                   !- G-Function G Value 30
+    1.335,                    !- G-Function Ln(T/Ts) Value 31
+    69.162,                   !- G-Function G Value 31
+    1.679,                    !- G-Function Ln(T/Ts) Value 32
+    70.476,                   !- G-Function G Value 32
+    2.028,                    !- G-Function Ln(T/Ts) Value 33
+    71.361,                   !- G-Function G Value 33
+    2.275,                    !- G-Function Ln(T/Ts) Value 34
+    71.79,                    !- G-Function G Value 34
+    3.003,                    !- G-Function Ln(T/Ts) Value 35
+    72.511;                   !- G-Function G Value 35
 
   Pump:ConstantSpeed,
     Cond Circ Pump,          !- Name
@@ -3109,7 +3107,7 @@
     88.565,90.708,112.850,132.850,152.850;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     PRESSURE,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3133,7 +3131,7 @@
     0.3664E+07,0.3810E+07,0.3961E+07,0.4116E+07,0.4277E+07,0.4990E+07;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3157,7 +3155,7 @@
     0.3104E+06,0.3143E+06,0.3183E+06,0.3225E+06,0.3271E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     ENTHALPY,                !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3181,7 +3179,7 @@
     0.4120E+06,0.4107E+06,0.4091E+06,0.4072E+06,0.4048E+06,0.3669E+06;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3205,7 +3203,7 @@
     0.8937E+03,0.8754E+03,0.8555E+03,0.8335E+03,0.8088E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     DENSITY,                 !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3229,7 +3227,7 @@
     0.1954E+03,0.2083E+03,0.2227E+03,0.2390E+03,0.2579E+03,0.5238E+03;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUID,                   !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name
@@ -3253,7 +3251,7 @@
     0.2181E+04,0.2340E+04,0.2550E+04,0.2840E+04,0.3272E+04,0.0000E+00;
 
   FluidProperties:Saturated,
-    R22,                     !- Name
+    R22,                     !- Fluid Name
     SPECIFICHEAT,            !- Fluid Property Type
     FLUIDGAS,                !- Fluid Phase
     R22SaturatedTemperatures,!- Temperature Values Name

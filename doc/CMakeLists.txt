@@ -9,7 +9,7 @@ configure_file(${CMAKE_SOURCE_DIR}/doc/title.tex.in ${CMAKE_BINARY_DIR}/doc-buil
 configure_file(${CMAKE_SOURCE_DIR}/doc/index.html ${CMAKE_BINARY_DIR}/doc-build/index.html COPYONLY)
 
 # add each of the documents, they have their own CMakeLists.txt files
-add_subdirectory(acknowledgements)
+add_subdirectory(acknowledgments)
 add_subdirectory(auxiliary-programs)
 add_subdirectory(ems-application-guide)
 add_subdirectory(engineering-reference)

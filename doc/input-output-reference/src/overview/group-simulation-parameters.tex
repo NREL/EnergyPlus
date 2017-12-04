@@ -88,11 +88,11 @@ In order to reduce time used in simulating your building, you may choose to ente
 
 \paragraph{Field: Minimum Plant Iterations}\label{field-minimum-plant-iterations}
 
-The plant system modeling includes a solver that iterates within a single HVAC manager iteration. This input field and the next one provide some control over how the plant solver iterates. This field sets a minimum threshold for plant iterations. The default for this field is the value ``2'' which indicates that a minimum of two full plant model interations will be performed every time plant is called by the HVAC manager. For faster performance with simple plant systems, this input field could be set to the value ``1''. For complicated plant systems that present difficulties to solve, this value may need to be set higher to ensure accuracy but at the expense of speed. Complicated plant systems include those with several interconnected loops, sizing miss-matches such that plant components are starved of flow compared to their desired flow, heat recovery systems, and thermal load following onsite generators.
+The plant system modeling includes a solver that iterates within a single HVAC manager iteration. This input field and the next one provide some control over how the plant solver iterates. This field sets a minimum threshold for plant iterations. The default for this field is the value ``2'' which indicates that a minimum of two full plant model iterations will be performed every time plant is called by the HVAC manager. For faster performance with simple plant systems, this input field could be set to the value ``1''. For complicated plant systems that present difficulties to solve, this value may need to be set higher to ensure accuracy but at the expense of speed. Complicated plant systems include those with several interconnected loops, sizing miss-matches such that plant components are starved of flow compared to their desired flow, heat recovery systems, and thermal load following onsite generators.
 
 \paragraph{Field: Maximum Plant Iterations}\label{field-maximum-plant-iterations}
 
-The plant system solver iterates within a single HVAC manager iteration. This input field and the previous one provide some control over how the plant model iterates. This field sets a maximum limit for plant interations. The default for this field is the value ``8'' which indicates that the plant solver will exit after having completed eight full iterations. This value can be raised for better accuracy with complex plants or lowered for faster speed with simple plants. The output variable called ``Plant Solver Sub Iteration Count'' (typically reported at the ``detailed'' frequency) is useful for understanding how many plant solver iterations are actually being used during a particular simulation. The lower limit of the value for this field is ``2.''
+The plant system solver iterates within a single HVAC manager iteration. This input field and the previous one provide some control over how the plant model iterates. This field sets a maximum limit for plant iterations. The default for this field is the value ``8'' which indicates that the plant solver will exit after having completed eight full iterations. This value can be raised for better accuracy with complex plants or lowered for faster speed with simple plants. The output variable called ``Plant Solver Sub Iteration Count'' (typically reported at the ``detailed'' frequency) is useful for understanding how many plant solver iterations are actually being used during a particular simulation. The lower limit of the value for this field is ``2.''
 
 Use in an IDF:
 
@@ -535,6 +535,8 @@ This is the rate of generic air contaminant added (or subtracted) to a zone from
 
 This object is used to control some details of EnergyPlus's solar, shadowing and daylighting models. There are two basic methods available for the calculations. In order to speed up the calculations, shadowing calculations (sun position, etc.) for the default method are performed over a period of days. Note that this value may be very important for determining the amount of sun entering your building and by inference the amount of cooling or heating load needed for maintaining the building. Though termed ``shadowing'' calculations, it in affect determines the sun position for a particular day in a weather file period simulation. (Each design day will use the date of the design day object). Even though weather file data contains the amount of solar radiation, the internal calculation of sun position will govern how that affects various parts of the building. By default, the calculations are done for every 20 days throughout a weather run period; an average solar position is chosen and the solar factors (such as sunlit areas of surfaces) remain the same for that number of days. When more integrated calculations are needed for controlling dynamic windows or shades, a second method is available where solar calculations are performed at each zone timestep.
 
+This object also allows setting up global flags to import and export exterior shading calculations results. This enables importing pre-calculated results of the shading fractions for each exterior building surface from external simulation tools. This also enables reusing the shading results for parametric runs which usually do not change external shading.
+
 \subsubsection{Inputs}\label{inputs-10-019}
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method-000}
@@ -561,12 +563,23 @@ In general (and you should also read the previous field description), if shadowi
 
 This field applies to the method called ``AverageOverDaysInFrequency.'' When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
 
+\paragraph{Field: External Shading Calculation Method}\label{field-external-shading-calculation-method}
+
+The field has two options: \textbf{ScheduledShading} and \textbf{InternalCalculation}. The field indicates whether the external shading is pre-calculated and imported as schedules, which overwrite the EnergyPlus calculated array of the surface sunlit fraction. If \textbf{ScheduledShading} is chosen, all external shading calculation would be performed externally (EnergyPlus internal calculations of external shading will be turned off) and be imported during the initialization of an EnergyPlus run with the schedule object defined by the \textbf{SurfaceProperty:LocalEnvironment} object of this surface. If some exterior surfaces do not have their \textbf{SurfaceProperty:LocalEnvironment} objects, no shading is assigned on those exterior surfaces. The default choice is \textbf{InternalCalculation}, indicating EnergyPlus will do the external shading calculations and no external results will be used.
+
+The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
+
+\paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
+This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. If \textbf{Yes} is chosen, the calculated results will be exported as "eplusshading.csv" file. Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. The default choice is \textbf{No}.
+
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
 \begin{lstlisting}
 ShadowCalculation,AverageOverDaysInFrequency,1;
 
 ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
+
+ShadowCalculation, AverageOverDaysInFrequency, , , , , ScheduledShading, YES;
 \end{lstlisting}
 
 Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
@@ -595,7 +608,7 @@ Allowable choices are:
 
 \textbf{DisplayZoneAirHeatBalanceOffBalance} -- this is a developer diagnostic which you can turn on, if you desire.
 
-\textbf{DoNotMirrorDetachedShading} -- use this to turn off the automatic mirroring of detached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. 
+\textbf{DoNotMirrorDetachedShading} -- use this to turn off the automatic mirroring of detached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate.
 
 \textbf{DoNotMirrorAttachedShading} -- use this to turn off the automatic mirroring of attached shading surfaces. These surfaces are automatically mirrored so that the user does not need to worry about facing direction of the surface and the shading surface will shade the building as appropriate. Attached shading surfaces include Shading:Overhang, Shading:Overhang:Projection, Shading:Fin, Shading:Fin:Projection, and Shading:Zone:Detailed.
 
@@ -682,6 +695,14 @@ This object is an advanced feature that can be used to control the effective sto
 
 \subsubsection{Inputs}\label{inputs-14-014}
 
+\paragraph{Field: Name}\label{field-name-hybrid-model}
+
+The name of the ZoneCapacitanceMultiplier:ResearchSpecial object.
+
+\paragraph{Field: Zone or ZoneList Name}\label{field-Zone-or-zonelist-name-hybrid-model}
+
+This field is the name of the thermal zone (ref: Zone) and attaches a particular zone capacitance multiplier to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then capacity multiplier is applied to each of the zones in the zone list.
+
 \paragraph{Field: Temperature Capacity Multiplier}\label{field-temperature-capacity-multiplier}
 
 This field is used to alter the effective heat capacitance of the zone air volume. This affects the transient calculations of zone air temperature. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the temperature of zone air from timestep to timestep. Note that sensible heat capacity can also be modeled using internal mass surfaces.
@@ -696,15 +717,7 @@ This field is used to alter the effective carbon dioxide capacitance of the zone
 
 \paragraph{Field: Generic Contaminant Capacity Multiplier}\label{field-generic-contaminant-capacity-multiplier}
 
-This field is used to alter the effective generic contaminant capacitance of the zone air volume. This affects the transient calculations of zone air generic contaminantconcentration. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminantlevel of zone air from timestep to timestep.
-
-\paragraph{Field: Name}\label{field-name-hybrid-model}
-
-The name of the ZoneCapacitanceMultiplier:ResearchSpecial object.
-
-\paragraph{Field: Zone or ZoneList Name}\label{field-Zone-or-zonelist-name-hybrid-model}
-
-This field is the name of the thermal zone (ref: Zone) and attaches a particular zone capacitance multiplier to a thermal zone or set of thermal zones in the building. When the ZoneList option is used then capacity multiplier is applied to each of the zones in the zone list.
+This field is used to alter the effective generic contaminant capacitance of the zone air volume. This affects the transient calculations of zone air generic contaminant concentration. Values greater than 1.0 have the effect of smoothing or damping the rate of change in the generic contaminant level of zone air from timestep to timestep.
 
 \subsection{SimulationControl}\label{simulationcontrol}
 
@@ -768,12 +781,12 @@ algorithm will be used to find a part load ratio or mass flow rate at given equi
 \paragraph{Field: Algorithm}\label{field-algorithm}
 
 Five choices are allowed to select which solution algorithm will be used: RegulaFalsi, Bisection,  BisectionThenRegulaFalsi, RegulaFalsiThenBisection, and Alternation. The RegulaFalsi
-selection is the default selection. Bisection selction will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.  
+selection is the default selection. Bisection selection will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.
 
 
 \paragraph{Field: Number of Iterations Before Algorithm Switch}\label{field-number-of-iteration-before-algorithm-switch}
 
-This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi or Alternation is entered. When the iteration number is greater than the value, algorithm switches either from RegulaFalsi to Bisection or from Bisection to RegulaFalsi with choices of RegulaFalsiThenBisection or BisectionThenRegulaFalsi. 
+This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi or Alternation is entered. When the iteration number is greater than the value, algorithm switches either from RegulaFalsi to Bisection or from Bisection to RegulaFalsi with choices of RegulaFalsiThenBisection or BisectionThenRegulaFalsi.
 
 An IDF example:
 

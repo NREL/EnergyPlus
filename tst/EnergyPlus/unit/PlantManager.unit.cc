@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -81,7 +82,7 @@ namespace EnergyPlus {
 			PlantLoop( 1 ).FluidType = NodeType_Water;
 			PlantLoop( 1 ).FluidIndex = 1;
 			SizePlantLoop( 1, true );
-			int TestVolume = 600;		  			
+			int TestVolume = 600;
 			EXPECT_EQ( TestVolume, PlantLoop( 1 ).Volume );
 		}
 
@@ -92,7 +93,7 @@ namespace EnergyPlus {
 
 			std::string const idf_objects = delimited_string( {
 
-				"  Version,8.8;",
+				"  Version,8.9;",
 
 				"  PlantLoop,",
 				"    Chilled Water Loop,      !- Name",
@@ -205,23 +206,23 @@ namespace EnergyPlus {
 			} );
 
 			ASSERT_FALSE( process_idf( idf_objects ) );
-			
-			// get input and checks if there are two setpointmanagers 
-			// for a TwoWayCommonPipe and one of them setpoints can be 
+
+			// get input and checks if there are two setpointmanagers
+			// for a TwoWayCommonPipe and one of them setpoints can be
 			// a SetpointManager:OutdoorAirReset type.
 			GetPlantLoopData();
 			ASSERT_FALSE( ErrorsFound );
 			// there two setpoint amanegrs in the loop
 			EXPECT_EQ( 1, NumSchSetPtMgrs );  // SetpointManager:Scheduled
-			EXPECT_EQ( 1, NumOutAirSetPtMgrs ); // SetpointManager:OutdoorAirReset 
+			EXPECT_EQ( 1, NumOutAirSetPtMgrs ); // SetpointManager:OutdoorAirReset
 			EXPECT_EQ( 2, NumAllSetPtMgrs );
-			// Schedule Setpoint Manager assigned at a plant loop supply outlet node 
+			// Schedule Setpoint Manager assigned at a plant loop supply outlet node
 			EXPECT_EQ( SchSetPtMgr( 1 ).CtrlVarType, "TEMPERATURE" );
 			EXPECT_EQ( SchSetPtMgr( 1 ).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY OUTLET" );
-			// OAReset Setpoint Manager assigned at a plant loop supply inlet node 
+			// OAReset Setpoint Manager assigned at a plant loop supply inlet node
 			EXPECT_EQ( OutAirSetPtMgr( 1 ).CtrlVarType, "TEMPERATURE" );
 			EXPECT_EQ( OutAirSetPtMgr( 1 ).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY INLET" );
-			
+
 		}
 	}
 }

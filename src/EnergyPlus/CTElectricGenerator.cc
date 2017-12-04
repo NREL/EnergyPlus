@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -476,33 +477,33 @@ namespace CTElectricGenerator {
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
-			SetupOutputVariable( "Generator Produced Electric Power [W]", CTGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", CTGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator Produced Electric Energy [J]", CTGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Rate [W]", CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Energy [J]", CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, CTGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, CTGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
 
 			//    general fuel use report (to match other generators)
-			SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Mass Flow Rate [kg/s]", CTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, CTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator Exhaust Air Temperature [C]", CTGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, CTGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
 
 			if ( CTGenerator( GeneratorNum ).HeatRecActive ) {
-				SetupOutputVariable( "Generator Exhaust Heat Recovery Rate [W]", CTGeneratorReport( GeneratorNum ).QExhaustRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Exhaust Heat Recovery Energy [J]", CTGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).QExhaustRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Exhaust Heat Recovery Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Lube Heat Recovery Rate [W]", CTGeneratorReport( GeneratorNum ).QLubeOilRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Lube Heat Recovery Energy [J]", CTGeneratorReport( GeneratorNum ).LubeOilEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).QLubeOilRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Lube Heat Recovery Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).LubeOilEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Produced Thermal Rate [W]", CTGeneratorReport( GeneratorNum ).QTotalHeatRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", CTGeneratorReport( GeneratorNum ).TotalHeatEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).QTotalHeatRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).TotalHeatEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature [C]", CTGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature [C]", CTGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Heat Recovery Mass Flow Rate [kg/s]", CTGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, CTGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, CTGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, CTGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
 			}
 
 		}

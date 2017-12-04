@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -94,7 +95,7 @@ namespace CoolingPanelSimple {
 
 	// Autosizing variables
 	extern Array1D_bool MySizeFlagCoolPanel;
-	
+
 	//SUBROUTINE SPECIFICATIONS FOR MODULE Simple Chilled Ceiling Panel
 
 	// Types
@@ -209,19 +210,34 @@ namespace CoolingPanelSimple {
 			CoolingPanelInletTempFlowReSimIndex( 0 )
 		{}
 
+		void
+		CalcCoolingPanel( int const CoolingPanelNum );
+		
+		void
+		SetCoolingPanelControlTemp(
+			Real64 & ControlTemp,
+			int const ZoneNum
+		);
+		
+		bool
+		SizeCoolingPanelUA( );
+
+		void
+		ReportCoolingPanel( );
+		
 	};
 
 	struct CoolingPanelSysNumericFieldData
 	{
 		// Members
 		Array1D_string FieldNames;
-		
+
 		// Default Constructor
 		CoolingPanelSysNumericFieldData()
 		{}
-		
+
 	};
-		
+
 	// Object Data
 	extern Array1D< CoolingPanelParams > CoolingPanel;
 	extern Array1D< CoolingPanelSysNumericFieldData > CoolingPanelSysNumericFields;
@@ -230,7 +246,7 @@ namespace CoolingPanelSimple {
 
 	void
 	clear_state();
-		
+
 	void
 	SimCoolingPanel(
 		std::string const & EquipName,
@@ -255,24 +271,6 @@ namespace CoolingPanelSimple {
 		int const CoolingPanelNum
 	);
 
-	bool
- 	SizeCoolingPanelUA(
-		int const CoolingPanelNum
-	);
-	
-	void
-	CalcCoolingPanel(
-		int & CoolingPanelNum
-	);
-
-	void
-	SetCoolingPanelControlTemp(
-		Real64 & ControlTemp,
-		int const CoolingPanelNum,
-		 int const ZoneNum
-	);
-
-	
 	void
 	UpdateCoolingPanel( int const CoolingPanelNum );
 
@@ -282,35 +280,8 @@ namespace CoolingPanelSimple {
 	void
 	DistributeCoolingPanelRadGains();
 
-	void
-	ReportCoolingPanel( int const CoolingPanelNum );
-
 	Real64
 	SumHATsurf( int const ZoneNum ); // Zone number
-
-	//*****************************************************************************************
-	//     NOTICE
-
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 } // CoolingPanelSimple
 

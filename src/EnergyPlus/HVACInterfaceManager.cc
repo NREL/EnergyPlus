@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1353,9 +1354,9 @@ namespace HVACInterfaceManager {
 
 			} else if ( SELECT_CASE_var == CommonPipe_Single ) { //Uncontrolled ('single') common pipe
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_Single;
-				SetupOutputVariable( "Plant Common Pipe Mass Flow Rate [Kg/s]", PlantCommonPipe( CurLoopNum ).Flow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Temperature [C]", PlantCommonPipe( CurLoopNum ).Temp, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Flow Direction Status []", PlantCommonPipe( CurLoopNum ).FlowDir, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).Flow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Temperature", OutputProcessor::Unit::C, PlantCommonPipe( CurLoopNum ).Temp, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Flow Direction Status", OutputProcessor::Unit::None, PlantCommonPipe( CurLoopNum ).FlowDir, "System", "Average", PlantLoop( CurLoopNum ).Name );
 
 				if ( first_supply_component_typenum == TypeOf_PumpVariableSpeed ) {
 					// If/when the model supports variable-pumping primary, this can be removed.
@@ -1368,10 +1369,10 @@ namespace HVACInterfaceManager {
 
 			} else if ( SELECT_CASE_var == CommonPipe_TwoWay ) { //Controlled ('two-way') common pipe
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_TwoWay;
-				SetupOutputVariable( "Plant Common Pipe Primary Mass Flow Rate [kg/s]", PlantCommonPipe( CurLoopNum ).PriCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Secondary Mass Flow Rate [kg/s]", PlantCommonPipe( CurLoopNum ).SecCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Primary to Secondary Mass Flow Rate [kg/s]", PlantCommonPipe( CurLoopNum ).PriToSecFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
-				SetupOutputVariable( "Plant Common Pipe Secondary to Primary Mass Flow Rate [kg/s]", PlantCommonPipe( CurLoopNum ).SecToPriFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Primary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).PriCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Secondary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).SecCPLegFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Primary to Secondary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).PriToSecFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
+				SetupOutputVariable( "Plant Common Pipe Secondary to Primary Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantCommonPipe( CurLoopNum ).SecToPriFlow, "System", "Average", PlantLoop( CurLoopNum ).Name );
 
 				// check type of pump on supply side inlet
 				if ( first_supply_component_typenum == TypeOf_PumpConstantSpeed ) {

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -204,27 +205,22 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = 1;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig( 2 ).ZoneName = "Zone 2";
 	DataZoneEquipment::ZoneEquipConfig( 2 ).ActualZoneNum = 2;
 	DataZoneEquipment::ZoneEquipConfig( 2 ).ZoneNode = 2;
-	DataZoneEquipment::ZoneEquipConfig( 2 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig( 3 ).ZoneName = "Zone 3";
 	DataZoneEquipment::ZoneEquipConfig( 3 ).ActualZoneNum = 3;
 	DataZoneEquipment::ZoneEquipConfig( 3 ).ZoneNode = 3;
-	DataZoneEquipment::ZoneEquipConfig( 3 ).AirLoopNum = 1;
 
 	DataZoneEquipment::ZoneEquipConfig( 4 ).ZoneName = "Zone 4";
 	DataZoneEquipment::ZoneEquipConfig( 4 ).ActualZoneNum = 4;
 	DataZoneEquipment::ZoneEquipConfig( 4 ).ZoneNode = 4;
-	DataZoneEquipment::ZoneEquipConfig( 4 ).AirLoopNum = 2;
 
 	DataZoneEquipment::ZoneEquipConfig( 5 ).ZoneName = "Zone 5";
 	DataZoneEquipment::ZoneEquipConfig( 5 ).ActualZoneNum = 5;
 	DataZoneEquipment::ZoneEquipConfig( 5 ).ZoneNode = 5;
-	DataZoneEquipment::ZoneEquipConfig( 5 ).AirLoopNum = 2;
 
 	DataZoneEquipment::ZoneEquipInputsFilled = true;
 
@@ -663,6 +659,16 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr )
 	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
 	// check that the system is no action mode, zone air temp is outside T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+
+	// Test cycle time reset at beginning of day during warmup
+	DataGlobals::WarmupFlag = true;
+	DataGlobals::BeginDayFlag = true;
+	DataGlobals::SimTimeSteps = 96;
+	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
+	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).StartTime );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).StopTime );
+
 }
 
 TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
@@ -692,7 +698,6 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "SPACE1-1";
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = 1;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).Name = "System Avail";
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).CtrlType = SystemAvailabilityManager::CycleOnAny;
@@ -791,5 +796,15 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus );
 	// Check that the system is no action mode, zone air temp is within T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+
+	// Test cycle time reset at beginning of day during warmup
+	DataGlobals::WarmupFlag = true;
+	DataGlobals::BeginDayFlag = true;
+	DataGlobals::SimTimeSteps = 96;
+	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus );
+	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataAirLoop::PriAirSysAvailMgr( PriAirSysNum ).StartTime );
+	EXPECT_EQ( DataGlobals::SimTimeSteps, DataAirLoop::PriAirSysAvailMgr( PriAirSysNum ).StopTime );
+
 }
 

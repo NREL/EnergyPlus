@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -107,7 +108,7 @@ namespace ExternalInterface {
 	std::string FMURootWorkingFolder; // FMU root working folder
 
 	// MODULE PARAMETER DEFINITIONS:
-	int const maxVar( 1024 ); // Maximum number of variables to be exchanged
+	int const maxVar( 10240000 ); // Maximum number of variables to be exchanged
 	int const maxErrMsgLength( 10000 ); // Maximum error message length from xml schema validation
 	int const indexSchedule( 1 ); // Index for schedule in inpVarTypes
 	int const indexVariable( 2 ); // Index for variable in inpVarTypes
@@ -2177,7 +2178,7 @@ namespace ExternalInterface {
 		int numKeys( 0 ); // Number of keys found
 		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
-		std::string varUnits; // Units sting, may be blank
+		OutputProcessor::Unit varUnits( OutputProcessor::Unit::None ); // Units sting, may be blank
 		Array1D_int keyIndexes; // Array index for
 		Array1D_string NamesOfKeys; // Specific key name
 		int Loop, iKey; // Loop counters

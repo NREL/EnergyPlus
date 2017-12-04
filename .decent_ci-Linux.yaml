@@ -5,10 +5,20 @@ compilers:
     release_build_enable_pgo: true
     release_build_training_ctest_filter:  -R  "integration.(RefBldg.*|.*Slab|.*[^g]Basement|.*5Zone.*|Rad|Pip|.*Network.*|Window|CentralChillerHeaterSystem_Cooling_Heating|CmplxGlz_.*|ConvectionAdaptiveSmallOffice|DElight.*|DaylightingDevice.*|DisplacementVent_Nat_AirflowNetwork_AdaptiveComfort|DOADualDuctSchool|EMS.*|Flr_Rf_8Sides|FluidCooler|GSHP.*|GeneratorswithPV|HeatPumpWaterToAir.*|HospitalBaselineReheatReportEMS|HospitalLowEnergy|MicroCogeneration|PlantApplicationsGuide.*|PlateHeatExchanger|PurchAirWithDaylighting|RefrigeratedWarehouse|SolarCollectorFlatPlateWater|SurfaceTest|ThermalChimneyTest|UserDefinedRoomAirPatterns|VSHeatPumpWaterToAirEquationFit|WaterHeater.*|_CTFTestsPart2|_HybridVentilationControlGlobalAN|CentralChillerHeaterSystem)"
     release_build_cmake_extra_flags: -DPROFILE_GENERATE:BOOL=OFF -DPROFILE_USE:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
-    cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
+    cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DTEX_INTERACTION="nonstopmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
     collect_performance_results: true
     s3_upload: doc-build
     s3_upload_bucket: energyplus
+
+  - name: "gcc"
+    version: "4.8"
+    build_package_generator: "TGZ"
+    build_tag: "tgz"
+    release_only: true
+    release_build_enable_pgo: true
+    release_build_training_ctest_filter:  -R  "integration.(RefBldg.*|.*Slab|.*[^g]Basement|.*5Zone.*|Rad|Pip|.*Network.*|Window|CentralChillerHeaterSystem_Cooling_Heating|CmplxGlz_.*|ConvectionAdaptiveSmallOffice|DElight.*|DaylightingDevice.*|DisplacementVent_Nat_AirflowNetwork_AdaptiveComfort|DOADualDuctSchool|EMS.*|Flr_Rf_8Sides|FluidCooler|GSHP.*|GeneratorswithPV|HeatPumpWaterToAir.*|HospitalBaselineReheatReportEMS|HospitalLowEnergy|MicroCogeneration|PlantApplicationsGuide.*|PlateHeatExchanger|PurchAirWithDaylighting|RefrigeratedWarehouse|SolarCollectorFlatPlateWater|SurfaceTest|ThermalChimneyTest|UserDefinedRoomAirPatterns|VSHeatPumpWaterToAirEquationFit|WaterHeater.*|_CTFTestsPart2|_HybridVentilationControlGlobalAN|CentralChillerHeaterSystem)"
+    release_build_cmake_extra_flags: -DPROFILE_GENERATE:BOOL=OFF -DPROFILE_USE:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
+    cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
 
   - name: cppcheck
     compiler_extra_flags: --enable=warning  --suppress="*:*gtest*" --suppress="constStatement:*Objex*" --suppress="cppcheckError:*" --suppress="uninitvar:*" --suppress="syntaxError:*" --suppress="*:*sqlite*" --suppress="invalidscanf:*DElight*" --suppress="uninitMemberVar:*DElight*" --suppress="invalidScanfArgType_int:*DElight*" --suppress="uninitMemberVar:*jsoncpp*" --suppress="*:*re2*" --suppress="*:*eigen*"

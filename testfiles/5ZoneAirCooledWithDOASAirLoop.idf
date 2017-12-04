@@ -27,7 +27,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -2045,7 +2045,7 @@
     SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SPACE1-1 Inlets,         !- Name
@@ -2058,7 +2058,7 @@
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SPACE2-1 Inlets,         !- Name
@@ -2071,7 +2071,7 @@
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SPACE3-1 Inlets,         !- Name
@@ -2084,7 +2084,7 @@
     SPACE4-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SPACE4-1 Inlets,         !- Name
@@ -2097,7 +2097,7 @@
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SPACE5-1 Inlets,         !- Name
@@ -2182,55 +2182,60 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
@@ -2242,7 +2247,7 @@
     SPACE1-1 VAV Reheat,     !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
-    VAV ATU Sizing;         !- Design Specification Air Terminal Sizing Object Name
+    VAV ATU Sizing;          !- Design Specification Air Terminal Sizing Object Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE2-1 ATU,            !- Name
@@ -2251,7 +2256,7 @@
     SPACE2-1 VAV Reheat,     !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
-    VAV ATU Sizing;         !- Design Specification Air Terminal Sizing Object Name
+    VAV ATU Sizing;          !- Design Specification Air Terminal Sizing Object Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE3-1 ATU,            !- Name
@@ -2260,7 +2265,7 @@
     SPACE3-1 VAV Reheat,     !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
-    VAV ATU Sizing;         !- Design Specification Air Terminal Sizing Object Name
+    VAV ATU Sizing;          !- Design Specification Air Terminal Sizing Object Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE4-1 ATU,            !- Name
@@ -2269,7 +2274,7 @@
     SPACE4-1 VAV Reheat,     !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
-    VAV ATU Sizing;         !- Design Specification Air Terminal Sizing Object Name
+    VAV ATU Sizing;          !- Design Specification Air Terminal Sizing Object Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE5-1 ATU,            !- Name
@@ -2278,7 +2283,7 @@
     SPACE5-1 VAV Reheat,     !- Air Terminal Name
     ,                        !- Nominal Upstream Leakage Fraction
     ,                        !- Constant Downstream Leakage Fraction
-    VAV ATU Sizing;         !- Design Specification Air Terminal Sizing Object Name
+    VAV ATU Sizing;          !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE1-1 VAV Reheat,     !- Name
@@ -2540,10 +2545,10 @@
     Main Cooling Coil 1,     !- Component 1 Name
     VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Component 1 Outlet Node Name
-    Fan:VariableVolume,      !- Component 3 Object Type
-    Supply Fan 1,            !- Component 3 Name
-    Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
-    VAV Sys 1 Outlet Node;   !- Component 3 Outlet Node Name
+    Fan:VariableVolume,      !- Component 2 Object Type
+    Supply Fan 1,            !- Component 2 Name
+    Main Cooling Coil 1 Outlet Node,  !- Component 2 Inlet Node Name
+    VAV Sys 1 Outlet Node;   !- Component 2 Outlet Node Name
 
   Coil:Cooling:Water,
     Main Cooling Coil 1,     !- Name
@@ -3142,7 +3147,7 @@
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
   DesignSpecification:AirTerminal:Sizing,
-    DOAS ATU Sizing,     !- Name
+    DOAS ATU Sizing,         !- Name
     0.0,                     !- Fraction of Design Cooling Load {dimensionless}
     1.0,                     !- Cooling Design Supply Air Temperature Difference Ratio {dimensionless}
     0.0,                     !- Fraction of Design Heating Load {dimensionless}
@@ -3150,7 +3155,7 @@
     1.0;                     !- Fraction of Minimum Outdoor Air Flow {dimensionless}
 
   DesignSpecification:AirTerminal:Sizing,
-    VAV ATU Sizing,     !- Name
+    VAV ATU Sizing,          !- Name
     1.0,                     !- Fraction of Design Cooling Load {dimensionless}
     1.0,                     !- Cooling Design Supply Air Temperature Difference Ratio {dimensionless}
     1.0,                     !- Fraction of Design Heating Load {dimensionless}
@@ -3348,11 +3353,10 @@
 
   Schedule:Compact,
     HVACTemplate-Always 12.8,!- Name
-    Any Number, !- Schedule Type Limits Name
+    Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    12.8;                    !- Field 4
+    Until: 24:00,12.8;       !- Field 3
 
   SetpointManager:Scheduled,
     DOAS Cooling Supply Air Temp Manager,  !- Name
@@ -3405,9 +3409,9 @@
     DOAS DX Coil Std EIR-FT, !- Energy Input Ratio Function of Temperature Curve Name
     DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
     DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Supply Water Storage Tank Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    0;                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0;                       !- Maximum Cycling Rate {cycles/hr}
 
   CoilPerformance:DX:Cooling,
     DOAS Standard Perf 1+2,  !- Name
@@ -3421,9 +3425,9 @@
     DOAS DX Coil Std EIR-FT, !- Energy Input Ratio Function of Temperature Curve Name
     DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
     DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Supply Water Storage Tank Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    0;                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0;                       !- Maximum Cycling Rate {cycles/hr}
 
   CoilPerformance:DX:Cooling,
     DOAS Dehumid Perf 1,     !- Name
@@ -3437,9 +3441,9 @@
     DOAS DX Coil Dehum EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
     DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
     DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Supply Water Storage Tank Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    0;                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0;                       !- Maximum Cycling Rate {cycles/hr}
 
   CoilPerformance:DX:Cooling,
     DOAS Dehumid Perf 1+2,   !- Name
@@ -3453,9 +3457,9 @@
     DOAS DX Coil Dehum EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
     DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
     DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Supply Water Storage Tank Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    0;                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0;                       !- Maximum Cycling Rate {cycles/hr}
 
   Curve:Biquadratic,
     DOAS DX Coil Std Cap-FT, !- Name
@@ -3557,11 +3561,10 @@
 
   Schedule:Compact,
     HVACTemplate-Always 12.2,!- Name
-    Any Number, !- Schedule Type Limits Name
+    Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    12.2;                    !- Field 4
+    Until: 24:00,12.2;       !- Field 3
 
   SetpointManager:Scheduled,
     DOAS Heating Supply Air Temp Manager,  !- Name
@@ -3590,11 +3593,10 @@
 
   Schedule:Compact,
     HVACTemplate-Always 0.00924,  !- Name
-    Any Number, !- Schedule Type Limits Name
+    Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    0.00924;                 !- Field 4
+    Until: 24:00,0.00924;    !- Field 3
 
   SetpointManager:Scheduled,
     DOAS Dehumidification Setpoint Manager,  !- Name
@@ -3603,7 +3605,7 @@
     DOAS Cooling Coil Outlet;!- Setpoint Node or NodeList Name
 
   OutdoorAir:NodeList,
-    DOAS Air Loop Inlet;  !- Node or NodeList Name 1
+    DOAS Air Loop Inlet;     !- Node or NodeList Name 1
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
@@ -3615,22 +3617,6 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Humidity Ratio,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Humidity Ratio,hourly;
-
   Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
@@ -3639,17 +3625,7 @@
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
 
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
   Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Main Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 

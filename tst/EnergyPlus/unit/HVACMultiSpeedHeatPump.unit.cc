@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -65,6 +66,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::BranchInputManager;
@@ -146,6 +148,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Z401 terminal list,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    401directair,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -153,6 +156,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Z402 terminal list,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    402directair,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1231,8 +1235,10 @@ namespace EnergyPlus {
 			HeatBalanceManager::GetZoneData( ErrorsFound ); // read zone data
 			EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
-			// Get Zone Equipment Configuration ata
+			// Get Zone Equipment Configuration data
 			DataZoneEquipment::GetZoneEquipmentData();
+			DataZoneEquipment::ZoneEquipList( 1 ).EquipIndex( 1 ) = 2; // 1st zone is 402, so this is 2nd direct air unit
+			DataZoneEquipment::ZoneEquipList( 2 ).EquipIndex( 1 ) = 1; // 2nd zone is 401, so this is 1st direct air unit
 			MixedAir::GetOutsideAirSysInputs();
 			MixedAir::GetOAControllerInputs();
 			SplitterComponent::GetSplitterInput();
