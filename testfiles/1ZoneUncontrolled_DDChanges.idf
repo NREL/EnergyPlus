@@ -567,7 +567,7 @@
   Schedule:Day:Interval,
     DaySchedule5,            !- Name
     Temperature,             !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     until: 24:00,            !- Time 1
     5;                       !- Value Until Time 1
 
@@ -1064,7 +1064,7 @@
   Schedule:Day:List,
     Example Weather Temp,    !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     19.55,                   !- Value 1
     20.1,                    !- <none>
@@ -1166,7 +1166,7 @@
   Schedule:Day:List,
     Example Weather Direct Solar,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     0,                       !- Value 1
     0,                       !- <none>
@@ -1268,7 +1268,7 @@
   Schedule:Day:List,
     Example Weather Diffuse Solar,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     0,                       !- Value 1
     0,                       !- <none>
@@ -1370,7 +1370,7 @@
   Schedule:Day:List,
     Example Weather Relative Humidity,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     82,                      !- Value 1
     81,                      !- <none>
@@ -1505,7 +1505,7 @@
   Schedule:Day:List,
     ListScheduleExample_int, !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     60,                      !- Minutes per Item
     1,                       !- Value 1
     2,                       !- <none>
