@@ -90,6 +90,7 @@ namespace DataEnvironment {
 	extern int DSTIndicator; // Daylight Saving Time Indicator (1=yes, 0=no) for Today
 	extern Real64 Elevation; // Elevation of this building site
 	extern bool EndMonthFlag; // Set to true on last day of month
+	extern bool EndYearFlag; // Set to true on last day of year
 	extern Real64 GndReflectanceForDayltg; // Ground visible reflectance for use in daylighting calc
 	extern Real64 GndReflectance; // Ground visible reflectance from input
 	extern Real64 GndSolarRad; // Current ground reflected radiation

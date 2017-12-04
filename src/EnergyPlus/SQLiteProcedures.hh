@@ -182,6 +182,15 @@ public:
 		bool const warmupFlag = false
 	);
 
+	void createYearlyTimeIndexRecord(
+		int const reportingInterval,
+		int const recordIndex,
+		int const simulationYear,
+		int const cumlativeSimulationDays,
+		int const curEnvirNum,
+		bool const warmupFlag = false
+	);
+
 	void addSQLiteZoneSizingRecord(
 		std::string const & ZoneName, // the name of the zone
 		std::string const & LoadType, // the description of the input variable

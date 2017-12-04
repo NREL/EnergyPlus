@@ -161,7 +161,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
+			std::vector<std::string> testResult0 {"1", "", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
@@ -231,7 +231,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
+			std::vector<std::string> testResult0 {"1", "", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9", "2,9999.9" } ) ) );
@@ -296,7 +296,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", ""};
+			std::vector<std::string> testResult0 {"1", "", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
 
@@ -368,7 +368,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
+			std::vector<std::string> testResult0 {"1", "", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.251683925, 1,10,4283136.252484382, 1,60", "2,9999.9,4283136.251683925, 1,10,4283136.252484382, 1,60" } ) ) );
 
@@ -444,7 +444,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+			std::vector<std::string> testResult0 {"1", "", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12", "1,999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60", "2,9999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60" } ) ) );
 
@@ -520,7 +520,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
+			std::vector<std::string> testResult0 {"1", "", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1", "1,999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60", "2,9999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60" } ) ) );
 
@@ -607,12 +607,12 @@ namespace EnergyPlus {
 
 			std::vector< std::vector<std::string> > timeData(
 			{
-				{"1", "12", "21", "0", "10", "0", "10", "0", "1", "WinterDesignDay", "0", "0"},
-				{"2", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"},
-				{"3", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", "0"},
-				{"4", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", "0"},
-				{"5", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", "0"},
-				{"6", "", "", "", "", "", "1440", "4", "1", "", "0", "0"}
+				{"1", "", "12", "21", "0", "10", "0", "10", "0", "1", "WinterDesignDay", "0", "0"},
+				{"2", "", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"},
+				{"3", "", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", "0"},
+				{"4", "", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", "0"},
+				{"5", "", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", "0"},
+				{"6", "", "", "", "", "", "", "1440", "4", "1", "", "0", "0"}
 			});
 
 			EXPECT_EQ( timeData, timeResults );
@@ -3061,11 +3061,11 @@ namespace EnergyPlus {
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
 			std::vector< std::vector<std::string> > timeData({
-				{"1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
-				{"2", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
-				{"3", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
-				{"4", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
-				{"5", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
+				{"1", "", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
+				{"2", "", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
+				{"3", "", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
+				{"4", "", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
+				{"5", "", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
 			});
 
 			EXPECT_EQ( timeData, timeResults );
@@ -3247,11 +3247,11 @@ namespace EnergyPlus {
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
 			std::vector< std::vector<std::string> > timeData({
-				{"1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
-				{"2", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
-				{"3", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
-				{"4", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
-				{"5", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
+				{"1", "", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
+				{"2", "", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
+				{"3", "", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
+				{"4", "", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
+				{"5", "", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
 			});
 
 			EXPECT_EQ( timeData, timeResults );
@@ -3442,7 +3442,7 @@ namespace EnergyPlus {
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
 			std::vector< std::vector<std::string> > timeData({
-				{ "1", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0" },
+				{ "1", "", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0" },
 			});
 
 			EXPECT_EQ( timeData, timeResults );
@@ -3595,22 +3595,22 @@ namespace EnergyPlus {
 
 
 			compare_eso_stream( delimited_string( {
-				"6,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-				"37,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
+				"38,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
-				"6,1.1",
+				"7,1.1",
 				"2,365,12,31, 0,24,20.00,30.00,Tuesday",
-				"6,1.3",
+				"7,1.3",
 				"2,365,12,31, 0,24,30.00,40.00,Tuesday",
-				"6,1.5",
+				"7,1.5",
 				"2,365,12,31, 0,24,40.00,50.00,Tuesday",
-				"6,1.7",
+				"7,1.7",
 				"2,365,12,31, 0,24,50.00,60.00,Tuesday",
-				"6,1.9",
+				"7,1.9",
 				"2,365,12,31, 0,24,60.00,70.00,Tuesday",
-				"6,2.2",
+				"7,2.2",
 				"5,365",
-				"37,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+				"38,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
 			} ) );
 
 
@@ -3630,11 +3630,11 @@ namespace EnergyPlus {
 
 			compare_eso_stream( delimited_string( {
 				"2,365,12,31, 0,24, 0.00,10.00,Tuesday",
-				"6,100.0",
+				"7,100.0",
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
-				"6,200.0",
+				"7,200.0",
 				"5,365",
-				"37,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
+				"38,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
 			} ) );
 
 		}

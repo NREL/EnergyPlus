@@ -244,6 +244,9 @@ namespace OutputProcessor {
 	int MonthlyStampReportNbr; // Monthly Report number
 	std::string MonthlyStampReportChr; // Monthly Report number (character -- for printing)
 	bool TrackingMonthlyVariables( false ); // Requested Monthly Report Variables
+	int YearlyStampReportNbr; // Yearly Report number
+	std::string YearlyStampReportChr; // Yearly Report number (character -- for printing)
+	bool TrackingYearlyVariables(false); // Requested Yearly Report Variables
 	int RunPeriodStampReportNbr; // RunPeriod Report number
 	std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	bool TrackingRunPeriodVariables( false ); // Requested RunPeriod Report Variables
@@ -356,6 +359,9 @@ namespace OutputProcessor {
 		MonthlyStampReportNbr = 0;
 		MonthlyStampReportChr = "";
 		TrackingMonthlyVariables = false;
+		YearlyStampReportNbr = 0;
+		YearlyStampReportChr = "";
+		TrackingYearlyVariables = false;
 		RunPeriodStampReportNbr = 0;
 		RunPeriodStampReportChr = "";
 		TrackingRunPeriodVariables = false;
@@ -4015,12 +4021,68 @@ namespace OutputProcessor {
 			std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
 			out_stream << stamp << NL;
 			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum );
-		} else {
-			std::ostringstream ss;
-			ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
-			if ( sqlite ) {
-				sqlite->sqliteWriteMessage( ss.str() );
-			}
+		} else if ( sqlite ){
+			std::string str( "Illegal reportingInterval passed to WriteTimeStampFormatData: " + std::to_string( reportingInterval ) );
+			sqlite->sqliteWriteMessage( str );
+		}
+	}
+
+	void
+	WriteYearlyTimeStampFormatData(
+		std::ostream * out_stream_p, // Output stream pointer
+		int const reportID, // The ID of the time stamp
+		std::string const & reportIDString, // The ID of the time stamp
+		std::string const & YearOfSimChr, // the year of the simulation
+		bool writeToSQL
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Jason DeGraw
+		//       DATE WRITTEN   December 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function reports the timestamp data for the output processor
+		// Much of the code in this function was embedded in earlier versions of EnergyPlus
+		// and was moved to this location to simplify maintenance and to allow for data output
+		// to the SQL database
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataPrecisionGlobals;
+		using DataStringGlobals::NL;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		static int const N( 100 );
+		static char stamp[ N ];
+		assert( reportIDString.length() + YearOfSimChr.length() + 26 < N ); // Check will fit in stamp size
+
+		if ( ( ! out_stream_p ) || ( ! *out_stream_p ) ) return; // Stream
+		std::ostream & out_stream(*out_stream_p);
+
+		std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
+		out_stream << stamp << NL;
+		if ( writeToSQL && sqlite ) {
+			sqlite->createSQLiteTimeIndexRecord( static_cast<int>(ReportingFrequency::Yearly), reportID, DayOfSim, DataEnvironment::CurEnvirNum );
 		}
 	}
 
@@ -4243,6 +4305,7 @@ namespace OutputProcessor {
 
 	void
 	WriteRealVariableOutput(
+		RealVariables &realVar, // Real variable to write out
 		int const reportType // The report type or interval (e.g., hourly)
 	)
 	{
@@ -4250,7 +4313,7 @@ namespace OutputProcessor {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Greg Stark
 		//       DATE WRITTEN   August 2008
-		//       MODIFIED       April 2011; Linda Lawrie
+		//       MODIFIED       April 2011; Linda Lawrie, December 2017; Jason DeGraw
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4282,17 +4345,17 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( RVar().Report && RVar().ReportFreq == reportType && RVar().Stored ) {
-			if ( RVar().NumStored > 0.0 ) {
-				WriteReportRealData( RVar().ReportID, RVar().ReportIDChr, RVar().StoreValue, RVar().StoreType, RVar().NumStored, RVar().ReportFreq, RVar().MinValue, RVar().minValueDate, RVar().MaxValue, RVar().maxValueDate );
+		if ( realVar.Report && realVar.ReportFreq == reportType && realVar.Stored ) {
+			if ( realVar.NumStored > 0.0 ) {
+				WriteReportRealData( realVar.ReportID, realVar.ReportIDChr, realVar.StoreValue, realVar.StoreType, realVar.NumStored, realVar.ReportFreq, realVar.MinValue, realVar.minValueDate, realVar.MaxValue, realVar.maxValueDate );
 				++StdOutputRecordCount;
 			}
 
-			RVar().StoreValue = 0.0;
-			RVar().NumStored = 0.0;
-			RVar().MinValue = MinSetValue;
-			RVar().MaxValue = MaxSetValue;
-			RVar().Stored = false;
+			realVar.StoreValue = 0.0;
+			realVar.NumStored = 0.0;
+			realVar.MinValue = MinSetValue;
+			realVar.MaxValue = MaxSetValue;
+			realVar.Stored = false;
 
 		}
 
@@ -4652,6 +4715,7 @@ namespace OutputProcessor {
 
 	void
 	WriteIntegerVariableOutput(
+		IntegerVariables &intVar, // Integer variable to write out
 		int const reportType // The report type (i.e., the reporting interval)
 	)
 	{
@@ -4659,7 +4723,7 @@ namespace OutputProcessor {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Greg Stark
 		//       DATE WRITTEN   August 2008
-		//       MODIFIED       April 2011; Linda Lawrie
+		//       MODIFIED       April 2011; Linda Lawrie, December 2017; Jason DeGraw
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -4695,17 +4759,17 @@ namespace OutputProcessor {
 
 		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
 
-		if ( IVar().Report && IVar().ReportFreq == reportType && IVar().Stored ) {
+		if ( intVar.Report && intVar.ReportFreq == reportType && intVar.Stored ) {
 			if ( IVar().NumStored > 0.0 ) {
-				WriteReportIntegerData( IVar().ReportID, IVar().ReportIDChr, IVar().StoreValue, IVar().StoreType, IVar().NumStored, IVar().ReportFreq, IVar().MinValue, IVar().minValueDate, IVar().MaxValue, IVar().maxValueDate );
+				WriteReportIntegerData( intVar.ReportID, intVar.ReportIDChr, intVar.StoreValue, intVar.StoreType, intVar.NumStored, intVar.ReportFreq, intVar.MinValue, intVar.minValueDate, intVar.MaxValue, intVar.maxValueDate );
 				++StdOutputRecordCount;
 			}
 
-			IVar().StoreValue = 0.0;
-			IVar().NumStored = 0.0;
-			IVar().MinValue = IMinSetValue;
-			IVar().MaxValue = IMaxSetValue;
-			IVar().Stored = false;
+			intVar.StoreValue = 0.0;
+			intVar.NumStored = 0.0;
+			intVar.MinValue = IMinSetValue;
+			intVar.MaxValue = IMaxSetValue;
+			intVar.Stored = false;
 
 		}
 
@@ -5789,6 +5853,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	using DataGlobals::EndEnvrnFlag;
 	using DataGlobals::eso_stream;
 	using DataEnvironment::EndMonthFlag;
+	using DataEnvironment::EndYearFlag;
 	using General::EncodeMonDayHrMin;
 
 	// Locals
@@ -6168,15 +6233,13 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
-					RVar >>= RVariableTypes( Loop ).VarPtr;
-					WriteRealVariableOutput( ReportDaily );
+					WriteRealVariableOutput( RVariableTypes( Loop ).VarPtr, ReportDaily );
 				}
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
-					IVar >>= IVariableTypes( Loop ).VarPtr;
-					WriteIntegerVariableOutput( ReportDaily );
+					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportDaily );
 				}
 			} // Number of I Variables
 		} // Index type (Zone or HVAC)
@@ -6199,15 +6262,13 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
-					RVar >>= RVariableTypes( Loop ).VarPtr;
-					WriteRealVariableOutput( ReportMonthly );
+					WriteRealVariableOutput( RVariableTypes(Loop).VarPtr, ReportMonthly );
 				}
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
-					IVar >>= IVariableTypes( Loop ).VarPtr;
-					WriteIntegerVariableOutput( ReportMonthly );
+					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportMonthly );
 				}
 			} // Number of I Variables
 		} // IndexType (Zone, HVAC)
@@ -6216,6 +6277,31 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 		NumHoursInMonth = 0;
 	} // Month Block
+
+	// Yearly Block
+	if ( EndYearFlag ) {
+		if ( TrackingYearlyVariables ) {
+			WriteTimeStampFormatData( eso_stream, ReportSim, YearlyStampReportNbr, YearlyStampReportChr, DayOfSim, DayOfSimChr, true );
+			TimePrint = false;
+		}
+		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
+			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
+					WriteRealVariableOutput( RVariableTypes( Loop ).VarPtr, ReportSim );
+				}
+			} // Number of R Variables
+
+			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
+					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportSim );
+				}
+			} // Number of I Variables
+		} // Index Type (Zone, HVAC)
+
+		ReportSMMeters( TimePrint );
+
+		NumHoursInSim = 0;
+	}
 
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
@@ -6226,15 +6312,13 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
-					RVar >>= RVariableTypes( Loop ).VarPtr;
-					WriteRealVariableOutput( ReportSim );
+					WriteRealVariableOutput( RVariableTypes( Loop ).VarPtr, ReportSim );
 				}
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
-					IVar >>= IVariableTypes( Loop ).VarPtr;
-					WriteIntegerVariableOutput( ReportSim );
+					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportSim );
 				}
 			} // Number of I Variables
 		} // Index Type (Zone, HVAC)

@@ -176,6 +176,9 @@ namespace OutputProcessor {
 	extern int MonthlyStampReportNbr; // Monthly Report number
 	extern std::string MonthlyStampReportChr; // Monthly Report number (character -- for printing)
 	extern bool TrackingMonthlyVariables; // Requested Monthly Report Variables
+	extern int YearlyStampReportNbr; // Monthly Report number
+	extern std::string YearlyStampReportChr; // Monthly Report number (character -- for printing)
+	extern bool TrackingYearlyVariables; // Requested Yearly Report Variables
 	extern int RunPeriodStampReportNbr; // RunPeriod Report number
 	extern std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	extern bool TrackingRunPeriodVariables; // Requested RunPeriod Report Variables
@@ -241,6 +244,16 @@ namespace OutputProcessor {
 		kgWater_s,
 		unknown,
 		customEMS
+	};
+
+	enum class ReportingFrequency {
+		EachCall = -1, // Write out each time UpdatedataandReport is called
+		TimeStep, // Write out at 'EndTimeStepFlag'
+		Hourly, // Write out at 'EndHourFlag'
+		Daily, // Write out at 'EndDayFlag'
+		Monthly, // Write out at end of month (must be determined)
+		Simulation, // Write out once per environment 'EndEnvrnFlag'
+		Yearly // Write out at 'EndYearFlag'
 	};
 
 	struct TimeSteps
@@ -940,6 +953,7 @@ namespace OutputProcessor {
 
 	void
 	WriteRealVariableOutput(
+		RealVariables &realVar, // Real variable to write out
 		int const reportType // The report type or interval (e.g., hourly)
 	);
 
@@ -1001,6 +1015,7 @@ namespace OutputProcessor {
 
 	void
 	WriteIntegerVariableOutput(
+		IntegerVariables &intVar, // Integer variable to write out
 		int const reportType // The report type (i.e., the reporting interval)
 	);
 
