@@ -1856,7 +1856,7 @@ namespace ThermalComfort {
 		using DataHeatBalance::Construct;
 
 		// Return value
-		Real64 CalcSurfaceWeightedMRT;
+		Real64 CalcSurfaceWeightedMRT = 0.0;
 		
 		// Local variables
 		int SurfNum2; // surface number used in "for" loop
