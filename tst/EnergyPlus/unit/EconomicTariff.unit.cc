@@ -273,7 +273,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
 	// Check that if defaults the conversion choice correctly
 	EXPECT_EQ( conversionM3, tariff( 1 ).convChoice );
 	EXPECT_EQ( 1, tariff( 1 ).energyConv );
-	EXPECT_EQ( 1, tariff( 1 ).demandConv );
+	EXPECT_EQ( 3600, tariff( 1 ).demandConv );
 	EXPECT_EQ( 10, tariff( 1 ).monthChgVal );
 }
 

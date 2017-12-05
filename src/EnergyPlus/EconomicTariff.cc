@@ -606,7 +606,7 @@ namespace EconomicTariff {
 					tariff( iInObj ).demandConv = 0.003412;
 
 				// Volumetric units for natural gas
-				// Actually assuming 1 therm = 1 CCF
+				// Actually assuming 1 therm = 1 CCF (= 100 ft^3)
 				} else if ( SameString( cAlphaArgs( 3 ), "MCF" ) ) {
 					tariff( iInObj ).convChoice = conversionMCF;
 					tariff( iInObj ).energyConv = 9.4781712e-10;
