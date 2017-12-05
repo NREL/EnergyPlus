@@ -4760,7 +4760,7 @@ namespace OutputProcessor {
 		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
 
 		if ( intVar.Report && intVar.ReportFreq == reportType && intVar.Stored ) {
-			if ( IVar().NumStored > 0.0 ) {
+			if ( intVar.NumStored > 0.0 ) {
 				WriteReportIntegerData( intVar.ReportID, intVar.ReportIDChr, intVar.StoreValue, intVar.StoreType, intVar.NumStored, intVar.ReportFreq, intVar.MinValue, intVar.minValueDate, intVar.MaxValue, intVar.maxValueDate );
 				++StdOutputRecordCount;
 			}
