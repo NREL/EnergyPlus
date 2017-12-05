@@ -1006,7 +1006,7 @@ namespace HVACUnitarySystem {
 		if ( AirLoopNum == -1 ) { // Outdoor Air Unit
 			Node( ControlNode ).TempSetPoint = OAUCoilOutTemp; // Set the coil outlet temperature
 			if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil ) {
-				FrostControlSetPointLimit( UnitarySysNum, UnitarySystem( UnitarySysNum ).DesiredOutletTemp, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout, 1 );
+				FrostControlSetPointLimit( UnitarySysNum, UnitarySystem( UnitarySysNum ).DesiredOutletTemp, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DesignMinOutletTemp, 1 );
 			}
 		} else if ( AirLoopNum != -1 ) { // Not an Outdoor air unit
 
@@ -1160,13 +1160,13 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).DesiredOutletHumRat = 1.0;
 				} else if ( ControlNode == OutNode ) {
 					if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil && UnitarySystem( UnitarySysNum ).RunOnSensibleLoad ) {
-						FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout, 1 );
+						FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DesignMinOutletTemp, 1 );
 					}
 					UnitarySystem( UnitarySysNum ).DesiredOutletTemp = Node( ControlNode ).TempSetPoint;
 					//  IF HumRatMax is zero, then there is no request from SetpointManager:SingleZone:Humidity:Maximum
 					if ( ( UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_None ) && ( Node( ControlNode ).HumRatMax > 0.0 ) ) {
 						if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil && UnitarySystem( UnitarySysNum ).RunOnLatentLoad ) {
-							FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout, 2 );
+							FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DesignMinOutletTemp, 2 );
 						}
 						UnitarySystem( UnitarySysNum ).DesiredOutletHumRat = Node( ControlNode ).HumRatMax;
 					} else {
@@ -1174,12 +1174,12 @@ namespace HVACUnitarySystem {
 					}
 				} else {
 					if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil && UnitarySystem( UnitarySysNum ).RunOnSensibleLoad ) {
-						FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout, 1 );
+						FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DesignMinOutletTemp, 1 );
 					}
 					UnitarySystem( UnitarySysNum ).DesiredOutletTemp = Node( ControlNode ).TempSetPoint - ( Node( ControlNode ).Temp - Node( OutNode ).Temp );
 					if ( UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_None ) {
 						if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil && UnitarySystem( UnitarySysNum ).RunOnLatentLoad ) {
-							FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout, 2 );
+							FrostControlSetPointLimit( UnitarySysNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, UnitarySystem( UnitarySysNum ).DesignMinOutletTemp, 2 );
 						}
 						UnitarySystem( UnitarySysNum ).DesiredOutletHumRat = Node( ControlNode ).HumRatMax - ( Node( ControlNode ).HumRat - Node( OutNode ).HumRat );
 					} else {
@@ -2647,7 +2647,7 @@ namespace HVACUnitarySystem {
 			PrintFlag = true;
 			FieldNum = 2; // Minimum Supply Air Temperature in Cooling Mode
 			SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [C]";
-			RequestSizing( CompType, CompName, SizingMethod, SizingString, UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout, PrintFlag, RoutineName );
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, UnitarySystem( UnitarySysNum ).DesignMinOutletTemp, PrintFlag, RoutineName );
 
 			SizingMethod = ASHRAEMaxSATHeatingSizing;
 			FieldNum = 17; // Maximum Supply Air Temperature in Heating Mode
@@ -5118,18 +5118,18 @@ namespace HVACUnitarySystem {
 			// DOAS DX Cooling Coil Leaving Minimum Air Temperature
 			if ( NumNumbers > 0 ) {
 				if ( ! lNumericBlanks( iDOASDXMinTempNumericNum ) ) {
-					UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout = Numbers( iDOASDXMinTempNumericNum );
-					if( UnitarySystem( UnitarySysNum ).ControlType != CCM_ASHRAE && UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout == AutoSize ) {
+					UnitarySystem( UnitarySysNum ).DesignMinOutletTemp = Numbers( iDOASDXMinTempNumericNum );
+					if( UnitarySystem( UnitarySysNum ).ControlType != CCM_ASHRAE && UnitarySystem( UnitarySysNum ).DesignMinOutletTemp == AutoSize ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Invalid entry for " + cNumericFields( iDOASDXMinTempNumericNum ) + " = AutoSize." );
 						ShowContinueError( "AutoSizing not allowed when " + cAlphaFields( iControlTypeAlphaNum ) + " = " + Alphas( iControlTypeAlphaNum ) );
 						ErrorsFound = true;
 					}
-					if( UnitarySystem( UnitarySysNum ).ControlType != CCM_ASHRAE && UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout > 7.5 ) {
+					if( UnitarySystem( UnitarySysNum ).ControlType != CCM_ASHRAE && UnitarySystem( UnitarySysNum ).DesignMinOutletTemp > 7.5 ) {
 						ShowWarningError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Invalid entry for " + cNumericFields( iDOASDXMinTempNumericNum ) + " = " + TrimSigDigits( Numbers( iDOASDXMinTempNumericNum ), 3 )   );
 						ShowContinueError( "The minimum supply air temperature will be limited to 7.5C and the simulation continues." );
-						UnitarySystem( UnitarySysNum ).DOASDXCoolingCoilMinTout = 7.5;
+						UnitarySystem( UnitarySysNum ).DesignMinOutletTemp = 7.5;
 					}
 				}
 			}
@@ -7127,7 +7127,7 @@ namespace HVACUnitarySystem {
 
 			auto & SZVAVModel( UnitarySystem( UnitarySysNum ) );
 			// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-			General::calcSZVAVModel (SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, AirLoopNum, HXUnitOn, CompressorONFlag, FullSensibleOutput, NoLoadOutletTemp, FullLoadAirOutletTemp );
+			General::calcSZVAVModel (SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadRatio, NoLoadOutletTemp, FullSensibleOutput, FullLoadAirOutletTemp, CompressorONFlag );
 
 		} else { // not ASHRAE model
 

@@ -198,14 +198,13 @@ namespace HVACUnitarySystem {
 		int ZoneInletNode; // Zone inlet node number in the controlled zone
 		Real64 ControlZoneMassFlowFrac; // Fraction of flow to control zone
 		bool Humidistat; // Set to True if dehumidification control mode is set to
-		Real64 DesignMaxOutletTemp; // Maximum supply air temperature from heater [C]
 		int CondenserNodeNum; // index to condenser air inlet node
 		int DehumidControlType_Num; // Set to Dehumid Control None, CoolReheat or MultiMode
 		int AirFlowControl; // UseCompressorOnFlow or UseCompressorOffFlow
-		int ControlType; // Setpoint or Load based control
+		int ControlType; // Setpoint, Load based or ASHRAE (SZVAV) control
 		bool validASHRAECoolCoil; // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
 		bool validASHRAEHeatCoil; // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
-		bool simASHRAEModel; // flag denoting that ASHRAE model should be used
+		bool simASHRAEModel; // flag denoting that ASHRAE model (SZVAV) should be used
 		int CapacityControlType; // operational system control
 		bool RequestAutoSize; // determines if inputs need autosizing
 		bool RunOnSensibleLoad; // logical determines if this system will run to
@@ -226,19 +225,9 @@ namespace HVACUnitarySystem {
 		Real64 DesignCoolingCapacity; // cooling coil capacity (W)
 		int CoolingCoilAvailSchPtr; // cooling coil availability schedule index
 		int ActualDXCoilIndexForHXAssisted; // index to DX coil used in HX assisted object
-		Real64 DOASDXCoolingCoilMinTout; // DOAS DX Cooling coil outlet air minimum temperature
 		bool ISHundredPercentDOASDXCoil; // logical determines if this system will run as 100% DOAS
 		bool CoolCoilExists; // True if a cooling coil is specified in the unitary system
 		int FrostControlStatus; // DOAS coil system frost control status
-		int CoolCoilInletNodeNum; // Cooling coil air inlet node number
-		int CoolCoilOutletNodeNum; // Cooling coil air outlet node number
-		int CoolCoilFluidOutletNodeNum; // Cooling coil fluid outlet node number (from Plant Loop data)
-		int CoolCoilLoopNum; // Plant loop num of chilled water coil
-		int CoolCoilLoopSide; // Supply side or demand side
-		int CoolCoilBranchNum; // Branch of number of the cooling coil in the plant loop
-		int CoolCoilCompNum; // Comp num of the cooling coil in the plant loop
-		int CoolCoilFluidInletNode; // Cooling coil fluid inlet node
-		Real64 MaxCoolCoilFluidFlow; // Maximum cooling coil fluid flow for chilled water coil
 		bool CoolingCoilUpstream; // Set to true when coolign coil is upstream in the unitary system
 		Real64 CoolCompPartLoadRatio; // Unitary system compressor part load ratio in cooling
 		// Heating coil specific data
@@ -250,16 +239,9 @@ namespace HVACUnitarySystem {
 		bool DXHeatingCoil; // specifies if heating coil is DX
 		int HeatCoilInletNodeNum; // Heating coil air inlet node number
 		int HeatCoilOutletNodeNum; // Heating coil air outlet node number
-		int HeatCoilFluidOutletNodeNum; // Heating coil fluid outlet node number (from Plant Loop data)
 		int HeatingCoilPLFCurveIndex; // PLF curve index (not used yet?)
 		int HeatingCoilAvailSchPtr; // heating coil availability schedule index
 		bool HeatCoilExists; // True if a heating coil is specified in the unitary system
-		int HeatCoilLoopNum; // Plant loop num of hot water or steam coil
-		int HeatCoilLoopSide; // Supply side or demand side
-		int HeatCoilBranchNum; // Branch of number of the heating coil in the plant loop
-		int HeatCoilCompNum; // Comp num of the heating coil in the plant loop
-		int HeatCoilFluidInletNode; // Heating coil fluid inlet node
-		Real64 MaxHeatCoilFluidFlow; // Maximum heating coil fluid flow for hot water or steam coil
 		Real64 CoolCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
 		Real64 HeatCoilWaterFlowRatio; // ratio of water coil flow rate to max water flow rate
 		Real64 HeatCompPartLoadRatio; // Unitary system compressor part load ratio in heating
@@ -297,9 +279,6 @@ namespace HVACUnitarySystem {
 		Real64 MaxNoCoolHeatAirVolFlow; // Maximum coil air volumetric flow for no cooling or heating [m3/s]
 		Real64 DesignFanVolFlowRate; // Design fan volume flow rate [m3/s]
 		Real64 DesignMassFlowRate; // Design mass flow rate [m3/s]
-		Real64 MaxCoolAirMassFlow; // Maximum coil air mass flow for cooling [kg/s]
-		Real64 MaxHeatAirMassFlow; // Maximum coil air mass flow for heating [kg/s]
-		Real64 MaxNoCoolHeatAirMassFlow; // Maximum coil air mass flow for no cooling or heating [kg/s]
 		Real64 NoLoadAirFlowRateRatio; // fraction of supply air flow rate used during no load operation [~]
 		int CoolingSAFMethod; // Supply air flow method for cooling
 		int HeatingSAFMethod; // Supply air flow method for heating
@@ -401,8 +380,6 @@ namespace HVACUnitarySystem {
 		Real64 SpeedRatio; // current compressor speed ratio (variable speed)
 		Real64 CycRatio; // cycling part load ratio (variable speed)
 		int TESOpMode; // operating mode of TES DX cooling coil
-		Real64 LowSpeedCoolFanRatio;
-		Real64 LowSpeedHeatFanRatio;
 		// Warning message variables
 		int HXAssistedSensPLRIter; // used in HX Assisted calculations
 		int HXAssistedSensPLRIterIndex; // used in HX Assisted calculations
@@ -489,6 +466,31 @@ namespace HVACUnitarySystem {
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 		
+		// SZVAV variables
+		Real64 DesignMinOutletTemp; // DOAS DX Cooling or SZVAV coil outlet air minimum temperature
+		Real64 DesignMaxOutletTemp; // Maximum supply air temperature from heater [C]
+		Real64 MaxCoolAirMassFlow; // Maximum coil air mass flow for cooling [kg/s]
+		Real64 MaxHeatAirMassFlow; // Maximum coil air mass flow for heating [kg/s]
+		Real64 MaxNoCoolHeatAirMassFlow; // Maximum coil air mass flow for no cooling or heating [kg/s]
+		Real64 LowSpeedCoolFanRatio;
+		Real64 LowSpeedHeatFanRatio;
+		int CoolCoilInletNodeNum; // Cooling coil air inlet node number
+		int CoolCoilOutletNodeNum; // Cooling coil air outlet node number
+		int CoolCoilFluidOutletNodeNum; // Cooling coil fluid outlet node number (from Plant Loop data)
+		int CoolCoilLoopNum; // Plant loop num of chilled water coil
+		int CoolCoilLoopSide; // Supply side or demand side
+		int CoolCoilBranchNum; // Branch of number of the cooling coil in the plant loop
+		int CoolCoilCompNum; // Comp num of the cooling coil in the plant loop
+		int CoolCoilFluidInletNode; // Cooling coil fluid inlet node
+		Real64 MaxCoolCoilFluidFlow; // Maximum cooling coil fluid flow for chilled water coil
+		int HeatCoilLoopNum; // Plant loop num of hot water or steam coil
+		int HeatCoilLoopSide; // Supply side or demand side
+		int HeatCoilBranchNum; // Branch of number of the heating coil in the plant loop
+		int HeatCoilCompNum; // Comp num of the heating coil in the plant loop
+		int HeatCoilFluidInletNode; // Heating coil fluid inlet node
+		int HeatCoilFluidOutletNodeNum; // Heating coil fluid outlet node number (from Plant Loop data)
+		Real64 MaxHeatCoilFluidFlow; // Maximum heating coil fluid flow for hot water or steam coil
+
 		// Default Constructor
 		UnitarySystemData() :
 			UnitarySystemType_Num( 0 ),
@@ -505,7 +507,6 @@ namespace HVACUnitarySystem {
 			ZoneInletNode( 0 ),
 			ControlZoneMassFlowFrac( 0.0 ),
 			Humidistat( false ),
-			DesignMaxOutletTemp( 80.0 ),
 			CondenserNodeNum( 0 ),
 			DehumidControlType_Num( 0 ),
 			AirFlowControl( 1 ),
@@ -528,19 +529,9 @@ namespace HVACUnitarySystem {
 			DesignCoolingCapacity( 0.0 ),
 			CoolingCoilAvailSchPtr( 0 ),
 			ActualDXCoilIndexForHXAssisted( 0 ),
-			DOASDXCoolingCoilMinTout( 0.0 ),
 			ISHundredPercentDOASDXCoil( false ),
 			CoolCoilExists( false ),
 			FrostControlStatus( 0 ),
-			CoolCoilInletNodeNum( 0 ),
-			CoolCoilOutletNodeNum( 0 ),
-			CoolCoilFluidOutletNodeNum( 0 ),
-			CoolCoilLoopNum( 0 ),
-			CoolCoilLoopSide( 0 ),
-			CoolCoilBranchNum( 0 ),
-			CoolCoilCompNum( 0 ),
-			CoolCoilFluidInletNode( 0 ),
-			MaxCoolCoilFluidFlow( AutoSize ),
 			CoolingCoilUpstream( true ),
 			CoolCompPartLoadRatio( 0.0 ),
 			HeatingCoilType_Num( 0 ),
@@ -550,16 +541,9 @@ namespace HVACUnitarySystem {
 			DXHeatingCoil( false ),
 			HeatCoilInletNodeNum( 0 ),
 			HeatCoilOutletNodeNum( 0 ),
-			HeatCoilFluidOutletNodeNum( 0 ),
 			HeatingCoilPLFCurveIndex( 0 ),
 			HeatingCoilAvailSchPtr( 0 ),
 			HeatCoilExists( false ),
-			HeatCoilLoopNum( 0 ),
-			HeatCoilLoopSide( 0 ),
-			HeatCoilBranchNum( 0 ),
-			HeatCoilCompNum( 0 ),
-			HeatCoilFluidInletNode( 0 ),
-			MaxHeatCoilFluidFlow( AutoSize ),
 			CoolCoilWaterFlowRatio( 0.0 ),
 			HeatCoilWaterFlowRatio( 0.0 ),
 			HeatCompPartLoadRatio( 0.0 ),
@@ -591,9 +575,6 @@ namespace HVACUnitarySystem {
 			MaxNoCoolHeatAirVolFlow( 0.0 ),
 			DesignFanVolFlowRate( 0.0 ),
 			DesignMassFlowRate( 0.0 ),
-			MaxCoolAirMassFlow( 0.0 ),
-			MaxHeatAirMassFlow( 0.0 ),
-			MaxNoCoolHeatAirMassFlow( 0.0 ),
 			NoLoadAirFlowRateRatio( 1.0 ),
 			CoolingSAFMethod( 0 ),
 			HeatingSAFMethod( 0 ),
@@ -679,8 +660,6 @@ namespace HVACUnitarySystem {
 			SpeedRatio( 0.0 ),
 			CycRatio( 0.0 ),
 			TESOpMode( 0 ),
-			LowSpeedCoolFanRatio( 0.0),
-			LowSpeedHeatFanRatio( 0.0 ),
 			HXAssistedSensPLRIter( 0 ),
 			HXAssistedSensPLRIterIndex( 0 ),
 			HXAssistedSensPLRFail( 0 ),
@@ -757,7 +736,32 @@ namespace HVACUnitarySystem {
 			ATMixerOutNode( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+
+			// SZVAV variables
+			DesignMinOutletTemp( 0.0 ),
+			DesignMaxOutletTemp( 80.0 ),
+			MaxCoolAirMassFlow( 0.0 ),
+			MaxHeatAirMassFlow( 0.0 ),
+			MaxNoCoolHeatAirMassFlow( 0.0 ),
+			LowSpeedCoolFanRatio( 0.0 ),
+			LowSpeedHeatFanRatio( 0.0 ),
+			CoolCoilInletNodeNum( 0 ),
+			CoolCoilOutletNodeNum( 0 ),
+			CoolCoilFluidOutletNodeNum( 0 ),
+			CoolCoilLoopNum( 0 ),
+			CoolCoilLoopSide( 0 ),
+			CoolCoilBranchNum( 0 ),
+			CoolCoilCompNum( 0 ),
+			CoolCoilFluidInletNode( 0 ),
+			MaxCoolCoilFluidFlow( AutoSize ),
+			HeatCoilLoopNum( 0 ),
+			HeatCoilLoopSide( 0 ),
+			HeatCoilBranchNum( 0 ),
+			HeatCoilCompNum( 0 ),
+			HeatCoilFluidInletNode( 0 ),
+			HeatCoilFluidOutletNodeNum( 0 ),
+			MaxHeatCoilFluidFlow( AutoSize )
 			{}
 
 	};

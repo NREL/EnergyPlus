@@ -22,6 +22,10 @@
 **Richard Raustad, Florida Solar Energy Center**
 
  - NFP Initial draft submitted November 15, 2017
+ - Design document conference call on Nov 27, 2017 (EL, MW, JD, RR)
+ - Update to this document based on design team conference call and review
+ - 
+ - As of 12/5/17, this Final NFP document now incorporates all expected code changes.
  
  
 
@@ -508,3 +512,10 @@ This use of a reference would require that the member variable names in FourPipe
 Once the common function is operational in UnitarySystem, the call to this new function will be added to the packaged terminal unit model.
 
 
+## Design Document Conference Call##
+
+Conference call held on Nov 27, 2017. Review of suggested changes brought up two options. Add base class to handle common variables among different equipment types or use templates to pass references of model structures.
+
+Templates have some issues that need to be understood. One is that compilers can be picky about syntax and the other is that is can be harder to debug code since the instance of a template does not exist until runtime. For this reason, it was decided to go the route of the base class method.
+
+To simplify the conversion, it was discussed that the code in question would be moved to a common location (e.g., General.cc). It was also suggested that implementation of the base class method not yet be undertaken until it is well understood what variables were needed in the base class for all affected equipment models (i,e., fan coil, unitary system and PTHP). The review team agreed that this method would be used going forward.

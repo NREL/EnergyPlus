@@ -624,7 +624,7 @@ namespace HVACDXSystem {
 			// DOAS DX Cooling Coil Leaving Minimum Air Temperature
 			if ( NumNums > 0 ) {
 				if ( ! lNumericBlanks( 1 ) ) {
-					DXCoolingSystem( DXCoolSysNum ).DOASDXCoolingCoilMinTout = Numbers( 1 );
+					DXCoolingSystem( DXCoolSysNum ).DesignMinOutletTemp = Numbers( 1 );
 				}
 			}
 			if ( DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ) {
@@ -736,7 +736,7 @@ namespace HVACDXSystem {
 					if ( AirLoopNum == -1 ) { // Outdoor Air Unit
 						Node( ControlNode ).TempSetPoint = OAUCoilOutletTemp; // Set the coil outlet temperature
 						if ( DXCoolingSystem( DXSystemNum ).ISHundredPercentDOASDXCoil ) {
-							FrostControlSetPointLimit( DXSystemNum, DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DOASDXCoolingCoilMinTout, 1 );
+							FrostControlSetPointLimit( DXSystemNum, DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DesignMinOutletTemp, 1 );
 						}
 					} else if ( AirLoopNum != -1 ) { // Not an outdoor air unit
 
@@ -786,7 +786,7 @@ namespace HVACDXSystem {
 			} else if ( ControlNode == OutNode ) {
 				DXCoolingSystem( DXSystemNum ).DesiredOutletTemp = OAUCoilOutletTemp;
 				if ( DXCoolingSystem( DXSystemNum ).ISHundredPercentDOASDXCoil && DXCoolingSystem( DXSystemNum ).RunOnSensibleLoad ) {
-					FrostControlSetPointLimit( DXSystemNum, DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DOASDXCoolingCoilMinTout, 1 );
+					FrostControlSetPointLimit( DXSystemNum, DXCoolingSystem( DXSystemNum ).DesiredOutletTemp, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DesignMinOutletTemp, 1 );
 				}
 			}
 			//  If the Dxsystem is an equipment of Outdoor Air Unit, the desiered coiloutlet humidity level is set to zero
@@ -802,13 +802,13 @@ namespace HVACDXSystem {
 				DXCoolingSystem( DXSystemNum ).DesiredOutletHumRat = 1.0;
 			} else if ( ControlNode == OutNode ) {
 				if ( DXCoolingSystem( DXSystemNum ).ISHundredPercentDOASDXCoil && DXCoolingSystem( DXSystemNum ).RunOnSensibleLoad ) {
-					FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DOASDXCoolingCoilMinTout, 1 );
+					FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DesignMinOutletTemp, 1 );
 				}
 				DXCoolingSystem( DXSystemNum ).DesiredOutletTemp = Node( ControlNode ).TempSetPoint;
 				//  If HumRatMax is zero, then there is no request from SetpointManager:SingleZone:Humidity:Maximum
 				if ( ( DXCoolingSystem( DXSystemNum ).DehumidControlType != DehumidControl_None ) && ( Node( ControlNode ).HumRatMax > 0.0 ) ) {
 					if ( DXCoolingSystem( DXSystemNum ).ISHundredPercentDOASDXCoil && DXCoolingSystem( DXSystemNum ).RunOnLatentLoad ) {
-						FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DOASDXCoolingCoilMinTout, 2 );
+						FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DesignMinOutletTemp, 2 );
 					}
 					DXCoolingSystem( DXSystemNum ).DesiredOutletHumRat = Node( ControlNode ).HumRatMax;
 				} else {
@@ -816,12 +816,12 @@ namespace HVACDXSystem {
 				}
 			} else {
 				if ( DXCoolingSystem( DXSystemNum ).ISHundredPercentDOASDXCoil && DXCoolingSystem( DXSystemNum ).RunOnSensibleLoad ) {
-					FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DOASDXCoolingCoilMinTout, 1 );
+					FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DesignMinOutletTemp, 1 );
 				}
 				DXCoolingSystem( DXSystemNum ).DesiredOutletTemp = Node( ControlNode ).TempSetPoint - ( Node( ControlNode ).Temp - Node( OutNode ).Temp );
 				if ( DXCoolingSystem( DXSystemNum ).DehumidControlType != DehumidControl_None ) {
 					if ( DXCoolingSystem( DXSystemNum ).ISHundredPercentDOASDXCoil && DXCoolingSystem( DXSystemNum ).RunOnLatentLoad ) {
-						FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DOASDXCoolingCoilMinTout, 2 );
+						FrostControlSetPointLimit( DXSystemNum, Node( ControlNode ).TempSetPoint, Node( ControlNode ).HumRatMax, OutBaroPress, DXCoolingSystem( DXSystemNum ).DesignMinOutletTemp, 2 );
 					}
 					DXCoolingSystem( DXSystemNum ).DesiredOutletHumRat = Node( ControlNode ).HumRatMax - ( Node( ControlNode ).HumRat - Node( OutNode ).HumRat );
 				} else {

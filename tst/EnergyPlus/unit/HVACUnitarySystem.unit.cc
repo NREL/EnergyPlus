@@ -7745,7 +7745,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.103, 0.001 ); // cooling coil water flow ratio, cooling coil is on
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow / UnitarySystem( 1 ).MaxCoolAirMassFlow, 0.0001 ); // fan PLR at minimum speed
-	EXPECT_GT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature is not below min limit
+	EXPECT_GT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp ); // outlet temperature is not below min limit
 
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -9000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -9000.0;
@@ -7771,7 +7771,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.392, 0.001 ); // cooling coil water flow ratio, cooling coil is on
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 0.5117, 0.0001 ); // fan PLR above minimum speed
-	EXPECT_NEAR( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout, 0.01 ); // outlet temperature modulated to meet max limit
+	EXPECT_NEAR( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp, 0.01 ); // outlet temperature modulated to meet max limit
 
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -18000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -18000.0;
@@ -7796,7 +7796,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.795, 0.001 ); // cooling coil water flow ratio, cooling coil is on
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 1.0, 0.0001 ); // fan PLR at maximum speed
-	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature below minimum temperature limit
+	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp ); // outlet temperature below minimum temperature limit
 
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -22000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -22000.0;
@@ -7822,7 +7822,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.0, 0.001 ); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 1.0, 0.0001 ); // fan PLR at maximum speed
-	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature below minimum temperature limit
+	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp ); // outlet temperature below minimum temperature limit
 
 }
 

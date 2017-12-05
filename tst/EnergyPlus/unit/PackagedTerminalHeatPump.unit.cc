@@ -859,7 +859,7 @@ namespace EnergyPlus {
 		Node( PTUnit( 1 ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( 1 ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
