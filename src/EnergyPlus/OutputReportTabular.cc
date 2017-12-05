@@ -5345,13 +5345,13 @@ namespace OutputReportTabular {
 			WriteVeriSumTable();
 			WriteDemandEndUseSummary();
 			WriteSourceEnergyEndUseSummary();
+			WritePredefinedTables();
 			WriteComponentSizing();
 			WriteSurfaceShadowing();
 			WriteCompCostTable();
 			WriteAdaptiveComfortTable();
 			WriteEioTables();
 			WriteLoadComponentSummaryTables();
-			WritePredefinedTables(); // moved to come after zone load components is finished
 			if ( DoWeathSim ) {
 				WriteMonthlyTables();
 				WriteTimeBinTables();
