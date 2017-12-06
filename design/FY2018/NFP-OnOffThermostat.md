@@ -134,30 +134,32 @@ An optional field as the last field will be added to allow systems to operate ei
 
 The function of GetZoneAirSetPoints in the ZoneTempPredictorCorrector will be revised to add a reading section to read an additional field of the ZoneControl:Thermostat and to set up the temperature difference. The temperature difference will be used in both heating and cooling.
 
-### Revise CalcPredictedSystemLoad ###
+### Revise CalcZoneAirTempSetPoints ###
   
-When the temperature difference (dt) is greater than 0, the following calculation procedures will be performed:
+When the temperature difference (dt) is greater than 0, the following calculation procedures will be performed in 4 control types:
 
 #### Heating
 
-1. When the zone air temperature at the previous time step < setpoint
+1. When the zone air temperature at the previous time step <= setpoint + dt
 
-   Calculate the predicted load based on the setpoint and request heating
-2. When the zone air temperature > setpoint
+   Calculate the setpoint based on the heating setpoint + dt and request heating
+
+2. When the zone air temperature > setpoint + dt
   
-   Calculate the predicted load based on the setpoint + dt and request heating
+   Calculate the setpoint based on the heating setpoint and request heating
  
 #### Cooling
 
-1. When the zone air temperature at the previous time step > setpoint
+1. When the zone air temperature at the previous time step >= setpoint - dt
 
-   Calculate the predicted load based on the setpoint and request cooling
-2. When the zone air temperature < setpoint 
+   Calculate the setpoint based on the cooling setpoint - dt and request cooling
 
-   Calculate the predicted load based on the setpoint - dt and request cooling
+2. When the zone air temperature < setpoint - dt 
 
+   Calculate the setpoint based on the cooling setpoint - dt and request cooling
 
-The predicted load will be assigned to the value of ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired.
+This procedures will be applied to 3 control types: SingleHeating, SingleCooling, and DualSetpoint. However, the procedure will not be applied to a control type of SinglHeatingAndCooling.
+
 
 ### Add min operation time in the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
 
@@ -259,8 +261,8 @@ The corresponding control type name. The name is used in an object with the name
 
 <span style="color:red;">**Field: Temperature Difference Between Cutout And Setpoint}\label{field-temperature-difference-between-cutout-and-Setpoint}**<span>
 
-<span style="color:red;">This optional choice field provides a temperature difference between cut-out temperature and setpoint. The temperature difference is applied to both heating and cooling. When the zone air temperature at the previous time step is below the heating setpoint, the setpoint is used to predict zone heating load. When the zone air temperature at the previous time step is above the heating setpoint, the setpoint plus the temperature difference is used to predict zone heating load. When the zone air temperature at the previous time step is above the cooling setpoint, the setpoint is used to predict zone cooling load. When the zone air temperature at the previous time step is below the heating setpoint, the setpoint minus the temperature difference is used to predict zone cooling load. 
-  
+<span style="color:red;">This optional choice field provides a temperature difference between cut-out temperature and setpoint. The temperature difference is applied to both heating and cooling. When the zone air temperature at the previous time step is below the heating setpoint + temperature difference, the setpoint is the heating setpoint + temperature difference, When the zone air temperature is higher than the heating setpoint + temperature difference, the setpoint is the heating setpoint. When the zone air temperature at the previous time step is above the cooling setpoint - temperature difference, the setpoint is the cooling setpoint - temperature difference, When the zone air temperature is below the cooling setpoint - temperature difference, the setpoint is the cooling setpoint.  
+
 
 An example of this statement in an IDF is:
 
@@ -368,4 +370,48 @@ A link to the enhancement item is provided below.
  
 https://github.com/NREL/EnergyPlusDevSupport/blob/master/DesignDocuments/EnhancementList/HVAC_General_2013_05.doc
 
+# Design Document #
 
+The modules modified for this new feature will be DataZoneControls and ZoneTempPredictorCorrector.
+
+## DataZoneControls ##
+
+A new variable will be added in the struct of ZoneTempControls to represent a new field of Temperature difference between cutout and setpoint:
+
+  		Real64 DeltaTCutSet; // Temperature difference between cutout and setpoint
+
+
+## ZoneTempPredictorCorrector ##
+
+The function of CalcZoneAirTempSetPoints will be modified to accommodate the new feature
+
+### SingleHeatingSetPoint ###
+
+		if ( MAT( ActualZoneNum ) < TempZoneThermostatSetPoint( ActualZoneNum ) + DeltaTCutSet && DeltaTCutSet > 0.0 ) {
+			TempZoneThermostatSetPoint( ActualZoneNum ) += DeltaTCutSet;
+		}
+
+### SingleCoolingSetPoint ###
+
+		if ( MAT( ActualZoneNum ) > TempZoneThermostatSetPoint( ActualZoneNum ) - DeltaTCutSet && DeltaTCutSet > 0.0 ) {
+			TempZoneThermostatSetPoint( ActualZoneNum ) -= DeltaTCutSet;
+		}
+
+### SingleHeatCoolSetPoint ###
+
+No change
+
+### DualSetPointWithDeadBand ###
+
+		if ( MAT( ActualZoneNum ) > ZoneThermostatSetPointHi( ActualZoneNum ) - DeltaTCutSet && DeltaTCutSet > 0.0 ) {
+			ZoneThermostatSetPointHi( ActualZoneNum ) -= DeltaTCutSet;
+		}
+
+		if ( MAT( ActualZoneNum ) < ZoneThermostatSetPointLo( ActualZoneNum ) + DeltaTCutSet && DeltaTCutSet > 0.0 ) {
+			ZoneThermostatSetPointLo( ActualZoneNum ) += DeltaTCutSet;
+			if ( ZoneThermostatSetPointHi( ActualZoneNum ) < ZoneThermostatSetPointLo( ActualZoneNum ) ) {
+				ZoneThermostatSetPointLo( ActualZoneNum ) = ZoneThermostatSetPointHi( ActualZoneNum );
+			}
+		}
+
+It should be noted that if the recalculated cooling setpoint is lower than the heating setpoint, the recalculated cooling setpoint will be set to the heating setpoint. 
