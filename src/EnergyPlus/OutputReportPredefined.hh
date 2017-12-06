@@ -322,7 +322,8 @@ namespace OutputReportPredefined {
 	extern int pdchSysSizAdjustedClAir;
 	extern int pdchSysSizAdjustedHtAir;
 	extern int pdchSysSizAdjustedMainAir;
-	extern int pdchSysSizHeatFlowRatio;
+	extern int pdchSysSizCalcHeatFlowRatio;
+	extern int pdchSysSizUserHeatFlowRatio;
 	extern int pdstPlantSize;
 	extern int pdchPlantSizCalcVdot;
 	extern int pdchPlantSizMeasVdot;

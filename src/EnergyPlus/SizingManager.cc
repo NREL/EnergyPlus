@@ -1114,7 +1114,15 @@ namespace SizingManager {
 					} else { // big trouble anyway. 
 						FinalSysSizing( AirLoopNum ).SysAirMinFlowRat = 1.0;
 					}
-					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizHeatFlowRatio, curName, FinalSysSizing( AirLoopNum ).SysAirMinFlowRat, 4 );
+					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, FinalSysSizing( AirLoopNum ).SysAirMinFlowRat, 4 );
+					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing( AirLoopNum ).SysAirMinFlowRat, 4 );
+				} else {
+					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing( AirLoopNum ).SysAirMinFlowRat, 4 );
+					Real64 calcSysAirMinFlowRat( 0.0 );
+					if ( FinalSysSizing( AirLoopNum ).DesMainVolFlow > 0.0 ) { // protect div by zero
+						calcSysAirMinFlowRat = FinalSysSizing( AirLoopNum ).DesHeatVolFlow / FinalSysSizing( AirLoopNum ).DesMainVolFlow;
+					}
+					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, calcSysAirMinFlowRat, 4 );
 				}
 			}
 		}

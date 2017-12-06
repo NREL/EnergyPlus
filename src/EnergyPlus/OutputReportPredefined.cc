@@ -331,7 +331,8 @@ namespace OutputReportPredefined {
 	int pdchSysSizAdjustedClAir;
 	int pdchSysSizAdjustedHtAir;
 	int pdchSysSizAdjustedMainAir;
-	int pdchSysSizHeatFlowRatio;
+	int pdchSysSizCalcHeatFlowRatio;
+	int pdchSysSizUserHeatFlowRatio;
 	int pdstPlantSize;
 	int pdchPlantSizCalcVdot;
 	int pdchPlantSizMeasVdot;
@@ -970,7 +971,8 @@ namespace OutputReportPredefined {
 		pdchSysSizAdjustedClAir = 0;
 		pdchSysSizAdjustedHtAir = 0;
 		pdchSysSizAdjustedMainAir = 0;
-		pdchSysSizHeatFlowRatio = 0;
+		pdchSysSizCalcHeatFlowRatio = 0;
+		pdchSysSizUserHeatFlowRatio = 0;
 		pdstPlantSize = 0;
 		pdchPlantSizCalcVdot = 0;
 		pdchPlantSizMeasVdot = 0;
@@ -1651,7 +1653,8 @@ namespace OutputReportPredefined {
 		pdchSysSizAdjustedClAir = newPreDefColumn( pdstSystemSize, "Adjusted cooling [m3/s]" );
 		pdchSysSizAdjustedHtAir = newPreDefColumn( pdstSystemSize, "Adjusted heating [m3/s]" );
 		pdchSysSizAdjustedMainAir = newPreDefColumn( pdstSystemSize, "Adjusted main [m3/s]" );
-		pdchSysSizHeatFlowRatio = newPreDefColumn( pdstSystemSize, "Calculated Heating Air Flow Ratio" );
+		pdchSysSizCalcHeatFlowRatio = newPreDefColumn( pdstSystemSize, "Calculated Heating Air Flow Ratio" );
+		pdchSysSizUserHeatFlowRatio = newPreDefColumn( pdstSystemSize, "User Heating Air Flow Ratio" );
 
 		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
 //		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
