@@ -1417,7 +1417,7 @@ namespace SizingManager {
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 			int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
-			if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) {
+			if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 				PzSumBySys( AirLoopNum ) = 0.0;
 				PsBySys( AirLoopNum ) = 0.0;
 				for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
@@ -1450,7 +1450,7 @@ namespace SizingManager {
 					for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // loop over all the air systems
 						int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 						if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
-						if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) {
+						if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 
 							// Loop over all zones connected to air loop
 							Real64 TotConcurrentPeopleOnSys = 0.0;
