@@ -185,6 +185,7 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
 
   HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
 
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 
 Zone Air Terminal Sensible Heating Energy 
 
@@ -197,6 +198,19 @@ Zone Air Terminal Sensible Cooling Energy
 Zone Air Terminal Sensible Cooling Rate
 
 These outputs are the sensible cooling energy and cooling rate provided to the zone by the air terminal single duct constant volume no reheat object.
+
+Zone Air Terminal Outdoor Air Volume Flow Rate
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency
+being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied
+by the fraction of outdoor air entering the air loop’s outside air system.
+
+#### New EMS internal variable:
+  An internal variable called “AirTerminal:SingleDuct:ConstantVolume:NoReheat Maximum Mass Flow Rate” provides
+information about the design flow rate for single duct constant volume no reheat air terminals.
+
+#### New EMS Actuator:
+“Mass Flow Rate” control in the “AirTerminal:SingleDuct:ConstantVolume:NoReheat” EMS actuator
 
 ## Engineering Reference ##
 
