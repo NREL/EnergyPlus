@@ -6,8 +6,8 @@ Single Duct Constant Volume Air Terminal NoReheat New Object
 **Bereket Nigusse, Florida Solar Energy Center**
 
  - November 20, 2017 (submitted initial NFP)
- - December 4, 2017 (submitted Final NFP)
-
+ - December 4, 2017 (submitted Original Final NFP)
+ - December 7, 2017 (submitted Revised Final NFP)
 
 ## Justification for New Feature ##
 
@@ -20,7 +20,25 @@ The new air terminal object will solve these problems.
 
 
 ## E-mail and  Conference Call Conclusions ##
-N/A
+
+Conference call: December 6, 2017
+
+@mjwitte commented on this pull request.
+
+This looks good in general. I've noted some editorial changes here and there. Also, AirTerminal:SingleDuct:Uncontrolled has an EMS actuator for mass flow rate, so this terminal unit will need that also.
+
+Mike Witte provided detailed review comments on github pull request.
+
+Larry: can we keep the *Uncontrolled object for longer period (e.g. up to 2 years) before removing it. 
+Mike W. Adding "Deprecated" to the IDD causes warning error messaged but we can add that at the last minutes to avoid huge warning error messages.
+
+Brent: suggested that a new object should use oo design approach. He said consider the HVACFourPipeBeam as an example. 
+
+Bereket: OO design will be considered in the design of the implementation.
+
+Agreed to keep the *Uncontrolled object for a couple of years before fully removing it. Needs a transition plan. 
+Mike also offered to help in the transition effort.
+
 
 ## Overview ##
 
@@ -52,13 +70,11 @@ Compare outputs with the AirTerminal:SingleDuct:Uncontrolled object. Transitione
 
 Add a section for this new object in the Input Output Reference under Group - Air Distribution Equipment
 
-The *AirTerminal:SingleDuct:ConstantVolume:NoReheat* object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with an AirLoopHVAC running as a constant-volume and variable-temperature system. This object allows the program to know what zone this branch of the air system is attached to, and input fields for availability schedule, air inlet and outlet nodes, the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the *AirLoopHVAC:ZoneSplitter* object outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two optional input fields: *Design Specification Outdoor Air Object Name*, and *Per Person Ventilation Rate Mode* are used for modulating the outdoor air requirement of an air terminal unit depending on the method.
+The *AirTerminal:SingleDuct:ConstantVolume:NoReheat* object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate. This object allows the program to know what zone this branch of the air system is attached to, and input fields for availability schedule, air inlet and outlet nodes, the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the *AirLoopHVAC:ZoneSplitter* or *AirLoopHVAC:SupplyPlenum* component  outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two optional input fields: *Design Specification Outdoor Air Object Name*, and *Per Person Ventilation Rate Mode* are used for modulating the outdoor air requirement of an air terminal unit depending on the method.
 
 ![](ATSDCVNoReheat.png)
 
                          Figure 1 Air terminal single duct constant volume without reheat
-
-
 
 ## IDD - Input Data Dictionary ##
 This new IDD object has all input fields of the *AirTerminal:SingleDuct:Uncontrolled* IDD object except that the *Design Specification Air Terminal Sizing Object Name* input field. The value for the later input field can be obtained from the parent object, ZoneHVAC:AirDistributionUnit. Also unlike the *Uncontrolled* object the new object has an inlet and an outlet air nodes input fields. Proposed idd object is shown below.
@@ -92,8 +108,9 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
 
        \required-field
        \type node
-       \note The air-inlet node name that connects the air splitter to the individual zone air distribution 
-       \note unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter component.
+       \note The air inlet node name that connects the air splitter to the individual zone air distribution 
+       \note unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter or
+       \note AirLoopHVAC:SupplyPlenum component.
 
   N1,  \field Maximum Air Flow Rate
 
@@ -101,17 +118,20 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
        \units m3/s
        \minimum 0.0
        \autosizable
+       \note The design maximum volume flow rate.
 
    A5, \field Design Specification Outdoor Air Object Name
 
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
-       \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
-       \note unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled."
-       \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
-       \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
-       \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate.
-       \note If this field is blank, then the terminal unit will not be controlled for outdoor air flow.
+       \note This field is used to modulate the terminal unit flow rate based on the specified outdoor air 
+       \note requirement. When the name of a DesignSpecification:OutdoorAir object is entered, the terminal unit will
+       \note adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled."
+       \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based 
+       \note on either the current or design occupancy as specified in the Per Person Ventilation Rate Mode field.
+       \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. The requested fl
+       \note rate may not be fully met if the system is operating with cycling fan. If this field is blank, then
+       \note the terminal unit will not be controlled for outdoor air flow. This field is optional.
 
    A6; \field Per Person Ventilation Rate Mode
 
@@ -119,7 +139,7 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
        \key CurrentOccupancy
        \key DesignOccupancy
        \default CurrentOccupancy
-       \note CurrentOccupancy models demand controlled ventilation using the current number of people
+       \note CurrentOccupancy uses current number of people in the zone which may vary
        \note DesignOccupancy uses the total Number of People in the zone and is constant
 
 ```
@@ -130,31 +150,31 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
 
 #### Field: Name
 
-A unique user assigned name for each AirTerminal:SingleDuct:ConstantVolume:NoReheat component. Any other component that needs to use this terminal air component will refer to it by this name.
+A unique user assigned name for this component.
 
 #### Field: Availability Schedule Name
 
-The name of the schedule (ref: Schedule) that denotes whether the component can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
+Availability schedule name for this system. Schedule value > 0 means the system is available or else the system is off. If this field is blank, the system is always available.
 
 #### Field: Air Outlet Node Name
 
-This is an air outlet node from the air distribution unit. This node name should be one of the supply air inlet node names of a zone served by this component.
+This is an air outlet node from the air distribution unit. This node name should be one of the supply air inlet node names of the zone served by this component.
 
 #### Field: Air Inlet Node Name
 
-The air-inlet node name that connects the air splitter to the individual zone air distribution unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter component.
+The air inlet node name that connects the air splitter to the individual zone air distribution unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum component.
 
 #### Field: Maximum Air Flow Rate
 
-The design maximum volume flow rate~ (m\(^{3}\)/sec) specified for the AirTerminal:SingleDuct:ConstantVolume:NoReheat object.  This field is autosizable.
+The design maximum volume flow rate~ (m\(^{3}\)/sec). This field is autosizable.
 
 #### Field: Design Specification Outdoor Air Object Name
 
-This field allows modifying the behavior of this air terminal so that it is modulated to supply the required outdoor air to the zone.  This field is optional. When the name of an DesignSpecification:OutdoorAir object is entered, the model is changed to adjust the flow rate to provide the volume of outdoor air described by that object.  This feature allows modeling demand controlled ventilation on a zone-by-zone basis using the Outdoor Air Flow per Person rate (specified in the DesignSpecification:OutdoorAir object) and the number of occupants (specified in the People object schedules).  If the outdoor air fraction of the supply air is 1.0, as for a dedicated outdoor air system, the air flow rate will match the outdoor air requirement.  When the outdoor air fraction is less than 1.0, as for a recirculating air system, the terminal air flow will be modulated upward to account for the increased total air flow needed to provide the required flow rate of outdoor air.   The total air flow rate will not exceed the Maximum Air Flow Rate specified above. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0.
+This field is used to modulate the terminal unit flow rate based on the specified outdoor air requirement. When the name of a DesignSpecification:OutdoorAir object is entered, the terminal unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled." If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on either the current or design occupancy as specified in the *Per Person Ventilation Rate Mode* input field below. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. The requested flow rate may not be fully met if the system is operating with cycling fan. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. This field is optional.
 
 #### Field: Per Person Ventilation Rate Mode
 
-This field specifies how the outdoor air ventilation rates are calculated when based on a rate per person. It can be either based on the current number of people as affected by time-varying occupancy schedules, or on the constant value for the maximum number of people.  Enter the key CurrentOccupancy for the former and DesignOccupancy for the later.
+This field specifies the occupancy level to use when calculating the ventilation rate per person when a Design Specification Outdoor Air Object Name has been specified. CurrentOccupancy uses the current number of people in the zone which may vary. DesignOccupancy uses the total Number of People specified for the zone which is constant.
 
 
 ## New idf object based on the proposed IDD object.
@@ -202,11 +222,10 @@ These outputs are the sensible cooling energy and cooling rate provided to the z
 Zone Air Terminal Outdoor Air Volume Flow Rate
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency
-being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied
-by the fraction of outdoor air entering the air loop’s outside air system.
+being reported. The air terminal outdoor air volume flow rate is calculated as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop’s outside air system.
 
 #### New EMS internal variable:
-  An internal variable called “AirTerminal:SingleDuct:ConstantVolume:NoReheat Maximum Mass Flow Rate” provides
+An internal variable called “AirTerminal:SingleDuct:ConstantVolume:NoReheat Maximum Mass Flow Rate” provides
 information about the design flow rate for single duct constant volume no reheat air terminals.
 
 #### New EMS Actuator:
@@ -214,7 +233,8 @@ information about the design flow rate for single duct constant volume no reheat
 
 ## Engineering Reference ##
 
-The input object AirTerminal:SingleDuct:ConstantVolume:NoReheat is used to pass conditioned or treated central supply air directly into a zone without any reheat. This terminal air equipment allows to supply central system air directly to a zone without any zone level control or tempering. The supply air temperature is controlled by the central system to meet the load in a controlled zone. This object is configured for use with a constant volume central air system or Furnace and variable supply air temperature. This unit allows the program to know what zone this branch of the air system is attached to, air inlet and outlet nodes, an input field for the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the AirLoopHVAC:ZoneSplitter object outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two input fields: *Design Specification Outdoor Air Object Name*, and *Per Person Ventilation Rate Mode* are used for calculating the outdoor air requirement of an air terminal unit. This component is typically used with an AirLoopHVAC running as a constant-volume and variable-temperature system.
+The input object AirTerminal:SingleDuct:ConstantVolume:NoReheat is used to pass conditioned or treated central supply air directly into a zone without any reheat. This terminal air equipment allows to supply central system air directly to a zone without any zone level control or tempering. The supply air temperature is controlled by the central system to meet the load in a controlled zone. This object is configured for use with a constant volume central air system or Furnace and variable supply air temperature. This unit allows the program to know what zone this branch of the air system is attached to, air inlet and outlet nodes, an input field for the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum component outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two input fields: *Design Specification Outdoor Air Object Name*, and *Per Person Ventilation Rate Mode* are used to compute the outdoor air requirement of an air terminal unit and the air terminal mass flow rate is set to the value calculated using these two input fields. 
+
 
 ## Example File and Transition Changes ##
 
@@ -224,3 +244,5 @@ New example file will be added if needed. Transition option will be investigated
 
 N/A
 
+
+## Design - Single Duct Constant Volume Air Terminal NoReheat
