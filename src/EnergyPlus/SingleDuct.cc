@@ -4974,7 +4974,8 @@ namespace SingleDuct {
 						if ( ZoneSizingInput( SizingInputNum ).ZoneNum == SysATMixer( ATMixerNum ).ZoneNum ) {
 							if ( ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex == 0 ) {
 								ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
-								ShowContinueError( "If " + cAlphaFieldNames( 8 ) + "is blank, the input of Design Specification Outdoor Air Object Name in Sizing:Zone is needed. Otherwise the mixer outdoor airflow rate is zero." );
+								ShowContinueError( cAlphaFieldNames( 8 ) + " is blank in both the mixer and the Sizing:Zone object for the same zone." );
+								ShowContinueError( "The mixer outdoor airflow rate is set to zero." );
 								SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = 0.0;
 							} else {
 								SysATMixer( ATMixerNum ).OARequirementsPtr = ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex;
@@ -4984,7 +4985,7 @@ namespace SingleDuct {
 						}
 					}
 				} else {
-					ShowWarningError( "If " + cAlphaFieldNames( 8 ) + "is blank and there is no Sizing:Zone in the same zone, the mixer outdoor airflow rate is set to zero." );
+					ShowWarningError( cAlphaFieldNames( 8 ) + "is blank and there is no Sizing:Zone for the same zone. The mixer outdoor airflow rate is set to zero." );
 					SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = 0.0;
 				}
 			}
