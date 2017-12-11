@@ -245,4 +245,75 @@ New example file will be added if needed. Transition option will be investigated
 N/A
 
 
-## Design - Single Duct Constant Volume Air Terminal NoReheat
+## Design - Single Duct Constant Volume Air Terminal No Reheat
+
+
+**Bereket Nigusse, Florida Solar Energy Center**
+
+ - Original Date: December 11, 2017 (Design)
+
+
+### New Feature Proposal ##
+Refer to the new feature proposal file *NFP-SingleDuctAirTerminalConstantVolumeNoReheatNFP,MD* for details on the justification, overview, and output description.
+
+## Overview
+All air terminal single duct related code is located in the ***SingleDuct.cc*** and ***SingleDuct.hh*** files. The air terminal single duct constant volume No reheat new object will be added to these files. The design document does not include any OO type implementation.
+
+## Approach
+### Changes to the **SingleDuct.cc** file
+- adds new object AirTerminal:SingleDuct:ConstantVolume:NoReheat
+- adds this new object to the Air Distribution Unit equipment list 
+- adds new get input section in **GetSysInput()** function under SingleDuct.cc module
+- adds new function **SimConstVolNoReheat()** for air terminal Single Duct CV No Reheat object
+- adds a calling point for **SimConstVolNoReheat()** new function under "SimulateSingleDuct" function
+- updates the sizing calculation in **SizeSys()** function to allow for the new object
+- updates the flow rate calculation in **InitSys()** function depending on the air flow rate calculation method
+
+### Changes to the **SingleDuct.hh** file
+
+
+The data structures **SysDesignParams()** will not change. But a new variable will be added.
+
+ - adds int **OAPerPersonMode** object variable for how per person rates are determined
+
+Adds module parameter for the new object added
+
+ - adds extern int const **SingleDuctVAVNoReheat** new module parameter
+
+
+### Other modules header file change include:
+ - AirTerminalUnit.hh
+
+	Adds  **singleDuctConstVolNoReheat** parameter to the enum list for AirTerminalUnitType{}
+
+ - DataDefineEquip.hh
+
+	Adds  **singleDuctConstVolNoReheat** parameter to the Equipment Types in ZoneAirLoopEquipment
+
+ - DataHVACGlobals.hh
+
+	Adds  **ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat** parameter to the ZoneHVACTerminalTypes list 
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat;
+
+### Other modules cc files change include:
+ - DataDefineEquip.cc
+
+	- Adds **SingleDuctConstVolNoReheat()**  parameter
+
+ - DataHVACGlobals.cc
+
+	- Adds **AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT** and **"AirTerminal:SingleDuct:ConstantVolume:NoReheat"** new object names in ZoneHVACTerminalTypes
+
+ - SystemReports.cc
+
+	- Adds **AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT** parameter to the enum list for ComponentTypes{}
+	- Adds 	{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT", IRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT }
+	- Adds 	case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT:
+		under CalcSystemEnergyUse() function
+
+ - ZoneAirLoopEquipmentManager.cc
+
+	- Adds AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) = SingleDuctConstVolNoReheat; case statement in get input function GetZoneAirLoopEquipment().
+	
+	- Adds calling point for SimulateSingleDuct for SingleDuctConstVolNoReheat case in SimZoneAirLoopEquipment() function
+
