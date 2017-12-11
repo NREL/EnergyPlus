@@ -4682,6 +4682,7 @@ namespace ZoneTempPredictorCorrector {
 		int ADUNum;
 		int ADUInNode;
 		int ADUOutNode;
+		Real64 ZoneOABal;
 
 		// FLOW:
 		MoistureMassFlowRate = 0.0;
@@ -4780,8 +4781,10 @@ namespace ZoneTempPredictorCorrector {
 		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
 		// Check for the flow and NO flow condition
-		B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
-		A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+		ZoneOABal = MDotOA( ZoneNum );
+		if ( ZoneMassFlowRate <= 0.0 ) ZoneOABal = 0.0;
+		B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + (MoistureMassFlowRate)+SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + ZoneOABal * OutHumRat;
+		A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + ZoneOABal;
 		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
 			// Multizone airflow calculated in AirflowNetwork
 			B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
