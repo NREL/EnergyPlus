@@ -1753,6 +1753,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone1Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type",
 		"    Zone1VentSlab,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1760,6 +1761,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone4Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type",
 		"    Zone4VentSlab,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",

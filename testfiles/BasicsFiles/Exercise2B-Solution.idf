@@ -49,9 +49,10 @@
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Cooling Coil Setpoint Reset Type
     None,                    !- Heating Coil Setpoint Reset Type
-    ,                        !- Dehumidification Control Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
     ,                        !- Dehumidification Setpoint {percent}
-    ,                        !- Humidifier Type
+    None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
     ,                        !- Humidifier Rated Capacity {m3/s}
     ,                        !- Humidifier Rated Electric Power {W}
@@ -405,7 +406,7 @@
 !
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Exercise 2B,             !- Name
@@ -2131,5 +2132,5 @@
     HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
-    ABUPS;                   !- Report 1 Name
+    AnnualBuildingUtilityPerformanceSummary;  !- Report 1 Name
 

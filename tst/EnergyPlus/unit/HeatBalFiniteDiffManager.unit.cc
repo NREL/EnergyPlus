@@ -55,12 +55,13 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 using namespace EnergyPlus::HeatBalFiniteDiffManager;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
+	TEST_F( EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest )
 	{
 
 		int const numNodes( 4 );
@@ -179,6 +180,58 @@ namespace EnergyPlus {
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 3 ), expectedResult3, 0.0001 );
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 4 ), expectedResult4, 0.0001 );
 		EXPECT_NEAR( SurfaceFD( SurfNum ).QDreport( 5 ), expectedResult5, 0.0001 );
+
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChange )
+	{
+		// create a single PCM object in the input and process it
+		std::string const idf_objects = delimited_string( {
+			"  MaterialProperty:PhaseChangeHysteresis,",
+			"    PCMNAME,   !- Name",
+			"    10000,                   !- Latent Heat during the Entire Phase Change Process {J/kg}",
+			"    1.5,                     !- Liquid State Thermal Conductivity {W/m-K}",
+			"    2200,                    !- Liquid State Density {kg/m3}",
+			"    2000,                    !- Liquid State Specific Heat {J/kg-K}",
+			"    1,                       !- High Temperature Difference of Melting Curve {deltaC}",
+			"    20,                      !- Peak Melting Temperature {C}",
+			"    1,                       !- Low Temperature Difference of Melting Curve {deltaC}",
+			"    1.8,                     !- Solid State Thermal Conductivity {W/m-K}",
+			"    2300,                    !- Solid State Density {kg/m3}",
+			"    2000,                    !- Solid State Specific Heat {J/kg-K}",
+			"    1,                       !- High Temperature Difference of Freezing Curve {deltaC}",
+			"    23,                      !- Peak Freezing Temperature {C}",
+			"    1;                       !- Low Temperature Difference of Freezing Curve {deltaC}"
+		} );
+		ASSERT_FALSE( process_idf( idf_objects, false ) );
+		
+		// allocate a finite difference surface object and needed member variables
+		int const surfaceIndex = 1;
+		int const finiteDiffLayerIndex = 1;
+		SurfaceFD.allocate( 1 );
+		SurfaceFD( surfaceIndex ).PhaseChangeTemperatureReverse.allocate( 1 );
+		SurfaceFD( surfaceIndex ).PhaseChangeTemperatureReverse( finiteDiffLayerIndex ) = 20.0;
+		SurfaceFD( surfaceIndex ).PhaseChangeState.allocate( 1 );
+		SurfaceFD( surfaceIndex ).PhaseChangeState( finiteDiffLayerIndex ) = HysteresisPhaseChange::PhaseChangeStates::LIQUID;
+		SurfaceFD( surfaceIndex ).PhaseChangeStateOld.allocate( 1 );
+		SurfaceFD( surfaceIndex ).PhaseChangeStateOld( finiteDiffLayerIndex ) = HysteresisPhaseChange::PhaseChangeStates::MELTING;
+		
+		// create a materials data object and assign the phase change variable based on above IDF processing
+		DataHeatBalance::MaterialProperties material;
+		material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory( "PCMNAME" );
+		
+		// create local variables to calculate and call the new worker function
+		Real64 newSpecificHeat, newDensity, newThermalConductivity;
+		adjustPropertiesForPhaseChange( finiteDiffLayerIndex, surfaceIndex, material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity );
+		
+		// check the values are correct
+		EXPECT_NEAR( 10187.3, newSpecificHeat, 0.1 );
+		EXPECT_NEAR( 2250, newDensity, 0.1 );
+		EXPECT_NEAR( 1.65, newThermalConductivity, 0.1 );
+		
+		// deallocate
+		SurfaceFD.deallocate();
+		
 
 	}
 

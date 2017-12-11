@@ -136,7 +136,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -2498,10 +2498,11 @@
     NORTH_ZONE PTAC Supply Inlet,  !- Zone Air Inlet Node or NodeList Name
     NORTH_ZONE PTAC Return,  !- Zone Air Exhaust Node or NodeList Name
     NORTH_ZONE Zone Air Node,!- Zone Air Node Name
-    NORTH_ZONE Return Outlet;!- Zone Return Air Node Name
+    NORTH_ZONE Return Outlet;!- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     NORTH_ZONE Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     NORTH_ZONE PTAC,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
