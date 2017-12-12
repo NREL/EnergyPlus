@@ -4649,6 +4649,9 @@ namespace ZoneEquipmentManager {
 						}
 						// Overwrite heat-to-return from ITE objects
 						if ( Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
+							if ( ZoneEquipConfig( ZoneNum ).ZoneHasAirFlowWindowReturn ) {
+								ShowFatalError( "Return air heat gains from window are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures." );
+							}
 							TempRetAir = Zone( ActualZoneNum ).AdjustedTempToReturnAir;
 							Node( ReturnNode ).Temp = TempRetAir;
 						}

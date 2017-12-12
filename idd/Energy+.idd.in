@@ -21157,14 +21157,15 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list ZoneNames
-  A3 , \field Air Flow Caclulation Method
-       \note The entered calculation method is used to specify how the IT inlet temperature and zone 
-       \note return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. 
+  A3 , \field Air Flow Calculation Method
+       \note The specified method is used to calculate the IT inlet temperature and zone return 
+       \note air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. 
        \note If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature 
        \note should be defined to indicate the temperature difference due to the air distribution. When
        \note FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction
        \note and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple
        \note ITE objects defined for one zone, the same calculation method should apply.
+       \note Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
        \type choice
        \key FlowFromSystem
        \key FlowControlWithApproachTemperatures

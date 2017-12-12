@@ -54,10 +54,23 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    Annual,                  !- Name
+    Jan,                     !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    12,                      !- End Month
+    1,                       !- End Month
+    31,                      !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Jul,                     !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    7,                       !- End Month
     31,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -68,8 +81,8 @@
 
   Site:Location,
     Denver Centennial CO USA WMO=724666,  !- Name
-    39.57,                   !- Latitude {deg}
-    -104.85,                 !- Longitude {deg}
+    39.74,                   !- Latitude {deg}
+    -105.18,                 !- Longitude {deg}
     -7.00,                   !- Time Zone {hr}
     1793.00;                 !- Elevation {m}
 
@@ -753,10 +766,11 @@
     Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main Zone Node,          !- Zone Air Node Name
-    Main Zone Outlet Node;   !- Zone Return Air Node Name
+    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Main Zone Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Main Zone ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -859,10 +873,11 @@
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
     ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
-	2,                       !- field Supply Approach Temperature
-	0,                       !- field Supply Approach Temperature Schedule
-	-2,                      !- field Return Approach Temperature 
-	0;                       !- field Return Approach Temperature Schedule
+    2,                       !- field Supply Approach Temperature
+    ,                        !- field Supply Approach Temperature Schedule
+    -1,                      !- field Return Approach Temperature 
+    ;                        !- field Return Approach Temperature Schedule
+
 
   Curve:Quadratic,
     ECM FanPower fFlow,      !- Name
@@ -1011,15 +1026,32 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
+  Output:Variable,*,Performance Curve Input Variable 1 Value,Hourly;
+
+  Output:Variable,*,Performance Curve Input Variable 2 Value,Hourly;
+
+  Output:Variable,*,Performance Curve Output Value,Hourly;
 
   Output:Variable,*,System Node Temperature,Hourly;
 
   Output:Variable,*,System Node Mass Flow Rate,Hourly;
 
+  Output:Variable,*,System Node Setpoint Temperature,Hourly;
+
+  Output:Variable,*,System Node Standard Density Volume Flow Rate,Hourly;
+
+  Output:Variable,*,System Node Humidity Ratio,Hourly;
+
+  Output:Variable,Supply Inlet Node,System Node Dewpoint Temperature,Hourly;
+
+  Output:Variable,Main Cooling Coil 1 Outlet Node,System Node Dewpoint Temperature,Hourly;
+
+  Output:Variable,Supply Inlet Node,System Node Relative Humidity,Hourly;
+
   Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
-  
+
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Latent Cooling Rate,Hourly;
@@ -1103,8 +1135,25 @@
   Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,Hourly;
 
   Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,Hourly;
-  
+ 
   Output:Variable,*,Zone ITE Adjusted Return Air Temperature,Hourly;
+
+  Output:Variable,*,Zone Air Temperature,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Internal Convective Heat Gain Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Surface Convection Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Interzone Air Transfer Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Outdoor Air Transfer Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance System Air Transfer Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance System Convective Heat Gain Rate,Hourly;
+
+  Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,Hourly;
+
 ! custom EMS output variables
 ! SCOP
 
@@ -1227,9 +1276,9 @@
     CalcPUE,                 !- Name
     IF IT_Equip_power > 0.0, !- Program Line 1
     set PUE = whole_building_power / IT_Equip_power,  !- Program Line 2
-    ELSE,                    !- Program Line 3
-    set PUE = 0.0,           !- Program Line 4
-    ENDIF;                   !- Program Line 5
+    ELSE,                    !- <none>
+    set PUE = 0.0,           !- <none>
+    ENDIF;                   !- <none>
 
   Output:Variable,*,PUE,Hourly;
 

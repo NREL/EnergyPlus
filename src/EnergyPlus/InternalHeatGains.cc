@@ -2348,6 +2348,11 @@ namespace InternalHeatGains {
 						ZoneITEq( Loop ).FlowControlWithApproachTemps = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).NoHeatToReturnAir = false;
+						if ( ZnRpt.size() > 0 && ZnRpt( ZoneITEq( Loop ).ZonePtr ).LtsRetAirGainRate > 0.0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
+							ShowContinueError( "Other return air heat gains from window or lights are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures." );
+							ErrorsFound = true;
+						}
 
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
@@ -2456,6 +2461,9 @@ namespace InternalHeatGains {
 				ZoneITEq( Loop ).SupplyApproachTemp = IHGNumbers( 10 );
 				ZoneITEq( Loop ).ReturnApproachTemp = IHGNumbers( 11 );
 
+				bool hasSupplyApproachTemp = !lNumericFieldBlanks( 10 );
+				bool hasReturnApproachTemp = !lNumericFieldBlanks( 11 );
+
 				// Performance curves
 				ZoneITEq( Loop ).CPUPowerFLTCurve = GetCurveIndex( AlphaName( 7 ) );
 				if ( ZoneITEq( Loop ).CPUPowerFLTCurve == 0 ) {
@@ -2463,6 +2471,7 @@ namespace InternalHeatGains {
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) );
 					ErrorsFound = true;
 				}
+
 
 				ZoneITEq( Loop ).AirFlowFLTCurve = GetCurveIndex( AlphaName( 8 ) );
 				if ( ZoneITEq( Loop ).AirFlowFLTCurve == 0 ) {
@@ -2567,8 +2576,12 @@ namespace InternalHeatGains {
 				if ( ZoneITEq( Loop ).FlowControlWithApproachTemps ) {
 					if ( !lAlphaFieldBlanks( 20 ) ) {
 						ZoneITEq( Loop ).SupplyApproachTempSch = GetScheduleIndex( AlphaName( 20 ) );
+						if ( ZoneITEq( Loop ).SupplyApproachTempSch == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 20 ) + " entered=" + AlphaName( 20 ) );
+							ErrorsFound = true;
+						}						
 					} else {
-						if ( lNumericFieldBlanks( 10 ) ) {
+						if ( !hasSupplyApproachTemp ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 10 ) + " or " + cAlphaFieldNames( 20 ) + " is required, but both are left blank." );
 							ErrorsFound = true;
@@ -2577,8 +2590,12 @@ namespace InternalHeatGains {
 
 					if ( !lAlphaFieldBlanks( 21 ) ) {
 						ZoneITEq( Loop ).ReturnApproachTempSch = GetScheduleIndex( AlphaName( 21 ) );
+						if ( ZoneITEq( Loop ).ReturnApproachTempSch == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 20 ) + " entered=" + AlphaName( 20 ) );
+							ErrorsFound = true;
+						}	
 					} else {
-						if ( lNumericFieldBlanks( 11 ) ) {
+						if ( !hasReturnApproachTemp ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 11 ) + " or " + cAlphaFieldNames( 21 ) + " is required, but both are left blank." );
 							ErrorsFound = true;
@@ -3978,6 +3995,7 @@ namespace InternalHeatGains {
 				} else {
 					ShowSevereError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
 					ShowContinueError( "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified." );
+					ShowFatalError( "Program terminates due to above conditions." );
 				}
 				if ( ZoneITEq( Loop ).SupplyApproachTempSch != 0) {
 					TAirIn = TSupply + GetCurrentScheduleValue( ZoneITEq( Loop ).SupplyApproachTempSch );
@@ -3994,6 +4012,7 @@ namespace InternalHeatGains {
 					} else {
 						ShowSevereError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
 						ShowContinueError( "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified." );
+						ShowFatalError( "Program terminates due to above conditions." );
 					}
 					if ( ZoneITEq( Loop ).RecircFLTCurve != 0 ) {
 						RecircFrac = ZoneITEq( Loop ).DesignRecircFrac * CurveValue( ZoneITEq( Loop ).RecircFLTCurve, CPULoadSchedFrac, TSupply );
