@@ -2740,9 +2740,12 @@ namespace SimAirServingZones {
 			Iter = 0;
 			ControllerConvergedFlag = false;
 			// if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
-			if ( AirLoopControlInfo( AirLoopNum ).EconoActive && PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( AirLoopControlNum ) ) {
-				ControllerConvergedFlag = true;
-				continue;
+			if ( AirLoopControlInfo( AirLoopNum ).EconoActive ) {
+				// nesting this next if to try and speed this up. If economizer is not active, it doesn't matter if CanBeLockedOutByEcono = true
+				if ( PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( AirLoopControlNum ) ) {
+					ControllerConvergedFlag = true;
+					continue;
+				}
 			}
 
 			// For each controller in sequence, iterate until convergence
@@ -2935,8 +2938,6 @@ namespace SimAirServingZones {
 				if ( PrimaryAirSystem( AirLoopNum ).CanBeLockedOutByEcono( HVACControllers::ControllerProps( ControllerIndex ).AirLoopControllerIndex ) ) {
 					ControllerConvergedFlag = true;
 				}
-			} else {
-				ControllerConvergedFlag = true;
 			}
 		}
 
