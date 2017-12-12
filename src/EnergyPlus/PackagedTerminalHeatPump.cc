@@ -1287,6 +1287,8 @@ namespace PackagedTerminalHeatPump {
 
 			if ( NumAlphas < 19 ) {
 				PTUnit( PTUnitNum ).ControlType = None;
+				PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+				PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 			} else if ( !lAlphaBlanks( 19 ) ) {
 				if ( SameString( Alphas( 19 ), "SingleZoneVAV" ) ) {
 					PTUnit( PTUnitNum ).ControlType = CCM_ASHRAE;
@@ -1298,9 +1300,13 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 				} else {
 					PTUnit( PTUnitNum ).ControlType = None;
+					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 				}
 			} else {
 				PTUnit( PTUnitNum ).ControlType = None;
+				PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+				PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 			}
 
 			if ( NumNumbers > 10 ) {
@@ -1399,7 +1405,7 @@ namespace PackagedTerminalHeatPump {
 			// check for specific input requirements for ASHRAE90.1 model
 			if ( PTUnit( PTUnitNum ).ControlType == CCM_ASHRAE ) {
 
-				// only allowed for water and DX cooling coils at this time
+				// only allowed for DX cooling coils at this time
 				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed ) {
 					if ( DisplayExtraWarnings ) {
 						ShowWarningError( CurrentModuleObject + ": " + PTUnit( PTUnitNum ).Name );
@@ -1410,7 +1416,7 @@ namespace PackagedTerminalHeatPump {
 					// mark this coil as non-ASHRAE90 type
 					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
 				}
-				// only allow for water, fuel, or electric at this time
+				// only allow for DX heating coils at this time
 				if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num != CoilDX_HeatingEmpirical ) {
 					if ( DisplayExtraWarnings ) {
 						ShowWarningError( CurrentModuleObject + ": " + PTUnit( PTUnitNum ).Name );
@@ -1982,6 +1988,41 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
+			if ( NumAlphas < 17 ) {
+				PTUnit( PTUnitNum ).ControlType = None;
+				PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+				PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
+			} else if ( !lAlphaBlanks( 17 ) ) {
+				if ( SameString( Alphas( 17 ), "SingleZoneVAV" ) ) {
+					PTUnit( PTUnitNum ).ControlType = CCM_ASHRAE;
+					PTUnit( PTUnitNum ).validASHRAECoolCoil = true;
+					PTUnit( PTUnitNum ).validASHRAEHeatCoil = true;
+				} else if ( SameString( Alphas( 17 ), "None" ) ) {
+					PTUnit( PTUnitNum ).ControlType = None;
+					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
+				} else {
+					PTUnit( PTUnitNum ).ControlType = None;
+					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
+				}
+			} else {
+				PTUnit( PTUnitNum ).ControlType = None;
+				PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+				PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
+			}
+
+			if ( NumNumbers > 6 ) {
+				PTUnit( PTUnitNum ).DesignMinOutletTemp = Numbers( 7 );
+			} else {
+				PTUnit( PTUnitNum ).DesignMinOutletTemp = AutoSize; // what should happen here
+			}
+			if ( NumNumbers > 7 ) {
+				PTUnit( PTUnitNum ).DesignMaxOutletTemp = Numbers( 8 );
+			} else {
+				PTUnit( PTUnitNum ).DesignMaxOutletTemp = AutoSize; // what should happen here
+			}
+
 			//   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
 			//                              UseCompressorOffFlow = operate at value specified by user
 			//   AirFlowControl only valid if fan opmode = ContFanCycCoil
@@ -2048,6 +2089,35 @@ namespace PackagedTerminalHeatPump {
 					ShowContinueError( "..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer" );
 					ShowContinueError( ".. " + cNumericFields( 6 ) + " is set to 0 and simulation continues." );
 					PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow = 0;
+				}
+			}
+
+			// check for specific input requirements for ASHRAE90.1 model
+			if ( PTUnit( PTUnitNum ).ControlType == CCM_ASHRAE ) {
+
+				// only allowed for DX cooling coils at this time
+				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed ) {
+					if ( DisplayExtraWarnings ) {
+						ShowWarningError( CurrentModuleObject + ": " + PTUnit( PTUnitNum ).Name );
+						ShowContinueError( "ASHRAE90.1 control method requires specific cooling coil types." );
+						ShowContinueError( "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed." );
+						ShowContinueError( "The input cooling coil type = " + PTUnit( PTUnitNum ).DXCoolCoilType + ". This coil will not be modeled using the ASHRAE 90.1 algorithm." );
+					}
+					// mark this coil as non-ASHRAE90 type
+					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+				}
+				// only allow for water, fuel, or electric at this time
+				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num != Coil_HeatingWater
+					&& PTUnit( PTUnitNum ).ACHeatCoilType_Num != Coil_HeatingGasOrOtherFuel
+					&& PTUnit( PTUnitNum ).ACHeatCoilType_Num != Coil_HeatingElectric ) {
+						if ( DisplayExtraWarnings ) {
+						ShowWarningError( CurrentModuleObject + ": " + PTUnit( PTUnitNum ).Name );
+						ShowContinueError( "ASHRAE90.1 control method requires specific heating coil types." );
+						ShowContinueError( "Valid heating coil type is Coil:Heating:DX:SingleSpeed." );
+						ShowContinueError( "The input heating coil type = " + PTUnit( PTUnitNum ).DXHeatCoilType + ". This coil will not be modeled using the ASHRAE 90.1 algorithm." );
+					}
+					// mark this coil as non-ASHRAE90 type
+					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 				}
 			}
 
@@ -2906,6 +2976,11 @@ namespace PackagedTerminalHeatPump {
 
 			//Set maximum supply air temperature for supplemental heating coil
 			PTUnit( PTUnitNum ).MaxOATSupHeat = Numbers( 12 );
+
+			// WSHP not yet included in ASHRAE90.1 model
+			PTUnit( PTUnitNum ).ControlType = None;
+			PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
+			PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 
 		} //End of the WaterToAirHeatPump Loop
 

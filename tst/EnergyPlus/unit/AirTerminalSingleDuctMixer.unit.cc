@@ -650,7 +650,7 @@ namespace EnergyPlus {
 		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
@@ -977,7 +977,7 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( PTUnitNum ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
@@ -1390,7 +1390,7 @@ namespace EnergyPlus {
 		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
@@ -1800,7 +1800,7 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( PTUnitNum ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
