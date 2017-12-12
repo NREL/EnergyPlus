@@ -3287,21 +3287,21 @@ namespace HVACUnitarySystem {
 					if ( ZoneEquipmentFound ) {
 						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
 							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
-							ZoneInletNodeFound = true;
+								ZoneInletNodeFound = true;
 							break;
 						}
 					}
 				}
-				if ( !ZoneInletNodeFound ) {
+				if ( ! ZoneInletNodeFound ) {
 					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
 							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
-							ZoneInletNodeFound = true;
-							ZoneEquipmentFound = true;
+								ZoneInletNodeFound = true;
+								ZoneEquipmentFound = true;
 							break;
 						}
 					}
-					if ( !ZoneInletNodeFound && ZoneEquipmentFound ) {
+					if ( ! ZoneInletNodeFound && ZoneEquipmentFound ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirOutletNodeNameAlphaNum ) + " = " + Alphas( iAirOutletNodeNameAlphaNum ) );
 						ShowContinueError( "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections object inputs." );
@@ -3464,7 +3464,7 @@ namespace HVACUnitarySystem {
 										if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != UnitarySystem( UnitarySysNum ).ControlZoneNum ) continue;
 										AirNodeFound = true;
 									}
-									break;
+								break;
 								}
 							}
 						}
@@ -3475,7 +3475,7 @@ namespace HVACUnitarySystem {
 				if ( !AirLoopFound && CurOASysNum > 0 ) {
 					for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 						for ( OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum ) {
-							if ( !SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || !SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
+							if ( ! SameString( OutsideAirSys( OASysNum ).ComponentName( OACompNum ), Alphas( iNameAlphaNum ) ) || ! SameString( OutsideAirSys( OASysNum ).ComponentType( OACompNum ), CurrentModuleObject ) ) continue;
 							AirLoopNumber = OASysNum;
 							OASysFound = true;
 							break;
@@ -3491,11 +3491,11 @@ namespace HVACUnitarySystem {
 				MyGetInputSuccessfulFlag( UnitarySysNum ) = true;
 			}
 
-			if ( AirLoopNumber == 0 && !ZoneEquipmentFound && ( UnitarySystem( UnitarySysNum ).ControlType == LoadBased || UnitarySystem( UnitarySysNum ).ControlType == CCM_ASHRAE ) ) {
+			if ( AirLoopNumber == 0 && ! ZoneEquipmentFound && ( UnitarySystem( UnitarySysNum ).ControlType == LoadBased || UnitarySystem( UnitarySysNum ).ControlType == CCM_ASHRAE ) ) {
 				ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
 				ShowContinueError( "Did not find proper connection for AirLoopHVAC or ZoneHVAC system." );
 				ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
-				if ( !AirNodeFound && !ZoneEquipmentFound ) {
+				if ( ! AirNodeFound && ! ZoneEquipmentFound ) {
 					ShowSevereError( CurrentModuleObject + " = " + Alphas( iNameAlphaNum ) );
 					ShowContinueError( "Did not find air node (zone with thermostat)." );
 					ShowContinueError( "specified " + cAlphaFields( iControlZoneAlphaNum ) + " = " + Alphas( iControlZoneAlphaNum ) );
@@ -3504,7 +3504,7 @@ namespace HVACUnitarySystem {
 				ErrorsFound = true;
 			}
 
-			if ( !ZoneEquipmentFound ) TestCompSet( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iAirInletNodeNameAlphaNum ), Alphas( iAirOutletNodeNameAlphaNum ), "Air Nodes" );
+			if ( ! ZoneEquipmentFound ) TestCompSet( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iAirInletNodeNameAlphaNum ), Alphas( iAirOutletNodeNameAlphaNum ), "Air Nodes" );
 
 			//Get fan data
 			FanType = Alphas( iFanTypeAlphaNum );

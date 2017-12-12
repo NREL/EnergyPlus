@@ -80,10 +80,11 @@ namespace DataStringGlobals {
 	extern std::string outputTblTxtFileName;
 	extern std::string outputTblXmlFileName;
 	extern std::string inputIdfFileName;
-	extern	std::string inputIddFileName;
-	extern	std::string inputWeatherFileName;
+	extern std::string inputIddFileName;
+	extern std::string inputWeatherFileName;
 	extern std::string outputAdsFileName;
 	extern std::string outputDfsFileName;
+	extern std::string outputGLHEFileName;
 	extern std::string outputDelightInFileName;
 	extern std::string outputDelightOutFileName;
 	extern std::string outputDelightEldmpFileName;

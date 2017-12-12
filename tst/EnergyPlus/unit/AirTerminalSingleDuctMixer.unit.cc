@@ -73,8 +73,10 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 // EnergyPlus Headers
@@ -7142,6 +7144,172 @@ namespace EnergyPlus {
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
 		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
 		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
+
+	}
+	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs ) {
+
+		// This test was added for #6399 to confirm that the correct SysATMixer( ATMixerNum ).OARequirementsPtr 
+		// is found when searching Sizing:Zone objects. The defect is exposed when there are more Sizing:Zone objects than 
+		// DesignSpecification:OutdoorAir objects. In this test, there are 2 zones and one DSOA object.  
+		// In this test, the first mixer declares "DSOA 1" directly, and the second mixer leaves it blank so
+		// it searches the sizing objects. Both mixers should find OARequirementsPtr = 1.
+
+		bool ErrorsFound( false );
+
+		std::string const idf_objects = delimited_string({
+			"Version, 8.8;",
+
+			"DesignSpecification:OutdoorAir,",
+			"  DSOA 1,  !- Name",
+			"  sum,                     !- Outdoor Air Method",
+			"  0.0,                     !- Outdoor Air Flow per Person {m3/s-person}",
+			"  0.0009,                  !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+			"  0;                       !- Outdoor Air Flow per Zone {m3/s}",
+
+			"Sizing:Zone,",
+			" SPACE1-1,                 !- Zone or ZoneList Name",
+			" SupplyAirTemperature,     !- Zone Cooling Design Supply Air Temperature Input Method",
+			" 12.,                      !- Zone Cooling Design Supply Air Temperature{ C }",
+			" ,                         !- Zone Cooling Design Supply Air Temperature Difference{ deltaC }",
+			" SupplyAirTemperature,     !- Zone Heating Design Supply Air Temperature Input Method",
+			" 50.,                      !- Zone Heating Design Supply Air Temperature{ C }",
+			" ,                         !- Zone Heating Design Supply Air Temperature Difference{ deltaC }",
+			" 0.008,                    !- Zone Cooling Design Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+			" 0.008,                    !- Zone Heating Design Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+			" DSOA 1,                   !- Design Specification Outdoor Air Object Name",
+			" 0.0,                      !- Zone Heating Sizing Factor",
+			" 0.0,                      !- Zone Cooling Sizing Factor",
+			" DesignDay,                !- Cooling Design Air Flow Method",
+			" 0,                        !- Cooling Design Air Flow Rate{ m3 / s }",
+			" ,                         !- Cooling Minimum Air Flow per Zone Floor Area{ m3 / s - m2 }",
+			" ,                         !- Cooling Minimum Air Flow{ m3 / s }",
+			" ,                         !- Cooling Minimum Air Flow Fraction",
+			" DesignDay,                !- Heating Design Air Flow Method",
+			" 0,                        !- Heating Design Air Flow Rate{ m3 / s }",
+			" ,                         !- Heating Maximum Air Flow per Zone Floor Area{ m3 / s - m2 }",
+			" ,                         !- Heating Maximum Air Flow{ m3 / s }",
+			" ;                         !- Heating Maximum Air Flow Fraction",
+
+			"Sizing:Zone,",
+			" SPACE1-2,                 !- Zone or ZoneList Name",
+			" SupplyAirTemperature,     !- Zone Cooling Design Supply Air Temperature Input Method",
+			" 12.,                      !- Zone Cooling Design Supply Air Temperature{ C }",
+			" ,                         !- Zone Cooling Design Supply Air Temperature Difference{ deltaC }",
+			" SupplyAirTemperature,     !- Zone Heating Design Supply Air Temperature Input Method",
+			" 50.,                      !- Zone Heating Design Supply Air Temperature{ C }",
+			" ,                         !- Zone Heating Design Supply Air Temperature Difference{ deltaC }",
+			" 0.008,                    !- Zone Cooling Design Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+			" 0.008,                    !- Zone Heating Design Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+			" DSOA 1,                   !- Design Specification Outdoor Air Object Name",
+			" 0.0,                      !- Zone Heating Sizing Factor",
+			" 0.0,                      !- Zone Cooling Sizing Factor",
+			" DesignDay,                !- Cooling Design Air Flow Method",
+			" 0,                        !- Cooling Design Air Flow Rate{ m3 / s }",
+			" ,                         !- Cooling Minimum Air Flow per Zone Floor Area{ m3 / s - m2 }",
+			" ,                         !- Cooling Minimum Air Flow{ m3 / s }",
+			" ,                         !- Cooling Minimum Air Flow Fraction",
+			" DesignDay,                !- Heating Design Air Flow Method",
+			" 0,                        !- Heating Design Air Flow Rate{ m3 / s }",
+			" ,                         !- Heating Maximum Air Flow per Zone Floor Area{ m3 / s - m2 }",
+			" ,                         !- Heating Maximum Air Flow{ m3 / s }",
+			" ;                         !- Heating Maximum Air Flow Fraction",
+
+			"AirTerminal:SingleDuct:Mixer,",
+			"    SPACE1-1 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
+			"    SPACE1-1 PTAC,      !- ZoneHVAC Terminal Unit Name",
+			"    SPACE1-1 Heat Pump Inlet,!- Terminal Unit Outlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name",
+			"    InletSide,          !- Terminal Unit Connection Type",
+			"    DSOA 1;             !- Design Specification Outdoor Air Object Name",
+
+			"ZoneHVAC:AirDistributionUnit,",
+			"    SPACE1-1 DOAS ATU,       !- Name",
+			"    SPACE1-1 Heat Pump Inlet,!- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE1-1 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"ZoneHVAC:EquipmentList,",
+			"    SPACE1-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+			"Zone,",
+			"    SPACE1-1;                !- Name",
+
+			"ZoneHVAC:EquipmentConnections,",
+			"    SPACE1-1,                !- Zone Name",
+			"    SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    ,                        !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE1-1 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name",
+
+			"AirTerminal:SingleDuct:Mixer,",
+			"    SPACE1-2 DOAS Air Terminal,  !- Name",
+			"    ZoneHVAC:PackagedTerminalAirConditioner,     !- ZoneHVAC Terminal Unit Object Type",
+			"    SPACE1-2 PTAC,      !- ZoneHVAC Terminal Unit Name",
+			"    SPACE1-2 Supply Inlet,!- Terminal Unit Outlet Node Name",
+			"    SPACE1-2 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
+			"    SPACE1-2 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name",
+			"    SupplySide,         !- Terminal Unit Connection Type",
+			"    ;                   !- Design Specification Outdoor Air Object Name",
+
+			"ZoneHVAC:AirDistributionUnit,",
+			"    SPACE1-2 DOAS ATU,       !- Name",
+			"    SPACE1-2 Supply Inlet,   !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:Mixer,  !- Air Terminal Object Type",
+			"    SPACE1-2 DOAS Air Terminal;  !- Air Terminal Name",
+
+			"ZoneHVAC:EquipmentList,",
+			"    SPACE1-2 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    SPACE1-2 DOAS ATU,       !- Zone Equipment 1 Name",
+			"    1,                       !- Zone Equipment 1 Cooling Sequence",
+			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+			"Zone,",
+			"    SPACE1-2;                !- Name",
+
+			"ZoneHVAC:EquipmentConnections,",
+			"    SPACE1-2,                !- Zone Name",
+			"    SPACE1-2 Equipment,      !- Zone Conditioning Equipment List Name",
+			"    SPACE1-2 Supply Inlet,   !- Zone Air Inlet Node or NodeList Name",
+			"    SPACE1-2 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name",
+			"    SPACE1-2 Zone Air Node,  !- Zone Air Node Name",
+			"    SPACE1-2 Return Outlet;  !- Zone Return Air Node Name",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		GetZoneData( ErrorsFound );
+		ASSERT_FALSE( ErrorsFound );
+
+		SizingManager::GetOARequirements();
+		SizingManager::GetZoneSizingInput();
+		GetZoneEquipmentData1();
+		ZoneEquipmentManager::SetUpZoneSizingArrays();
+		GetZoneAirLoopEquipment();
+		GetATMixers();
+
+		ASSERT_EQ( 2, NumATMixers );
+		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
+		EXPECT_EQ( 1, SysATMixer( 1 ).OARequirementsPtr ); // design spec OA pointer - for both mixers this pointer should be 1
+
+		EXPECT_EQ( "SPACE1-2 DOAS AIR TERMINAL", SysATMixer( 2 ).Name ); // single duct air terminal mixer name
+		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 2 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 2 ).EquipType( 1 ) ); // Air distribution unit equipment type
+		// design spec OA pointer - for both mixers this pointer should be 1
+		// before the fix, this was 2 which later caused an array bounds error
+		EXPECT_EQ( 1, SysATMixer( 2 ).OARequirementsPtr );
 
 	}
 }
