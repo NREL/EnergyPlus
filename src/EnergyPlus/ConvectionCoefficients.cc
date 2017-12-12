@@ -6394,7 +6394,7 @@ namespace ConvectionCoefficients {
 			FlowRegimeStack( 0 ) = InConvFlowRegime_A3;
 		} else { // is controlled, lets see by how and if that means is currently active
 
-			if ( ! ( ZoneEquipConfig( ZoneNum ).EquipListIndex > 0 ) ) {
+			if ( ! ( ZoneEquipConfig( ZoneNum ).EquipListIndex > 0 ) || SysSizingCalc || ZoneSizingCalc || ! ZoneEquipSimulatedOnce ) {
 				FlowRegimeStack( 0 ) = InConvFlowRegime_A3;
 			} else {
 

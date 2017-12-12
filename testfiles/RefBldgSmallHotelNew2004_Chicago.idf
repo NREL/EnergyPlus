@@ -72,7 +72,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 67
 
-  Version,8.8;
+  Version,8.9;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -13546,7 +13546,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     18025,                   !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.5000,                  !- Fraction Lost
@@ -18679,6 +18679,7 @@
 
   ZoneHVAC:EquipmentList,
     CorridorFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr1 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18686,6 +18687,7 @@
 
   ZoneHVAC:EquipmentList,
     CorridorFlr2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr2 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18693,6 +18695,7 @@
 
   ZoneHVAC:EquipmentList,
     CorridorFlr3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr3 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18700,6 +18703,7 @@
 
   ZoneHVAC:EquipmentList,
     CorridorFlr4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     CorridorFlr4 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18707,6 +18711,7 @@
 
   ZoneHVAC:EquipmentList,
     EmployeeLoungeFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     EmployeeLoungeFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18714,6 +18719,7 @@
 
   ZoneHVAC:EquipmentList,
     ExerciseCenterFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ExerciseCenterFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18721,6 +18727,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontLoungeFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     FrontLoungeFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18728,6 +18735,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontOfficeFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     FrontOfficeFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18735,6 +18743,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18742,6 +18751,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18749,6 +18759,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18756,6 +18767,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStairsFlr4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStairsFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18763,6 +18775,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18770,6 +18783,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18777,6 +18791,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18784,6 +18799,7 @@
 
   ZoneHVAC:EquipmentList,
     FrontStorageFlr4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     FrontStorageFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18791,6 +18807,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom101 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom101 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18798,6 +18815,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom102 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom102 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18805,6 +18823,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom103 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom103 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18812,6 +18831,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom104 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom104 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18819,6 +18839,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom105 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom105 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18826,6 +18847,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom201 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom201 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18833,6 +18855,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom202_205 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom202_205 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18840,6 +18863,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom206_208 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom206_208 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18847,6 +18871,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom209_212 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom209_212 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18854,6 +18879,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom213 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom213 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18861,6 +18887,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom214 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom214 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18868,6 +18895,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom215_218 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom215_218 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18875,6 +18903,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom219 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom219 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18882,6 +18911,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom220_223 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom220_223 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18889,6 +18919,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom224 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom224 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18896,6 +18927,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom301 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom301 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18903,6 +18935,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom302_305 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom302_305 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18910,6 +18943,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom306_308 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom306_308 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18917,6 +18951,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom309_312 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom309_312 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18924,6 +18959,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom313 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom313 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18931,6 +18967,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom314 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom314 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18938,6 +18975,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom315_318 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom315_318 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18945,6 +18983,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom319 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom319 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18952,6 +18991,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom320_323 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom320_323 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18959,6 +18999,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom324 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom324 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18966,6 +19007,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom401 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom401 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18973,6 +19015,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom402_405 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom402_405 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18980,6 +19023,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom406_408 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom406_408 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18987,6 +19031,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom409_412 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom409_412 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18994,6 +19039,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom413 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom413 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19001,6 +19047,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom414 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom414 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19008,6 +19055,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom415_418 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom415_418 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19015,6 +19063,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom419 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom419 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19022,6 +19071,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom420_423 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom420_423 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19029,6 +19079,7 @@
 
   ZoneHVAC:EquipmentList,
     GuestRoom424 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     GuestRoom424 PTAC,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19036,6 +19087,7 @@
 
   ZoneHVAC:EquipmentList,
     LaundryRoomFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     LaundryRoomFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19043,6 +19095,7 @@
 
   ZoneHVAC:EquipmentList,
     MechanicalRoomFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     MechanicalRoomFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19050,6 +19103,7 @@
 
   ZoneHVAC:EquipmentList,
     MeetingRoomFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     MeetingRoomFlr1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19057,6 +19111,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19064,6 +19119,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr2 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19071,6 +19127,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19078,6 +19135,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStairsFlr4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStairsFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19085,6 +19143,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr1 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19092,6 +19151,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr2 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19099,6 +19159,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr3 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19106,6 +19167,7 @@
 
   ZoneHVAC:EquipmentList,
     RearStorageFlr4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     RearStorageFlr4 Unit Heater,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19113,6 +19175,7 @@
 
   ZoneHVAC:EquipmentList,
     RestroomFlr1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     RestroomFlr1 Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -23043,7 +23106,7 @@
     CorridorFlr1 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     CorridorFlr1 Air Node,   !- Zone Air Node Name
-    CorridorFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    CorridorFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     CorridorFlr2,            !- Zone Name
@@ -23051,7 +23114,7 @@
     CorridorFlr2 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     CorridorFlr2 Air Node,   !- Zone Air Node Name
-    CorridorFlr2 Return Air Node Name;  !- Zone Return Air Node Name
+    CorridorFlr2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     CorridorFlr3,            !- Zone Name
@@ -23059,7 +23122,7 @@
     CorridorFlr3 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     CorridorFlr3 Air Node,   !- Zone Air Node Name
-    CorridorFlr3 Return Air Node Name;  !- Zone Return Air Node Name
+    CorridorFlr3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     CorridorFlr4,            !- Zone Name
@@ -23067,7 +23130,7 @@
     CorridorFlr4 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     CorridorFlr4 Air Node,   !- Zone Air Node Name
-    CorridorFlr4 Return Air Node Name;  !- Zone Return Air Node Name
+    CorridorFlr4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EmployeeLoungeFlr1,      !- Zone Name
@@ -23075,7 +23138,7 @@
     EmployeeLoungeFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     EmployeeLoungeFlr1 Air Node,  !- Zone Air Node Name
-    EmployeeLoungeFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    EmployeeLoungeFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ExerciseCenterFlr1,      !- Zone Name
@@ -23083,7 +23146,7 @@
     ExerciseCenterFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ExerciseCenterFlr1 Air Node,  !- Zone Air Node Name
-    ExerciseCenterFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    ExerciseCenterFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontLoungeFlr1,         !- Zone Name
@@ -23091,7 +23154,7 @@
     FrontLoungeFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     FrontLoungeFlr1 Air Node,!- Zone Air Node Name
-    FrontLoungeFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontLoungeFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontOfficeFlr1,         !- Zone Name
@@ -23099,7 +23162,7 @@
     FrontOfficeFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     FrontOfficeFlr1 Air Node,!- Zone Air Node Name
-    FrontOfficeFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontOfficeFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStairsFlr1,         !- Zone Name
@@ -23107,7 +23170,7 @@
     FrontStairsFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStairsFlr1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStairsFlr1 Air Node,!- Zone Air Node Name
-    FrontStairsFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStairsFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStairsFlr2,         !- Zone Name
@@ -23115,7 +23178,7 @@
     FrontStairsFlr2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStairsFlr2 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStairsFlr2 Air Node,!- Zone Air Node Name
-    FrontStairsFlr2 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStairsFlr2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStairsFlr3,         !- Zone Name
@@ -23123,7 +23186,7 @@
     FrontStairsFlr3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStairsFlr3 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStairsFlr3 Air Node,!- Zone Air Node Name
-    FrontStairsFlr3 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStairsFlr3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStairsFlr4,         !- Zone Name
@@ -23131,7 +23194,7 @@
     FrontStairsFlr4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStairsFlr4 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStairsFlr4 Air Node,!- Zone Air Node Name
-    FrontStairsFlr4 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStairsFlr4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStorageFlr1,        !- Zone Name
@@ -23139,7 +23202,7 @@
     FrontStorageFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStorageFlr1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStorageFlr1 Air Node,  !- Zone Air Node Name
-    FrontStorageFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStorageFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStorageFlr2,        !- Zone Name
@@ -23147,7 +23210,7 @@
     FrontStorageFlr2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStorageFlr2 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStorageFlr2 Air Node,  !- Zone Air Node Name
-    FrontStorageFlr2 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStorageFlr2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStorageFlr3,        !- Zone Name
@@ -23155,7 +23218,7 @@
     FrontStorageFlr3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStorageFlr3 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStorageFlr3 Air Node,  !- Zone Air Node Name
-    FrontStorageFlr3 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStorageFlr3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     FrontStorageFlr4,        !- Zone Name
@@ -23163,7 +23226,7 @@
     FrontStorageFlr4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     FrontStorageFlr4 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     FrontStorageFlr4 Air Node,  !- Zone Air Node Name
-    FrontStorageFlr4 Return Air Node Name;  !- Zone Return Air Node Name
+    FrontStorageFlr4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom101,            !- Zone Name
@@ -23171,7 +23234,7 @@
     GuestRoom101 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom101 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom101 Air Node,   !- Zone Air Node Name
-    GuestRoom101 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom101 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom102,            !- Zone Name
@@ -23179,7 +23242,7 @@
     GuestRoom102 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom102 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom102 Air Node,   !- Zone Air Node Name
-    GuestRoom102 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom102 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom103,            !- Zone Name
@@ -23187,7 +23250,7 @@
     GuestRoom103 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom103 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom103 Air Node,   !- Zone Air Node Name
-    GuestRoom103 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom103 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom104,            !- Zone Name
@@ -23195,7 +23258,7 @@
     GuestRoom104 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom104 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom104 Air Node,   !- Zone Air Node Name
-    GuestRoom104 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom104 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom105,            !- Zone Name
@@ -23203,7 +23266,7 @@
     GuestRoom105 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom105 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom105 Air Node,   !- Zone Air Node Name
-    GuestRoom105 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom105 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom201,            !- Zone Name
@@ -23211,7 +23274,7 @@
     GuestRoom201 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom201 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom201 Air Node,   !- Zone Air Node Name
-    GuestRoom201 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom201 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom202_205,        !- Zone Name
@@ -23219,7 +23282,7 @@
     GuestRoom202_205 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom202_205 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom202_205 Air Node,  !- Zone Air Node Name
-    GuestRoom202_205 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom202_205 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom206_208,        !- Zone Name
@@ -23227,7 +23290,7 @@
     GuestRoom206_208 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom206_208 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom206_208 Air Node,  !- Zone Air Node Name
-    GuestRoom206_208 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom206_208 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom209_212,        !- Zone Name
@@ -23235,7 +23298,7 @@
     GuestRoom209_212 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom209_212 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom209_212 Air Node,  !- Zone Air Node Name
-    GuestRoom209_212 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom209_212 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom213,            !- Zone Name
@@ -23243,7 +23306,7 @@
     GuestRoom213 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom213 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom213 Air Node,   !- Zone Air Node Name
-    GuestRoom213 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom213 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom214,            !- Zone Name
@@ -23251,7 +23314,7 @@
     GuestRoom214 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom214 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom214 Air Node,   !- Zone Air Node Name
-    GuestRoom214 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom214 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom215_218,        !- Zone Name
@@ -23259,7 +23322,7 @@
     GuestRoom215_218 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom215_218 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom215_218 Air Node,  !- Zone Air Node Name
-    GuestRoom215_218 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom215_218 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom219,            !- Zone Name
@@ -23267,7 +23330,7 @@
     GuestRoom219 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom219 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom219 Air Node,   !- Zone Air Node Name
-    GuestRoom219 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom219 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom220_223,        !- Zone Name
@@ -23275,7 +23338,7 @@
     GuestRoom220_223 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom220_223 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom220_223 Air Node,  !- Zone Air Node Name
-    GuestRoom220_223 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom220_223 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom224,            !- Zone Name
@@ -23283,7 +23346,7 @@
     GuestRoom224 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom224 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom224 Air Node,   !- Zone Air Node Name
-    GuestRoom224 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom224 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom301,            !- Zone Name
@@ -23291,7 +23354,7 @@
     GuestRoom301 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom301 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom301 Air Node,   !- Zone Air Node Name
-    GuestRoom301 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom301 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom302_305,        !- Zone Name
@@ -23299,7 +23362,7 @@
     GuestRoom302_305 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom302_305 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom302_305 Air Node,  !- Zone Air Node Name
-    GuestRoom302_305 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom302_305 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom306_308,        !- Zone Name
@@ -23307,7 +23370,7 @@
     GuestRoom306_308 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom306_308 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom306_308 Air Node,  !- Zone Air Node Name
-    GuestRoom306_308 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom306_308 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom309_312,        !- Zone Name
@@ -23315,7 +23378,7 @@
     GuestRoom309_312 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom309_312 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom309_312 Air Node,  !- Zone Air Node Name
-    GuestRoom309_312 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom309_312 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom313,            !- Zone Name
@@ -23323,7 +23386,7 @@
     GuestRoom313 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom313 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom313 Air Node,   !- Zone Air Node Name
-    GuestRoom313 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom313 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom314,            !- Zone Name
@@ -23331,7 +23394,7 @@
     GuestRoom314 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom314 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom314 Air Node,   !- Zone Air Node Name
-    GuestRoom314 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom314 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom315_318,        !- Zone Name
@@ -23339,7 +23402,7 @@
     GuestRoom315_318 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom315_318 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom315_318 Air Node,  !- Zone Air Node Name
-    GuestRoom315_318 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom315_318 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom319,            !- Zone Name
@@ -23347,7 +23410,7 @@
     GuestRoom319 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom319 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom319 Air Node,   !- Zone Air Node Name
-    GuestRoom319 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom319 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom320_323,        !- Zone Name
@@ -23355,7 +23418,7 @@
     GuestRoom320_323 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom320_323 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom320_323 Air Node,  !- Zone Air Node Name
-    GuestRoom320_323 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom320_323 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom324,            !- Zone Name
@@ -23363,7 +23426,7 @@
     GuestRoom324 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom324 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom324 Air Node,   !- Zone Air Node Name
-    GuestRoom324 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom324 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom401,            !- Zone Name
@@ -23371,7 +23434,7 @@
     GuestRoom401 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom401 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom401 Air Node,   !- Zone Air Node Name
-    GuestRoom401 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom401 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom402_405,        !- Zone Name
@@ -23379,7 +23442,7 @@
     GuestRoom402_405 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom402_405 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom402_405 Air Node,  !- Zone Air Node Name
-    GuestRoom402_405 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom402_405 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom406_408,        !- Zone Name
@@ -23387,7 +23450,7 @@
     GuestRoom406_408 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom406_408 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom406_408 Air Node,  !- Zone Air Node Name
-    GuestRoom406_408 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom406_408 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom409_412,        !- Zone Name
@@ -23395,7 +23458,7 @@
     GuestRoom409_412 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom409_412 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom409_412 Air Node,  !- Zone Air Node Name
-    GuestRoom409_412 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom409_412 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom413,            !- Zone Name
@@ -23403,7 +23466,7 @@
     GuestRoom413 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom413 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom413 Air Node,   !- Zone Air Node Name
-    GuestRoom413 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom413 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom414,            !- Zone Name
@@ -23411,7 +23474,7 @@
     GuestRoom414 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom414 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom414 Air Node,   !- Zone Air Node Name
-    GuestRoom414 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom414 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom415_418,        !- Zone Name
@@ -23419,7 +23482,7 @@
     GuestRoom415_418 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom415_418 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom415_418 Air Node,  !- Zone Air Node Name
-    GuestRoom415_418 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom415_418 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom419,            !- Zone Name
@@ -23427,7 +23490,7 @@
     GuestRoom419 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom419 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom419 Air Node,   !- Zone Air Node Name
-    GuestRoom419 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom419 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom420_423,        !- Zone Name
@@ -23435,7 +23498,7 @@
     GuestRoom420_423 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     GuestRoom420_423 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom420_423 Air Node,  !- Zone Air Node Name
-    GuestRoom420_423 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom420_423 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     GuestRoom424,            !- Zone Name
@@ -23443,7 +23506,7 @@
     GuestRoom424 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     GuestRoom424 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     GuestRoom424 Air Node,   !- Zone Air Node Name
-    GuestRoom424 Return Air Node Name;  !- Zone Return Air Node Name
+    GuestRoom424 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     LaundryRoomFlr1,         !- Zone Name
@@ -23451,7 +23514,7 @@
     LaundryRoomFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LaundryRoomFlr1 Air Node,!- Zone Air Node Name
-    LaundryRoomFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    LaundryRoomFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     MechanicalRoomFlr1,      !- Zone Name
@@ -23459,7 +23522,7 @@
     MechanicalRoomFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     MechanicalRoomFlr1 Air Node,  !- Zone Air Node Name
-    MechanicalRoomFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    MechanicalRoomFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     MeetingRoomFlr1,         !- Zone Name
@@ -23467,7 +23530,7 @@
     MeetingRoomFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     MeetingRoomFlr1 Air Node,!- Zone Air Node Name
-    MeetingRoomFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    MeetingRoomFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStairsFlr1,          !- Zone Name
@@ -23475,7 +23538,7 @@
     RearStairsFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStairsFlr1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStairsFlr1 Air Node, !- Zone Air Node Name
-    RearStairsFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStairsFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStairsFlr2,          !- Zone Name
@@ -23483,7 +23546,7 @@
     RearStairsFlr2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStairsFlr2 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStairsFlr2 Air Node, !- Zone Air Node Name
-    RearStairsFlr2 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStairsFlr2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStairsFlr3,          !- Zone Name
@@ -23491,7 +23554,7 @@
     RearStairsFlr3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStairsFlr3 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStairsFlr3 Air Node, !- Zone Air Node Name
-    RearStairsFlr3 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStairsFlr3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStairsFlr4,          !- Zone Name
@@ -23499,7 +23562,7 @@
     RearStairsFlr4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStairsFlr4 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStairsFlr4 Air Node, !- Zone Air Node Name
-    RearStairsFlr4 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStairsFlr4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStorageFlr1,         !- Zone Name
@@ -23507,7 +23570,7 @@
     RearStorageFlr1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStorageFlr1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStorageFlr1 Air Node,!- Zone Air Node Name
-    RearStorageFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStorageFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStorageFlr2,         !- Zone Name
@@ -23515,7 +23578,7 @@
     RearStorageFlr2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStorageFlr2 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStorageFlr2 Air Node,!- Zone Air Node Name
-    RearStorageFlr2 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStorageFlr2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStorageFlr3,         !- Zone Name
@@ -23523,7 +23586,7 @@
     RearStorageFlr3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStorageFlr3 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStorageFlr3 Air Node,!- Zone Air Node Name
-    RearStorageFlr3 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStorageFlr3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RearStorageFlr4,         !- Zone Name
@@ -23531,7 +23594,7 @@
     RearStorageFlr4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     RearStorageFlr4 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     RearStorageFlr4 Air Node,!- Zone Air Node Name
-    RearStorageFlr4 Return Air Node Name;  !- Zone Return Air Node Name
+    RearStorageFlr4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     RestroomFlr1,            !- Zone Name
@@ -23539,7 +23602,7 @@
     RestroomFlr1 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     RestroomFlr1 Air Node,   !- Zone Air Node Name
-    RestroomFlr1 Return Air Node Name;  !- Zone Return Air Node Name
+    RestroomFlr1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     CorridorFlr1 Inlet Nodes,!- Name
@@ -27559,7 +27622,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27576,7 +27639,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27591,7 +27654,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27599,7 +27662,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27607,7 +27670,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27615,7 +27678,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27623,7 +27686,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27631,7 +27694,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27639,7 +27702,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27647,7 +27710,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -27657,7 +27720,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -27683,7 +27746,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27700,7 +27763,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27708,7 +27771,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27716,7 +27779,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27724,7 +27787,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27732,7 +27795,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27740,7 +27803,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27748,7 +27811,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27756,7 +27819,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -27766,7 +27829,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -27790,7 +27853,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27815,7 +27878,7 @@
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

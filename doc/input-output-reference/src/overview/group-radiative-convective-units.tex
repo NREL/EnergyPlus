@@ -541,17 +541,17 @@ This field reports the amount of convective energy transferred from the baseboar
 
 \subsection{ZoneHVAC:CoolingPanel:RadiantConvective:Water}\label{zonehvaccoolingpanelradiantconvectivewater}
 
-The radiant/convective cooling panel is a component of zone equipment.  Chilled water is supplied by the plant and circulated through the panel.  Through radiation and convective heat transfer, the panel absorbs energy contained within the zone to provide cooling.  Control of the panel is achieved using the methodology used for low temperature radiant systems—a piecewise linear control profile that varies the flow rate to the panel based on a control parameter defined by the user.  This is different than being controlled to meet any remaining load like the air-based systems.  However, due to the radiant nature of these devices, it is not possible to control precisely on a zone air-based load since this will result in overcooling at the next time step.  Despite this, in addition to the piecewise linear controls that have been used with low temperature radiant systems in the past, two new controls will be added for this simple model: one that varies convective output of the system to meet the remaining zone load and one that varies the total convective output of the system to meet the remaining zone load.  In these two zone load control types, the user must enter the typical zone thermostat object to replace the setpoint and throttling range input in this object.  In this component, control is accomplished by throttling the chilled water flow to the device.  Capacity rating information is required as input and is used to calculate a UA value of the unit. The unit is connected to a chilled water loop (demand side) with an inlet and outlet node. The input data dictionary definition of the unit is as follows.
+The radiant/convective cooling panel is a type of zone equipment.  Chilled water is supplied by the plant and circulated through the panel.  Through radiation and convective heat transfer, the panel absorbs energy contained within the zone to provide cooling.  Control of the panel is achieved using the methodology used for low temperature radiant systems—a piecewise linear control profile that varies the flow rate to the panel based on a control parameter defined by the user.  This is different than being controlled to meet any remaining load like the air-based systems.  However, due to the radiant nature of these devices, it is not possible to control precisely on a zone air-based load since this will result in overcooling at the next time step.  Despite this, in addition to the piecewise linear controls that have been used with low temperature radiant systems in the past, two new controls are available for this simple model: one that varies the convective output of the system to meet the remaining zone load and one that varies the total convective output of the system to meet the remaining zone load.  In these two zone load control types, the user must enter the typical zone thermostat object to replace the setpoint and throttling range input in this object.  In this component, control is accomplished by throttling the chilled water flow to the device.  Capacity rating information is required as input and is used to calculate a UA value of the unit. The unit is connected to a chilled water loop (demand side) with an inlet and outlet node. The input data dictionary definition of the unit is as follows.
 
 \subsubsection{Inputs}\label{inputs-3-028-1}
 
 \paragraph{Field: Name}\label{field-name-3-025-1}
 
-A unique user assigned name for an instance of radiant cooling panel. Any reference to this unit by another object will use this name.
+A unique user assigned name for this instance of a radiant cooling panel. Any reference to this unit by another object will use this name.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-3-005-1}
 
-The name of the schedule (ref: Schedule) that denotes whether the radiant cooling panel can run during a given hour. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the hour. A value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for the hour.
+The name of the schedule (ref: Schedule) that denotes whether the radiant cooling panel can run during a given hour. A schedule value greater than 0 (usually 1 is used) indicates that the unit can be on during the hour. A value less than or equal to 0 (usually 0 is used) denotes that the unit is off for the hour.
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2-002-1}
 
@@ -563,7 +563,7 @@ The name of the water outlet node for the radiant cooling panel.
 
 \paragraph{Field: Rated Inlet Water Temperature}\label{field-rated-inlet-water-temperature}
 
-This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rated conditions is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 5°C (44°F).
+This field is the inlet temperature to the panel under conditions used to rate the capacity of the panel.  This value along with the other rating condition parameters is used to calculate the overall heat transfer coefficient (U-Value) that will be used to characterize the heat transfer between the water being circulated through the panel and the air in the zone.  The default value is 5°C (41°F).
 
 \paragraph{Field: Rated Space Temperature}\label{field-rated-space-temperature}
 
@@ -575,23 +575,23 @@ This field is the rated standard water flow rate in kg/s that was used to obtain
 
 \paragraph{Field: Cooling Design Capacity Method}\label{field-cooling-design-capacity-method-2}
 
-Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either \emph{CoolingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedCoolingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{CoolingDesignCapacity} means the user specifies the magnitude of maximum or nominal cooling capacity or the program calculates the maximum or nominal design cooling capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design cooling capacity from the user specified cooling capacity per floor area and floor area of the zone served by the cooling panel unit. \emph{FractionOfAutosizedCoolingCapacity} means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity. The default method is \emph{CoolingDesignCapacity}.
+This field defines the method used to determine the cooling design capacity for scalable sizing. The inputs that are allowed for this field include: \emph{CoolingDesignCapacity}, \emph{CapacityPerFloorArea}, or \emph{FractionOfAutosizedCoolingCapacity}. If this input field is left blank, then the \emph{CoolingDesignCapacity} method is assumed to be valid for this unit. \emph{CoolingDesignCapacity} means the user specifies the magnitude of maximum or nominal cooling capacity or the program calculates the maximum or nominal design cooling capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design cooling capacity from the user specified cooling capacity per floor area and the floor area of the zone served by the cooling panel unit. \emph{FractionOfAutosizedCoolingCapacity} means the program calculates the design cooling capacity from a user specified fraction and the auto-sized design cooling capacity.
 
 \paragraph{Field: Cooling Design Capacity}\label{field-cooling-design-capacity-2}
 
-This field is for the cooling panel unit nominal cooling capacity in watts at the rated flow rate of water through the unit (see Rated Water Mass Flow Rate field above). This field can be autosized by EnergyPlus. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
+This field contains the cooling panel unit nominal cooling capacity in Watts at the rated flow rate of water through the unit (see Rated Water Mass Flow Rate field above). This field can be autosized by EnergyPlus. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity}~ and this input is blank, autosizing is assumed. A design day sizing run must be specified for this to be autosized.
 
 \paragraph{Field: Cooling Design Capacity Per Floor Area}\label{field-cooling-design-capacity-per-floor-area-2}
 
-Enter the cooling capacity per unit floor area in W/m2 for the cooling panel unit. This field is a required field when the Cooling Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the cooling capacity from floor area of the zone served by the cooling panel unit and the cooling capacity per unit floor area value specified by the user. This field may be left blank.
+This field is used to enter the cooling capacity per unit floor area in W/m2 for the cooling panel unit. This field is a required field when the Cooling Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the cooling capacity from floor area of the zone served by the cooling panel unit and the cooling capacity per unit floor area value specified by the user. This field may be left blank.
 
 \paragraph{Field: Fraction of Autosized Cooling Design Capacity}\label{field-fraction-of-autosized-cooling-design-capacity-2}
 
-Enter the cooling capacity as a fraction of the autosized cooling capacity for the cooling panel. This input field is required when the Cooling Design Capacity Method is \emph{FractionOfAutosizedCoolingCapacity}. The program calculates the cooling capacity from the design autosized cooling capacity and the user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
+This field is used to enter the cooling capacity as a fraction of the autosized cooling capacity for the cooling panel. This input field is required when the Cooling Design Capacity Method is \emph{FractionOfAutosizedCoolingCapacity}. The program calculates the cooling capacity from the design autosized cooling capacity and the user specified fraction. A design day sizing run must be specified. This field may be left blank, and the default value is 1.0.
 
 \paragraph{Field: Maximum Chilled Water Flow Rate}\label{field-maximum-chilled-water-flow-rate}
 
-The maximum chilled water volumetric flow rate in m3/sec.  This field can also be autosized.
+This field specifies the maximum chilled water volumetric flow rate in m3/sec.  This field can also be autosized.
 
 \paragraph{Field: Control Type}\label{field-control-type}
 
@@ -644,20 +644,20 @@ This optional parameter is only valid with the SimpleOff and VariableOff condens
 
 \paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-2-000-1}
 
-This field gives the user an opportunity to characterize the zone temperature as a function of the zone mean radiant temperature and the mean air temperature.  The performance of the unit is proportional to the difference between the water inlet temperature and the zone temperature where the zone temperature is found using a weighted average of zone mean radiant temperature and mean air temperature.  The weighting factor is this parameter and it is multiplied by the zone mean radiant temperature.  The remainder of the zone temperature calculation is made up of the zone mean air temperature.  This parameter can be difficult to quantify as the fraction radiant can vary with zone conditions.  However, by definition, a radiant system like this radiant cooling panel must exchange at least 50% of its energy to the zone via radiation.  One study has shown that a fraction radiant between 0.6 and 0.7 is a reasonable estimation.  For more information, see the EnergyPlus Engineering Reference in section Radiant System Models, subsection Simple Radiant Cooling Panel.
+This field allows the user an opportunity to characterize the heat tranfser at the surface of the panel as either purely radiative, purely convective, or some combination of radiant and convective.  As a result, through this parameter, EnergyPlus gives the user an opportunity to characterize the zone temperature as a function of the zone mean radiant temperature and the mean air temperature.  The performance of the unit is proportional to the difference between the water inlet temperature and the zone temperature where the zone temperature is found using a weighted average of zone mean radiant temperature and mean air temperature.  The weighting factor is this parameter, and it is multiplied by the zone mean radiant temperature.  The remainder of the zone temperature calculation is made up of the zone mean air temperature.  During modeling, it is likewise used to calculate how much of the energy being absorbed by the unit is radiant energy.  This parameter can be difficult to quantify as the fraction radiant can vary with zone conditions.  However, by definition, a radiant system like this radiant cooling panel exchanges at least half of its energy to the zone via radiation.  One study has shown that a fraction radiant between 0.6 and 0.7 is a reasonable estimation.  For more information, see the EnergyPlus Engineering Reference in section Radiant System Models, subsection Simple Radiant Cooling Panel.
 
 \paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people-2-1}
 
-This field allows the user to direct some of the radiant energy to be absorbed from people rather than surfaces within the space.  This would have a direct impact on thermal comfort and would depend on the location of the people with respect to the radiant cooling panel.  All energy absorbed by the panel would have a cooling effect on people and is subtracted from the total radiant energy absorbed by the panel defined by the previous term.
+This field allows the user to direct some of the radiant energy to be absorbed from people rather than surfaces within the space.  This has a direct impact on thermal comfort and depends on the location of the people with respect to the radiant cooling panel.  All energy absorbed by the panel would have a cooling effect on people and is subtracted from the total radiant energy absorbed by the panel defined by the previous term.
 
 \paragraph{Field Set: Surface Name, Fraction of Radiant Energy to Surface}\label{field-set-surface-name-fraction-of-radiant-energy-to-surface-2-1}
 
-The following two items are repeated for an unlimited number of surface/fraction pairs. At least one surface/fraction pair must appear in an input file. In other words, at least one surface must be identified as a recipient of radiant energy from the baseboard heater.
+These two fields are repeated for up to 100 surface/fraction pairs. At least one surface/fraction pair must appear in an input file. In other words, at least one surface must be identified as a recipient of radiant energy from the baseboard heater.
 
-The radiant energy from the cooling panel is defined by the total energy input to the cooling panel from the chilled water loop times the fraction radiant field shown above. This radiant energy is distributed to surfaces and people using the surface and fraction pairs and the fraction to people input by the user. These fractions to people and surfaces must add up to 1.0. In other words, in an input file, the following relation should be maintained by the user input:
+The radiant energy from the cooling panel is defined by the total energy input to the cooling panel from the chilled water loop times the fraction radiant field shown above. This radiant energy is received from surfaces and people using the surface and fraction pairs and the fraction to people input by the user. These fractions from people and surfaces must add up to 1.0. In other words, in an input file, the following relation should be maintained by the user input:
 
 \begin{equation}
-FractionIndicentOnPeople + \sum {FractionToSurfaces = 1}
+FractionIndicentOnPeople + \sum {FractionToSurfaces} = 1
 \end{equation}
 
 \paragraph{Field Set: Surface \textless{}x\textgreater{} Name}\label{field-set-surface-x-name-1}
@@ -666,7 +666,7 @@ The radiant energy absorbed by the radiant cooling panel can be specified to be 
 
 \paragraph{Field Set: Fraction of Radiant Energy to Surface \textless{}x\textgreater{}}\label{field-set-fraction-of-radiant-energy-to-surface-x-1}
 
-In combination with the previous field, this defines what fraction of the radiant energy being absorbed by the radiant cooling panel comes from the surface named by the previous field.  These pairs of surface names and fractions of radiant energy from the surface can be repeated up to 100 times in the input for a particular radiant cooling panel.  Note that the sum of all of the radiant energy fractions plus the radiant fraction from people must add up to unity just like in the radiant-convective baseboard models.  Note that there is a small possibility that a particular surface listed in these pairs is actually lower than the temperature of the panel.  This probably will not happen unless there is another cooling surface within the zone.  In reality, absorbing net radiant energy from a colder surface would violate the Second Law of Thermodynamics.  However, in keeping with the simple nature of this model, EnergyPlus will monitor the inlet water temperature to the panel and produce a warning message if this temperature is lower than any of the surface temperature of the surfaces with which this system is interacting.
+In combination with the previous field, this defines what fraction of the radiant energy being absorbed by the radiant cooling panel comes from the surface named by the previous field.  These pairs of surface names and fractions of radiant energy from the surface can be repeated up to 100 times in the input for a particular radiant cooling panel.  Note that the sum of all of the surface radiant energy fractions plus the radiant fraction from people must add up to unity just like in the radiant-convective baseboard models.  Note that there is a small possibility that a particular surface listed in these pairs is actually lower than the temperature of the panel.  This probably will not happen unless there is another cooling surface within the zone.  In reality, absorbing net radiant energy from a colder surface would violate the Second Law of Thermodynamics.  However, in keeping with the simple nature of this model, EnergyPlus will monitor the inlet water temperature to the panel and produce a warning message if this temperature is lower than any of the surface temperature of the surfaces with which this system is interacting.
 
 An example input for the radiant cooling panel is shown below.
 
@@ -720,11 +720,13 @@ ZoneHVAC:CoolingPanel:RadiantConvective:Water,
   HVAC, Average, Cooling Panel Water Mass Flow Rate [kg/s]
 \item
   HVAC, Average, Cooling Panel Water Inlet Temperature [C]
+\item
+  HVAC, Average, Cooling Panel Water Outlet Temperature [C]
 \end{itemize}
 
 \paragraph{Cooling Panel Total System Cooling Rate [W]}\label{cooling-panel-total-system-cooling-rate-w}
 
-This field is the total rate of cooling achieved by the radiant cooling panel on the zone in Watts. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiant absorbed by people.
+This field is the total rate of cooling achieved by the radiant cooling panel in Watts. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiation associated with the panel that is absorbed from people.
 
 \paragraph{Cooling Panel Total Cooling Rate [W]}\label{cooling-panel-total-cooling-rate-w}
 
@@ -740,7 +742,7 @@ This field reports the rate at which radiant heat is removed from people and the
 
 \paragraph{Cooling Panel Total System Cooling Energy [J]}\label{cooling-panel-total-system-cooling-energy-j}
 
-This field is the total cooling achieved by the radiant cooling panel on the zone in Joules over the timestep being reported. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiant absorbed by people.
+This field is the total cooling achieved by the radiant cooling panel on the zone in Joules over the timestep being reported. This is the impact of the cooling panel on the space and is the actual impact the system has on the zone.  It includes the convective heat transfer rate as well as the decreased convection from zone surfaces as a result of the operation of the unit and the radiation associated with the panel that is absorbed from people.
 
 \paragraph{Cooling Panel Total Cooling Energy [J]}\label{cooling-panel-total-cooling-energy-j}
 

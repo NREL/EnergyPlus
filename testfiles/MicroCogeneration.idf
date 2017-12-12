@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,6;
 
@@ -1155,7 +1155,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1488.2332,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -1228,7 +1228,7 @@
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_1 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Name
@@ -1241,6 +1241,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_1 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1698,7 +1699,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1297.9068,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -1771,7 +1772,7 @@
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_2 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_2 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Name
@@ -1783,6 +1784,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_2 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2240,7 +2242,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1488.2332,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -2313,7 +2315,7 @@
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_3 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_3 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Name
@@ -2325,6 +2327,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_3 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2782,7 +2785,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1297.9068,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -2855,7 +2858,7 @@
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_4 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_4 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Name
@@ -2867,6 +2870,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_4 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3308,7 +3312,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     452.9242,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -3381,7 +3385,7 @@
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_5 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_5 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Name
@@ -3395,6 +3399,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_5 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4451,7 +4456,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCharges,     !- Name
+    AnnualEnergyCharges,     !- Utility Cost Charge Simple Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4459,7 +4464,7 @@
     0.1023;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandCharge,      !- Name
+    AnnualDemandCharge,      !- Utility Cost Charge Block Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -4474,7 +4479,7 @@
     16.24;                   !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand10kw,           !- Name
+    MinDemand10kw,           !- Utility Cost Qualify Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -4484,7 +4489,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4510,7 +4515,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     ConsEdisCo_No-2_GeneralSmall,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4525,7 +4530,7 @@
     0.1329;                  !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand10kw,           !- Name
+    MaxDemand10kw,           !- Utility Cost Qualify Name
     ConsEdisCo_No-2_GeneralSmall,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -4535,7 +4540,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     ConsEdisCo_No-2_GeneralSmall,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4561,7 +4566,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     NY_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4586,7 +4591,7 @@
     9.24;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     NY_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4764,7 +4769,7 @@
     Mythical Wind Turbine Null Input Curve,  !- Heat Recovery Lube Energy Curve Name
     0.02,                    !- Coefficient 1 of U-Factor Times Area Curve
     0.9,                     !- Coefficient 2 of U-Factor Times Area Curve
-    0.0,                     !- Maximum Exhaust Flow per Unit of Power Output {(Kg/s)/W}
+    0.0,                     !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}
     150,                     !- Design Minimum Exhaust Temperature {C}
     25,                      !- Design Air Inlet Temperature {C}
     43500,                   !- Fuel Higher Heating Value {kJ/kg}

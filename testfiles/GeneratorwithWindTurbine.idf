@@ -85,7 +85,7 @@
 !   Environmental Emissions:        None
 !   Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,4;
 
@@ -494,6 +494,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -505,7 +506,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 NODE,             !- Zone Air Node Name
-    Zone 1 Outlet;           !- Zone Return Air Node Name
+    Zone 1 Outlet;           !- Zone Return Air Node or NodeList Name
 
   Generator:WindTurbine,
     WT1,                     !- Name

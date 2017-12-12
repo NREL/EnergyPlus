@@ -805,6 +805,7 @@ namespace EnergyPlus {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone One Equipment,  !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Zone One 4pipe Beam,  !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2324,6 +2325,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone One Equipment,  !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    Zone One 4pipe Beam,  !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
