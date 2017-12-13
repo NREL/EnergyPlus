@@ -363,7 +363,6 @@ namespace HVACUnitarySystem {
 		bool HXUnitOn; // Flag to control HX for HXAssisted Cooling Coil
 		int CompOn; // Determines if compressor is on or off
 		Real64 TempMassFlowRateMaxAvail;
-		bool ErrorsFound;
 
 		CompOn = 0; //Autodesk:Init Was used uninitialized
 
@@ -1138,8 +1137,13 @@ namespace HVACUnitarySystem {
 
 			UnitarySystem( UnitarySysNum ).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
 			// allows non-ASHSRAE compliant coil types to be modeled using non-ASHAR90 method. Constant fan operating mode is required.
-			if( CoolingLoad && UnitarySystem( UnitarySysNum ).validASHRAECoolCoil && UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) UnitarySystem( UnitarySysNum ).simASHRAEModel = true;
-			if( HeatingLoad && UnitarySystem( UnitarySysNum ).validASHRAEHeatCoil && UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) UnitarySystem( UnitarySysNum ).simASHRAEModel = true;
+			if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				if ( CoolingLoad ) {
+					if ( UnitarySystem( UnitarySysNum ).validASHRAECoolCoil ) UnitarySystem( UnitarySysNum ).simASHRAEModel = true;
+				} else if ( HeatingLoad ) {
+					if ( UnitarySystem( UnitarySysNum ).validASHRAEHeatCoil ) UnitarySystem( UnitarySysNum ).simASHRAEModel = true;
+				}
+			}
 
 		} else if ( SELECT_CASE_var == SetPointBased ) {
 			if ( AirLoopNum == -1 ) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAIRUNIT
@@ -6745,12 +6749,6 @@ namespace HVACUnitarySystem {
 		int SolFlagLat; // return flag from RegulaFalsi for latent load
 		int SpeedNum; // multi-speed coil speed number
 		int CompressorONFlag; // 0= compressor off, 1= compressor on
-		int coilFluidInletNode; // water coil fluid inlet node
-		int coilFluidOutletNode; // water coil fluid outlet node
-		int coilLoopNum; // water coil plant loop number
-		int coilLoopSide; // water coil plant loop side
-		int coilBranchNum; // water coil plant branch number
-		int coilCompNum; // water coil component number
 		Real64 PartLoadRatio; // operating part-load ratio [-]
 		Real64 SensOutputOff; // sensible output at PLR = 0 [W]
 		Real64 LatOutputOff; // latent output at PLR = 0 [W]
@@ -6766,24 +6764,9 @@ namespace HVACUnitarySystem {
 		Real64 TempMaxPLR; // iterative maximum PLR
 		Real64 CoolingOnlySensibleOutput; // use to calculate dehumidification induced heating [W]
 		Real64 CpAir; // specific heat of air [J/kg_C]
-		Real64 lowWaterMdot; // water flow rate at low air flow rate [kg/s]
-		Real64 outletTemp; // air outlet node temperature [C]
-		Real64 minAirMassFlow; // minimum air flow rate for ASHRAE 90.1 model [kg/s]
-		Real64 maxAirMassFlow; // maximum air flow rate for ASHRAE 90.1 model [kg/s]
-		Real64 maxCoilFluidFlow; // maximum water coil fluid flow adjusted for plant limitations
-		Real64 coilFluidFlow; // maximum water coil fluid flow adjusted for SAT limit
-		Real64 maxOutletTemp; // max outlet temp of heating coil (or min outlet temp of cooling coil - aka maximum outlet temp of coil) [C]
-		Real64 lowSpeedFanRatio; // ratio of no load air flow to full fan flow [-]
-		Real64 MinHumRatio; // minimum of outlet node and zone humidity ratio [kg/kg]
-		Real64 AirMassFlow; // air mass flow rate [kg/s]
-		Real64 ZoneTemp; // zone temperature [C]
-		Real64 ZoneHumRat; // zone humidity ratio [kg/kg]
 		Real64 FullLoadAirOutletTemp; // saved full load outlet air temperature [C]
 		Real64 FullLoadAirOutletHumRat; // saved full load outlet air humidity ratio [kg/kg]
 		Real64 NoLoadOutletTemp; // outlet temp of system with coils off [C]
-		bool coilActive; // true when coil is on
-		int coilAirInletNode; // coil air side inlet node number
-		int coilAirOutletNode; // coil air side outlet node number
 
 		CompName = UnitarySystem( UnitarySysNum ).Name;
 		InletNode = UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum;

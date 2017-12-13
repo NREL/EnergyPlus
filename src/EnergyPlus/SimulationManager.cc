@@ -378,8 +378,10 @@ namespace SimulationManager {
 		}
 
 		DisplayString( "Initializing Simulation" );
-		KickOffSimulation = true;
+		DisplayString( "Initializing Simulation1" );
+		DataGlobals::KickOffSimulation = true;
 
+		DisplayString( "ResetEnvironmentCounter" );
 		ResetEnvironmentCounter();
 		SetupSimulation( ErrorsFound );
 
@@ -388,7 +390,7 @@ namespace SimulationManager {
 		InitCurveReporting();
 
 		AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
-		KickOffSimulation = false;
+		DataGlobals::KickOffSimulation = false;
 		WarmupFlag = false;
 		DoWeatherInitReporting = true;
 
@@ -453,6 +455,7 @@ namespace SimulationManager {
 		WeatherManager::ReadVariableLocationOrientation();
 		
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
+		DisplayString( "DoHVACSizingSimulation" );
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
 		}
@@ -1653,6 +1656,7 @@ namespace SimulationManager {
 
 			TimeStep = 1;
 
+			DisplayString( "Initializing Simulation2" );
 			if ( DeveloperFlag ) DisplayString( "Initializing Simulation - timestep 1:" + EnvironmentName );
 
 			BeginTimeStepFlag = true;
@@ -1677,6 +1681,7 @@ namespace SimulationManager {
 			BeginFullSimFlag = false;
 
 			//          ! do another timestep=1
+			DisplayString( "Initializing Simulation3" );
 			if ( DeveloperFlag ) DisplayString( "Initializing Simulation - 2nd timestep 1:" + EnvironmentName );
 
 			ManageWeather();
@@ -1691,6 +1696,7 @@ namespace SimulationManager {
 			TimeStep = NumOfTimeStepInHour;
 			EndEnvrnFlag = true;
 
+			DisplayString( "Initializing Simulation4" );
 			if ( DeveloperFlag ) DisplayString( "Initializing Simulation - hour 24 timestep 1:" + EnvironmentName );
 			ManageWeather();
 

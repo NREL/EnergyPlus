@@ -3201,6 +3201,7 @@ namespace ZoneEquipmentManager {
 
 				{ auto const SELECT_CASE_var( ZoneEquipTypeNum );
 
+				DisplayString( "CallZoneEquip" );
 				if ( SELECT_CASE_var == AirDistUnit_Num ) { // 'ZoneHVAC:AirDistributionUnit'
 
 					// Air loop system availability manager status only applies to PIU and exhaust fans

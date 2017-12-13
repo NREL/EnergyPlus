@@ -4023,10 +4023,12 @@ namespace General {
 			Par( 15 ) = 0.0;
 		}
 		Par( 16 ) = 1.0; // iteration method, 1 = modulate coil capacity, 2 = modulate air flow rate
-						 // initialize flow variables to 0
+		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning in PTUnit version in General.cc
+
 		int InletNode = SZVAVModel.UnitarySystemInletNodeNum;
 		int OutletNode = SZVAVModel.UnitarySystemOutletNodeNum;
 		Real64 ZoneTemp = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).Temp;
+		// initialize flow variables to 0
 		Real64 lowWaterMdot = 0.0;
 
 		// model attempts to control air and water flow rate in specific operating regions:
@@ -4239,7 +4241,6 @@ namespace General {
 																													  // Step 8: IF coil capacity was modulated to meet outlet air SP, load can be met, and air flow should be reduced
 																													  // back calculate air flow rate needed to meet outlet air temperature limit
 					Real64 MinHumRatio = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).HumRat;
-					Real64 ZoneHumRat = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).HumRat;
 					if ( outletTemp < ZoneTemp ) MinHumRatio = DataLoopNode::Node( OutletNode ).HumRat;
 					// this air flow rate should be between min and max, safer to just make sure
 					Real64 AirMassFlow = min( maxAirMassFlow, ( ZoneLoad / ( PsyHFnTdbW( outletTemp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) ) );
@@ -4394,7 +4395,7 @@ namespace General {
 		int const MaxIter( 100 ); // maximum number of iterations
 		int SolFlag; // return flag from RegulaFalsi for sensible load
 
-		Array1D< Real64 > Par( 16 ); // parameters passed to RegulaFalsi function
+		Array1D< Real64 > Par( 17 ); // parameters passed to RegulaFalsi function
 		Real64 maxCoilFluidFlow;
 		Real64 maxOutletTemp;
 		Real64 minAirMassFlow;
@@ -4410,7 +4411,7 @@ namespace General {
 		int coilAirOutletNode;
 
 		Real64 TempSensOutput; // iterative sensible capacity [W]
-		Real64 TempLatOutput; // iterative latent capacity [W]
+//		Real64 TempLatOutput; // iterative latent capacity [W]
 
 		// set up mode specific variables to use in common function calls
 		if ( CoolingLoad ) {
@@ -4464,7 +4465,7 @@ namespace General {
 		Par( 4 ) = ZoneLoad; // load to be met
 		Par( 5 ) = double( SZVAVModel.AirInNode );
 		Par( 6 ) = OnOffAirFlowRatio;
-//		Par( 7 ) = double( AirLoopNum ); // used in UnitarySystem but not PTHP
+		Par( 7 ) = double( AirLoopNum ); // used in UnitarySystem but not PTHP
 		Par( 8 ) = double( coilFluidInletNode );
 		// initialize other RegulaFalsi variables to most common state 
 		Par( 9 ) = 0.0; // minCoilFluidFlow - low fan speed water flow rate
@@ -4478,10 +4479,12 @@ namespace General {
 			Par( 15 ) = 0.0;
 		}
 		Par( 16 ) = 1.0; // iteration method, 1 = modulate coil capacity, 2 = modulate air flow rate
-						 // initialize flow variables to 0
+		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning in PTUnit version in General.cc
+
 		int InletNode = SZVAVModel.AirInNode; // *** variable name is different from UnitarySystem model
 		int OutletNode = SZVAVModel.AirOutNode; // *** variable name is different from UnitarySystem model
 		Real64 ZoneTemp = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).Temp;
+		// initialize flow variables to 0
 		Real64 lowWaterMdot = 0.0;
 		Real64 SupHeaterLoad = 0.0; // *** new variable used in PTHP
 
@@ -4703,7 +4706,6 @@ namespace General {
 																													  // Step 8: IF coil capacity was modulated to meet outlet air SP, load can be met, and air flow should be reduced
 																													  // back calculate air flow rate needed to meet outlet air temperature limit
 					Real64 MinHumRatio = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).HumRat;
-					Real64 ZoneHumRat = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).HumRat;
 					if ( outletTemp < ZoneTemp ) MinHumRatio = DataLoopNode::Node( OutletNode ).HumRat;
 					// this air flow rate should be between min and max, safer to just make sure
 					Real64 AirMassFlow = min( maxAirMassFlow, ( ZoneLoad / ( PsyHFnTdbW( outletTemp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) ) );

@@ -3709,8 +3709,13 @@ namespace PackagedTerminalHeatPump {
 
 		PTUnit( PTUnitNum ).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
 	   // allows non-ASHSRAE compliant coil types to be modeled using non-ASHAR90 method. Constant fan operating mode is required.
-		if ( CoolingLoad && PTUnit( PTUnitNum ).validASHRAECoolCoil && PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
-		if ( HeatingLoad && PTUnit( PTUnitNum ).validASHRAEHeatCoil && PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+		if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) {
+			if ( CoolingLoad ) {
+				if ( PTUnit( PTUnitNum ).validASHRAECoolCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+			} else if ( HeatingLoad ) {
+				if ( PTUnit( PTUnitNum ).validASHRAEHeatCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+			}
+		}
 
 		// get operating capacity of water and steam coil (dependent on entering water/steam temperature)
 		if ( FirstHVACIteration && PartLoadFrac > 0.0 ) {
