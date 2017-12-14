@@ -89,10 +89,12 @@
 #include <ScheduleManager.hh>
 #include <SingleDuct.hh>
 #include <SteamCoils.hh>
+#include <SZVAVModel.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
 #include <WaterToAirHeatPump.hh>
 #include <WaterToAirHeatPumpSimple.hh>
+#include <DisplayRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -2979,6 +2981,7 @@ namespace PackagedTerminalHeatPump {
 
 			// WSHP not yet included in ASHRAE90.1 model
 			PTUnit( PTUnitNum ).ControlType = None;
+			PTUnit( PTUnitNum ).simASHRAEModel = false;
 			PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
 			PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 
@@ -3519,7 +3522,7 @@ namespace PackagedTerminalHeatPump {
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
 			//   set fluid-side hardware limits
-			if ( PTUnit( PTUnitNum ).HeatCoilFluidInletNode > 0 ) {
+			if ( PTUnit( PTUnitNum ).HeatCoilFluidInletNode > 0 && PTUnit( PTUnitNum ).UnitType_Num != PTWSHPUnit ) {
 				// If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
 				if ( PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow == AutoSize ) {
 					SimulateWaterCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, PTUnit( PTUnitNum ).ACHeatCoilIndex );
@@ -4457,6 +4460,7 @@ namespace PackagedTerminalHeatPump {
 		if ( !HeatingLoad && !CoolingLoad ) {
 			return;
 		}
+
 		// Get result when DX coil is off
 		CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 		Real64 NoLoadOutletTemp = Node( PTUnit( PTUnitNum ).AirOutNode ).Temp;
@@ -4472,7 +4476,7 @@ namespace PackagedTerminalHeatPump {
 			int CompressorOnFlag = 0;
 			auto & SZVAVModel( PTUnit( PTUnitNum ) );
 			// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-			General::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
+			SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
 
 		} else {
 

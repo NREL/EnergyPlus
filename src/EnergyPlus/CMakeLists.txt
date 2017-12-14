@@ -491,6 +491,8 @@ SET( SRC
   SystemAvailabilityManager.hh
   SystemReports.cc
   SystemReports.hh
+  SZVAVModel.cc
+  SZVAVModel.hh
   TARCOGArgs.cc
   TARCOGArgs.hh
   TARCOGCommon.cc

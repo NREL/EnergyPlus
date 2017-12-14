@@ -53,6 +53,7 @@ extern "C" {
 // C++ Headers
 #include <cmath>
 #include <string>
+#include <iostream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
@@ -236,6 +237,7 @@ namespace SimulationManager {
 		// na
 
 		// Using/Aliasing
+		using DataGlobals::KickOffSimulation;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
@@ -378,10 +380,8 @@ namespace SimulationManager {
 		}
 
 		DisplayString( "Initializing Simulation" );
-		DisplayString( "Initializing Simulation1" );
-		DataGlobals::KickOffSimulation = true;
+		KickOffSimulation = true;
 
-		DisplayString( "ResetEnvironmentCounter" );
 		ResetEnvironmentCounter();
 		SetupSimulation( ErrorsFound );
 
@@ -390,7 +390,7 @@ namespace SimulationManager {
 		InitCurveReporting();
 
 		AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
-		DataGlobals::KickOffSimulation = false;
+		KickOffSimulation = false;
 		WarmupFlag = false;
 		DoWeatherInitReporting = true;
 
@@ -455,7 +455,6 @@ namespace SimulationManager {
 		WeatherManager::ReadVariableLocationOrientation();
 		
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
-		DisplayString( "DoHVACSizingSimulation" );
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
 		}
@@ -1656,7 +1655,6 @@ namespace SimulationManager {
 
 			TimeStep = 1;
 
-			DisplayString( "Initializing Simulation2" );
 			if ( DeveloperFlag ) DisplayString( "Initializing Simulation - timestep 1:" + EnvironmentName );
 
 			BeginTimeStepFlag = true;
@@ -1681,7 +1679,6 @@ namespace SimulationManager {
 			BeginFullSimFlag = false;
 
 			//          ! do another timestep=1
-			DisplayString( "Initializing Simulation3" );
 			if ( DeveloperFlag ) DisplayString( "Initializing Simulation - 2nd timestep 1:" + EnvironmentName );
 
 			ManageWeather();
@@ -1696,7 +1693,6 @@ namespace SimulationManager {
 			TimeStep = NumOfTimeStepInHour;
 			EndEnvrnFlag = true;
 
-			DisplayString( "Initializing Simulation4" );
 			if ( DeveloperFlag ) DisplayString( "Initializing Simulation - hour 24 timestep 1:" + EnvironmentName );
 			ManageWeather();
 
