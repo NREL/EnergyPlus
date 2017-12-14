@@ -523,12 +523,6 @@ namespace DataSizing {
 		DBySys.deallocate();
 		PeakPsOccurrenceDateTimeStringBySys.deallocate();
 		PeakPsOccurrenceEnvironmentStringBySys.deallocate();
-		//PzSumBySysCool.deallocate();
-		//PzSumBySysHeat.deallocate();
-		//PsBySysCool.deallocate();
-		//PsBySysHeat.deallocate();
-		//DBySysCool.deallocate();
-		//DBySysHeat.deallocate();
 		VouBySys.deallocate();
 		VpsClgBySys.deallocate();
 		VpsHtgBySys.deallocate();

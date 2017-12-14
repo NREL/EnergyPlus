@@ -1239,6 +1239,24 @@ namespace SizingManager {
 				//the design zone ventilation value is based on the larger of the system-level cooling Vot and/or heating Vot
 				FinalSysSizing( AirLoopNum ).DesOutAirVolFlow = max( VotClgBySys( AirLoopNum ), VotHtgBySys( AirLoopNum ) );
 			} // system OA is autosized and VRP
+			else { // not vrp, zone sum, fill out values that still apply
+				// redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
+				DataSizing::VpzClgSumBySys( AirLoopNum ) = 0.0;
+				for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
+					int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( zoneNumOnLoop );
+					DataSizing::VpzClgSumBySys( AirLoopNum ) += DataSizing::VdzClgByZone( CtrlZoneNum );
+				}
+				//Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use conincident sizing result if available for block air flow
+				DataSizing::VpsClgBySys( AirLoopNum ) = FinalSysSizing( SysSizNum ).DesCoolVolFlow;
+				//Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
+				DataSizing::VpsHtgBySys( AirLoopNum ) = 0.0;
+				DataSizing::VpzHtgSumBySys( AirLoopNum ) = 0.0; // for reporting only
+				for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
+					int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( zoneNumOnLoop );
+					DataSizing::VpsHtgBySys( AirLoopNum ) += DataSizing::VpzMinHtgByZone( CtrlZoneNum );
+					DataSizing::VpzHtgSumBySys( AirLoopNum ) += DataSizing::VpzHtgByZone( CtrlZoneNum );
+				}
+			}
 		} // airloop loop
 
 		// write out predefined standard 62.1 report data, total of 8 tables
