@@ -60,7 +60,7 @@ The version of the PVWatts calculations to use. Available Options:
 
 ##### Field: DC System Capacity
 
-DC nameplate capacity of the system in kW.
+DC nameplate capacity of the system in W.
 
 ##### Field: Module Type
 
