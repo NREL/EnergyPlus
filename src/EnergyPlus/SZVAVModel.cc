@@ -195,7 +195,7 @@ namespace SZVAVModel {
 		if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 		Par( 3 ) = double( SZVAVModel.ControlZoneNum );
 		Par( 4 ) = ZoneLoad; // load to be met
-		Par( 5 ) = double( SZVAVModel.UnitarySystemInletNodeNum );
+		Par( 5 ) = double( SZVAVModel.AirInNode );
 		Par( 6 ) = OnOffAirFlowRatio;
 		Par( 7 ) = double( AirLoopNum );
 		Par( 8 ) = double( coilFluidInletNode );
@@ -213,8 +213,8 @@ namespace SZVAVModel {
 		Par( 16 ) = 1.0; // iteration method, 1 = modulate coil capacity, 2 = modulate air flow rate
 		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning in PTUnit version in General.cc
 
-		int InletNode = SZVAVModel.UnitarySystemInletNodeNum;
-		int OutletNode = SZVAVModel.UnitarySystemOutletNodeNum;
+		int InletNode = SZVAVModel.AirInNode;
+		int OutletNode = SZVAVModel.AirOutNode;
 		Real64 ZoneTemp = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).Temp;
 		// initialize flow variables to 0
 		Real64 lowWaterMdot = 0.0;
@@ -303,19 +303,19 @@ namespace SZVAVModel {
 					if ( SolFlag == -1 ) {
 						if ( abs( DataLoopNode::Node( OutletNode ).Temp - maxOutletTemp ) > 0.1 ) { // oulet temperature can sometimes fluctuate around the target by 0.02+ even when PLR changes by 1E-12
 							if ( SZVAVModel.MaxIterIndex == 0 ) {
-								ShowWarningMessage( "Step 2: Coil control failed to converge for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+								ShowWarningMessage( "Step 2: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 								ShowContinueError( "  Iteration limit exceeded in calculating system supply air outlet temperature." );
 								ShowContinueErrorTimeStamp( "Supply air temperature target = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), supply air temperature = " + General::TrimSigDigits( DataLoopNode::Node( OutletNode ).Temp, 3 ) + " (C), and the simulation continues." );
 							}
-							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
+							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 						}
 					} else if ( SolFlag == -2 ) { // should not get here
 						if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-							ShowWarningMessage( "Step 2: Coil control failed for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+							ShowWarningMessage( "Step 2: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 							ShowContinueError( "  supply air temperature target determined to be outside the range." );
 							ShowContinueErrorTimeStamp( "Supply air temperature = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), and the simulation continues." );
 						}
-						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
+						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 					}
 				}
 			}
@@ -343,19 +343,19 @@ namespace SZVAVModel {
 
 					if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
 						if ( SZVAVModel.MaxIterIndex == 0 ) {
-							ShowWarningMessage( "Step 4: Coil control failed to converge for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+							ShowWarningMessage( "Step 4: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
 							ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + General::TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
 						}
-						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
+						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
 					}
 				} else if ( SolFlag == -2 ) {
 					if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-						ShowWarningMessage( "Step 4: Coil control failed for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+						ShowWarningMessage( "Step 4: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 						ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
 						ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
 					}
-					ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
+					ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 				}
 			}
 
@@ -399,19 +399,19 @@ namespace SZVAVModel {
 							if ( SolFlag == -1 ) {
 								if ( abs( DataLoopNode::Node( OutletNode ).Temp - maxOutletTemp ) > 0.1 ) { // oulet temperature can sometimes fluctuate around the target by 0.02+ even when PLR changes by 1E-12
 									if ( SZVAVModel.MaxIterIndex == 0 ) {
-										ShowWarningMessage( "Step 6: Coil control failed to converge for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+										ShowWarningMessage( "Step 6: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 										ShowContinueError( "  Iteration limit exceeded in calculating system supply air outlet temperature." );
 										ShowContinueErrorTimeStamp( "Supply air temperature target = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), supply air temperature = " + General::TrimSigDigits( DataLoopNode::Node( OutletNode ).Temp, 3 ) + " (C), and the simulation continues." );
 									}
-									ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
+									ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 								}
 							} else if ( SolFlag == -2 ) { // should not get here
 								if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-									ShowWarningMessage( "Step 6: Coil control failed for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+									ShowWarningMessage( "Step 6: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 									ShowContinueError( "  supply air temperature target determined to be outside the range." );
 									ShowContinueErrorTimeStamp( "Supply air temperature = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), and the simulation continues." );
 								}
-								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
+								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 							}
 						}
 						outletTemp = DataLoopNode::Node( OutletNode ).Temp;
@@ -487,19 +487,19 @@ namespace SZVAVModel {
 							}
 							if ( abs( DataLoopNode::Node( OutletNode ).Temp - maxOutletTemp ) > 0.1 ) { // oulet temperature can sometimes fluctuate around the target by 0.02+ even when PLR changes by 1E-12
 								if ( SZVAVModel.MaxIterIndex == 0 ) {
-									ShowWarningMessage( "Step 8: Coil control failed to converge for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+									ShowWarningMessage( "Step 8: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 									ShowContinueError( "  Iteration limit exceeded in calculating system supply air outlet temperature." );
 									ShowContinueErrorTimeStamp( "Supply air temperature target = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), supply air temperature = " + General::TrimSigDigits( DataLoopNode::Node( OutletNode ).Temp, 3 ) + " (C), and the simulation continues." );
 								}
-								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
+								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 							}
 						} else if ( SolFlag == -2 ) { // should not get here
 							if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-								ShowWarningMessage( "Step 8: Coil control failed for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+								ShowWarningMessage( "Step 8: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 								ShowContinueError( "  supply air temperature target determined to be outside the range." );
 								ShowContinueErrorTimeStamp( "Supply air temperature = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), and the simulation continues." );
 							}
-							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
+							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 						}
 					}
 
@@ -522,19 +522,19 @@ namespace SZVAVModel {
 
 							if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
 								if ( SZVAVModel.MaxIterIndex == 0 ) {
-									ShowWarningMessage( "Step 9: Coil control failed to converge for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+									ShowWarningMessage( "Step 9: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 									ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
 									ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + General::TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
 								}
-								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
+								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
 							}
 						} else if ( SolFlag == -2 ) {
 							if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-								ShowWarningMessage( "Step 9: Coil control failed for " + SZVAVModel.UnitarySystemType + ':' + SZVAVModel.Name );
+								ShowWarningMessage( "Step 9: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 								ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
 								ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
 							}
-							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitarySystemType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
+							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 						}
 					}
 				}
@@ -669,8 +669,8 @@ namespace SZVAVModel {
 		Par( 16 ) = 1.0; // iteration method, 1 = modulate coil capacity, 2 = modulate air flow rate
 		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning in PTUnit version in General.cc
 
-		int InletNode = SZVAVModel.AirInNode; // *** variable name is different from UnitarySystem model
-		int OutletNode = SZVAVModel.AirOutNode; // *** variable name is different from UnitarySystem model
+		int InletNode = SZVAVModel.AirInNode;
+		int OutletNode = SZVAVModel.AirOutNode;
 		Real64 ZoneTemp = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).Temp;
 		// initialize flow variables to 0
 		Real64 lowWaterMdot = 0.0;

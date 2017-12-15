@@ -407,8 +407,8 @@ TEST_F( EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1 ) {
 
 	DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
 
-	InletNode = HVACUnitarySystem::UnitarySystem( 1 ).UnitarySystemInletNodeNum;
-	OutletNode = HVACUnitarySystem::UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	InletNode = HVACUnitarySystem::UnitarySystem( 1 ).AirInNode;
+	OutletNode = HVACUnitarySystem::UnitarySystem( 1 ).AirOutNode;
 	ControlZoneNum = HVACUnitarySystem::UnitarySystem( 1 ).NodeNumOfControlledZone;
 
 	// set up unitary system inlet condtions

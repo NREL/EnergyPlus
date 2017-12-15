@@ -53,7 +53,6 @@ extern "C" {
 // C++ Headers
 #include <cmath>
 #include <string>
-#include <iostream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
@@ -237,7 +236,6 @@ namespace SimulationManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::KickOffSimulation;
 		using DataHVACGlobals::TimeStepSys;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;

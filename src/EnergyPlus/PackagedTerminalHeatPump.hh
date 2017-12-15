@@ -118,8 +118,6 @@ namespace PackagedTerminalHeatPump {
 	{
 		// Members
 		// input data
-		std::string Name; // name of unit
-		std::string UnitType; // type of unit
 		int UnitType_Num; // paramter equivalent to type of unit
 		int ZoneEquipType; // Type of PT unit
 		bool useVSCoilModel; // does PT use VS coil models
@@ -127,17 +125,12 @@ namespace PackagedTerminalHeatPump {
 		Real64 MaxCoolAirVolFlow; // supply air volumetric flow rate during cooling operation [m3/s]
 		Real64 MaxHeatAirVolFlow; // supply air volumetric flow rate during heating operation [m3/s]
 		Real64 MaxNoCoolHeatAirVolFlow; // supply air volumetric flow rate when no cooling or heating [m3/s]
-		Real64 MaxCoolAirMassFlow; // supply air mass flow rate during cooling operation [kg/s]
-		Real64 MaxHeatAirMassFlow; // supply air mass flow rate during heating operation [kg/s]
-		Real64 MaxNoCoolHeatAirMassFlow; // supply air mass flow rate when no cooling or heating [kg/s]
 		Real64 CoolOutAirVolFlow; // OA volumetric flow rate during cooling operation [m3/s]
 		Real64 HeatOutAirVolFlow; // OA volumetric flow rate during heating operation [m3/s]
 		Real64 NoCoolHeatOutAirVolFlow; // OA volumetric flow rate when no cooling or heating [m3/s]
 		Real64 CoolOutAirMassFlow; // OA mass flow rate during cooling operation [kg/s]
 		Real64 HeatOutAirMassFlow; // OA mass flow rate during heating operation [kg/s]
 		Real64 NoCoolHeatOutAirMassFlow; // OA mass flow rate when no cooling or heating [kg/s]
-		int AirInNode; // inlet air node number
-		int AirOutNode; // outlet air node number
 		int OutsideAirNode; // OAmixer outside air node number
 		int AirReliefNode; // OAmixer relief air node number
 		std::string OAMixType; // type of outside air mixer
@@ -196,7 +189,6 @@ namespace PackagedTerminalHeatPump {
 		Real64 DesignHeatingCapacity; // Nominal Capacity of Heating Coil [W]
 		Real64 DesignCoolingCapacity; // Nominal Capacity of Cooling Coil [W]
 		Real64 DesignSuppHeatingCapacity; // Nominal Capacity of Supplemental Heating Coil [W]
-		int ControlZoneNum; // index of unit in ZoneEquipConfig
 		int NodeNumOfControlledZone; // node number of control zone
 		// addition for OA to Zone Units
 		bool ATMixerExists; // True if there is an ATMixer
@@ -265,17 +257,26 @@ namespace PackagedTerminalHeatPump {
 		int ZonePtr; // pointer to a zone served by a fancoil unit
 		int HVACSizingIndex; // index of a HVACSizing object for a fancoil unit
 		bool FirstPass; // used to reset sizing flags
-		Real64 CoolCoilWaterFlowRatio; //
-		Real64 HeatCoilWaterFlowRatio; //
 		Real64 HeatCoilWaterFlowRate; //
-		int MaxIterIndex; //
-		int RegulaFalsIFailedIndex; //
 		Real64 ControlZoneMassFlowFrac; //
 
-		Real64 DesignMinOutletTemp;
-		Real64 DesignMaxOutletTemp;
-		Real64 LowSpeedCoolFanRatio;
-		Real64 LowSpeedHeatFanRatio;
+		// variables used in SZVAV model:
+		std::string Name; // name of unit
+		std::string UnitType; // type of unit
+		int MaxIterIndex; // used in PLR calculations for sensible load
+		int RegulaFalsIFailedIndex; // used in PLR calculations for sensible load
+		Real64 CoolCoilWaterFlowRatio; // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
+		Real64 HeatCoilWaterFlowRatio; // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
+		int ControlZoneNum; // index of unit in ZoneEquipConfig
+		int AirInNode; // Parent inlet air node number
+		int AirOutNode; // Parent outlet air node number
+		Real64 MaxCoolAirMassFlow; // Maximum coil air mass flow for cooling [kg/s]
+		Real64 MaxHeatAirMassFlow; // Maximum coil air mass flow for heating [kg/s]
+		Real64 MaxNoCoolHeatAirMassFlow; // Maximum coil air mass flow for no cooling or heating [kg/s]
+		Real64 DesignMinOutletTemp; // DOAS DX Cooling or SZVAV coil outlet air minimum temperature [C]
+		Real64 DesignMaxOutletTemp; // Maximum supply air temperature from heating coil [C]
+		Real64 LowSpeedCoolFanRatio; // cooling mode ratio of low speed fan flow to full flow rate
+		Real64 LowSpeedHeatFanRatio; // heating mode ratio of low speed fan flow to full flow rate
 		Real64 MaxCoolCoilFluidFlow; // water flow rate for cooling coil [kg/s] - NOT USED in PTHP
 		Real64 MaxHeatCoilFluidFlow; // water or steam mass flow rate for heating coil [kg/s]
 		int CoolCoilLoopNum; // plant loop index for water cooling coil - NOT USED in PTHP
@@ -306,17 +307,12 @@ namespace PackagedTerminalHeatPump {
 			MaxCoolAirVolFlow( 0.0 ),
 			MaxHeatAirVolFlow( 0.0 ),
 			MaxNoCoolHeatAirVolFlow( 0.0 ),
-			MaxCoolAirMassFlow( 0.0 ),
-			MaxHeatAirMassFlow( 0.0 ),
-			MaxNoCoolHeatAirMassFlow( 0.0 ),
 			CoolOutAirVolFlow( 0.0 ),
 			HeatOutAirVolFlow( 0.0 ),
 			NoCoolHeatOutAirVolFlow( 0.0 ),
 			CoolOutAirMassFlow( 0.0 ),
 			HeatOutAirMassFlow( 0.0 ),
 			NoCoolHeatOutAirMassFlow( 0.0 ),
-			AirInNode( 0 ),
-			AirOutNode( 0 ),
 			OutsideAirNode( 0 ),
 			AirReliefNode( 0 ),
 			OAMixIndex( 0 ),
@@ -357,7 +353,6 @@ namespace PackagedTerminalHeatPump {
 			DesignHeatingCapacity( 0.0 ),
 			DesignCoolingCapacity( 0.0 ),
 			DesignSuppHeatingCapacity( 0.0 ),
-			ControlZoneNum( 0 ),
 			NodeNumOfControlledZone( 0 ),
 			ATMixerExists( false ),
 			ATMixerIndex( 0 ),
@@ -418,15 +413,23 @@ namespace PackagedTerminalHeatPump {
 			ZonePtr(0),
 			HVACSizingIndex(0),
 			FirstPass( true ),
-			CoolCoilWaterFlowRatio( 0.0 ),
-			HeatCoilWaterFlowRatio( 0.0 ),
 			HeatCoilWaterFlowRate( 0.0 ),
+			ControlZoneMassFlowFrac( 1.0 ),
+			// variables used in SZVAV model:
 			MaxIterIndex( 0 ),
 			RegulaFalsIFailedIndex( 0 ),
-			ControlZoneMassFlowFrac( 1.0 ),
-
+			CoolCoilWaterFlowRatio( 0.0 ),
+			HeatCoilWaterFlowRatio( 0.0 ),
+			ControlZoneNum( 0 ),
+			AirInNode( 0 ),
+			AirOutNode( 0 ),
+			MaxCoolAirMassFlow( 0.0 ),
+			MaxHeatAirMassFlow( 0.0 ),
+			MaxNoCoolHeatAirMassFlow( 0.0 ),
 			DesignMinOutletTemp( 0.0 ),
 			DesignMaxOutletTemp( 0.0 ),
+			LowSpeedCoolFanRatio( 0.0 ),
+			LowSpeedHeatFanRatio( 0.0 ),
 			MaxCoolCoilFluidFlow( 0.0 ),
 			MaxHeatCoilFluidFlow( 0.0 ),
 			CoolCoilLoopNum( 0 ),
@@ -441,9 +444,11 @@ namespace PackagedTerminalHeatPump {
 			CoolCoilFluidOutletNodeNum( 0 ),
 			CoolCoilInletNodeNum( 0 ),
 			CoolCoilOutletNodeNum( 0 ),
-			HeatCoilInletNodeNum( 0 )
+			HeatCoilFluidInletNode( 0 ),
+			HeatCoilFluidOutletNodeNum( 0 ),
+			HeatCoilInletNodeNum( 0 ),
+			HeatCoilOutletNodeNum( 0 )
 			{}
-
 	};
 
 	struct PTUnitNumericFieldData

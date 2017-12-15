@@ -413,8 +413,8 @@ namespace HVACUnitarySystem {
 
 		// MassFlowRateMaxAvail issues are impeding non-VAV air loop equipment by limiting air flow
 		// temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
-		TempMassFlowRateMaxAvail = Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail;
-		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = UnitarySystem( UnitarySysNum ).DesignMassFlowRate;
+		TempMassFlowRateMaxAvail = Node( UnitarySystem( UnitarySysNum ).AirInNode ).MassFlowRateMaxAvail;
+		Node( UnitarySystem( UnitarySysNum ).AirInNode ).MassFlowRateMaxAvail = UnitarySystem( UnitarySysNum ).DesignMassFlowRate;
 
 		HXUnitOn = false;
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).ControlType );
@@ -478,7 +478,7 @@ namespace HVACUnitarySystem {
 		// can't do this since there are other checks that need this flag (e.g., HVACManager, SetHeatToReturnAirFlag())
 		//  AirLoopControlInfo(AirLoopNum)%UnitarySys = .FALSE.
 
-		Node( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ).MassFlowRateMaxAvail = TempMassFlowRateMaxAvail;
+		Node( UnitarySystem( UnitarySysNum ).AirInNode ).MassFlowRateMaxAvail = TempMassFlowRateMaxAvail;
 
 	}
 
@@ -588,7 +588,7 @@ namespace HVACUnitarySystem {
 				AirLoopControlInfo( AirLoopNum ).CycFanSchedPtr = UnitarySystem( UnitarySysNum ).FanOpModeSchedPtr;
 			} else if( AirLoopNum < 0 ) {
 				if( UnitarySystem( UnitarySysNum ).ControlType == CCM_ASHRAE ) {
-					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": " + UnitarySystem( UnitarySysNum ).Name );
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + ": " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "  Invalid application of Control Type = SingleZoneVAV in outdoor air system." );
 					ShowFatalError( "InitUnitarySystems: Program terminated for previous conditions." );
 				}
@@ -1012,13 +1012,13 @@ namespace HVACUnitarySystem {
 
 			if ( Node( ControlNode ).TempSetPoint == SensedNodeFlagValue && UnitarySystem( UnitarySysNum ).ControlType == SetPointBased ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
-					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing temperature setpoint for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + ": Missing temperature setpoint for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 					SetPointErrorFlag = true;
 				} else {
 					CheckIfNodeSetPointManagedByEMS( ControlNode, iTemperatureSetPoint, SetPointErrorFlag );
 					if ( SetPointErrorFlag ) {
-						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing temperature setpoint for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + ": Missing temperature setpoint for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 						ShowContinueError( "  or use an EMS actuator to establish a temperature setpoint at the coil control node." );
 					}
@@ -1026,13 +1026,13 @@ namespace HVACUnitarySystem {
 			}
 			if ( ( UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_None ) && ( Node( ControlNode ).HumRatMax == SensedNodeFlagValue ) && UnitarySystem( UnitarySysNum ).ControlType == SetPointBased && CoilType == CoolingCoil ) {
 				if ( ! AnyEnergyManagementSystemInModel ) {
-					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 					SetPointErrorFlag = true;
 				} else {
 					CheckIfNodeSetPointManagedByEMS( ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag );
 					if ( SetPointErrorFlag ) {
-						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the coil control node." );
 						ShowContinueError( "  or use an EMS actuator to establish a maximum humidity ratio setpoint." );
 					}
@@ -1088,7 +1088,7 @@ namespace HVACUnitarySystem {
 		{ auto const SELECT_CASE_var( ControlType );
 		if ( SELECT_CASE_var == LoadBased || SELECT_CASE_var == CCM_ASHRAE ) {
 			if ( AirLoopNum == -1 ) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAirUnit
-				ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
+				ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 				ShowFatalError( "...Load based control is not allowed when used with ZoneHVAC:OutdoorAirUnit" );
 			}
 
@@ -1381,7 +1381,7 @@ namespace HVACUnitarySystem {
 						if ( fanHasPowerSpeedRatioCurve ) {
 
 							if ( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow ) {
-								ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
+								ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 								ShowContinueError( "...For fan type and name = " + FanType + " \"" + FanName + "\"" );
 								ShowContinueError( "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the same as the unitary system volumetric flow rate." );
 								ShowContinueError( "...Fan volumetric flow rate            = " + RoundSigDigits( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate, 5 ) + " m3/s." );
@@ -1416,13 +1416,13 @@ namespace HVACUnitarySystem {
 				}
 				MyCheckFlag( UnitarySysNum ) = false;
 				if ( UnitarySystem( UnitarySysNum ).ZoneSequenceCoolingNum == 0 ) {
-					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": No matching air terminal found in the zone equipment list for zone = " + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + "." );
-					ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  Preceding condition(s) causes termination." );
+					ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": No matching air terminal found in the zone equipment list for zone = " + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + "." );
+					ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitType + " input.  Preceding condition(s) causes termination." );
 				}
 			}
 			if ( UnitarySystem( UnitarySysNum ).ZoneInletNode == 0 ) {
-				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": The zone inlet node in the controlled zone (" + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + ") is not found." );
-				ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitarySystemType + " input.  Preceding condition(s) causes termination." );
+				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\": The zone inlet node in the controlled zone (" + Zone( UnitarySystem( UnitarySysNum ).ControlZoneNum ).Name + ") is not found." );
+				ShowFatalError( "Subroutine InitLoadBasedControl: Errors found in getting " + UnitarySystem( UnitarySysNum ).UnitType + " input.  Preceding condition(s) causes termination." );
 			}
 		}
 
@@ -1454,21 +1454,21 @@ namespace HVACUnitarySystem {
 			ZoneInNode = UnitarySystem( UnitarySysNum ).ZoneInletNode;
 			MinHumRat = Node( ZoneInNode ).HumRat;
 			MassFlowRate = Node( ZoneInNode ).MassFlowRate / UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac;
-			if ( Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).Temp < Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp ) MinHumRat = Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).HumRat;
+			if ( Node( UnitarySystem( UnitarySysNum ).AirOutNode ).Temp < Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp ) MinHumRat = Node( UnitarySystem( UnitarySysNum ).AirOutNode ).HumRat;
 			if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
-				DeltaMassRate = Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).MassFlowRate - Node( ZoneInNode ).MassFlowRate / UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac;
+				DeltaMassRate = Node( UnitarySystem( UnitarySysNum ).AirOutNode ).MassFlowRate - Node( ZoneInNode ).MassFlowRate / UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac;
 				if ( DeltaMassRate < 0.0 ) DeltaMassRate = 0.0;
 			} else {
-				MassFlowRate = Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).MassFlowRate;
+				MassFlowRate = Node( UnitarySystem( UnitarySysNum ).AirOutNode ).MassFlowRate;
 				DeltaMassRate = 0.0;
 			}
-			UnitarySystem( UnitarySysNum ).SenLoadLoss = MassFlowRate * ( PsyHFnTdbW( Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneInNode ).Temp, MinHumRat ) ) + DeltaMassRate * ( PsyHFnTdbW( Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).Temp, MinHumRat ) - PsyHFnTdbW( Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp, MinHumRat ) );
+			UnitarySystem( UnitarySysNum ).SenLoadLoss = MassFlowRate * ( PsyHFnTdbW( Node( UnitarySystem( UnitarySysNum ).AirOutNode ).Temp, MinHumRat ) - PsyHFnTdbW( Node( ZoneInNode ).Temp, MinHumRat ) ) + DeltaMassRate * ( PsyHFnTdbW( Node( UnitarySystem( UnitarySysNum ).AirOutNode ).Temp, MinHumRat ) - PsyHFnTdbW( Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp, MinHumRat ) );
 			if ( std::abs( UnitarySystem( UnitarySysNum ).SensibleLoadMet ) > 0.0 ) {
 				if ( std::abs( UnitarySystem( UnitarySysNum ).SenLoadLoss / UnitarySystem( UnitarySysNum ).SensibleLoadMet ) < 0.001 ) UnitarySystem( UnitarySysNum ).SenLoadLoss = 0.0;
 			}
 			if ( UnitarySystem( UnitarySysNum ).Humidistat ) {
 				MaxTemp = Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp;
-				UnitarySystem( UnitarySysNum ).LatLoadLoss = MassFlowRate * ( PsyHFnTdbW( MaxTemp, Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).HumRat ) - PsyHFnTdbW( MaxTemp, Node( ZoneInNode ).HumRat ) ) + DeltaMassRate * ( PsyHFnTdbW( MaxTemp, Node( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ).HumRat ) - PsyHFnTdbW( MaxTemp, Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat ) );
+				UnitarySystem( UnitarySysNum ).LatLoadLoss = MassFlowRate * ( PsyHFnTdbW( MaxTemp, Node( UnitarySystem( UnitarySysNum ).AirOutNode ).HumRat ) - PsyHFnTdbW( MaxTemp, Node( ZoneInNode ).HumRat ) ) + DeltaMassRate * ( PsyHFnTdbW( MaxTemp, Node( UnitarySystem( UnitarySysNum ).AirOutNode ).HumRat ) - PsyHFnTdbW( MaxTemp, Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat ) );
 				if ( std::abs( UnitarySystem( UnitarySysNum ).LatentLoadMet ) > 0.0 ) {
 					if ( std::abs( UnitarySystem( UnitarySysNum ).LatLoadLoss / UnitarySystem( UnitarySysNum ).LatentLoadMet ) < 0.001 ) UnitarySystem( UnitarySysNum ).LatLoadLoss = 0.0;
 				}
@@ -1853,7 +1853,7 @@ namespace HVACUnitarySystem {
 		ManageEMS( emsCallFromUnitarySystemSizing, anyEMSRan ); // calling point
 
 		CompName = UnitarySystem( UnitarySysNum ).Name;
-		CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
+		CompType = UnitarySystem( UnitarySysNum ).UnitType;
 		CoolingSAFlowMethod = UnitarySystem( UnitarySysNum ).CoolingSAFMethod;
 		HeatingSAFlowMethod = UnitarySystem( UnitarySysNum ).HeatingSAFMethod;
 // can't reset this to 0 for systems where DX heating coil is in downstream unit and DX cooling coil is in upstream unit
@@ -2622,11 +2622,11 @@ namespace HVACUnitarySystem {
 					if ( InitLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax >= SmallAirVolFlow ) {
 						UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac = InitLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
 					} else {
-						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( " The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1." );
 						UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac = 1.0;
 					}
-					ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Fraction of Supply Air Flow That Goes Through the Controlling Zone", UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac );
+					ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitType, UnitarySystem( UnitarySysNum ).Name, "Fraction of Supply Air Flow That Goes Through the Controlling Zone", UnitarySystem( UnitarySysNum ).ControlZoneMassFlowFrac );
 				}
 			}
 		} else {
@@ -2672,7 +2672,7 @@ namespace HVACUnitarySystem {
 
 			// check that MaxNoCoolHeatAirVolFlow is less than both MaxCoolAirVolFlow and MaxHeatAirVolFlow
 			if( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow || UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow >= UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow ) {
-				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " = " + UnitarySystem( UnitarySysNum ).Name );
+				ShowSevereError( UnitarySystem( UnitarySysNum ).UnitType + " = " + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( " For SingleZoneVAV control the No Load Supply Air Flow Rate must be less than both the cooling and heating supply air flow rates." );
 				UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = min( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow ) - 0.01;
 				ShowContinueError( " The SingleZoneVAV control No Load Supply Air Flow Rate is reset to " + TrimSigDigits( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow, 5 ) + " and the simulation continues." );
@@ -3161,7 +3161,7 @@ namespace HVACUnitarySystem {
 			SupHeatCoilOutletNode = 0;
 
 			CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
-			UnitarySystem( UnitarySysNum ).UnitarySystemType = CurrentModuleObject;
+			UnitarySystem( UnitarySysNum ).UnitType = CurrentModuleObject;
 			UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
 			UnitarySystem( UnitarySysNum ).iterationMode.allocate( 20 );
 
@@ -3246,8 +3246,8 @@ namespace HVACUnitarySystem {
 				}
 			}
 
-			UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum = GetOnlySingleNode( Alphas( iAirInletNodeNameAlphaNum ), ErrorsFound, CurrentModuleObject, Alphas( iNameAlphaNum ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-			UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum = GetOnlySingleNode( Alphas( iAirOutletNodeNameAlphaNum ), ErrorsFound, CurrentModuleObject, Alphas( iNameAlphaNum ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+			UnitarySystem( UnitarySysNum ).AirInNode = GetOnlySingleNode( Alphas( iAirInletNodeNameAlphaNum ), ErrorsFound, CurrentModuleObject, Alphas( iNameAlphaNum ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			UnitarySystem( UnitarySysNum ).AirOutNode = GetOnlySingleNode( Alphas( iAirOutletNodeNameAlphaNum ), ErrorsFound, CurrentModuleObject, Alphas( iNameAlphaNum ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 			// TotalZonesOnAirLoop doesn't appear to be used anywhere
 			//TotalZonesOnAirLoop = 0;
@@ -3261,7 +3261,7 @@ namespace HVACUnitarySystem {
 			ZoneInletNodeFound = false;
 
 			// Get AirTerminal mixer data
-			GetATMixer( UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ATMixerName, UnitarySystem( UnitarySysNum ).ATMixerIndex, UnitarySystem( UnitarySysNum ).ATMixerType, UnitarySystem( UnitarySysNum ).ATMixerPriNode, UnitarySystem( UnitarySysNum ).ATMixerSecNode, UnitarySystem( UnitarySysNum ).ATMixerOutNode, UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum );
+			GetATMixer( UnitarySystem( UnitarySysNum ).Name, UnitarySystem( UnitarySysNum ).ATMixerName, UnitarySystem( UnitarySysNum ).ATMixerIndex, UnitarySystem( UnitarySysNum ).ATMixerType, UnitarySystem( UnitarySysNum ).ATMixerPriNode, UnitarySystem( UnitarySysNum ).ATMixerSecNode, UnitarySystem( UnitarySysNum ).ATMixerOutNode, UnitarySystem( UnitarySysNum ).AirOutNode );
 			if ( UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_InletSide || UnitarySystem( UnitarySysNum ).ATMixerType == ATMixer_SupplySide ) {
 				UnitarySystem( UnitarySysNum ).ATMixerExists = true;
 			}
@@ -3270,7 +3270,7 @@ namespace HVACUnitarySystem {
 			if ( !UnitarySystem( UnitarySysNum ).ATMixerExists && !AirLoopFound && !OASysFound ) {
 				for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 					for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
-						if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
+						if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).AirInNode ) continue;
 						ZoneEquipmentFound = true;
 						//               Find the controlled zone number for the specified thermostat location
 						UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
@@ -3291,7 +3291,7 @@ namespace HVACUnitarySystem {
 					}
 					if ( ZoneEquipmentFound ) {
 						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
-							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).AirOutNode ) continue;
 								ZoneInletNodeFound = true;
 							break;
 						}
@@ -3300,7 +3300,7 @@ namespace HVACUnitarySystem {
 				if ( ! ZoneInletNodeFound ) {
 					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 						for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
-							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+							if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).AirOutNode ) continue;
 								ZoneInletNodeFound = true;
 								ZoneEquipmentFound = true;
 							break;
@@ -3336,7 +3336,7 @@ namespace HVACUnitarySystem {
 							//++TotalZonesOnAirLoop;
 							TotalFloorAreaOnAirLoop = Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).FloorArea;
 							UnitarySystem( UnitarySysNum ).AirLoopEquipment = false;
-							UnitarySystem( UnitarySysNum ).ZoneInletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+							UnitarySystem( UnitarySysNum ).ZoneInletNode = UnitarySystem( UnitarySysNum ).AirOutNode;
 							if ( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex > 0 ) {
 								for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
 									if ( ( ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipType_Num( EquipNum ) != ZoneUnitarySystem_Num ) || ZoneEquipList( ZoneEquipConfig( ControlledZoneNum ).EquipListIndex ).EquipName( EquipNum ) != UnitarySystem( UnitarySysNum ).Name ) continue;
@@ -3349,7 +3349,7 @@ namespace HVACUnitarySystem {
 						}
 						if ( ZoneEquipmentFound ) {
 							for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
-								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).AirOutNode ) continue;
 								ZoneInletNodeFound = true;
 								break;
 							}
@@ -3358,7 +3358,7 @@ namespace HVACUnitarySystem {
 					if ( !ZoneInletNodeFound ) {
 						for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 							for ( ZoneInletNum = 1; ZoneInletNum <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++ZoneInletNum ) {
-								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) continue;
+								if ( ZoneEquipConfig( ControlledZoneNum ).InletNode( ZoneInletNum ) != UnitarySystem( UnitarySysNum ).AirOutNode ) continue;
 								ZoneInletNodeFound = true;
 								ZoneEquipmentFound = true;
 								break;
@@ -3386,7 +3386,7 @@ namespace HVACUnitarySystem {
 				if ( !AirLoopFound && !OASysFound ) {
 					for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 						for ( ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
-							if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) continue;
+							if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != UnitarySystem( UnitarySysNum ).AirInNode ) continue;
 							ZoneEquipmentFound = true;
 							//               Find the controlled zone number for the specified thermostat location
 							UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
@@ -4255,7 +4255,7 @@ namespace HVACUnitarySystem {
 			}
 
 			// coil outlet node set point has priority, IF not exist, then use system outlet node
-			if ( NodeHasSPMCtrlVarType( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+			if ( NodeHasSPMCtrlVarType( UnitarySystem( UnitarySysNum ).AirOutNode, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum = UnitarySystem( UnitarySysNum ).AirOutNode;
 			if ( NodeHasSPMCtrlVarType( HeatingCoilOutletNode, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SystemHeatControlNodeNum = HeatingCoilOutletNode;
 
 			UnitarySystem( UnitarySysNum ).HeatCoilInletNodeNum = HeatingCoilInletNode;
@@ -4795,7 +4795,7 @@ namespace HVACUnitarySystem {
 						if ( ! InletNodeNotControlled ) {
 							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( ControllerTypes( ControllerSimple_Type ) + " found for " + CoolingCoilType + " = \"" + CoolingCoilName + ".\"" );
-							ShowContinueError( "...water coil controllers are not used with " + UnitarySystem( UnitarySysNum ).UnitarySystemType );
+							ShowContinueError( "...water coil controllers are not used with " + UnitarySystem( UnitarySysNum ).UnitType );
 							ErrorsFound = true;
 						}
 
@@ -5062,7 +5062,7 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).VarSpeedCoolingCoil = true;
 				}
 
-				if ( NodeHasSPMCtrlVarType( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+				if ( NodeHasSPMCtrlVarType( UnitarySystem( UnitarySysNum ).AirOutNode, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum = UnitarySystem( UnitarySysNum ).AirOutNode;
 				if ( NodeHasSPMCtrlVarType( CoolingCoilOutletNode, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SystemCoolControlNodeNum = CoolingCoilOutletNode;
 
 				UnitarySystem( UnitarySysNum ).CoolCoilInletNodeNum = CoolingCoilInletNode;
@@ -5387,7 +5387,7 @@ namespace HVACUnitarySystem {
 
 			} // IF(.NOT. lAlphaBlanks(iSuppHeatCoilTypeAlphaNum))THEN
 
-			if ( NodeHasSPMCtrlVarType( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SuppHeatControlNodeNum = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+			if ( NodeHasSPMCtrlVarType( UnitarySystem( UnitarySysNum ).AirOutNode, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SuppHeatControlNodeNum = UnitarySystem( UnitarySysNum ).AirOutNode;
 			if ( NodeHasSPMCtrlVarType( SupHeatCoilOutletNode, iCtrlVarType_Temp ) ) UnitarySystem( UnitarySysNum ).SuppHeatControlNodeNum = SupHeatCoilOutletNode;
 
 			// Add supplemental heating coil to component sets array
@@ -5840,11 +5840,11 @@ namespace HVACUnitarySystem {
 			// check node connections
 			if ( UnitarySystem( UnitarySysNum ).FanPlace == BlowThru ) {
 
-				if ( FanInletNode != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) {
+				if ( FanInletNode != UnitarySystem( UnitarySysNum ).AirInNode ) {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "When a blow through fan is specified, the fan inlet node name must be the same as the unitary system inlet node name." );
 					ShowContinueError( "...Fan inlet node name           = " + NodeID( FanInletNode ) );
-					ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) );
+					ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirInNode ) );
 					ErrorsFound = true;
 				}
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
@@ -5863,20 +5863,20 @@ namespace HVACUnitarySystem {
 						ErrorsFound = true;
 					}
 					if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
-						if ( SupHeatCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) {
+						if ( SupHeatCoilOutletNode != UnitarySystem( UnitarySysNum ).AirOutNode ) {
 							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "The reheat coil outlet node name must be the same as the unitary system outlet node name." );
 							ShowContinueError( "...Reheat coil outlet node name   = " + NodeID( SupHeatCoilOutletNode ) );
-							ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
+							ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirOutNode ) );
 							//                ErrorsFound=.TRUE.
 						}
 					} else { // IF((UnitarySystem(UnitarySysNum)%Humidistat ...
 						// Heating coil outlet node name must be the same as the Unitary system outlet node name
-						if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && HeatingCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) {
+						if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && HeatingCoilOutletNode != UnitarySystem( UnitarySysNum ).AirOutNode ) {
 							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "When a blow through fan is specified, the heating coil outlet node name must be the same as the unitary system outlet node name." );
 							ShowContinueError( "...Heating coil outlet node name  = " + NodeID( HeatingCoilOutletNode ) );
-							ShowContinueError( "...Unitary system outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
+							ShowContinueError( "...Unitary system outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirOutNode ) );
 							ErrorsFound = true;
 						}
 					}
@@ -5895,11 +5895,11 @@ namespace HVACUnitarySystem {
 						ShowContinueError( "...Cooling coil inlet node name  = " + NodeID( CoolingCoilInletNode ) );
 						ErrorsFound = true;
 					}
-					if ( CoolingCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+					if ( CoolingCoilOutletNode != UnitarySystem( UnitarySysNum ).AirOutNode && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a blow through fan is specified, the cooling coil outlet node name must be the same as the unitary system outlet node name." );
 						ShowContinueError( "...Cooling coil outlet node name   = " + NodeID( CoolingCoilOutletNode ) );
-						ShowContinueError( "...UnitarySystem outlet node name  = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
+						ShowContinueError( "...UnitarySystem outlet node name  = " + NodeID( UnitarySystem( UnitarySysNum ).AirOutNode ) );
 						ErrorsFound = true;
 					}
 				}
@@ -5907,11 +5907,11 @@ namespace HVACUnitarySystem {
 			} else { // ELSE from IF(UnitarySystem(UnitarySysNum)%FanPlace .EQ. BlowThru)THEN
 
 				if ( UnitarySystem( UnitarySysNum ).CoolingCoilUpstream ) {
-					if ( CoolingCoilInletNode != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum && CoolingCoilInletNode != 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
+					if ( CoolingCoilInletNode != UnitarySystem( UnitarySysNum ).AirInNode && CoolingCoilInletNode != 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the cooling coil inlet node name must be the same as the unitary system inlet node name." );
 						ShowContinueError( "...Cooling coil inlet node name  = " + NodeID( CoolingCoilInletNode ) );
-						ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) );
+						ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirInNode ) );
 						ErrorsFound = true;
 					}
 					if ( CoolingCoilOutletNode != HeatingCoilInletNode && UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
@@ -5936,27 +5936,27 @@ namespace HVACUnitarySystem {
 							ShowContinueError( "...Reheat coil inlet node name = " + NodeID( SupHeatCoilInletNode ) );
 							//                ErrorsFound=.TRUE.
 						}
-						if ( SupHeatCoilOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) {
+						if ( SupHeatCoilOutletNode != UnitarySystem( UnitarySysNum ).AirOutNode ) {
 							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "The reheat coil outlet node name must be the same as the unitary system outlet node name." );
 							ShowContinueError( "...Reheat coil outlet node name   = " + NodeID( SupHeatCoilOutletNode ) );
-							ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
+							ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirOutNode ) );
 						}
 					} else {
-						if ( FanOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum && UnitarySystem( UnitarySysNum ).FanExists ) {
+						if ( FanOutletNode != UnitarySystem( UnitarySysNum ).AirOutNode && UnitarySystem( UnitarySysNum ).FanExists ) {
 							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "When a draw through fan is specified, the fan outlet node name must be the same as the unitary system outlet node name." );
 							ShowContinueError( "...Fan outlet node name        = " + NodeID( FanOutletNode ) );
-							ShowContinueError( "...Unitary system outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
+							ShowContinueError( "...Unitary system outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirOutNode ) );
 							ErrorsFound = true;
 						}
 					}
 				} else { // IF(UnitarySystem(UnitarySysNum)%CoolingCoilUpstream)THEN
-					if ( HeatingCoilInletNode != UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum && HeatingCoilInletNode != 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
+					if ( HeatingCoilInletNode != UnitarySystem( UnitarySysNum ).AirInNode && HeatingCoilInletNode != 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the heating coil inlet node name must be the same as the unitary system inlet node name." );
 						ShowContinueError( "...Heating coil inlet node name  = " + NodeID( HeatingCoilInletNode ) );
-						ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum ) );
+						ShowContinueError( "...UnitarySystem inlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirInNode ) );
 						ErrorsFound = true;
 					}
 					if ( HeatingCoilOutletNode != CoolingCoilInletNode && UnitarySystem( UnitarySysNum ).HeatCoilExists && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
@@ -5973,11 +5973,11 @@ namespace HVACUnitarySystem {
 						ShowContinueError( "...Fan inlet node name           = " + NodeID( FanInletNode ) );
 						ErrorsFound = true;
 					}
-					if ( FanOutletNode != UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum && UnitarySystem( UnitarySysNum ).FanExists ) {
+					if ( FanOutletNode != UnitarySystem( UnitarySysNum ).AirOutNode && UnitarySystem( UnitarySysNum ).FanExists ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "When a draw through fan is specified, the fan outlet node name must be the same as the unitary system outlet node name." );
 						ShowContinueError( "...Fan outlet node name           = " + NodeID( FanOutletNode ) );
-						ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum ) );
+						ShowContinueError( "...UnitarySystem outlet node name = " + NodeID( UnitarySystem( UnitarySysNum ).AirOutNode ) );
 						ErrorsFound = true;
 					}
 				}
@@ -6770,8 +6770,8 @@ namespace HVACUnitarySystem {
 		Real64 NoLoadOutletTemp; // outlet temp of system with coils off [C]
 
 		CompName = UnitarySystem( UnitarySysNum ).Name;
-		InletNode = UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum;
-		OutletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+		InletNode = UnitarySystem( UnitarySysNum ).AirInNode;
+		OutletNode = UnitarySystem( UnitarySysNum ).AirOutNode;
 		OpMode = UnitarySystem( UnitarySysNum ).FanOpMode;
 
 		if ( GetCurrentScheduleValue( UnitarySystem( UnitarySysNum ).SysAvailSchedPtr ) <= 0.0 ) {
@@ -7195,27 +7195,27 @@ namespace HVACUnitarySystem {
 						if ( SolFlag == -1 ) {
 							if ( std::abs( ZoneLoad - TempSensOutput ) > SmallLoad ) {
 								if ( UnitarySystem( UnitarySysNum ).MaxIterIndex == 0 ) {
-									ShowWarningMessage( "Coil control failed to converge for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
+									ShowWarningMessage( "Coil control failed to converge for " + UnitarySystem( UnitarySysNum ).UnitType + ':' + UnitarySystem( UnitarySysNum ).Name );
 									ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
 									ShowContinueErrorTimeStamp( "Sensible load to be met = " + TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
 								}
-								ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).MaxIterIndex, ZoneLoad, ZoneLoad );
+								ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).MaxIterIndex, ZoneLoad, ZoneLoad );
 							}
 						} else if ( SolFlag == -2 ) {
 							if ( UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex == 0 ) {
-								ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
+								ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitType + ':' + UnitarySystem( UnitarySysNum ).Name );
 								ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
 								ShowContinueErrorTimeStamp( "Sensible load to be met = " + TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
 							}
-							ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
+							ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 						}
 					} else if ( SolFlag == -2 ) {
 						if ( UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex == 0 ) {
-							ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
+							ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitType + ':' + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
 							ShowContinueErrorTimeStamp( "Sensible load to be met = " + TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
 						}
-						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
+						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", UnitarySystem( UnitarySysNum ).RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 					} // IF (SolFlag == -1) THEN
 				} else { // load is not bounded by capacity. Leave PLR=1 or turn off unit?
 					UnitarySystem( UnitarySysNum ).CoolingPartLoadFrac = 0.0;
@@ -7389,27 +7389,27 @@ namespace HVACUnitarySystem {
 			if ( SolFlagLat == -1 ) {
 				if ( std::abs( MoistureLoad - TempLatOutput ) > SmallLoad ) {
 					if ( UnitarySystem( UnitarySysNum ).LatMaxIterIndex == 0 ) {
-						ShowWarningMessage( "Coil control failed to converge for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
+						ShowWarningMessage( "Coil control failed to converge for " + UnitarySystem( UnitarySysNum ).UnitType + ':' + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating system Latent part-load ratio." );
 						ShowContinueErrorTimeStamp( "Latent load to be met = " + TrimSigDigits( MoistureLoad, 2 ) + " (watts), Latent output = " + TrimSigDigits( TempLatOutput, 2 ) + " (watts), and the simulation continues." );
 					}
-					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded in calculating Latent part-load ratio error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatMaxIterIndex, MoistureLoad, MoistureLoad );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded in calculating Latent part-load ratio error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatMaxIterIndex, MoistureLoad, MoistureLoad );
 				}
 			} else if ( SolFlagLat == -2 ) {
 				if ( UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex == 0 ) {
-					ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
+					ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitType + ':' + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "  Latent part-load ratio determined to be outside the range of 0-1." );
 					ShowContinueErrorTimeStamp( "Latent load to be met = " + TrimSigDigits( MoistureLoad, 2 ) + " (watts), and the simulation continues." );
 				}
-				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
+				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
 			}
 		} else if ( SolFlagLat == -2 ) {
 			if ( UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex == 0 ) {
-				ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitarySystemType + ':' + UnitarySystem( UnitarySysNum ).Name );
+				ShowWarningMessage( "Coil control failed for " + UnitarySystem( UnitarySysNum ).UnitType + ':' + UnitarySystem( UnitarySysNum ).Name );
 				ShowContinueError( "  Latent part-load ratio determined to be outside the range of 0-1." );
 				ShowContinueErrorTimeStamp( "Latent load to be met = " + TrimSigDigits( MoistureLoad, 2 ) + " (watts), and the simulation continues." );
 			}
-			ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
+			ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Latent part-load ratio out of range error continues. Latent load statistics:", UnitarySystem( UnitarySysNum ).LatRegulaFalsIFailedIndex, MoistureLoad, MoistureLoad );
 		}
 
 		FullSensibleOutput = TempSensOutput;
@@ -7588,7 +7588,7 @@ namespace HVACUnitarySystem {
 			}
 		} else {
 			// Calculate residual based on outlet temperature
-			OutletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+			OutletNode = UnitarySystem( UnitarySysNum ).AirOutNode;
 			Residuum = ( Node( OutletNode ).Temp - SATempTarget ) * 10.0;
 		}
 		
@@ -7853,8 +7853,8 @@ namespace HVACUnitarySystem {
 		int InletNode; // unitary system inlet node
 		int ZoneNode; // zone air node
 
-		OutletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
-		InletNode = UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum;
+		OutletNode = UnitarySystem( UnitarySysNum ).AirOutNode;
+		InletNode = UnitarySystem( UnitarySysNum ).AirInNode;
 		ZoneNode = UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone;
 
 		CoolingCompOn = 0;
@@ -8053,7 +8053,7 @@ namespace HVACUnitarySystem {
 		// Check delta T (outlet to space), IF positive use space HumRat ELSE outlet humrat to calculate
 		// sensible capacity as MdotDeltaH at constant humidity ratio
 		MinHumRatio = Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat;
-		OutletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+		OutletNode = UnitarySystem( UnitarySysNum ).AirOutNode;
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
 		ZoneTemp = Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp;
 		ZoneHumRat = Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat;
@@ -9032,23 +9032,23 @@ namespace HVACUnitarySystem {
 									if ( ! WarmupFlag ) {
 										if ( UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIter < 1 ) {
 											++UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIter;
-											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
+											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 											ShowContinueError( "Estimated part-load ratio   = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 										}
-										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 									}
 								} else if ( SolFla == -2 ) {
 									PartLoadFrac = ReqOutput / FullOutput;
 									if ( ! WarmupFlag ) {
 										if ( UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail < 1 ) {
 											++UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail;
-											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit sensible part-load ratio calculation unexpectedly failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - DX unit sensible part-load ratio calculation unexpectedly failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 										}
-										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit sensible part-load ratio calculation unexpectedly failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit sensible part-load ratio calculation unexpectedly failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 									}
 								}
 							} else if ( SolFla == -2 ) {
@@ -9056,11 +9056,11 @@ namespace HVACUnitarySystem {
 								if ( ! WarmupFlag ) {
 									if ( UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail2 < 1 ) {
 										++UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFail2;
-										ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+										ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 										ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 										ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 									}
-									ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex2, PartLoadFrac, PartLoadFrac );
+									ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedSensPLRFailIndex2, PartLoadFrac, PartLoadFrac );
 								}
 							}
 							if ( CoilType_Num == CoilDX_CoolingHXAssisted ) UnitarySystem( UnitarySysNum ).CompPartLoadRatio = PartLoadFrac;
@@ -9178,7 +9178,7 @@ namespace HVACUnitarySystem {
 							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, TESIceStorageCoilOutletResidual, 0.0, 1.0, Par );
 
 						} else {
-							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
+							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 							ShowFatalError( "ControlCoolingSystemToSP: Invalid cooling coil type = " + cAllCoilTypes( CoilType_Num ) );
 
 						}
@@ -9370,12 +9370,12 @@ namespace HVACUnitarySystem {
 										if ( ! WarmupFlag ) {
 											if ( UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIter < 1 ) {
 												++UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIter;
-												ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
+												ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 												ShowContinueError( "Estimated latent part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 												ShowContinueError( "Calculated latent part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 												ShowContinueErrorTimeStamp( "The calculated latent part-load ratio will be used and the simulation continues. Occurrence info:" );
 											}
-											ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIterIndex, PartLoadFrac, PartLoadFrac );
+											ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRIterIndex, PartLoadFrac, PartLoadFrac );
 										}
 
 									} else if ( SolFla == -2 ) {
@@ -9384,11 +9384,11 @@ namespace HVACUnitarySystem {
 										if ( ! WarmupFlag ) {
 											if ( UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail < 1 ) {
 												++UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail;
-												ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit latent part-load ratio calculation failed unexpectedly: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+												ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - DX unit latent part-load ratio calculation failed unexpectedly: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 												ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 												ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 											}
-											ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit latent part-load ratio calculation failed unexpectedly error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex, PartLoadFrac, PartLoadFrac );
+											ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit latent part-load ratio calculation failed unexpectedly error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex, PartLoadFrac, PartLoadFrac );
 										}
 									}
 								} else if ( SolFla == -2 ) {
@@ -9396,11 +9396,11 @@ namespace HVACUnitarySystem {
 									if ( ! WarmupFlag ) {
 										if ( UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail2 < 1 ) {
 											++UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFail2;
-											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+											ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 											ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 											ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 										}
-										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex2, PartLoadFrac, PartLoadFrac );
+										ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).HXAssistedCRLatPLRFailIndex2, PartLoadFrac, PartLoadFrac );
 									}
 								}
 							}
@@ -9568,12 +9568,12 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SensPLRIter < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SensPLRIter;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - Iteration limit exceeded calculating part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 				}
 			}
 		} else if ( SolFla == -2 ) {
@@ -9581,11 +9581,11 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SensPLRFail < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SensPLRFail;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 				}
 			}
 		}
@@ -9594,12 +9594,12 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).LatPLRIter < 1 ) {
 					++UnitarySystem( UnitarySysNum ).LatPLRIter;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating latent part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - Iteration limit exceeded calculating latent part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio   = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRIterIndex, PartLoadFrac, PartLoadFrac );
+				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRIterIndex, PartLoadFrac, PartLoadFrac );
 			}
 		} else if ( SolFlaLat == -2 && SolFla != -2 ) {
 			//               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
@@ -9611,11 +9611,11 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).LatPLRFail < 1 ) {
 					++UnitarySystem( UnitarySysNum ).LatPLRFail;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - latent part-load ratio calculation failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRFailIndex, PartLoadFrac, PartLoadFrac );
+				ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - latent part-load ratio calculation failed error continues. Latent PLR statistics follow.", UnitarySystem( UnitarySysNum ).LatPLRFailIndex, PartLoadFrac, PartLoadFrac );
 			}
 		}
 		//Set the final results
@@ -10096,7 +10096,7 @@ namespace HVACUnitarySystem {
 							// should never get here, user defined coil cannot be controlled and has already been simulated
 
 						} else {
-							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitarySystemType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
+							ShowMessage( " For :" + UnitarySystem( UnitarySysNum ).UnitType + "=\"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 							ShowFatalError( "ControlHeatingSystemToSP: Invalid heating coil type = " + cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) );
 
 						}}
@@ -10116,12 +10116,12 @@ namespace HVACUnitarySystem {
 				if ( !WarmupFlag ) {
 					if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter < 1 ) {
 						++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIter;
-						ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 						ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 						ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 					}
 				}
 			} else if ( SolFla == -2 ) {
@@ -10129,11 +10129,11 @@ namespace HVACUnitarySystem {
 				if ( !WarmupFlag ) {
 					if ( UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail < 1 ) {
 						++UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFail;
-						ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+						ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 						ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+						ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).HeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 					}
 				}
 			}
@@ -10436,12 +10436,12 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIter < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIter;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
 					ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 					ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );
 				}
 			} // IF(.NOT. WarmupFlag)THEN
 		} else if ( SolFla == -2 ) {
@@ -10449,11 +10449,11 @@ namespace HVACUnitarySystem {
 			if ( ! WarmupFlag ) {
 				if ( UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFail < 1 ) {
 					++UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFail;
-					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
+					ShowWarningError( UnitarySystem( UnitarySysNum ).UnitType + " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 					ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
+					ShowRecurringWarningErrorAtEnd( UnitarySystem( UnitarySysNum ).UnitType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.", UnitarySystem( UnitarySysNum ).SuppHeatCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac );
 				}
 			} // IF(.NOT. WarmupFlag)THEN
 		} // IF (SolFla == -1) THEN
@@ -11146,7 +11146,7 @@ namespace HVACUnitarySystem {
 		fanPartLoadRatio = PartLoadRatio;
 		if( UnitarySystem( UnitarySysNum ).simASHRAEModel ) fanPartLoadRatio = UnitarySystem( UnitarySysNum ).FanPartLoadRatio;
 		SpeedNum = max( UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).HeatingSpeedNum );
-		InletNode = UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum;
+		InletNode = UnitarySystem( UnitarySysNum ).AirInNode;
 
 		if ( SpeedNum > 1 ) {
 			if ( ( CoolingLoad && MultiOrVarSpeedCoolCoil( UnitarySysNum ) ) || ( HeatingLoad && MultiOrVarSpeedHeatCoil( UnitarySysNum ) ) ) {
@@ -11285,12 +11285,12 @@ namespace HVACUnitarySystem {
 		UnitarySystem( UnitarySysNum ).ElecPower = 0.0;
 		UnitarySystem( UnitarySysNum ).ElecPowerConsumption = 0.0;
 
-		OutletNode = UnitarySystem( UnitarySysNum ).UnitarySystemOutletNodeNum;
+		OutletNode = UnitarySystem( UnitarySysNum ).AirOutNode;
 		AirMassFlow = Node( OutletNode ).MassFlowRate;
 
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).ControlType );
 		if ( SELECT_CASE_var == SetPointBased ) {
-			InletNode = UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum;
+			InletNode = UnitarySystem( UnitarySysNum ).AirInNode;
 			MinHumRatio = Node( InletNode ).HumRat;
 			QSensUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( Node( InletNode ).Temp, MinHumRatio ) ) - UnitarySystem( UnitarySysNum ).SenLoadLoss;
 			QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
