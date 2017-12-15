@@ -5217,6 +5217,7 @@ Label9999: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Format descriptor for the environment title
+		static gio::Fmt A("(a)");
 		static std::string EnvironmentString( ",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]" );
 		static std::string TimeStepString( ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType" );
 		static std::string DailyString( ",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily " );
@@ -5230,38 +5231,38 @@ Label9999: ;
 		}
 		EnvironmentReportChr = std::to_string( EnvironmentReportNbr );
 		strip( EnvironmentReportChr );
-		gio::write( OutputFileStandard, EnvironmentReportChr + EnvironmentString );
-		gio::write( OutputFileMeters, EnvironmentReportChr + EnvironmentString );
+		gio::write( OutputFileStandard, A ) << EnvironmentReportChr + EnvironmentString;
+		gio::write( OutputFileMeters, A ) << EnvironmentReportChr + EnvironmentString;
 
 		AssignReportNumber( OutputProcessor::TimeStepStampReportNbr );
 		OutputProcessor::TimeStepStampReportChr = std::to_string( OutputProcessor::TimeStepStampReportNbr );
 		strip( OutputProcessor::TimeStepStampReportChr );
-		gio::write( OutputFileStandard, OutputProcessor::TimeStepStampReportChr + TimeStepString );
-		gio::write( OutputFileMeters, OutputProcessor::TimeStepStampReportChr + TimeStepString );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
+		gio::write( OutputFileMeters, A ) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
 
 		AssignReportNumber( OutputProcessor::DailyStampReportNbr );
 		OutputProcessor::DailyStampReportChr = std::to_string( OutputProcessor::DailyStampReportNbr );
 		strip( OutputProcessor::DailyStampReportChr );
-		gio::write( OutputFileStandard, OutputProcessor::DailyStampReportChr + DailyString + "Report Variables Requested" );
-		gio::write( OutputFileMeters, OutputProcessor::DailyStampReportChr + DailyString + "Meters Requested" );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::DailyStampReportChr + DailyString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::DailyStampReportChr + DailyString + "Meters Requested";
 
 		AssignReportNumber( OutputProcessor::MonthlyStampReportNbr );
 		OutputProcessor::MonthlyStampReportChr = std::to_string( OutputProcessor::MonthlyStampReportNbr );
 		strip( OutputProcessor::MonthlyStampReportChr );
-		gio::write( OutputFileStandard, OutputProcessor::MonthlyStampReportChr + MonthlyString + "Report Variables Requested" );
-		gio::write( OutputFileMeters, OutputProcessor::MonthlyStampReportChr + MonthlyString + "Meters Requested" );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Meters Requested";
 
 		AssignReportNumber( OutputProcessor::RunPeriodStampReportNbr );
 		OutputProcessor::RunPeriodStampReportChr = std::to_string( OutputProcessor::RunPeriodStampReportNbr );
 		strip( OutputProcessor::RunPeriodStampReportChr );
-		gio::write( OutputFileStandard, OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Report Variables Requested" );
-		gio::write( OutputFileMeters, OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Meters Requested" );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Meters Requested";
 
 		AssignReportNumber( OutputProcessor::YearlyStampReportNbr );
 		OutputProcessor::YearlyStampReportChr = std::to_string( OutputProcessor::YearlyStampReportNbr );
 		strip( OutputProcessor::YearlyStampReportChr );
-		gio::write( OutputFileStandard, OutputProcessor::YearlyStampReportChr + YearlyString + "Report Variables Requested" );
-		gio::write( OutputFileMeters, OutputProcessor::YearlyStampReportChr + YearlyString + "Meters Requested" );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::YearlyStampReportChr + YearlyString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::YearlyStampReportChr + YearlyString + "Meters Requested";
 
 	}
 
