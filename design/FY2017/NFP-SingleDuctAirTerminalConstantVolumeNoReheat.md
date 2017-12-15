@@ -265,7 +265,13 @@ All air terminal single duct related code is located in the ***SingleDuct.cc*** 
 - adds this new object to the Air Distribution Unit equipment list 
 - adds new get input section in **GetSysInput()** function under SingleDuct.cc module
 - adds new function **SimConstVolNoReheat()** for air terminal Single Duct CV No Reheat object
+ 
+	the new function **SimConstVolNoReheat()** will be a member of derived struct SysDesignParams 
+
 - adds a calling point for **SimConstVolNoReheat()** new function under "SimulateSingleDuct" function
+
+	will be executed as a member of derived variable Sys. e.g. Sys().SimConstVolNoReheat()
+
 - updates the sizing calculation in **SizeSys()** function to allow for the new object
 - updates the flow rate calculation in **InitSys()** function depending on the air flow rate calculation method
 

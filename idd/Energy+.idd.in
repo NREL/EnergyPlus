@@ -40683,6 +40683,49 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
       \units C
       \minimum> 0.0
 
+AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+       \memo Central air system terminal unit, single duct, constant volume, without reheat coil
+  A1 , \field Name
+       \required-field
+       \reference AirTerminalUnitNames
+       \reference AFNTerminalUnitNames
+  A2 , \field Availability Schedule Name
+       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+       \note If this field is blank, the system is always available.
+       \type object-list
+       \object-list ScheduleNames
+  A3,  \field Air Outlet Node Name
+       \required-field
+       \type node
+       \note This is an air outlet node from the air distribution unit. This node name should be one of the 
+       \note supply air inlet node names of a zone served by this component.   
+  A4,  \field Air Inlet Node Name
+       \required-field
+       \type node
+       \note The air-inlet node name that connects the air splitter to the individual zone air distribution 
+       \note unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter component.
+  N1,  \field Maximum Air Flow Rate
+       \required-field
+       \units m3/s
+       \minimum 0.0
+       \autosizable
+   A5, \field Design Specification Outdoor Air Object Name
+       \type object-list
+       \object-list DesignSpecificationOutdoorAirNames
+       \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
+       \note unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled."
+       \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
+       \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
+       \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate.
+       \note If this field is blank, then the terminal unit will not be controlled for outdoor air flow.
+   A6; \field Per Person Ventilation Rate Mode
+       \type choice
+       \key CurrentOccupancy
+       \key DesignOccupancy
+       \default CurrentOccupancy
+       \note CurrentOccupancy models demand controlled ventilation using the current number of people
+       \note DesignOccupancy uses the total Number of People in the zone and is constant
+
 AirTerminal:SingleDuct:VAV:NoReheat,
        \memo Central air system terminal unit, single duct, variable volume, with no reheat coil.
   A1,  \field Name
@@ -41811,6 +41854,7 @@ ZoneHVAC:AirDistributionUnit,
        \key AirTerminal:DualDuct:ConstantVolume
        \key AirTerminal:DualDuct:VAV
        \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+       \key AirTerminal:SingleDuct:ConstantVolume:NoReheat
        \key AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
        \key AirTerminal:SingleDuct:VAV:Reheat
        \key AirTerminal:SingleDuct:VAV:NoReheat

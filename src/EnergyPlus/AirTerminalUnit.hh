@@ -63,6 +63,7 @@ enum AirTerminalUnitType {
 	dualDuctVAV,
 	singleDuctVAVReheat,
 	singleDuctConstVolReheat,
+	singleDuctConstVolNoReheat,
 	singleDuctVAVNoReheat,
 	singleDuct_SeriesPIU_Reheat,
 	singleDuct_ParallelPIU_Reheat,

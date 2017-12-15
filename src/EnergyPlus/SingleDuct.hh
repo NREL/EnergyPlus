@@ -72,6 +72,7 @@ namespace SingleDuct {
 	// SysTypes represented here
 	extern int const SingleDuctVAVReheat;
 	extern int const SingleDuctConstVolReheat;
+	extern int const SingleDuctConstVolNoReheat;
 	extern int const SingleDuctVAVNoReheat;
 	extern int const SingleDuctVAVReheatVSFan;
 	extern int const SingleDuctCBVAVReheat;
@@ -200,6 +201,13 @@ namespace SingleDuct {
 		// warning variables
 		int IterationLimit; // Used for RegulaFalsi error -1
 		int IterationFailed; // Used for RegulaFalsi error -2
+		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
+		bool EMSOverrideAirFlow; // if true, EMS is calling to override flow rate
+		Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
+		Real64 HeatRate; // zone air terminal sensible heating rate
+		Real64 CoolRate; // zone air terminal sensible cooling rate
+		Real64 HeatEnergy; // zone air terminal sensible heating energy
+		Real64 CoolEnergy; // zone air terminal sensible cooling energy
 
 		// Default Constructor
 		SysDesignParams() :
@@ -267,8 +275,22 @@ namespace SingleDuct {
 			HWCompIndex( 0 ),
 			SecInNode( 0 ),
 			IterationLimit( 0 ),
-			IterationFailed( 0 )
+			IterationFailed( 0 ),
+			OAPerPersonMode( 0 ),
+			EMSOverrideAirFlow( false ),
+			EMSMassFlowRateValue( 0.0 ),
+			HeatRate( 0.0 ),
+			CoolRate( 0.0 ),
+			HeatEnergy( 0.0 ),
+			CoolEnergy( 0.0 )
 		{}
+
+		void SimConstVolNoReheat(
+			int const SysNum,
+			bool const FirstHVACIteration,
+			int const ZoneNum,
+			int const ZoneNodeNum
+		);
 
 	};
 
