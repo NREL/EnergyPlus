@@ -127,7 +127,7 @@ namespace SZVAVModel {
 		int const MaxIter( 100 ); // maximum number of iterations
 		int SolFlag; // return flag from RegulaFalsi for sensible load
 
-		Array1D< Real64 > Par( 16 ); // parameters passed to RegulaFalsi function
+		Array1D< Real64 > Par( 17 ); // parameters passed to RegulaFalsi function
 		Real64 maxCoilFluidFlow;
 		Real64 maxOutletTemp;
 		Real64 minAirMassFlow;
@@ -211,7 +211,7 @@ namespace SZVAVModel {
 			Par( 15 ) = 0.0;
 		}
 		Par( 16 ) = 1.0; // iteration method, 1 = modulate coil capacity, 2 = modulate air flow rate
-		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning in PTUnit version in General.cc
+		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning (unused variable) in PTUnit version of SZVAV
 
 		int InletNode = SZVAVModel.AirInNode;
 		int OutletNode = SZVAVModel.AirOutNode;
@@ -667,7 +667,7 @@ namespace SZVAVModel {
 			Par( 15 ) = 0.0;
 		}
 		Par( 16 ) = 1.0; // iteration method, 1 = modulate coil capacity, 2 = modulate air flow rate
-		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning in PTUnit version in General.cc
+		Par( 17 ) = double( CompressorONFlag ); // ** not used, gets rid of warning (unused variable) in PTUnit version of SZVAV
 
 		int InletNode = SZVAVModel.AirInNode;
 		int OutletNode = SZVAVModel.AirOutNode;

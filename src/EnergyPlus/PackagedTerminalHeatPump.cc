@@ -3160,7 +3160,6 @@ namespace PackagedTerminalHeatPump {
 		InNode = PTUnit( PTUnitNum ).AirInNode;
 		OutNode = PTUnit( PTUnitNum ).AirOutNode;
 		CtrlZoneNum = 0;
-//		std::cout << ( "Init 1 " );
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
 
@@ -3266,7 +3265,6 @@ namespace PackagedTerminalHeatPump {
 			MyPlantScanFlag( PTUnitNum ) = false;
 		}
 
-//		std::cout << ( "Init 2 " );
 		if ( ZoneEquipmentListNotChecked ) {
 			if( ZoneEquipInputsFilled ) {
 				ZoneEquipmentListNotChecked = false;
@@ -3340,7 +3338,6 @@ namespace PackagedTerminalHeatPump {
 			}
 		}
 
-//		std::cout << ( "Init 3 " );
 		if ( MyFanFlag( PTUnitNum ) ) {
 			if ( PTUnit( PTUnitNum ).ActualFanVolFlowRate != AutoSize ) {
 				if ( PTUnit( PTUnitNum ).ActualFanVolFlowRate > 0.0 ) {
@@ -3490,7 +3487,6 @@ namespace PackagedTerminalHeatPump {
 			SetOnOffMassFlowRate( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 		}
 
-//		std::cout << ( "Init 4 " );
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( PTUnitNum ) ) {
 			InNode = PTUnit( PTUnitNum ).AirInNode;
@@ -3523,7 +3519,6 @@ namespace PackagedTerminalHeatPump {
 			MyEnvrnFlag( PTUnitNum ) = false;
 			PTUnit( PTUnitNum ).LastMode = HeatingMode;
 
-//			std::cout << ( "Init 5 " );
 			//   set fluid-side hardware limits
 			if ( PTUnit( PTUnitNum ).HeatCoilFluidInletNode > 0 ) {
 				// If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
@@ -3541,7 +3536,6 @@ namespace PackagedTerminalHeatPump {
 
 			}
 
-//			std::cout << ( "Init 6 " );
 			if ( PTUnit( PTUnitNum ).SuppCoilFluidInletNode > 0 ) {
 
 				if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow == AutoSize ) {
@@ -3555,7 +3549,6 @@ namespace PackagedTerminalHeatPump {
 				InitComponentNodes( 0.0, PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow, PTUnit( PTUnitNum ).SuppCoilFluidInletNode, PTUnit( PTUnitNum ).PlantCoilOutletNode, PTUnit( PTUnitNum ).SuppCoilLoopNum, PTUnit( PTUnitNum ).SuppCoilLoopSide, PTUnit( PTUnitNum ).SuppCoilBranchNum, PTUnit( PTUnitNum ).SuppCoilCompNum );
 
 			}
-//			std::cout << ( "Init 7 " );
 			if ( PTUnit( PTUnitNum ).HeatCoilFluidInletNode > 0 ) {
 				//     If steam coil max steam flow rate is autosized, simulate once in order to mine max steam flow rate
 				if ( PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow == AutoSize ) {
@@ -3571,7 +3564,6 @@ namespace PackagedTerminalHeatPump {
 					InitComponentNodes( 0.0, PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow, PTUnit( PTUnitNum ).HeatCoilFluidInletNode, PTUnit( PTUnitNum ).PlantCoilOutletNode, PTUnit( PTUnitNum ).HeatCoilLoopNum, PTUnit( PTUnitNum ).HeatCoilLoopSide, PTUnit( PTUnitNum ).HeatCoilBranchNum, PTUnit( PTUnitNum ).HeatCoilCompNum );
 				}
 			}
-//			std::cout << ( "Init 8 " );
 			if ( PTUnit( PTUnitNum ).SuppCoilFluidInletNode > 0 ) {
 				if ( PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow == AutoSize ) {
 					SimulateSteamCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, PTUnit( PTUnitNum ).SuppHeatCoilIndex, 1.0, QActual ); //QCoilReq, simulate any load > 0 to get max capacity of steam coil
@@ -3592,7 +3584,6 @@ namespace PackagedTerminalHeatPump {
 			MyEnvrnFlag( PTUnitNum ) = true;
 		}
 
-//		std::cout << ( "Init 9 " );
 		if ( PTUnit( PTUnitNum ).ACHeatCoilCap == AutoSize ) {
 			if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ) {
 				PTUnit( PTUnitNum ).ACHeatCoilCap = GetHeatingCoilCapacity( PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).ACHeatCoilName, ErrorsFound );
@@ -3603,7 +3594,6 @@ namespace PackagedTerminalHeatPump {
 
 		// Constant fan systems are tested for ventilation load to determine if load to be met changes.
 
-//		std::cout << ( "Init 10 " );
 		if ( ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil || PTUnit( PTUnitNum ).ATMixerExists ) && GetCurrentScheduleValue( PTUnit( PTUnitNum ).SchedPtr ) > 0.0 && ( ( GetCurrentScheduleValue( PTUnit( PTUnitNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) ) {
 
 			SupHeaterLoad = 0.0;
