@@ -657,8 +657,6 @@ namespace OutputProcessor {
 	extern Array1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
 	extern Reference< RealVariables > RVariable;
 	extern Reference< IntegerVariables > IVariable;
-	extern Reference< RealVariables > RVar;
-	extern Reference< IntegerVariables > IVar;
 	extern Array1D< ReqReportVariables > ReqRepVars;
 	extern Array1D< MeterArrayType > VarMeterArrays;
 	extern Array1D< MeterType > EnergyMeters;

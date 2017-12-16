@@ -282,8 +282,6 @@ namespace OutputProcessor {
 	Array1D< VariableTypeForDDOutput > DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
 	Reference< RealVariables > RVariable;
 	Reference< IntegerVariables > IVariable;
-	Reference< RealVariables > RVar;
-	Reference< IntegerVariables > IVar;
 	Array1D< ReqReportVariables > ReqRepVars;
 	Array1D< MeterArrayType > VarMeterArrays;
 	Array1D< MeterType > EnergyMeters;
@@ -381,8 +379,6 @@ namespace OutputProcessor {
 		DDVariableTypes.deallocate();
 		RVariable.deallocate();
 		IVariable.deallocate();
-		RVar.deallocate();
-		IVar.deallocate();
 		ReqRepVars.deallocate();
 		VarMeterArrays.deallocate();
 		EnergyMeters.deallocate();
@@ -426,11 +422,9 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		RVariableTypes.allocate( RVarAllocInc );
-		RVar.allocate();
 		MaxRVariable = RVarAllocInc;
 
 		IVariableTypes.allocate( IVarAllocInc );
-		IVar.allocate();
 		MaxIVariable = IVarAllocInc;
 
 		// First index is the frequency designation (-1 = each call, etc)
@@ -3075,8 +3069,7 @@ namespace OutputProcessor {
 		}
 
 		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
-			RVar >>= RVariableTypes( Loop ).VarPtr;
-			auto & rVar( RVar() );
+			auto & rVar( RVariableTypes(Loop).VarPtr() );
 			if ( rVar.ReportFreq == ReportMonthly || rVar.ReportFreq == ReportSim ) {
 				rVar.StoreValue = 0.0;
 				rVar.NumStored = 0;
@@ -3084,8 +3077,7 @@ namespace OutputProcessor {
 		}
 
 		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
-			IVar >>= IVariableTypes( Loop ).VarPtr;
-			auto & iVar( IVar() );
+			auto & iVar( IVariableTypes( Loop ).VarPtr() );
 			if ( iVar.ReportFreq == ReportMonthly || iVar.ReportFreq == ReportSim ) {
 				iVar.StoreValue = 0;
 				iVar.NumStored = 0;
@@ -4760,7 +4752,7 @@ namespace OutputProcessor {
 		if ( UpdateDataDuringWarmupExternalInterface && ! ReportDuringWarmup ) return;
 
 		if ( intVar.Report && intVar.ReportFreq == reportType && intVar.Stored ) {
-			if ( IVar().NumStored > 0.0 ) {
+			if ( intVar.NumStored > 0.0 ) {
 				WriteReportIntegerData( intVar.ReportID, intVar.ReportIDChr, intVar.StoreValue, intVar.StoreType, intVar.NumStored, intVar.ReportFreq, intVar.MinValue, intVar.minValueDate, intVar.MaxValue, intVar.maxValueDate );
 				++StdOutputRecordCount;
 			}
@@ -5035,11 +5027,9 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( varType == 1 ) { // Integer
-			IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
-			IVar().Which() = SetIntVal;
+			IVariableTypes( keyVarIndex ).VarPtr().Which() = SetIntVal;
 		} else if ( varType == 2 ) { // real
-			RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
-			RVar().Which() = SetRealVal;
+			RVariableTypes(keyVarIndex).VarPtr().Which() = SetRealVal;
 		} else if ( varType == 3 ) { // meter
 			EnergyMeters( keyVarIndex ).CurTSValue = SetRealVal;
 		}
@@ -5916,9 +5906,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 			if ( RVariableTypes( Loop ).IndexType != IndexType ) continue;
 
-			// Act on the RVariables variable using the RVar structure
-			RVar >>= RVariableTypes( Loop ).VarPtr;
-			auto & rVar( RVar() );
+			// Act on the RVariables variable
+			auto & rVar( RVariableTypes( Loop ).VarPtr() );
 			rVar.Stored = true;
 			if ( rVar.StoreType == AveragedVar ) {
 				CurVal = rVar.Which * rxTime;
@@ -5982,9 +5971,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 			if ( IVariableTypes( Loop ).IndexType != IndexType ) continue;
 
-			// Act on the IVariables variable using the IVar structure
-			IVar >>= IVariableTypes( Loop ).VarPtr;
-			auto & iVar( IVar() );
+			// Act on the IVariables variable
+			auto & iVar( IVariableTypes( Loop ).VarPtr() );
 			iVar.Stored = true;
 			//      ICurVal=IVar%Which
 			if ( iVar.StoreType == AveragedVar ) {
@@ -6055,8 +6043,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType != IndexType ) continue;
-				RVar >>= RVariableTypes( Loop ).VarPtr;
-				auto & rVar( RVar() );
+				auto & rVar( RVariableTypes( Loop ).VarPtr() );
 				// Update meters on the TimeStep  (Zone)
 				if ( rVar.MeterArrayPtr != 0 ) {
 					if ( VarMeterArrays( rVar.MeterArrayPtr ).NumOnCustomMeters <= 0 ) {
@@ -6102,8 +6089,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType != IndexType ) continue;
-				IVar >>= IVariableTypes( Loop ).VarPtr;
-				auto & iVar( IVar() );
+				auto & iVar( IVariableTypes( Loop ).VarPtr() );
 				ReportNow = true;
 				if ( iVar.SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( iVar.SchedPtr ) != 0.0 ); // SetReportNow(IVar%SchedPtr)
 				if ( ! ReportNow ) {
@@ -6161,8 +6147,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			TimeValue( IndexType ).CurMinute = 0.0;
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType != IndexType ) continue;
-				RVar >>= RVariableTypes( Loop ).VarPtr;
-				auto & rVar( RVar() );
+				auto & rVar( RVariableTypes( Loop ).VarPtr() );
 				//        ReportNow=.TRUE.
 				//        IF (RVar%SchedPtr > 0) &
 				//          ReportNow=(GetCurrentScheduleValue(RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
@@ -6188,8 +6173,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType != IndexType ) continue;
-				IVar >>= IVariableTypes( Loop ).VarPtr;
-				auto & iVar( IVar() );
+				auto & iVar( IVariableTypes( Loop ).VarPtr() );
 				//        ReportNow=.TRUE.
 				//        IF (IVar%SchedPtr > 0) &
 				//          ReportNow=(GetCurrentScheduleValue(IVar%SchedPtr) /= 0.0)  !SetReportNow(IVar%SchedPtr)
@@ -7171,11 +7155,11 @@ GetInstantMeterValue(
 		}
 		for ( int Loop = cache_beg; Loop <= cache_end; ++Loop ) {
 			auto & r_var_loop( RVariableTypes( InstMeterCache( Loop ) ) );
-			RVar >>= r_var_loop.VarPtr;
 			// Separate the Zone variables from the HVAC variables using IndexType
 			if ( r_var_loop.IndexType == IndexType ) {
+				auto & rVar( r_var_loop.VarPtr() );
 				// Add to the total all of the appropriate variables
-				InstantMeterValue += RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
+				InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
 			}
 		}
 	} else { // MeterType_CustomDec
@@ -7187,11 +7171,11 @@ GetInstantMeterValue(
 			auto const & var_meter_on( VarMeterArrays( Loop ).OnMeters );
 			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnMeters; Meter <= Meter_end; ++Meter ) {
 				if ( var_meter_on( Meter ) == energy_meter.SourceMeter ) {
-					RVar >>= r_var_loop.VarPtr;
 					//Separate the Zone variables from the HVAC variables using IndexType
 					if ( r_var_loop.IndexType == IndexType ) {
+						auto & rVar( r_var_loop.VarPtr() );
 						//Add to the total all of the appropriate variables
-						InstantMeterValue += RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
+						InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
 						break;
 					}
 				}
@@ -7200,11 +7184,11 @@ GetInstantMeterValue(
 			auto const & var_meter_on_custom( VarMeterArrays( Loop ).OnCustomMeters );
 			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnCustomMeters; Meter <= Meter_end; ++Meter ) {
 				if ( var_meter_on_custom( Meter ) == energy_meter.SourceMeter ) {
-					RVar >>= r_var_loop.VarPtr;
 					// Separate the Zone variables from the HVAC variables using IndexType
 					if ( r_var_loop.IndexType == IndexType ) {
+						auto & rVar( r_var_loop.VarPtr() );
 						// Add to the total all of the appropriate variables
-						InstantMeterValue += RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
+						InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
 						break;
 					}
 				}
@@ -7217,11 +7201,11 @@ GetInstantMeterValue(
 			auto const & var_meter_on( VarMeterArrays( Loop ).OnMeters );
 			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnMeters; Meter <= Meter_end; ++Meter ) {
 				if ( var_meter_on( Meter ) == MeterNumber ) {
-					RVar >>= r_var_loop.VarPtr;
 					// Separate the Zone variables from the HVAC variables using IndexType
 					if ( r_var_loop.IndexType == IndexType ) {
+						auto & rVar( r_var_loop.VarPtr() );
 						// Add to the total all of the appropriate variables
-						InstantMeterValue -= RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
+						InstantMeterValue -= rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
 						break;
 					}
 				}
@@ -7230,11 +7214,11 @@ GetInstantMeterValue(
 			auto const & var_meter_on_custom( VarMeterArrays( Loop ).OnCustomMeters );
 			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnCustomMeters; Meter <= Meter_end; ++Meter ) {
 				if ( var_meter_on_custom( Meter ) == MeterNumber ) {
-					RVar >>= r_var_loop.VarPtr;
 					// Separate the Zone variables from the HVAC variables using IndexType
 					if ( r_var_loop.IndexType == IndexType ) {
+						auto & rVar( r_var_loop.VarPtr() );
 						// Add to the total all of the appropriate variables
-						InstantMeterValue -= RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
+						InstantMeterValue -= rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
 						break;
 					}
 				}
@@ -7340,9 +7324,8 @@ GetInternalVariableValue(
 			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
-		IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
 		// must use %Which, %Value is always zero if variable is not a requested report variable
-		resultVal = double( IVar().Which );
+		resultVal = double( IVariableTypes( keyVarIndex ).VarPtr().Which );
 	} else if ( varType == 2 ) { // real
 		if ( keyVarIndex > NumOfRVariable ) {
 			ShowFatalError( "GetInternalVariableValue: Real variable passed index beyond range of array." );
@@ -7352,9 +7335,8 @@ GetInternalVariableValue(
 			ShowFatalError( "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits( keyVarIndex ) );
 		}
 
-		RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
 		// must use %Which, %Value is always zero if variable is not a requested report variable
-		resultVal = RVar().Which;
+		resultVal = RVariableTypes( keyVarIndex ).VarPtr().Which;
 	} else if ( varType == 3 ) { // Meter
 		resultVal = GetCurrentMeterValue( keyVarIndex );
 	} else if ( varType == 4 ) { // Schedule
@@ -7425,9 +7407,8 @@ GetInternalVariableValueExternalInterface(
 			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );
 		}
 
-		IVar >>= IVariableTypes( keyVarIndex ).VarPtr;
 		// must use %EITSValue, %This is the last-zonetimestep value
-		resultVal = double( IVar().EITSValue );
+		resultVal = double( IVariableTypes( keyVarIndex ).VarPtr().EITSValue );
 	} else if ( varType == 2 ) { // REAL(r64)
 		if ( keyVarIndex > NumOfRVariable ) {
 			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );
@@ -7436,9 +7417,8 @@ GetInternalVariableValueExternalInterface(
 			ShowFatalError( "GetInternalVariableValueExternalInterface: passed index beyond range of array." );
 		}
 
-		RVar >>= RVariableTypes( keyVarIndex ).VarPtr;
 		// must use %EITSValue, %This is the last-zonetimestep value
-		resultVal = RVar().EITSValue;
+		resultVal = RVariableTypes( keyVarIndex ).VarPtr().EITSValue;
 	} else if ( varType == 3 ) { // Meter
 		resultVal = GetCurrentMeterValue( keyVarIndex );
 	} else if ( varType == 4 ) { // Schedule
@@ -7501,9 +7481,13 @@ GetNumMeteredVariables(
 		//    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
 		//    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
 		if ( ComponentName != RVariableTypes( Loop ).KeyNameOnlyUC ) continue;
-		RVar >>= RVariableTypes( Loop ).VarPtr;
-		if ( RVar().MeterArrayPtr == 0 ) continue;
-		if ( VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters > 0 ) ++NumVariables;
+		auto & rVar( RVariableTypes( Loop ).VarPtr() );
+		if ( rVar.MeterArrayPtr == 0 ) {
+			continue;
+		}
+		if ( VarMeterArrays( rVar.MeterArrayPtr ).NumOnMeters > 0 ) {
+			++NumVariables;
+		}
 	}
 
 	return NumVariables;
@@ -7576,10 +7560,10 @@ GetMeteredVariables(
 		//    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
 		//    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
 		if ( ComponentName != RVariableTypes( Loop ).KeyNameOnlyUC ) continue;
-		RVar >>= RVariableTypes( Loop ).VarPtr;
-		if ( RVar().MeterArrayPtr == 0 ) continue;
-		NumOnMeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters;
-		MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( 1 );
+		auto & rVar( RVariableTypes( Loop ).VarPtr() );
+		if ( rVar.MeterArrayPtr == 0 ) continue;
+		NumOnMeterPtr = VarMeterArrays( rVar.MeterArrayPtr ).NumOnMeters;
+		MeterPtr = VarMeterArrays( rVar.MeterArrayPtr ).OnMeters( 1 );
 		if ( MeterPtr ) {
 			++NumVariables;
 			VarIndexes( NumVariables ) = Loop;
@@ -7593,7 +7577,7 @@ GetMeteredVariables(
 			}
 			if ( present( EndUses ) ) {
 				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					MeterPtr = VarMeterArrays( rVar.MeterArrayPtr ).OnMeters( MeterNum );
 					if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
 						EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
 						break;
@@ -7602,7 +7586,7 @@ GetMeteredVariables(
 			}
 			if ( present( Groups ) ) {
 				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					MeterPtr = VarMeterArrays( rVar.MeterArrayPtr ).OnMeters( MeterNum );
 					if ( EnergyMeters( MeterPtr ).Group != "" ) {
 						Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
 						break;
@@ -7610,7 +7594,7 @@ GetMeteredVariables(
 				}
 			}
 			if ( present( VarIDs ) ) {
-				VarIDs()( NumVariables ) = RVar().ReportID;
+				VarIDs()( NumVariables ) = rVar.ReportID;
 			}
 		} else {
 			ShowWarningError( "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"" );
