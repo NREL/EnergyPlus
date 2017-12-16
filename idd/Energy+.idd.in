@@ -303,6 +303,7 @@
 !      V/K                    =>   V/F                 0.555555555555556
 !      W                      =>   Btu/h               3.4121412858518
 !      W/((m3/s)-Pa)          =>   W/((gal/min)-ftH20) 0.188582274697355
+!      W/((m3/s)-Pa)          =>   W/((ft3/min)-inH2O) 0.117556910599482
 !      W/(m3/s)               =>   W/(ft3/min)         0.0004719475
 !      W/K                    =>   Btu/h-F             1.89563404769544
 !      W/m                    =>   Btu/h-ft            1.04072
@@ -2611,11 +2612,12 @@ Schedule:Day:Interval,
        \type object-list
        \object-list ScheduleTypeLimitsNames
   A3 , \field Interpolate to Timestep
-       \note when the interval does not match the user specified timestep a Yes choice will average between the intervals request (to
-       \note timestep resolution.  a No choice will use the interval value at the simulation timestep without regard to if it matches
-       \note the boundary or not.
+       \note when the interval does not match the user specified timestep a Average choice will average between the intervals request (to
+       \note timestep resolution. A No choice will use the interval value at the simulation timestep without regard to if it matches
+       \note the boundary or not. A Linear choice will interpolate linearly between successive values.
        \type choice
-       \key Yes
+       \key Average
+       \key Linear
        \key No
        \default No
  A4  , \field Time 1
@@ -3208,11 +3210,12 @@ Schedule:Day:List,
        \type object-list
        \object-list ScheduleTypeLimitsNames
   A3 , \field Interpolate to Timestep
-       \note when the interval does not match the user specified timestep a "Yes" choice will average between the intervals request (to
-       \note timestep resolution.  a "No" choice will use the interval value at the simulation timestep without regard to if it matches
-       \note the boundary or not.
+       \note when the interval does not match the user specified timestep a "Average" choice will average between the intervals request (to
+       \note timestep resolution.  A "No" choice will use the interval value at the simulation timestep without regard to if it matches
+       \note the boundary or not. A "Linear" choice will interpolate linearly between successive values.
        \type choice
-       \key Yes
+       \key Average
+       \key Linear
        \key No
        \default No
   N1 , \field Minutes per Item
@@ -4031,7 +4034,7 @@ Schedule:Compact,
    \memo Irregular object.  Does not follow the usual definition for fields.  Fields A3... are:
    \memo Through: Date
    \memo For: Applicable days (ref: Schedule:Week:Compact)
-   \memo Interpolate: Yes/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"
+   \memo Interpolate: Average/Linear/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"
    \memo Until: <Time> (ref: Schedule:Day:Interval)
    \memo <numeric value>
    \memo words "Through","For","Interpolate","Until" must be included.
@@ -23573,6 +23576,7 @@ AirflowNetwork:MultiZone:Surface,
   A3, \field External Node Name
       \type object-list
       \object-list ExternalNodeNames
+      \object-list OutdoorAirNodeNames
       \note Used if Wind Pressure Coefficient Type = Input in the AirflowNetwork:SimulationControl object,
       \note otherwise this field may be left blank.
   N1, \field Window/Door Opening Factor, or Crack Factor
@@ -33369,7 +33373,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \memo that mixes zone air with the specified amount of outdoor air and then adds or removes
        \memo heat and moisture at 100% efficiency in order to meet the specified controls. Energy
        \memo use is reported as DistrictHeating and DistrictCooling.
-       \min-fields 26
+       \min-fields 27
   A1 , \field Name
        \required-field
        \reference ZoneEquipmentNames
@@ -33396,6 +33400,7 @@ ZoneHVAC:IdealLoadsAirSystem,
        \note The Zone Supply Air Node Name must match a zone inlet air node name for the zone where this
        \note Ideal Loads Air System is connected. The Zone Exhaust Air Node Name must match an inlet air
        \note node name of an AirloopHVAC:ReturnAirPlenum object.
+       \type node
   N1 , \field Maximum Heating Supply Air Temperature
        \units C
        \minimum> 0
@@ -56948,19 +56953,19 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
        \type object-list
        \object-list QuadraticCurves
        \object-list UniVariateTables
-  N17, \field Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N17, \field Diameter of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the piping loss
        \type real
        \units m
        \minimum 0.0
        \default 0.0762
-  N18, \field Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N18, \field Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the heat loss of the main pipe
        \type real
        \units m
        \minimum 0.0
        \default 30.0
-  N19, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N19, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the refrigerant pressure drop of the main pipe
        \type real
        \units m
@@ -57372,13 +57377,13 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
        \units m
        \minimum 0.0
        \default 0.0762
-  N25, \field Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N25, \field Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the heat loss of the main pipe
        \type real
        \units m
        \minimum 0.0
        \default 30.0
-  N26, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units
+  N26, \field Equivalent Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint
        \note used to calculate the refrigerant pressure drop of the main pipe
        \type real
        \units m
@@ -61698,7 +61703,7 @@ OutdoorAir:Node,
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
-  A3 , \field Wetbulb Schedule Name
+  A3 , \field Wetbulb Temperature Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
