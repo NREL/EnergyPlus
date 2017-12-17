@@ -1122,6 +1122,7 @@ namespace SimAirServingZones {
 						PrimaryAirSystem( AirSysNum ).ControlConverged( OASysControllerNum ) = false;
 						PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = true;
 						GetControllerActuatorNodeNum( ControllerName, ActuatorNodeNum, errFlag );
+
 						bool nonLockoutCoilFound = false;
 						WaterCoilNodeNum = -1;
 						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
