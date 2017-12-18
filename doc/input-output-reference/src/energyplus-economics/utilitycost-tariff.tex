@@ -52,50 +52,11 @@ A choice that allows several different predefined conversion factors to be used;
   kgal
 \end{itemize}
 
-Not all choices will be accepted by EnergyPlus depending on the resource of the Output Meter of the tariff object, and the same Conversion Factor Choice will take different values depending on the resource type.
+Not all choices will be accepted by EnergyPlus depending on the resource of the Output Meter of the tariff object, and the same Conversion Factor Choice will take different values depending on the resource type. EnergyPlus will differentiate between \textbf{Water Meters} and \textbf{Energy Meters}.
 
-EnergyPlus will differentiate between \textbf{Water Meters} and \textbf{Energy Meters}.
-
-\subparagraph{Water Meters}
-
-\textbf{Water Meters} natively report "energy" in cubic meters m3.
-
-If Conversion Factor Choice is omitted or not a valid conversion factor from the table below, the default is m3 and a warning is issued to the user.
-
-The following table shows the accepted options and the conversion factors for a water meter.
-
-% table 36
-\begin{longtable}[c]{@{}lll@{}}
-\caption{Built in UtilityCost:Tariff Conversion Factors for Water Meters \label{table:built-in-utilitycost-tariff-conversion-water}} \tabularnewline
-\toprule 
-Choice & Energy Conversion Factor \tabularnewline
-\midrule
-\endfirsthead
-
-\caption[]{Built in UtilityCost:Tariff Conversion Factors for Water Meters} \tabularnewline
-\toprule 
-Choice & Energy Conversion Factor \tabularnewline
-\midrule
-\endhead
-
-CCF & 0.353146667214885 \tabularnewline
-gal & 264.172052360252 \tabularnewline
-kgal & 0.264172052360252 \tabularnewline
-\bottomrule
-\end{longtable}
-
-
-\subparagraph{Energy Meters}
-
-\textbf{Energy Meters} natively report energy in Joules (J) and demand in Joules/Sec (J/s) which is equivalent to Watts (W).
-
+Energy Meters natively report energy in Joules (J) and demand in Joules/Sec (J/s) which is equivalent to Watts (W).  
 If Conversion Factor Choice is omitted or not a valid conversion factor from the table below, the default is kWh and a warning is issued to the user.
-
-EnergyPlus will make a distinction between Electric, Gas, and 'Other' meters to determine the accepted options
-
-\subsubparagraph{Electric Meters}
-
-The following table shows the accepted options and the conversion factors for an Electric Meter
+EnergyPlus will make a distinction between Electric, Gas, and 'Other' meters to determine the accepted options. If 'Therm' is used for an electric meter, the user is warned that this is an unusual choice for electricity. The following table shows the accepted options and the conversion factors for an Electric Meter.
 
 % table 37
 \begin{longtable}[c]{@{}lll@{}}
@@ -120,24 +81,17 @@ Therm & 9.4781712E-09 & 0.00003412 \tabularnewline
 \bottomrule
 \end{longtable}
 
-If 'Therm' is used for an electric meter, the user is warned that this is an unusual choice for electricity.
-
-\subsubparagraph{Gas Meters}
-
-The following table shows the accepted options and the conversion factors for a Gas Meter.
-
-Note that for volumetric units, the simplification for the heat content of natural gas is that 100 CCF = 1 therm.
-It is recommended to use actual values for the heat content of natural gas in your region/year by using "UserDefined" and manually entering the conversion factors for energy and demand.
+ The following table shows the accepted options and the conversion factors for a Gas Meter. Note that for volumetric units, the simplification for the heat content of natural gas is that 100 CCF = 1 therm. It is recommended to use actual values for the heat content of natural gas in your region/year by using "UserDefined" and manually entering the conversion factors for energy and demand.
 
 % table 38
 \begin{longtable}[c]{@{}lll@{}}
-\caption{Built in UtilityCost:Tariff Conversion Factors for Electric Meters \label{table:built-in-utilitycost-tariff-conversion-gas}} \tabularnewline
+\caption{Built in UtilityCost:Tariff Conversion Factors for Gas Meters \label{table:built-in-utilitycost-tariff-conversion-gas}} \tabularnewline
 \toprule 
 Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Built in UtilityCost:Tariff Conversion Factors for Electric Meters} \tabularnewline
+\caption[]{Built in UtilityCost:Tariff Conversion Factors for Gas Meters} \tabularnewline
 \toprule 
 Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
 \midrule
@@ -155,8 +109,27 @@ m3 & 2.6839192e-10 & 9.6617081E-05 \tabularnewline
 \bottomrule
 \end{longtable}
 
+Water Meters natively report "energy" in cubic meters m3.  If Conversion Factor Choice is omitted or not a valid conversion factor from the table below, the default is m3 and a warning is issued to the user. The following table shows the accepted options and the conversion factors for a water meter.
 
-\subsubparagraph{Other Meters}
+% table 36
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Built in UtilityCost:Tariff Conversion Factors for Water Meters \label{table:built-in-utilitycost-tariff-conversion-water}} \tabularnewline
+\toprule 
+Choice & Energy Conversion Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Built in UtilityCost:Tariff Conversion Factors for Water Meters} \tabularnewline
+\toprule 
+Choice & Energy Conversion Factor \tabularnewline
+\midrule
+\endhead
+
+CCF & 0.353146667214885 \tabularnewline
+gal & 264.172052360252 \tabularnewline
+kgal & 0.264172052360252 \tabularnewline
+\bottomrule
+\end{longtable}
 
 The following table shows the accepted options and the conversion factors for all other Meters that aren't either Water, Electric, or gas.
 
