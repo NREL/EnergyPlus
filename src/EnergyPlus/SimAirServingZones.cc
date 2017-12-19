@@ -4430,24 +4430,8 @@ namespace SimAirServingZones {
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
 			if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
-				//for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-				//	CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
-				//	TotalPeople += FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone;
-				//	PeakPeople += FinalZoneSizing( CtrlZoneNum ).ZonePeakOccupancy; // this is not quite correct, different zones could have schedule max at different times, the way the code works the concurrence situation is not handled correctly.  
-				//}
-				//if ( TotalPeople > 0.0 ) {
-				//	PopulationDiversity = PeakPeople / TotalPeople;
-				//} else {
-				//	PopulationDiversity = 1.0;
-				//}
-				////save population for standard 62.1 report
-				//DataSizing::PzSumBySysCool( AirLoopNum ) = TotalPeople;
-				//DataSizing::PsBySysCool( AirLoopNum ) = PeakPeople;
-				//DataSizing::DBySysCool( AirLoopNum ) = PopulationDiversity;
 
-				//DataSizing::PzSumBySysHeat( AirLoopNum ) = TotalPeople;
-				//DataSizing::PsBySysHeat( AirLoopNum ) = PeakPeople;
-				//DataSizing::DBySysHeat( AirLoopNum ) = PopulationDiversity;
+				// people related code removed, see SizingManager::DetermineSystemPopulationDiversity
 
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
@@ -4458,7 +4442,7 @@ namespace SimAirServingZones {
 					}
 					if ( SysSizNum > 0 ) {
 						if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
-							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA;
+							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).MinOA; // This has effectiveness included
 							FinalZoneSizing( CtrlZoneNum ).VozClgByZone = FinalZoneSizing( CtrlZoneNum ).MinOA; // store anyway
 							if ( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) { 
 								ZoneOAFracCooling = FinalZoneSizing( CtrlZoneNum ).VozClgByZone / FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow ; // calculate anyway for use with zone OA max fraction below
@@ -4486,7 +4470,8 @@ namespace SimAirServingZones {
 
 							//Save Std 62.1 cooling ventilation required by zone
 							FinalZoneSizing( CtrlZoneNum ).VozClgByZone = ZoneOAUnc / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
-							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).VozClgByZone * DataSizing::DBySys( AirLoopNum ); //  apply D here
+							MinOAFlow += FinalZoneSizing( CtrlZoneNum ).VozClgByZone * DataSizing::DBySys( AirLoopNum ); //  apply D here, D forced to 1.0 for single zone systems
+							
 
 							if ( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
 								if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 || FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin <= 0 ) {
@@ -4613,8 +4598,7 @@ namespace SimAirServingZones {
 
 									// Save Std 62.1 heating ventilation required by zone
 									FinalZoneSizing( CtrlZoneNum ).VozHtgByZone = ZoneOAUnc / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
-									MinOAFlow += FinalZoneSizing( CtrlZoneNum ).VozHtgByZone  * DataSizing::DBySys( AirLoopNum ); // apply D here
-
+									MinOAFlow += FinalZoneSizing( CtrlZoneNum ).VozHtgByZone * DataSizing::DBySys( AirLoopNum ); // apply D here, D forced to 1.0 for single zone systems
 									if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
 										if ( FinalZoneSizing( CtrlZoneNum ).ZoneSecondaryRecirculation > 0.0 ) { // multi-path system
 											// multi-path system

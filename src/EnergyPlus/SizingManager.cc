@@ -1139,7 +1139,7 @@ namespace SizingManager {
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 			int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
-			if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) {
+			if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP && DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones > 1 ) {
 
 				// Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for each zone
 				for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
@@ -1239,7 +1239,25 @@ namespace SizingManager {
 				//the design zone ventilation value is based on the larger of the system-level cooling Vot and/or heating Vot
 				FinalSysSizing( AirLoopNum ).DesOutAirVolFlow = max( VotClgBySys( AirLoopNum ), VotHtgBySys( AirLoopNum ) );
 			} // system OA is autosized and VRP
-			else { // not vrp, zone sum, fill out values that still apply
+			else if ( ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP && DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones == 1 ) ) { // single zone VRP
+				int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( 1 );
+				// single zone cooling
+				DataSizing::VotClgBySys( AirLoopNum ) = VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+				DataSizing::EvzByZoneCool( CtrlZoneNum ) = FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
+				DataSizing::EvzMinBySysCool( AirLoopNum ) = DataSizing::EvzByZoneCool( CtrlZoneNum );
+				DataSizing::VpsClgBySys( AirLoopNum ) = FinalSysSizing( SysSizNum ).DesCoolVolFlow;
+				DataSizing::VpzClgSumBySys( AirLoopNum ) = DataSizing::VdzClgByZone( CtrlZoneNum );
+				// single zone heating
+				DataSizing::VotHtgBySys( AirLoopNum ) = VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+				DataSizing::EvzByZoneHeat( CtrlZoneNum ) = FinalZoneSizing( CtrlZoneNum ).ZoneADEffHeating;
+				DataSizing::EvzMinBySysHeat( AirLoopNum ) = DataSizing::EvzByZoneHeat( CtrlZoneNum );
+				DataSizing::VpsHtgBySys( AirLoopNum ) = DataSizing::VpzMinHtgByZone( CtrlZoneNum );
+				DataSizing::VpzHtgSumBySys( AirLoopNum ) = DataSizing::VpzHtgByZone( CtrlZoneNum );
+
+				//the design zone ventilation value is based on the larger of the system-level cooling Vot and/or heating Vot
+				FinalSysSizing( AirLoopNum ).DesOutAirVolFlow = max( VotClgBySys( AirLoopNum ), VotHtgBySys( AirLoopNum ) );
+
+			} else { // not vrp, zone sum, fill out values that still apply
 				// redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
 				DataSizing::VpzClgSumBySys( AirLoopNum ) = 0.0;
 				for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
@@ -1520,6 +1538,11 @@ namespace SizingManager {
 				DBySys( AirLoopNum ) = 1.0;
 			}
 			DBySys( AirLoopNum ) = min( 1.0, DBySys( AirLoopNum ) );
+
+			//For single zone systems, D should be 1.0.
+			if ( DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones == 1 ) {
+				DBySys( AirLoopNum ) = 1.0;
+			}
 		}
 
 	}
