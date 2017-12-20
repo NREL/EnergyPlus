@@ -6480,7 +6480,7 @@ GenOutputVariablesAuditReport()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static std::unordered_map< ReportingFrequency, std::string > reportFrequency( { { ReportingFrequency::EachCall, "Detailed" }, { ReportingFrequency::TimeStep, "TimeStep" }, { ReportingFrequency::Hourly, "Hourly" }, { ReportingFrequency::Daily, "Daily" }, { ReportingFrequency::Monthly, "Monthly" }, { ReportingFrequency::Yearly, "Annual" } } );
+	static std::map< ReportingFrequency, std::string > reportFrequency( { { ReportingFrequency::EachCall, "Detailed" }, { ReportingFrequency::TimeStep, "TimeStep" }, { ReportingFrequency::Hourly, "Hourly" }, { ReportingFrequency::Daily, "Daily" }, { ReportingFrequency::Monthly, "Monthly" }, { ReportingFrequency::Yearly, "Annual" } } );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
