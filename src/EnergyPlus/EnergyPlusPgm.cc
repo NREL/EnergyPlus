@@ -364,7 +364,7 @@ EnergyPlusPgm( std::string const & filepath )
 	if ( ! cEnvValue.empty() ) SortedIDD = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( MinReportFrequencyEnvVar, cEnvValue );
-	if ( ! cEnvValue.empty() ) cMinReportFrequency = cEnvValue; // turned into value later
+	if ( ! cEnvValue.empty() ) MinReportFrequency = cEnvValue; // turned into value later
 
 	get_environment_variable( cDeveloperFlag, cEnvValue );
 	if ( ! cEnvValue.empty() ) DeveloperFlag = env_var_on( cEnvValue ); // Yes or True

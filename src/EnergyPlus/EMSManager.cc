@@ -1341,7 +1341,7 @@ namespace EMSManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumKeys;
 		int KeyNum;
-		int AvgOrSum;
+		OutputProcessor::StoreType AvgOrSum;
 		int StepType;
 		OutputProcessor::Unit Units( OutputProcessor::Unit::None );
 		Array1D_string KeyName;

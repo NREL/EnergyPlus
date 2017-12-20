@@ -72,13 +72,6 @@ namespace OutputProcessor {
 	// in this file should obey a USE OutputProcessor, ONLY: rule.
 
 	// MODULE PARAMETER DEFINITIONS:
-	extern int const ReportEach; // Write out each time UpdatedataandReport is called
-	extern int const ReportTimeStep; // Write out at 'EndTimeStepFlag'
-	extern int const ReportHourly; // Write out at 'EndHourFlag'
-	extern int const ReportDaily; // Write out at 'EndDayFlag'
-	extern int const ReportMonthly; // Write out at end of month (must be determined)
-	extern int const ReportSim; // Write out once per environment 'EndEnvrnFlag'
-
 	extern int const ReportVDD_No; // Don't report the variable dictionaries in any form
 	extern int const ReportVDD_Yes; // Report the variable dictionaries in "report format"
 	extern int const ReportVDD_IDF; // Report the variable dictionaries in "IDF format"
@@ -90,9 +83,6 @@ namespace OutputProcessor {
 
 	extern int const ZoneVar; // Type value for those variables reported on the Zone Time Step
 	extern int const HVACVar; // Type value for those variables reported on the System Time Step
-
-	extern int const AveragedVar; // Type value for "averaged" variables
-	extern int const SummedVar; // Type value for "summed" variables
 
 	extern int const VarType_NotFound; // ref: GetVariableKeyCountandType, 0 = not found
 	extern int const VarType_Integer; // ref: GetVariableKeyCountandType, 1 = integer
@@ -256,6 +246,13 @@ namespace OutputProcessor {
 		Yearly // Write out at 'EndYearFlag'
 	};
 
+	extern ReportingFrequency minimumReportFrequency;
+
+	enum class StoreType {
+		Averaged = 1,// Type value for "averaged" variables
+		Summed // Type value for "summed" variables
+	};
+
 	struct TimeSteps
 	{
 		// Members
@@ -277,13 +274,13 @@ namespace OutputProcessor {
 		Real64 EITSValue; // Value of this variable at the Zone Time Step for external interface
 		Real64 StoreValue; // At end of Zone Time Step, value is placed here for later reporting
 		Real64 NumStored; // Number of hours stored
-		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
 		bool Stored; // True when value is stored
 		bool Report; // User has requested reporting of this variable in the IDF
 		bool tsStored; // if stored for this zone timestep
 		bool thisTSStored; // if stored for this zone timestep
 		int thisTSCount;
-		int ReportFreq; // How often to report this variable
+		ReportingFrequency frequency; // How often to report this variable
 		Real64 MaxValue; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
 		int maxValueDate; // Date stamp of maximum
 		Real64 MinValue; // Minimum reporting (only for Averaged variables, and those greater than Time Step)
@@ -302,13 +299,13 @@ namespace OutputProcessor {
 			EITSValue( 0.0 ),
 			StoreValue( 0.0 ),
 			NumStored( 0.0 ),
-			StoreType( 0 ),
+			storeType( StoreType::Averaged ),
 			Stored( false ),
 			Report( false ),
 			tsStored( false ),
 			thisTSStored( false ),
 			thisTSCount( 0 ),
-			ReportFreq( 0 ),
+			frequency( ReportingFrequency::Hourly ),
 			MaxValue( -9999.0 ),
 			maxValueDate( 0 ),
 			MinValue( 9999.0 ),
@@ -331,13 +328,13 @@ namespace OutputProcessor {
 		Real64 EITSValue; // Value of this variable at the Zone Time Step for external interface
 		Real64 StoreValue; // At end of Zone Time Step, value is placed here for later reporting
 		Real64 NumStored; // Number of hours stored
-		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
 		bool Stored; // True when value is stored
 		bool Report; // User has requested reporting of this variable in the IDF
 		bool tsStored; // if stored for this zone timestep
 		bool thisTSStored; // if stored for this zone timestep
 		int thisTSCount;
-		int ReportFreq; // How often to report this variable
+		ReportingFrequency frequency; // How often to report this variable
 		int MaxValue; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
 		int maxValueDate; // Date stamp of maximum
 		int MinValue; // Minimum reporting (only for Averaged variables, and those greater than Time Step)
@@ -353,13 +350,13 @@ namespace OutputProcessor {
 			EITSValue( 0.0 ),
 			StoreValue( 0.0 ),
 			NumStored( 0.0 ),
-			StoreType( 0 ),
+			storeType( StoreType::Averaged ),
 			Stored( false ),
 			Report( false ),
 			tsStored( false ),
 			thisTSStored( false ),
 			thisTSCount( 0 ),
-			ReportFreq( 0 ),
+			frequency( ReportingFrequency::Hourly ),
 			MaxValue( -9999 ),
 			maxValueDate( 0 ),
 			MinValue( 9999 ),
@@ -374,7 +371,7 @@ namespace OutputProcessor {
 	{
 		// Members
 		int IndexType; // Type whether Zone or HVAC
-		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
 		int VariableType; // Integer, Real.
 		int Next; // Next variable of same name (different units)
 		bool ReportedOnDDFile; // true after written to .rdd/.mdd file
@@ -385,7 +382,7 @@ namespace OutputProcessor {
 		// Default Constructor
 		VariableTypeForDDOutput() :
 			IndexType( 0 ),
-			StoreType( 0 ),
+			storeType( StoreType::Averaged ),
 			VariableType( VarType_NotFound ),
 			Next( 0 ),
 			ReportedOnDDFile( false ),
@@ -398,7 +395,7 @@ namespace OutputProcessor {
 	{
 		// Members
 		int IndexType; // Type whether Zone or HVAC
-		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
 		int ReportID; // Report variable ID number
 		std::string VarName; // Name of Variable key:variable
 		std::string VarNameUC; // Name of Variable (Uppercase)
@@ -412,7 +409,7 @@ namespace OutputProcessor {
 		// Default Constructor
 		RealVariableType() :
 			IndexType( 0 ),
-			StoreType( 0 ),
+			storeType( StoreType::Averaged ),
 			ReportID( 0 ),
 			units( OutputProcessor::Unit::None )
 		{}
@@ -423,7 +420,7 @@ namespace OutputProcessor {
 	{
 		// Members
 		int IndexType; // Type whether Zone or HVAC
-		int StoreType; // Variable Type (Summed/Non-Static or Average/Static)
+		StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
 		int ReportID; // Report variable ID number
 		std::string VarName; // Name of Variable
 		std::string VarNameUC; // Name of Variable
@@ -434,7 +431,7 @@ namespace OutputProcessor {
 		// Default Constructor
 		IntegerVariableType() :
 			IndexType( 0 ),
-			StoreType( 0 ),
+			storeType( StoreType::Averaged ),
 			ReportID( 0 ),
 			units( OutputProcessor::Unit::None )
 		{}
@@ -446,14 +443,14 @@ namespace OutputProcessor {
 		// Members
 		std::string Key; // Could be blank or "*"
 		std::string VarName; // Name of Variable
-		int ReportFreq; // Reporting Frequency
+		ReportingFrequency frequency; // Reporting Frequency
 		int SchedPtr; // Index of the Schedule
 		std::string SchedName; // Schedule Name
 		bool Used; // True when this combination (key, varname, frequency) has been set
 
 		// Default Constructor
 		ReqReportVariables() :
-			ReportFreq( 0 ),
+			frequency( ReportingFrequency::Hourly ),
 			SchedPtr( 0 ),
 			Used( false )
 		{}
@@ -702,24 +699,23 @@ namespace OutputProcessor {
 	void
 	GetReportVariableInput();
 
-	void
-	DetermineFrequency(
-		std::string const & FreqString,
-		int & ReportFreq
+	ReportingFrequency
+	determineFrequency(
+		std::string const & FreqString
 	);
 
 	void
 	ProduceMinMaxString(
 		std::string & String, // Current value
 		int const DateValue, // Date of min/max
-		int const ReportFreq // Reporting Frequency
+		ReportingFrequency const ReportFreq // Reporting Frequency
 	);
 
 	void
 	ProduceMinMaxStringWStartMinute(
 		std::string & String, // Current value
 		int const DateValue, // Date of min/max
-		int const ReportFreq // Reporting Frequency
+		ReportingFrequency const ReportFreq // Reporting Frequency
 	);
 
 	inline
@@ -756,11 +752,11 @@ namespace OutputProcessor {
 	std::string
 	StandardIndexTypeKey( int const IndexType );
 
-	int
-	ValidateVariableType( std::string const & VariableTypeKey );
+	StoreType
+	validateVariableType( std::string const & VariableTypeKey );
 
 	std::string
-	StandardVariableTypeKey( int const VariableType );
+	standardVariableTypeKey( StoreType const VariableType );
 
 	// *****************************************************************************
 	// The following routines implement Energy Meters in EnergyPlus.
@@ -904,7 +900,7 @@ namespace OutputProcessor {
 	void
 	WriteTimeStampFormatData(
 		std::ostream * out_stream_p, // Output stream pointer
-		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
+		ReportingFrequency const reportingInterval, // Reporting frequency.
 		int const reportID, // The ID of the time stamp
 		std::string const & reportIDString, // The ID of the time stamp
 		int const DayOfSim, // the number of days simulated so far
@@ -921,8 +917,8 @@ namespace OutputProcessor {
 
 	void
 	WriteReportVariableDictionaryItem(
-		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
-		int const storeType,
+		ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
+		StoreType const storeType,
 		int const reportID, // The reporting ID for the data
 		int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
 		std::string const & indexGroup, // The reporting group (e.g., Zone, Plant Loop, etc.)
@@ -937,8 +933,8 @@ namespace OutputProcessor {
 
 	void
 	WriteMeterDictionaryItem(
-		int const reportingInterval, // The reporting interval (e.g., hourly, daily)
-		int const storeType,
+		ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
+		StoreType const storeType,
 		int const reportID, // The reporting ID in for the variable
 		int const indexGroupKey, // The reporting group for the variable
 		std::string const & indexGroup, // The reporting group for the variable
@@ -952,7 +948,7 @@ namespace OutputProcessor {
 	void
 	WriteRealVariableOutput(
 		RealVariables &realVar, // Real variable to write out
-		int const reportType // The report type or interval (e.g., hourly)
+		ReportingFrequency const reportType // The report type or interval (e.g., hourly)
 	);
 
 	void
@@ -960,9 +956,9 @@ namespace OutputProcessor {
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
 		Real64 const repValue, // The variable's value
-		int const storeType, // Averaged or Sum
+		StoreType const storeType, // Averaged or Sum
 		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
-		int const reportingInterval, // The variable's reporting interval (e.g., daily)
+		ReportingFrequency const reportingInterval, // The variable's reporting interval (e.g., daily)
 		Real64 const minValue, // The variable's minimum value during the reporting interval
 		int const minValueDate, // The date the minimum value occurred
 		Real64 const MaxValue, // The variable's maximum value during the reporting interval
@@ -982,7 +978,7 @@ namespace OutputProcessor {
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
 		Real64 const repValue, // The variable's value
-		int const reportingInterval, // The variable's reporting interval (e.g., hourly)
+		ReportingFrequency const reportingInterval, // The variable's reporting interval (e.g., hourly)
 		Real64 const minValue, // The variable's minimum value during the reporting interval
 		int const minValueDate, // The date the minimum value occurred
 		Real64 const MaxValue, // The variable's maximum value during the reporting interval
@@ -1014,7 +1010,7 @@ namespace OutputProcessor {
 	void
 	WriteIntegerVariableOutput(
 		IntegerVariables &intVar, // Integer variable to write out
-		int const reportType // The report type (i.e., the reporting interval)
+		ReportingFrequency const reportType // The report type (i.e., the reporting interval)
 	);
 
 	void
@@ -1022,9 +1018,9 @@ namespace OutputProcessor {
 		int const reportID, // The variable's reporting ID
 		std::string const & reportIDString, // The variable's reporting ID (character)
 		Real64 const repValue, // The variable's value
-		int const storeType, // Type of item (averaged or summed)
+		StoreType const storeType, // Type of item (averaged or summed)
 		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
-		int const reportingInterval, // The reporting interval (e.g., monthly)
+		ReportingFrequency const reportingInterval, // The reporting interval (e.g., monthly)
 		int const minValue, // The variable's minimum value during the reporting interval
 		int const minValueDate, // The date the minimum value occurred
 		int const MaxValue, // The variable's maximum value during the reporting interval
@@ -1145,7 +1141,7 @@ void
 SetInitialMeterReportingAndOutputNames(
 	int const WhichMeter, // Which meter number
 	bool const MeterFileOnlyIndicator, // true if this is a meter file only reporting
-	int const FrequencyIndicator, // at what frequency is the meter reported
+	OutputProcessor::ReportingFrequency const FrequencyIndicator, // at what frequency is the meter reported
 	bool const CumulativeIndicator // true if this is a Cumulative meter reporting
 );
 
@@ -1206,7 +1202,7 @@ GetVariableKeyCountandType(
 	std::string const & varName, // Standard variable name
 	int & numKeys, // Number of keys found
 	int & varType, // 0=not found, 1=integer, 2=real, 3=meter
-	int & varAvgSum, // Variable  is Averaged=1 or Summed=2
+	OutputProcessor::StoreType & varAvgSum, // Variable  is Averaged=1 or Summed=2
 	int & varStepType, // Variable time step is Zone=1 or HVAC=2
 	OutputProcessor::Unit & varUnits // Units enumeration
 );
@@ -1232,7 +1228,7 @@ void
 AddToOutputVariableList(
 	std::string const & VarName, // Variable Name
 	int const IndexType,
-	int const StateType,
+	OutputProcessor::StoreType const StateType,
 	int const VariableType,
 	OutputProcessor::Unit const unitsForVar,
 	Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units

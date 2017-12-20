@@ -92,7 +92,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_getVariableKeys )
 
 	int keyCount = 0;
 	int typeVar = 0;
-	int avgSumVar = 0;
+	OutputProcessor::StoreType avgSumVar;
 	int stepTypeVar = 0;
 	OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
 
