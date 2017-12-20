@@ -591,17 +591,14 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true );
 		int Item;
 		int Loop;
 		int Pos;
 		int MinLook;
 		int MaxLook;
 
-		if ( GetInputFlag ) {
-			GetReportVariableInput();
-			GetInputFlag = false;
-		}
+		// Make sure that input has been read
+		GetReportVariableInput();
 
 		if ( NumOfReqVariables > 0 ) {
 			// Do a quick check
@@ -974,6 +971,15 @@ namespace OutputProcessor {
 		// Formats
 		static gio::Fmt Format_800( "('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')" );
 		static gio::Fmt Format_801( "(' Minimum Reporting Frequency, ',A,',',A)" );
+
+		// Flag to prevent multiple reads of the input
+		static bool GetInputFlag( true );
+
+		// Bail out if the input has already been read in
+		if ( !GetInputFlag ) {
+			return;
+		}
+		GetInputFlag = false;
 
 		// First check environment variable to see of possible override for minimum reporting frequency
 		if ( MinReportFrequency != "" ) {
