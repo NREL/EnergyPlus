@@ -80583,6 +80583,7 @@ Generator:PVWatts,
       \note Applies only to arrays with one-axis tracking and is the ratio of module surface area
       \note to area of the ground or roof occupied by the array.
       \type real
+      \default 0.4
       \minimum 0
       \maximum 1
 

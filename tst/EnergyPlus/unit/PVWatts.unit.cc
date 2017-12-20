@@ -46,6 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus::ElectricPowerServiceManager Unit Tests
+#include <map>
+#include <string>
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -70,10 +72,64 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_Constructor )
     EXPECT_EQ(GeometryType::TILT_AZIMUTH, pvw.getGeometryType());
     EXPECT_DOUBLE_EQ(20.0, pvw.getTilt());
     EXPECT_DOUBLE_EQ(180.0, pvw.getAzimuth());
-    EXPECT_DOUBLE_EQ(1.0, pvw.getGroundCoverageRatio());
+    EXPECT_DOUBLE_EQ(0.4, pvw.getGroundCoverageRatio());
     
     ASSERT_THROW(PVWattsGenerator pvw2("", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1), std::runtime_error);
     std::string const error_string = "   ** Severe  ** PVWatts: name cannot be blank.\n   ** Severe  ** PVWatts: DC system capacity must be greater than zero.\n   ** Severe  ** PVWatts: Invalid system loss value 1.10\n   ** Severe  ** PVWatts: Invalid tilt: 91.00\n   ** Severe  ** PVWatts: Invalid azimuth: 360.00\n   ** Severe  ** PVWatts: Invalid ground coverage ratio: -0.10\n   **  Fatal  ** Errors found in getting PVWatts input\n   ...Summary of Errors that led to program termination:\n   ..... Reference severe error count=6\n   ..... Last severe error=PVWatts: Invalid ground coverage ratio: -0.10\n";
     EXPECT_TRUE( compare_err_stream( error_string, true ) );
 }
 
+TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
+{
+    using namespace PVWatts;
+    const std::string idfTxt = delimited_string({
+        "Version, 8.8;",
+        "Generator:PVWatts,",
+        "PVWattsArray1,",
+        "5,",
+        "4000,",
+        "Premium,",
+        "OneAxis,",
+        ",",
+        ",",
+        ",",
+        ";"
+        "Generator:PVWatts,",
+        "PVWattsArray2,",
+        "5,",
+        "4000,",
+        "Premium,",
+        "OneAxis,",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ";"
+        "Generator:PVWatts,",
+        "PVWattsArray2,",
+        "5,",
+        "4000,",
+        "Premium,",
+        "OneAxis,",
+        ",",
+        ",",
+        "21,",
+        "175,",
+        ",",
+        "0.5;"
+    });
+    process_idf(idfTxt);
+    EXPECT_FALSE(has_err_output());
+    PVWattsGenerator pvw1 = PVWattsGenerator::createFromIdfObj(1);
+    EXPECT_EQ(pvw1.getModuleType(), ModuleType::PREMIUM);
+    EXPECT_EQ(pvw1.getArrayType(), ArrayType::ONE_AXIS);
+    EXPECT_DOUBLE_EQ(0.4, pvw1.getGroundCoverageRatio());
+    PVWattsGenerator pvw2 = PVWattsGenerator::createFromIdfObj(2);
+    EXPECT_DOUBLE_EQ(0.4, pvw2.getGroundCoverageRatio());
+    PVWattsGenerator pvw3 = PVWattsGenerator::createFromIdfObj(3);
+    EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
+    EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
+    EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
+
+}

@@ -62,7 +62,7 @@ namespace PVWatts {
 
     std::map<std::string, PVWattsGenerator> PVWattsGenerators;
     
-    PVWattsGenerator::PVWattsGenerator(const std::string &name, const double dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, double systemLosses, GeometryType geometryType, double tilt, double azimuth, size_t surfaceNum, double groundCoverageRatio)
+    PVWattsGenerator::PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses, GeometryType geometryType, Real64 tilt, Real64 azimuth, size_t surfaceNum, Real64 groundCoverageRatio)
     {
         using General::RoundSigDigits;
         bool errorsFound(false);
@@ -105,8 +105,10 @@ namespace PVWatts {
                 ShowSevereError("PVWatts: SurfaceNum not in Surfaces: " + std::to_string(surfaceNum));
                 errorsFound = true;
             } else {
-                m_surfacePtr = &DataSurfaces::Surface(surfaceNum);
-                // TODO: Calculate tilt and azimuth from the surface.
+                m_surfaceNum = surfaceNum;
+                m_tilt = getSurface().Tilt;
+                m_azimuth = getSurface().Azimuth;
+                // TODO: Do some bounds checking on Tilt and Azimuth.
             }
         } else {
             assert(false);
@@ -123,7 +125,57 @@ namespace PVWatts {
         }
     }
     
-    double PVWattsGenerator::getDCSystemCapacity()
+    PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
+    {
+        using InputProcessor::GetObjectItem;
+        using InputProcessor::SameString;
+        using InputProcessor::FindItemInList;
+        
+        Array1D_string cAlphaFieldNames;
+        Array1D_string cNumericFieldNames;
+        Array1D_bool lNumericFieldBlanks;
+        Array1D_bool lAlphaFieldBlanks;
+        Array1D_string cAlphaArgs;
+        Array1D< Real64 > rNumericArgs;
+        const int maxAlphas = 6; // from idd
+        const int maxNumeric = 5; // from idd
+        cAlphaFieldNames.allocate(maxAlphas);
+        cNumericFieldNames.allocate(maxNumeric);
+        lNumericFieldBlanks.allocate(maxNumeric);
+        lAlphaFieldBlanks.allocate(maxAlphas);
+        cAlphaArgs.allocate(maxAlphas);
+        rNumericArgs.allocate(maxNumeric);
+        int NumAlphas;
+        int NumNums;
+        int IOStat;
+
+        GetObjectItem("Generator:PVWatts", objNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+        
+        const std::string name(cAlphaArgs(AlphaFields::NAME));
+        const Real64 dcSystemCapacity(rNumericArgs(NumFields::DC_SYSTEM_CAPACITY));
+        const std::map<std::string, ModuleType> moduleTypeMap = { {"STANDARD", ModuleType::STANDARD}, {"PREMIUM", ModuleType::PREMIUM}, {"ThinFilm", ModuleType::THIN_FILM} };
+        const ModuleType moduleType(moduleTypeMap.at(cAlphaArgs(AlphaFields::MODULE_TYPE)));
+        const std::map<std::string, ArrayType> arrayTypeMap = { {"FIXEDOPENRACK", ArrayType::FIXED_OPEN_RACK}, {"FIXEDROOFMOUNTED", ArrayType::FIXED_ROOF_MOUNTED}, {"ONEAXIS", ArrayType::ONE_AXIS}, {"ONEAXISBACKTRACKING", ArrayType::ONE_AXIS_BACKTRACKING}, {"TWOAXIS", ArrayType::TWO_AXIS} };
+        const ArrayType arrayType(arrayTypeMap.at(cAlphaArgs(AlphaFields::ARRAY_TYPE)));
+        const Real64 systemLosses(rNumericArgs(NumFields::SYSTEM_LOSSES));
+        const std::map<std::string, GeometryType> geometryTypeMap { {"TILTAZIMUTH", GeometryType::TILT_AZIMUTH}, {"SURFACE", GeometryType::SURFACE} };
+        const GeometryType geometryType(geometryTypeMap.at(cAlphaArgs(AlphaFields::GEOMETRY_TYPE)));
+        const Real64 tilt(rNumericArgs(NumFields::TILT_ANGLE));
+        const Real64 azimuth(rNumericArgs(NumFields::AZIMUTH_ANGLE));
+        int surfaceNum;
+        if (lAlphaFieldBlanks(AlphaFields::SURFACE_NAME)) {
+            surfaceNum = 0;
+        } else {
+            surfaceNum = FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), DataSurfaces::Surface);
+        }
+        if ( NumNums < NumFields::GROUND_COVERAGE_RATIO ) {
+            return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum);
+        }
+        const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
+        return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
+    }
+    
+    Real64 PVWattsGenerator::getDCSystemCapacity()
     {
         return m_dcSystemCapacity;
     }
@@ -138,7 +190,7 @@ namespace PVWatts {
         return m_arrayType;
     }
     
-    double PVWattsGenerator::getSystemLosses()
+    Real64 PVWattsGenerator::getSystemLosses()
     {
         return m_systemLosses;
     }
@@ -148,22 +200,22 @@ namespace PVWatts {
         return m_geometryType;
     }
     
-    double PVWattsGenerator::getTilt()
+    Real64 PVWattsGenerator::getTilt()
     {
         return m_tilt;
     }
     
-    double PVWattsGenerator::getAzimuth()
+    Real64 PVWattsGenerator::getAzimuth()
     {
         return m_azimuth;
     }
     
-    DataSurfaces::SurfaceData* PVWattsGenerator::getSurface()
+    DataSurfaces::SurfaceData& PVWattsGenerator::getSurface()
     {
-        return m_surfacePtr;
+        return DataSurfaces::Surface(m_surfaceNum);
     }
     
-    double PVWattsGenerator::getGroundCoverageRatio()
+    Real64 PVWattsGenerator::getGroundCoverageRatio()
     {
         return m_groundCoverageRatio;
     }

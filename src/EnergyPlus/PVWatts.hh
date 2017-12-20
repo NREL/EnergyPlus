@@ -84,29 +84,52 @@ namespace PVWatts {
     class PVWattsGenerator
     {
     private:
+
+        enum AlphaFields {
+            NAME = 1,
+            VERSION = 2,
+            MODULE_TYPE = 3,
+            ARRAY_TYPE = 4,
+            GEOMETRY_TYPE = 5,
+            SURFACE_NAME = 6,
+        };
+
+        enum NumFields {
+            DC_SYSTEM_CAPACITY = 1,
+            SYSTEM_LOSSES = 2,
+            TILT_ANGLE = 3,
+            AZIMUTH_ANGLE = 4,
+            GROUND_COVERAGE_RATIO = 5,
+        };
+        
         std::string m_name;
-        double m_dcSystemCapacity;
+        Real64 m_dcSystemCapacity;
         ModuleType m_moduleType;
         ArrayType m_arrayType;
-        double m_systemLosses;
+        Real64 m_systemLosses;
         GeometryType m_geometryType;
-        double m_tilt;
-        double m_azimuth;
-        DataSurfaces::SurfaceData *m_surfacePtr;
-        double m_groundCoverageRatio;
+        Real64 m_tilt;
+        Real64 m_azimuth;
+        int m_surfaceNum;
+        Real64 m_groundCoverageRatio;
+
+        
+
         
     public:
-        PVWattsGenerator(const std::string &name, const double dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, double systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, double tilt=20.0, double azimuth=180.0, size_t surfaceNum=0, double groundCoverageRatio=1.0);
+        static PVWattsGenerator createFromIdfObj(int objNum);
         
-        double getDCSystemCapacity();
+        PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4);
+        
+        Real64 getDCSystemCapacity();
         ModuleType getModuleType();
         ArrayType getArrayType();
-        double getSystemLosses();
+        Real64 getSystemLosses();
         GeometryType getGeometryType();
-        double getTilt();
-        double getAzimuth();
-        DataSurfaces::SurfaceData* getSurface();
-        double getGroundCoverageRatio();
+        Real64 getTilt();
+        Real64 getAzimuth();
+        DataSurfaces::SurfaceData& getSurface();
+        Real64 getGroundCoverageRatio();
         
     };
     
