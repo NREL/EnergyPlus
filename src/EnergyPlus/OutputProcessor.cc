@@ -133,13 +133,6 @@ namespace OutputProcessor {
 	// in this file should obey a USE OutputProcessor, ONLY: rule.
 
 	// MODULE PARAMETER DEFINITIONS:
-	//int const ReportEach( -1 ); // Write out each time UpdatedataandReport is called
-	int const ReportTimeStep( 0 ); // Write out at 'EndTimeStepFlag'
-	int const ReportHourly( 1 ); // Write out at 'EndHourFlag'
-	int const ReportDaily( 2 ); // Write out at 'EndDayFlag'
-	int const ReportMonthly( 3 ); // Write out at end of month (must be determined)
-	int const ReportSim( 4 ); // Write out once per environment 'EndEnvrnFlag'
-
 	int const ReportVDD_No( 0 ); // Don't report the variable dictionaries in any form
 	int const ReportVDD_Yes( 1 ); // Report the variable dictionaries in "report format"
 	int const ReportVDD_IDF( 2 ); // Report the variable dictionaries in "IDF format"
@@ -151,9 +144,6 @@ namespace OutputProcessor {
 
 	int const ZoneVar( 1 ); // Type value for those variables reported on the Zone Time Step
 	int const HVACVar( 2 ); // Type value for those variables reported on the System Time Step
-
-	int const AveragedVar( 1 ); // Type value for "averaged" variables
-	int const SummedVar( 2 ); // Type value for "summed" variables
 
 	int const VarType_NotFound( 0 ); // ref: GetVariableKeyCountandType, 0 = not found
 	int const VarType_Integer( 1 ); // ref: GetVariableKeyCountandType, 1 = integer
@@ -226,7 +216,6 @@ namespace OutputProcessor {
 	Array1D_int ReportList;
 	int NumReportList( 0 );
 	int NumExtraVars( 0 );
-	Array2D_string FreqNotice( {1,2}, {-1,4} ); // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
 
 	int NumOfReqVariables( 0 ); // Current number of Requested Report Variables
 
@@ -345,7 +334,6 @@ namespace OutputProcessor {
 		ReportList.deallocate();
 		NumReportList = 0;
 		NumExtraVars = 0;
-		FreqNotice.dimension( {1,2}, {-1,4} );
 		NumOfReqVariables = 0;
 		NumVarMeterArrays = 0;
 		NumEnergyMeters = 0;
@@ -432,18 +420,18 @@ namespace OutputProcessor {
 		// First index is the frequency designation (-1 = each call, etc)
 		// Second index is the variable type (1=Average, 2=Sum)
 		// Note, Meters always report like Average (with min/max, etc) for hourly and above
-		FreqNotice( 1, -1 ) = " !Each Call";
-		FreqNotice( 1, 0 ) = " !TimeStep";
-		FreqNotice( 1, 1 ) = " !Hourly";
-		FreqNotice( 1, 2 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 1, 3 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 1, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
-		FreqNotice( 2, -1 ) = " !Each Call";
-		FreqNotice( 2, 0 ) = " !TimeStep";
-		FreqNotice( 2, 1 ) = " !Hourly";
-		FreqNotice( 2, 2 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 2, 3 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 2, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		//FreqNotice( 1, -1 ) = " !Each Call";
+		//FreqNotice( 1, 0 ) = " !TimeStep";
+		//FreqNotice( 1, 1 ) = " !Hourly";
+		//FreqNotice( 1, 2 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
+		//FreqNotice( 1, 3 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		//FreqNotice( 1, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		//FreqNotice( 2, -1 ) = " !Each Call";
+		//FreqNotice( 2, 0 ) = " !TimeStep";
+		//FreqNotice( 2, 1 ) = " !Hourly";
+		//FreqNotice( 2, 2 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
+		//FreqNotice( 2, 3 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		//FreqNotice( 2, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
 
 		ReportList.allocate( 500 );
 		NumReportList = 500;

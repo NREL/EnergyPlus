@@ -148,7 +148,6 @@ namespace OutputProcessor {
 	extern Array1D_int ReportList;
 	extern int NumReportList;
 	extern int NumExtraVars;
-	extern Array2D_string FreqNotice; // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
 
 	extern int NumOfReqVariables; // Current number of Requested Report Variables
 
