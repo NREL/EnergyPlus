@@ -1256,6 +1256,9 @@ namespace SizingManager {
 
 				//the design zone ventilation value is based on the larger of the system-level cooling Vot and/or heating Vot
 				FinalSysSizing( AirLoopNum ).DesOutAirVolFlow = max( VotClgBySys( AirLoopNum ), VotHtgBySys( AirLoopNum ) );
+				//Fill Xs values for reporting
+				DataSizing::XsBySysCool( AirLoopNum ) = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / DataSizing::VpsClgBySys( AirLoopNum );
+				DataSizing::XsBySysHeat( AirLoopNum ) = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / DataSizing::VpsHtgBySys( AirLoopNum );
 
 			} else { // not vrp, zone sum, fill out values that still apply
 				// redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
