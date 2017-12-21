@@ -158,7 +158,7 @@ To specify the order of when shades are deployed, the two different approaches c
 
 It is possible to mix these two approaches. For example, if first a group of shades is controlled together followed by a sequence of individual windows than these approaches can be combined with the Multiple Surface Control Type field should be set to Sequential in the second WindowShadingControl object.
 
-###Inputs
+### Inputs
 
 Only showing new fields in the following:
 
