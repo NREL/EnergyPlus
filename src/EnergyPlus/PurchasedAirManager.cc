@@ -2306,12 +2306,8 @@ namespace PurchasedAirManager {
 
 		if ( PurchAir( PurchAirNum ).PlenumExhaustAirNodeNum > 0 ) {
 			Node( PurchAir( PurchAirNum ).PlenumExhaustAirNodeNum ).MassFlowRate = SupplyMassFlowRate;
-			Node( RecircNodeNum ).MassFlowRate = SupplyMassFlowRate;
-		} else {
-			if ( PurchAir( PurchAirNum ).ZoneExhaustAirNodeNum > 0 && abs( Node( PurchAir( PurchAirNum ).ZoneExhaustAirNodeNum ).MassFlowRate - SupplyMassFlowRate) > rTinyValue ) {
-				Node( PurchAir( PurchAirNum ).ZoneExhaustAirNodeNum ).MassFlowRate = SupplyMassFlowRate;
-			}
 		}
+		Node( RecircNodeNum ).MassFlowRate = SupplyMassFlowRate;
 
 	}
 
