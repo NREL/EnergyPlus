@@ -13,7 +13,7 @@
 ! Plant:    None.
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,4;
 
@@ -705,7 +705,7 @@
     Zone 1 Inlets,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Zone 1 Inlets,           !- Name
@@ -713,6 +713,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone 1 Equipment,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone 1 Direct Air,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

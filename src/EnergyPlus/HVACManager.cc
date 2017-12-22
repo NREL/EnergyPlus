@@ -851,6 +851,11 @@ namespace HVACManager {
 				// the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
 				SimAirLoopsFlag = true;
 			}
+			if ( HVACManageIteration < MinAirLoopIterationsAfterFirst ) {
+				// sequenced zone loads only work if there are at least two iterations after FirstHVACIteraion
+				SimAirLoopsFlag = true;
+				SimZoneEquipmentFlag = true;
+			}
 
 		}
 		if ( AnyPlantInModel ) {

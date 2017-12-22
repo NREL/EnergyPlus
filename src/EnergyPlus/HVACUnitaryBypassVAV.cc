@@ -1195,6 +1195,20 @@ namespace HVACUnitaryBypassVAV {
 							ShowContinueError( "Thermostat not found in zone = " + ZoneEquipConfig( CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum ) ).ZoneName + " and the simulation continues." );
 							ShowContinueError( "This zone will not be controlled to a temperature setpoint." );
 						}
+						int zoneNum = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
+						int zoneInlet = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
+						int coolingPriority = 0;
+						int heatingPriority = 0;
+						//setup zone equipment sequence information based on finding matching air terminal
+						if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
+							ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
+							CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) = coolingPriority;
+							CBVAV( CBVAVNum ).ZoneSequenceHeatingNum( AirLoopZoneNum ) = heatingPriority;
+						}
+						if ( CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) == 0 ) {
+							ShowSevereError( "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"" + CBVAV( CBVAVNum ).Name + "\", No matching air terminal found in the zone equipment list for zone = " + ZoneEquipConfig( zoneNum ).ZoneName + "." );
+							ErrorsFound = true;
+						}
 					} else {
 						ShowSevereError( "Controlled Zone node not found." );
 						ErrorsFound = true;

@@ -325,6 +325,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  ZoneEquipment,                  !- Name",
+		"  SequentialLoad,                 !- Load Distribution Scheme",
 		"  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
 		"  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
 		"  1,                              !- Zone Equipment 1 Cooling Sequence",
