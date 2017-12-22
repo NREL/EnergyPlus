@@ -57,84 +57,92 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
+#include <InputProcessor.hh>
 
 namespace EnergyPlus {
 
 namespace PVWatts {
-    
-    enum class ModuleType {
-        STANDARD,
-        PREMIUM,
-        THIN_FILM,
-    };
-    
-    enum class ArrayType {
-        FIXED_OPEN_RACK,
-        FIXED_ROOF_MOUNTED,
-        ONE_AXIS,
-        ONE_AXIS_BACKTRACKING,
-        TWO_AXIS,
-    };
-    
-    enum class GeometryType {
-        TILT_AZIMUTH,
-        SURFACE,
-    };
-    
-    class PVWattsGenerator
-    {
-    private:
 
-        enum AlphaFields {
-            NAME = 1,
-            VERSION = 2,
-            MODULE_TYPE = 3,
-            ARRAY_TYPE = 4,
-            GEOMETRY_TYPE = 5,
-            SURFACE_NAME = 6,
-        };
+	enum class ModuleType {
+		STANDARD,
+		PREMIUM,
+		THIN_FILM,
+	};
 
-        enum NumFields {
-            DC_SYSTEM_CAPACITY = 1,
-            SYSTEM_LOSSES = 2,
-            TILT_ANGLE = 3,
-            AZIMUTH_ANGLE = 4,
-            GROUND_COVERAGE_RATIO = 5,
-        };
-        
-        std::string m_name;
-        Real64 m_dcSystemCapacity;
-        ModuleType m_moduleType;
-        ArrayType m_arrayType;
-        Real64 m_systemLosses;
-        GeometryType m_geometryType;
-        Real64 m_tilt;
-        Real64 m_azimuth;
-        int m_surfaceNum;
-        Real64 m_groundCoverageRatio;
+	enum class ArrayType {
+		FIXED_OPEN_RACK,
+		FIXED_ROOF_MOUNTED,
+		ONE_AXIS,
+		ONE_AXIS_BACKTRACKING,
+		TWO_AXIS,
+	};
 
-        
+	enum class GeometryType {
+		TILT_AZIMUTH,
+		SURFACE,
+	};
 
-        
-    public:
-        static PVWattsGenerator createFromIdfObj(int objNum);
-        
-        PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4);
-        
-        Real64 getDCSystemCapacity();
-        ModuleType getModuleType();
-        ArrayType getArrayType();
-        Real64 getSystemLosses();
-        GeometryType getGeometryType();
-        Real64 getTilt();
-        Real64 getAzimuth();
-        DataSurfaces::SurfaceData& getSurface();
-        Real64 getGroundCoverageRatio();
-        
-    };
-    
-    extern std::map<std::string, PVWattsGenerator> PVWattsGenerators;
-    
+	class PVWattsGenerator
+	{
+	private:
+
+		enum AlphaFields {
+			NAME = 1,
+			VERSION = 2,
+			MODULE_TYPE = 3,
+			ARRAY_TYPE = 4,
+			GEOMETRY_TYPE = 5,
+			SURFACE_NAME = 6,
+		};
+
+		enum NumFields {
+			DC_SYSTEM_CAPACITY = 1,
+			SYSTEM_LOSSES = 2,
+			TILT_ANGLE = 3,
+			AZIMUTH_ANGLE = 4,
+			GROUND_COVERAGE_RATIO = 5,
+		};
+
+		std::string m_name;
+		Real64 m_dcSystemCapacity;
+		ModuleType m_moduleType;
+		ArrayType m_arrayType;
+		Real64 m_systemLosses;
+		GeometryType m_geometryType;
+		Real64 m_tilt;
+		Real64 m_azimuth;
+		int m_surfaceNum;
+		Real64 m_groundCoverageRatio;
+
+		Real64 m_gamma;
+		bool m_useARGlass;
+		int m_trackMode;
+		Real64 m_inoct;
+		int m_shadeMode1x;
+
+	public:
+		static PVWattsGenerator createFromIdfObj(int objNum);
+
+		PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4);
+
+		Real64 getDCSystemCapacity();
+		ModuleType getModuleType();
+		ArrayType getArrayType();
+		Real64 getSystemLosses();
+		GeometryType getGeometryType();
+		Real64 getTilt();
+		Real64 getAzimuth();
+		DataSurfaces::SurfaceData& getSurface();
+		Real64 getGroundCoverageRatio();
+
+	};
+
+	extern std::map<int, PVWattsGenerator> PVWattsGenerators;
+
+	PVWattsGenerator& GetOrCreatePVWattsGenerator(std::string const & GeneratorName);
+
+	void SimPVWattsGenerator(std::string const & GeneratorName, bool const RunFlag);
+
 }
 
 }

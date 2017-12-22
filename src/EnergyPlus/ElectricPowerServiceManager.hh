@@ -558,7 +558,8 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 		fuelCell,
 		microCHP,
 		microturbine,
-		windTurbine
+		windTurbine,
+				pvWatts
 	};
 
 	std::string name; // user identifier

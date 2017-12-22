@@ -81572,6 +81572,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81595,6 +81596,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81618,6 +81620,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81641,6 +81644,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81664,6 +81668,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81687,6 +81692,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81710,6 +81716,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81733,6 +81740,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81756,6 +81764,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81779,6 +81788,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81802,6 +81812,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81825,6 +81836,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81848,6 +81860,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81871,6 +81884,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81894,6 +81908,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81917,6 +81932,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81940,6 +81956,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81963,6 +81980,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81986,6 +82004,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82009,6 +82028,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82032,6 +82052,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82055,6 +82076,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82078,6 +82100,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82101,6 +82124,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82124,6 +82148,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82147,6 +82172,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82170,6 +82196,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82193,6 +82220,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82216,6 +82244,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82239,6 +82268,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
