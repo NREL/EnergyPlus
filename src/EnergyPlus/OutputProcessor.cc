@@ -246,6 +246,8 @@ namespace OutputProcessor {
 	int MaxNumSubcategories( 1 );
 	bool isFinalYear( false );
 
+	bool GetOutputInputFlag( true );
+
 	ReportingFrequency minimumReportFrequency( ReportingFrequency::EachCall );
 
 	namespace {
@@ -326,6 +328,7 @@ namespace OutputProcessor {
 		NumOfIVariable = 0;
 		MaxIVariable = 0;
 		OutputInitialized = false;
+		GetOutputInputFlag = true;
 		ProduceReportVDD = ReportVDD_No;
 		OutputFileMeterDetails = 0;
 		NumHoursInDay = 24;
@@ -966,26 +969,22 @@ namespace OutputProcessor {
 		Array1D< Real64 > rNumericArgs( 1 );
 		Array1D_string cNumericFieldNames( 1 );
 		Array1D_bool lNumericFieldBlanks( 1 );
-		ReportingFrequency minimumReportingFrequency( ReportingFrequency::EachCall );
 
 		// Formats
 		static gio::Fmt Format_800( "('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')" );
 		static gio::Fmt Format_801( "(' Minimum Reporting Frequency, ',A,',',A)" );
 
-		// Flag to prevent multiple reads of the input
-		static bool GetInputFlag( true );
-
 		// Bail out if the input has already been read in
-		if ( !GetInputFlag ) {
+		if ( !GetOutputInputFlag ) {
 			return;
 		}
-		GetInputFlag = false;
+		GetOutputInputFlag = false;
 
 		// First check environment variable to see of possible override for minimum reporting frequency
 		if ( MinReportFrequency != "" ) {
 			minimumReportFrequency = determineFrequency( MinReportFrequency );
 			gio::write( OutputFileInits, Format_800 );
-			gio::write( OutputFileInits, Format_801 ) << frequencyNotice( StoreType::Averaged, minimumReportingFrequency ) << MinReportFrequency;
+			gio::write( OutputFileInits, Format_801 ) << frequencyNotice( StoreType::Averaged, minimumReportFrequency ) << MinReportFrequency;
 		}
 
 		cCurrentModuleObject = "Output:Variable";

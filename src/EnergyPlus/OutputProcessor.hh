@@ -178,6 +178,8 @@ namespace OutputProcessor {
 	extern int MaxNumSubcategories;
 	extern bool isFinalYear;
 
+  extern bool GetOutputInputFlag; // First time, input is "gotten"
+
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
 	//PUBLIC  SetReportNow
