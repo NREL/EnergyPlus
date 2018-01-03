@@ -536,9 +536,8 @@ namespace EconomicTariff {
 				}
 
 			// If it's an electric meter
-			// Does THERM make sense for an electric meter?
-			// Volumetric units such as MCF or CCF doesn't make sense IMHO
-			// Currently I accept but issue a warning.
+			// Volumetric units such as MCF or CCF doesn't make sense IMHO (JM)
+			// THERM is strange for an electric meter but currently I accept but issue a warning
 			} else if ( tariff( iInObj ).kindElectricMtr != kindMeterNotElectric ) {
 				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
 					tariff( iInObj ).convChoice = conversionUSERDEF;
