@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -344,20 +345,20 @@ namespace EnergyPlus {
 		TEST_F( EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
 	{
 
-		std::string const idf_objects = delimited_string( {
-			" Version,8.5;",
+			std::string const idf_objects = delimited_string({
+				" Version,8.5;",
 
-			"AirLoopHVAC,",
-			"  DOAS,                    !- Name",
-			"  ,                        !- Controller List Name",
-			"  DOAS Availability Managers,  !- Availability Manager List Name",
-			"  autosize,                !- Design Supply Air Flow Rate {m3/s}",
-			"  DOAS Branches,           !- Branch List Name",
-			"  ,                        !- Connector List Name",
-			"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
-			"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
-			"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
-			"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
+				"AirLoopHVAC,",
+				"  DOAS,                    !- Name",
+				"  ,                        !- Controller List Name",
+				"  DOAS Availability Managers,  !- Availability Manager List Name",
+				"  autosize,                !- Design Supply Air Flow Rate {m3/s}",
+				"  DOAS Branches,           !- Branch List Name",
+				"  ,                        !- Connector List Name",
+				"  DOAS Air Loop Inlet,     !- Supply Side Inlet Node Name",
+				"  DOAS Return Air Outlet,  !- Demand Side Outlet Node Name",
+				"  DOAS Supply Path Inlet,  !- Demand Side Inlet Node Names",
+				"  DOAS Supply Fan Outlet;  !- Supply Side Outlet Node Names",
 
 			"AirLoopHVAC,",
 			"  Air Loop 1,                    !- Name",

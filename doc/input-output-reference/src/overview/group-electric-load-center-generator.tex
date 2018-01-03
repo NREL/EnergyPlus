@@ -2980,7 +2980,7 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
 \item
   HVAC,Sum, Generator Fuel Cell Model Iteration Count {[]}
 \item
-  HVAC,Sum,Generator Regula Falsi Iteration Count {[]}
+  HVAC,Sum,Generator Root Solver Iteration Count {[]}
 \end{itemize}
 
 \paragraph{Generator Air Inlet Temperature {[}C{]}}\label{generator-air-inlet-temperature-c}
@@ -3139,9 +3139,9 @@ This variable provides the results for the energy used by AC ancillaries. It is 
 
 This variable provides information on the numerical method used to calculate the FC model. EnergyPlus uses a sequential substitution iterative algorithm to solve the main heat balance equation for the FC model. This output variable indicates the number of iterations needed to converge.
 
-\paragraph{Generator Regula Falsi Iteration Count {[]}}\label{generator-regula-falsi-iteration-count}
+\paragraph{Generator Root Solver Iteration Count {[]}}\label{generator-regula-falsi-iteration-count}
 
-This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A Regula Falsi numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the Regula Falsi method to converge.
+This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A root solver numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the root solver method to converge.
 
 \paragraph{Generator Heat Recovery Exit Gas Temperature {[}C{]}}\label{generator-heat-recovery-exit-gas-temperature-c}
 

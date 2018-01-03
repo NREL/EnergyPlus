@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	// this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
 	// set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
 	std::string const idf_objects = delimited_string( {
-	" Version,8.7;",
+	" Version,8.9;",
 
 	"  Timestep,6;",
 
@@ -172,8 +173,9 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    ,                        !- Condenser Air Inlet Node Name",
 	"    AirCooled,               !- Condenser Type",
 	"    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
-	"    0.0,                   !- Crankcase Heater Capacity {W}",
+	"    0.0,                     !- Crankcase Heater Capacity {W}",
 	"    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+	"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 	"    ,                        !- Supply Water Storage Tank Name",
 	"    ,                        !- Condensate Collection Water Storage Tank Name",
 	"    ,                        !- Basin Heater Capacity {W/K}",
@@ -253,6 +255,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	"  ZoneHVAC:EquipmentList,",
 	"    Zone1Equipment,          !- Name",
+	"    SequentialLoad,          !- Load Distribution Scheme",
 	"    ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type",
 	"    Zone1WindAC,             !- Zone Equipment 1 Name",
 	"    1,                       !- Zone Equipment 1 Cooling Sequence",

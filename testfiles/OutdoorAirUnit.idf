@@ -25,7 +25,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -410,14 +410,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -434,26 +426,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Coil:Heating:Fuel,
     Zone2OAUHeatingCoil,     !- Name
@@ -663,39 +637,39 @@
     Zone5OAUFanOutletNode,   !- Supply FanOutlet Node Name
     Zone5OAUEquip1;          !- Outdoor Air Unit List Name
 
-Fan:SystemModel,
-  Zone5OAUFan1 , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Zone5OAUOANode,  !- Air Inlet Node Name
-  Zone5OAUFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone5OAUFan1,            !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Zone5OAUOANode,          !- Air Inlet Node Name
+    Zone5OAUFanOutletNode,   !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5;                     !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone5OAUExhaustFan1 , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
-  Zone5OAU Relief Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.5; !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone5OAUExhaustFan1,     !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
+    Zone5OAU Relief Node,    !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5;                     !- Fan Total Efficiency
 
   ZoneHVAC:OutdoorAirUnit:EquipmentList,
     Zone5OAUEquip1,          !- Name
@@ -722,43 +696,43 @@ Fan:SystemModel,
     10,                      !- Rotor Power {W}
     Coil:Heating:Fuel,       !- Regeneration Coil Object Type
     Desiccant Regen Coil,    !- Regeneration Coil Name
-    Fan:SystemModel,      !- Regeneration Fan Object Type
+    Fan:SystemModel,         !- Regeneration Fan Object Type
     Desiccant Regen Fan,     !- Regeneration Fan Name
     DEFAULT;                 !- Performance Model Type
 
-Fan:SystemModel,
-  Desiccant Regen Fan , !- Name
-  FanAndCoilAvailSched , !- Availability Schedule Name
-  Outside Air Inlet Node 2,  !- Air Inlet Node Name
-  Regen Coil Inlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Continuous , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  600.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.7,  !- Fan Total Efficiency 
-  VAV Fan Curve, !- Electric Power Function of Flow Fraction Curve Name
-  , !- Night Ventilation Mode Pressure Rise
-  , !- Night Ventilation Mode Flow Fraction
-  , !- Motor Loss Zone Name
-  , !- Motor Loss Radiative Fraction 
-  Fan Energy; !- End-Use Subcategory
+  Fan:SystemModel,
+    Desiccant Regen Fan,     !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Outside Air Inlet Node 2,!- Air Inlet Node Name
+    Regen Coil Inlet Node,   !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    600.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.7,                     !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    Fan Energy;              !- End-Use Subcategory
 
-Curve:Linear,
-  VAV Fan Curve,
-  0, ! constant
-  1, ! x coef
-  0, ! min x
-  1, ! max x
-  0, ! min output
-  1, ! max output
-  Dimensionless,
-  Dimensionless;
+  Curve:Linear,
+    VAV Fan Curve,           !- Name
+    0,                       !- Coefficient1 Constant
+    1,                       !- Coefficient2 x
+    0,                       !- Minimum Value of x
+    1,                       !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    1,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   HeatExchanger:AirToAir:FlatPlate,
     Zone5A2AHeat Recovery,   !- Name
@@ -841,6 +815,7 @@ Curve:Linear,
 
   ZoneHVAC:EquipmentList,
     Zone5Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone5WaterOutAir,        !- Zone Equipment 1 Name
     2,                       !- Zone Equipment 1 Cooling Sequence
@@ -856,7 +831,7 @@ Curve:Linear,
     Zone5Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone5Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 5 Node,             !- Zone Air Node Name
-    Zone 5 Outlet Node;      !- Zone Return Air Node Name
+    Zone 5 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -1058,22 +1033,22 @@ Curve:Linear,
     Zone5OAUFanOutletNode2,  !- Supply FanOutlet Node Name
     Zone5OAUEquip2;          !- Outdoor Air Unit List Name
 
-Fan:SystemModel,
-  Zone5OAUFan2 , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Zone5DESHCoilOut2,  !- Air Inlet Node Name
-  Zone5OAUZoneInletNode2,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone5OAUFan2,            !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Zone5DESHCoilOut2,       !- Air Inlet Node Name
+    Zone5OAUZoneInletNode2,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Heating:Water,
     Zone5OAUWaterHCoil,      !- Name
@@ -1108,22 +1083,22 @@ Fan:SystemModel,
     Coil:Heating:Water,      !- Component 2 Object Type
     Zone5OAUWaterHCoil;      !- Component 2 Name
 
-Fan:SystemModel,
-  Zone5OAUextFan1 , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Zone5OAUZoneOutletNode2,  !- Air Inlet Node Name
-  OutAir5,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone5OAUextFan1,         !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Zone5OAUZoneOutletNode2, !- Air Inlet Node Name
+    OutAir5,                 !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Cooling:DX:SingleSpeed,
     ACDXCoil 52,             !- Name
@@ -1141,33 +1116,33 @@ Fan:SystemModel,
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name
 
-Fan:SystemModel,
-  Zone3OAUextFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  HXoutnode3,  !- Air Inlet Node Name
-  OutAir3,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone3OAUextFan,          !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    HXoutnode3,              !- Air Inlet Node Name
+    OutAir3,                 !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Cooling:Water,
     Zone4OAUWCcoil,          !- Name
     OAUnitOASched_01,        !- Availability Schedule Name
-    autosize,                !- Design Water Flow Rate {m3/s}
-    autosize,                !- Design Air Flow Rate {m3/s}
-    autosize,                !- Design Inlet Water Temperature {C}
-    autosize,                !- Design Inlet Air Temperature {C}
-    autosize,                !- Design Outlet Air Temperature {C}
-    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
-    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
+    0.001,                   !- Design Water Flow Rate {m3/s}
+    0.84,                    !- Design Air Flow Rate {m3/s}
+    6.67,                    !- Design Inlet Water Temperature {C}
+    30,                      !- Design Inlet Air Temperature {C}
+    11,                      !- Design Outlet Air Temperature {C}
+    0.014,                   !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     Zone4OAUChWInletNode,    !- Water Inlet Node Name
     Zone4OAUChWOutletNode,   !- Water Outlet Node Name
     Zone4OAUCCoilIn,         !- Air Inlet Node Name
@@ -1271,42 +1246,43 @@ Fan:SystemModel,
     Zone4OAUZoneOutletNode,  !- Secondary Air Inlet Node Name
     HXoutnode4;              !- Secondary Air Outlet Node Name
 
-Fan:SystemModel,
-  Zone4OAUFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Zone4OAUOANode,  !- Air Inlet Node Name
-  Zone4OAUFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone4OAUFan,             !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Zone4OAUOANode,          !- Air Inlet Node Name
+    Zone4OAUFanOutletNode,   !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone4OAUextFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  HXoutnode4,  !- Air Inlet Node Name
-  OutAir4,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone4OAUextFan,          !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    HXoutnode4,              !- Air Inlet Node Name
+    OutAir4,                 !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone4OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1318,7 +1294,7 @@ Fan:SystemModel,
     Zone4Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone4Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 4 Node,             !- Zone Air Node Name
-    Zone 4 Outlet Node;      !- Zone Return Air Node Name
+    Zone 4 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   Branch,
     Heating Supply Inlet Branch,  !- Name
@@ -1625,6 +1601,7 @@ Fan:SystemModel,
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone3OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1636,24 +1613,24 @@ Fan:SystemModel,
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone3Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
-Fan:SystemModel,
-  Zone3OAUFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Zone3OAUHCOutletNode,  !- Air Inlet Node Name
-  Zone3OAUZoneInletNode,  !- Air Outlet Node Name
-  0.42 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone3OAUFan,             !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Zone3OAUHCOutletNode,    !- Air Inlet Node Name
+    Zone3OAUZoneInletNode,   !- Air Outlet Node Name
+    0.42,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System 3,!- Name
@@ -1976,6 +1953,7 @@ Fan:SystemModel,
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone2OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1987,45 +1965,45 @@ Fan:SystemModel,
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone2Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   OutdoorAir:Node,
     Zone2OAUOANode,          !- Name
     -1.0;                    !- Height Above Ground {m}
 
-Fan:SystemModel,
-  Zone2OAUFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Zone2OAUOANode,  !- Air Inlet Node Name
-  Zone2OAUFanOutletNode,  !- Air Outlet Node Name
-  0.42 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone2OAUFan,             !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Zone2OAUOANode,          !- Air Inlet Node Name
+    Zone2OAUFanOutletNode,   !- Air Outlet Node Name
+    0.42,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone2OAUExhaustFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  HXoutnode2,  !- Air Inlet Node Name
-  Zone2OAU Relief Node,  !- Air Outlet Node Name
-  0.42 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone2OAUExhaustFan,      !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    HXoutnode2,              !- Air Inlet Node Name
+    Zone2OAU Relief Node,    !- Air Outlet Node Name
+    0.42,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -2263,22 +2241,22 @@ Fan:SystemModel,
     Zone1OAUFanOutletNode,   !- Supply FanOutlet Node Name
     Zone1OAEQLIST;           !- Outdoor Air Unit List Name
 
-Fan:SystemModel,
-  Zone1OAUextFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  HXoutnode,  !- Air Inlet Node Name
-  OutAir1,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone1OAUextFan,          !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    HXoutnode,               !- Air Inlet Node Name
+    OutAir1,                 !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   ZoneHVAC:OutdoorAirUnit:EquipmentList,
     Zone1OAEQLIST,           !- Name
@@ -3478,10 +3456,11 @@ Fan:SystemModel,
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type
     Zone1OutAir,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3491,23 +3470,22 @@ Fan:SystemModel,
     Zone1OAUOANode,          !- Name
     -1.0;                    !- Height Above Ground {m}
 
-
-Fan:SystemModel,
-  Zone1OAUFan , !- Name
-  OAUnitOASched_01 , !- Availability Schedule Name
-  Z1OAFanIn,  !- Air Inlet Node Name
-  Zone1OAUZoneInletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone1OAUFan,             !- Name
+    OAUnitOASched_01,        !- Availability Schedule Name
+    Z1OAFanIn,               !- Air Inlet Node Name
+    Zone1OAUZoneInletNode,   !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Output:Variable,*,Zone Air Temperature,hourly;
 

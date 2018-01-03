@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -67,6 +68,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataZoneEquipment.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
@@ -79,6 +81,9 @@
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
 #include <WeatherManager.hh>
+#include <DataLoopNode.hh>
+#include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 
 namespace EnergyPlus {
 
@@ -502,7 +507,7 @@ namespace SurfaceGeometry {
 
 		}
 
-		CalculateZoneVolume( ErrorsFound, ZoneCeilingHeightEntered ); // Calculate Zone Volumes
+		CalculateZoneVolume( ZoneCeilingHeightEntered ); // Calculate Zone Volumes
 
 		// Calculate zone centroid (and min/max x,y,z for zone)
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -1923,6 +1928,10 @@ namespace SurfaceGeometry {
 
 		GetSurfaceHeatTransferAlgorithmOverrides( ErrorsFound );
 
+		GetSurfaceSrdSurfsData( ErrorsFound );
+
+		GetSurfaceLocalEnvData( ErrorsFound );
+
 		if ( SurfError || ErrorsFound ) {
 			ErrorsFound = true;
 			ShowFatalError( RoutineName + "Errors discovered, program terminates." );
@@ -3028,6 +3037,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				SurfaceTmp( SurfNum ).Vertex.allocate( SurfaceTmp( SurfNum ).Sides );
+				SurfaceTmp( SurfNum ).NewVertex.allocate( SurfaceTmp( SurfNum ).Sides );
 				GetVertices( SurfNum, SurfaceTmp( SurfNum ).Sides, rNumericArgs( {3,_} ) );
 				if ( SurfaceTmp( SurfNum ).Area <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", Surface Area <= 0.0; Entered Area=" + TrimSigDigits( SurfaceTmp( SurfNum ).Area, 2 ) );
@@ -5847,12 +5857,12 @@ namespace SurfaceGeometry {
 			}
 			ExtVentedCavity( Item ).ActualArea = ExtVentedCavity( Item ).ProjArea * ExtVentedCavity( Item ).AreaRatio;
 
-			SetupOutputVariable( "Surface Exterior Cavity Baffle Surface Temperature [C]", ExtVentedCavity( Item ).Tbaffle, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Air Drybulb Temperature [C]", ExtVentedCavity( Item ).TAirCav, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Air Change Rate [ACH]", ExtVentedCavity( Item ).PassiveACH, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate [kg/s]", ExtVentedCavity( Item ).PassiveMdotVent, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate [kg/s]", ExtVentedCavity( Item ).PassiveMdotWind, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate [kg/s]", ExtVentedCavity( Item ).PassiveMdotTherm, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Baffle Surface Temperature", OutputProcessor::Unit::C, ExtVentedCavity( Item ).Tbaffle, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Air Drybulb Temperature", OutputProcessor::Unit::C, ExtVentedCavity( Item ).TAirCav, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Air Change Rate", OutputProcessor::Unit::ach, ExtVentedCavity( Item ).PassiveACH, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotVent, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotWind, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotTherm, "System", "Average", ExtVentedCavity( Item ).Name );
 
 		}
 
@@ -5891,56 +5901,376 @@ namespace SurfaceGeometry {
 				continue;
 			}
 
+			// Choose calculation method
+			std::string calculationMethod = cAlphaArgs( alpF );
+			if ( calculationMethod != "TOTALEXPOSEDPERIMETER" && calculationMethod != "EXPOSEDPERIMETERFRACTION" && calculationMethod != "BYSEGMENT" ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + calculationMethod + " is not a valid choice for " + cAlphaFieldNames( alpF ) );
+				ErrorsFound = true;
+			}
+			alpF++;
 
 			Data data;
 			data.useDetailedExposedPerimeter = true;
-			int optionsUsed = 0;
+
 			if ( !lNumericFieldBlanks( numF ) ) {
-				data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
-				if (data.exposedFraction > 1.0) {
-					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", "+ cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
-					ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
-					ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
-					data.exposedFraction = 1.0;
+				if ( calculationMethod == "TOTALEXPOSEDPERIMETER" ) {
+					data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
+					if (data.exposedFraction > 1.0) {
+						ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
+						ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
+						ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
+						data.exposedFraction = 1.0;
+					}
+
+					data.useDetailedExposedPerimeter = false;
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but a value has been set for " + cNumericFieldNames( numF ) + ". This value will be ignored." );
 				}
-
-				data.useDetailedExposedPerimeter = false;
-				optionsUsed++;
-			} numF++;
-			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
-
-			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
-			if (numRemainingFields > 0) {
-				optionsUsed++;
-				if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
-					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
-					ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
+			} else {
+				if ( calculationMethod == "TOTALEXPOSEDPERIMETER" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cNumericFieldNames( numF ));
 					ErrorsFound = true;
 				}
-				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-					if ( lAlphaFieldBlanks( alpF ) || SameString(cAlphaArgs( alpF ), "YES") ) {
-						data.isExposedPerimeter.push_back(true);
-					} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
-						data.isExposedPerimeter.push_back(false);
-					} else {
-						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
+			} numF++;
+
+			if ( !lNumericFieldBlanks( numF )) {
+				if ( calculationMethod == "EXPOSEDPERIMETERFRACTION" ) {
+					data.exposedFraction = rNumericArgs( numF );
+					data.useDetailedExposedPerimeter = false;
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but a value has been set for " + cNumericFieldNames( numF ) + ". This value will be ignored." );
+				}
+			} else {
+				if ( calculationMethod == "EXPOSEDPERIMETERFRACTION" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cNumericFieldNames( numF ));
+					ErrorsFound = true;
+				}
+			}  numF++;
+
+			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
+			if ( numRemainingFields > 0) {
+				if ( calculationMethod == "BYSEGMENT" ) {
+					if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
+						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
+						ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
 						ErrorsFound = true;
-					} alpF++;
+					}
+					for (int segNum = 0; segNum < numRemainingFields; segNum++) {
+						if ( SameString(cAlphaArgs( alpF ), "YES") ) {
+							data.isExposedPerimeter.push_back(true);
+						} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
+							data.isExposedPerimeter.push_back(false);
+						} else if ( lAlphaFieldBlanks( alpF ) ) {
+							ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cAlphaFieldNames( alpF ) + ". Must be \"Yes\" or \"No\".");
+							ErrorsFound = true;
+						} else {
+							ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + "]. Must be \"Yes\" or \"No\"." );
+							ErrorsFound = true;
+						} alpF++;
+					}
+				}
+			} else {
+				if ( calculationMethod == "BYSEGMENT" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no values have been set for Surface Segments Exposed");
+					ErrorsFound = true;
 				}
 			}
-			if (optionsUsed == 0) {
-				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define at least one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
-				ErrorsFound = true;
-			}
-
-			if (optionsUsed > 1) {
-				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", may only define one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
-				ErrorsFound = true;
-			}
-
 			surfaceMap[Found] = data;
 		}
 	}
+
+	void
+	GetSurfaceLocalEnvData( bool & ErrorsFound ) // Error flag indicator (true if errors found)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X LUO
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// load input data for Outdoor Air Node for exterior surfaces
+
+		// METHODOLOGY EMPLOYED:
+		// usual E+ input processes
+
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using namespace DataErrorTracking;
+
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+		using ScheduleManager::GetScheduleIndex;
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+		
+		using DataSurfaces::TotSurfaces;
+		using DataSurfaces::Surface;
+		using DataSurfaces::TotSurfLocalEnv;
+		using DataSurfaces::SurfLocalEnvironment;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetSurfaceLocalEnvData: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS:na
+		// DERIVED TYPE DEFINITIONS:na
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlpha;
+		int NumNumeric;
+		int Loop;
+		int SurfLoop;
+		bool ErrorInName;
+		bool IsBlank;
+		int IOStat;
+		int SurfNum;
+		int NodeNum;
+		int ExtShadingSchedNum;
+		int SurroundingSurfsNum;
+
+		//-----------------------------------------------------------------------
+		//                SurfaceProperty:LocalEnvironment
+		//-----------------------------------------------------------------------
+
+		cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
+		TotSurfLocalEnv = GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( TotSurfLocalEnv > 0 ) {
+
+			AnyLocalEnvironmentsInModel = true;
+
+			if ( !allocated( SurfLocalEnvironment ) ) {
+				SurfLocalEnvironment.allocate( TotSurfLocalEnv );
+			}
+
+			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				ErrorInName = false;
+				IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), SurfLocalEnvironment, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ShowContinueError( "...each SurfaceProperty:LocalEnvironment name must not duplicate other SurfaceProperty:LocalEnvironment name" );
+					ErrorsFound = true;
+					continue;
+				}
+
+				SurfLocalEnvironment( Loop ).Name = cAlphaArgs( 1 );
+
+				// Assign surface number
+				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				if ( SurfNum == 0 ) {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 2 ) + " has been found." );
+					ShowContinueError( cAlphaFieldNames( 2 ) + " entered value = \"" + cAlphaArgs( 2 ) + "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file." );
+					ErrorsFound = true;
+				}
+				else {
+					SurfLocalEnvironment( Loop ).SurfPtr = SurfNum;
+				}
+
+				// Assign External Shading Schedule number
+				if ( !lAlphaFieldBlanks( 3 ) ) {
+					ExtShadingSchedNum = GetScheduleIndex( cAlphaArgs( 3 ) );
+					if ( ExtShadingSchedNum == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 3 ) + " has been found." );
+						ShowContinueError( cAlphaFieldNames( 3 ) + " entered value = \"" + cAlphaArgs( 3 ) + "\" no corresponding schedule has been found in the input file." );
+						ErrorsFound = true;
+					}
+					else {
+						SurfLocalEnvironment( Loop ).ExtShadingSchedPtr = ExtShadingSchedNum;
+					}
+				}
+
+				//Assign surrounding surfaces object number;
+				if ( !lAlphaFieldBlanks( 4 ) ) {
+					SurroundingSurfsNum = FindItemInList( cAlphaArgs( 4 ), SurroundingSurfsProperty );
+					if ( SurroundingSurfsNum == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 4 ) + " has been found." );
+						ShowContinueError( cAlphaFieldNames( 4 ) + " entered value = \"" + cAlphaArgs( 4 ) + "\" no corresponding surrounding surfaces properties has been found in the input file." );
+						ErrorsFound = true;
+					}
+					else {
+						SurfLocalEnvironment( Loop ).SurroundingSurfsPtr = SurroundingSurfsNum;
+					}
+				}
+
+				//Assign outdoor air node number;
+				if ( !lAlphaFieldBlanks( 5 ) ) {
+					NodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+					if ( NodeNum == 0 && CheckOutAirNodeNumber( NodeNum ) ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ", object. Illegal value for " + cAlphaFieldNames( 5 ) + " has been found." );
+						ShowContinueError( cAlphaFieldNames( 5 ) + " entered value = \"" + cAlphaArgs( 5 ) + "\" no corresponding outdoor air node has been found in the input file." );
+						ErrorsFound = true;
+					}
+					else {
+						SurfLocalEnvironment( Loop ).OutdoorAirNodePtr = NodeNum;
+                    }
+		        }
+			}
+		}
+		// Link surface properties to surface object
+		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
+			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {			
+				if ( SurfLocalEnvironment( Loop ).SurfPtr == SurfLoop ) {
+					if ( SurfLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
+						Surface( SurfLoop ).HasLinkedOutAirNode = true;
+						Surface( SurfLoop ).LinkedOutAirNode = SurfLocalEnvironment( Loop ).OutdoorAirNodePtr;
+					}
+					if ( SurfLocalEnvironment( Loop ).ExtShadingSchedPtr != 0 ) {
+						Surface( SurfLoop ).SchedExternalShadingFrac = true;
+						Surface( SurfLoop ).ExternalShadingSchInd = SurfLocalEnvironment( Loop ).ExtShadingSchedPtr;
+					}
+					if ( SurfLocalEnvironment( Loop ).SurroundingSurfsPtr != 0 ) {
+						Surface( SurfLoop ).HasSurroundingSurfProperties = true;
+						Surface( SurfLoop ).SurroundingSurfacesNum = SurfLocalEnvironment( Loop ).SurroundingSurfsPtr;
+					}
+				}
+			}
+		}
+	}
+
+	void
+	GetSurfaceSrdSurfsData( bool & ErrorsFound ) // Error flag indicator (true if errors found)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X LUO
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// load input data for surrounding surfaces properties for exterior surfaces
+
+		// METHODOLOGY EMPLOYED:
+		// usual E+ input processes
+
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using namespace DataErrorTracking;
+
+		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::FindItemInList;
+		using InputProcessor::VerifyName;
+		using ScheduleManager::GetScheduleIndex;
+		using NodeInputManager::GetOnlySingleNode;
+		using OutAirNodeManager::CheckOutAirNodeNumber;
+
+		using DataSurfaces::TotSurfaces;
+		using DataSurfaces::Surface;
+		using DataSurfaces::TotSurfLocalEnv;
+		using DataSurfaces::SurfLocalEnvironment;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetSurfaceSrdSurfsData: " );
+
+		// INTERFACE BLOCK SPECIFICATIONS:na
+		// DERIVED TYPE DEFINITIONS:na
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int NumAlpha;
+		int NumNumeric;
+		int Loop;
+		bool ErrorInName;
+		bool IsBlank;
+		int IOStat;
+
+		int TotSrdSurfProperties;
+		int TotSrdSurf;
+		int SurfLoop;
+		int SurfNameArg;
+		int SurfVFArg;
+		int SurfTempArg;
+
+		//-----------------------------------------------------------------------
+		//                SurfaceProperty:SurroundingSurfaces
+		//-----------------------------------------------------------------------
+
+		cCurrentModuleObject = "SurfaceProperty:SurroundingSurfaces";
+		TotSrdSurfProperties = GetNumObjectsFound( cCurrentModuleObject );
+
+		if ( TotSrdSurfProperties > 0 ) {
+
+			if ( !allocated( SurroundingSurfsProperty ) ) {
+				SurroundingSurfsProperty.allocate( TotSrdSurfProperties );
+			}
+
+			for ( Loop = 1; Loop <= TotSrdSurfProperties; ++Loop ) {
+				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				ErrorInName = false;
+				IsBlank = false;
+				VerifyName( cAlphaArgs( 1 ), SurroundingSurfsProperty, Loop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				if ( ErrorInName ) {
+					ShowContinueError( "...each SurfaceProperty:SurroundingSurfaces name must not duplicate other SurfaceProperty:SurroundingSurfaces names" );
+					ErrorsFound = true;
+					continue;
+				}
+
+				// A1: Name
+				SurroundingSurfsProperty( Loop ).Name = cAlphaArgs( 1 );
+
+				// N1: sky view factor
+				if ( !lNumericFieldBlanks( 1 ) ) {
+					SurroundingSurfsProperty( Loop ).SkyViewFactor = rNumericArgs( 1 );
+				}
+
+				// A2: sky temp sch name
+				if ( !lAlphaFieldBlanks( 2 ) ) {
+					SurroundingSurfsProperty( Loop ).SkyTempSchNum = GetScheduleIndex( cAlphaArgs( 2 ) );
+				}
+
+				// N2: ground view factor
+				if ( !lNumericFieldBlanks( 2 ) ) {
+					SurroundingSurfsProperty( Loop ).GroundViewFactor = rNumericArgs( 2 );
+				}
+
+				// A3: ground temp sch name
+				if ( !lAlphaFieldBlanks( 3 ) ) {
+					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 3 ) );
+				}
+
+				// The object requires at least one srd surface input, each surface requires a set of 3 fields (2 Alpha fields Name and Temp Sch Name and 1 Num fields View Factor)
+				if ( NumAlpha < 5 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
+					ShowContinueError( "At lease one set of surrounding surface properties should be defined.");
+					ErrorsFound = true;
+					continue;
+				}
+				if ( ( NumAlpha - 3 ) / 2 != ( NumNumeric - 2 ) ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" is not defined correctly." );
+					ShowContinueError( "Check number of input fields for each surrounding surface." );
+					ErrorsFound = true;
+					continue;
+				}
+				//Read surrounding surfaces properties
+				TotSrdSurf = NumNumeric - 2;
+				SurroundingSurfsProperty( Loop ).TotSurroundingSurface = TotSrdSurf;
+				SurroundingSurfsProperty( Loop ).SurroundingSurfs.allocate( TotSrdSurf );
+				for ( SurfLoop = 1; SurfLoop <= TotSrdSurf; ++SurfLoop ) {
+					SurfNameArg = SurfLoop * 2 + 2; //A4, A6, A8, ...
+					SurfVFArg = SurfLoop + 2; //N3, N4, N5, ...
+					SurfTempArg = SurfLoop * 2 + 3; //A5, A7, A9, ...
+					SurroundingSurfsProperty( Loop ).SurroundingSurfs( SurfLoop ).Name = cAlphaArgs( SurfNameArg );
+					SurroundingSurfsProperty( Loop ).SurroundingSurfs( SurfLoop ).ViewFactor = rNumericArgs( SurfVFArg );
+					SurroundingSurfsProperty( Loop ).SurroundingSurfs( SurfLoop ).TempSchNum = GetScheduleIndex( cAlphaArgs( SurfTempArg ) );
+				}
+			}
+		}
+	}
+
 
 	void
 	GetSurfaceHeatTransferAlgorithmOverrides( bool & ErrorsFound )
@@ -7493,15 +7823,7 @@ namespace SurfaceGeometry {
 		using InputProcessor::SameString;
 		using ScheduleManager::GetScheduleIndex;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+		std::string const RoutineName("GetWindowGapAirflowControlData");
 		int IOStat; // IO Status when calling get input subroutine
 		int ControlNumAlpha; // Number of control alpha names being passed
 		int ControlNumProp; // Number of control properties being passed
@@ -7610,6 +7932,22 @@ namespace SurfaceGeometry {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_OutdoorAir;
 				} else if ( SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
+					int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex( Surface( SurfNum ).ZoneName );
+					if( controlledZoneNum > 0 ) DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+					// Set return air node number
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = 0;
+					std::string retNodeName = "";
+					if ( !lAlphaFieldBlanks( 7 ) ) {
+						retNodeName = cAlphaArgs( 7 );
+					}
+					std::string callDescription = cCurrentModuleObject + "=" + Surface( SurfNum ).Name;
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName, callDescription );
+					if ( SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0 ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Surface( SurfNum ).Name + "\", airflow window return air node not found for " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
+						if ( !lAlphaFieldBlanks( 7 ) ) ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" did not find a matching return air node." );
+						ShowContinueError( "..Airflow windows with Airflow Destination = ReturnAir must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object) with at least one return air node." );
+						ErrorsFound = true;
+					}
 				}
 				if ( SameString( cAlphaArgs( 4 ), "AlwaysOnAtMaximumFlow" ) ) {
 					SurfaceWindow( SurfNum ).AirflowControlType = AirFlowWindow_ControlType_MaxFlow;
@@ -7710,12 +8048,15 @@ namespace SurfaceGeometry {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
 				} else if (SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
-				} else /* if (SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
+				} else if (SameString(cAlphaArgs( alpF ), "Autoselect")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
+				} else {
+					ErrorsFound = true;
+					ShowSevereError( "Foundation:Kiva:Settings, " + cAlphaArgs( alpF ) + " is not a valid choice for " + cAlphaFieldNames( alpF ) );
 				}
 			} alpF++;
 
-			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.deepGroundDepth = rNumericArgs( numF );} numF++;
+			if ( lNumericFieldBlanks( numF ) || rNumericArgs( numF ) == AutoCalculate ) { kivaManager.settings.deepGroundDepth = 40.0; } else {kivaManager.settings.deepGroundDepth = rNumericArgs( numF );} numF++;
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.minCellDim = rNumericArgs( numF );} numF++;
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.maxGrowthCoeff = rNumericArgs( numF );} numF++;
 
@@ -8018,7 +8359,7 @@ namespace SurfaceGeometry {
 						} alpF++;
 
 						if ( lNumericFieldBlanks( numF ) ) {
-							block.depth = 0.0;
+							block.depth = 0.0; // Temporary indicator to default to foundation depth
 						} else {
 							block.depth = rNumericArgs( numF );
 						} numF++;
@@ -8242,7 +8583,7 @@ namespace SurfaceGeometry {
 			}
 			if ( OSC( Loop ).SurfFilmCoef > 0.0 ) {
 				cAlphaArgs( 1 ) = RoundSigDigits( OSC( Loop ).SurfFilmCoef, 3 );
-				SetupOutputVariable( "Surface Other Side Coefficients Exterior Air Drybulb Temperature [C]", OSC( Loop ).OSCTempCalc, "System", "Average", OSC( Loop ).Name );
+				SetupOutputVariable( "Surface Other Side Coefficients Exterior Air Drybulb Temperature", OutputProcessor::Unit::C, OSC( Loop ).OSCTempCalc, "System", "Average", OSC( Loop ).Name );
 			} else {
 				cAlphaArgs( 1 ) = "N/A";
 			}
@@ -8338,10 +8679,10 @@ namespace SurfaceGeometry {
 			// Note no validation of the below at this time:
 			OSCM( OSCMNum ).Class = cAlphaArgs( 2 );
 			// setup output vars for modeled coefficients
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Air Temperature [C]", OSCM( OSCMNum ).TConv, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient [W/m2-K]", OSCM( OSCMNum ).HConv, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Temperature [C]", OSCM( OSCMNum ).TRad, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient [W/m2-K]", OSCM( OSCMNum ).HRad, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Air Temperature", OutputProcessor::Unit::C, OSCM( OSCMNum ).TConv, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, OSCM( OSCMNum ).HConv, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Temperature", OutputProcessor::Unit::C, OSCM( OSCMNum ).TRad, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, OSCM( OSCMNum ).HRad, "System", "Average", OSCM( OSCMNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Other Side Boundary Conditions", OSCM( OSCMNum ).Name, "Convection Bulk Air Temperature", "[C]", OSCM( OSCMNum ).EMSOverrideOnTConv, OSCM( OSCMNum ).EMSOverrideTConvValue );
@@ -8528,7 +8869,6 @@ namespace SurfaceGeometry {
 	// Calculates the volume (m3) of a zone using the surfaces as possible.
 	void
 	CalculateZoneVolume(
-		bool & ErrorsFound, // If errors found in input
 		Array1S_bool const CeilingHeightEntered
 	)
 	{
@@ -8572,7 +8912,6 @@ namespace SurfaceGeometry {
 		Real64 SurfCount; // Surface Count
 		int SurfNum; // Loop counter for surfaces
 		int ZoneNum; // Loop counter for Zones
-		bool ErrorFlag;
 		Array1D_int surfacenotused;
 		int notused;
 		int NFaces;
@@ -8657,7 +8996,7 @@ namespace SurfaceGeometry {
 				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight1;
 			} else if ( isFloorHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).FloorArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0 ) {
-				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;  
+				CalcVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
 				volCalcMethod = zoneVolumeCalculationMethod::floorAreaTimesHeight2;
 			} else if ( isCeilingHorizontal && areWallsVertical && areWallsSameHeight && Zone( ZoneNum ).CeilingArea > 0.0 && Zone( ZoneNum ).CeilingHeight > 0.0) {
 			    CalcVolume = Zone( ZoneNum ).CeilingArea * Zone( ZoneNum ).CeilingHeight;
@@ -8741,8 +9080,11 @@ namespace SurfaceGeometry {
 			}
 
 			if ( Zone( ZoneNum ).Volume <= 0.0 ) {
-				ShowSevereError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "Zone Volume calculated was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowWarningError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "The calculated Zone Volume was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowContinueError( "The simulation will continue with the Zone Volume set to 10.0 m3. ");
+				ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones." );
+				Zone( ZoneNum ).Volume =  10.;
 			}
 
 			if ( ShowZoneSurfaces ) {
@@ -8792,15 +9134,6 @@ namespace SurfaceGeometry {
 			}
 		}
 
-		ErrorFlag = false;
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( Zone( ZoneNum ).Volume <= 0.0 ) ErrorFlag = true;
-		}
-		if ( ErrorFlag ) {
-			ShowSevereError( "All ZONE Volumes must be > 0.0" );
-			ErrorsFound = true;
-		}
-
 	}
 
 	// test if the volume described by the polyhedron if full enclosed (would not leak)
@@ -8840,10 +9173,10 @@ namespace SurfaceGeometry {
 	edgesInBoth(
 		std::vector<EdgeOfSurf> edges1,
 		std::vector<EdgeOfSurf> edges2
-	) 
+	)
 	{
 		// J. Glazer - June 2017
-		// this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20. 
+		// this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20.
 
 		std::vector<EdgeOfSurf> inBoth;
 		for ( auto e1 : edges1 ) {
@@ -8941,7 +9274,7 @@ namespace SurfaceGeometry {
 				}
 			}
 		}
-		// All edges for an enclosed polyhedron should be shared by two (and only two) sides. 
+		// All edges for an enclosed polyhedron should be shared by two (and only two) sides.
 		// So if the count is not two for all edges, the polyhedron is not enclosed
 		std::vector<EdgeOfSurf> edgesNotTwoCount;
 		for ( auto anEdge : uniqueEdges ) {
@@ -9069,7 +9402,7 @@ namespace SurfaceGeometry {
 
 	// test if the ceiling and floor are the same except for their height difference by looking at the corners
 	bool
-	areFloorAndCeilingSame( 
+	areFloorAndCeilingSame(
 		DataVectorTypes::Polyhedron const & zonePoly
 	)
 	{
@@ -9077,7 +9410,7 @@ namespace SurfaceGeometry {
 
 		// check if the floor and ceiling are the same
 		// this is almost equivent to saying, if you ignore the z-coordinate, are the vertices the same
-		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they 
+		// so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they
 		// should always be even (they would be two but you might define multiple surfaces that meet in a corner)
 
 		using DataVectorTypes::Vector;
@@ -9151,7 +9484,7 @@ namespace SurfaceGeometry {
 					}
 				}
 				if ( foundWallHeight ) {
-					if ( abs( maxZ - wallHeightZ ) > 0.0254 ) {    //  2.54 cm = 1 inch 
+					if ( abs( maxZ - wallHeightZ ) > 0.0254 ) {    //  2.54 cm = 1 inch
 						areWlHgtSame = false;
 						break;
 					}
@@ -9179,15 +9512,15 @@ namespace SurfaceGeometry {
 		for ( int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace ) {
 			int curSurfNum = zonePoly.SurfaceFace( iFace ).SurfNum;
 			if ( Surface( curSurfNum ).Class == SurfaceClass_Floor ) {
-				if ( abs( Surface( curSurfNum ).Tilt - 180. ) > 1. ) {  // with 1 degree angle  
+				if ( abs( Surface( curSurfNum ).Tilt - 180. ) > 1. ) {  // with 1 degree angle
 					isFlrHoriz = false;
 				}
 			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Roof ) { //includes ceilings
-				if ( abs( Surface( curSurfNum ).Tilt ) > 1. ) {  // with 1 degree angle of 
+				if ( abs( Surface( curSurfNum ).Tilt ) > 1. ) {  // with 1 degree angle of
 					isClgHoriz = false;
 				}
 			} else if ( Surface( curSurfNum ).Class == SurfaceClass_Wall ) {
-				if ( abs( Surface( curSurfNum ).Tilt - 90 ) > 1. ) {  // with 1 degree angle  
+				if ( abs( Surface( curSurfNum ).Tilt - 90 ) > 1. ) {  // with 1 degree angle
 					areWlVert = false;
 				}
 			}
@@ -9205,7 +9538,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the 
+		// approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the
 		// vertices( one counting backwards ) and if it is the same distance than assume that it is the same.
 		using DataVectorTypes::Vector;
 		bool foundOppEqual = false;
@@ -9238,7 +9571,7 @@ namespace SurfaceGeometry {
     }
 
 	// provides a list of indices of polyhedron faces that are facing a specific azimuth
-	std::vector<int> 
+	std::vector<int>
 	listOfFacesFacingAzimuth(
 		DataVectorTypes::Polyhedron const & zonePoly,
 		Real64 const & azimuth
@@ -9259,10 +9592,10 @@ namespace SurfaceGeometry {
 	}
 
 	// returns the index of the face of a polyhedron that is probably opposite of the face index provided
-	int 
+	int
 	findPossibleOppositeFace(
 		DataVectorTypes::Polyhedron const & zonePoly,
-		int const & faceIndex 
+		int const & faceIndex
 	)
 	{
 		// J. Glazer - March 2017
@@ -9295,7 +9628,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		bool allAreEquidistant = true;
 		Real64 firstDistance = -99.;
 		if ( zonePoly.SurfaceFace( faceIndex ).NSides == zonePoly.SurfaceFace( opFaceIndex ).NSides ) { // double check that the number of sides match
@@ -9307,7 +9640,7 @@ namespace SurfaceGeometry {
 				} else {
 					if ( abs( curDistBetwCorners - firstDistance ) > tol ) {
 						allAreEquidistant = false;
-						break; 
+						break;
 					}
 				}
 			}
@@ -9319,7 +9652,7 @@ namespace SurfaceGeometry {
 	}
 
 	// test if two points in space are in the same position based on a small tolerance
-	bool 
+	bool
 	isAlmostEqual3dPt(
 		DataVectorTypes::Vector v1,
 		DataVectorTypes::Vector v2
@@ -9327,7 +9660,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) && ( abs( v1.z - v2.z ) < tol ) ) ;
 	}
 
@@ -9340,7 +9673,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
@@ -9353,7 +9686,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( ( abs( v1.x - v2.x ) < tol ) && ( abs( v1.y - v2.y ) < tol ) );
 	}
 
@@ -9398,7 +9731,7 @@ namespace SurfaceGeometry {
 	{
 		// J. Glazer - March 2017
 
-		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch 
+		Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
 		return ( abs( (distance(start, end ) - (distance(start, test ) + distance(test, end) ) ) ) < tol );
 	}
 

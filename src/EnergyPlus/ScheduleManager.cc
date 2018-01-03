@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -628,7 +629,7 @@ namespace ScheduleManager {
 			for ( Hr = 1; Hr <= 24; ++Hr ) {
 				DaySchedule( Count ).TSValue( {1,NumOfTimeStepInHour}, Hr ) = Numbers( Hr );
 			}
-			DaySchedule( Count ).IntervalInterpolated = false;
+			DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::No;
 			SchedTypePtr = DaySchedule( Count ).ScheduleTypePtr;
 			if ( ScheduleType( SchedTypePtr ).Limited ) {
 				if ( any_lt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Minimum ) || any_gt( DaySchedule( Count ).TSValue, ScheduleType( SchedTypePtr ).Maximum ) ) {
@@ -689,28 +690,33 @@ namespace ScheduleManager {
 				ErrorsFound = true;
 			}
 
-			ProcessIntervalFields( Alphas( { 4, _ } ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorsFound, Alphas( 1 ), CurrentModuleObject, (Alphas( 3 ) == "YES") );
 			// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-			if ( Alphas( 3 ) != "NO" && Alphas( 3 ) != "YES" ) {
+			if ( SameString( Alphas( 3 ), "NO" ) ) {
+				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::No;
+			} else if ( SameString( Alphas( 3 ), "AVERAGE" ) ) {
+				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Average;
+			} else if ( SameString( Alphas( 3 ), "LINEAR" ) ) {
+				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Linear;
+			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
 				ErrorsFound = true;
-			} else if ( Alphas( 3 ) != "YES" ) { // No validation done on the value of the interpolation field
-				DaySchedule( Count ).IntervalInterpolated = false;
-				for ( Hr = 1; Hr <= 24; ++Hr ) {
-					CurMinute = MinutesPerTimeStep;
-					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						DaySchedule( Count ).TSValue( TS, Hr ) = MinuteValue( CurMinute, Hr );
-						CurMinute += MinutesPerTimeStep;
-					}
-				}
-			} else {
-				DaySchedule( Count ).IntervalInterpolated = true;
+			}
+			ProcessIntervalFields( Alphas( { 4, _ } ), Numbers, NumFields, NumNumbers, MinuteValue, SetMinuteValue, ErrorsFound, Alphas( 1 ), CurrentModuleObject, DaySchedule( Count ).IntervalInterpolated );
+			if ( DaySchedule( Count ).IntervalInterpolated == ScheduleInterpolation::Average ) {
 				for ( Hr = 1; Hr <= 24; ++Hr ) {
 					SCount = 1;
 					CurMinute = MinutesPerTimeStep;
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						DaySchedule( Count ).TSValue( TS, Hr ) = sum( MinuteValue( {SCount,CurMinute}, Hr ) ) / double( MinutesPerTimeStep );
+						DaySchedule( Count ).TSValue( TS, Hr ) = sum( MinuteValue( { SCount,CurMinute }, Hr ) ) / double( MinutesPerTimeStep );
 						SCount = CurMinute + 1;
+						CurMinute += MinutesPerTimeStep;
+					}
+				}
+			} else {
+				for ( Hr = 1; Hr <= 24; ++Hr ) {
+					CurMinute = MinutesPerTimeStep;
+					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						DaySchedule( Count ).TSValue( TS, Hr ) = MinuteValue( CurMinute, Hr );
 						CurMinute += MinutesPerTimeStep;
 					}
 				}
@@ -767,13 +773,15 @@ namespace ScheduleManager {
 			}
 
 			// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-			if ( Alphas( 3 ) != "NO" && Alphas( 3 ) != "YES" ) {
+			if ( SameString( Alphas( 3 ), "NO" ) ) {
+				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::No;
+			} else if ( SameString( Alphas( 3 ), "AVERAGE" ) ) {
+				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Average;
+			} else if ( SameString( Alphas( 3 ), "LINEAR" ) ) {
+				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Linear;
+			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
 				ErrorsFound = true;
-			} else if ( Alphas( 3 ) != "YES" ) { // No validation done on the value of the interpolation field
-				DaySchedule( Count ).IntervalInterpolated = false;
-			} else {
-				DaySchedule( Count ).IntervalInterpolated = true;
 			}
 
 			// check to see if there are any fields
@@ -822,7 +830,7 @@ namespace ScheduleManager {
 
 			// Now parcel into TS Value....
 
-			if ( DaySchedule( Count ).IntervalInterpolated ) {
+			if ( DaySchedule( Count ).IntervalInterpolated == ScheduleInterpolation::Average) {
 				for ( Hr = 1; Hr <= 24; ++Hr ) {
 					SCount = 1;
 					CurMinute = MinutesPerTimeStep;
@@ -1168,18 +1176,25 @@ namespace ScheduleManager {
 					// Check for "Interpolate"
 					++NumField;
 					if ( has_prefix( Alphas( NumField ), "INTERPOLATE" ) ) {
-						if ( has( Alphas( NumField ), "YES" ) ) {
-							DaySchedule( AddDaySch ).IntervalInterpolated = true;
+						if ( has( Alphas( NumField ), "NO" ) ) {
+							DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::No;
+						} else if ( has( Alphas( NumField ), "AVERAGE" ) ) {
+							DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::Average;
+						} else if ( has( Alphas( NumField ), "LINEAR" ) ) {
+							DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::Linear;
 						} else {
-							DaySchedule( AddDaySch ).IntervalInterpolated = false;
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( NumField ) + "\" field=\"" + Alphas( NumField ) + "\"" );
+							ErrorsFound = true;
 						}
 						++NumField;
 					} else {
 						if ( ! has_prefix( Alphas( NumField ), "UNTIL" ) ) {
-							if ( has( Alphas( NumField ), "YES" ) ) {
-								DaySchedule( AddDaySch ).IntervalInterpolated = true;
-							} else if ( has( Alphas( NumField ), "NO" ) ) {
-								DaySchedule( AddDaySch ).IntervalInterpolated = false;
+							if ( has( Alphas( NumField ), "NO" ) ) {
+								DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::No;
+							} else if ( has( Alphas( NumField ), "AVERAGE" ) ) {
+								DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::Average;
+							} else if ( has( Alphas( NumField ), "LINEAR" ) ) {
+								DaySchedule( AddDaySch ).IntervalInterpolated = ScheduleInterpolation::Linear;
 							} else {
 								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Illegal Field entered =" + Alphas( NumField ) );
 								ErrorsFound = true;
@@ -1223,7 +1238,7 @@ namespace ScheduleManager {
 							ShowContinueError( "ref " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
 							ErrorsFound = true;
 						}
-						if ( ! DaySchedule( AddDaySch ).IntervalInterpolated ) { // No validation done on the value of the interpolation field
+						if ( DaySchedule( AddDaySch ).IntervalInterpolated == ScheduleInterpolation::No ) { // No validation done on the value of the interpolation field
 							for ( Hr = 1; Hr <= 24; ++Hr ) {
 								CurMinute = MinutesPerTimeStep;
 								for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
@@ -1980,7 +1995,7 @@ namespace ScheduleManager {
 		std::string SchWFmt( "('! <WeekSchedule>,Name" );
 		std::string SchDFmt;
 		std::string SchDFmtdata;
-		std::string YesNo1;
+		std::string NoAverageLinear;
 		std::string YesNo2;
 		std::string Num1;
 		std::string Num2;
@@ -2050,7 +2065,7 @@ namespace ScheduleManager {
 
 			for ( Count = 1; Count <= NumScheduleTypes; ++Count ) {
 				if ( ScheduleType( Count ).Limited ) {
-					YesNo1 = "Yes";
+					NoAverageLinear = "Average";
 					Num1 = RoundSigDigits( ScheduleType( Count ).Minimum, 2 );
 					strip( Num1 );
 					Num2 = RoundSigDigits( ScheduleType( Count ).Maximum, 2 );
@@ -2065,22 +2080,28 @@ namespace ScheduleManager {
 						strip( Num2 );
 					}
 				} else {
-					YesNo1 = "No";
+					NoAverageLinear = "No";
 					Num1 = "N/A";
 					Num2 = "N/A";
 					YesNo2 = "N/A";
 				}
-				gio::write( OutputFileInits, SchTFmtdata ) << ScheduleType( Count ).Name << YesNo1 << Num1 << Num2 << YesNo2;
+				gio::write( OutputFileInits, SchTFmtdata ) << ScheduleType( Count ).Name << NoAverageLinear << Num1 << Num2 << YesNo2;
 			}
 
 			//      WRITE(Num1,*) NumOfTimeStepInHour*24
 			//      Num1=ADJUSTL(Num1)
 			//      SchDFmtdata=TRIM(SchDFmtdata)//TRIM(Num1)//"(',',A))"
 			for ( Count = 1; Count <= NumDaySchedules; ++Count ) {
-				if ( DaySchedule( Count ).IntervalInterpolated ) {
-					YesNo1 = "Yes";
-				} else {
-					YesNo1 = "No";
+				switch ( DaySchedule( Count ).IntervalInterpolated ) {
+					case ScheduleInterpolation::Average:
+						NoAverageLinear = "Average";
+						break;
+					case ScheduleInterpolation::Linear:
+						NoAverageLinear = "Linear";
+						break;
+					case ScheduleInterpolation::No:
+						NoAverageLinear = "No";
+						break;
 				}
 				for ( Hr = 1; Hr <= 24; ++Hr ) {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
@@ -2091,7 +2112,7 @@ namespace ScheduleManager {
 					gio::write( OutputFileInits, SchDFmtdata0 )
 						<< DaySchedule( Count ).Name
 						<< ScheduleType( DaySchedule( Count ).ScheduleTypePtr ).Name
-						<< YesNo1
+						<< NoAverageLinear
 						<< "Values:";
 					for ( Hr = 1; Hr <= 24; ++Hr ) {
 						gio::write( OutputFileInits, SchDFmtdata )
@@ -2101,7 +2122,7 @@ namespace ScheduleManager {
 					gio::write( OutputFileInits, SchDFmtdata0 )
 						<< DaySchedule( Count ).Name
 						<< ScheduleType( DaySchedule( Count ).ScheduleTypePtr ).Name
-						<< YesNo1
+						<< NoAverageLinear
 						<< "Values:";
 					for ( Hr = 1; Hr <= 24; ++Hr ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
@@ -2922,7 +2943,7 @@ namespace ScheduleManager {
 		bool & ErrorsFound,
 		std::string const & DayScheduleName, // Name (used for errors)
 		std::string const & ErrContext, // Context (used for errors)
-		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		ScheduleInterpolation interpolationKind  // enumeration on how to interpolate values in schedule
 		)
 	{
 
@@ -2968,11 +2989,14 @@ namespace ScheduleManager {
 		int MMField;
 		int Hr;
 		int Min;
-		int SHr;
-		int SMin;
-		int EHr;
-		int EMin;
+		int SHr;    //starting hour
+		int SMin;   //starting minute
+		int EHr;    //ending hour
+		int EMin;   //ending minute
 		std::string::size_type sFld;
+		int totalMinutes;
+		Real64 incrementPerMinute;
+		Real64 curValue;
 
 		MinuteValue = 0.0;
 		SetMinuteValue = false;
@@ -2981,6 +3005,9 @@ namespace ScheduleManager {
 		EHr = 0;
 		EMin = 0;
 		sFld = 0;
+
+		Real64 StartValue = 0;
+		Real64 EndValue = 0;
 
 		if ( NumUntils != NumNumbers ) {
 			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, number of Time fields does not match number of value fields, " + ErrContext + '=' + DayScheduleName );
@@ -2996,9 +3023,9 @@ namespace ScheduleManager {
 				} else {
 					sFld = 5;
 				}
-				DecodeHHMMField( Untils( Count ).substr( sFld ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ), useInterpolation );
+				DecodeHHMMField( Untils( Count ).substr( sFld ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ), interpolationKind );
 			} else if ( Pos == std::string::npos ) {
-				DecodeHHMMField( Untils( Count ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ), useInterpolation );
+				DecodeHHMMField( Untils( Count ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ), interpolationKind );
 			} else { // Until found but wasn't first field
 				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
@@ -3029,6 +3056,20 @@ namespace ScheduleManager {
 				EMin = MMField;
 			}
 
+			if ( interpolationKind == ScheduleInterpolation::Linear ) {
+				totalMinutes = ( EHr - SHr ) * 60 + ( EMin - SMin ) + 1;
+				if ( totalMinutes == 0 ) totalMinutes = 1; // protect future division
+				if ( Count == 1 ) {
+					StartValue = Numbers( Count ); //assume first period is flat
+					EndValue = Numbers( Count );
+				} else {
+					StartValue = EndValue;
+					EndValue = Numbers( Count );
+				}
+				incrementPerMinute = ( EndValue - StartValue ) / totalMinutes;
+				curValue = StartValue + incrementPerMinute;
+			}
+
 			if ( SHr == EHr ) {
 				for ( Min = SMin; Min <= EMin; ++Min ) {
 					if ( SetMinuteValue( Min, SHr ) ) {
@@ -3036,8 +3077,14 @@ namespace ScheduleManager {
 						ErrorsFound = true;
 						goto UntilLoop_exit;
 					}
-					MinuteValue( Min, SHr ) = Numbers( Count );
-					SetMinuteValue( Min, SHr ) = true;
+					if ( interpolationKind == ScheduleInterpolation::Linear ) {
+						MinuteValue( Min, EHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, SHr ) = true;
+					} else {
+						MinuteValue( Min, SHr ) = Numbers( Count );
+						SetMinuteValue( Min, SHr ) = true;
+					}
 				}
 				SMin = EMin + 1;
 				if ( SMin > 60 ) {
@@ -3048,17 +3095,37 @@ namespace ScheduleManager {
 				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 				ErrorsFound = true;
 			} else {
-				for ( Min = SMin; Min <= 60; ++Min ) {
-					MinuteValue( Min, SHr ) = Numbers( Count );
-					SetMinuteValue( Min, SHr ) = true;
-				}
-				for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {
-					MinuteValue( _, Hr ) = Numbers( Count );
-					SetMinuteValue( _, Hr ) = true;
-				}
-				for ( Min = 1; Min <= EMin; ++Min ) {
-					MinuteValue( Min, EHr ) = Numbers( Count );
-					SetMinuteValue( Min, EHr ) = true;
+				if ( interpolationKind == ScheduleInterpolation::Linear ) {
+					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
+						MinuteValue( Min, SHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, SHr ) = true;
+					}
+					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+						for ( Min = 1; Min <= 60; ++Min ) {
+							MinuteValue( Min, Hr ) = curValue;
+							curValue += incrementPerMinute;
+							SetMinuteValue( Min, Hr ) = true;
+						}
+					}
+					for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
+						MinuteValue( Min, EHr ) = curValue;
+						curValue += incrementPerMinute;
+						SetMinuteValue( Min, EHr ) = true;
+					}
+				} else { // either no interpolation or "average" interpolation (average just is when the interval does not match the timestep)
+					for ( Min = SMin; Min <= 60; ++Min ) {         // for portion of starting hour
+						MinuteValue( Min, SHr ) = Numbers( Count );
+						SetMinuteValue( Min, SHr ) = true;
+					}
+					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+						MinuteValue( _, Hr ) = Numbers( Count );
+						SetMinuteValue( _, Hr ) = true;
+					}
+					for ( Min = 1; Min <= EMin; ++Min ) {           // for ending hour
+						MinuteValue( Min, EHr ) = Numbers( Count );
+						SetMinuteValue( Min, EHr ) = true;
+					}
 				}
 				SHr = EHr;
 				SMin = EMin + 1;
@@ -3086,7 +3153,7 @@ namespace ScheduleManager {
 		bool & ErrorsFound, // True if errors found in this field
 		std::string const & DayScheduleName, // originating day schedule name
 		std::string const & FullFieldValue, // Full Input field value
-		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		ScheduleInterpolation interpolationKind  // enumeration on how to interpolate values in schedule
 	)
 	{
 
@@ -3177,7 +3244,7 @@ namespace ScheduleManager {
 			gio::write( mMinute, hhmmFormat ) << RetMM;
 			ShowContinueError( "Until value to be used will be: " + hHour + ':' + mMinute );
 		}
-		if ( !useInterpolation ){
+		if ( interpolationKind == ScheduleInterpolation::No ) {
 				if ( !isMinuteMultipleOfTimestep( RetMM, MinutesPerTimeStep ) ){
 				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: " + stripped( FullFieldValue ) );
 				ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
@@ -4540,7 +4607,7 @@ namespace ScheduleManager {
 		if ( DoScheduleReportingSetup ) { // CurrentModuleObject='Any Schedule'
 			for ( ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex ) {
 				// Set Up Reporting
-				SetupOutputVariable( "Schedule Value []", Schedule( ScheduleIndex ).CurrentValue, "Zone", "Average", Schedule( ScheduleIndex ).Name );
+				SetupOutputVariable( "Schedule Value", OutputProcessor::Unit::None, Schedule( ScheduleIndex ).CurrentValue, "Zone", "Average", Schedule( ScheduleIndex ).Name );
 			}
 			DoScheduleReportingSetup = false;
 		}
@@ -4690,6 +4757,45 @@ namespace ScheduleManager {
 
 	}
 
+	// returns the annual full load hours for a schedule - essentially the sum of the hourly values
+	Real64
+	ScheduleAnnualFullLoadHours(
+		int const ScheduleIndex, // Which Schedule being tested
+		int const StartDayOfWeek, // Day of week for start of year
+		bool const isItLeapYear // true if it is a leap year containing February 29
+	)
+	{
+		// J. Glazer - July 2017
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+
+		int DaysInYear;
+
+		if ( isItLeapYear ) {
+			DaysInYear = 366;
+		} else {
+			DaysInYear = 365;
+		}
+
+		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
+			ShowFatalError( "ScheduleAnnualFullLoadHours called with ScheduleIndex out of range" );
+		}
+
+		int DayT = StartDayOfWeek;
+		Real64 TotalHours = 0.0;
+
+		if ( DayT == 0 ) return TotalHours;
+
+		for ( int Loop = 1; Loop <= DaysInYear; ++Loop ) {
+			int WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
+			TotalHours += sum( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue ) / double( NumOfTimeStepInHour );
+			++DayT;
+			if ( DayT > 7 ) DayT = 1;
+		}
+
+		return TotalHours;
+	}
+
+	// returns the average number of hours per week based on the schedule index provided
 	Real64
 	ScheduleAverageHoursPerWeek(
 		int const ScheduleIndex, // Which Schedule being tested
@@ -4708,42 +4814,13 @@ namespace ScheduleManager {
 		// This function returns the "average" hours per week for a schedule over
 		// the entire year.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
 		// Return value
-		Real64 AverageHoursPerWeek; // Average Hours Per Week
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int WkSch;
-		int DayT;
-		int Loop;
-		Real64 TotalHours;
 		Real64 WeeksInYear;
-		int DaysInYear;
 
 		if ( isItLeapYear ) {
-			DaysInYear = 366;
 			WeeksInYear = 366.0 / 7.0;
 		} else {
-			DaysInYear = 365;
 			WeeksInYear = 365.0 / 7.0;
 		}
 
@@ -4751,26 +4828,57 @@ namespace ScheduleManager {
 			ShowFatalError( "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range" );
 		}
 
-		DayT = StartDayOfWeek;
-		AverageHoursPerWeek = 0.0;
-		TotalHours = 0.0;
+		Real64 TotalHours = ScheduleAnnualFullLoadHours( ScheduleIndex , StartDayOfWeek, isItLeapYear );
 
-		if ( DayT == 0 ) return AverageHoursPerWeek;
+		return TotalHours / WeeksInYear; // Ok to return a fraction since WeeksInYear we know is always non-zero
 
-		for ( Loop = 1; Loop <= DaysInYear; ++Loop ) {
-			WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
-			TotalHours += sum( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue ) / double( NumOfTimeStepInHour );
+	}
+
+	// returns the annual hours greater than 1% for a schedule - essentially the number of hours with any operation
+	Real64
+	ScheduleHoursGT1perc(
+			int const ScheduleIndex, // Which Schedule being tested
+			int const StartDayOfWeek, // Day of week for start of year
+			bool const isItLeapYear // true if it is a leap year containing February 29
+		)
+	{
+		// J. Glazer - July 2017
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+
+		int DaysInYear;
+
+		if ( isItLeapYear ) {
+			DaysInYear = 366;
+		} else {
+			DaysInYear = 365;
+		}
+
+		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {
+			ShowFatalError( "ScheduleHoursGT1perc called with ScheduleIndex out of range" );
+		}
+
+		int DayT = StartDayOfWeek;
+		Real64 TotalHours = 0.0;
+
+		if ( DayT == 0 ) return TotalHours;
+
+		for ( int Loop = 1; Loop <= DaysInYear; ++Loop ) {
+			int WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
+			for ( int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay ) {
+				for ( int TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+					if ( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue( TS, hrOfDay  ) ) {
+						TotalHours += DataGlobals::TimeStepZone;
+					}
+				}
+			}
+
 			++DayT;
 			if ( DayT > 7 ) DayT = 1;
 		}
 
-		//  Total hours for year have been set.
-
-		AverageHoursPerWeek = TotalHours / WeeksInYear;
-
-		return AverageHoursPerWeek;
-
+		return TotalHours;
 	}
+
 
 	int
 	GetNumberOfSchedules()

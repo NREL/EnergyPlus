@@ -15,7 +15,8 @@
 !                          terminal units for zones: SPACE4-1 and SPACE5-1.
 !
 ! Highlights:              DOAS ducted to inlet and supply side of ZoneHVAC:PackagedTerminalAirConditioner using AirTerminal:SingleDuct:Mixer
-!
+!                          Each AirTerminal:SingleDuct:Mixers specifies outdoor air flow rate for each zone with OutDoor Air Method = Sum in
+!                          DesignSpecification:OutdoorAir.
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
 !                          Run Control executes the design days only.
@@ -107,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2426,7 +2427,9 @@
     SPACE1-1 PTAC Inlet,     !- Mixer Outlet Node Name
     SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE1-1,        !- Design Specification Outdoor Air Object Name
+    CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
   AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
@@ -2435,7 +2438,9 @@
     SPACE2-1 PTAC Inlet,     !- Mixer Outlet Node Name
     SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name
+    CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
   AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
@@ -2444,7 +2449,9 @@
     SPACE3-1 PTAC Inlet,     !- Mixer Outlet Node Name
     SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE3-1,        !- Design Specification Outdoor Air Object Name
+    CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
   AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
@@ -2453,7 +2460,9 @@
     SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE4-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
+    SZ DSOA SPACE4-1,        !- Design Specification Outdoor Air Object Name
+    CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
   AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
@@ -2462,7 +2471,9 @@
     SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE5-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
+    SZ DSOA SPACE5-1,        !- Design Specification Outdoor Air Object Name
+    CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
@@ -2500,6 +2511,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2511,6 +2523,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2522,6 +2535,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2533,6 +2547,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2544,6 +2559,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2561,7 +2577,7 @@
     SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE1-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2569,7 +2585,7 @@
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE2-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2577,7 +2593,7 @@
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE3-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE3-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2585,7 +2601,7 @@
     SPACE4-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE4-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE4-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2593,7 +2609,7 @@
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE5-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 

@@ -46,7 +46,7 @@
 ! Environmental Emissions: No
 ! Utility Tariffs: No
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Plant Load Profile Example,  !- Name

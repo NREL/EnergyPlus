@@ -29,7 +29,7 @@
 !         Systems are set to Night Cycle during setup/setback.
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,6;
 
@@ -3893,6 +3893,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -3917,7 +3918,7 @@
     Zone ZN1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN1 Node,                !- Zone Air Node Name
-    ZN1 Outlet Node;         !- Zone Return Air Node Name
+    ZN1 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN1 Thermostat,          !- Name
@@ -3928,6 +3929,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN1 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4219,6 +4221,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -4243,7 +4246,7 @@
     Zone ZN3 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN3 Node,                !- Zone Air Node Name
-    ZN3 Outlet Node;         !- Zone Return Air Node Name
+    ZN3 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN3 Thermostat,          !- Name
@@ -4254,6 +4257,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN3 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN3 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4545,6 +4549,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -4569,7 +4574,7 @@
     Zone ZN5 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN5 Node,                !- Zone Air Node Name
-    ZN5 Outlet Node;         !- Zone Return Air Node Name
+    ZN5 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN5 Thermostat,          !- Name
@@ -4580,6 +4585,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN5 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN5 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4871,6 +4877,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -4895,7 +4902,7 @@
     Zone ZN7 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN7 Node,                !- Zone Air Node Name
-    ZN7 Outlet Node;         !- Zone Return Air Node Name
+    ZN7 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN7 Thermostat,          !- Name
@@ -4906,6 +4913,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN7 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN7 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5197,6 +5205,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -5221,7 +5230,7 @@
     Zone ZN9 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN9 Node,                !- Zone Air Node Name
-    ZN9 Outlet Node;         !- Zone Return Air Node Name
+    ZN9 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN9 Thermostat,          !- Name
@@ -5232,6 +5241,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN9 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN9 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5523,6 +5533,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -5547,7 +5558,7 @@
     Zone ZN11 Inlets,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN11 Node,               !- Zone Air Node Name
-    ZN11 Outlet Node;        !- Zone Return Air Node Name
+    ZN11 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN11 Thermostat,         !- Name
@@ -5558,6 +5569,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN11 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN11 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5849,6 +5861,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -5873,7 +5886,7 @@
     Zone ZN13 Inlets,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN13 Node,               !- Zone Air Node Name
-    ZN13 Outlet Node;        !- Zone Return Air Node Name
+    ZN13 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN13 Thermostat,         !- Name
@@ -5884,6 +5897,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN13 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN13 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6175,6 +6189,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -6199,7 +6214,7 @@
     Zone ZN15 Inlets,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN15 Node,               !- Zone Air Node Name
-    ZN15 Outlet Node;        !- Zone Return Air Node Name
+    ZN15 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN15 Thermostat,         !- Name
@@ -6210,6 +6225,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN15 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN15 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6501,6 +6517,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -6525,7 +6542,7 @@
     Zone ZN17 Inlets,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN17 Node,               !- Zone Air Node Name
-    ZN17 Outlet Node;        !- Zone Return Air Node Name
+    ZN17 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN17 Thermostat,         !- Name
@@ -6536,6 +6553,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN17 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN17 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6827,6 +6845,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
   AirLoopHVAC:OutdoorAirSystem,
@@ -6851,7 +6870,7 @@
     Zone ZN19 Inlets,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN19 Node,               !- Zone Air Node Name
-    ZN19 Outlet Node;        !- Zone Return Air Node Name
+    ZN19 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN19 Thermostat,         !- Name
@@ -6862,6 +6881,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN19 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN19 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

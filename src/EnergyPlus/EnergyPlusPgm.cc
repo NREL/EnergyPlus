@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -189,7 +190,7 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlusPgm.hh>
@@ -310,6 +311,9 @@ EnergyPlusPgm( std::string const & filepath )
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
 	ReverseDD = env_var_on( cEnvValue ); // Yes or True
 
+	get_environment_variable( DisableGLHECachingEnvVar, cEnvValue );
+	DisableGLHECaching = env_var_on( cEnvValue ); // Yes or True
+
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
 	if (AnnualSimulation)
@@ -342,6 +346,10 @@ EnergyPlusPgm( std::string const & filepath )
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
 	if ( ReverseDD ) ReportDuringWarmup = false; // force to false for ReverseDD runs
+
+	get_environment_variable( cReportDuringWarmup, cEnvValue );
+	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
+	if ( DisableGLHECaching ) ReportDuringWarmup = true; // force to true for standard runs runs
 
 	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
 	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True

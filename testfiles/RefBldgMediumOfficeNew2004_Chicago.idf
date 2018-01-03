@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,8.7;
+  Version,8.9;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -89,7 +89,7 @@
     6;                       !- Minimum Number of Warmup Days
 
   RunPeriod,
-    annual,                        !- Name
+    annual,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -401,10 +401,6 @@
   Construction,
     DropCeiling,             !- Name
     Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -4357,45 +4353,45 @@
 ! ***HVAC EQUIPMENT***
 
   Fan:SystemModel,
-    VAV_1_Fan , !- Name
-    HVACOperationSchd , !- Availability Schedule Name
+    VAV_1_Fan,               !- Name
+    HVACOperationSchd,       !- Availability Schedule Name
     VAV_1_HeatC-VAV_1_FanNode,  !- Air Inlet Node Name
     VAV_1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
-    Autosize , !- Design Maximum Air Flow Rate
-    Continuous , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    1109.648, !- Design Pressure Rise
-    0.91 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5915,  !- Fan Total Efficiency 
-    VAV Fan Curve, !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    Fan Energy; !- End-Use Subcategory
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    1109.648,                !- Design Pressure Rise {Pa}
+    0.91,                    !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5915,                  !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    Fan Energy;              !- End-Use Subcategory
 
   Curve:Quartic,
-    VAV Fan Curve , !- Name
-    0.0407598940 , !- Coefficient1 Constant
-    0.08804497 , !- Coefficient2 x
-    -0.072926120 , !- Coefficient3 x**2
-    0.9437398230 , !- Coefficient4 x**3
-    0.0 , !- Coefficient5 x**4
-    0.0 , !- Minimum Value of x
-    1.0, !- Maximum Value of x
-    0.0 , !- Minimum Curve Output
-    1.0 , !- Maximum Curve Output
-    Dimensionless , !- Input Unit Type for X
-    Dimensionless ; !- Output Unit Type
+    VAV Fan Curve,           !- Name
+    0.0407598940,            !- Coefficient1 Constant
+    0.08804497,              !- Coefficient2 x
+    -0.072926120,            !- Coefficient3 x**2
+    0.9437398230,            !- Coefficient4 x**3
+    0.0,                     !- Coefficient5 x**4
+    0.0,                     !- Minimum Value of x
+    1.0,                     !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    1.0,                     !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
-Output:Variable,VAV Fan Curve,Performance Curve Input Variable 1 Value,detailed; !- HVAC Average []
+  Output:Variable,VAV Fan Curve,Performance Curve Input Variable 1 Value,detailed;
 
-Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC Average []
+  Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed;
 
   Fan:VariableVolume,
     VAV_2_Fan,               !- Name
@@ -4970,6 +4966,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Core_bottom Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Core_bottom VAV Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4977,6 +4974,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Core_mid Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Core_mid VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4984,6 +4982,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Core_top Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Core_top VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4991,6 +4990,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4998,6 +4998,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5005,6 +5006,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5012,6 +5014,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5019,6 +5022,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5026,6 +5030,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5033,6 +5038,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5040,6 +5046,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5047,6 +5054,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5054,6 +5062,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5061,6 +5070,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5068,6 +5078,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6138,7 +6149,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Core_bottom Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_bottom Air Node,    !- Zone Air Node Name
-    Core_bottom Return Air Node Name;  !- Zone Return Air Node Name
+    Core_bottom Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Core_mid,                !- Zone Name
@@ -6146,7 +6157,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Core_mid Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_mid Air Node,       !- Zone Air Node Name
-    Core_mid Return Air Node Name;  !- Zone Return Air Node Name
+    Core_mid Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Core_top,                !- Zone Name
@@ -6154,7 +6165,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Core_top Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_top Air Node,       !- Zone Air Node Name
-    Core_top Return Air Node Name;  !- Zone Return Air Node Name
+    Core_top Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_1,      !- Zone Name
@@ -6162,7 +6173,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_bot_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_1 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_2,      !- Zone Name
@@ -6170,7 +6181,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_bot_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_2 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_3,      !- Zone Name
@@ -6178,7 +6189,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_bot_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_3 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_4,      !- Zone Name
@@ -6186,7 +6197,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_bot_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_4 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_1,      !- Zone Name
@@ -6194,7 +6205,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_mid_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_1 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_2,      !- Zone Name
@@ -6202,7 +6213,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_mid_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_2 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_3,      !- Zone Name
@@ -6210,7 +6221,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_mid_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_3 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_4,      !- Zone Name
@@ -6218,7 +6229,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_mid_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_4 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_top_ZN_1,      !- Zone Name
@@ -6226,7 +6237,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_top_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_1 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_top_ZN_2,      !- Zone Name
@@ -6234,7 +6245,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_top_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_2 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_top_ZN_3,      !- Zone Name
@@ -6242,7 +6253,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_top_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_3 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_top_ZN_4,      !- Zone Name
@@ -6250,7 +6261,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Perimeter_top_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_4 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:AirDistributionUnit,
     Core_bottom VAV Box,     !- Name
@@ -6435,6 +6446,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -6443,6 +6455,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -6451,6 +6464,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   BranchList,
@@ -7334,7 +7348,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7351,7 +7365,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7366,7 +7380,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7374,7 +7388,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7382,7 +7396,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7390,7 +7404,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7398,7 +7412,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7406,7 +7420,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7414,7 +7428,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7422,7 +7436,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -7432,7 +7446,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -7458,7 +7472,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7475,7 +7489,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7483,7 +7497,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7491,7 +7505,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7499,7 +7513,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7507,7 +7521,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7515,7 +7529,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7523,7 +7537,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7531,7 +7545,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -7541,7 +7555,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -7565,7 +7579,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7590,7 +7604,7 @@ Output:Variable,VAV Fan Curve,Performance Curve Output Value,detailed; !- HVAC A
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

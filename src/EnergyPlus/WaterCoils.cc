@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -72,6 +73,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACControllers.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -557,10 +559,10 @@ namespace WaterCoils {
 
 			//Setup the Simple Heating Coil reporting variables
 			//CurrentModuleObject = "Coil:Heating:Water"
-			SetupOutputVariable( "Heating Coil Heating Energy [J]", WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy [J]", WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Heating Rate [W]", WaterCoil( CoilNum ).TotWaterHeatingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil U Factor Times Area Value [W/K]", WaterCoil( CoilNum ).UACoilVariable, "System", "Average", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).TotWaterHeatingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, WaterCoil( CoilNum ).TotWaterHeatingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil U Factor Times Area Value", OutputProcessor::Unit::W_K, WaterCoil( CoilNum ).UACoilVariable, "System", "Average", WaterCoil( CoilNum ).Name );
 
 		}
 
@@ -666,16 +668,16 @@ namespace WaterCoils {
 
 			// Setup Report variables for the Detailed Flat Fin Cooling Coils
 			// CurrentModuleObject = "Coil:Cooling:Water:DetailedGeometry"
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", WaterCoil( CoilNum ).SenWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", WaterCoil( CoilNum ).TotWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", WaterCoil( CoilNum ).SenWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).SenWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, WaterCoil( CoilNum ).TotWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, WaterCoil( CoilNum ).SenWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
 
 			if ( WaterCoil( CoilNum ).CondensateCollectMode == CondensateToTank ) {
 
-				SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", WaterCoil( CoilNum ).CondensateVdot, "System", "Average", WaterCoil( CoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", WaterCoil( CoilNum ).CondensateVol, "System", "Sum", WaterCoil( CoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
+				SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterCoil( CoilNum ).CondensateVdot, "System", "Average", WaterCoil( CoilNum ).Name );
+				SetupOutputVariable( "Cooling Coil Condensate Volume", OutputProcessor::Unit::m3, WaterCoil( CoilNum ).CondensateVol, "System", "Sum", WaterCoil( CoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
 			}
 
 		}
@@ -785,17 +787,17 @@ namespace WaterCoils {
 
 			// Setup Report variables for the Design input Cooling Coils
 			// CurrentModuleObject = "Coil:Cooling:Water"
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy [J]", WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", WaterCoil( CoilNum ).SenWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", WaterCoil( CoilNum ).TotWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", WaterCoil( CoilNum ).SenWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Wetted Area Fraction []", WaterCoil( CoilNum ).SurfAreaWetFraction, "System", "Average", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).TotWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, WaterCoil( CoilNum ).SenWaterCoolingCoilEnergy, "System", "Sum", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, WaterCoil( CoilNum ).TotWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, WaterCoil( CoilNum ).SenWaterCoolingCoilRate, "System", "Average", WaterCoil( CoilNum ).Name );
+			SetupOutputVariable( "Cooling Coil Wetted Area Fraction", OutputProcessor::Unit::None, WaterCoil( CoilNum ).SurfAreaWetFraction, "System", "Average", WaterCoil( CoilNum ).Name );
 
 			if ( WaterCoil( CoilNum ).CondensateCollectMode == CondensateToTank ) {
 
-				SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate [m3/s]", WaterCoil( CoilNum ).CondensateVdot, "System", "Average", WaterCoil( CoilNum ).Name );
-				SetupOutputVariable( "Cooling Coil Condensate Volume [m3]", WaterCoil( CoilNum ).CondensateVol, "System", "Sum", WaterCoil( CoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
+				SetupOutputVariable( "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, WaterCoil( CoilNum ).CondensateVdot, "System", "Average", WaterCoil( CoilNum ).Name );
+				SetupOutputVariable( "Cooling Coil Condensate Volume", OutputProcessor::Unit::m3, WaterCoil( CoilNum ).CondensateVol, "System", "Sum", WaterCoil( CoilNum ).Name, _, "OnSiteWater", "Condensate", _, "System" );
 			}
 
 		}
@@ -855,7 +857,7 @@ namespace WaterCoils {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::Iterate;
 		using General::SafeDivide;
 		using DataSizing::AutoSize;
@@ -866,6 +868,7 @@ namespace WaterCoils {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace FaultsManager;
 		using DataAirSystems::PrimaryAirSystem;
+		using HVACControllers::GetControllerNameAndIndex;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallNo( 1.e-9 ); // SmallNo number in place of zero
@@ -875,6 +878,7 @@ namespace WaterCoils {
 		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int tempCoilNum; // loop variable
 		Real64 DesInletAirEnth; // Entering air enthalpy at rating (J/kg)
 		Real64 DesOutletAirEnth; // Leaving air enthalpy at rating(J/kg)
 		Real64 DesAirApparatusDewPtEnth; // Air enthalpy at apparatus dew point at rating(J/kg)
@@ -980,6 +984,11 @@ namespace WaterCoils {
 			MyCoilReportFlag = true;
 			InitWaterCoilOneTimeFlag = false;
 			PlantLoopScanFlag = true;
+
+			for ( tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum ) {
+				GetControllerNameAndIndex( WaterCoil( tempCoilNum ).WaterInletNodeNum, WaterCoil( tempCoilNum ).ControllerName, WaterCoil( tempCoilNum ).ControllerIndex, errFlag );
+			}
+
 		}
 
 		if ( PlantLoopScanFlag( CoilNum ) && allocated( PlantLoop ) ) {
@@ -1333,7 +1342,7 @@ namespace WaterCoils {
 				// approximate the dry UA as 1.0 times wet UA
 				WaterCoil( CoilNum ).UADryExtPerUnitArea = WaterCoil( CoilNum ).UAWetExtPerUnitArea;
 
-				// Now use SolveRegulaFalsi to "invert" the cooling coil model to obtain the UA given the specified design inlet and outlet conditions
+				// Now use SolveRoot to "invert" the cooling coil model to obtain the UA given the specified design inlet and outlet conditions
 				// Note that the UAs we have obtained so far are rough estimates that are the starting points for the the following iterative
 				//   calulation of the actual UAs.
 				Par( 1 ) = WaterCoil( CoilNum ).DesTotWaterCoilLoad;
@@ -1349,7 +1358,7 @@ namespace WaterCoils {
 				UA0 = 0.1 * WaterCoil( CoilNum ).UACoilExternal;
 				UA1 = 10.0 * WaterCoil( CoilNum ).UACoilExternal;
 				// Invert the simple cooling coil model: given the design inlet conditions and the design load, find the design UA
-				SolveRegulaFalsi( 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, Par );
+				SolveRoot( 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, Par );
 				// if the numerical inversion failed, issue error messages.
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Calculation of cooling coil design UA failed for coil " + WaterCoil( CoilNum ).Name );
@@ -1629,7 +1638,7 @@ namespace WaterCoils {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -2144,7 +2153,7 @@ namespace WaterCoils {
 					TempSize = WaterCoil( CoilNum ).UACoil;
 				}
 
-					DataFlowUsedForSizing = WaterCoil( CoilNum ).InletAirMassFlowRate;
+				DataFlowUsedForSizing = WaterCoil( CoilNum ).InletAirMassFlowRate;
 				DesCoilWaterInTempSaved = WaterCoil( DataCoilNum ).InletWaterTemp;
 				if ( DesCoilWaterInTempSaved < DesCoilHWInletTempMin ) {
 					// at low coil design water inlet temp, sizing has convergence issue hence slightly higher water inlet temperature
@@ -2162,12 +2171,12 @@ namespace WaterCoils {
 					WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
 				}
 				WaterCoil( CoilNum ).UACoil = TempSize;
-					// if coil UA did not size due to one of these variables being 0, must set UACoilVariable to avoid crash later on
-					if ( DataCapacityUsedForSizing == 0.0 || DataWaterFlowUsedForSizing == 0.0 || DataFlowUsedForSizing == 0.0 ) {
-						if ( WaterCoil( CoilNum ).UACoilVariable == AutoSize ) {
-							WaterCoil( CoilNum ).UACoilVariable = TempSize;
-						}
+				// if coil UA did not size due to one of these variables being 0, must set UACoilVariable to avoid crash later on
+				if ( DataCapacityUsedForSizing == 0.0 || DataWaterFlowUsedForSizing == 0.0 || DataFlowUsedForSizing == 0.0 ) {
+					if ( WaterCoil( CoilNum ).UACoilVariable == AutoSize ) {
+						WaterCoil( CoilNum ).UACoilVariable = TempSize;
 					}
+				}
 				WaterCoil( CoilNum ).UACoilVariable = TempSize;
 				WaterCoil( CoilNum ).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
 				WaterCoil( DataCoilNum ).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature 
@@ -5715,7 +5724,7 @@ Label10: ;
 		// none
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 
 		// Return value
@@ -5748,7 +5757,7 @@ Label10: ;
 		Par( 1 ) = H;
 		Par( 2 ) = RH;
 		Par( 3 ) = PB;
-		SolveRegulaFalsi( Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par );
+		SolveRoot( Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par );
 		// if the numerical inversion failed, issue error messages.
 		if ( SolFla == -1 ) {
 			ShowSevereError( "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)" );

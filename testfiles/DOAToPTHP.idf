@@ -14,7 +14,9 @@
 !                          to the outlet side of the PTHP and mixed with the PTHP outlet through the use of supply side mixer
 !                          terminal units for zones: SPACE4-1 and SPACE5-1.
 !
-! Highlights:              DOAS ducted to inlet and supply side of ZoneHVAC:PackagedTerminalHeatPump using AirTerminal:SingleDuct:Mixer
+! Highlights:              DOAS ducted to inlet and supply side of ZoneHVAC:PackagedTerminalHeatPump using AirTerminal:SingleDuct:Mixer.
+!                          Each AirTerminal:SingleDuct:Mixers specifies outdoor air flow rate for each zone with OutDoor Air Method = IndoorAirQualityProcedure
+!                          in DesignSpecification:OutdoorAir to control indoor CO2 level below the setpoint.
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
 !                          Run Control executes the design days only.
@@ -106,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -128,6 +130,12 @@
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONEAIRCONTAMINANTBALANCE ===========
+
+  ZoneAirContaminantBalance,
+    Yes,                     !- Carbon Dioxide Concentration
+    Outdoor Air CO2 Concentration;  !- Outdoor Carbon Dioxide Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -467,6 +475,10 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Constant,Outdoor Air CO2 Concentration,Any Number,400;
+
+  Schedule:Constant,Zone Setpoint CO2 Concentration,Any Number,1200;
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
 
@@ -1856,37 +1868,37 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    IndoorAirQualityProcedure,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.00050,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    IndoorAirQualityProcedure,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.00050,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    IndoorAirQualityProcedure,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.00050,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    IndoorAirQualityProcedure,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.00050,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    IndoorAirQualityProcedure,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.00050,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
 !-   ===========  ALL OBJECTS IN CLASS: DESIGNSPECIFICATION:ZONEAIRDISTRIBUTION ===========
@@ -2129,6 +2141,43 @@
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     All Zones Dual SP Control;  !- Control 1 Name
 
+!-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:ContaminantController ===========
+
+  ZoneControl:ContaminantController,
+    SPACE1-1 Contaminant Controller,  !- Name
+    SPACE1-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE2-1 Contaminant Controller,  !- Name
+    SPACE2-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE3-1 Contaminant Controller,  !- Name
+    SPACE3-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE4-1 Contaminant Controller,  !- Name
+    SPACE4-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE5-1 Contaminant Controller,  !- Name
+    SPACE5-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
 !-   ===========  ALL OBJECTS IN CLASS: THERMOSTATSETPOINT:DUALSETPOINT ===========
 
   ThermostatSetpoint:DualSetpoint,
@@ -2157,7 +2206,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     SPACE1-1 HP Heating Mode,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE1-1 HP Cooling Mode,!- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -2372,7 +2420,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     SPACE2-1 HP Heating Mode,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE2-1 HP Cooling Mode,!- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -2444,7 +2491,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     SPACE3-1 HP Heating Mode,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE3-1 HP Cooling Mode,!- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -2516,7 +2562,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     SPACE4-1 HP Heating Mode,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE4-1 HP Cooling Mode,!- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -2588,7 +2633,6 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     SPACE5-1 HP Heating Mode,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    2.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE5-1 HP Cooling Mode,!- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
@@ -2651,7 +2695,8 @@
     SPACE1-1 Heat Pump Inlet,!- Mixer Outlet Node Name
     SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE1-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
@@ -2660,7 +2705,8 @@
     SPACE2-1 Heat Pump Inlet,!- Mixer Outlet Node Name
     SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE2-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
@@ -2669,7 +2715,8 @@
     SPACE3-1 Heat Pump Inlet,!- Mixer Outlet Node Name
     SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE3-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
@@ -2678,7 +2725,8 @@
     SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE4-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
+    SZ DSOA SPACE4-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
@@ -2687,7 +2735,8 @@
     SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE5-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
+    SZ DSOA SPACE5-1;        !- Design Specification Outdoor Air Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
@@ -2725,6 +2774,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2736,6 +2786,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2747,6 +2798,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2758,6 +2810,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2769,6 +2822,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2786,7 +2840,7 @@
     SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE1-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2794,7 +2848,7 @@
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE2-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2802,7 +2856,7 @@
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE3-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE3-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2810,7 +2864,7 @@
     SPACE4-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 Heat Pump Inlet,!- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE4-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE4-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2818,7 +2872,7 @@
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 Heat Pump Inlet,!- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE5-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -3311,4 +3365,6 @@
   Output:Variable,SPACE4-1 Supply Inlet,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 Supply Inlet,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,*,Zone Air CO2 Concentration,hourly;
 

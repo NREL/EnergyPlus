@@ -24,7 +24,7 @@
 !           There is a single window in West Zone's south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,6;
 
@@ -1341,6 +1341,7 @@
     FanAndCoilAvailSched,    !- Fan Schedule Name
     CycleOnAnyCoolingOrHeatingZone,  !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800,                    !- Cycling Run Time {s}
     ,                        !- Control Zone or Zone List Name
     Reheat System 1 Cooling Zones,  !- Cooling Control Zone or Zone List Name
@@ -2099,7 +2100,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -2107,7 +2108,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -2115,10 +2116,11 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone3Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2126,6 +2128,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2133,6 +2136,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2276,21 +2280,21 @@
     Zone 1 PIU Sec Air Inlet Node;  !- Inlet 2 Node Name
 
   Fan:SystemModel,
-    Zone 1 PIU Fan ,           !- Name
-    FanAndCoilAvailSched,      !- Availability Schedule Name
+    Zone 1 PIU Fan,          !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 1 PIU Mixer Air Outlet Node,  !- Air Inlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Air Outlet Node Name
-    AUTOSIZE ,                   !- Design Maximum Air Flow Rate
-    Discrete ,                   !- Speed Control Method
-    0.0,                         !- Electric Power Minimum Flow Rate Fraction
-    50.0,                        !- Design Pressure Rise
-    0.9 ,                        !- Motor Efficiency
-    1.0 ,                        !- Motor In Air Stream Fraction
-    AUTOSIZE,                    !- Design Electric Power Consumption
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    50.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
-    ,                            !- Electric Power Per Unit Flow Rate
-    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.50;                        !- Fan Total Efficiency
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Heating:Water,
     Reheat Coil Zone 1,      !- Name
@@ -2327,21 +2331,21 @@
     ;                        !- Rated Ratio for Air and Water Convection
 
   Fan:SystemModel,
-    Zone 3 PIU Fan ,           !- Name
-    FanAndCoilAvailSched,      !- Availability Schedule Name
+    Zone 3 PIU Fan,          !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 3 PIU Sec Air Inlet Node,  !- Air Inlet Node Name
-    Zone 3 PIU Fan Air Outlet Node, !- Air Outlet Node Name
-    AUTOSIZE ,                   !- Design Maximum Air Flow Rate
-    Discrete ,                   !- Speed Control Method
-    0.0,                         !- Electric Power Minimum Flow Rate Fraction
-    50.0,                        !- Design Pressure Rise
-    0.9 ,                        !- Motor Efficiency
-    1.0 ,                        !- Motor In Air Stream Fraction
-    AUTOSIZE,                    !- Design Electric Power Consumption
+    Zone 3 PIU Fan Air Outlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    50.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
-    ,                            !- Electric Power Per Unit Flow Rate
-    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.50;                        !- Fan Total Efficiency
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   AirLoopHVAC:ZoneMixer,
     Zone 3 PIU Mixer,        !- Name

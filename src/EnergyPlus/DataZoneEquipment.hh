@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -114,6 +116,10 @@ namespace DataZoneEquipment {
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
 
+	// Per Person Ventilation Rate Mode
+	extern int const PerPersonDCVByCurrentLevel;
+	extern int const PerPersonByDesignLevel;
+
 	extern int const NumValidSysAvailZoneComponents;
 	extern Array1D_string const cValidSysAvailManagerCompTypes;
 
@@ -137,11 +143,19 @@ namespace DataZoneEquipment {
 
 	// Types
 
+	enum class LoadDist 
+	{
+		SequentialLoading,
+		UniformLoading,
+		UniformPLRLoading,
+		SequentialUniformPLRLoading
+	};
+
 	struct EquipMeterData
 	{
 		// Members
 		std::string ReportVarName;
-		std::string ReportVarUnits;
+		OutputProcessor::Unit ReportVarUnits;
 		int ResourceType;
 		std::string EndUse;
 		int EndUse_CompMode;
@@ -153,6 +167,7 @@ namespace DataZoneEquipment {
 
 		// Default Constructor
 		EquipMeterData() :
+			ReportVarUnits( OutputProcessor::Unit::None ),
 			ResourceType( 0 ),
 			EndUse_CompMode( 0 ),
 			ReportVarIndex( 0 ),
@@ -291,6 +306,7 @@ namespace DataZoneEquipment {
 		int MainBranchIndex;
 		int SupplyBranchIndex;
 		int AirDistUnitIndex; // equipment number in EquipList
+		int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
 		int SupplyAirPathIndex;
 		Real64 NetBranchCoilDemand;
 		Array1D< SubSubEquipmentData > Coil;
@@ -303,6 +319,7 @@ namespace DataZoneEquipment {
 			MainBranchIndex( 0 ),
 			SupplyBranchIndex( 0 ),
 			AirDistUnitIndex( 0 ),
+			TermUnitSizingIndex( 0 ),
 			SupplyAirPathIndex( 0 ),
 			NetBranchCoilDemand( 0.0 )
 		{}
@@ -318,42 +335,44 @@ namespace DataZoneEquipment {
 		int EquipListIndex;
 		std::string ControlListName;
 		int ZoneNode;
-		int ReturnAirNode;
-		int NumInletNodes;
-		int NumExhaustNodes;
+		int NumInletNodes; // number of inlet nodes
+		int NumExhaustNodes; // number of exhaust nodes
+		int NumReturnNodes; // number of return air nodes
 		int NumReturnFlowBasisNodes; // number of return air flow basis nodes
 		int ReturnFlowSchedPtrNum; // return air flow fraction schedule pointer
 		bool FlowError; // flow error flag
 		Array1D_int InletNode; // zone supply air inlet nodes
+		Array1D_int InletNodeAirLoopNum; // air loop number connected to this inlet node (0 if not an airloop node)
+		Array1D_int InletNodeADUNum; // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
+		Array1D_int InletNodeSDUNum; // Single duct uncontrolled connected to this inlet node (0 if none, could be zone equip or ADU)
 		Array1D_int ExhaustNode; // zone air exhaust nodes
+		Array1D_int ReturnNode; // zone return air nodes (node numbers)
+		Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
+		Array1D_int ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
+		Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
 		Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
-		int ReturnZonePlenumCondNum; // number of the zone's return air plenum
-		int AirLoopNum; // the air loop index for this controlled zone
-		int FanOpMode; // =0 if no central sys;
-		// -1 if central sys is in cycling fan mode;
-		// =2 if central sysis in constant fan mode.
+
 		bool ZonalSystemOnly; // TRUE if served by a zonal system (only)
 		bool IsControlled; // True when this is a controlled zone.
 		Real64 ZoneExh; // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
 		Real64 ZoneExhBalanced; // balanced zone exhaust mass flow rate [kg/s]
 		Real64 PlenumMassFlow; // zone air mass flow rate induced from plenum [kg/s]
+		Real64 ExcessZoneExh; // excess zone exhaust to be balanced by other zones (only used when !ZoneAirMassFlow.EnforceZoneMassBalance) [kg/s]
+		Real64 TotAvailAirLoopOA; // total airloop OA available for systems serving this zone (used to apportion excess exhaust) [kg/s}
 		// AirDistUnitCool and AirDistUnitHeat
 		// do not correspond with the AIR DISTRIBUTION UNIT object in the zone equipment list.
 		// AirDistUnitCool/AirDistUnitHeat, may represent a DIRECT AIR object,
 		// or the cold/hot side of AIR DISTRIBUTION
 		// UNIT object.  That is both AirDistUnitHeat and AirDistUnitCool are required to describe a dual
-		// duct AIR DISTRIBUTION object in the ZoneEquipList.  Although only one AIR DISTRIBUTION UNIT is
-		// allowed in ZoneEquipList, two instances of that object may exist in this data structure
+		// duct AIR DISTRIBUTION object in the ZoneEquipList.
 		Array1D< AirIn > AirDistUnitHeat; // dimensioned to number of zone inlet nodes
 		Array1D< AirIn > AirDistUnitCool; // dimensioned to number of zone inlet nodes.
-		bool SupLeakToRetPlen; // True if there is supply duct leak to the
-		// plenum (simple duct leakage model)
 		bool InFloorActiveElement; // Convection adapation, true if zone has in-floor HVAC
 		bool InWallActiveElement; // Convection adapation, true if zone has in-wall HVAC
 		bool InCeilingActiveElement; // Convection adapation,
 		// true when zone has in-ceiling HVAC
-		int ADUNum; // index of Air Distribution Unit
-		int SDUNum; // index of Single Duct Uncontrolled
+		bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
+		bool ZoneHasAirLoopWithOASys; // true if zone is served by one or more airloops with an outdoor air system
 
 		// Default Constructor
 		EquipConfiguration() :
@@ -361,26 +380,25 @@ namespace DataZoneEquipment {
 			ActualZoneNum( 0 ),
 			EquipListIndex( 0 ),
 			ZoneNode( 0 ),
-			ReturnAirNode( 0 ),
 			NumInletNodes( 0 ),
 			NumExhaustNodes( 0 ),
+			NumReturnNodes( 0 ),
 			NumReturnFlowBasisNodes( 0 ),
 			ReturnFlowSchedPtrNum( 0 ),
 			FlowError( false ),
-			ReturnZonePlenumCondNum( 0 ),
-			AirLoopNum( 0 ),
-			FanOpMode( 0 ),
+
 			ZonalSystemOnly( false ),
 			IsControlled( false ),
 			ZoneExh( 0.0 ),
 			ZoneExhBalanced( 0.0 ),
 			PlenumMassFlow( 0.0 ),
-			SupLeakToRetPlen( false ),
+			ExcessZoneExh( 0.0 ),
+			TotAvailAirLoopOA( 0.0 ),
 			InFloorActiveElement( false ),
 			InWallActiveElement( false ),
 			InCeilingActiveElement( false ),
-			ADUNum( 0 ),
-			SDUNum( 0 )
+			ZoneHasAirFlowWindowReturn( false ),
+			ZoneHasAirLoopWithOASys( false )
 		{}
 
 	};
@@ -414,7 +432,6 @@ namespace DataZoneEquipment {
 		Real64 TotPlantSupplyOther;
 		Real64 PlantSupplyOtherEff;
 		Real64 PeakPlantSupplyOtherEff;
-		Real64 Capacity;
 		int OpMode;
 
 		// Default Constructor
@@ -439,7 +456,6 @@ namespace DataZoneEquipment {
 			TotPlantSupplyOther( 0.0 ),
 			PlantSupplyOtherEff( 0.0 ),
 			PeakPlantSupplyOtherEff( 0.0 ),
-			Capacity( 0.0 ),
 			OpMode( 0 )
 		{}
 
@@ -449,20 +465,34 @@ namespace DataZoneEquipment {
 	{
 		// Members
 		std::string Name; // Name of the equipment list
+		DataZoneEquipment::LoadDist LoadDistScheme; // load distribution scheme
 		int NumOfEquipTypes; // Number of items on this list
+		int NumAvailHeatEquip; // Number of pieces of equipment available for heating
+		int NumAvailCoolEquip; // Number of pieces of equipment available for cooling
 		Array1D_string EquipType;
 		Array1D_int EquipType_Num;
 		Array1D_string EquipName;
 		Array1D_int EquipIndex;
 		Array1D_int CoolingPriority;
 		Array1D_int HeatingPriority;
+		Array1D_int CoolingCapacity; // Current cooling capacity (negative) [W]
+		Array1D_int HeatingCapacity; // Current heating capacity (positive) [W]
 		Array1D< EquipmentData > EquipData; // Index of energy output report data
 
 		// Default Constructor
 		EquipList() :
-			NumOfEquipTypes( 0 )
+			LoadDistScheme( DataZoneEquipment::LoadDist::SequentialLoading ),
+			NumOfEquipTypes( 0 ),
+			NumAvailHeatEquip( 0 ),
+			NumAvailCoolEquip( 0 )
 		{}
 
+		void
+		getPrioritiesforInletNode(
+			int const inletNodeNum, // Zone inlet node number to match
+			int & coolingPriority, // Cooling priority num for matching equipment
+			int & heatingPriority // Heating priority num for matching equipment
+		);
 	};
 
 	struct ControlList
@@ -567,7 +597,17 @@ namespace DataZoneEquipment {
 	GetSystemNodeNumberForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
 
 	int
-	GetReturnAirNodeForZone( std::string const & ZoneName ); // Zone name to match into Controlled Zone structure
+	GetReturnAirNodeForZone( 
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName,  // Return air node name to match (may be blank)
+		std::string const & calledFromDescription  // String identifying the calling function and object
+	);
+
+	int
+	GetReturnNumForZone( 
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	);
 
 	Real64
 	CalcDesignSpecificationOutdoorAir(

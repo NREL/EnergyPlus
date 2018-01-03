@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -71,6 +72,10 @@ public:
 		this->ModelA.deltaTempFreezingLow = 1.0;  // deltaC
 		this->ModelA.specHeatTransition = ( this->ModelA.specificHeatSolid + this->ModelA.specificHeatLiquid ) / 2.0;
 		this->ModelA.CpOld = this->ModelA.specificHeatSolid;
+		this->ModelA.fullySolidThermalConductivity = 1.0;
+		this->ModelA.fullyLiquidThermalConductivity = 2.0;
+		this->ModelA.fullySolidDensity = 3.0;
+		this->ModelA.fullyLiquidDensity = 4.0;
 	}
 
 	virtual void TearDown()
@@ -502,4 +507,16 @@ TEST_F(HysteresisTest, IntoMeltingAndBackDown)
 		EXPECT_EQ(cp_call.expectedUpdatedPhaseChangeState, calculated_pcm_state);
 		EXPECT_NEAR(cp_call.expectedSpecificHeat, calculated_cp, 1.0);
 	}
+}
+
+TEST_F(HysteresisTest, TestVariableConductivity) {
+	EXPECT_NEAR(1.0, this->ModelA.getConductivity(19.0), 0.01);
+	EXPECT_NEAR(1.5, this->ModelA.getConductivity(21.5), 0.01);
+	EXPECT_NEAR(2.0, this->ModelA.getConductivity(24.0), 0.01);
+}
+
+TEST_F(HysteresisTest, TestVariableDensity) {
+	EXPECT_NEAR(3.0, this->ModelA.getDensity(19.0), 0.01);
+	EXPECT_NEAR(3.5, this->ModelA.getDensity(21.5), 0.01);
+	EXPECT_NEAR(4.0, this->ModelA.getDensity(24.0), 0.01);
 }

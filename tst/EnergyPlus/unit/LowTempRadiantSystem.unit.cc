@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -245,6 +246,13 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow )
 	HydrRadSys( RadSysNum ).TubeLength = AutoSize;
 	HydrRadSys( RadSysNum ).TotalSurfaceArea = 1500.0;
 	ExpectedResult3 = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+	HydrRadSys( RadSysNum ).SurfacePtr.allocate( 1 );
+	HydrRadSys( RadSysNum ).SurfacePtr( 1 ) = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 1500.0;
+	Construct.allocate( 1 );
+	Construct( 1 ).ThicknessPerpend = 0.075;
 
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat, 0.1 );
@@ -319,6 +327,14 @@ TEST_F( LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow )
 	FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad = 2200.0;
 	ExpectedResult2 = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad;
 
+	HydrRadSys( RadSysNum ).SurfacePtr.allocate( 1 );
+	HydrRadSys( RadSysNum ).SurfacePtr( 1 ) = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 1500.0;
+	Construct.allocate( 1 );
+	Construct( 1 ).ThicknessPerpend = 0.075;
+
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, HydrRadSys( RadSysNum ).ScaledHeatingCapacity, 0.1 );
 	EXPECT_NEAR( ExpectedResult2, HydrRadSys( RadSysNum ).ScaledCoolingCapacity, 0.1 );
@@ -378,6 +394,15 @@ TEST_F( LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow )
 	FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 1200.0;
 	ExpectedResult1 = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
 	ExpectedResult1 = ExpectedResult1 / ( PlantSizData( 1 ).DeltaT * RhoWater * CpWater );
+
+	CFloRadSys( RadSysNum ).SurfacePtr.allocate( 1 );
+	CFloRadSys( RadSysNum ).SurfacePtr( 1 ) = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 150.0;
+	Construct.allocate( 1 );
+	Construct( 1 ).ThicknessPerpend = 0.075;
+
 
 	SizeLowTempRadiantSystem( RadSysNum, SystemType );
 	EXPECT_NEAR( ExpectedResult1, CFloRadSys( RadSysNum ).WaterVolFlowMax, 0.001 );
@@ -462,6 +487,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone1Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Zone Equipment 1 Object Type",
 		"    West Zone Radiant Floor, !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1146,7 +1172,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 	ChilledWaterFlowRate = CoolingCapacity / ( PlantSizData( 2 ).DeltaT * Cp * Density );
 	// tuble length sizing calculation
 	HydrRadSys( RadSysNum ).TotalSurfaceArea = Surface( HydrRadSys( RadSysNum ).SurfacePtr( 1 ) ).Area;
-	TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+	TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.1524; // tube length uses the construction perpendicular spacing
 
 	// do autosize calculations
 	SizeLowTempRadiantSystem( RadSysNum, RadSysTypes( 1 ).SystemType );
@@ -1185,13 +1211,13 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystem )
 	CFloRadSys( RadSysNum ).NomPumpHead = 1.0;
 	CFloRadSys( RadSysNum ).NomPowerUse = 1.0;
 	CFloRadSys( RadSysNum ).MotorEffic = 1.2;
-	
+
 	CFloRadSys( RadSysNum ).CoolingSystem = true;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	EXPECT_EQ( 3.0, CFloRadSys( RadSysNum ).ChWaterMassFlowRate );
 	EXPECT_EQ( 0.0, CFloRadSys( RadSysNum ).WaterMassFlowRate );
-	
+
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = true;
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
@@ -1203,7 +1229,7 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 {
 
 	bool InitErrorFound;
-	
+
 	// Test 1: with autosize for max flow, nothing should happen
 	LowTempRadiantSystem::clear_state();
 	RadSysNum = 1;
@@ -1231,12 +1257,12 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
-	
+
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = AutoSize;
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	EXPECT_EQ( CFloRadSys( RadSysNum ).PumpEffic, 0.0 );
 	EXPECT_EQ( InitErrorFound, false );
-	
+
 	// Test 2: pump efficiency below 50%
 	LowTempRadiantSystem::clear_state();
 	RadSysNum = 1;
@@ -1301,7 +1327,7 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
-	
+
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = 0.98; // because of how other parameters are set, this value is equal to the pump efficiency
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	std::string const error_string03 = delimited_string( {
@@ -1338,7 +1364,7 @@ TEST_F( LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump )
 	CFloRadSys( RadSysNum ).PumpEffic = 0.0;
 	CFloRadSys( RadSysNum ).CoolingSystem = false;
 	CFloRadSys( RadSysNum ).HeatingSystem = false;
-	
+
 	CFloRadSys( RadSysNum ).WaterVolFlowMax = 1.23; // because of how other parameters are set, this value is equal to the pump efficiency
 	InitLowTempRadiantSystem( false, RadSysNum, SystemType, InitErrorFound );
 	std::string const error_string04 = delimited_string( {
@@ -1559,5 +1585,112 @@ TEST_F( LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode )
 	HydrRadSys.deallocate( );
 	Schedule.deallocate( );
 	DataHeatBalFanSys::MAT.deallocate( );
+
+}
+
+TEST_F( LowTempRadiantSystemTest, SizeRadSysTubeLengthTest )
+{
+	// # Low Temperature Radiant System (variable and constant flow) autosizing tube length issue #6202
+	Real64 FuncCalc;
+	int RadSysType;
+
+	RadSysNum = 1;
+	LowTempRadiantSystem::clear_state( );
+
+	HydrRadSys.allocate( 3 );
+	CFloRadSys.allocate( 3 );
+
+	HydrRadSys( 1 ).NumOfSurfaces = 1;
+	HydrRadSys( 1 ).SurfacePtr.allocate( 1 );
+	HydrRadSys( 1 ).SurfacePtr( 1 ) = 1;
+	HydrRadSys( 2 ).NumOfSurfaces = 2;
+	HydrRadSys( 2 ).SurfacePtr.allocate( 2 );
+	HydrRadSys( 2 ).SurfacePtr( 1 ) = 1;
+	HydrRadSys( 2 ).SurfacePtr( 2 ) = 2;
+	HydrRadSys( 3 ).NumOfSurfaces = 1;
+	HydrRadSys( 3 ).SurfacePtr.allocate( 1 );
+	HydrRadSys( 3 ).SurfacePtr( 1 ) = 3;
+
+
+	CFloRadSys( 1 ).NumOfSurfaces = 1;
+	CFloRadSys( 1 ).SurfacePtr.allocate( 1 );
+	CFloRadSys( 1 ).SurfacePtr( 1 ) = 1;
+	CFloRadSys( 2 ).NumOfSurfaces = 2;
+	CFloRadSys( 2 ).SurfacePtr.allocate( 2 );
+	CFloRadSys( 2 ).SurfacePtr( 1 ) = 1;
+	CFloRadSys( 2 ).SurfacePtr( 2 ) = 2;
+	CFloRadSys( 3 ).NumOfSurfaces = 1;
+	CFloRadSys( 3 ).SurfacePtr.allocate( 1 );
+	CFloRadSys( 3 ).SurfacePtr( 1 ) = 3;
+
+	Surface.allocate( 3 );
+	Surface( 1 ).Construction = 1;
+	Surface( 1 ).Area = 100.0;
+	Surface( 2 ).Construction = 2;
+	Surface( 2 ).Area = 200.0;
+	Surface( 3 ).Construction = 3;
+	Surface( 3 ).Area = 300.0;
+
+	Construct.allocate( 3 );
+	Construct( 1 ).ThicknessPerpend = 0.05;
+	Construct( 2 ).ThicknessPerpend = 0.125;
+
+	// Test 1: Hydronic radiant system 1 (one surface)
+	RadSysType = HydronicSystem;
+	RadSysNum = 1;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1000.0, 0.1 );
+
+	// Test 2: Hydronic radiant system 2 (two surfaces)
+	RadSysType = HydronicSystem;
+	RadSysNum = 2;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1800.0, 0.1 );
+
+	// Test 3: Constant flow radiant system 1 (one surface)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 1;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1000.0, 0.1 );
+
+	// Test 4: Constant flow radiant system 2 (two surfaces)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 2;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 1800.0, 0.1 );
+
+	// Test 5: Hydronic radiant system 3 (thickness out of range, low side)
+	RadSysType = HydronicSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.004;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+
+	// Test 6: Hydronic radiant system 3 (thickness out of range, high side)
+	RadSysType = HydronicSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.6;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+
+	// Test 7: Constant flow radiant system 3 (thickness out of range, low side)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.004;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+
+	// Test 8: Constant flow radiant system 3 (thickness out of range, high side)
+	RadSysType = ConstantFlowSystem;
+	RadSysNum = 3;
+	Construct( 3 ).ThicknessPerpend = 0.6;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 2000.0, 0.1 );
+
+	// Test 9: Wrong system type
+	RadSysType = 0;
+	RadSysNum = 1;
+	FuncCalc = SizeRadSysTubeLength( RadSysType, RadSysNum );
+	EXPECT_NEAR( FuncCalc, 60.0, 0.1 );
 
 }

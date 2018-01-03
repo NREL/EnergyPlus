@@ -22,7 +22,7 @@
 !           There is a single window in the West zone south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -97,8 +97,11 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 !
-  output:Sqlite, simple;
-  Version,8.7;
+
+  output:Sqlite,
+    simple;                  !- Option Type
+
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -106,8 +109,8 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                      !- Run Simulation for Sizing Periods
-    No;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1308,6 +1311,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1315,6 +1319,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1322,6 +1327,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1335,7 +1341,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1343,7 +1349,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1351,7 +1357,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -1365,7 +1371,6 @@
     1.0,                     !- Motor In Airstream Fraction
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
-
 
   Coil:Heating:Electric,
     Reheat Coil Zone 1,      !- Name
@@ -1393,7 +1398,7 @@
     autosize,                !- Nominal Capacity {W}
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Heating Coil Air Outlet Node,  !- Air Outlet Node Name
-    Heating Coil Air Outlet Node;
+    Heating Coil Air Outlet Node;  !- Temperature Setpoint Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS ===========
 
@@ -1418,7 +1423,7 @@
     BlowThrough,             !- Supply Air Fan Placement
     Fan OpMode Schedule,     !- Supply Air Fan Operating Mode Schedule Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
-    Main Cooling Coil 1,              !- Cooling Coil Name
+    Main Cooling Coil 1,     !- Cooling Coil Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Furnace Heating Coil 1,  !- Heating Coil Name
     CoolingPriority,         !- Priority Control Mode
@@ -1524,12 +1529,12 @@
     Air Loop Outlet Node;    !- Setpoint Node or NodeList Name
 
   Coil:Cooling:DX:VariableSpeed,
-    Main Cooling Coil 1,    !- Name
-     DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
+    Main Cooling Coil 1,     !- Name
+    DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     4.0,                     !- Number of Speeds {dimensionless}
     4.0,                     !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
@@ -1537,14 +1542,15 @@
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
-    0.0,                   !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    8914.185229,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    8914.185229,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.79,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.980488789,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.944,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1554,7 +1560,7 @@
     HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp1,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    16456.94607,             !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    16456.94607,             !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.73,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.08,                    !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     1.888,                   !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1564,7 +1570,7 @@
     HPACFFF,                 !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp2,      !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    23463.3646,              !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    23463.3646,              !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.78,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.19,                    !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     2.832,                   !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1574,7 +1580,7 @@
     HPACFFF,                 !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp3,      !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    36991.44197,             !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    36991.44197,             !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.866381837,             !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     3.776,                   !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1585,16 +1591,14 @@
     HPCoolingEIRFTemp4,      !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF;                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
-
-   
-   Curve:Quadratic,
+  Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
-    1.0,                    !- Coefficient1 Constant
-    0.0,                    !- Coefficient2 x
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.5,                     !- Minimum Value of x
-    1.5;                     !- Maximum Value of x  
-   
+    1.5;                     !- Maximum Value of x
+
   Curve:Cubic,
     HPACFFF,                 !- Name
     1.0,                     !- Coefficient1 Constant
@@ -1603,7 +1607,7 @@
     0.0,                     !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
-    
+
   Curve:Biquadratic,
     HPHeatingCAPFTemp1,      !- Name
     0.8406506803,            !- Coefficient1 Constant
@@ -1762,7 +1766,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
   Curve:Biquadratic,
     HPCoolingCAPFTemp1,      !- Name
     1.6253449506,            !- Coefficient1 Constant
@@ -1907,8 +1910,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
-
   OutdoorAir:Node,
     Main Cooling Coil 1 Condenser Node,  !- Name
     -1.0;                    !- Height Above Ground {m}
@@ -2003,13 +2004,20 @@
 
   Output:Variable,*,Cooling Coil Dehumidification Mode,timestep;
 
-Output:Variable,*,Cooling Coil Air Mass Flow Rate,timestep; !- HVAC Average [kg/s]
-Output:Variable,*,Cooling Coil Air Inlet Temperature,timestep; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Outlet Temperature,timestep; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Total Cooling Rate,timestep; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Electric Power,timestep; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Upper Speed Level,timestep; !- HVAC Average []
-Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,timestep; !- HVAC Average []
+  Output:Variable,*,Cooling Coil Air Mass Flow Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Air Inlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Air Outlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Electric Power,timestep;
+
+  Output:Variable,*,Cooling Coil Upper Speed Level,timestep;
+
+  Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,timestep;
+
   Output:Variable,*,Zone Air System Sensible Heating Rate,timestep;
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,timestep;

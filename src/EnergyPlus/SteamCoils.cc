@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -424,12 +425,12 @@ namespace SteamCoils {
 
 			//Setup the Simple Heating Coil reporting variables
 			//CurrentModuleObject = "Coil:Heating:Steam"
-			SetupOutputVariable( "Heating Coil Heating Energy [J]", SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Heating Rate [W]", SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate [Kg/s]", SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Inlet Temperature [C]", SteamCoil( CoilNum ).InletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Outlet Temperature [C]", SteamCoil( CoilNum ).OutletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
-			SetupOutputVariable( "Heating Coil Steam Trap Loss Rate [W]", SteamCoil( CoilNum ).LoopLoss, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, SteamCoil( CoilNum ).TotSteamHeatingCoilEnergy, "System", "Sum", SteamCoil( CoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, SteamCoil( CoilNum ).TotSteamHeatingCoilRate, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, SteamCoil( CoilNum ).OutletSteamMassFlowRate, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Inlet Temperature", OutputProcessor::Unit::C, SteamCoil( CoilNum ).InletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Outlet Temperature", OutputProcessor::Unit::C, SteamCoil( CoilNum ).OutletSteamTemp, "System", "Average", SteamCoil( CoilNum ).Name );
+			SetupOutputVariable( "Heating Coil Steam Trap Loss Rate", OutputProcessor::Unit::W, SteamCoil( CoilNum ).LoopLoss, "System", "Average", SteamCoil( CoilNum ).Name );
 
 		}
 
@@ -824,7 +825,11 @@ namespace SteamCoils {
 				if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
 					// if coil is part of a terminal unit just use the terminal unit value
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
-						SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurZoneEqNum ).MaxSTVolFlow;
+						if ( CurTermUnitSizingNum > 0 ) {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurTermUnitSizingNum ).MaxSTVolFlow;
+						} else {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = 0.0;
+						}
 						// if coil is part of a zonal unit, calc coil load to get hot Steam flow rate
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;

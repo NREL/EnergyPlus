@@ -87,7 +87,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     FICTITIOUS BLDG,         !- Name
@@ -2487,7 +2487,7 @@
     WEST ZONE In Nodes,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     WEST ZONE Node,          !- Zone Air Node Name
-    WEST ZONE Out Node;      !- Zone Return Air Node Name
+    WEST ZONE Out Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     MID-UPP ZONE,            !- Zone Name
@@ -2495,7 +2495,7 @@
     MID-UPP ZONE In Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     MID-UPP ZONE Node,       !- Zone Air Node Name
-    MID-UPP ZONE Out Node;   !- Zone Return Air Node Name
+    MID-UPP ZONE Out Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     MID-LOW ZONE,            !- Zone Name
@@ -2503,7 +2503,7 @@
     MID-LOW ZONE In Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     MID-LOW ZONE Node,       !- Zone Air Node Name
-    MID-LOW ZONE Out Node;   !- Zone Return Air Node Name
+    MID-LOW ZONE Out Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -2511,10 +2511,11 @@
     EAST ZONE In Nodes,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     EAST ZONE Node,          !- Zone Air Node Name
-    EAST ZONE Out Node;      !- Zone Return Air Node Name
+    EAST ZONE Out Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     WEST ZONE Eq,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     WEST ZONE ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2522,6 +2523,7 @@
 
   ZoneHVAC:EquipmentList,
     MID-UPP ZONE Eq,         !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     MID-UPP ZONE ATU,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2529,6 +2531,7 @@
 
   ZoneHVAC:EquipmentList,
     MID-LOW ZONE Eq,         !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     MID-LOW ZONE ATU,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2536,6 +2539,7 @@
 
   ZoneHVAC:EquipmentList,
     EAST ZONE Eq,            !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     EAST ZONE ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

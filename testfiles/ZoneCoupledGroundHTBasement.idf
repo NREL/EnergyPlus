@@ -58,7 +58,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.7;
+  Version,8.9;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -542,8 +542,8 @@
   Site:GroundDomain:Basement,
     CoupledBasement,         !- Name
     5,                       !- Ground Domain Depth {m}
-    1,                       !- Aspect ratio {m}
-    5,                       !- Perimeter offset {m}
+    1,                       !- Aspect Ratio
+    5,                       !- Perimeter Offset {m}
     1.8,                     !- Soil Thermal Conductivity {W/m-K}
     3200,                    !- Soil Density {kg/m3}
     836,                     !- Soil Specific Heat {J/kg-K}
@@ -648,10 +648,11 @@
     Main Floor Ideal Loads Supply Inlet,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main Floor Zone Air Node,!- Zone Air Node Name
-    Main Floor Return Outlet;!- Zone Return Air Node Name
+    Main Floor Return Outlet;!- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Main Floor Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Main Floor Ideal Loads Air System,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -662,6 +663,7 @@
     ,                        !- Availability Schedule Name
     Main Floor Ideal Loads Supply Inlet,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.0156,                  !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

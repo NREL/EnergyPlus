@@ -44,7 +44,7 @@
 !
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Urbana             Load Calc,  !- Name
@@ -1476,7 +1476,7 @@
     Lshaped zone-Inlets,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Lshaped zone-ZoneAirNode,!- Zone Air Node Name
-    Lshaped zone-ReturnAirNode;  !- Zone Return Air Node Name
+    Lshaped zone-ReturnAirNode;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     LshapedZoneBase,         !- Zone Name
@@ -1484,10 +1484,11 @@
     LshapedZoneBase-Inlets,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LshapedZoneBase-ZoneAirNode,  !- Zone Air Node Name
-    LshapedZoneBase-ReturnAirNode;  !- Zone Return Air Node Name
+    LshapedZoneBase-ReturnAirNode;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Equipment-Lshaped zone,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Lshaped zone-Air,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1495,6 +1496,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-LshapedZoneBase,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     LshapedZoneBase-Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1505,6 +1507,7 @@
     ,                        !- Availability Schedule Name
     Lshaped zone-Inlet,      !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1533,6 +1536,7 @@
     ,                        !- Availability Schedule Name
     LshapedZoneBase-Inlet,   !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

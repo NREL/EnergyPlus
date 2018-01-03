@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -88,7 +89,7 @@ namespace General {
 	// Functions
 
 	void
-	SolveRegulaFalsi(
+	SolveRoot(
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
@@ -100,7 +101,22 @@ namespace General {
 	);
 
 	void
-	SolveRegulaFalsi(
+	SolveRoot(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
+		std::function< Real64( Real64 const, Array1< Real64 > const & ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1, // 2nd bound of interval that contains the solution
+		Array1< Real64 > const & Par, // array with additional parameters used for function evaluation
+		int const AlgorithmTypeNum, // ALgorithm selection
+		Real64 & XX_0, // Low bound obtained with maximum number of allowed iterations
+		Real64 & XX_1 // Hign bound obtained with maximum number of allowed iterations
+	);
+
+	void
+	SolveRoot(
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
@@ -108,6 +124,20 @@ namespace General {
 		std::function< Real64( Real64 const ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1 // 2nd bound of interval that contains the solution
+	);
+
+	void
+	SolveRoot(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1, // 2nd bound of interval that contains the solution
+		int const AlgorithmTypeNum, // ALgorithm selection
+		Real64 & XX_0, // Low bound obtained with maximum number of allowed iterations
+		Real64 & XX_1 // Hign bound obtained with maximum number of allowed iterations
 	);
 
 	Real64
@@ -285,6 +315,13 @@ namespace General {
 
 	std::string
 	CreateSysTimeIntervalString();
+
+	int
+	nthDayOfWeekOfMonth(
+		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
+		int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
+		int const & monthNumber // January = 1
+	);
 
 	Real64
 	SafeDivide(

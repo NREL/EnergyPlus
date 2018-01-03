@@ -628,24 +628,18 @@ The MaterialProperty:PhaseChangeHysteresis object includes the following inputs.
 
 This input must match the name of a material defined elsewhere within EnergyPlus.  The thermal properies of that material are then overridden by the properties defind in this object.
 
-\paragraph{Field: Temperature Coefficient for Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-name}
-
-This field is used to enter the temperature dependent coefficient for thermal conductivity of the material.~ Units for this parameter are (W/(m-K\(^{2}\)). This is the thermal conductivity change per unit temperature excursion from 20 C. The conductivity value at 20 C is the one specified with the basic material properties of the regular material specified in the name field. The thermal conductivity is obtained from:
-
-\begin{equation}
-k = {k_o} + {k_1}({T_i} - 20)
-\end{equation}
-
-where:
-
-k\(_{o}\) is the 20C value of thermal conductivity(normal idf~ input)
-
-k\(_{1}\) is the change in conductivity per degree temperature difference from 20C
-
 \paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-name}
 
 This is the total amount of latent heat absorbed or discharged during the transition from solid to liquid or back, in Joules.
 The shapes of the enthalpy curves differ based on direction, but the total amount of energy from one state to the other does not.
+
+\paragraph{Field: Liquid State Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-liquidk}
+
+This is the constant thermal conductivity used while the material is fully liquid, in W/m-K.
+
+\paragraph{Field: Liquid State Density}\label{materialpropertyphasechangehysteresis-inputs-liquidrho}
+
+This is the constant density while the material is fully liquid, in kg/m3.
 
 \paragraph{Field: Liquid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
 
@@ -662,6 +656,14 @@ This is the center (peak) of the melting curve, in Kelvin.
 \paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
 
 This is the width of the enthalpy/specific heat melting curve, on the low side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
+
+\paragraph{Field: Solid State Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-solidk}
+
+This is the constant thermal conductivity used while the material is fully solid, in W/m-K.
+
+\paragraph{Field: Solid State Density}\label{materialpropertyphasechangehysteresis-inputs-solidrho}
+
+This is the constant density while the material is fully solid, in kg/m3.
 
 \paragraph{Field: Solid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
 
@@ -702,12 +704,15 @@ Note, the following Heat Balance Algorithm is necessary (only specified once). A
 
   MaterialProperty:PhaseChangeHysteresis,
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,   !- Name
-    0,                       !- Temperature Coefficient for Thermal Conductivity {W/m-K2}
     10000,                   !- Latent Heat of Fusion {J/kg}
+    0.5,                     !- Liquid State Thermal Conductivity {W/m-K}
+    1500,                    !- Liquid State Density {kg/m3}
     2000,                    !- Liquid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Melting Curve {deltaC}
     20,                      !- Peak Melting Temperature {C}
     1,                       !- Low Temperature Difference of Melting Curve {deltaC}
+    0.5,                     !- Solid State Thermal Conductivity {W/m-K}
+    1600,                    !- Solid State Density {kg/m3}
     2000,                    !- Solid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Freezing Curve {deltaC}
     23,                      !- Peak Freezing Temperature {C}
@@ -3073,7 +3078,7 @@ The perpendicular length between the slat cord ~and the curve (m). Crown = 0.062
 
 \paragraph{Field: Slat Angle}\label{field-slat-angle-2}
 
-The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). If the ``Slat Angle Control'' input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value is zero, and the maximum value allowed is 180.0 degrees.~ The default value is 45 degrees.
+The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). The slat angle is +ve if the tip of the slat front face is tilted upward, or else the slat angle is -ve if the tip of the slat front face is tilted downward. The slat angle varies between -90 to +90.~ If the ``Slat Angle Control'' input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value allowed is -90.0, and the maximum value allowed is 90.0 degrees.~ The default value is 45 degrees.
 
 \paragraph{Field: Front Side Slat Beam-Diffuse Solar Transmittance}\label{field-front-side-slat-beam-diffuse-solar-transmittance}
 

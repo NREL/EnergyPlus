@@ -22,7 +22,7 @@
 !           There is a single window in the West zone south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -97,8 +97,11 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 !
-  output:Sqlite, simple;
-  Version,8.7;
+
+  output:Sqlite,
+    simple;                  !- Option Type
+
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -106,8 +109,8 @@
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                      !- Run Simulation for Sizing Periods
-    No;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Sizing Periods
+    No;                      !- Run Simulation for Weather File Run Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1175,7 +1178,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:SYSTEM ===========
 
   Sizing:System,
-    Changeover Bypass VAV Heat Pump,       !- AirLoop Name
+    Changeover Bypass VAV Heat Pump,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
     0.3,                     !- Central Heating Maximum System Air Flow Ratio
@@ -1308,6 +1311,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1315,6 +1319,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1322,6 +1327,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1335,7 +1341,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1343,7 +1349,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1351,7 +1357,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -1365,7 +1371,6 @@
     1.0,                     !- Motor In Airstream Fraction
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
-
 
   Coil:Heating:Electric,
     Reheat Coil Zone 1,      !- Name
@@ -1383,11 +1388,10 @@
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS ===========
 
   AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
-    CBVAV Heat Pump System,    !- Name
+    CBVAV Heat Pump System,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     autosize,                !- Heating Supply Air Flow Rate {m3/s}
@@ -1407,8 +1411,8 @@
     BlowThrough,             !- Supply Air Fan Placement
     Fan OpMode Schedule,     !- Supply Air Fan Operating Mode Schedule Name
     Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
-    Main Cooling Coil 1,              !- Cooling Coil Name
-    Coil:Heating:DX:VariableSpeed,       !- Heating Coil Object Type
+    Main Cooling Coil 1,     !- Cooling Coil Name
+    Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Main DX Heating Coil 1,  !- Heating Coil Name
     CoolingPriority,         !- Priority Control Mode
     10.0,                    !- Minimum Outlet Air Temperature During Cooling Operation {C}
@@ -1416,7 +1420,7 @@
     None;                    !- Dehumidification Control Type
 
   AirLoopHVAC,
-    Changeover Bypass VAV Heat Pump,       !- Name
+    Changeover Bypass VAV Heat Pump,  !- Name
     ,                        !- Controller List Name
     Furnace 1 Avail List,    !- Availability Manager List Name
     1.75,                    !- Design Supply Air Flow Rate {m3/s}
@@ -1464,7 +1468,7 @@
     Air Loop Main Branch,    !- Name
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,  !- Component 1 Object Type
-    CBVAV Heat Pump System,    !- Component 1 Name
+    CBVAV Heat Pump System,  !- Component 1 Name
     Air Loop Inlet Node,     !- Component 1 Inlet Node Name
     Air Loop Outlet Node;    !- Component 1 Outlet Node Name
 
@@ -1518,7 +1522,7 @@
     Heating Coil Air Outlet Node,  !- Indoor Air Outlet Node Name
     5.0,                     !- Number of Speeds {dimensionless}
     3.0,                     !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Rated Heating Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Rated Heating Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
     ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
@@ -1531,70 +1535,70 @@
     OnDemand,                !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
     AUTOSIZE,                !- Resistive Defrost Heater Capacity {W}
-    9124.853458,             !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
+    9124.853458,             !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     4.29731,                 !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.653,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     HPHeatingCAPFTemp1,      !- Speed 1 Heating Capacity Function of Temperature Curve Name
     HPACFFF,                 !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPHeatingEIRFTemp1,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    12807.12192,             !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
+    12807.12192,             !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     4.06127,                 !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
     0.6532,                  !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     HPHeatingCAPFTemp2,      !- Speed 2 Heating Capacity Function of Temperature Curve Name
     HPACFFF,                 !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPHeatingEIRFTemp2,      !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    16381.47714,             !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
+    16381.47714,             !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     3.90494,                 !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
     0.79,                    !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     HPHeatingCAPFTemp3,      !- Speed 3 Heating Capacity Function of Temperature Curve Name
     HPACFFF,                 !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPHeatingEIRFTemp3,      !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    19932.09261,             !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
+    19932.09261,             !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     3.50533,                 !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
     0.791,                   !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     HPHeatingCAPFTemp4,      !- Speed 4 Heating Capacity Function of Temperature Curve Name
     HPACFFF,                 !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
     HPHeatingEIRFTemp4,      !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    28464.50762,             !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
+    28464.50762,             !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     2.63201,                 !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
     0.80,                    !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     HPHeatingCAPFTemp5,      !- Speed 5 Heating Capacity Function of Temperature Curve Name
     HPACFFF,                 !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
     HPHeatingEIRFTemp5,      !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
+    ,                        !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     ,                        !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
     ,                        !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     ,                        !- Speed 6 Heating Capacity Function of Temperature Curve Name
     ,                        !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
     ,                        !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
+    ,                        !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     ,                        !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     ,                        !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     ,                        !- Speed 7 Heating Capacity Function of Temperature Curve Name
     ,                        !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     ,                        !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
+    ,                        !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     ,                        !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
     ,                        !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     ,                        !- Speed 8 Heating Capacity Function of Temperature Curve Name
     ,                        !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     ,                        !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
+    ,                        !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     ,                        !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     ,                        !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     ,                        !- Speed 9 Heating Capacity Function of Temperature Curve Name
     ,                        !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
     ,                        !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
     ,                        !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
+    ,                        !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     ,                        !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     ,                        !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     ,                        !- Speed 10 Heating Capacity Function of Temperature Curve Name
@@ -1603,12 +1607,12 @@
     ;                        !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Coil:Cooling:DX:VariableSpeed,
-    Main Cooling Coil 1,    !- Name
-     DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
+    Main Cooling Coil 1,     !- Name
+    DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
     4.0,                     !- Number of Speeds {dimensionless}
     4.0,                     !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
@@ -1616,14 +1620,15 @@
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
-    0.0,                   !- Crankcase Heater Capacity {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    8914.185229,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}
+    8914.185229,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.79,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.980488789,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
     0.944,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1633,7 +1638,7 @@
     HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp1,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    16456.94607,             !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {w}
+    16456.94607,             !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.73,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.08,                    !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
     1.888,                   !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1643,7 +1648,7 @@
     HPACFFF,                 !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp2,      !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    23463.3646,              !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {w}
+    23463.3646,              !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.78,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.19,                    !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
     2.832,                   !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1653,7 +1658,7 @@
     HPACFFF,                 !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPCoolingEIRFTemp3,      !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF,                 !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    36991.44197,             !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {w}
+    36991.44197,             !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.866381837,             !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
     3.776,                   !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
@@ -1664,16 +1669,14 @@
     HPCoolingEIRFTemp4,      !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
     HPACFFF;                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
-
-   
-   Curve:Quadratic,
+  Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
-    1.0,                    !- Coefficient1 Constant
-    0.0,                    !- Coefficient2 x
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.5,                     !- Minimum Value of x
-    1.5;                     !- Maximum Value of x  
-   
+    1.5;                     !- Maximum Value of x
+
   Curve:Cubic,
     HPACFFF,                 !- Name
     1.0,                     !- Coefficient1 Constant
@@ -1682,7 +1685,7 @@
     0.0,                     !- Coefficient4 x**3
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
-    
+
   Curve:Biquadratic,
     HPHeatingCAPFTemp1,      !- Name
     0.8406506803,            !- Coefficient1 Constant
@@ -1841,7 +1844,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
   Curve:Biquadratic,
     HPCoolingCAPFTemp1,      !- Name
     1.6253449506,            !- Coefficient1 Constant
@@ -1985,6 +1987,7 @@
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
+
   Curve:Biquadratic,
     HPHeatingCAPFTemp5,      !- Name
     0.8593017622,            !- Coefficient1 Constant
@@ -2022,7 +2025,6 @@
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
-
 
   OutdoorAir:Node,
     Main Cooling Coil 1 Condenser Node,  !- Name
@@ -2114,13 +2116,20 @@
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Upper Speed Level,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,hourly; !- HVAC Average []
+  Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Air Inlet Temperature,hourly;
+
+  Output:Variable,*,Cooling Coil Air Outlet Temperature,hourly;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Electric Power,hourly;
+
+  Output:Variable,*,Cooling Coil Upper Speed Level,hourly;
+
+  Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,hourly;
+
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
@@ -2162,22 +2171,38 @@ Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,hourly; !- HVAC Av
   Output:Variable,Zone 1 Reheat Air Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,Zone 1 Reheat Air Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
-Output:Variable,*,Heating Coil Air Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,*,Heating Coil Air Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Heating Coil Air Inlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Heating Coil Air Outlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Heating Coil Air Outlet Humidity Ratio,hourly; !- HVAC Average [kgWater/kgDryAir]
-Output:Variable,*,Heating Coil Sensible Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Source Side Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Upper Speed Level,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Neighboring Speed Levels Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil Defrost Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Defrost Electric Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Heating Coil Crankcase Heater Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly; !- HVAC Sum [J]
+
+  Output:Variable,*,Heating Coil Air Mass Flow Rate,hourly;
+
+  Output:Variable,*,Heating Coil Air Inlet Temperature,hourly;
+
+  Output:Variable,*,Heating Coil Air Inlet Humidity Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Air Outlet Temperature,hourly;
+
+  Output:Variable,*,Heating Coil Air Outlet Humidity Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Sensible Heating Rate,hourly;
+
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
+
+  Output:Variable,*,Heating Coil Part Load Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Runtime Fraction,hourly;
+
+  Output:Variable,*,Heating Coil Source Side Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Heating Coil Upper Speed Level,hourly;
+
+  Output:Variable,*,Heating Coil Neighboring Speed Levels Ratio,hourly;
+
+  Output:Variable,*,Heating Coil Defrost Electric Power,hourly;
+
+  Output:Variable,*,Heating Coil Defrost Electric Energy,hourly;
+
+  Output:Variable,*,Heating Coil Crankcase Heater Electric Power,hourly;
+
+  Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
@@ -2196,7 +2221,6 @@ Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly; !- HVAC 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DEBUGGINGDATA ===========
 

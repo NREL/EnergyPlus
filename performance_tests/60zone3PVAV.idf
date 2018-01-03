@@ -8,7 +8,7 @@
 ! Title5= VisualDOE 5.0.0
 ! \group Simulation Parameters
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Green Design Tools,      !- Name
@@ -35,10 +35,12 @@
   Output:DebuggingData,0,0;
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
+    1.,                      !- Name
+    1.,                      !- Zone or ZoneList Name
     1.,                      !- Temperature Capacity Multiplier
-    1.,                      !- Humidity Capacity Multiplier
-    1.,                      !- Carbon Dioxide Capacity Multiplier
-    1.0;                     !- Generic Contaminant Capacity Multiplier
+    1.0,                     !- Humidity Capacity Multiplier
+    ,                        !- Carbon Dioxide Capacity Multiplier
+    ;                        !- Generic Contaminant Capacity Multiplier
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation

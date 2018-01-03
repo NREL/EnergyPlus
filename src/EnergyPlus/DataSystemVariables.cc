@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -101,6 +102,7 @@ namespace DataSystemVariables {
 
 	std::string const DDOnlyEnvVar( "DDONLY" ); // Only run design days
 	std::string const ReverseDDEnvVar( "REVERSEDD" ); // Reverse DD during run
+	std::string const DisableGLHECachingEnvVar( "DISABLEGLHECACHING" );
 	std::string const FullAnnualSimulation( "FULLANNUALRUN" ); // Generate annual run
 	std::string const cDeveloperFlag( "DeveloperFlag" );
 	std::string const cDisplayAllWarnings( "DisplayAllWarnings" );
@@ -142,6 +144,7 @@ namespace DataSystemVariables {
 	// MODULE VARIABLE DECLARATIONS:
 	bool DDOnly( false ); // TRUE if design days (sizingperiod:*) only are to be run.
 	bool ReverseDD( false ); // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
+	bool DisableGLHECaching( false ); // TRUE if caching is to be disabled, for example, during unit tests.
 	bool FullAnnualRun( false ); // TRUE if full annual simulation is to be run.
 	bool DeveloperFlag( false ); // TRUE if developer flag is turned on. (turns on more displays to console)
 	bool TimingFlag( false ); // TRUE if timing flag is turned on. (turns on more timing displays to console)
@@ -158,6 +161,8 @@ namespace DataSystemVariables {
 	bool ReportDuringHVACSizingSimulation( false ); // true when reporting outputs during HVAC sizing Simulation
 	bool ReportDetailedWarmupConvergence( false ); // True when the detailed warmup convergence is requested
 	bool UpdateDataDuringWarmupExternalInterface( false ); // variable sets in the external interface.
+	bool UseScheduledSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are imported from schedule inputs
+	bool ReportExtShadingSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are exported as a csv format output
 	// This update the value during the warmup added for FMI
 	Real64 Elapsed_Time( 0.0 ); // For showing elapsed time at end of run
 	Real64 Time_Start( 0.0 ); // Call to CPU_Time for start time of simulation

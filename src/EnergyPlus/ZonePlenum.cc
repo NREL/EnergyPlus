@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -67,6 +68,7 @@
 #include <NodeInputManager.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>
+#include <PurchasedAirManager.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -312,6 +314,7 @@ namespace ZonePlenum {
 		using DataZoneEquipment::EquipConfiguration;
 		using namespace DataIPShortCuts;
 		using PoweredInductionUnits::PIUInducesPlenumAir;
+		using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -414,6 +417,9 @@ namespace ZonePlenum {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
+			} else {
+				Zone( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum ).IsReturnPlenum = true;
+				Zone( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum ).PlenumCondNum = ZonePlenumNum;
 			}
 			//  Check if this zone is used as a controlled zone
 			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
@@ -458,12 +464,14 @@ namespace ZonePlenum {
 				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
 					ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) = NodeNums( NodeNum );
 					UniqueNodeError = false;
-					CheckUniqueNodes( "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ) );
-					if ( UniqueNodeError ) {
-						ShowContinueError( "Occurs for ReturnPlenum = " + AlphArray( 1 ) );
-						ErrorsFound = true;
+					if ( ! CheckPurchasedAirForReturnPlenum( ZonePlenumNum ) ) {
+						CheckUniqueNodes( "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ) );
+						if ( UniqueNodeError ) {
+							ShowContinueError( "Occurs for ReturnPlenum = " + AlphArray( 1 ) );
+							ErrorsFound = true;
+						}
+						PIUInducesPlenumAir( ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) );
 					}
-					PIUInducesPlenumAir( ZoneRetPlenCond( ZonePlenumNum ).InducedNode( NodeNum ) );
 				}
 			} else {
 				ShowContinueError( "Invalid Induced Air Outlet Node or NodeList name in AirLoopHVAC:ReturnPlenum object = " + ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName );
@@ -554,6 +562,9 @@ namespace ZonePlenum {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
+			} else {
+				Zone( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum ).IsSupplyPlenum = true;
+				Zone( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum ).PlenumCondNum = ZonePlenumNum;
 			}
 			//  Check if this zone is used as a controlled zone
 			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
@@ -717,14 +728,17 @@ namespace ZonePlenum {
 						// Loop through ZoneEquipConfig's and look for return air node value = InletNode
 						for ( ZoneEquipConfigLoop = 1; ZoneEquipConfigLoop <= NumOfZones; ++ZoneEquipConfigLoop ) {
 							if ( ! ZoneEquipConfig( ZoneEquipConfigLoop ).IsControlled ) continue;
-							if ( ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnAirNode == InletNode ) {
-								ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnZonePlenumCondNum = ZonePlenumLoop;
-								ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) = ZoneEquipConfigLoop;
+							for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigLoop ).NumReturnNodes; ++retNode ) {
+								if ( ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnNode( retNode ) == InletNode ) {
+									ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnNodePlenumNum = ZonePlenumLoop;
+									ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) = ZoneEquipConfigLoop;
+								}
 							}
 						}
 						// count the ADUs that can leak to this plenum
 						for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 							if ( AirDistUnit( ADUNum ).ZoneEqNum == ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) ) {
+								AirDistUnit( ADUNum ).RetPlenumNum = ZonePlenumLoop;
 								++NumADUsToPlen;
 							}
 						}
@@ -734,14 +748,26 @@ namespace ZonePlenum {
 				ZoneRetPlenCond( ZonePlenumLoop ).NumADUs = NumADUsToPlen;
 				// fill the list of air distribution units that can leak to this plenum
 				if ( NumADUsToPlen > 0 ) {
-					for ( InletNodeLoop = 1; InletNodeLoop <= ZoneRetPlenCond( ZonePlenumLoop ).NumInletNodes; ++InletNodeLoop ) {
-						for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-							if ( AirDistUnit( ADUNum ).ZoneEqNum == ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) ) {
-								++ADUsToPlenIndex;
-								ZoneRetPlenCond( ZonePlenumLoop ).ADUIndex( ADUsToPlenIndex ) = ADUNum;
-							}
+					for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+						if ( AirDistUnit( ADUNum ).RetPlenumNum == ZonePlenumLoop ) {
+							++ADUsToPlenIndex;
+							ZoneRetPlenCond( ZonePlenumLoop ).ADUIndex( ADUsToPlenIndex ) = ADUNum;
 						}
 					}
+				}
+			}
+
+
+			// Check that all ADUs with leakage found a return plenum
+			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+				auto & thisADU( AirDistUnit( ADUNum ) );
+				if ( ( thisADU.DownStreamLeak || thisADU.DownStreamLeak ) &&  ( thisADU.RetPlenumNum == 0 ) ) {
+					ShowWarningError( "No return plenum found for simple duct leakage for ZoneHVAC:AirDistributionUnit=" + thisADU.Name + " in Zone=" + ZoneEquipConfig( thisADU.ZoneEqNum ).ZoneName );
+					ShowContinueError( "Leakage will be ignored for this ADU." );
+					thisADU.UpStreamLeak = false;
+					thisADU.DownStreamLeak = false;
+					thisADU.UpStreamLeakFrac = 0.0;
+					thisADU.DownStreamLeakFrac = 0.0;
 				}
 			}
 
@@ -762,6 +788,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			InitAirZoneReturnPlenumEnvrnFlag = false;
@@ -877,6 +913,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			MyEnvrnFlag = false;
@@ -1429,6 +1475,66 @@ namespace ZonePlenum {
 
 	//        End of Reporting subroutines for the ZonePlenum Module
 	// *****************************************************************************
+
+	int
+	GetReturnPlenumIndex(
+		int const & ExNodeNum
+	)
+	{
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int PlenumNum; // loop counter
+		int InducedNodeNum; // loop counter
+		int WhichPlenum; // index to return plenum
+
+						 // Obtains and Allocates ZonePlenum related parameters from input file
+		if ( GetInputFlag ) { // First time subroutine has been entered
+			GetZonePlenumInput();
+			GetInputFlag = false;
+		}
+
+		WhichPlenum = 0;
+		if ( NumZoneReturnPlenums > 0 ) {
+			for ( PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum ) {
+				if ( ExNodeNum != ZoneRetPlenCond( PlenumNum ).OutletNode ) continue;
+				WhichPlenum = PlenumNum;
+				break;
+			}
+			if ( WhichPlenum == 0 ) {
+				for ( PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum ) {
+					for ( InducedNodeNum = 1; InducedNodeNum <= ZoneRetPlenCond( PlenumNum ).NumInducedNodes; ++InducedNodeNum ) {
+						if ( ExNodeNum != ZoneRetPlenCond( PlenumNum ).InducedNode( InducedNodeNum ) ) continue;
+						WhichPlenum = PlenumNum;
+						break;
+					}
+					if ( WhichPlenum > 0 ) break;
+				}
+			}
+		}
+
+		return WhichPlenum;
+
+	}
+
+	void
+	GetReturnPlenumName(
+		int const & ReturnPlenumIndex,
+		std::string & ReturnPlenumName
+	)
+	{
+
+		// Obtains and Allocates ZonePlenum related parameters from input file
+		if ( GetInputFlag ) { // First time subroutine has been entered
+			GetZonePlenumInput();
+			GetInputFlag = false;
+		}
+
+		ReturnPlenumName = " ";
+		if ( NumZoneReturnPlenums > 0 ) {
+			ReturnPlenumName = ZoneRetPlenCond( ReturnPlenumIndex ).ZonePlenumName;
+		}
+
+	}
 
 } // ZonePlenum
 

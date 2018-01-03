@@ -75,7 +75,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -86014,28 +86014,6 @@
     0.162;                   !- Thermal Resistance {m2-K/W}
 
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
-!Construction,
-!    WALL-1,                  !- Name
-!    BK05,                    !- Outside Layer
-!    PW06,                    !- Layer #2
-!    IN-W,                    !- Layer #3
-!    GP02;                    !- Layer #5
-
-  Construction,
-    ROOF-1,                  !- Name
-    BR01,                    !- Outside Layer
-    CC24,                    !- Layer 2
-    IN-R,                    !- Layer 3
-    AL33,                    !- Layer 4
-    AC02;                    !- Layer 5
-
-! DMcQ: ExtWall is now defined in WallMatConst.inc
-! Construction,
-!     ExtWall_Const,           !- Name
-!     ST01,                    !- Outside Layer
-!     IN-W,                    !- Layer #2
-!     AL21,                    !- Layer #3
-!     GP02;                    !- Layer #4
 
   Construction,
     FLOOR-1,                 !- Name
@@ -86047,19 +86025,10 @@
     CC24;                    !- Outside Layer
 
   Construction,
-    SLAB-1,                  !- Name
-    SOIL,                    !- Outside Layer
-    CC15;                    !- Layer 2
-
-  Construction,
     INTWALL-1,               !- Name
     GP02,                    !- Outside Layer
     AL21,                    !- Layer 2
     GP02;                    !- Layer 3
-
-  Construction,
-    Medium Furniture,        !- Name
-    MediumFurniture;         !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -86179,10 +86148,11 @@
     COMFENZone Inlets,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     COMFENZone Zone Air Node,!- Zone Air Node Name
-    COMFENZone Return Outlet;!- Zone Return Air Node Name
+    COMFENZone Return Outlet;!- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     COMFENZone Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     COMFENZone Direct Air,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -86310,6 +86280,7 @@
     FAN-SCHED,               !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     4.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     7200.;                   !- Cycling Run Time {s}
 
   SetpointManager:SingleZone:Reheat,
@@ -86364,11 +86335,11 @@
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Nominal Time for Condensate Removal to Begin {s}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Latent Capacity Time Constant {s}
-    ;                        !- Condenser Air Inlet Node Name
+    ;                        !- Latent Capacity Time Constant {s}
 
   Coil:Heating:Fuel,
     SYS-1 Heating Coil,      !- Name

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -517,22 +518,22 @@ namespace FluidCoolers {
 
 		// Set up output variables, CurrentModuleObject='FluidCooler:SingleSpeed'
 		for ( FluidCoolerNum = 1; FluidCoolerNum <= NumSingleSpeedFluidCoolers; ++FluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 		}
 
 		// CurrentModuleObject='FluidCooler:TwoSpeed'
 		for ( FluidCoolerNum = NumSingleSpeedFluidCoolers + 1; FluidCoolerNum <= NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers; ++FluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleFluidCoolerReport( FluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleFluidCoolerReport( FluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).Qactual, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleFluidCoolerReport( FluidCoolerNum ).FanPower, "System", "Average", SimpleFluidCooler( FluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleFluidCoolerReport( FluidCoolerNum ).FanEnergy, "System", "Sum", SimpleFluidCooler( FluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 		}
 
 	}
@@ -1012,7 +1013,7 @@ namespace FluidCoolers {
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -1256,7 +1257,7 @@ namespace FluidCoolers {
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 					SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+					SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 						ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1344,7 +1345,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1471,7 +1472,7 @@ namespace FluidCoolers {
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb = SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleFluidCoolerInlet( FluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleFluidCoolerInlet( FluidCoolerNum ).AirTemp, SimpleFluidCoolerInlet( FluidCoolerNum ).AirWetBulb, SimpleFluidCoolerInlet( FluidCoolerNum ).AirPress, CalledFrom );
-				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
+				SolveRoot( Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating fluid cooler UA." );
 					ShowContinueError( "Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );

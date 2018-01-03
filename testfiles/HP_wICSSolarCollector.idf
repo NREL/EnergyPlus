@@ -31,7 +31,7 @@
 !           There is a single window in the West zone south wall. The walls are 1 in stucco over 4 in common
 !           brick and gypboard. The three zones are seperated from the attic zone by a ceiling with plywood,
 !           cieling air gap, and gypboard. The roof is a built up of Asphalt Shingle and 1/2 in Plywood Siding.
-!           The window is single pane 3mm clear. The window to wall ratio is approxomately 0.07.
+!           The window is single pane 3mm clear. The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -116,7 +116,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -162,8 +162,8 @@
   Site:Location,
     Miami Intl Ap FL USA WMO=722020,  !- Name
     25.82,                   !- Latitude {deg}
-    -80.3,                  !- Longitude {deg}
-    -5.0,                   !- Time Zone {hr}
+    -80.3,                   !- Longitude {deg}
+    -5.0,                    !- Time Zone {hr}
     11.00;                   !- Elevation {m}
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
@@ -651,7 +651,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    Absolute;                   !- Coordinate System
+    Absolute;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 ! original zone origin (0,0,0)
@@ -949,7 +949,7 @@
     Zn002:Wall006,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
-    Attic ZONE,               !- Zone Name
+    Attic ZONE,              !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1039,7 +1039,6 @@
     12.192000000000,0.000000000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
     12.192000000000,6.096000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
     12.192000000000,6.096000000000,3.048000000000;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   BuildingSurface:Detailed,
     Zn002:Flr001,            !- Name
@@ -1496,6 +1495,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1503,6 +1503,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1510,6 +1511,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1523,7 +1525,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1531,7 +1533,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1539,7 +1541,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -1571,6 +1573,7 @@
     HPCoolEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     HPCoolEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPCoolPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     4,                       !- Maximum Cycling Rate {cycles/hr}
@@ -2909,3 +2912,4 @@
     Until: 20:00,0.0,        !- Field 3
     Until: 20:30,1.0,        !- Field 5
     Until: 24:00,0.0;        !- Field 7
+

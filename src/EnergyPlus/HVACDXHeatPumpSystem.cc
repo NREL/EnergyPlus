@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -450,7 +451,7 @@ namespace HVACDXHeatPumpSystem {
 
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
 			// Setup Report variables for the DXHeatingSystem that is not reported in the components themselves
-			SetupOutputVariable( "Coil System Part Load Ratio []", DXHeatPumpSystem( DXHeatSysNum ).PartLoadFrac, "System", "Average", DXHeatPumpSystem( DXHeatSysNum ).Name );
+			SetupOutputVariable( "Coil System Part Load Ratio", OutputProcessor::Unit::None, DXHeatPumpSystem( DXHeatSysNum ).PartLoadFrac, "System", "Average", DXHeatPumpSystem( DXHeatSysNum ).Name );
 		}
 
 		Alphas.deallocate();
@@ -608,7 +609,7 @@ namespace HVACDXHeatPumpSystem {
 		using DXCoils::SimDXCoil;
 		using DXCoils::DXCoilOutletTemp;
 		using FaultsManager::FaultsCoilSATSensor;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
@@ -741,7 +742,7 @@ namespace HVACDXHeatPumpSystem {
 							Par( 2 ) = DesOutTemp;
 							Par( 3 ) = 1.0; //OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXHeatPumpSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
@@ -856,7 +857,7 @@ namespace HVACDXHeatPumpSystem {
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
 								Par( 3 ) = double( SpeedNum );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
 
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
@@ -888,7 +889,7 @@ namespace HVACDXHeatPumpSystem {
 								Par( 1 ) = double( VSCoilIndex );
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXHeatPumpSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {

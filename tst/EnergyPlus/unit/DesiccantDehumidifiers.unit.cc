@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2320,6 +2321,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE1-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2327,6 +2329,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2334,6 +2337,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE3-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE3-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2341,6 +2345,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 ATU,            !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2646,6 +2651,7 @@ namespace EnergyPlus {
 			"    HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name",
 			"    HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name",
 			"    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name",
+			"   ,                         !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 			"    0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 			"    4,                       !- Maximum Cycling Rate {cycles/hr}",
@@ -3751,6 +3757,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -3867,6 +3874,7 @@ namespace EnergyPlus {
 			"    HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name",
 			"    HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name",
 			"    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name",
+			"   ,                         !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 			"    0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 			"    4,                       !- Maximum Cycling Rate {cycles/hr}",
@@ -4920,6 +4928,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -5027,6 +5036,7 @@ namespace EnergyPlus {
 			"    HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name",
 			"    HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name",
 			"    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name",
+			"   ,                         !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
 			"    0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 			"    4,                       !- Maximum Cycling Rate {cycles/hr}",
@@ -5451,7 +5461,7 @@ namespace EnergyPlus {
 
 		std::string const idf_objects = delimited_string( {
 
-			"  Version,8.7;",
+			"  Version,8.9;",
 
 			"  Timestep,6;",
 
@@ -6336,6 +6346,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
 			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
@@ -6440,19 +6451,20 @@ namespace EnergyPlus {
 			"  Coil:Cooling:DX:VariableSpeed,",
 			"    Desiccant DXSystem Cooling Coil,    !- Name",
 			"     Desiccant DXSystem Mixed Air Node,  !- Indoor Air Inlet Node Name",
-			"    HX Process Inlet Node,  !- Indoor Air Outlet Node Name",
+			"    HX Process Inlet Node,   !- Indoor Air Outlet Node Name",
 			"    1.0,                     !- Number of Speeds {dimensionless}",
 			"    1.0,                     !- Nominal Speed Level {dimensionless}",
-			"    22000,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}",
-			"    1.05,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
-			"    1000,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+			"    22000,                   !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}",
+			"    1.05,                    !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+			"    1000,                    !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
 			"    0.4,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
 			"    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name",
-			"    Condenser Inlet Node,                        !- Condenser Air Inlet Node Name",
+			"    Condenser Inlet Node,    !- Condenser Air Inlet Node Name",
 			"    AirCooled,               !- Condenser Type",
 			"    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
-			"    0.0,                   !- Crankcase Heater Capacity {W}",
+			"    0.0,                     !- Crankcase Heater Capacity {W}",
 			"    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+			"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    ,                        !- Supply Water Storage Tank Name",
 			"    ,                        !- Condensate Collection Water Storage Tank Name",
 			"    ,                        !- Basin Heater Capacity {W/K}",
@@ -6460,7 +6472,7 @@ namespace EnergyPlus {
 			"    ,                        !- Basin Heater Operating Schedule Name",
 			"    36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
 			"    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
-			"    3.5,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
+			"    3.5,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
 			"    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
 			"    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
 			"    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -546,28 +547,28 @@ namespace SwimmingPool {
 		// Set up the output variables for swimming pools
 		// CurrentModuleObject = "SwimmingPool:Indoor"
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
-			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool(Item).MakeUpWaterVolFlowRate, "System", "Average", Pool(Item).Name);
-			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterVol, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
-			SetupOutputVariable( "Indoor Pool Makeup Water Temperature [C]", Pool( Item ).CurMakeupWaterTemp, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Water Temperature [C]", Pool( Item ).PoolWaterTemp, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Inlet Water Temperature [C]", Pool( Item ).WaterInletTemp, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Inlet Water Mass Flow Rate [kg/s]", Pool( Item ).WaterMassFlowRate, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Miscellaneous Equipment Power [W]", Pool( Item ).MiscEquipPower, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Miscellaneous Equipment Energy [J]", Pool( Item ).MiscEquipEnergy, "System", "Sum", Pool( Item ).Name);
-			SetupOutputVariable( "Indoor Pool Water Heating Rate [W]", Pool( Item ).HeatPower, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Water Heating Energy [J]", Pool( Item ).HeatEnergy, "System", "Sum", Pool( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Indoor Pool Radiant to Convection by Cover [W]", Pool( Item ).RadConvertToConvect, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool People Heat Gain [W]", Pool( Item ).PeopleHeatGain, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Current Activity Factor []", Pool( Item ).CurActivityFactor, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Current Cover Factor []", Pool( Item ).CurCoverSchedVal, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Rate [W]", Pool( Item ).EvapHeatLossRate, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Energy [J]", Pool( Item ).EvapEnergyLoss, "System", "Sum", Pool( Item ).Name);
-			SetupOutputVariable( "Indoor Pool Saturation Pressure at Pool Temperature [Pa]", Pool( Item ).SatPressPoolWaterTemp, "System", "Average", Pool( Item ).Name);
-			SetupOutputVariable( "Indoor Pool Partial Pressure of Water Vapor in Air [Pa]", Pool( Item ).PartPressZoneAirTemp, "System", "Average", Pool( Item ).Name);
-			SetupOutputVariable( "Indoor Pool Current Cover Evaporation Factor []", Pool( Item ).CurCoverEvapFac, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Current Cover Convective Factor []", Pool( Item ).CurCoverConvFac, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Current Cover SW Radiation Factor []", Pool( Item ).CurCoverSWRadFac, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Current Cover LW Radiation Factor []", Pool( Item ).CurCoverLWRadFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Makeup Water Rate", OutputProcessor::Unit::m3_s, Pool(Item).MakeUpWaterVolFlowRate, "System", "Average", Pool(Item).Name);
+			SetupOutputVariable( "Indoor Pool Makeup Water Volume", OutputProcessor::Unit::m3, Pool( Item ).MakeUpWaterVol, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
+			SetupOutputVariable( "Indoor Pool Makeup Water Temperature", OutputProcessor::Unit::C, Pool( Item ).CurMakeupWaterTemp, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Water Temperature", OutputProcessor::Unit::C, Pool( Item ).PoolWaterTemp, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Inlet Water Temperature", OutputProcessor::Unit::C, Pool( Item ).WaterInletTemp, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Inlet Water Mass Flow Rate", OutputProcessor::Unit::kg_s, Pool( Item ).WaterMassFlowRate, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Miscellaneous Equipment Power", OutputProcessor::Unit::W, Pool( Item ).MiscEquipPower, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Miscellaneous Equipment Energy", OutputProcessor::Unit::J, Pool( Item ).MiscEquipEnergy, "System", "Sum", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Water Heating Rate", OutputProcessor::Unit::W, Pool( Item ).HeatPower, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Water Heating Energy", OutputProcessor::Unit::J, Pool( Item ).HeatEnergy, "System", "Sum", Pool( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Indoor Pool Radiant to Convection by Cover", OutputProcessor::Unit::W, Pool( Item ).RadConvertToConvect, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool People Heat Gain", OutputProcessor::Unit::W, Pool( Item ).PeopleHeatGain, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Activity Factor", OutputProcessor::Unit::None, Pool( Item ).CurActivityFactor, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover Factor", OutputProcessor::Unit::None, Pool( Item ).CurCoverSchedVal, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Rate", OutputProcessor::Unit::W, Pool( Item ).EvapHeatLossRate, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Energy", OutputProcessor::Unit::J, Pool( Item ).EvapEnergyLoss, "System", "Sum", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Saturation Pressure at Pool Temperature", OutputProcessor::Unit::Pa, Pool( Item ).SatPressPoolWaterTemp, "System", "Average", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Partial Pressure of Water Vapor in Air", OutputProcessor::Unit::Pa, Pool( Item ).PartPressZoneAirTemp, "System", "Average", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Current Cover Evaporation Factor", OutputProcessor::Unit::None, Pool( Item ).CurCoverEvapFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover Convective Factor", OutputProcessor::Unit::None, Pool( Item ).CurCoverConvFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover SW Radiation Factor", OutputProcessor::Unit::None, Pool( Item ).CurCoverSWRadFac, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, Pool( Item ).CurCoverLWRadFac, "System", "Average", Pool( Item ).Name );
 		}
 
 	}
@@ -597,12 +598,8 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::AnyPlantInModel;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantLoop;
-		using DataPlant::TypeOf_SwimmingPool_Indoor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using FluidProperties::GetDensityGlycol;
@@ -628,7 +625,6 @@ namespace SwimmingPool {
 		static bool MyOneTimeFlag( true ); // Flag for one-time initializations
 		static bool MyEnvrnFlagGeneral( true );
 		static Array1D_bool MyPlantScanFlagPool;
-		bool errFlag;
 		Real64 mdot;
 		Real64 HeatGainPerPerson;
 		Real64 PeopleModifier;
@@ -643,18 +639,6 @@ namespace SwimmingPool {
 			MyPlantScanFlagPool.allocate( NumSwimmingPools );
 			MyPlantScanFlagPool = true;
 
-			if ( MyPlantScanFlagPool( PoolNum ) && allocated( PlantLoop ) ) {
-				errFlag = false;
-				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
-					ScanPlantLoopsForObject( Pool( PoolNum ).Name, TypeOf_SwimmingPool_Indoor, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum, _, _, _, Pool( PoolNum ).WaterInletNode, _, errFlag );
-					if ( errFlag ) {
-						ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
-					}
-				}
-				MyPlantScanFlagPool( PoolNum ) = false;
-			} else if ( MyPlantScanFlagPool( PoolNum ) && ! AnyPlantInModel ) {
-				MyPlantScanFlagPool( PoolNum ) = false;
-			}
 			ZeroSourceSumHATsurf.allocate( NumOfZones );
 			ZeroSourceSumHATsurf = 0.0;
 			QPoolSrcAvg.allocate( TotSurfaces );
@@ -671,6 +655,8 @@ namespace SwimmingPool {
 			LastTimeStepSys = 0.0;
 		}
 
+		InitSwimmingPoolPlantLoopIndex( PoolNum, MyPlantScanFlagPool( PoolNum ) );
+		
 		if ( BeginEnvrnFlag && MyEnvrnFlagGeneral ) {
 			ZeroSourceSumHATsurf = 0.0;
 			QPoolSrcAvg = 0.0;
@@ -805,6 +791,42 @@ namespace SwimmingPool {
 
 	}
 
+	void
+	InitSwimmingPoolPlantLoopIndex(
+		int const PoolNum, // number of the swimming pool
+		bool & MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   June 2017
+
+		// Using/Aliasing
+		using DataPlant::PlantLoop;
+		using DataPlant::TypeOf_SwimmingPool_Indoor;
+		using DataPlant::ScanPlantLoopsForObject;
+		using DataGlobals::AnyPlantInModel;
+
+		bool errFlag;
+		static std::string const RoutineName( "InitSwimmingPoolPlantLoopIndex" );
+		
+		if ( MyPlantScanFlagPool && allocated( PlantLoop ) ) {
+			errFlag = false;
+			if ( Pool( PoolNum ).WaterInletNode > 0 ) {
+				ScanPlantLoopsForObject( Pool( PoolNum ).Name, TypeOf_SwimmingPool_Indoor, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum, _, _, _, Pool( PoolNum ).WaterInletNode, _, errFlag );
+				if ( errFlag ) {
+					ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
+				}
+			}
+			MyPlantScanFlagPool = false;
+		} else if ( MyPlantScanFlagPool && ! AnyPlantInModel ) {
+			MyPlantScanFlagPool = false;
+		}
+
+	}
+	
+	
 	void
 	CalcSwimmingPool(
 		int const PoolNum // number of the swimming pool

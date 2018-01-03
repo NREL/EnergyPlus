@@ -81,7 +81,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Multistory Example,      !- Name
@@ -404,12 +404,6 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,
-    Int Wall,                !- Name
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
-    C2 - 4 IN LW CONCRETE BLOCK,  !- Layer 2
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
-
-  Construction,
     Floor,                   !- Name
     E5 - ACOUSTIC TILE,      !- Outside Layer
     E4 - CEILING AIRSPACE,   !- Layer 2
@@ -480,7 +474,7 @@
     Watts/Person,            !- Design Level Calculation Method
     ,                        !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    31.1,                    !- Power per Person {W/Person}
+    31.1,                    !- Power per Person {W/person}
     0.2,                     !- Fraction Latent
     0.1,                     !- Fraction Radiant
     0.5,                     !- Fraction Lost
@@ -828,7 +822,7 @@
     Gnd West AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Gnd West AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Gnd West Air Node,       !- Zone Air Node Name
-    Gnd West Return Node;    !- Zone Return Air Node Name
+    Gnd West Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Gnd West Thermostat,     !- Name
@@ -839,6 +833,7 @@
 
   ZoneHVAC:EquipmentList,
     Gnd West Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Gnd West Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1095,7 +1090,7 @@
     Gnd Center AC Outlet Node,  !- Zone Air Inlet Node or NodeList Name
     Gnd Center AC Inlet Node,!- Zone Air Exhaust Node or NodeList Name
     Gnd Center Air Node,     !- Zone Air Node Name
-    Gnd Center Return Node;  !- Zone Return Air Node Name
+    Gnd Center Return Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Gnd Center Thermostat,   !- Name
@@ -1106,6 +1101,7 @@
 
   ZoneHVAC:EquipmentList,
     Gnd Center Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Gnd Center Window AC,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1371,7 +1367,7 @@
     Gnd East AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Gnd East AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Gnd East Air Node,       !- Zone Air Node Name
-    Gnd East Return Node;    !- Zone Return Air Node Name
+    Gnd East Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Gnd East Thermostat,     !- Name
@@ -1382,6 +1378,7 @@
 
   ZoneHVAC:EquipmentList,
     Gnd East Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Gnd East Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1658,7 +1655,7 @@
     Mid West AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Mid West AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Mid West Air Node,       !- Zone Air Node Name
-    Mid West Return Node;    !- Zone Return Air Node Name
+    Mid West Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Mid West Thermostat,     !- Name
@@ -1669,6 +1666,7 @@
 
   ZoneHVAC:EquipmentList,
     Mid West Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Mid West Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1918,7 +1916,7 @@
     Mid Center AC Outlet Node,  !- Zone Air Inlet Node or NodeList Name
     Mid Center AC Inlet Node,!- Zone Air Exhaust Node or NodeList Name
     Mid Center Air Node,     !- Zone Air Node Name
-    Mid Center Return Node;  !- Zone Return Air Node Name
+    Mid Center Return Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Mid Center Thermostat,   !- Name
@@ -1929,6 +1927,7 @@
 
   ZoneHVAC:EquipmentList,
     Mid Center Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Mid Center Window AC,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2194,7 +2193,7 @@
     Mid East AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Mid East AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Mid East Air Node,       !- Zone Air Node Name
-    Mid East Return Node;    !- Zone Return Air Node Name
+    Mid East Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Mid East Thermostat,     !- Name
@@ -2205,6 +2204,7 @@
 
   ZoneHVAC:EquipmentList,
     Mid East Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Mid East Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2481,7 +2481,7 @@
     Top West AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Top West AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Top West Air Node,       !- Zone Air Node Name
-    Top West Return Node;    !- Zone Return Air Node Name
+    Top West Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Top West Thermostat,     !- Name
@@ -2492,6 +2492,7 @@
 
   ZoneHVAC:EquipmentList,
     Top West Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Top West Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2741,7 +2742,7 @@
     Top Center AC Outlet Node,  !- Zone Air Inlet Node or NodeList Name
     Top Center AC Inlet Node,!- Zone Air Exhaust Node or NodeList Name
     Top Center Air Node,     !- Zone Air Node Name
-    Top Center Return Node;  !- Zone Return Air Node Name
+    Top Center Return Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Top Center Thermostat,   !- Name
@@ -2752,6 +2753,7 @@
 
   ZoneHVAC:EquipmentList,
     Top Center Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Top Center Window AC,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3017,7 +3019,7 @@
     Top East AC Outlet Node, !- Zone Air Inlet Node or NodeList Name
     Top East AC Inlet Node,  !- Zone Air Exhaust Node or NodeList Name
     Top East Air Node,       !- Zone Air Node Name
-    Top East Return Node;    !- Zone Return Air Node Name
+    Top East Return Node;    !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     Top East Thermostat,     !- Name
@@ -3028,6 +3030,7 @@
 
   ZoneHVAC:EquipmentList,
     Top East Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type
     Top East Window AC,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

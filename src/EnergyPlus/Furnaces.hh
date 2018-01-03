@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -205,7 +206,8 @@ namespace Furnaces {
 		Real64 WSHPRuntimeFrac; // Runtime fraction of water source heat pump
 		Real64 CoolPartLoadRatio; // Cooling part load ratio
 		Real64 HeatPartLoadRatio; // Heating part load ratio
-		Real64 MinOATCompressor; // Minimum outdoor operating temperature for heat pump compressor
+		Real64 MinOATCompressorCooling; // Minimum outdoor operating temperature for heat pump compressor
+		Real64 MinOATCompressorHeating; // Minimum outdoor operating temperature for heat pump compressor
 		Real64 MaxOATSuppHeat; // Maximum outdoor dry-bulb temperature for
 		int CondenserNodeNum; // Node number of outdoor condenser/compressor
 		Real64 MaxONOFFCyclesperHour; // Maximum ON/OFF Cycling Rate [cycles/hr]
@@ -352,7 +354,8 @@ namespace Furnaces {
 			WSHPRuntimeFrac( 0.0 ),
 			CoolPartLoadRatio( 0.0 ),
 			HeatPartLoadRatio( 0.0 ),
-			MinOATCompressor( 0.0 ),
+			MinOATCompressorCooling( 0.0 ),
+			MinOATCompressorHeating(0.0),
 			MaxOATSuppHeat( 0.0 ),
 			CondenserNodeNum( 0 ),
 			MaxONOFFCyclesperHour( 0.0 ),
@@ -597,6 +600,7 @@ namespace Furnaces {
 	SimVariableSpeedHP(
 		int const FurnaceNum, // number of the current engine driven Heat Pump being simulated
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+		int const AirLoopNum, // index to air loop
 		Real64 const QZnReq, // required zone load
 		Real64 const QLatReq, // required latent load
 		Real64 & OnOffAirFlowRatio // ratio of compressor ON airflow to AVERAGE airflow over timestep
@@ -674,6 +678,18 @@ namespace Furnaces {
 		Real64 const QZnReq, // sensible load to be met (W) !unused1208
 		Real64 const MoistureLoad, // moisture load to be met (W)
 		Real64 & PartLoadRatio // coil part-load ratio
+	);
+
+	void
+	SetMinOATCompressor(
+		int const FurnaceNum, // index to furnace
+		std::string const FurnaceName, // name of furnace
+		std::string const cCurrentModuleObject, // type of furnace
+		std::string const CoolingCoilType, // type of cooling coil
+		std::string const CoolingCoilName, // name of cooling coil
+		std::string const HeatingCoilType, // type of heating coil
+		std::string const HeatingCoilName, // name of heating coil
+		bool & ErrorsFound // GetInput logical that errors were found
 	);
 
 } // Furnaces

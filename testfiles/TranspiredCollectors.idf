@@ -30,7 +30,7 @@
 !        ZN15_Shop_1 is a floating zone
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -822,22 +822,8 @@
     Ceiling Tiles 3/4 office;!- Outside Layer
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    MAT-CC05 4  MW CONCRETE, !- Outside Layer
-    CP02 CARPET PAD;         !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    CP02 CARPET PAD,         !- Outside Layer
-    MAT-CC05 4  MW CONCRETE; !- Layer 2
-
-  Construction,
     InteriorFurnishings,     !- Name
     Wood 6inch;              !- Outside Layer
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    MAT-CC05 4  MW CONCRETE; !- Outside Layer
 
   Zone,
     ZN1_S_Space_1,           !- Name
@@ -3320,6 +3306,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN1_S_Space_1 ;
@@ -3346,7 +3333,7 @@
     Zone ZN1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN1 Node,                !- Zone Air Node Name
-    ZN1 Outlet Node;         !- Zone Return Air Node Name
+    ZN1 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN1 Thermostat,          !- Name
@@ -3357,6 +3344,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN1 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3609,6 +3597,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN2_E_Space_1 ;
@@ -3635,7 +3624,7 @@
     Zone ZN2 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN2 Node,                !- Zone Air Node Name
-    ZN2 Outlet Node;         !- Zone Return Air Node Name
+    ZN2 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN2 Thermostat,          !- Name
@@ -3646,6 +3635,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN2 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3898,6 +3888,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN3_N_Space_1 ;
@@ -3924,7 +3915,7 @@
     Zone ZN3 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN3 Node,                !- Zone Air Node Name
-    ZN3 Outlet Node;         !- Zone Return Air Node Name
+    ZN3 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN3 Thermostat,          !- Name
@@ -3935,6 +3926,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN3 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN3 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4187,6 +4179,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN4_W_Space_1 ;
@@ -4213,7 +4206,7 @@
     Zone ZN4 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN4 Node,                !- Zone Air Node Name
-    ZN4 Outlet Node;         !- Zone Return Air Node Name
+    ZN4 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN4 Thermostat,          !- Name
@@ -4224,6 +4217,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN4 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN4 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4476,6 +4470,7 @@
     HVACoperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     3600;                    !- Cycling Run Time {s}
 
 !   ZN5_Core_Space_1 ;
@@ -4502,7 +4497,7 @@
     Zone ZN5 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN5 Node,                !- Zone Air Node Name
-    ZN5 Outlet Node;         !- Zone Return Air Node Name
+    ZN5 Outlet Node;         !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     ZN5 Thermostat,          !- Name
@@ -4513,6 +4508,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone ZN5 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone ZN5 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4713,10 +4709,11 @@
     Zone11Inlets,            !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN11 Node,               !- Zone Air Node Name
-    ZN11 Outlet Node;        !- Zone Return Air Node Name
+    ZN11 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone11Equipment,         !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone11DirectAir,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4913,10 +4910,11 @@
     Zone12Inlets,            !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN12 Node,               !- Zone Air Node Name
-    ZN12 Outlet Node;        !- Zone Return Air Node Name
+    ZN12 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone12Equipment,         !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone12DirectAir,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5110,10 +5108,11 @@
     Zone13Inlets,            !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN13 Node,               !- Zone Air Node Name
-    ZN13 Outlet Node;        !- Zone Return Air Node Name
+    ZN13 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone13Equipment,         !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone13DirectAir,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5299,10 +5298,11 @@
     Zone14Inlets,            !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN14 Node,               !- Zone Air Node Name
-    ZN14 Outlet Node;        !- Zone Return Air Node Name
+    ZN14 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone14Equipment,         !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone14DirectAir,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

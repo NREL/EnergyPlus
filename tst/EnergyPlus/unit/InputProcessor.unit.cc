@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -845,13 +846,13 @@ namespace EnergyPlus {
 
 			ASSERT_EQ( 5, NumSectionDefs );
 
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 2 ).Name );
 			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
 
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
+			EXPECT_EQ( "LEAD INPUT", SectionDef( 3 ).Name );
 			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
 
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
+			EXPECT_EQ( "SIMULATION DATA", SectionDef( 1 ).Name );
 			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
 
 			EXPECT_EQ( "SIMULATIONCONTROL", SectionDef( 4 ).Name );
@@ -962,13 +963,13 @@ namespace EnergyPlus {
 
 			ASSERT_EQ( 3, NumSectionDefs );
 
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
+			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 2 ).Name );
 			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
 
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
+			EXPECT_EQ( "LEAD INPUT", SectionDef( 3 ).Name );
 			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
 
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
+			EXPECT_EQ( "SIMULATION DATA", SectionDef( 1 ).Name );
 			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
 
 			ASSERT_EQ( 3, NumIDFSections );

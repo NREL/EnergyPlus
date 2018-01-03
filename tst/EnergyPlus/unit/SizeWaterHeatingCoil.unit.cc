@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -176,6 +177,7 @@ namespace EnergyPlus {
 			"	SPACE1-1 Out Node; !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	SPACE1-1 Eq, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			"	SPACE1-1 ATU, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -286,28 +288,27 @@ namespace EnergyPlus {
 		Zone( 1 ).FloorArea = 99.16;
 		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
 		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
+		CurTermUnitSizingNum = 1;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.28794;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.7;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 3191.7;
 		FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.099;
 		FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.0038485;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.6;
-		TermUnitSizing( CurZoneEqNum ).AirVolFlow = 0.12046;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU = 16.6;
+		TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2 = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea * Zone( 1 ).FloorArea;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -413,6 +414,7 @@ namespace EnergyPlus {
 			"	SPACE1-1 Out Node; !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	SPACE1-1 Eq, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			"	SPACE1-1 ATU, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -523,28 +525,27 @@ namespace EnergyPlus {
 		Zone( 1 ).FloorArea = 99.16;
 		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
 		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
+		CurTermUnitSizingNum = 1;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.28794;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.7;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 3191.7;
 		FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.099;
 		FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.0038485;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.6;
-		TermUnitSizing( CurZoneEqNum ).AirVolFlow = 0.12046;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU = 16.6;
+		TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2 = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea * Zone( 1 ).FloorArea;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -649,6 +650,7 @@ namespace EnergyPlus {
 			"	SPACE1-1 Out Node; !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	SPACE1-1 Eq, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			"	SPACE1-1 ATU, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -759,28 +761,27 @@ namespace EnergyPlus {
 		Zone( 1 ).FloorArea = 99.16;
 		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
 		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
+		CurTermUnitSizingNum = 1;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.28794;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.7;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 3191.7;
 		FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.099;
 		FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.0038485;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.6;
-		TermUnitSizing( CurZoneEqNum ).AirVolFlow = 0.12046;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU = 16.6;
+		TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2 = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea * Zone( 1 ).FloorArea;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -886,6 +887,7 @@ namespace EnergyPlus {
 			"	SPACE1-1 Out Node; !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	SPACE1-1 Eq, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			"	SPACE1-1 ATU, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -996,28 +998,27 @@ namespace EnergyPlus {
 		Zone( 1 ).FloorArea = 99.16;
 		ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = false;
 		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
+		CurTermUnitSizingNum = 1;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow = 0.28794;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.7;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.008;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.28794;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.12046;
-		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor = 1.0;
 		FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad = 3191.7;
 		FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.099;
 		FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.0038485;
-		TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU = 16.6;
-		TermUnitSizing( CurZoneEqNum ).AirVolFlow = 0.12046;
+		TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU = 16.6;
+		TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = 0.12046;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2 = ZoneSizingInput( CurZoneEqNum ).DesCoolMinAirFlowPerArea * Zone( 1 ).FloorArea;
 		FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlow2,
 			FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFrac );
-		EXPECT_FALSE( FinalZoneSizing( CurZoneEqNum ).DesCoolMinAirFlowFracUsInpFlg );
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlow = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlow;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowFrac = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowFrac;
 		FinalZoneSizing( CurZoneEqNum ).DesHeatMaxAirFlowPerArea = ZoneSizingInput( CurZoneEqNum ).DesHeatMaxAirFlowPerArea;
@@ -1300,6 +1301,7 @@ namespace EnergyPlus {
 
 			" ZoneHVAC:EquipmentList,",
 			"	SPACE1-1 Eq,      !- Name",
+			"   SequentialLoad,   !- Load Distribution Scheme",
 			"	ZoneHVAC:AirDistributionUnit, !- Zone Equipment 1 Object Type",
 			"	SPACE1-1 ATU,     !- Zone Equipment 1 Name",
 			"	1,                !- Zone Equipment 1 Cooling Sequence",
@@ -1398,6 +1400,7 @@ namespace EnergyPlus {
 		Sys( 1 ).HWLoopSide = 1;
 		Sys( 1 ).HWBranchIndex = 1;
 		CurZoneEqNum = 1;
+		CurTermUnitSizingNum = 1;
 		CurSysNum = 0;
 		Zone( 1 ).FloorArea = 99.16;
 		Sys( 1 ).ZoneFloorArea = Zone( 1 ).FloorArea;

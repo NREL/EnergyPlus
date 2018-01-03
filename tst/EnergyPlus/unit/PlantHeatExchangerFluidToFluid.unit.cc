@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2362,7 +2363,7 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride ) {
-		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride. 
+		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride.
 		// unit test checks that the change for #5626 adjusts the temperature value used in central plant dispatch routines by the tolerance value.
 
 		PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
@@ -2481,7 +2482,7 @@ namespace EnergyPlus {
 		// check value in FreeCoolCntrlMinCntrlTemp
 		EXPECT_NEAR( DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 2 ).Comp( 1 ).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001 );
 
-		// change the tolerance and check the result, issue 5626 fix subtracts tolerance 
+		// change the tolerance and check the result, issue 5626 fix subtracts tolerance
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).TempControlTol = 1.5;
 		PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger( 1, 1 );
 

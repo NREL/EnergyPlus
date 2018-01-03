@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -226,6 +227,7 @@ namespace HVACCooledBeam {
 			ShowFatalError( "Cool Beam Unit not found = " + CompName );
 		}
 
+		DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingNum;
 		// initialize the unit
 		InitCoolBeam( CBNum, FirstHVACIteration );
 
@@ -394,36 +396,14 @@ namespace HVACCooledBeam {
 
 			//Setup the Cooled Beam reporting variables
 			//CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam"
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Air Terminal Beam Chilled Water Energy [J]", CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate [W]", CoolBeam( CBNum ).BeamCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Energy [J]", CoolBeam( CBNum ).SupAirCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Rate [W]", CoolBeam( CBNum ).SupAirCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Energy [J]", CoolBeam( CBNum ).SupAirHeatingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Rate [W]", CoolBeam( CBNum ).SupAirHeatingRate, "System", "Average", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Air Terminal Beam Chilled Water Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).BeamCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Air Terminal Beam Sensible Cooling Rate", OutputProcessor::Unit::W, CoolBeam( CBNum ).BeamCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).SupAirCoolingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Cooling Rate", OutputProcessor::Unit::W, CoolBeam( CBNum ).SupAirCoolingRate, "System", "Average", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Energy", OutputProcessor::Unit::J, CoolBeam( CBNum ).SupAirHeatingEnergy, "System", "Sum", CoolBeam( CBNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Supply Air Sensible Heating Rate", OutputProcessor::Unit::W, CoolBeam( CBNum ).SupAirHeatingRate, "System", "Average", CoolBeam( CBNum ).Name );
 
-			// Fill the Zone Equipment data with the supply air inlet node number of this unit.
-			AirNodeFound = false;
-			for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-				if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
-				for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
-					if ( CoolBeam( CBNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = CoolBeam( CBNum ).AirInNode;
-						ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = CoolBeam( CBNum ).AirOutNode;
-						AirNodeFound = true;
-						break;
-					}
-				}
-			}
-			if ( ! AirNodeFound ) {
-				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam( CBNum ).Name );
-				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 5 ) );
-				ErrorsFound = true;
-			}
-
-		}
-
-		for ( CBNum = 1; CBNum <= NumCB; ++CBNum ) {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( CoolBeam( CBNum ).AirOutNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					CoolBeam( CBNum ).ADUNum = ADUNum;
@@ -433,8 +413,31 @@ namespace HVACCooledBeam {
 			if ( CoolBeam( CBNum ).ADUNum == 0 ) {
 				ShowSevereError( RoutineName + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' + CoolBeam( CBNum ).Name + "]." );
 				ShowContinueError( "...should have outlet node=" + NodeID( CoolBeam( CBNum ).AirOutNode ) );
-				//          ErrorsFound=.TRUE.
+				ErrorsFound = true;
+			} else {
+
+				// Fill the Zone Equipment data with the supply air inlet node number of this unit.
+				AirNodeFound = false;
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
+					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
+						if ( CoolBeam( CBNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = CoolBeam( CBNum ).AirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = CoolBeam( CBNum ).AirOutNode;
+							AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+							AirDistUnit( CoolBeam( CBNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							AirNodeFound = true;
+							break;
+						}
+					}
+				}
 			}
+			if ( ! AirNodeFound ) {
+				ShowSevereError( "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam( CBNum ).Name );
+				ShowContinueError( "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas( 5 ) );
+				ErrorsFound = true;
+			}
+
 		}
 
 		Alphas.deallocate();
@@ -679,10 +682,10 @@ namespace HVACCooledBeam {
 
 		if ( CoolBeam( CBNum ).MaxAirVolFlow == AutoSize ) {
 
-			if ( CurZoneEqNum > 0 ) {
+			if ( CurTermUnitSizingNum > 0 ) {
 
 				CheckZoneSizing( CoolBeam( CBNum ).UnitType, CoolBeam( CBNum ).Name );
-				CoolBeam( CBNum ).MaxAirVolFlow = max( TermUnitFinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+				CoolBeam( CBNum ).MaxAirVolFlow = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlow, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlow );
 				if ( CoolBeam( CBNum ).MaxAirVolFlow < SmallAirVolFlow ) {
 					CoolBeam( CBNum ).MaxAirVolFlow = 0.0;
 				}
@@ -840,7 +843,7 @@ namespace HVACCooledBeam {
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
@@ -918,7 +921,7 @@ namespace HVACCooledBeam {
 					Par( 4 ) = QMin;
 					Par( 5 ) = QMax;
 					ErrTolerance = 0.01;
-					SolveRegulaFalsi( ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
+					SolveRoot( ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par );
 					if ( SolFlag == -1 ) {
 						ShowWarningError( "Cold water control failed in cooled beam unit " + CoolBeam( CBNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating cold water mass flow rate" );

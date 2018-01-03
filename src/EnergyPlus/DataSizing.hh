@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -139,6 +140,11 @@ namespace DataSizing {
 	extern int const ZOAM_Sum; // sum the outdoor air flow rate of the people component and the space floor area component
 	extern int const ZOAM_Max; // use the maximum of the outdoor air flow rate of the people component and
 	// the space floor area component
+	extern int const ZOAM_IAQP; // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
+	extern int const ZOAM_ProportionalControlSchOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on scheduled occupancy
+	extern int const ZOAM_ProportionalControlDesOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+												   // to calculate the zone level outdoor air flow rates based on design occupancy
 
 	//System Outdoor Air Method
 	extern int const SOAM_ZoneSum; // Sum the outdoor air flow rates of all zones
@@ -154,6 +160,7 @@ namespace DataSizing {
 	// based on the generic contaminant setpoint
 	extern int const SOAM_IAQPCOM; // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	// based on the generic contaminant setpoint
+	extern int const SOAM_ProportionalControlDesOARate; // Calculate the system level outdoor air flow rates based on design OA rate
 
 	// Zone HVAC Equipment Supply Air Sizing Option
 	extern int const None;
@@ -197,6 +204,7 @@ namespace DataSizing {
 	extern int CurSysNum; // Current Air System index (0 if not in air loop)
 	extern int CurOASysNum; // Current outside air system index (0 if not in OA Sys)
 	extern int CurZoneEqNum; // Current Zone Equipment index (0 if not simulating ZoneEq)
+	extern int CurTermUnitSizingNum; // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
 	extern int CurBranchNum; // Index of branch being simulated (or 0 if not air loop)
 	extern int CurDuctType; // Duct type of current branch
 	extern int CurLoopNum; // the current plant loop index
@@ -262,7 +270,9 @@ namespace DataSizing {
 	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
 	extern int DataZoneUsedForSizing; // pointer to control zone for air loop equipment
 	extern int DataZoneNumber; // a pointer to a zone served by zoneHVAC equipment
-	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
+	extern int NumZoneHVACSizing; // Number of design specification zone HVAC sizing objects
+	extern int NumAirTerminalSizingSpec; // Number of design specification air terminal sizing objects
+	extern int NumAirTerminalUnits; // Number of air terminal units (same as total number of zone inlet nodes)
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit
@@ -326,7 +336,6 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
-		bool DesCoolMinAirFlowFracUsInpFlg; // user input for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -371,7 +380,6 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
-			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			DesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -426,7 +434,6 @@ namespace DataSizing {
 		Real64 DesCoolMinAirFlowPerArea; // design cooling minimum air flow rate per zone area [m3/s / m2]
 		Real64 DesCoolMinAirFlow; // design cooling minimum air flow rate [m3/s]
 		Real64 DesCoolMinAirFlowFrac; // design cooling minimum air flow rate fraction
-		bool DesCoolMinAirFlowFracUsInpFlg; // user flag for minimum air flow rate fraction
 		//  (of the cooling design air flow rate)
 		int HeatAirDesMethod; // choice of how to get zone heating design air flow rates;
 		//  1 = calc from des day simulation; 2 = m3/s per zone, user input
@@ -596,7 +603,6 @@ namespace DataSizing {
 			DesCoolMinAirFlowPerArea( 0.0 ),
 			DesCoolMinAirFlow( 0.0 ),
 			DesCoolMinAirFlowFrac( 0.0 ),
-			DesCoolMinAirFlowFracUsInpFlg( false ),
 			HeatAirDesMethod( 0 ),
 			InpDesHeatAirFlow( 0.0 ),
 			DesHeatMaxAirFlowPerArea( 0.0 ),
@@ -711,6 +717,7 @@ namespace DataSizing {
 	struct TermUnitSizingData
 	{
 		// Members
+		int CtrlZoneNum; // Controlled zone number (index to FinalZoneSizing, etc.)
 		Real64 AirVolFlow; // design air vol flow rate for single duct terminal unit [m3/s]
 		Real64 MaxHWVolFlow; // design Hot Water vol flow for single duct terminal unit [m3/s]
 		Real64 MaxSTVolFlow; // design Steam vol flow rate for single duct terminal unit [m3/s]
@@ -722,9 +729,15 @@ namespace DataSizing {
 		Real64 ReheatLoadMult; // multiplier for load in reheat coil UA calculation
 		Real64 DesCoolingLoad; // design cooling load used for zone equipment [W]
 		Real64 DesHeatingLoad; // design heating load used for zone equipment [W]
+		Real64 SpecDesSensCoolingFrac; // Fraction of Design Sensible Cooling Load from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesCoolSATRatio; // Cooling Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesSensHeatingFrac; // Fraction of Design Sensible Heating Load from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecDesHeatSATRatio; // Heating Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
+		Real64 SpecMinOAFrac; // Fraction of Minimum Outdoor Air Flow from DesignSpecification:AirTerminal:Sizing
 
 		// Default Constructor
 		TermUnitSizingData() :
+			CtrlZoneNum( 0 ),
 			AirVolFlow( 0.0 ),
 			MaxHWVolFlow( 0.0 ),
 			MaxSTVolFlow( 0.0 ),
@@ -735,7 +748,12 @@ namespace DataSizing {
 			ReheatAirFlowMult( 1.0 ),
 			ReheatLoadMult( 1.0 ),
 			DesCoolingLoad( 0.0 ),
-			DesHeatingLoad( 0.0 )
+			DesHeatingLoad( 0.0 ),
+			SpecDesSensCoolingFrac( 1.0 ),
+			SpecDesCoolSATRatio( 1.0 ),
+			SpecDesSensHeatingFrac( 1.0 ),
+			SpecDesHeatSATRatio( 1.0 ),
+			SpecMinOAFrac ( 1.0 )
 		{}
 
 	};
@@ -823,6 +841,29 @@ namespace DataSizing {
 		{}
 
 	};
+
+	// Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit and AirTerminal:SingleDuct:Uncontrolled
+	struct AirTerminalSizingSpecData
+	{
+		// Members
+		std::string Name;
+		Real64 DesSensCoolingFrac; // Fraction of Design Sensible Cooling Load
+		Real64 DesCoolSATRatio; // Cooling Design Supply Air Temperature Difference Ratio
+		Real64 DesSensHeatingFrac; // Fraction of Design Sensible Heating Load
+		Real64 DesHeatSATRatio; // Heating Design Supply Air Temperature Difference Ratio
+		Real64 MinOAFrac; // Fraction of Minimum Outdoor Air Flow
+
+		// Default Constructor
+		AirTerminalSizingSpecData() :
+			DesSensCoolingFrac( 1.0 ),
+			DesCoolSATRatio( 1.0 ),
+			DesSensHeatingFrac( 1.0 ),
+			DesHeatSATRatio( 1.0 ),
+			MinOAFrac( 1.0 )
+		{}
+
+	};
+
 
 	struct SystemSizingInputData
 	{
@@ -1266,6 +1307,11 @@ namespace DataSizing {
 		Real64 OAFlowPerZone; // - OA requirement per zone
 		Real64 OAFlowACH; // - OA requirement per zone per hour
 		int OAFlowFracSchPtr; // - Fraction schedule applied to total OA requirement
+		int OAPropCtlMinRateSchPtr; // - Fraction schedule applied to Proportional Control Minimum Outdoor Air Flow Rate 
+		int CO2MaxMinLimitErrorCount; // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
+		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message for SOAM_ProportionalControlSchOcc
+		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
 
 		// Default Constructor
 		OARequirementsData() :
@@ -1274,7 +1320,12 @@ namespace DataSizing {
 			OAFlowPerArea( 0.0 ),
 			OAFlowPerZone( 0.0 ),
 			OAFlowACH( 0.0 ),
-			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn )
+			OAFlowFracSchPtr( DataGlobals::ScheduleAlwaysOn ),
+			OAPropCtlMinRateSchPtr( DataGlobals::ScheduleAlwaysOn ),
+			CO2MaxMinLimitErrorCount( 0 ),
+			CO2MaxMinLimitErrorIndex( 0 ),
+			CO2GainErrorCount( 0 ),
+			CO2GainErrorIndex( 0 )
 		{}
 
 	};
@@ -1323,6 +1374,7 @@ namespace DataSizing {
 	extern Array1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
 	extern Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	extern Array1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
+	extern Array1D< AirTerminalSizingSpecData > AirTerminalSizingSpec; // Input data for air terminal sizing
 	// used only for Facility Load Component Summary
 	extern Array1D< FacilitySizingData > CalcFacilitySizing; // Data for facility sizing 
 	extern FacilitySizingData CalcFinalFacilitySizing; // Final data for facility sizing 

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -63,6 +64,13 @@ namespace DataHVACGlobals {
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
+	enum class HVACSystemRootSolverAlgorithm : int {
+		RegulaFalsi = 0,
+		Bisection,
+		RegulaFalsiThenBisection,
+		BisectionThenRegulaFalsi,
+		Alternation
+	};
 
 	// MODULE PARAMETER DEFINITIONS:
 
@@ -298,6 +306,8 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	extern Real64 const OscillateMagnitude;
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	extern int const Bisection;
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -345,6 +355,7 @@ namespace DataHVACGlobals {
 	extern Real64 HPWHCrankcaseDBTemp; // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
 	extern bool AirLoopInit; // flag for whether InitAirLoops has been called
 	extern bool AirLoopsSimOnce; // True means that the air loops have been simulated once in this environment
+	extern bool GetAirPathDataDone; // True means that air loops inputs have been processed
 
 	// Hybrid ventilation control part
 	extern int NumHybridVentSysAvailMgrs; // Number of hybrid ventilation control
@@ -370,6 +381,7 @@ namespace DataHVACGlobals {
 	extern bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	extern bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	extern bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
+	extern int MinAirLoopIterationsAfterFirst; // minimum number of HVAC iterations after FirstHVACIteration (must be at least 2 for sequenced loads to operate on air loops)
 
 	extern int const NumZoneHVACTerminalTypes;
 	extern Array1D_string const ccZoneHVACTerminalTypes;
@@ -492,10 +504,26 @@ namespace DataHVACGlobals {
 
 	};
 
+	struct HVACSystemRootFindingAlgorithm
+	{
+		// Members
+		std::string Algorithm;           // Choice of algorithm
+		int NumOfIter;                   // Number of Iteration Before Algorith Switch
+		HVACSystemRootSolverAlgorithm HVACSystemRootSolver; //1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
+										 // Default Constructor
+		HVACSystemRootFindingAlgorithm( ) :
+			NumOfIter( 5 ),
+			HVACSystemRootSolver( HVACSystemRootSolverAlgorithm::RegulaFalsi )
+		{}
+
+	};
+
+
 	// Object Data
 	extern Array1D< ZoneCompTypeData > ZoneComp;
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
+	extern HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.

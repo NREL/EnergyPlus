@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -298,7 +299,7 @@ namespace EnergyPlus {
 			//	Tc                  ! Critical (Melting/Freezing) Temperature of PCM
 			//	Tau1                ! Width of Melting Zone low
 			//	Tau2                ! Width of Melting Zone high
-			//	EnthalpyOld         ! Previos Timestep Nodal Enthalpy
+			//	EnthalpyOld         ! Previous Timestep Nodal Enthalpy
 			//	EnthalpyNew         ! Current Timestep Nodal Enthalpy
 
 			Real64 T = temperatureCurrent;
@@ -322,6 +323,29 @@ namespace EnergyPlus {
 			}
 
 		}
+
+		Real64
+		HysteresisPhaseChange::getConductivity( Real64 T ) {
+			if ( T < this->peakTempMelting ) {
+				return this->fullySolidThermalConductivity;
+			} else if ( T > this->peakTempFreezing ) {
+				return this->fullyLiquidThermalConductivity;
+			} else {
+				return ( this->fullySolidThermalConductivity + this->fullyLiquidThermalConductivity ) / 2.0;
+			}
+		}
+
+		Real64
+		HysteresisPhaseChange::getDensity( Real64 T ) {
+			if ( T < this->peakTempMelting ) {
+				return this->fullySolidDensity;
+			} else if ( T > this->peakTempFreezing ) {
+				return this->fullyLiquidDensity;
+			} else {
+				return ( this->fullySolidDensity + this->fullyLiquidDensity ) / 2.0;
+			}
+		}
+
 
 		void readAllHysteresisModels() {
 
@@ -363,15 +387,19 @@ namespace EnergyPlus {
 				// now build out a new hysteresis instance and add it to the vector
 				HysteresisPhaseChange thisHM;
 				thisHM.name = DataIPShortCuts::cAlphaArgs( 1 );
-				thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs( 2 );
-				thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs( 3 );
-				thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs( 4 );
-				thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs( 5 );
-				thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs( 6 );
-				thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs( 7 );
-				thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs( 8 );
-				thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs( 9 );
-				thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs( 10 );
+				thisHM.totalLatentHeat = DataIPShortCuts::rNumericArgs( 1 );
+				thisHM.fullyLiquidThermalConductivity = DataIPShortCuts::rNumericArgs( 2 );
+				thisHM.fullyLiquidDensity = DataIPShortCuts::rNumericArgs( 3 );
+				thisHM.specificHeatLiquid = DataIPShortCuts::rNumericArgs( 4 );
+				thisHM.deltaTempMeltingHigh = DataIPShortCuts::rNumericArgs( 5 );
+				thisHM.peakTempMelting = DataIPShortCuts::rNumericArgs( 6 );
+				thisHM.deltaTempMeltingLow = DataIPShortCuts::rNumericArgs( 7 );
+				thisHM.fullySolidThermalConductivity = DataIPShortCuts::rNumericArgs( 8 );
+				thisHM.fullySolidDensity = DataIPShortCuts::rNumericArgs( 9 );
+				thisHM.specificHeatSolid = DataIPShortCuts::rNumericArgs( 10 );
+				thisHM.deltaTempFreezingHigh = DataIPShortCuts::rNumericArgs( 11 );
+				thisHM.peakTempFreezing = DataIPShortCuts::rNumericArgs( 12 );
+				thisHM.deltaTempFreezingLow = DataIPShortCuts::rNumericArgs( 13 );
 				thisHM.specHeatTransition = ( thisHM.specificHeatSolid + thisHM.specificHeatLiquid ) / 2.0;
 				thisHM.CpOld = thisHM.specificHeatSolid;
 				hysteresisPhaseChangeModels.push_back( thisHM );

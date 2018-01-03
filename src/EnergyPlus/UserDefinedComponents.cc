@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -55,6 +56,7 @@
 // EnergyPlus Headers
 #include <UserDefinedComponents.hh>
 #include <BranchNodeConnections.hh>
+#include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataLoopNode.hh>
@@ -1256,6 +1258,20 @@ namespace UserDefinedComponents {
 				SetupEMSActuator( "Primary Air Connection", UserAirTerminal( CompLoop ).Name, "Outlet Humidity Ratio", "[kgWater/kgDryAir]", lDummy, UserAirTerminal( CompLoop ).AirLoop.OutletHumRat );
 				SetupEMSActuator( "Primary Air Connection", UserAirTerminal( CompLoop ).Name, "Outlet Mass Flow Rate", "[kg/s]", lDummy, UserAirTerminal( CompLoop ).AirLoop.OutletMassFlowRate );
 				TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Air Nodes" );
+
+				int ADUNum = 0;
+				for ( ADUNum = 1; ADUNum <= DataDefineEquip::NumAirDistUnits; ++ADUNum ) {
+					if ( UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum == DataDefineEquip::AirDistUnit( ADUNum ).OutletNodeNum ) {
+						//        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum
+						UserAirTerminal( CompLoop ).ADUNum = ADUNum;
+					}
+				}
+				// one assumes if there isn't one assigned, it's an error?
+				if ( UserAirTerminal( CompLoop ).ADUNum == 0 ) {
+					ShowSevereError( "GetUserDefinedComponents: No matching Air Distribution Unit for " + cCurrentModuleObject + " = " + UserAirTerminal( CompLoop ).Name );
+					ShowContinueError( "...should have outlet node=" + NodeID( UserAirTerminal( CompLoop ).AirLoop.OutletNodeNum ) );
+					//          ErrorsFound=.TRUE.
+				}
 
 				// Fill the Zone Equipment data with the inlet node number of this unit.
 				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {

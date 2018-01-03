@@ -67,7 +67,7 @@ if(BUILD_FORTRAN)
   # Parametric preprocessor next
   string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
   if ( "${PAR_RESULT}" GREATER -1 )
-    find_program(PARAMETRIC_EXE ParametricPreprocessor PATHS "${PRODUCT_PATH}"
+    find_program(PARAMETRIC_EXE parametricpreprocessor PATHS "${PRODUCT_PATH}"
       NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${IDF_PATH}" "${OUTPUT_DIR_PATH}")
     execute_process(COMMAND "${PARAMETRIC_EXE}" "${IDF_FILE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
