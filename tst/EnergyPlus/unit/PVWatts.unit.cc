@@ -93,7 +93,7 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
 		",",
 		",",
 		",",
-		";"
+		";",
 		"Generator:PVWatts,",
 		"PVWattsArray2,",
 		"5,",
@@ -105,7 +105,7 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
 		",",
 		",",
 		",",
-		";"
+		";",
 		"Generator:PVWatts,",
 		"PVWattsArray3,",
 		"5,",
@@ -121,13 +121,13 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
 	});
 	process_idf(idfTxt);
 	EXPECT_FALSE(has_err_output());
-	PVWattsGenerator pvw1 = GetOrCreatePVWattsGenerator("PVWattsArray1");
+	PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator("PVWattsArray1");
 	EXPECT_EQ(pvw1.getModuleType(), ModuleType::PREMIUM);
 	EXPECT_EQ(pvw1.getArrayType(), ArrayType::ONE_AXIS);
 	EXPECT_DOUBLE_EQ(0.4, pvw1.getGroundCoverageRatio());
-	PVWattsGenerator pvw2 = GetOrCreatePVWattsGenerator("PVWattsArray2");
+	PVWattsGenerator &pvw2 = GetOrCreatePVWattsGenerator("PVWattsArray2");
 	EXPECT_DOUBLE_EQ(0.4, pvw2.getGroundCoverageRatio());
-	PVWattsGenerator pvw3 = GetOrCreatePVWattsGenerator("PVWattsArray3");
+	PVWattsGenerator &pvw3 = GetOrCreatePVWattsGenerator("PVWattsArray3");
 	EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
 	EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
 	EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
