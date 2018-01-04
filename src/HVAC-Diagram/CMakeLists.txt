@@ -44,6 +44,6 @@ add_executable( HVAC-Diagram ${SRC} )
 install( TARGETS HVAC-Diagram DESTINATION PostProcess )
 if(NOT ${STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-  install_target_prereqs( TARGETS HVAC-Diagram DESTINATION PostProcess )
+  install_target_prereqs( HVAC-Diagram PostProcess )
 endif()
 
