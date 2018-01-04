@@ -1114,14 +1114,18 @@ namespace SizingManager {
 					} else { // big trouble anyway. 
 						FinalSysSizing( AirLoopNum ).SysAirMinFlowRat = 1.0;
 					}
+					ReportSizingManager::ReportSizingOutput( "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", FinalSysSizing( AirLoopNum ).SysAirMinFlowRat );
 					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, FinalSysSizing( AirLoopNum ).SysAirMinFlowRat, 4 );
+					ReportSizingManager::ReportSizingOutput( "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing( AirLoopNum ).SysAirMinFlowRat );
 					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing( AirLoopNum ).SysAirMinFlowRat, 4 );
 				} else {
+					ReportSizingManager::ReportSizingOutput( "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing( AirLoopNum ).SysAirMinFlowRat );
 					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing( AirLoopNum ).SysAirMinFlowRat, 4 );
 					Real64 calcSysAirMinFlowRat( 0.0 );
 					if ( FinalSysSizing( AirLoopNum ).DesMainVolFlow > 0.0 ) { // protect div by zero
 						calcSysAirMinFlowRat = FinalSysSizing( AirLoopNum ).DesHeatVolFlow / FinalSysSizing( AirLoopNum ).DesMainVolFlow;
 					}
+					ReportSizingManager::ReportSizingOutput( "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", calcSysAirMinFlowRat );
 					OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchSysSizCalcHeatFlowRatio, curName, calcSysAirMinFlowRat, 4 );
 				}
 			}
@@ -1139,7 +1143,7 @@ namespace SizingManager {
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 			int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
-			if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP && DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones > 1 ) {
+			if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP && DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones > 1 && FinalSysSizing( AirLoopNum ).LoadSizeType != Ventilation ) {
 
 				// Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for each zone
 				for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {

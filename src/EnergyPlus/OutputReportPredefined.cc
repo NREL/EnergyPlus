@@ -1653,8 +1653,8 @@ namespace OutputReportPredefined {
 		pdchSysSizAdjustedClAir = newPreDefColumn( pdstSystemSize, "Adjusted cooling [m3/s]" );
 		pdchSysSizAdjustedHtAir = newPreDefColumn( pdstSystemSize, "Adjusted heating [m3/s]" );
 		pdchSysSizAdjustedMainAir = newPreDefColumn( pdstSystemSize, "Adjusted main [m3/s]" );
-		pdchSysSizCalcHeatFlowRatio = newPreDefColumn( pdstSystemSize, "Calculated Heating Air Flow Ratio" );
-		pdchSysSizUserHeatFlowRatio = newPreDefColumn( pdstSystemSize, "User Heating Air Flow Ratio" );
+		pdchSysSizCalcHeatFlowRatio = newPreDefColumn( pdstSystemSize, "Calculated Heating Air Flow Ratio []" );
+		pdchSysSizUserHeatFlowRatio = newPreDefColumn( pdstSystemSize, "User Heating Air Flow Ratio []" );
 
 		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
 //		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
