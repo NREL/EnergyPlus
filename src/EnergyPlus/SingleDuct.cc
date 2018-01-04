@@ -1837,7 +1837,7 @@ namespace SingleDuct {
 		using PlantUtilities::InitComponentNodes;
 		using DataGlobals::AnyPlantInModel;
 		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
-
+		
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitSys" );
 		static std::string const RoutineNameFull( "InitHVACSingleDuct" );
@@ -1958,7 +1958,7 @@ namespace SingleDuct {
 				Sys( SysNum ).MinReheatSteamFlow = SteamDensity * Sys( SysNum ).MinReheatSteamVolFlow;
 			}
 
-			if ( SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:Reheat" ) || SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat" ) || SameString( Sys( SysNum ).SysType, "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat" ) ) {
+			if ( ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheat || Sys( SysNum ).SysType_Num == SingleDuctCBVAVReheat) || ( Sys( SysNum ).SysType_Num == SingleDuctCBVAVNoReheat) ) {
 				// need the lowest schedule value
 				if ( Sys( SysNum ).ZoneMinAirFracMethod == ScheduledMinFrac ) {
 					Sys( SysNum ).ZoneMinAirFrac = GetScheduleMinValue( Sys( SysNum ).ZoneMinAirFracSchPtr );
@@ -4271,8 +4271,8 @@ namespace SingleDuct {
 	void
 	SysDesignParams::SimConstVolNoReheat(
 		int const SysNum,
-		bool const FirstHVACIteration,
-		int const ZoneNum,
+		bool const EP_UNUSED( FirstHVACIteration ),
+		int const EP_UNUSED( ZoneNum ),
 		int const ZoneNodeNum
 	)
 	{
@@ -4314,7 +4314,7 @@ namespace SingleDuct {
 		}
 
 		if ( MassFlow > 0.0 ) {
-			Real64 CpAir = PsyCpAirFnWTdb( 0.5 * ( Node( Node( this->OutletNodeNum ).HumRat + ZoneNodeNum ).HumRat ), 0.5 * ( Node( this->OutletNodeNum ).Temp + Node( ZoneNodeNum ).Temp ) );
+			Real64 CpAir = PsyCpAirFnWTdb( 0.5 * ( Node( this->OutletNodeNum ).HumRat + Node( ZoneNodeNum ).HumRat ), 0.5 * ( Node( this->OutletNodeNum ).Temp + Node( ZoneNodeNum ).Temp ) );
 			SensOutputProvided = MassFlow * CpAir * ( Node( this->OutletNodeNum ).Temp - Node( ZoneNodeNum ).Temp );
 		} else {
 			SensOutputProvided = 0.0;

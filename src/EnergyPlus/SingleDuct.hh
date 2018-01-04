@@ -287,8 +287,8 @@ namespace SingleDuct {
 
 		void SimConstVolNoReheat(
 			int const SysNum,
-			bool const FirstHVACIteration,
-			int const ZoneNum,
+			bool const EP_UNUSED( FirstHVACIteration ),
+			int const EP_UNUSED( ZoneNum ),
 			int const ZoneNodeNum
 		);
 
