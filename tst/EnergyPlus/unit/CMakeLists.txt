@@ -50,6 +50,7 @@ set( test_src
   EarthTube.unit.cc
   EconomicTariff.unit.cc
   EconomicLifeCycleCost.unit.cc
+        Eigen.unit.cc
   ElectricBaseboardRadiator.unit.cc
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
