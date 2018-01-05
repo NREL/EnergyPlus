@@ -578,11 +578,53 @@ if (UNIX)
   ADD_DEFINITIONS("-fPIC")
 endif()
 
+set(
+        INTELMKL
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_core.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_core.a
+
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_avx.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_avx2.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_avx512.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_avx512_mic.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_def.so
+
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_gnu_thread.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_gnu_thread.a
+
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_ilp64.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_ilp64.a
+
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_lp64.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_lp64.a
+
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.a
+
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_mc.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_mc3.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_rt.so
+
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_sequential.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_sequential.a
+
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_tbb_thread.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_tbb_thread.a
+
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_avx.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_avx2.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_avx512.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_avx512_mic.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_def.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_mc.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_mc2.so
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_mc3.so
+        )
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva)
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva ${INTELMKL})
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )

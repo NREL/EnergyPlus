@@ -47,6 +47,7 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+#define EIGEN_USE_MKL_ALL
 #include <Eigen/Dense>
 
 TEST(Eigen, EigenTest) {
