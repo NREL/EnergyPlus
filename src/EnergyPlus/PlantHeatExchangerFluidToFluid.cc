@@ -784,6 +784,10 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 tmpDmdSideDesignVolFlowRate;
 		Real64 tmpUA;
 		Real64 tmpDeltaTSupLoop;
+		Real64 tmpDeltaTDmdLoop;
+		Real64 tmpSupSideCapPerVolFlowRate;
+		Real64 tmpDmdSideCapPerVolFlowRate;
+		Real64 tmpDmdToSupVolFlowRatio;
 		Real64 tmpDeltaTloopToLoop( 0.0 );
 		bool ErrorsFound;
 		Real64 Cp;
@@ -828,7 +832,25 @@ namespace PlantHeatExchangerFluidToFluid {
 		tmpDmdSideDesignVolFlowRate = FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate;
 		if ( FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRateWasAutoSized ) {
 			if ( tmpSupSideDesignVolFlowRate > SmallWaterVolFlow ) {
-				tmpDmdSideDesignVolFlowRate = tmpSupSideDesignVolFlowRate;
+				// calculate the supply side capacity per volume flow rate
+				tmpDeltaTSupLoop = PlantSizData(PltSizNumSupSide).DeltaT;
+				Cp = GetSpecificHeatGlycol(PlantLoop(FluidHX(CompNum).SupplySideLoop.LoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(FluidHX(CompNum).SupplySideLoop.LoopNum).FluidIndex, RoutineName);
+				rho = GetDensityGlycol(PlantLoop(FluidHX(CompNum).SupplySideLoop.LoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(FluidHX(CompNum).SupplySideLoop.LoopNum).FluidIndex, RoutineName);
+
+				tmpSupSideCapPerVolFlowRate = Cp * rho * tmpDeltaTSupLoop;
+
+				// calculate the demand side capacity per volume flow rate
+				tmpDeltaTDmdLoop = PlantSizData(PltSizNumDmdSide).DeltaT;
+				Cp = GetSpecificHeatGlycol(PlantLoop(FluidHX(CompNum).DemandSideLoop.LoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(FluidHX(CompNum).DemandSideLoop.LoopNum).FluidIndex, RoutineName);
+				rho = GetDensityGlycol(PlantLoop(FluidHX(CompNum).DemandSideLoop.LoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(FluidHX(CompNum).DemandSideLoop.LoopNum).FluidIndex, RoutineName);
+
+				tmpDmdSideCapPerVolFlowRate = Cp * rho * tmpDeltaTDmdLoop;
+
+				// calculate the ratio of the demand and supply side flow rates
+				tmpDmdToSupVolFlowRatio = tmpSupSideCapPerVolFlowRate / tmpDmdSideCapPerVolFlowRate;
+
+				// set the demand side flow rate based on the supply side flow rate and the ratio
+				tmpDmdSideDesignVolFlowRate = tmpDmdToSupVolFlowRatio * tmpSupSideDesignVolFlowRate;
 				if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
 			} else {
 				tmpDmdSideDesignVolFlowRate = 0.0;
