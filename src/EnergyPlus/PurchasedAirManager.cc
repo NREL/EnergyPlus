@@ -2511,11 +2511,6 @@ namespace PurchasedAirManager {
 			PurchAir( PurchAirNum ).HtRecSenOutput = 0.0;
 			PurchAir( PurchAirNum ).HtRecLatOutput = 0.0;
 		}
-		// If exhaust node is specified, then set massflow on exhaust node, otherwise return node sets its own massflow
-		if ( PurchAir( PurchAirNum ).ZoneExhaustAirNodeNum > 0 ) {
-			Node( RecircNodeNum ).MassFlowRate = RecircMassFlowRate;
-		}
-
 	}
 
 	void
