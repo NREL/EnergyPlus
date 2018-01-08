@@ -439,10 +439,8 @@ namespace SimAirServingZones {
 		Array1D_int NodeNums; // node numbers returned by GetNodeNums
 		int NodeNum; // a node number
 		int AirSysNum; // an air system (air loop) number
-		int OANum; // outside aur system index
-		int OASysNum;
+		int OANum; // outside air system index
 		int NumInList;
-		int OACompNum;
 		int OAMixNum; // outside air mixer index
 		int IOStat; // status number returned by GetObjectItem
 		int NumControllers; // number of controllers
@@ -1123,32 +1121,42 @@ namespace SimAirServingZones {
 						PrimaryAirSystem( AirSysNum ).ControllerType( OASysControllerNum ) = ControllerType;
 						PrimaryAirSystem( AirSysNum ).ControlConverged( OASysControllerNum ) = false;
 						PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = true;
-						//         Coil controllers can be entered either in the air loop controller list or the
-						//         OA system controller list. The CanBeLockedOutByEcono should only be set for OA coils
-						//         First get the OA controller actuator node and then compare to the air loop coil water inlet node
-						//         If these node numbers match, the coil is in the main air loop and the lockout flag should be reset to FALSE
 						GetControllerActuatorNodeNum( ControllerName, ActuatorNodeNum, errFlag );
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( SameString( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirloopHVAC:OutdoorAirSystem" ) ) continue;
-								CompType = PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-								WaterCoilNodeNum = -1;
-								if ( SameString( CompType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CompType, "Coil:Heating:Water" ) || SameString( CompType, "Coil:Cooling:Water" ) ) {
-									WaterCoilNodeNum = GetCoilWaterInletNode( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name, ErrorsFound );
-								}
-								if ( WaterCoilNodeNum == ActuatorNodeNum ) {
-									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
+
+						bool nonLockoutCoilFound = false;
+						WaterCoilNodeNum = -1;
+						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
+						if ( OANum > 0 ) {
+							for ( int OACompNum = 1; OACompNum <= OutsideAirSys( OANum ).NumComponents; ++OACompNum ) {
+								CompType = OutsideAirSys( OANum ).ComponentType( OACompNum );
+								if ( SameString( CompType, "Coil:Heating:Water" ) ) {
+									WaterCoilNodeNum = GetCoilWaterInletNode( CompType, OutsideAirSys( OANum ).ComponentName( OACompNum ), ErrorsFound );
+									if ( WaterCoilNodeNum == ActuatorNodeNum ) nonLockoutCoilFound = true;
+									break;
 								}
 							}
 						}
-						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
-						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
-							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
-								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
-								if (SameString( CompType, "Coil:Heating:Water" )) {
-									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
+						if ( !nonLockoutCoilFound ) {
+							//         Coil controllers can be entered either in the air loop controller list or the
+							//         OA system controller list. The CanBeLockedOutByEcono should only be set for OA coils
+							//         First get the OA controller actuator node and then compare to the air loop coil water inlet node
+							//         If these node numbers match, the coil is in the main air loop and the lockout flag should be reset to FALSE
+							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
+								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+									if ( SameString( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirloopHVAC:OutdoorAirSystem" ) ) continue;
+									CompType = PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
+									if ( SameString( CompType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CompType, "Coil:Heating:Water" ) || SameString( CompType, "Coil:Cooling:Water" ) ) {
+										WaterCoilNodeNum = GetCoilWaterInletNode( CompType, PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name, ErrorsFound );
+										if (WaterCoilNodeNum == ActuatorNodeNum) {
+											nonLockoutCoilFound = true;
+											break;
+										}
+									}
 								}
 							}
+						}
+						if ( nonLockoutCoilFound ) {
+								PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
 						}
 					}
 				}
@@ -1337,9 +1345,9 @@ namespace SimAirServingZones {
 		}
 
 		OANum = GetNumOASystems();
-		for ( OASysNum = 1; OASysNum <= OANum; ++OASysNum ) {
+		for ( int OASysNum = 1; OASysNum <= OANum; ++OASysNum ) {
 			NumInList = GetOACompListNumber( OASysNum );
-			for ( OACompNum = 1; OACompNum <= NumInList; ++OACompNum ) {
+			for ( int OACompNum = 1; OACompNum <= NumInList; ++OACompNum ) {
 				CompType_Num = GetOACompTypeNum( OASysNum, OACompNum );
 				if ( CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling ) {
 					WaterCoilNodeNum = GetCoilWaterInletNode( GetOACompType( OASysNum, OACompNum ), GetOACompName( OASysNum, OACompNum ), ErrorsFound );
