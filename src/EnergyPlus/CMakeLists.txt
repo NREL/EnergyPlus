@@ -589,27 +589,53 @@ set(
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_avx512_mic.so
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_def.so
 
+        # threading libs, openMP for use with libmkl_intel_thread and libmkl_gnu_thread
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libiomp5.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libiomp5.a
+
+        # not sure what these are used for
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libiompstubs5.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libiompstubs5.so
+
+        # threading libs, intel tbb
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libtbb.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libtbb.so.2
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libtbbmalloc.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/threading/libtbbmalloc.so.2
+
+
+        # threading - for use with openMP
 #        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_gnu_thread.so
 #        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_gnu_thread.a
 
+        # threading - recommended here: https://software.intel.com/en-us/mkl-linux-developer-guide-linking-with-threading-libraries
+        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.a
+
+        # threading - intel tbb
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_tbb_thread.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_tbb_thread.a
+
+        # specifies sequential and not threaded mode? see link above
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_sequential.so
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_sequential.a
+
+
+#        this is for 32 bit architectures?
 #        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_ilp64.so
 #        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_ilp64.a
 
+#        this should be for 64 bit
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_lp64.so
 #        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_lp64.a
 
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.so
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.a
 
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_mc.so
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_mc3.so
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_rt.so
 
-        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_sequential.so
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_sequential.a
 
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_tbb_thread.so
-#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_tbb_thread.a
+
 
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_avx.so
         ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_vml_avx2.so
