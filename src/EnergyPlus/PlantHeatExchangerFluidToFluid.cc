@@ -850,7 +850,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				tmpDmdToSupVolFlowRatio = tmpSupSideCapPerVolFlowRate / tmpDmdSideCapPerVolFlowRate;
 
 				// set the demand side flow rate based on the supply side flow rate and the ratio
-				tmpDmdSideDesignVolFlowRate = tmpDmdToSupVolFlowRatio * tmpSupSideDesignVolFlowRate;
+				tmpDmdSideDesignVolFlowRate = tmpDmdToSupVolFlowRatio * FluidHX(CompNum).SupplySideLoop.DesignVolumeFlowRate;
 				if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
 			} else {
 				tmpDmdSideDesignVolFlowRate = 0.0;
