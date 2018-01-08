@@ -54,6 +54,7 @@
 #include <DataLoopNode.hh>
 #include <NodeInputManager.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
+#include <DataSizing.hh>
 //#include <EMSManager.hh>
 #include <SetPointManager.hh>
 #include <ScheduleManager.hh>
