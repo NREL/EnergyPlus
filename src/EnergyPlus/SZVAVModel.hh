@@ -94,7 +94,7 @@ namespace SZVAVModel {
 	void
 	calcSZVAVModel(
 		HVACUnitarySystem::UnitarySystemData SZVAVModel,
-		int const & UnitarySysNum,
+		int const & SysIndex,
 		bool const & FirstHVACIteration,
 		bool const & CoolingLoad,
 		bool const & HeatingLoad,
@@ -112,7 +112,7 @@ namespace SZVAVModel {
 	void
 	calcSZVAVModel(
 		PackagedTerminalHeatPump::PTUnitData SZVAVModel,
-		int const & UnitarySysNum,
+		int const & SysIndex,
 		bool const & FirstHVACIteration,
 		bool const & CoolingLoad,
 		bool const & HeatingLoad,

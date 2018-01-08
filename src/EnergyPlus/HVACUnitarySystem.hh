@@ -189,7 +189,6 @@ namespace HVACUnitarySystem {
 		bool AirLoopEquipment; // identifies that this system is part of an air loop
 		int ZoneSequenceCoolingNum; // Index to cooling sequence/priority for this zone
 		int ZoneSequenceHeatingNum; // Index to heating sequence/priority for this zone
-		int NodeNumOfControlledZone; // Node number of controlled zone
 		int ZoneInletNode; // Zone inlet node number in the controlled zone
 		Real64 ControlZoneMassFlowFrac; // Fraction of flow to control zone
 		bool Humidistat; // Set to True if dehumidification control mode is set to
@@ -346,7 +345,6 @@ namespace HVACUnitarySystem {
 		// end of additional variables for variable speed water source heat pump
 		// Report Varibles
 		Real64 PartLoadFrac; // part load fraction for current time step (single speed)
-		Real64 FanPartLoadRatio; // Unitary system fan part load ratio
 		Real64 CompPartLoadRatio; // Unitary system compressor part load ratio
 		Real64 ElecPower; // Unitary System Electric Power
 		Real64 ElecPowerConsumption; // Electricity power comsumption: CondenserFan+CCHeater+Defrost+aux
@@ -460,8 +458,10 @@ namespace HVACUnitarySystem {
 		// variables used in SZVAV model:
 		std::string Name; // name of unit
 		std::string UnitType; // type of unit
+		int NodeNumOfControlledZone; // Node number of controlled zone
 		int MaxIterIndex; // used in PLR calculations for sensible load
 		int RegulaFalsIFailedIndex; // used in PLR calculations for sensible load
+		Real64 FanPartLoadRatio; // Unitary system fan part load ratio
 		Real64 CoolCoilWaterFlowRatio; // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
 		Real64 HeatCoilWaterFlowRatio; // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
 		int ControlZoneNum; // index of unit in ZoneEquipConfig
@@ -500,7 +500,6 @@ namespace HVACUnitarySystem {
 			AirLoopEquipment( true ),
 			ZoneSequenceCoolingNum( 0 ),
 			ZoneSequenceHeatingNum( 0 ),
-			NodeNumOfControlledZone( 0 ),
 			ZoneInletNode( 0 ),
 			ControlZoneMassFlowFrac( 0.0 ),
 			Humidistat( false ),
@@ -630,7 +629,6 @@ namespace HVACUnitarySystem {
 			CoolingCycRatio( 0.0 ),
 			HeatingCycRatio( 0.0 ),
 			PartLoadFrac( 0.0 ),
-			FanPartLoadRatio( 0.0 ),
 			CompPartLoadRatio( 0.0 ),
 			ElecPower( 0.0 ),
 			ElecPowerConsumption( 0.0 ),
@@ -734,6 +732,8 @@ namespace HVACUnitarySystem {
 			// SZVAV variables
 			MaxIterIndex( 0 ),
 			RegulaFalsIFailedIndex( 0 ),
+			NodeNumOfControlledZone( 0 ),
+			FanPartLoadRatio( 0.0 ),
 			CoolCoilWaterFlowRatio( 0.0 ),
 			HeatCoilWaterFlowRatio( 0.0 ),
 			ControlZoneNum( 0 ),

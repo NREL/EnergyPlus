@@ -102,7 +102,7 @@ namespace SZVAVModel {
 	void
 	calcSZVAVModel(
 		HVACUnitarySystem::UnitarySystemData SZVAVModel,
-		int const & UnitarySysNum,
+		int const & SysIndex,
 		bool const & FirstHVACIteration,
 		bool const & CoolingLoad,
 		bool const & HeatingLoad,
@@ -190,7 +190,7 @@ namespace SZVAVModel {
 			coilAirOutletNode = 0;
 		}
 		// set up RegulaFalsi variables
-		Par( 1 ) = double( UnitarySysNum );
+		Par( 1 ) = double( SysIndex );
 		Par( 2 ) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
 		if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 		Par( 3 ) = double( SZVAVModel.ControlZoneNum );
@@ -265,7 +265,7 @@ namespace SZVAVModel {
 		//
 		// Step 1: set min air flow and full coil capacity
 		PartLoadRatio = 1.0; // full coil capacity
-		SZVAVModel.FanPartLoadRatio = 0.0; // minimum fan PLR, air flow = ( fanPartLoadRatio * minAirMassFlow ) + ( ( 1.0 - fanPartLoadRatio ) * maxAirMassFlow )
+		SZVAVModel.FanPartLoadRatio = 0.0; // minimum fan PLR, air flow = ( fanPartLoadRatio * maxAirMassFlow ) + ( ( 1.0 - fanPartLoadRatio ) * minAirMassFlow )
 		DataLoopNode::Node( InletNode ).MassFlowRate = minAirMassFlow;
 		// set max water flow rate and check to see if plant limits flow
 		if ( coilLoopNum > 0 ) SetComponentFlowRate( maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum );
@@ -274,10 +274,10 @@ namespace SZVAVModel {
 		if ( CoolingLoad ) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
 							 // set the water flow ratio so water coil gets proper flow
 			SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
-			CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+			CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 		} else {
 			SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
-			CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+			CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 		}
 		bool coilActive = DataLoopNode::Node( coilAirInletNode ).Temp - DataLoopNode::Node( coilAirOutletNode ).Temp;
 		Real64 outletTemp = DataLoopNode::Node( OutletNode ).Temp;
@@ -293,9 +293,9 @@ namespace SZVAVModel {
 				General::SolveRoot( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par );
 
 				if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-					CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+					CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 				} else {
-					CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+					CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 				}
 				if ( coilLoopNum > 0 ) lowWaterMdot = DataLoopNode::Node( coilFluidInletNode ).MassFlowRate; // save adjusted water flow rate for later use if needed
 
@@ -336,9 +336,9 @@ namespace SZVAVModel {
 
 					// get result for reporting
 					if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					} else {
-						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					}
 
 					if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
@@ -376,7 +376,7 @@ namespace SZVAVModel {
 					// must check full flow outlet temp with coils off before calling regula falsi
 					SZVAVModel.CoolCoilWaterFlowRatio = 0.0;
 					SZVAVModel.HeatCoilWaterFlowRatio = 0.0;
-					CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+					CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					outletTemp = DataLoopNode::Node( OutletNode ).Temp;
 
 					if ( ( CoolingLoad && outletTemp > maxOutletTemp ) || ( HeatingLoad && outletTemp < maxOutletTemp ) ) {
@@ -390,9 +390,9 @@ namespace SZVAVModel {
 						if ( coilLoopNum > 0 ) coilFluidFlow = DataLoopNode::Node( coilFluidInletNode ).MassFlowRate; // save adjusted water flow rate for later use if needed
 
 						if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-							CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+							CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 						} else {
-							CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+							CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 						}
 
 						if ( SolFlag < 0 ) {
@@ -440,10 +440,10 @@ namespace SZVAVModel {
 					if ( CoolingLoad ) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
 										 // set the water flow ratio so water coil gets proper flow
 						SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
-						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					} else {
 						SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
-						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					}
 					outletTemp = DataLoopNode::Node( OutletNode ).Temp;
 					if ( ( CoolingLoad && outletTemp < maxOutletTemp ) || ( HeatingLoad && outletTemp > maxOutletTemp ) ) {
@@ -481,9 +481,9 @@ namespace SZVAVModel {
 						if ( SolFlag == -1 ) {
 							// get capacity for warning
 							if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+								CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 							} else {
-								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+								CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 							}
 							if ( abs( DataLoopNode::Node( OutletNode ).Temp - maxOutletTemp ) > 0.1 ) { // oulet temperature can sometimes fluctuate around the target by 0.02+ even when PLR changes by 1E-12
 								if ( SZVAVModel.MaxIterIndex == 0 ) {
@@ -504,39 +504,45 @@ namespace SZVAVModel {
 					}
 
 				} else { // Step 9: not enough cooling or heating
-						 // Region 3: air flow rate at max while modulating coil capacity to meet load
-					Par( 9 ) = lowWaterMdot; // max water flow at low speed fan
-					Par( 10 ) = maxCoilFluidFlow; // max water flow rate limited by SAT or max if not limited
-					Par( 12 ) = maxAirMassFlow;
-					Par( 13 ) = 0.0;
-					General::SolveRoot( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par );
 
-					if ( SolFlag < 0 ) {
-						if ( SolFlag == -1 ) {
-							// get capacity for warning
-							if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
-							} else {
-								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
-							}
+					if ( CoolingLoad && FullSensibleOutput < ZoneLoad || HeatingLoad && FullSensibleOutput > ZoneLoad ) {
 
-							if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
-								if ( SZVAVModel.MaxIterIndex == 0 ) {
-									ShowWarningMessage( "Step 9: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
-									ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
-									ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + General::TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
+						// Region 3: air flow rate at max while modulating coil capacity to meet load
+						Par( 9 ) = lowWaterMdot; // max water flow at low speed fan
+						Par( 10 ) = maxCoilFluidFlow; // max water flow rate limited by SAT or max if not limited
+						Par( 12 ) = maxAirMassFlow;
+						Par( 13 ) = 0.0;
+						General::SolveRoot( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par );
+
+						if ( SolFlag < 0 ) {
+							if ( SolFlag == -1 ) {
+								// get capacity for warning
+								if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
+									CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+								} else {
+									CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 								}
-								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
+
+								if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
+									if ( SZVAVModel.MaxIterIndex == 0 ) {
+										ShowWarningMessage( "Step 9: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
+										ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
+										ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + General::TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
+									}
+									ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
+								}
+							} else if ( SolFlag == -2 ) {
+								if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
+									ShowWarningMessage( "Step 9: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
+									ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
+									ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
+								}
+								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 							}
-						} else if ( SolFlag == -2 ) {
-							if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-								ShowWarningMessage( "Step 9: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
-								ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
-								ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
-							}
-							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 						}
+
 					}
+
 				}
 
 			} else { // coil can be schedule off so set fan at high speed at these times.
@@ -557,22 +563,23 @@ namespace SZVAVModel {
 	}
 
 	void
-		calcSZVAVModel(
-			PackagedTerminalHeatPump::PTUnitData SZVAVModel,
-			int const & PTUnitNum,
-			bool const & FirstHVACIteration,
-			bool const & CoolingLoad,
-			bool const & HeatingLoad,
-			Real64 const & ZoneLoad,
-			Real64 & OnOffAirFlowRatio,
-			bool const & HXUnitOn,
-			int const & AirLoopNum,
-			Real64 & PartLoadRatio,
-			Real64 const & NoLoadOutletTemp,
-			Real64 const & FullSensibleOutput,
-			Real64 const & FullLoadAirOutletTemp,
-			int const & CompressorONFlag
-		) {
+	calcSZVAVModel(
+		PackagedTerminalHeatPump::PTUnitData SZVAVModel,
+		int const & SysIndex,
+		bool const & FirstHVACIteration,
+		bool const & CoolingLoad,
+		bool const & HeatingLoad,
+		Real64 const & ZoneLoad,
+		Real64 & OnOffAirFlowRatio,
+		bool const & HXUnitOn,
+		int const & AirLoopNum,
+		Real64 & PartLoadRatio,
+		Real64 const & NoLoadOutletTemp,
+		Real64 const & FullSensibleOutput,
+		Real64 const & FullLoadAirOutletTemp,
+		int const & CompressorONFlag
+	)
+	{
 
 		// Using/Aliasing
 		using PackagedTerminalHeatPump::CalcPTUnit;
@@ -646,14 +653,14 @@ namespace SZVAVModel {
 			coilAirOutletNode = 0;
 		}
 		// set up RegulaFalsi variables
-		Par( 1 ) = double( PTUnitNum );
+		Par( 1 ) = double( SysIndex );
 		Par( 2 ) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
 		if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 		Par( 3 ) = double( SZVAVModel.ControlZoneNum );
 		Par( 4 ) = ZoneLoad; // load to be met
 		Par( 5 ) = double( SZVAVModel.AirInNode );
 		Par( 6 ) = OnOffAirFlowRatio;
-		Par( 7 ) = double( AirLoopNum ); // used in UnitarySystem but not PTHP
+		Par( 7 ) = double( AirLoopNum );
 		Par( 8 ) = double( coilFluidInletNode );
 		// initialize other RegulaFalsi variables to most common state 
 		Par( 9 ) = 0.0; // minCoilFluidFlow - low fan speed water flow rate
@@ -722,7 +729,7 @@ namespace SZVAVModel {
 		//
 		// Step 1: set min air flow and full coil capacity
 		PartLoadRatio = 1.0; // full coil capacity
-		SZVAVModel.FanPartLoadRatio = 0.0; // minimum fan PLR, air flow = ( fanPartLoadRatio * minAirMassFlow ) + ( ( 1.0 - fanPartLoadRatio ) * maxAirMassFlow )
+		SZVAVModel.FanPartLoadRatio = 0.0; // minimum fan PLR, air flow = ( fanPartLoadRatio * maxAirMassFlow ) + ( ( 1.0 - fanPartLoadRatio ) * minAirMassFlow )
 		DataLoopNode::Node( InletNode ).MassFlowRate = minAirMassFlow;
 		// set max water flow rate and check to see if plant limits flow
 		if ( coilLoopNum > 0 ) SetComponentFlowRate( maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilLoopNum, coilLoopSide, coilBranchNum, coilCompNum );
@@ -731,15 +738,17 @@ namespace SZVAVModel {
 		if ( CoolingLoad ) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
 							 // set the water flow ratio so water coil gets proper flow
 			SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
-//			CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//			CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 		} else {
 			SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
-//			CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//			CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 		}
-		CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+		CalcPTUnit( SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
 		bool coilActive = DataLoopNode::Node( coilAirInletNode ).Temp - DataLoopNode::Node( coilAirOutletNode ).Temp;
 		Real64 outletTemp = DataLoopNode::Node( OutletNode ).Temp;
+		Real64 LowSpeedMaxCapacity = TempSensOutput;
+		Real64 LowSpeedOutletTemp = outletTemp;
 
 		// Step 2: if capacity exceeds load check temperature limits
 		// no need to check temperature limits if load exceeds full capacity at low fan speed
@@ -752,11 +761,11 @@ namespace SZVAVModel {
 				General::SolveRoot( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par );
 
 //				if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-//					CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//					CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //				} else {
-//					CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//					CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //				}
-				CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+				CalcPTUnit( SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
 				if ( coilLoopNum > 0 ) lowWaterMdot = DataLoopNode::Node( coilFluidInletNode ).MassFlowRate; // save adjusted water flow rate for later use if needed
 
@@ -764,19 +773,19 @@ namespace SZVAVModel {
 					if ( SolFlag == -1 ) {
 						if ( abs( DataLoopNode::Node( OutletNode ).Temp - maxOutletTemp ) > 0.1 ) { // oulet temperature can sometimes fluctuate around the target by 0.02+ even when PLR changes by 1E-12
 							if ( SZVAVModel.MaxIterIndex == 0 ) {
-								ShowWarningMessage( "Step 2: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+								ShowWarningMessage( "Step 2: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 								ShowContinueError( "  Iteration limit exceeded in calculating system supply air outlet temperature." );
 								ShowContinueErrorTimeStamp( "Supply air temperature target = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), supply air temperature = " + General::TrimSigDigits( DataLoopNode::Node( OutletNode ).Temp, 3 ) + " (C), and the simulation continues." );
 							}
-							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp ); // *** different variable name UnitType used in PTHP
+							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 						}
 					} else if ( SolFlag == -2 ) { // should not get here
 						if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-							ShowWarningMessage( "Step 2: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+							ShowWarningMessage( "Step 2: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 							ShowContinueError( "  supply air temperature target determined to be outside the range." );
 							ShowContinueErrorTimeStamp( "Supply air temperature = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), and the simulation continues." );
 						}
-						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp ); // *** different variable name UnitType used in PTHP
+						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 					}
 				}
 			}
@@ -784,9 +793,9 @@ namespace SZVAVModel {
 		// Step 3: check capacity wrt load
 		if ( ( CoolingLoad && ( ZoneLoad > TempSensOutput ) ) || ( HeatingLoad && ( ZoneLoad < TempSensOutput ) ) ) { // low speed fan can meet load
 
-																													  // Region 1: Low fan speed, modulate coil capacity
-																													  // Step 4: if capacity exceeds load then modulate coil capacity
-																													  //solve for the coil capacity at low speed fan
+			// Region 1: Low fan speed, modulate coil capacity
+			// Step 4: if capacity exceeds load then modulate coil capacity
+			//solve for the coil capacity at low speed fan
 			Par( 12 ) = minAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate, maxAirMassFlow indicates full air flow
 			Par( 13 ) = 0.0; // SA Temp target, 0 means iterate on load and not SA temperature
 			General::SolveRoot( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par );
@@ -797,27 +806,27 @@ namespace SZVAVModel {
 
 					// get result for reporting
 //					if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-//						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //					} else {
-//						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //					}
-					CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+					CalcPTUnit( SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
 					if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
 						if ( SZVAVModel.MaxIterIndex == 0 ) {
-							ShowWarningMessage( "Step 4: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+							ShowWarningMessage( "Step 4: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
 							ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + General::TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
 						}
-						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad ); // *** different variable name UnitType used in PTHP
+						ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
 					}
 				} else if ( SolFlag == -2 ) {
 					if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-						ShowWarningMessage( "Step 4: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+						ShowWarningMessage( "Step 4: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 						ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
 						ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
 					}
-					ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad ); // *** different variable name UnitType used in PTHP
+					ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 				}
 			}
 
@@ -838,9 +847,9 @@ namespace SZVAVModel {
 					// must check full flow outlet temp with coils off before calling regula falsi
 					SZVAVModel.CoolCoilWaterFlowRatio = 0.0;
 					SZVAVModel.HeatCoilWaterFlowRatio = 0.0;
-//					CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//					CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					Real64 TempPLR = 0.0;
-					CalcPTUnit( PTUnitNum, FirstHVACIteration, TempPLR, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+					CalcPTUnit( SysIndex, FirstHVACIteration, TempPLR, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 					outletTemp = DataLoopNode::Node( OutletNode ).Temp;
 
 					if ( ( CoolingLoad && outletTemp > maxOutletTemp ) || ( HeatingLoad && outletTemp < maxOutletTemp ) ) {
@@ -854,29 +863,29 @@ namespace SZVAVModel {
 						if ( coilLoopNum > 0 ) coilFluidFlow = DataLoopNode::Node( coilFluidInletNode ).MassFlowRate; // save adjusted water flow rate for later use if needed
 
 //						if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-//							CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//							CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //						} else {
-//							CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//							CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //						}
-						CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+						CalcPTUnit( SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
 						if ( SolFlag < 0 ) {
 							if ( SolFlag == -1 ) {
 								if ( abs( DataLoopNode::Node( OutletNode ).Temp - maxOutletTemp ) > 0.1 ) { // oulet temperature can sometimes fluctuate around the target by 0.02+ even when PLR changes by 1E-12
 									if ( SZVAVModel.MaxIterIndex == 0 ) {
-										ShowWarningMessage( "Step 6: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+										ShowWarningMessage( "Step 6: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 										ShowContinueError( "  Iteration limit exceeded in calculating system supply air outlet temperature." );
 										ShowContinueErrorTimeStamp( "Supply air temperature target = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), supply air temperature = " + General::TrimSigDigits( DataLoopNode::Node( OutletNode ).Temp, 3 ) + " (C), and the simulation continues." );
 									}
-									ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp ); // *** different variable name UnitType used in PTHP
+									ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 								}
 							} else if ( SolFlag == -2 ) { // should not get here
 								if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-									ShowWarningMessage( "Step 6: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+									ShowWarningMessage( "Step 6: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 									ShowContinueError( "  supply air temperature target determined to be outside the range." );
 									ShowContinueErrorTimeStamp( "Supply air temperature = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), and the simulation continues." );
 								}
-								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp ); // *** different variable name UnitType used in PTHP
+								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 							}
 						}
 						outletTemp = DataLoopNode::Node( OutletNode ).Temp;
@@ -905,12 +914,12 @@ namespace SZVAVModel {
 					if ( CoolingLoad ) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
 										 // set the water flow ratio so water coil gets proper flow
 						SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
-//						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					} else {
 						SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
-//						CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//						CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 					}
-					CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+					CalcPTUnit( SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 					outletTemp = DataLoopNode::Node( OutletNode ).Temp;
 					if ( ( CoolingLoad && outletTemp < maxOutletTemp ) || ( HeatingLoad && outletTemp > maxOutletTemp ) ) {
 
@@ -947,64 +956,70 @@ namespace SZVAVModel {
 						if ( SolFlag == -1 ) {
 							// get capacity for warning
 //							if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-//								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//								CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //							} else {
-//								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+//								CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
 //							}
-							CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+							CalcPTUnit( SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 							if ( abs( DataLoopNode::Node( OutletNode ).Temp - maxOutletTemp ) > 0.1 ) { // oulet temperature can sometimes fluctuate around the target by 0.02+ even when PLR changes by 1E-12
 								if ( SZVAVModel.MaxIterIndex == 0 ) {
-									ShowWarningMessage( "Step 8: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+									ShowWarningMessage( "Step 8: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 									ShowContinueError( "  Iteration limit exceeded in calculating system supply air outlet temperature." );
 									ShowContinueErrorTimeStamp( "Supply air temperature target = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), supply air temperature = " + General::TrimSigDigits( DataLoopNode::Node( OutletNode ).Temp, 3 ) + " (C), and the simulation continues." );
 								}
-								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp ); // *** different variable name UnitType used in PTHP
+								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating supply air temperature continues. Temperature statistics:", SZVAVModel.MaxIterIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 							}
 						} else if ( SolFlag == -2 ) { // should not get here
 							if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-								ShowWarningMessage( "Step 8: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
+								ShowWarningMessage( "Step 8: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
 								ShowContinueError( "  supply air temperature target determined to be outside the range." );
 								ShowContinueErrorTimeStamp( "Supply air temperature = " + General::TrimSigDigits( maxOutletTemp, 3 ) + " (C), and the simulation continues." );
 							}
-							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp ); // *** different variable name UnitType used in PTHP
+							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - supply air temperature outside of range error continues. Temperature statistics:", SZVAVModel.RegulaFalsIFailedIndex, DataLoopNode::Node( OutletNode ).Temp, DataLoopNode::Node( OutletNode ).Temp );
 						}
 					}
 
 				} else { // Step 9: not enough cooling or heating
-						 // Region 3: air flow rate at max while modulating coil capacity to meet load
-					Par( 9 ) = lowWaterMdot; // max water flow at low speed fan
-					Par( 10 ) = maxCoilFluidFlow; // max water flow rate limited by SAT or max if not limited
-					Par( 12 ) = maxAirMassFlow;
-					Par( 13 ) = 0.0;
-					General::SolveRoot( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par );
 
-					if ( SolFlag < 0 ) {
-						if ( SolFlag == -1 ) {
-							// get capacity for warning
-//							if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
-//								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
-//							} else {
-//								CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
-//							}
-							CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+					if ( CoolingLoad && FullSensibleOutput < ZoneLoad || HeatingLoad && FullSensibleOutput > ZoneLoad ) {
 
-							if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
-								if ( SZVAVModel.MaxIterIndex == 0 ) {
-									ShowWarningMessage( "Step 9: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
-									ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
-									ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + General::TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
+						// Region 3: air flow rate at max while modulating coil capacity to meet load
+						Par( 9 ) = lowWaterMdot; // max water flow at low speed fan
+						Par( 10 ) = maxCoilFluidFlow; // max water flow rate limited by SAT or max if not limited
+						Par( 12 ) = maxAirMassFlow;
+						Par( 13 ) = 0.0;
+						General::SolveRoot( 0.001, MaxIter, SolFlag, PartLoadRatio, CalcPTUnitWaterFlowResidual, 0.0, 1.0, Par );
+
+						if ( SolFlag < 0 ) {
+							if ( SolFlag == -1 ) {
+								// get capacity for warning
+								//							if ( CoolingLoad ) { // 4th and 5th arguments are CoolPLR and HeatPLR
+								//								CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, PartLoadRatio, 0.0, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+								//							} else {
+								//								CalcUnitarySystemToLoad( SysIndex, AirLoopNum, FirstHVACIteration, 0.0, PartLoadRatio, OnOffAirFlowRatio, TempSensOutput, TempLatOutput, HXUnitOn, _, _, CompressorONFlag );
+								//							}
+								CalcPTUnit( SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
+
+								if ( abs( TempSensOutput - ZoneLoad ) * SZVAVModel.ControlZoneMassFlowFrac > 15.0 ) { // water coil can provide same output at varying water PLR (model discontinuity?)
+									if ( SZVAVModel.MaxIterIndex == 0 ) {
+										ShowWarningMessage( "Step 9: Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
+										ShowContinueError( "  Iteration limit exceeded in calculating system sensible part-load ratio." );
+										ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), sensible output = " + General::TrimSigDigits( TempSensOutput, 2 ) + " (watts), and the simulation continues." );
+									}
+									ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad );
 								}
-								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - Iteration limit exceeded in calculating sensible part-load ratio error continues. Sensible load statistics:", SZVAVModel.MaxIterIndex, ZoneLoad, ZoneLoad ); // *** different variable name UnitType used in PTHP
+							} else if ( SolFlag == -2 ) {
+								if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
+									ShowWarningMessage( "Step 9: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name );
+									ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
+									ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
+								}
+								ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad );
 							}
-						} else if ( SolFlag == -2 ) {
-							if ( SZVAVModel.RegulaFalsIFailedIndex == 0 ) {
-								ShowWarningMessage( "Step 9: Coil control failed for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name ); // *** different variable name UnitType used in PTHP
-								ShowContinueError( "  sensible part-load ratio determined to be outside the range of 0-1." );
-								ShowContinueErrorTimeStamp( "Sensible load to be met = " + General::TrimSigDigits( ZoneLoad, 2 ) + " (watts), and the simulation continues." );
-							}
-							ShowRecurringWarningErrorAtEnd( SZVAVModel.UnitType + " \"" + SZVAVModel.Name + "\" - sensible part-load ratio out of range error continues. Sensible load statistics:", SZVAVModel.RegulaFalsIFailedIndex, ZoneLoad, ZoneLoad ); // *** different variable name UnitType used in PTHP
 						}
+
 					}
+
 				}
 
 			} else { // coil can be schedule off so set fan at high speed at these times.

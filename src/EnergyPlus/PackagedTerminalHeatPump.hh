@@ -189,7 +189,6 @@ namespace PackagedTerminalHeatPump {
 		Real64 DesignHeatingCapacity; // Nominal Capacity of Heating Coil [W]
 		Real64 DesignCoolingCapacity; // Nominal Capacity of Cooling Coil [W]
 		Real64 DesignSuppHeatingCapacity; // Nominal Capacity of Supplemental Heating Coil [W]
-		int NodeNumOfControlledZone; // node number of control zone
 		// addition for OA to Zone Units
 		bool ATMixerExists; // True if there is an ATMixer
 		std::string ATMixerName; // name of air terminal mixer
@@ -213,7 +212,6 @@ namespace PackagedTerminalHeatPump {
 		Real64 LatCoolEnergy; // latent cooling output [J]
 		Real64 ElecPower; // electricity consumed [W]
 		Real64 ElecConsumption; // electricity consumed [J]
-		Real64 FanPartLoadRatio; // fan part-load ratio for time step
 		Real64 CompPartLoadRatio; // compressor part-load ratio for time step
 		int LastMode; // last mode of operation, coolingmode or heatingmode
 		int AirFlowControl; // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
@@ -263,8 +261,10 @@ namespace PackagedTerminalHeatPump {
 		// variables used in SZVAV model:
 		std::string Name; // name of unit
 		std::string UnitType; // type of unit
+		int NodeNumOfControlledZone; // node number of control zone
 		int MaxIterIndex; // used in PLR calculations for sensible load
 		int RegulaFalsIFailedIndex; // used in PLR calculations for sensible load
+		Real64 FanPartLoadRatio; // fan part-load ratio for time step
 		Real64 CoolCoilWaterFlowRatio; // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
 		Real64 HeatCoilWaterFlowRatio; // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
 		int ControlZoneNum; // index of unit in ZoneEquipConfig
@@ -353,7 +353,6 @@ namespace PackagedTerminalHeatPump {
 			DesignHeatingCapacity( 0.0 ),
 			DesignCoolingCapacity( 0.0 ),
 			DesignSuppHeatingCapacity( 0.0 ),
-			NodeNumOfControlledZone( 0 ),
 			ATMixerExists( false ),
 			ATMixerIndex( 0 ),
 			ATMixerType( 0 ),
@@ -374,7 +373,6 @@ namespace PackagedTerminalHeatPump {
 			LatCoolEnergy( 0.0 ),
 			ElecPower( 0.0 ),
 			ElecConsumption( 0.0 ),
-			FanPartLoadRatio( 0.0 ),
 			CompPartLoadRatio( 0.0 ),
 			LastMode( 0 ),
 			AirFlowControl( 0 ),
@@ -418,6 +416,8 @@ namespace PackagedTerminalHeatPump {
 			// variables used in SZVAV model:
 			MaxIterIndex( 0 ),
 			RegulaFalsIFailedIndex( 0 ),
+			NodeNumOfControlledZone( 0 ),
+			FanPartLoadRatio( 0.0 ),
 			CoolCoilWaterFlowRatio( 0.0 ),
 			HeatCoilWaterFlowRatio( 0.0 ),
 			ControlZoneNum( 0 ),

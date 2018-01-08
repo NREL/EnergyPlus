@@ -914,6 +914,9 @@ namespace PackagedTerminalHeatPump {
 				ErrorsFound = true;
 			}
 
+			PTUnit( PTUnitNum ).HeatCoilInletNodeNum = HeatCoilInletNodeNum;
+			PTUnit( PTUnitNum ).HeatCoilOutletNodeNum = HeatCoilOutletNodeNum;
+
 			PTUnit( PTUnitNum ).HeatConvergenceTol = Numbers( 7 );
 			PTUnit( PTUnitNum ).DXCoolCoilName = Alphas( 12 );
 			PTUnit( PTUnitNum ).CoolConvergenceTol = Numbers( 8 );
@@ -964,6 +967,8 @@ namespace PackagedTerminalHeatPump {
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 				ErrorsFound = true;
 			}
+			PTUnit( PTUnitNum ).CoolCoilInletNodeNum = CoolCoilInletNodeNum;
+			PTUnit( PTUnitNum ).CoolCoilOutletNodeNum = CoolCoilOutletNodeNum;
 
 			if ( Alphas( 9 ) == "COIL:HEATING:DX:VARIABLESPEED" && Alphas( 11 ) == "COIL:COOLING:DX:VARIABLESPEED" ) {
 				if ( PTUnit( PTUnitNum ).DXHeatCoilIndexNum > 0 && PTUnit( PTUnitNum ).DXCoolCoilIndexNum > 0 ) {
@@ -1406,6 +1411,14 @@ namespace PackagedTerminalHeatPump {
 			// check for specific input requirements for ASHRAE90.1 model
 			if ( PTUnit( PTUnitNum ).ControlType == CCM_ASHRAE ) {
 
+				// MaxNoCoolHeatAirVolFlow should be greater than 0
+				if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow == 0 ) {
+					ShowWarningError( CurrentModuleObject + " illegal " + cNumericFields( 3 ) + " = " + TrimSigDigits( Numbers( 3 ), 3 ) );
+					ShowContinueError( "... when " + cAlphaFields( 19 ) + " = " + Alphas( 19 ) + " the minimum operating air flow rate should be autosized or > 0." );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					//					ErrorsFound = true;
+				}
+
 				// only allowed for DX cooling coils at this time
 				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed ) {
 					if ( DisplayExtraWarnings ) {
@@ -1673,7 +1686,6 @@ namespace PackagedTerminalHeatPump {
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate( "Coil:Heating:Water", ACHeatCoilName, errFlag );
 					}
 					HeatCoilInletNodeNum = GetWaterCoilInletNode( "Coil:Heating:Water", ACHeatCoilName, errFlag );
-					PTUnit( PTUnitNum ).HeatCoilInletNodeNum = HeatCoilInletNodeNum;
 					HeatCoilOutletNodeNum = GetWaterCoilOutletNode( "Coil:Heating:Water", PTUnit( PTUnitNum ).ACHeatCoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
@@ -1683,7 +1695,7 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).ACHeatCoilType_Num = Coil_HeatingSteam;
 					errFlag = false;
 					PTUnit( PTUnitNum ).ACHeatCoilIndex = GetSteamCoilIndex( Alphas( 9 ), ACHeatCoilName, errFlag );
-					PTUnit( PTUnitNum ).HeatCoilInletNodeNum = GetSteamCoilAirInletNode( PTUnit( PTUnitNum ).ACHeatCoilIndex, ACHeatCoilName, errFlag );
+					HeatCoilInletNodeNum = GetSteamCoilAirInletNode( PTUnit( PTUnitNum ).ACHeatCoilIndex, ACHeatCoilName, errFlag );
 					PTUnit( PTUnitNum ).HeatCoilFluidInletNode = GetCoilSteamInletNode( PTUnit( PTUnitNum ).ACHeatCoilIndex, ACHeatCoilName, errFlag );
 					PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).ACHeatCoilIndex, errFlag );
 					SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
@@ -1691,7 +1703,6 @@ namespace PackagedTerminalHeatPump {
 					if ( PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow > 0.0 ) {
 						PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate( PTUnit( PTUnitNum ).ACHeatCoilIndex, errFlag ) * SteamDensity;
 					}
-					HeatCoilInletNodeNum = PTUnit( PTUnitNum ).HeatCoilInletNodeNum;
 					HeatCoilOutletNodeNum = GetCoilAirOutletNode( PTUnit( PTUnitNum ).ACHeatCoilIndex, ACHeatCoilName, errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "...occurs in " + PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
@@ -1706,6 +1717,8 @@ namespace PackagedTerminalHeatPump {
 						ErrorsFound = true;
 					}
 				}
+				PTUnit( PTUnitNum ).HeatCoilInletNodeNum = HeatCoilInletNodeNum;
+				PTUnit( PTUnitNum ).HeatCoilOutletNodeNum = HeatCoilOutletNodeNum;
 			} else {
 				ShowWarningError( CurrentModuleObject + " illegal " + cAlphaFields( 9 ) + " = " + Alphas( 9 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
@@ -1766,6 +1779,8 @@ namespace PackagedTerminalHeatPump {
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 				ErrorsFound = true;
 			}
+			PTUnit( PTUnitNum ).CoolCoilInletNodeNum = CoolCoilInletNodeNum;
+			PTUnit( PTUnitNum ).CoolCoilOutletNodeNum = CoolCoilOutletNodeNum;
 
 			if ( SameString( Alphas( 13 ), "BlowThrough" ) ) PTUnit( PTUnitNum ).FanPlace = BlowThru;
 			if ( SameString( Alphas( 13 ), "DrawThrough" ) ) PTUnit( PTUnitNum ).FanPlace = DrawThru;
@@ -2095,6 +2110,14 @@ namespace PackagedTerminalHeatPump {
 
 			// check for specific input requirements for ASHRAE90.1 model
 			if ( PTUnit( PTUnitNum ).ControlType == CCM_ASHRAE ) {
+
+				// MaxNoCoolHeatAirVolFlow should be greater than 0
+				if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow == 0 ) {
+					ShowWarningError( CurrentModuleObject + " illegal " + cNumericFields( 3 ) + " = " + TrimSigDigits( Numbers( 3 ), 3 ) );
+					ShowContinueError( "... when " + cAlphaFields( 19 ) + " = " + Alphas( 19 ) + " the minimum operating air flow rate should be autosized or > 0." );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					//					ErrorsFound = true;
+				}
 
 				// only allowed for DX cooling coils at this time
 				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed ) {
@@ -3274,7 +3297,7 @@ namespace PackagedTerminalHeatPump {
 						PTUnit( Loop ).ControlZoneNum = CtrlZoneNum;
 						for ( int ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 							for ( int ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig( ControlledZoneNum ).NumExhaustNodes; ++ZoneExhNum ) {
-								if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != PTUnit( Loop ).AirOutNode ) continue;
+								if ( ZoneEquipConfig( ControlledZoneNum ).ExhaustNode( ZoneExhNum ) != PTUnit( Loop ).AirInNode ) continue;
 								// Find the controlled zone number for the specified thermostat location
 								PTUnit( Loop ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 								break;
@@ -3392,6 +3415,7 @@ namespace PackagedTerminalHeatPump {
 		} else {
 			PartLoadFrac = 0.0;
 		}
+		PTUnit( PTUnitNum ).FanPartLoadRatio = PartLoadFrac; // also set fan PLR variable for SZVAV models
 
 		if ( PTUnit( PTUnitNum ).useVSCoilModel && PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 && ! MySizeFlag( PTUnitNum ) ) { //BoS, variable-speed water source hp
 			//PTUnit(PTUnitNum)%IdleMassFlowRate = RhoAir*PTUnit(PTUnitNum)%IdleVolumeAirRate
@@ -3592,10 +3616,21 @@ namespace PackagedTerminalHeatPump {
 			}
 		}
 
+		PTUnit( PTUnitNum ).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
+													// allows non-ASHSRAE compliant coil types to be modeled using non-ASHAR90 method. Constant fan operating mode is required.
+		if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) {
+			if ( CoolingLoad ) {
+				if ( PTUnit( PTUnitNum ).validASHRAECoolCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+			} else if ( HeatingLoad ) {
+				if ( PTUnit( PTUnitNum ).validASHRAEHeatCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+			}
+		}
+
 		// Constant fan systems are tested for ventilation load to determine if load to be met changes.
 
 		if ( ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil || PTUnit( PTUnitNum ).ATMixerExists ) && GetCurrentScheduleValue( PTUnit( PTUnitNum ).SchedPtr ) > 0.0 && ( ( GetCurrentScheduleValue( PTUnit( PTUnitNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) ) {
 
+			if ( PTUnit( PTUnitNum ).simASHRAEModel ) PTUnit( PTUnitNum ).FanPartLoadRatio = 0.0;
 			SupHeaterLoad = 0.0;
 			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				CalcVarSpeedHeatPump( PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0, OnOffAirFlowRatio, SupHeaterLoad, false );
@@ -3706,16 +3741,6 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 			ZoneLoad = QZnReq;
-		}
-
-		PTUnit( PTUnitNum ).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
-	   // allows non-ASHSRAE compliant coil types to be modeled using non-ASHAR90 method. Constant fan operating mode is required.
-		if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) {
-			if ( CoolingLoad ) {
-				if ( PTUnit( PTUnitNum ).validASHRAECoolCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
-			} else if ( HeatingLoad ) {
-				if ( PTUnit( PTUnitNum ).validASHRAEHeatCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
-			}
 		}
 
 		// get operating capacity of water and steam coil (dependent on entering water/steam temperature)
@@ -3905,6 +3930,9 @@ namespace PackagedTerminalHeatPump {
 
 		// Using/Aliasing
 		using namespace DataSizing;
+		using DataZoneEquipment::PkgTermHPAirToAir_Num;
+		using DataZoneEquipment::PkgTermHPWaterToAir_Num;
+		using DataZoneEquipment::PkgTermACAirToAir_Num;
 		using WaterCoils::SetCoilDesFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
@@ -3962,6 +3990,7 @@ namespace PackagedTerminalHeatPump {
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+		Real64 minNoLoadFlow( 0 ); // used for sizing MaxNoCoolHeatVolFlow for SingleZoneVAV method
 
 		ErrorsFound = false;
 		IsAutoSize = false;
@@ -4196,12 +4225,31 @@ namespace PackagedTerminalHeatPump {
 				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = false;
 
 				SizingMethod = SystemAirflowSizing;
+				if ( PTUnit( PTUnitNum ).ZoneEquipType == PkgTermHPAirToAir_Num || PTUnit( PTUnitNum ).ZoneEquipType == PkgTermACAirToAir_Num ) {
+					if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow == AutoSize && PTUnit( PTUnitNum ).ControlType == CCM_ASHRAE ) {
+						SizingMethod = AutoCalculateSizing;
+						DataConstantUsedForSizing = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
+						minNoLoadFlow = 0.6667;
+						if ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow >= PTUnit( PTUnitNum ).MaxHeatAirVolFlow ) {
+							DataFractionUsedForSizing = min( minNoLoadFlow, ( PTUnit( PTUnitNum ).MaxHeatAirVolFlow / PTUnit( PTUnitNum ).MaxCoolAirVolFlow ) - 0.01 );
+						} else {
+							DataFractionUsedForSizing = min( minNoLoadFlow, ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow / PTUnit( PTUnitNum ).MaxHeatAirVolFlow ) - 0.01 );
+						}
+					}
+				}
 				FieldNum = 3; //N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				TempSize = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = TempSize;
 			}
+		}
+
+		if ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow > 0.0 ) {
+			PTUnit( PTUnitNum ).LowSpeedCoolFanRatio = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow / PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+		}
+		if ( PTUnit( PTUnitNum ).MaxHeatAirVolFlow > 0.0 ) {
+			PTUnit( PTUnitNum ).LowSpeedHeatFanRatio = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow / PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
 		}
 
 		IsAutoSize = false;
@@ -4365,6 +4413,59 @@ namespace PackagedTerminalHeatPump {
 			}
 		}
 
+		if ( PTUnit( PTUnitNum ).ControlType == CCM_ASHRAE ) {
+
+			SizingDesRunThisZone = false;
+			DataZoneUsedForSizing = PTUnit( PTUnitNum ).ControlZoneNum;
+			CheckThisZoneForSizing( DataZoneUsedForSizing, SizingDesRunThisZone );
+
+			SizingMethod = ASHRAEMinSATCoolingSizing;
+			Real64 capacityMultiplier = 0.5; // one-half of design zone load
+			if ( SizingDesRunThisZone ) {
+				DataCapacityUsedForSizing = FinalZoneSizing( PTUnit( PTUnitNum ).ControlZoneNum ).DesCoolLoad * capacityMultiplier;
+			} else {
+				DataCapacityUsedForSizing = PTUnit( PTUnitNum ).DesignCoolingCapacity * capacityMultiplier;
+			}
+			DataCapacityUsedForSizing /= PTUnit( PTUnitNum ).ControlZoneMassFlowFrac;
+			DataFlowUsedForSizing = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow;
+			PrintFlag = true;
+			if ( PTUnit( PTUnitNum ).ZoneEquipType == PkgTermHPAirToAir_Num ) {
+				FieldNum = 11; // Minimum Supply Air Temperature in Cooling Mode
+			} else if ( PTUnit( PTUnitNum ).ZoneEquipType == PkgTermACAirToAir_Num ) {
+				FieldNum = 7; // Minimum Supply Air Temperature in Cooling Mode
+			}
+			SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [C]";
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, PTUnit( PTUnitNum ).DesignMinOutletTemp, PrintFlag, RoutineName );
+
+			SizingMethod = ASHRAEMaxSATHeatingSizing;
+			if ( PTUnit( PTUnitNum ).ZoneEquipType == PkgTermHPAirToAir_Num ) {
+				FieldNum = 12; // Minimum Supply Air Temperature in Cooling Mode
+			} else if ( PTUnit( PTUnitNum ).ZoneEquipType == PkgTermACAirToAir_Num ) {
+				FieldNum = 8; // Minimum Supply Air Temperature in Cooling Mode
+			}
+			SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [C]";
+			if ( SizingDesRunThisZone ) {
+				DataCapacityUsedForSizing = FinalZoneSizing( PTUnit( PTUnitNum ).ControlZoneNum ).DesHeatLoad * capacityMultiplier;
+			} else {
+				DataCapacityUsedForSizing = PTUnit( PTUnitNum ).DesignHeatingCapacity * capacityMultiplier;
+			}
+			DataCapacityUsedForSizing /= PTUnit( PTUnitNum ).ControlZoneMassFlowFrac;
+			DataFlowUsedForSizing = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow;
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, PTUnit( PTUnitNum ).DesignMaxOutletTemp, PrintFlag, RoutineName );
+
+			DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
+			DataFlowUsedForSizing = 0.0;
+			DataZoneUsedForSizing = 0;
+
+			// check that MaxNoCoolHeatAirVolFlow is less than both MaxCoolAirVolFlow and MaxHeatAirVolFlow
+			if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow >= PTUnit( PTUnitNum ).MaxCoolAirVolFlow || PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow >= PTUnit( PTUnitNum ).MaxHeatAirVolFlow ) {
+				ShowSevereError( PTUnit( PTUnitNum ).UnitType + " = " + PTUnit( PTUnitNum ).Name );
+				ShowContinueError( " For SingleZoneVAV control the No Load Supply Air Flow Rate must be less than both the cooling and heating supply air flow rates." );
+				PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = min( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow ) - 0.01;
+				ShowContinueError( " The SingleZoneVAV control No Load Supply Air Flow Rate is reset to " + RoundSigDigits( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow, 5 ) + " and the simulation continues." );
+			}
+		}
+
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
@@ -4460,11 +4561,13 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		// Get result when DX coil is off
+		PTUnit( PTUnitNum ).FanPartLoadRatio = 0.0; // set SZVAV model variable
 		CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 		Real64 NoLoadOutletTemp = Node( PTUnit( PTUnitNum ).AirOutNode ).Temp;
 
 		// Get full load result
 		PartLoadFrac = 1.0;
+		PTUnit( PTUnitNum ).FanPartLoadRatio = 1.0; // set SZVAV model variable
 		CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 		Real64 FullLoadOutletTemp = Node( PTUnit( PTUnitNum ).AirOutNode ).Temp;
 
@@ -5339,15 +5442,19 @@ namespace PackagedTerminalHeatPump {
 		int AirRelNode; // relief air node number in PTHP loop
 		Real64 AverageUnitMassFlow; // average supply air mass flow rate over time step
 		Real64 AverageOAMassFlow; // average outdoor air mass flow rate over time step
+		Real64 fanPartLoadRatio; // local variable for PLR, used to disconnect fan speed from coil capacity when using SZVAV
 
 		InletNode = PTUnit( PTUnitNum ).AirInNode;
 		OutsideAirNode = PTUnit( PTUnitNum ).OutsideAirNode;
 		AirRelNode = PTUnit( PTUnitNum ).AirReliefNode;
 
-		AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
-		AverageOAMassFlow = ( PartLoadRatio * OACompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * OACompOffMassFlow );
+		fanPartLoadRatio = PartLoadRatio;
+		if ( PTUnit( PTUnitNum ).simASHRAEModel ) fanPartLoadRatio = PTUnit( PTUnitNum ).FanPartLoadRatio;
+
+		AverageUnitMassFlow = ( fanPartLoadRatio * CompOnMassFlow ) + ( ( 1 - fanPartLoadRatio ) * CompOffMassFlow );
+		AverageOAMassFlow = ( fanPartLoadRatio * OACompOnMassFlow ) + ( ( 1 - fanPartLoadRatio ) * OACompOffMassFlow );
 		if ( CompOffFlowRatio > 0.0 ) {
-			FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
+			FanSpeedRatio = ( fanPartLoadRatio * CompOnFlowRatio ) + ( ( 1 - fanPartLoadRatio ) * CompOffFlowRatio );
 		} else {
 			FanSpeedRatio = CompOnFlowRatio;
 		}
@@ -5429,6 +5536,11 @@ namespace PackagedTerminalHeatPump {
 		PTUnit( PTUnitNum ).LatHeatEnergy = PTUnit( PTUnitNum ).LatHeatEnergyRate * ReportingConstant;
 		PTUnit( PTUnitNum ).ElecConsumption = PTUnit( PTUnitNum ).ElecPower * ReportingConstant;
 
+		// adjust fan report variable to represent how the SZVAV model performs
+		if ( PTUnit( PTUnitNum ).simASHRAEModel ) {
+			PTUnit( PTUnitNum ).FanPartLoadRatio = Node( PTUnit( PTUnitNum ).AirInNode ).MassFlowRate / max( PTUnit( PTUnitNum ).MaxCoolAirMassFlow, PTUnit( PTUnitNum ).MaxHeatAirMassFlow );
+		}
+
 		if ( PTUnit( PTUnitNum ).FirstPass ) { // reset sizing flags so other zone equipment can size normally
 
 			if( !SysSizingCalc ) {
@@ -5447,6 +5559,8 @@ namespace PackagedTerminalHeatPump {
 			}
 
 		}
+
+		DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
 
 	}
 
@@ -7222,7 +7336,7 @@ namespace PackagedTerminalHeatPump {
 
 			// set air flow rate bounded by low speed and high speed air flow rates
 			Node( AirControlNode ).MassFlowRate = airMdot * ( lowSpeedRatio + ( PartLoadRatio * ( 1.0 - lowSpeedRatio ) ) );
-			// FanPartLoadRatio is used to pass info over to function SetAverageAirFlow since air and coil PLR are disassociated in the model
+			// FanPartLoadRatio is used to pass info over to function SetAverageAirFlow since air and coil PLR are disassociated in the SZVAV model
 			// FanPartLoadRatio is a report variable that is updated (overwritten) in ReportUnitarySystem
 			PTUnit( UnitarySysNum ).FanPartLoadRatio = PartLoadRatio;
 			//			if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;

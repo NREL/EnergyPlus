@@ -11138,7 +11138,7 @@ namespace HVACUnitarySystem {
 		Real64 AverageUnitMassFlow; // average supply air mass flow rate over time step
 		int SpeedNum; // speed for multi-speed or variable-speed coils
 		bool FanOn;
-		Real64 fanPartLoadRatio; // local variable for PLR
+		Real64 fanPartLoadRatio; // local variable for PLR, used to disconnect fan speed from coil capacity when using SZVAV
 
 		m_runTimeFraction1 = 0.0;
 		m_runTimeFraction2 = 0.0;
@@ -11472,6 +11472,8 @@ namespace HVACUnitarySystem {
 			}
 
 		}
+
+		DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
 
 	}
 
