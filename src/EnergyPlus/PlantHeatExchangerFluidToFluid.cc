@@ -757,7 +757,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// METHODOLOGY EMPLOYED:
 		// the supply side flow rate is obtained from the plant sizing structure
-		// the demand side is sized based on the supply side flow, demand side fluid/temperatures and supply side fluid/temperatures
+		// the demand side is sized based on the supply side flow, demand side fluid and delta T, and supply side fluid and delta T.
 		// the UA is sized for an effectiveness of 1.0 using sizing temps
 		// the capacity uses the full HX model
 
