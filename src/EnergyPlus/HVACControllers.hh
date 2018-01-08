@@ -563,6 +563,12 @@ namespace HVACControllers {
 		bool & NodeNotFound // true if matching actuator node not found
 	);
 
+	void
+	GetControllerIndex(
+		std::string const & ControllerName, // name of coil controller
+		int & ControllerIndex // input actuator node number
+	);
+
 } // HVACControllers
 
 } // EnergyPlus

@@ -146,7 +146,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType ) {
 		std::string const idf_objects = delimited_string( {
-			" Version,8.3;",
+
 			" Coil:Cooling:Water,",
 			"	Chilled Water Coil,	!- Name",
 			"	AvailSched,			!- Availability Schedule Name",
@@ -264,6 +264,8 @@ namespace EnergyPlus {
 		SimAirServingZones::SimAirLoops( true, SimZoneEquipment );
 
 		// after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
+		ASSERT_EQ( 1, DataAirSystems::PrimaryAirSystem( 1 ).NumControllers );
+		ASSERT_EQ( 1, DataAirSystems::PrimaryAirSystem( 1 ).ControllerIndex( 1 ) );
 		ASSERT_EQ( 1, ControllerProps( 1 ).AirLoopControllerIndex );
 
 	}
