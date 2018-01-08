@@ -2491,4 +2491,84 @@ namespace EnergyPlus {
 
 	}
 
+	TEST_F( EnergyPlusFixture, PlantHXSizingUnbalancedFlows)
+	{
+		// unit test for autosizing fluid-fluid heat exchanger with unbalanced flows
+		PlantHeatExchangerFluidToFluid::NumberOfPlantFluidHXs = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX.allocate(PlantHeatExchangerFluidToFluid::NumberOfPlantFluidHXs);
+
+		PlantHeatExchangerFluidToFluid::FluidHX(1).Name = "Test HX";
+		PlantHeatExchangerFluidToFluid::FluidHX(1).SizingFactor = 1.0;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).HeatExchangeModelType = PlantHeatExchangerFluidToFluid::Ideal;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.LoopNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.DesignVolumeFlowRate = 1.0;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.DesignVolumeFlowRateWasAutoSized = false;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.LoopNum = 2;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.DesignVolumeFlowRate = 0.5;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.DesignVolumeFlowRateWasAutoSized = false;
+		//PlantHeatExchangerFluidToFluid::FluidHX(1).UA = 1.0;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).UAWasAutoSized = true;
+
+		// setup four plant nodes for HX
+		DataLoopNode::Node.allocate(4);
+		PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.InletNodeNum = 1;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.OutletNodeNum = 3;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.InletNodeNum = 2;
+		PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.OutletNodeNum = 4;
+
+		// allocate loops and sizing
+		DataPlant::PlantLoop.allocate(2);
+		DataSizing::PlantSizData.allocate(2);
+
+		// set the supply side data
+		DataPlant::PlantLoop(1).PlantSizNum = 1;
+		DataPlant::PlantLoop(1).FluidIndex = 1;
+		DataPlant::PlantLoop(1).FluidName = "WATER";
+		DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+		DataSizing::PlantSizData(1).ExitTemp = 60.0;
+		DataSizing::PlantSizData(1).DeltaT = 10.0;
+		DataSizing::PlantSizData(1).LoopType = DataSizing::HeatingLoop;
+
+		// set the demand side data
+		DataPlant::PlantLoop(2).PlantSizNum = 2;
+		DataPlant::PlantLoop(2).FluidIndex = 1;
+		DataPlant::PlantLoop(2).FluidName = "WATER";
+		DataSizing::PlantSizData(2).DesVolFlowRate = 1.0;
+		DataSizing::PlantSizData(2).ExitTemp = 70.0;
+		DataSizing::PlantSizData(2).DeltaT = 10.0;
+
+		DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+		// call the sizing routine
+		PlantHeatExchangerFluidToFluid::SizeFluidHeatExchanger( 1 );
+
+		// not autosized yet so expect flow rate to match the loop design flow
+		EXPECT_EQ(PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.DesignVolumeFlowRate, 1.0);
+		EXPECT_EQ(PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.DesignVolumeFlowRate, 0.5);
+
+		// set the flow to autosize and redo checks
+		PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.DesignVolumeFlowRateWasAutoSized = true;
+		PlantHeatExchangerFluidToFluid::SizeFluidHeatExchanger(1);
+		EXPECT_EQ(PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.DesignVolumeFlowRate, 1.0);
+		EXPECT_EQ(PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.DesignVolumeFlowRate, 1.0);
+
+		// set the deltaT on the demand side to half of that of the supply side to check autosized flow rate
+		DataSizing::PlantSizData(2).DeltaT = 5.0;
+		PlantHeatExchangerFluidToFluid::SizeFluidHeatExchanger(1);
+		EXPECT_EQ(PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.DesignVolumeFlowRate, 1.0);
+		EXPECT_EQ(PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.DesignVolumeFlowRate, 2.0);
+
+		/* should have a check of sizing with a different fluid (e.g. 50% glycol on demand side)
+		// set the deltaT back to the original value and change the fluid on the demand side to 50% glycol
+		// set demand loop fluid to 50% glycol - unsure how this should work
+		DataSizing::PlantSizData(2).DeltaT = 10.0;
+		PlantHeatExchangerFluidToFluid::SizeFluidHeatExchanger(1);
+		EXPECT_EQ(PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.DesignVolumeFlowRate, 1.0);
+		EXPECT_NEAR(PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.DesignVolumeFlowRate, 1.1283886, 0.000001);
+		*/
+
+		PlantHeatExchangerFluidToFluid::FluidHX.deallocate();
+		DataSizing::PlantSizData.deallocate();
+		DataPlant::PlantLoop.deallocate();
+	}
 }
