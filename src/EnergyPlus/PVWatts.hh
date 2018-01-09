@@ -281,77 +281,6 @@ namespace PVWatts {
 						double &Fgnddiff );
 
 	double iam( double theta_deg, bool ar_glass ); // incidence angle modifier factor relative to normal incidence
-
-	// After this is E+ code again.
-
-	class PVWattsGenerator
-	{
-	private:
-
-		enum AlphaFields {
-			NAME = 1,
-			VERSION = 2,
-			MODULE_TYPE = 3,
-			ARRAY_TYPE = 4,
-			GEOMETRY_TYPE = 5,
-			SURFACE_NAME = 6,
-		};
-
-		enum NumFields {
-			DC_SYSTEM_CAPACITY = 1,
-			SYSTEM_LOSSES = 2,
-			TILT_ANGLE = 3,
-			AZIMUTH_ANGLE = 4,
-			GROUND_COVERAGE_RATIO = 5,
-		};
-
-		std::string m_name;
-		Real64 m_dcSystemCapacity;
-		ModuleType m_moduleType;
-		ArrayType m_arrayType;
-		Real64 m_systemLosses;
-		GeometryType m_geometryType;
-		Real64 m_tilt;
-		Real64 m_azimuth;
-		int m_surfaceNum;
-		Real64 m_groundCoverageRatio;
-		std::unique_ptr<pvwatts_celltemp> m_tccalc;
-
-		Real64 m_gamma;
-		bool m_useARGlass;
-		int m_trackMode;
-		Real64 m_inoct;
-		int m_shadeMode1x;
-
-	public:
-		static PVWattsGenerator createFromIdfObj(int objNum);
-
-		PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4);
-
-		Real64 getDCSystemCapacity();
-		ModuleType getModuleType();
-		ArrayType getArrayType();
-		Real64 getSystemLosses();
-		GeometryType getGeometryType();
-		Real64 getTilt();
-		Real64 getAzimuth();
-		DataSurfaces::SurfaceData& getSurface();
-		Real64 getGroundCoverageRatio();
-
-		void calc();
-
-		IrradianceOutput processIrradiance(int year, int month, int day, int hour, Real64 minute, Real64 ts_hour, Real64 lat, Real64 lon, Real64 tz, Real64 dn, Real64 df, Real64 alb );
-
-		DCPowerOutput powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput& irr_st);
-
-	};
-
-	extern std::map<int, PVWattsGenerator> PVWattsGenerators;
-
-	PVWattsGenerator& GetOrCreatePVWattsGenerator(std::string const & GeneratorName);
-
-	void SimPVWattsGenerator(std::string const & GeneratorName, bool const RunFlag);
-
 	//static void get_vertices( double axis_tilt, double axis_azimuth, double gcr, double vertices[3][4][3], double rotation);
 
 	//static double vec_dot(double a[3], double b[3]);
@@ -400,6 +329,91 @@ namespace PVWatts {
 						 double k,        /* proportionality constant assumed to be 4 (1/m) for derivation of Bouguer's law (set to zero to skip bougeur's law */
 						 double l_thick,  /* material thickness (set to zero to skip Bouguer's law */
 						 double *_theta2_deg = 0 ); /* thickness of cover material (m), usually 2 mm for typical module */
+
+	// After this is E+ code again.
+
+	class PVWattsGenerator
+	{
+	private:
+
+		enum AlphaFields {
+			NAME = 1,
+			VERSION = 2,
+			MODULE_TYPE = 3,
+			ARRAY_TYPE = 4,
+			GEOMETRY_TYPE = 5,
+			SURFACE_NAME = 6,
+		};
+
+		enum NumFields {
+			DC_SYSTEM_CAPACITY = 1,
+			SYSTEM_LOSSES = 2,
+			TILT_ANGLE = 3,
+			AZIMUTH_ANGLE = 4,
+			GROUND_COVERAGE_RATIO = 5,
+		};
+
+		// User inputs
+		std::string m_name;
+		Real64 m_dcSystemCapacity;
+		ModuleType m_moduleType;
+		ArrayType m_arrayType;
+		Real64 m_systemLosses;
+		GeometryType m_geometryType;
+		Real64 m_tilt;
+		Real64 m_azimuth;
+		int m_surfaceNum;
+		Real64 m_groundCoverageRatio;
+
+		// Internal properties and data structures
+		Real64 m_gamma;
+		bool m_useARGlass;
+		int m_trackMode;
+		Real64 m_inoct;
+		int m_shadeMode1x;
+		std::unique_ptr<pvwatts_celltemp> m_tccalc;
+
+		// State variables
+		Real64 m_TimeElapsed; // total time elapsed, to keep track of system time steps
+		Real64 m_lastCellTemperature; // last cell temperature
+		Real64 m_lastPlaneOfArrayIrradiance; // last cell plane of array irradiance
+		Real64 m_cellTemperature;
+		Real64 m_planeOfArrayIrradiance;
+
+		// Output variables
+		Real64 m_outputDCPower;
+		Real64 m_outputDCEnergy;
+
+
+	public:
+		static PVWattsGenerator createFromIdfObj(int objNum);
+
+		PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4);
+
+		Real64 getDCSystemCapacity();
+		ModuleType getModuleType();
+		ArrayType getArrayType();
+		Real64 getSystemLosses();
+		GeometryType getGeometryType();
+		Real64 getTilt();
+		Real64 getAzimuth();
+		DataSurfaces::SurfaceData& getSurface();
+		Real64 getGroundCoverageRatio();
+
+		void calc();
+
+		void getResults(Real64& GeneratorPower, Real64& GeneratorEnergy, Real64& ThermalPower, Real64& ThermalEnergy);
+
+		IrradianceOutput processIrradiance(int year, int month, int day, int hour, Real64 minute, Real64 ts_hour, Real64 lat, Real64 lon, Real64 tz, Real64 dn, Real64 df, Real64 alb );
+
+		DCPowerOutput powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput& irr_st);
+
+	};
+
+	extern std::map<int, PVWattsGenerator> PVWattsGenerators;
+
+	PVWattsGenerator& GetOrCreatePVWattsGenerator(std::string const & GeneratorName);
+
 
 }
 

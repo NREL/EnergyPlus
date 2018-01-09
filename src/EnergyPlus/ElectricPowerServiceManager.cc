@@ -2031,12 +2031,14 @@ namespace EnergyPlus {
 			thermalPowerOutput = thermProdRate;
 			break;
 		}
-				case GeneratorType::pvWatts: {
-						// TODO: Call the run PVWatts methods here.
-						PVWatts::SimPVWattsGenerator( name, runFlag );
-						thermalPowerOutput = 0.0;
-						break;
-				}
+		case GeneratorType::pvWatts: {
+			PVWatts::PVWattsGenerator &pvwattsGenerator(PVWatts::GetOrCreatePVWattsGenerator(name));
+			pvwattsGenerator.calc();
+			pvwattsGenerator.getResults( dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd );
+			electricPowerOutput = dCElectProdRate;
+			thermalPowerOutput = thermProdRate;
+			break;
+		}
 		case GeneratorType::fuelCell: {
 			FuelCellElectricGenerator::SimFuelCellGenerator( DataGlobalConstants::iGeneratorFuelCell, name, generatorIndex, runFlag, myElecLoadRequest, FirstHVACIteration );
 			FuelCellElectricGenerator::GetFuelCellGeneratorResults( DataGlobalConstants::iGeneratorFuelCell, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd );

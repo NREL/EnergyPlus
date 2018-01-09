@@ -55,6 +55,7 @@
 #include <PVWatts.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
+#include <OutputProcessor.hh>
 #include <DataHVACGlobals.hh>
 #include <DataGlobals.hh>
 #include <WeatherManager.hh>
@@ -66,7 +67,7 @@ namespace PVWatts {
 
 	std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-	PVWattsGenerator::PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses, GeometryType geometryType, Real64 tilt, Real64 azimuth, size_t surfaceNum, Real64 groundCoverageRatio)
+	PVWattsGenerator::PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses, GeometryType geometryType, Real64 tilt, Real64 azimuth, size_t surfaceNum, Real64 groundCoverageRatio) : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0)
 	{
 		using General::RoundSigDigits;
 		bool errorsFound(false);
@@ -173,6 +174,11 @@ namespace PVWatts {
 		// Set up the pvwatts cell temperature member
 		const Real64 pvwatts_height = 5.0;
 		m_tccalc = std::unique_ptr< pvwatts_celltemp >( new pvwatts_celltemp( m_inoct + 273.15, pvwatts_height, DataHVACGlobals::TimeStepSys ) );
+
+		// Set up output variables
+		SetupOutputVariable("Generator Produced DC Electric Power", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
+		SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, m_outputDCEnergy, "System", "Sum", m_name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
+		SetupOutputVariable( "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name );
 	}
 
 	PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
@@ -273,12 +279,24 @@ namespace PVWatts {
 	void PVWattsGenerator::calc()
 	{
 		using DataGlobals::TimeStep;
+		using DataHVACGlobals::TimeStepSys;
 		using DataGlobals::HourOfDay;
+		using DataGlobals::TimeStepZone;
+		using DataGlobals::SecInHour;
 
-		const Real64 &ts_hour = DataHVACGlobals::TimeStepSys;
+		//Real64 TimeElapsed = HourOfDay + TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTim eElapsed;
+
+		// We only run this once for each zone time step.
+		if ( !DataGlobals::BeginTimeStepFlag ) {
+			m_outputDCEnergy = m_outputDCPower * TimeStepSys * SecInHour;
+			return;
+		}
+
+		m_lastCellTemperature = m_cellTemperature;
+		m_lastPlaneOfArrayIrradiance = m_planeOfArrayIrradiance;
 
 		// initialize_cell_temp
-//		tccalc.set_last_values(lastTcell, lastPoa);
+		m_tccalc->set_last_values(m_lastCellTemperature, m_lastPlaneOfArrayIrradiance);
 
 		Real64 albedo = WeatherManager::TodayAlbedo(TimeStep, HourOfDay);
 		if (not ( std::isfinite(albedo) && albedo > 0.0 && albedo < 1 )) {
@@ -286,12 +304,26 @@ namespace PVWatts {
 		}
 
 		// process_irradiance
-		IrradianceOutput irr_st = processIrradiance(DataEnvironment::Year, DataEnvironment::Month, DataEnvironment::DayOfMonth, HourOfDay, TimeStep * DataGlobals::MinutesPerTimeStep, ts_hour, WeatherManager::WeatherFileLatitude, WeatherManager::WeatherFileLongitude, WeatherManager::WeatherFileTimeZone, DataEnvironment::BeamSolarRad, DataEnvironment::DifSolarRad, albedo);
+		IrradianceOutput irr_st = processIrradiance(DataEnvironment::Year, DataEnvironment::Month, DataEnvironment::DayOfMonth, HourOfDay, TimeStep * DataGlobals::MinutesPerTimeStep, TimeStepZone, WeatherManager::WeatherFileLatitude, WeatherManager::WeatherFileLongitude, WeatherManager::WeatherFileTimeZone, DataEnvironment::BeamSolarRad, DataEnvironment::DifSolarRad, albedo);
 
 		// powerout
 		// TODO: Change shad_beam to account for shading of other surfaces.
 		Real64 shad_beam = 1.0;
-		DCPowerOutput pwr_st = powerout(shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, WeatherManager::TodayWindSpeed( TimeStep, HourOfDay ), WeatherManager::TodayOutDryBulbTemp( TimeStep, HourOfDay ), irr_st);
+		DCPowerOutput pwr_st = powerout(shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, DataEnvironment::WindSpeed, DataEnvironment::OutDryBulbTemp, irr_st);
+
+		// Report out
+		m_cellTemperature = pwr_st.pvt;
+		m_planeOfArrayIrradiance = pwr_st.poa;
+		m_outputDCPower = pwr_st.dc;
+		m_outputDCEnergy = m_outputDCPower * TimeStepSys * SecInHour;
+	}
+
+	void PVWattsGenerator::getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy)
+	{
+		GeneratorPower = m_outputDCPower;
+		GeneratorEnergy = m_outputDCEnergy;
+		ThermalPower = 0.0;
+		ThermalEnergy = 0.0;
 	}
 
 	IrradianceOutput PVWattsGenerator::processIrradiance(int year, int month, int day, int hour, Real64 minute, Real64 ts_hour, Real64 lat, Real64 lon, Real64 tz, Real64 dn, Real64 df, Real64 alb) {
@@ -416,12 +448,6 @@ namespace PVWatts {
 		} else {
 			return it->second;
 		}
-	}
-
-	void SimPVWattsGenerator(std::string const & GeneratorName, bool const RunFlag)
-	{
-		PVWattsGenerator &pvw(GetOrCreatePVWattsGenerator(GeneratorName));
-		pvw.calc();
 	}
 
 	static const int __nday[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
