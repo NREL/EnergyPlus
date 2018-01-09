@@ -820,7 +820,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				}
 			} else {
 				if ( PlantFirstSizesOkayToFinalize ) {
-					ShowSevereError( "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object" );
+					ShowSevereError( "SizeFluidHeatExchanger: Autosizing of supply flow rate requires a loop Sizing:Plant object" );
 					ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
 					ErrorsFound = true;
 				}
