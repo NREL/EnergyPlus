@@ -63198,12 +63198,12 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
   A1 , \field Name
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Surface Name
        \required-field
        \type object-list
        \object-list AllShadingAndHTSurfNames
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames
   A3 , \field Photovoltaic-Thermal Model Performance Name
        \type object-list
        \object-list FlatPlatePVTParameters
