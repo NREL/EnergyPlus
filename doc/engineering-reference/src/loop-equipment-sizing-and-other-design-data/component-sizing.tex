@@ -1389,6 +1389,7 @@ where
 
 The sizing of plant heat exchanger component (object: HeatExchanger:FluidToFluid) involves determining design flow rates for both sides, a UA value, and a nominal capacity for reporting. The component has a sizing factor for fine control and uses the design temperatures defined in the Sizing:Plant object.
 
+\subsubsection{Loop Supply and Loop Demand Side Flows}
 The Loop Supply Side design flow rate, \({\dot V_{sup,des}}\) , is set equal to the design flow rate for that loop, multiplied by the component sizing factor, \({f_{comp}}\) .
 
 \begin{equation}
@@ -1397,32 +1398,27 @@ The Loop Supply Side design flow rate, \({\dot V_{sup,des}}\) , is set equal to 
 
 The Loop Demand Side design flow rate, \({\dot V_{dmd,des}}\) , is set based on an energy balance between the two loops.
 
-\begin{equation}
-{\dot Q_{dmd,des}} = {\dot Q_{sup,des}}
-\end{equation}
+\begin{align}
+{\dot Q_{dmd,des}} &= {\dot Q_{sup,des}}\\
+{\dot V_{dmd,des} \cdot {\rho_{dmdloop}} \cdot {c_{p, dmdloop}} \cdot \Delta {T_{dmdloop,des}}} &= {\dot V_{sup,des} \cdot {\rho_{suploop}} \cdot {c_{p, sup}} \cdot \Delta {T_{suploop,des}}}\\
+{\dot V_{dmd,des}} &= {\dot V_{sup,des} \frac{{\rho_{suploop}} \cdot {c_{p, suploop}} \cdot \Delta {T_{suploop,des}}}{{\rho_{dmdloop}} \cdot {c_{p, dmdloop}} \cdot \Delta {T_{dmdloop,des}}}}
+\end{align}
+
+\subsubsection{Heat Exchanger UA}
+The UA for the heat exchanger is calculated using the design temperatures for the two plant loops. The loop design temperature difference for the Loop Supply Side, \(\Delta {T_{suploop,des}}\) , is used to determine a nominal capacity.
 
 \begin{equation}
-{\dot V_{dmd,des} \cdot {\rho_{dmdloop}} \cdot {c_{p, dmdloop}} \cdot \Delta {T_{dmdloop,Des}}} = {\dot V_{sup,des} \cdot {\rho_{suploop}} \cdot {c_{p, sup}} \cdot \Delta {T_{suploop,des}}}
-\end{equation}
-
-\begin{equation}
-{\dot V_{dmd,des}} ={\dot V_{sup,des} \frac{{\rho_{suploop}} \cdot {c_{p, suploop}} \cdot \Delta {T_{suploop,des}}}{{\rho_{dmdloop}} \cdot {c_{p, dmdloop}} \cdot \Delta {T_{dmdloop,des}}}}
-\end{equation}
-
-The design heat transfer capacity and UA for the heat exchanger are calculated using the design temperatures for the two plant loops. The loop design temperature difference for the Loop Supply Side, \(\Delta {T_{suploop,des}}\) , is used to determine a nominal capacity.
-
-\begin{equation}
-{\dot Q} = {\dot V_{sup,des}} \cdot \rho \cdot {c_p} \cdot \Delta {T_{suploop,des}}
+{\dot Q_{nom}} = {\dot V_{sup,des}} \cdot \rho \cdot {c_p} \cdot \Delta {T_{suploop,des}}
 \end{equation}
 
 A loop-to-loop design temperature difference, \(\Delta {T_{looptoloop,des}}\) , is determined depending on the nature of the plant loop connected to the Loop Supply Side. The Sizing:Plant object includes classifications for the type of loop that include Heating, Steam, Cooling, or Condenser. For Cooling and Condenser loop types, the loop design temperature difference is added to the design exit temperature for the Loop Supply Side, \({T_{suploop,exit}}\) . For Heating and Steam loop types, the loop design temperature difference is subtracted from the design exit temperature. This adjusted supply side temperature is then compared to the design exit temperature for the Loop Demand Side, \({T_{dmdloop,exit}}\) .
 
 \begin{equation}
-\Delta {T_{looptoloop,des}} = \left( {{T_{suploop,exit}} + \Delta {T_{suploop,des}}} \right) - {T_{dmdloop,exit}} \quad \text{(Cooling, Condenser)}
-\end{equation}
-
-\begin{equation}
-\Delta {T_{looptoloop,des}} = \left( {{T_{suploop,exit}} - \Delta {T_{suploop,des}}} \right) - {T_{dmdloop,exit}}\quad \text{(Heating, Steam)}
+\Delta {T_{looptoloop,des}} = 
+\begin{cases}
+\left( {{T_{suploop,exit}} + \Delta {T_{suploop,des}}} \right) - {T_{dmdloop,exit}} & \text{Cooling, Condenser}\\
+\left( {{T_{suploop,exit}} - \Delta {T_{suploop,des}}} \right) - {T_{dmdloop,exit}} & \text{Heating, Steam}
+\end{cases}
 \end{equation}
 
 \begin{equation}
@@ -1431,10 +1427,12 @@ A loop-to-loop design temperature difference, \(\Delta {T_{looptoloop,des}}\) , 
 
 The UA value (U-Factor Times Area Value) is determined by assuming that the target capacity can be delivered for the loop-to-loop temperature difference which after substituting and rearranging becomes:
 
-\begin{equation}
-UA = \frac{{\dot V_{sup,des}} \cdot \rho \cdot {c_p} \cdot \Delta {T_{suploop,des}}}{\Delta {T_{looptoloop,des}}}
-\end{equation}
+\begin{align}
+{\dot Q_{nom}} &= UA \cdot {\Delta T_{looptoloop,des}} \\
+UA &= \frac{{\dot V_{sup,des}} \cdot \rho \cdot {c_p} \cdot \Delta {T_{suploop,des}}}{\Delta {T_{looptoloop,des}}}
+\end{align}
 
+\subsubsection{Nominal Capacity}
 A nominal capacity for the heat exchanger is determined from the design flow rates and UA (regardless of if they were automatically sized or input by the user) and the expected operating temperatures of the two loops. The loop operating temperatures are obtained from the input in Sizing:Plant object if it is present for that loop. If no Sizing:Plant is present then the loop's overall setpoint is used (if the loop's load scheme is DualSetpointDeadband then the average of the high and low setpoints is used). The full heat exchanger model is then calculated for the maximum loop flow rates and expected loop temperatures as inlets to the heat exchanger. The absolute value for the model result for heat transfer rate is then used as the capacity of the heat exchanger. This capacity is reported and may be used for controls based on operation scheme.
 
 \subsection{Humidifier Sizing}\label{humidifier-sizing}
