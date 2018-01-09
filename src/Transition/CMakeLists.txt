@@ -140,4 +140,5 @@ install( FILES "SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "P
 install( FILES "SupportFiles/Report Variables 8-5-0 to 8-6-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
 install( FILES "SupportFiles/Report Variables 8-6-0 to 8-7-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
 install( FILES "SupportFiles/Report Variables 8-7-0 to 8-8-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
+install( FILES "SupportFiles/Report Variables 8-8-0 to 8-9-0.csv" DESTINATION "PreProcess/IDFVersionUpdater" )
 
