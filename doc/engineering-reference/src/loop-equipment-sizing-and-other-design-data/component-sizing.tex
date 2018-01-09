@@ -1404,6 +1404,18 @@ The Loop Demand Side design flow rate, \({\dot V_{dmd,des}}\) , is set based on 
 {\dot V_{dmd,des}} &= {\dot V_{sup,des} \frac{{\rho_{suploop}} \cdot {c_{p, suploop}} \cdot \Delta {T_{suploop,des}}}{{\rho_{dmdloop}} \cdot {c_{p, dmdloop}} \cdot \Delta {T_{dmdloop,des}}}}
 \end{align}
 
+where:
+
+\({\dot Q_{des}}\) is the design heat transfer rate;
+
+\({\dot V_{des}}\) is the design volume flow rate;
+
+\(\rho_{loop}\) is the loop fluid density at standard conditions (\SI{5.05}{\celsius});
+
+\(c_{p,loop}\) is the loop fluid specific heat capacity at standard conditions (\SI{5.05}{\celsius});
+
+\({\Delta T_{loop,des}}\) is the loop design temperature difference.
+
 \subsubsection{Heat Exchanger UA}
 The UA for the heat exchanger is calculated using the design temperatures for the two plant loops. The loop design temperature difference for the Loop Supply Side, \(\Delta {T_{suploop,des}}\) , is used to determine a nominal capacity.
 
