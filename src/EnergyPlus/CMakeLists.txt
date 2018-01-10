@@ -312,6 +312,10 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  HybridUnitaryAirConditioners.cc
+  HybridUnitaryAirConditioners.hh
+  HybridEvapCoolingModel.cc
+  HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
