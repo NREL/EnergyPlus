@@ -16131,6 +16131,27 @@ SurfaceProperty:HeatTransferAlgorithm:Construction,
        \type object-list
        \object-list ConstructionNames
 
+SurfaceProperty:HeatBalanceSourceTerm,
+       \memo Allows additional heat source term of the surface boundary condition in the surface heat balance calculation
+       \memo For Advanced/Research Usage
+       \min-fields 3
+  A1 , \field Surface Name
+       \required-field
+       \type object-list
+       \object-list SurfaceNames
+  A2 , \field Heat Source Location
+       \type choice
+       \key Outside
+       \key Inside
+       \default Outside
+       \note This field indicates where the heat source applies.
+  A3 ; \field Heat Source Term Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note The schedule values are heat rate per surface area (W/m2), when positive
+       \note schedule values indicate heat gain and negative values indicates loss.
+
 SurfaceControl:MovableInsulation,
       \memo Exterior or Interior Insulation on opaque surfaces
   A1, \field Insulation Type

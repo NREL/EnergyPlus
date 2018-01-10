@@ -209,6 +209,9 @@ namespace DataHeatBalSurface {
 	extern Array1D< Real64 > QRadSWInAbs; // Short wave radiation absorbed on inside of opaque surface
 	extern Array1D< Real64 > QRadLWOutSrdSurfs;  // Long wave radiation absorbed on outside of exterior surface
 
+	extern Array1D< Real64 > QAdditionalHeatSourceOutside; // Additional heat source term on boundary conditions
+	extern Array1D< Real64 > QAdditionalHeatSourceInside; // Additional heat source term on boundary conditions
+
 	extern Array1D< Real64 > InitialDifSolInAbs; // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
 	extern Array1D< Real64 > InitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
 

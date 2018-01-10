@@ -6296,6 +6296,7 @@ namespace SurfaceGeometry {
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
 		using DataSurfaces::Surface;
 		using DataHeatBalance::HeatTransferAlgosUsed;
 		using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
@@ -6349,6 +6350,47 @@ namespace SurfaceGeometry {
 
 		// Formats
 		static gio::Fmt Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
+
+		// For evaporative cooling surfaces 
+		cCurrentModuleObject = "SurfaceProperty:HeatBalanceSourceTerm";
+		int CountAddHeatSourceSurf = GetNumObjectsFound( cCurrentModuleObject );
+		bool OutsideAddHeatSourceTerm;
+		int AdditionalHeatSourceTermSch;
+		for ( Item = 1; Item <= CountAddHeatSourceSurf; ++Item ) {
+			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			ErrorsFoundSingleSurf = false;
+			Found = FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
+			OutsideAddHeatSourceTerm = true;
+
+			if ( Found == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
+				ErrorsFoundSingleSurf = true;
+			}
+
+			if ( ! lAlphaFieldBlanks( 2 ) && SameString( cAlphaArgs( 2 ), "Inside" ) ) {
+				OutsideAddHeatSourceTerm = false;
+			}
+
+			if ( ! lAlphaFieldBlanks( 3 ) ) {
+				AdditionalHeatSourceTermSch = EnergyPlus::ScheduleManager::GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( AdditionalHeatSourceTermSch == 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", cannot find the matching Schedule: " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
+					ErrorsFoundSingleSurf = true;
+				}
+			} else {
+				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", " + cAlphaFieldNames( 3 ) + " is required." );
+				ErrorsFoundSingleSurf = true;
+			}			
+
+			if ( ! ErrorsFoundSingleSurf ) {
+				Surface( Found ).HasAdditionalHeatSourceTerm = true;
+				Surface( Found ).AdditionalHeatSourceTermSch = AdditionalHeatSourceTermSch;
+				Surface( Found ).OutsideAddHeatSourceTerm = OutsideAddHeatSourceTerm;
+			} else {
+				ErrorsFound = true;
+			}
+		} // End_For evaporative cooling surfaces
+
 
 		// first initialize each heat transfer surface with the overall model type, array assignment
 		for ( auto & e : Surface ) e.HeatTransferAlgorithm = HeatTransferAlgosUsed( 1 );
