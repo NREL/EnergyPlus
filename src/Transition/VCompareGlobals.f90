@@ -94,6 +94,7 @@ INTEGER NumNumbers
 CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutArgs
 INTEGER, ALLOCATABLE, DIMENSION(:) :: MatchArg
 CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: InArgs
+CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: TempArgs
 
 CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: OldRepVarName
 CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NewRepVarName

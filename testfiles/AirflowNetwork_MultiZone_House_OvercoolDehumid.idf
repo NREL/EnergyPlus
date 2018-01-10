@@ -112,7 +112,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -2119,10 +2119,11 @@
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone Node,               !- Zone Air Node Name
-    Zone Outlet Node;        !- Zone Return Air Node Name
+    Zone Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
