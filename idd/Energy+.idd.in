@@ -40698,12 +40698,13 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
        \required-field
        \type node
        \note This is an air outlet node from the air distribution unit. This node name should be one of the 
-       \note supply air inlet node names of a zone served by this component.   
+       \note supply air inlet node names of a zone served by this component.  
   A4,  \field Air Inlet Node Name
        \required-field
        \type node
        \note The air-inlet node name that connects the air splitter to the individual zone air distribution 
-       \note unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter component.
+       \note unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter or 
+       \note AirLoopHVAC:SupplyPlenum component.
   N1,  \field Maximum Air Flow Rate
        \required-field
        \units m3/s
@@ -40712,19 +40713,21 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
    A5, \field Design Specification Outdoor Air Object Name
        \type object-list
        \object-list DesignSpecificationOutdoorAirNames
-       \note When the name of a DesignSpecification:OutdoorAir object is entered, the terminal
-       \note unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled."
-       \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will
-       \note be computed based on the current number of occupants in the zone, as for demand controlled ventilation.
-       \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate.
-       \note If this field is blank, then the terminal unit will not be controlled for outdoor air flow.
+       \note This field is used to modulate the terminal unit flow rate based on the specified outdoor air 
+       \note requirement. When the name of a DesignSpecification:OutdoorAir object is entered, the terminal unit will
+       \note adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled."
+       \note If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based 
+       \note on either the current or design occupancy as specified in the Per Person Ventilation Rate Mode field.
+       \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. The requested fl
+       \note rate may not be fully met if the system is operating with cycling fan. If this field is blank, then
+       \note the terminal unit will not be controlled for outdoor air flow. This field is optional. 
    A6; \field Per Person Ventilation Rate Mode
        \type choice
        \key CurrentOccupancy
        \key DesignOccupancy
        \default CurrentOccupancy
-       \note CurrentOccupancy models demand controlled ventilation using the current number of people
-       \note DesignOccupancy uses the total Number of People in the zone and is constant
+       \note CurrentOccupancy uses current number of people in the zone which may vary
+       \note DesignOccupancy uses the total number of people in the zone and is constant
 
 AirTerminal:SingleDuct:VAV:NoReheat,
        \memo Central air system terminal unit, single duct, variable volume, with no reheat coil.

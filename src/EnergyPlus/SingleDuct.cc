@@ -2043,7 +2043,10 @@ namespace SingleDuct {
 							Node( InletNode ).MassFlowRate = mDotFromOARequirement;
 							Node( InletNode ).MassFlowRateMaxAvail = mDotFromOARequirement;
 						}
-						//if ( Sys( SysNum ).EMSOverrideAirFlow ) Node( InletNode ).MassFlowRate = Sys( SysNum ).EMSMassFlowRateValue;
+						if ( Sys( SysNum ).EMSOverrideAirFlow ) {
+							Node( InletNode ).MassFlowRate = Sys( SysNum ).EMSMassFlowRateValue;
+							Node( InletNode ).MassFlowRateMaxAvail = Sys( SysNum ).EMSMassFlowRateValue;
+						}
 					} else {
 						Node( InletNode ).MassFlowRateMaxAvail = Sys( SysNum ).AirMassFlowRateMax;
 					}
@@ -4303,21 +4306,17 @@ namespace SingleDuct {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 MassFlow; // [kg/sec]   Total Mass Flow Rate at the inlet 
-		Real64 SensOutputProvided; // [W]
+		Real64 MassFlow; // [kg/sec]   mass flow rate at the inlet 
+		Real64 SensOutputProvided; // heating and cooling provided to the zone [W]
 
-		MassFlow = SysInlet( SysNum ).AirMassFlowRateMaxAvail; // System massflow is set to the Available
+		MassFlow = SysInlet( SysNum ).AirMassFlowRate; // system air mass flow rate 
 
-		if ( ( ( SysInlet( SysNum ).AirMassFlowRateMaxAvail == 0.0 ) && ( SysInlet( SysNum ).AirMassFlowRateMinAvail == 0.0 ) ) || ( GetCurrentScheduleValue( this->SchedPtr ) == 0.0 || SysInlet( SysNum ).AirMassFlowRate == 0.0 ) ) {
-			// System is off set mass flow rate to 0.0
-			MassFlow = 0.0;
-		}
-
-		if ( MassFlow > 0.0 ) {
+		if ( GetCurrentScheduleValue( this->SchedPtr ) > 0.0 && MassFlow > SmallMassFlow ) {
 			Real64 CpAir = PsyCpAirFnWTdb( 0.5 * ( Node( this->OutletNodeNum ).HumRat + Node( ZoneNodeNum ).HumRat ), 0.5 * ( Node( this->OutletNodeNum ).Temp + Node( ZoneNodeNum ).Temp ) );
 			SensOutputProvided = MassFlow * CpAir * ( Node( this->OutletNodeNum ).Temp - Node( ZoneNodeNum ).Temp );
 		} else {
 			SensOutputProvided = 0.0;
+			MassFlow = 0.0;
 		}
 
 		// set the outlet node air conditions to that of the inlet

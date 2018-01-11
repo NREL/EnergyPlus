@@ -285,7 +285,8 @@ namespace SingleDuct {
 			CoolEnergy( 0.0 )
 		{}
 
-		void SimConstVolNoReheat(
+		void 
+		SimConstVolNoReheat(
 			int const SysNum,
 			bool const EP_UNUSED( FirstHVACIteration ),
 			int const EP_UNUSED( ZoneNum ),
