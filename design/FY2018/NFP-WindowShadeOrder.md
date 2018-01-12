@@ -4,6 +4,7 @@ Window Shade Order
 **Jason Glazer, GARD Analytics**
 
  - December 21, 2017
+ - January 10, 2018
  
 
 ## Justification for New Feature ##
@@ -13,6 +14,8 @@ When windows shades (including shades, blinds and switchable glazing) are deploy
 ## E-mail and  Conference Call Conclusions ##
 
 Many different approaches were considered during discussions between Jason Glazer, Tianzhen Hong, Mike Witte and Dan Macumber prior to drafting the NFP.
+
+Raustad provided suggestion on maintaining backward compatibility when transitioning files.
 
 ## Overview ##
 
@@ -226,6 +229,8 @@ Bullet (3) will be rewritten to read:
 ## Example File and Transition Changes ##
 
 Signaticant transition changes will be necessary since the referencing between objects is changing as well as the addition of new fields.
+
+To help provide backward compatibility the transition program will set WindowShadingControl Shading Control Sequence Number = n, where n is the order of occurrence of WindowProperty:ShadingControl in the idf. 
 
 ## References ##
 
