@@ -238,7 +238,7 @@ The input object AirTerminal:SingleDuct:ConstantVolume:NoReheat is used to pass 
 
 ## Example File and Transition Changes ##
 
-New example file will be added if needed. Transition option will be investigated.
+New example file will be added if needed. Transition rule spans over 4 or five objects and may involve search and replace node names in at least two objects. Draft transition rule has been added.
 
 ## References ##
 
