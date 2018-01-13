@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,8 +65,8 @@ namespace PondGroundHeatExchanger {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern Real64 const SmallNum; // Very small number to avoid div0 errors
-	extern Real64 const StefBoltzmann; // Stefan-Boltzmann constant
+	extern Real32 const SmallNum; // Very small number to avoid div0 errors
+	extern Real32 const StefBoltzmann; // Stefan-Boltzmann constant
 
 	// MODULE VARIABLE DECLARATIONS:
 	// utility variables initialized once

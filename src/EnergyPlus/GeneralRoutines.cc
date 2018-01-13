@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -101,21 +101,6 @@ namespace EnergyPlus {
 
 static gio::Fmt fmtLD( "*" );
 
-// Integer constants for different system types handled by the routines in this file
-enum GeneralRoutinesEquipNums {
-	ParallelPIUReheatNum = 1,
-	SeriesPIUReheatNum = 2,
-	HeatingCoilWaterNum = 3,
-	BBWaterConvOnlyNum = 4,
-	BBSteamRadConvNum = 5,
-	BBWaterRadConvNum = 6,
-	FourPipeFanCoilNum = 7,
-	OutdoorAirUnitNum = 8,
-	UnitHeaterNum = 9,
-	UnitVentilatorNum = 10,
-	VentilatedSlabNum = 11
-};
-
 void
 ControlCompOutput(
 	std::string const & CompName, // the component Name
@@ -209,7 +194,6 @@ ControlCompOutput(
 	bool WaterCoilAirFlowControl; // True if controlling air flow through water coil, water flow fixed
 	int SimCompNum; // internal number for case statement
 	static Real64 HalvingPrec( 0.0 ); // precision of halving algorithm
-	bool BBConvergeCheckFlag; // additional check on convergence specifically for radiant/convective baseboard units
 
 	struct IntervalHalf
 	{
@@ -501,7 +485,7 @@ ControlCompOutput(
 		}
 
 		switch ( SimCompNum ) { //Tuned If block changed to switch
-		case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
+		case 1: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -510,7 +494,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
+		case 2: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -519,7 +503,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
+		case 3: // 'COIL:HEATING:WATER'
 			// Simulate reheat coil for the VAV system
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -534,56 +518,56 @@ ControlCompOutput(
 			}
 			break;
 
-		case BBWaterConvOnlyNum: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
+		case 4: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
 			// Simulate baseboard
 			SimHWConvective( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
+		case 5: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
 			// Simulate baseboard
 			CalcSteamBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
+		case 6: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
 			// Simulate baseboard
 			CalcHWBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
+		case 7: // 'ZONEHVAC:FOURPIPEFANCOIL'
 			// Simulate fancoil unit
 			Calc4PipeFanCoil( CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
+		case 8: //'ZONEHVAC:OUTDOORAIRUNIT'
 			// Simulate outdoor air unit components
 			CalcOAUnitCoilComps( CompNum, FirstHVACIteration, EquipIndex, LoadMet ); //Autodesk:OPTIONAL EquipIndex used without PRESENT check
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
+		case 9: // 'ZONEHVAC:UNITHEATER'
 			// Simulate unit heater components
 			CalcUnitHeaterComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
+		case 10: // 'ZONEHVAC:UNITVENTILATOR'
 			// Simulate unit ventilator components
 			CalcUnitVentilatorComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
+		case 11: // 'ZONEHVAC:VENTILATEDSLAB'
 			// Simulate unit ventilator components
 			CalcVentilatedSlabComps( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
@@ -607,20 +591,6 @@ ControlCompOutput(
 			ZoneInterHalf.MaxResult = 1.0;
 			ZoneInterHalf.MinResult = 0.0;
 			break;
-		}
-		if ( !Converged ) {
-			BBConvergeCheckFlag = BBConvergeCheck( SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow );
-			if ( BBConvergeCheckFlag ) {
-				//Set to converged controller
-				Converged = true;
-				ZoneInterHalf.MaxFlowCalc = true;
-				ZoneInterHalf.MinFlowCalc = false;
-				ZoneInterHalf.NormFlowCalc = false;
-				ZoneInterHalf.MinFlowResult = false;
-				ZoneInterHalf.MaxResult = 1.0;
-				ZoneInterHalf.MinResult = 0.0;
-				break;
-			}
 		}
 
 		++Iter;
@@ -646,50 +616,6 @@ ControlCompOutput(
 
 }
 
-bool
-BBConvergeCheck(
-	int const SimCompNum,
-	Real64 const MaxFlow,
-	Real64 const MinFlow
-)
-{
-
-	// FUNCTION INFORMATION:
-	//       AUTHOR         Rick Strand
-	//       DATE WRITTEN   November 2017
-	
-	// PURPOSE OF THIS SUBROUTINE:
-	// This is an additional check for the radiant/convective baseboard units
-	// to see if they are converged or the flow is sufficiently converged to
-	// procede with the simulation.  With the radiant component to these systems,
-	// the impact on the load met is more difficult to calculate and the impact
-	// on the actual system output is not as well behaved as for convective
-	// systems.  This additional check avoids excessive iterations and max
-	// iteration warnings and provides sufficiently converged results.  It is
-	// only called from ControlCompOutput.
-
-	// Return Value
-	bool BBConvergeCheck;
-	
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	static Real64 const BBIterLimit( 0.00001 );
-	
-	if ( SimCompNum != BBSteamRadConvNum && SimCompNum != BBWaterRadConvNum ) {
-		// For all zone equipment except radiant/convective baseboard (steam and water) units:
-		BBConvergeCheck = false;
-	} else {
-		// For steam and water radiant/convective baseboard units:
-		if ( ( MaxFlow - MinFlow ) > BBIterLimit ) {
-			BBConvergeCheck = false;
-		} else {
-			BBConvergeCheck = true;
-		}
-	}
-	
-	return BBConvergeCheck;
-	
-}
-	
 void
 CheckSysSizing(
 	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
@@ -1046,9 +972,9 @@ CalcPassiveExteriorBaffleGap(
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	Real64 const g( 9.807 ); // gravitational constant (m/s**2)
-	Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
-	Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
+	Real32 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
+	Real32 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
+	Real32 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const KelvinConv( 273.15 ); // Conversion from Celsius to Kelvin
 	static std::string const RoutineName( "CalcPassiveExteriorBaffleGap" );
 	// INTERFACE BLOCK SPECIFICATIONS:

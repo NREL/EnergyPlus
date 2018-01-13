@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -75,13 +75,13 @@ namespace DataHVACGlobals {
 
 	// MODULE PARAMETER DEFINITIONS:
 
-	Real64 const SmallTempDiff( 1.0E-5 );
+	Real32 const SmallTempDiff( 1.0E-5 );
 	Real64 const SmallMassFlow( 0.001 );
-	Real64 const VerySmallMassFlow( 1.0E-30 );
+	Real32 const VerySmallMassFlow( 1.0E-30 );
 	Real64 const SmallLoad( 1.0 );
 	Real64 const TempControlTol( 0.1 ); // temperature control tolerance for packaged equip. [deg C]
 	Real64 const SmallAirVolFlow( 0.001 );
-	Real64 const SmallWaterVolFlow( 1.0E-9 );
+	Real32 const SmallWaterVolFlow( 1.0E-9 );
 	Real64 const BlankNumeric( -99999.0 ); // indicates numeric input field was blank
 	Real64 const RetTempMax( 60.0 ); // maximum return air temperature [deg C]
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
@@ -386,7 +386,6 @@ namespace DataHVACGlobals {
 	bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
-	int MinAirLoopIterationsAfterFirst( 1 ); // minimum number of HVAC iterations after FirstHVACIteration (must be at least 2 for sequenced loads to operate on air loops)
 
 	int const NumZoneHVACTerminalTypes( 37 );
 
@@ -580,7 +579,6 @@ namespace DataHVACGlobals {
 		SimZoneEquipmentFlag = true;
 		SimNonZoneEquipmentFlag = true;
 		ZoneMassBalanceHVACReSim = true;
-		MinAirLoopIterationsAfterFirst = 1;
 		ZoneComp.deallocate();
 		CompSetPtEquip.deallocate();
 		OptStartData = OptStartDataType();

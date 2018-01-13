@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,6 +63,9 @@
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
+
+
+#define EP_nocache_Psychrometrics
 
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
@@ -513,9 +516,9 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyRhovFnTdbWPb_fast(
-		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const dW, // humidity ratio
-		Real64 const PB // Barometric Pressure {Pascals}
+		Real32 const Tdb, // dry-bulb temperature {C}
+		Real32 const dW, // humidity ratio
+		Real32 const PB // Barometric Pressure {Pascals}
 	)
 	{
 		// Faster version with humidity ratio already adjusted

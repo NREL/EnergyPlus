@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,7 +95,7 @@ namespace DElightManagerF {
 		Real64 dSOLCOSX,
 		Real64 dSOLCOSY,
 		Real64 dSOLCOSZ,
-		Real64 & pdPowerReducFac,
+		Real32 & pdPowerReducFac,
 		int piErrorFlag
 	);
 

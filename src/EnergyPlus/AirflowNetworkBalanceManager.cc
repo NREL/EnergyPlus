@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -5090,10 +5090,10 @@ namespace AirflowNetworkBalanceManager {
 		// SUBROUTINE PARAMETER DEFINITIONS
 		//  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
 		//  index 2 is side ratio (0.25,1.0,4.0),
-		static Array2D< Real64 > const CPHighRiseWall( 3, 12, reshape2< Real64, int >( { 0.60, 0.54, 0.23, -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23, 0.54, 0.60, 0.48, 0.04, -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04, 0.48, 0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44 }, { 3, 12 } ) ); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const CPHighRiseWall( 3, 12, reshape2< Real64, int >( { 0.60f, 0.54f, 0.23f, -0.25f, -0.61f, -0.55f, -0.51f, -0.55f, -0.61f, -0.25f, 0.23f, 0.54f, 0.60f, 0.48f, 0.04f, -0.56f, -0.56f, -0.42f, -0.37f, -0.42f, -0.56f, -0.56f, 0.04f, 0.48f, 0.60f, 0.44f, -0.26f, -0.70f, -0.53f, -0.32f, -0.22f, -0.32f, -0.53f, -0.70f, -0.26f, 0.44f }, { 3, 12 } ) ); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args are work-around for VC++2013 bug
 		//  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
 		//  index 2 is side ratio (0.25,0.5,1.0),
-		static Array2D< Real64 > const CPHighRiseRoof( 3, 12, reshape2< Real64, int >( { -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55 }, { 3, 12 } ) ); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const CPHighRiseRoof( 3, 12, reshape2< Real64, int >( { -0.28f, -0.69f, -0.72f, -0.76f, -0.72f, -0.69f, -0.28f, -0.69f, -0.72f, -0.76f, -0.72f, -0.69f, -0.47f, -0.52f, -0.70f, -0.76f, -0.70f, -0.52f, -0.47f, -0.52f, -0.70f, -0.76f, -0.70f, -0.52f, -0.70f, -0.55f, -0.55f, -0.70f, -0.55f, -0.55f, -0.70f, -0.55f, -0.55f, -0.70f, -0.55f, -0.55f }, { 3, 12 } ) ); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args are work-around for VC++2013 bug
 
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
@@ -5222,7 +5222,7 @@ namespace AirflowNetworkBalanceManager {
 					IncAng = std::abs( WindAng - FacadeAng( FacadeNum ) );
 					if ( IncAng > 180.0 ) IncAng = 360.0 - IncAng;
 					IAng = int( IncAng / 30.0 ) + 1;
-					DelAng = mod( IncAng, 30.0 );
+					DelAng = mod( IncAng, 30.0f );
 					WtAng = 1.0 - DelAng / 30.0;
 
 					// Wind-pressure coefficients for vertical facades, low-rise building
@@ -5295,7 +5295,7 @@ namespace AirflowNetworkBalanceManager {
 					IncAng = std::abs( WindAng - FacadeAng( FacadeNum ) );
 					if ( IncAng > 180.0 ) IncAng = 360.0 - IncAng;
 					IAng = int( IncAng / 10.0 ) + 1;
-					DelAng = mod( IncAng, 10.0 );
+					DelAng = mod( IncAng, 10.0f );
 					WtAng = 1.0 - DelAng / 10.0;
 					// Wind-pressure coefficients for vertical facades, low-rise building
 					IncRad = IncAng * DegToRadians;
@@ -5318,7 +5318,7 @@ namespace AirflowNetworkBalanceManager {
 				IncAng = std::abs( WindAng - FacadeAng( FacadeNum ) );
 				if ( IncAng > 180.0 ) IncAng = 360.0 - IncAng;
 				IAng = int( IncAng / 30.0 ) + 1;
-				DelAng = mod( IncAng, 30.0 );
+				DelAng = mod( IncAng, 30.0f );
 				WtAng = 1.0 - DelAng / 30.0;
 				// Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
 				valsByFacade[ FacadeNum - 1 ][ WindDirNum - 1 ] = WtSR * ( WtAng * CPHighRiseRoof( ISR, IAng ) + ( 1.0 - WtAng ) * CPHighRiseRoof( ISR, IAng + 1 ) )

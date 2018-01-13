@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6129,8 +6129,8 @@ namespace OutputReportTabular {
 				HrsPerWeek = 24 * 7 * Lights( iLight ).SumConsumption / ( Lights( iLight ).DesignLevel * gatherElapsedTimeBEPS * SecInHour );
 				PreDefTableEntry( pdchInLtFullLoadHrs, Lights( iLight ).Name, HrsPerWeek );
 			}
-			PreDefTableEntry( pdchInLtConsump, Lights( iLight ).Name, Lights( iLight ).SumConsumption * mult / 1000000000.0 );
-			consumptionTotal += Lights( iLight ).SumConsumption / 1000000000.0;
+			PreDefTableEntry( pdchInLtConsump, Lights( iLight ).Name, Lights( iLight ).SumConsumption * mult / 1000000000.0f );
+			consumptionTotal += Lights( iLight ).SumConsumption / 1000000000.0f;
 		}
 		PreDefTableEntry( pdchInLtConsump, "Interior Lighting Total", consumptionTotal );
 
@@ -6150,8 +6150,8 @@ namespace OutputReportTabular {
 				HrsPerWeek = 24 * 7 * ExteriorLights( iLight ).SumConsumption / ( ExteriorLights( iLight ).DesignLevel * gatherElapsedTimeBEPS * SecInHour );
 				PreDefTableEntry( pdchExLtFullLoadHrs, ExteriorLights( iLight ).Name, HrsPerWeek );
 			}
-			PreDefTableEntry( pdchExLtConsump, ExteriorLights( iLight ).Name, ExteriorLights( iLight ).SumConsumption / 1000000000.0 );
-			consumptionTotal += ExteriorLights( iLight ).SumConsumption / 1000000000.0;
+			PreDefTableEntry( pdchExLtConsump, ExteriorLights( iLight ).Name, ExteriorLights( iLight ).SumConsumption / 1000000000.0f );
+			consumptionTotal += ExteriorLights( iLight ).SumConsumption / 1000000000.0f;
 		}
 		PreDefTableEntry( pdchExLtConsump, "Exterior Lighting Total", consumptionTotal );
 
@@ -12172,7 +12172,7 @@ namespace OutputReportTabular {
 		Array1D< Real64 > AvgData; // sequence data after averaging
 		AvgData.allocate( numTimeSteps );
 		AvgData = 0.;
-		MovingAvg( dataSeq * 1.0, numTimeSteps, NumTimeStepsInAvg, AvgData );
+		MovingAvg( dataSeq * 1.0f, numTimeSteps, NumTimeStepsInAvg, AvgData );
 		return AvgData( maxTimeStep );
 	}
 

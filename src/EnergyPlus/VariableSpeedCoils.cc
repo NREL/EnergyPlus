@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3390,8 +3390,8 @@ namespace VariableSpeedCoils {
 					PreDefTableEntry( pdchCoolCoilSHR, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).RatedCapCoolSens / VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
 					PreDefTableEntry( pdchCoolCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).MSRatedCOP( NormSpeed ) );
 				} else {
-					PreDefTableEntry( pdchCoolCoilSHR, VarSpeedCoil( DXCoilNum ).Name, 0.0 );
-					PreDefTableEntry( pdchCoolCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, 0.0 );
+					PreDefTableEntry( pdchCoolCoilSHR, VarSpeedCoil( DXCoilNum ).Name, 0.0f );
+					PreDefTableEntry( pdchCoolCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, 0.0f );
 				}
 				addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for." );
 			} else {
@@ -3450,7 +3450,7 @@ namespace VariableSpeedCoils {
 			if ( VarSpeedCoil( DXCoilNum ).RatedCapHeat != 0.0 ) {
 				PreDefTableEntry( pdchHeatCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).MSRatedCOP( NormSpeed ) );
 			} else {
-				PreDefTableEntry( pdchHeatCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, 0.0 );
+				PreDefTableEntry( pdchHeatCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, 0.0f );
 			}
 			addFootNoteSubTable( pdstHeatCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for." );
 		} else {
@@ -3866,7 +3866,7 @@ namespace VariableSpeedCoils {
 			if ( VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal != 0.0 ) {
 				PreDefTableEntry( pdchCoolCoilSHR, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).RatedCapCoolSens / VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
 			} else {
-				PreDefTableEntry( pdchCoolCoilSHR, VarSpeedCoil( DXCoilNum ).Name, 0.0 );
+				PreDefTableEntry( pdchCoolCoilSHR, VarSpeedCoil( DXCoilNum ).Name, 0.0f );
 			}
 			PreDefTableEntry( pdchCoolCoilNomEff, VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).MSRatedCOP( VarSpeedCoil( DXCoilNum ).NormSpedLevel ) );
 			addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for." );

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -607,20 +607,20 @@ namespace DataHeatBalance {
 	Array4D< Real64 > OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending
 	// beam solar radiation to the surfaces listed in BackSurfaces
 	//                       Air       Argon     Krypton   Xenon
-	Array2D< Real64 > const GasCoeffsCon( 3, 10, reshape2< Real64, int >( { 2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 3, 10 } ) ); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
+	Array2D< Real64 > const GasCoeffsCon( 3, 10, reshape2< Real64, int >( { 2.873e-3f, 2.285e-3f, 9.443e-4f, 4.538e-4f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 7.760e-5f, 5.149e-5f, 2.826e-5f, 1.723e-5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 3, 10 } ) ); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
 	//                       Air       Argon     Krypton   Xenon
-	Array2D< Real64 > const GasCoeffsVis( 3, 10, reshape2< Real64, int >( { 3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 3, 10 } ) ); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
+	Array2D< Real64 > const GasCoeffsVis( 3, 10, reshape2< Real64, int >( { 3.723e-6f, 3.379e-6f, 2.213e-6f, 1.069e-6f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 4.940e-8f, 6.451e-8f, 7.777e-8f, 7.414e-8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 3, 10 } ) ); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
 	//                     Air       Argon     Krypton   Xenon
-	Array2D< Real64 > const GasCoeffsCp( 3, 10, reshape2< Real64, int >( { 1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 3, 10 } ) ); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
+	Array2D< Real64 > const GasCoeffsCp( 3, 10, reshape2< Real64, int >( { 1002.737f, 521.929f, 248.091f, 158.340f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.2324e-2f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 3, 10 } ) ); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
 	//                       Air       Argon     Krypton   Xenon
-	Array1D< Real64 > const GasWght( 10, { 28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // Gas molecular weights for gases in a mixture
+	Array1D< Real64 > const GasWght( 10, { 28.97f, 39.948f, 83.8f, 131.3f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f } ); // Gas molecular weights for gases in a mixture
 
-	Array1D< Real64 > const GasSpecificHeatRatio( 10, { 1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // Gas specific heat ratios.  Used for gasses in low pressure
+	Array1D< Real64 > const GasSpecificHeatRatio( 10, { 1.4f, 1.67f, 1.68f, 1.66f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f } ); // Gas specific heat ratios.  Used for gasses in low pressure
 
-	Real64 ZeroPointerVal( 0.0 );
+	Real64 ZeroPointerVal( 0.0f );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
 
@@ -1750,7 +1750,7 @@ namespace DataHeatBalance {
 		// without Theta and Phi.
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const Small( 1.E-9 ); // Small Number used to approximate zero
+		Real32 const Small( 1.E-9 ); // Small Number used to approximate zero
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		int ScNum; // Index to screen data

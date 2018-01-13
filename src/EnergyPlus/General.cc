@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2728,7 +2728,7 @@ namespace General {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Determinant; // Determinant of Matrix A
+		Real32 Determinant; // Determinant of Matrix A
 
 		// Compute Determinant
 
@@ -2792,7 +2792,7 @@ namespace General {
 		//                  Cnvg = 1:  Converged
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const small( 1.e-9 ); // Small Number used to approximate zero
+		Real32 const small( 1.e-9 ); // Small Number used to approximate zero
 		Real64 const Perturb( 0.1 ); // Perturbation applied to X to initialize iteration
 
 		// INTERFACE BLOCK SPECIFICATIONS

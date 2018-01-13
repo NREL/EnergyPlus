@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4643,10 +4643,10 @@ Label999: ;
 			V2 = max( min( Var2, PerfCurve( CurveIndex ).Var2Max ), PerfCurve( CurveIndex ).Var2Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 2 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine when only 1 is required. The excess arguments are ignored." );
-					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine when only 1 is required." );
 				}
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 2.0, 2.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 1 ) {
@@ -4663,10 +4663,10 @@ Label999: ;
 			V3 = max( min( Var3, PerfCurve( CurveIndex ).Var3Max ), PerfCurve( CurveIndex ).Var3Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 3 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine when 2 or less are required. The excess arguments are ignored." );
-					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine when 2 or less are required." );
 				}
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 3.0, 3.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 2 ) {
@@ -4683,10 +4683,10 @@ Label999: ;
 			V4 = max( min( Var4, PerfCurve( CurveIndex ).Var4Max ), PerfCurve( CurveIndex ).Var4Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 4 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine when 3 or less are required. The excess arguments are ignored." );
-					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine when 3 or less are required." );
 				}
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 4.0, 4.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 3 ) {
@@ -4703,10 +4703,10 @@ Label999: ;
 			V5 = max( min( Var5, PerfCurve( CurveIndex ).Var5Max ), PerfCurve( CurveIndex ).Var5Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 5 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine when 4 or less are required. The excess arguments are ignored." );
-					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine when 4 or less are required." );
 				}
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 5.0, 5.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 4 ) {
@@ -5887,6 +5887,58 @@ Label999: ;
 		Optional< Real64 > Var2Max, // Maximum values of 2nd independent variable
 		Optional< Real64 > Var3Min, // Minimum values of 2nd independent variable
 		Optional< Real64 > Var3Max // Maximum values of 2nd independent variable
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Lixing Gu
+		//       DATE WRITTEN   July 2006
+		//       MODIFIED       B. Griffith Aug 2006 add third independent variable
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Given the curve index, returns the minimum and maximum values specified in the input
+		// for the independent variables of the performance curve.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+		Var1Min = PerfCurve( CurveIndex ).Var1Min;
+		Var1Max = PerfCurve( CurveIndex ).Var1Max;
+		if ( present( Var2Min ) ) Var2Min = PerfCurve( CurveIndex ).Var2Min;
+		if ( present( Var2Max ) ) Var2Max = PerfCurve( CurveIndex ).Var2Max;
+		if ( present( Var3Min ) ) Var3Min = PerfCurve( CurveIndex ).Var3Min;
+		if ( present( Var3Max ) ) Var3Max = PerfCurve( CurveIndex ).Var3Max;
+
+	}
+
+	void
+	GetCurveMinMaxValues(
+		int const CurveIndex, // index of curve in curve array
+		Real32 & Var1Min, // Minimum values of 1st independent variable
+		Real32 & Var1Max, // Maximum values of 1st independent variable
+		Optional< Real32 > Var2Min, // Minimum values of 2nd independent variable
+		Optional< Real32 > Var2Max, // Maximum values of 2nd independent variable
+		Optional< Real32 > Var3Min, // Minimum values of 2nd independent variable
+		Optional< Real32 > Var3Max // Maximum values of 2nd independent variable
 	)
 	{
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1794,7 +1794,7 @@ namespace PurchasedAirManager {
 				}
 
 				// Supply mass flow is greatest of these, but limit to cooling max flow rate, if applicable
-				SupplyMassFlowRate = max( 0.0, OAMassFlowRate, SupplyMassFlowRateForCool, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid );
+				SupplyMassFlowRate = max( 0.0f, OAMassFlowRate, SupplyMassFlowRateForCool, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid );
 				// EMS override point  Purch air massflow rate..... but only if unit is on, i.e. SupplyMassFlowRate>0.0
 				if ( ( PurchAir( PurchAirNum ).EMSOverrideMdotOn ) && ( SupplyMassFlowRate > 0.0 ) ) {
 					SupplyMassFlowRate = PurchAir( PurchAirNum ).EMSValueMassFlowRate;
@@ -2032,7 +2032,7 @@ namespace PurchasedAirManager {
 				}
 
 				// Supply mass flow is greatest of these, but limit to heating max flow rate, if applicable
-				SupplyMassFlowRate = max( 0.0, OAMassFlowRate, SupplyMassFlowRateForHeat, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid );
+				SupplyMassFlowRate = max( 0.0f, OAMassFlowRate, SupplyMassFlowRateForHeat, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid );
 				// EMS override point  Purch air massflow rate..... but only if unit is on, i.e. SupplyMassFlowRate>0.0
 				if ( ( PurchAir( PurchAirNum ).EMSOverrideMdotOn ) && ( SupplyMassFlowRate > 0.0 ) ) {
 					SupplyMassFlowRate = PurchAir( PurchAirNum ).EMSValueMassFlowRate;
@@ -2306,8 +2306,8 @@ namespace PurchasedAirManager {
 
 		if ( PurchAir( PurchAirNum ).PlenumExhaustAirNodeNum > 0 ) {
 			Node( PurchAir( PurchAirNum ).PlenumExhaustAirNodeNum ).MassFlowRate = SupplyMassFlowRate;
+			Node( RecircNodeNum ).MassFlowRate = SupplyMassFlowRate;
 		}
-		Node( RecircNodeNum ).MassFlowRate = SupplyMassFlowRate;
 
 	}
 
@@ -2511,6 +2511,11 @@ namespace PurchasedAirManager {
 			PurchAir( PurchAirNum ).HtRecSenOutput = 0.0;
 			PurchAir( PurchAirNum ).HtRecLatOutput = 0.0;
 		}
+		// If exhaust node is specified, then set massflow on exhaust node, otherwise return node sets its own massflow
+		if ( PurchAir( PurchAirNum ).ZoneExhaustAirNodeNum > 0 ) {
+			Node( RecircNodeNum ).MassFlowRate = RecircMassFlowRate;
+		}
+
 	}
 
 	void

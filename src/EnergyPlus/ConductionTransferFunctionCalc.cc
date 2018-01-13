@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,26 +126,26 @@ namespace ConductionTransferFunctionCalc {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	Array2D< Real64 > AExp; // Exponential of AMat
-	Array2D< Real64 > AInv; // Inverse of AMat
-	Array2D< Real64 > AMat; // "A" matrix from Seem's dissertation
+	Array2D< Real32 > AExp; // Exponential of AMat
+	Array2D< Real32 > AInv; // Inverse of AMat
+	Array2D< Real32 > AMat; // "A" matrix from Seem's dissertation
 	// (constant coefficients of linear system)
-	Array1D< Real64 > BMat( 3 ); // "B" matrix of state space method (non-zero elements)
-	Array1D< Real64 > CMat( 2 ); // "C" matrix of state space method (non-zero elements)
-	Array1D< Real64 > DMat( 2 ); // "D" matrix of state space method (non-zero elements)
-	Array1D< Real64 > e; // Coefficients for the surface flux history term
-	Array2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
+	Array1D< Real32 > BMat( 3 ); // "B" matrix of state space method (non-zero elements)
+	Array1D< Real32 > CMat( 2 ); // "C" matrix of state space method (non-zero elements)
+	Array1D< Real32 > DMat( 2 ); // "D" matrix of state space method (non-zero elements)
+	Array1D< Real32 > e; // Coefficients for the surface flux history term
+	Array2D< Real32 > Gamma1; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
-	Array2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
+	Array2D< Real32 > Gamma2; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
 	int NodeSource; // Node at which a source or sink is present
 	int NodeUserTemp; // Node where user wishes to calculate a temperature
 	// (for constructions with sources/sinks only)
 	int rcmax; // Total number of nodes in the construct (<= MaxTotNodes)
-	Array3D< Real64 > s; // Coefficients for the surface temperature history terms
-	Array2D< Real64 > s0( 3, 4 ); // Coefficients for the current surface temperature terms
-	Real64 TinyLimit;
-	Array2D< Real64 > IdenMatrix; // Identity Matrix
+	Array3D< Real32 > s; // Coefficients for the surface temperature history terms
+	Array2D< Real32 > s0( 3, 4 ); // Coefficients for the current surface temperature terms
+	Real32 TinyLimit;
+	Array2D< Real32 > IdenMatrix; // Identity Matrix
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
@@ -220,10 +220,10 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const PhysPropLimit( 1.0e-6 ); // Physical properties limit.
+		Real32 const PhysPropLimit( 1.0e-6 ); // Physical properties limit.
 		// This is more or less the traditional value from BLAST.
 
-		Real64 const RValueLowLimit( 1.0e-3 ); // Physical properties limit for R-value only layers
+		Real32 const RValueLowLimit( 1.0e-3 ); // Physical properties limit for R-value only layers
 		// This value was based on trial and error related to CR 7791 where a
 		// user had entered a "no insulation" layer with an R-value of 1.0E-05.
 		// Some trial and error established this as a potential value though
@@ -232,12 +232,12 @@ namespace ConductionTransferFunctionCalc {
 		int const MinNodes( 6 ); // Minimum number of state space nodes
 		// per layer.  This value was chosen based on experience with IBLAST.
 
-		Real64 const MaxAllowedCTFSumError( 0.01 ); // Allow a 1 percent
+		Real32 const MaxAllowedCTFSumError( 0.01 ); // Allow a 1 percent
 		// difference between the CTF series summations.  If the difference is
 		// greater than this, then the coefficients will not yield a valid steady
 		// state solution.
 
-		Real64 const MaxAllowedTimeStep( 4.0 ); // Sets the maximum allowed time step
+		Real32 const MaxAllowedTimeStep( 4.0 ); // Sets the maximum allowed time step
 		// for CTF calculations to be 4 hours.  This is done in response to some
 		// rare situations where odd or faulty input will cause the routine to
 		// go off and get some huge time step (in excess of 20 hours).  This value
@@ -259,25 +259,25 @@ namespace ConductionTransferFunctionCalc {
 		Array1D_int AdjacentResLayerNum( MaxLayersInConstruct ); // Layers that are adjacent to each other which are resistive
 		// only can and should be combined
 		int AdjLayer; // Loop counter for adjacent resistance-only layers
-		Real64 amatx; // Intermediate calculation variable
-		Real64 amatxx; // Intermediate calculation variable
-		Real64 amaty; // Intermediate calculation variable
-		Real64 BiggestSum; // Largest CTF series summation (maximum of SumXi, SumYi, and SumZi)
-		Real64 cap; // Thermal capacitance of a node (intermediate calculation)
-		Real64 capavg; // Thermal capacitance of a node (average value for a node at an interface)
-		Real64 cnd; // Total thermal conductance (1/Rtot) of the bldg element
+		Real32 amatx; // Intermediate calculation variable
+		Real32 amatxx; // Intermediate calculation variable
+		Real32 amaty; // Intermediate calculation variable
+		Real32 BiggestSum; // Largest CTF series summation (maximum of SumXi, SumYi, and SumZi)
+		Real32 cap; // Thermal capacitance of a node (intermediate calculation)
+		Real32 capavg; // Thermal capacitance of a node (average value for a node at an interface)
+		Real32 cnd; // Total thermal conductance (1/Rtot) of the bldg element
 		int Constr; // Loop counter
 		int ConstrNum; // Loop counter (construct number)
-		Array1D< Real64 > cp( MaxLayersInConstruct ); // Specific heat of a material layer
+		Array1D< Real32 > cp( MaxLayersInConstruct ); // Specific heat of a material layer
 		bool CTFConvrg; // Set after CTFs are calculated, based on whether there are too
 		// many CTF terms
 		int CurrentLayer; // Pointer to material number in Material derived type (current layer)
-		Array1D< Real64 > dl( MaxLayersInConstruct ); // Thickness of a material layer
-		Real64 dtn; // Intermediate calculation of the time step
-		Array1D< Real64 > dx( MaxLayersInConstruct ); // Distance between nodes in a particular material layer
-		Real64 dxn; // Intermediate calculation of nodal spacing
-		Real64 dxtmp; // Intermediate calculation variable ( = 1/dx/cap)
-		Real64 dyn; // Nodal spacing in the direction perpendicular to the main direction
+		Array1D< Real32 > dl( MaxLayersInConstruct ); // Thickness of a material layer
+		Real32 dtn; // Intermediate calculation of the time step
+		Array1D< Real32 > dx( MaxLayersInConstruct ); // Distance between nodes in a particular material layer
+		Real32 dxn; // Intermediate calculation of nodal spacing
+		Real32 dxtmp; // Intermediate calculation variable ( = 1/dx/cap)
+		Real32 dyn; // Nodal spacing in the direction perpendicular to the main direction
 		// of heat transfer (only valid for a 2-D solution)
 		static bool ErrorsFound( false ); // Flag for input error condition
 		int HistTerm; // Loop counter
@@ -287,7 +287,7 @@ namespace ConductionTransferFunctionCalc {
 		int Layer1; // Loop counter
 		int LayersInConstruct; // Array containing the number of layers for each construct
 		// Different from TotLayers because shades are not include in local var
-		Array1D< Real64 > lr( MaxLayersInConstruct ); // R value of a material layer
+		Array1D< Real32 > lr( MaxLayersInConstruct ); // R value of a material layer
 		int Node; // Loop counter
 		int Node2; // Node number (modification of Node and NodeInRow)
 		int NodeInLayer; // Loop counter
@@ -300,16 +300,16 @@ namespace ConductionTransferFunctionCalc {
 		Array1D_bool ResLayer( MaxLayersInConstruct ); // Set true if the layer must be handled as a resistive
 		bool RevConst; // Set true if one construct is the reverse of another (CTFs already
 		// available)
-		Array1D< Real64 > rho( MaxLayersInConstruct ); // Density of a material layer
-		Array1D< Real64 > rk( MaxLayersInConstruct ); // Thermal conductivity of a material layer
-		Real64 rs; // Total thermal resistance of the building element
-		Real64 SumXi; // Summation of all of the Xi terms (inside CTFs) for a construction
-		Real64 SumYi; // Summation of all of the Xi terms (cross CTFs) for a construction
-		Real64 SumZi; // Summation of all of the Xi terms (outside CTFs) for a construction
+		Array1D< Real32 > rho( MaxLayersInConstruct ); // Density of a material layer
+		Array1D< Real32 > rk( MaxLayersInConstruct ); // Thermal conductivity of a material layer
+		Real32 rs; // Total thermal resistance of the building element
+		Real32 SumXi; // Summation of all of the Xi terms (inside CTFs) for a construction
+		Real32 SumYi; // Summation of all of the Xi terms (cross CTFs) for a construction
+		Real32 SumZi; // Summation of all of the Xi terms (outside CTFs) for a construction
 		bool DoCTFErrorReport;
-		Real64 Alpha; // thermal diffusivity in m2/s, for local check of properties
-		Real64 DeltaTimestep; // zone timestep in seconds, for local check of properties
-		Real64 ThicknessThreshold; // min thickness consistent with other thermal properties, for local check
+		Real32 Alpha; // thermal diffusivity in m2/s, for local check of properties
+		Real32 DeltaTimestep; // zone timestep in seconds, for local check of properties
+		Real32 ThicknessThreshold; // min thickness consistent with other thermal properties, for local check
 
 		// FLOW:
 		// Subroutine initializations
@@ -1286,7 +1286,7 @@ namespace ConductionTransferFunctionCalc {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		Real64 const DPLimit( 1.0e-20 );
+		Real32 const DPLimit( 1.0e-20 );
 		// This argument is nice, but not sure it's accurate -- LKL Nov 1999.
 		// Parameter set to the significant figures limit of double
 		// precision variables plus a safety factor.- The argument for setting this parameter to 1E-20 involves the
@@ -1309,14 +1309,14 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 AMatRowNorm; // Row norm for AMat
-		Real64 AMatRowNormMax; // Largest row norm for AMat
-		Array2D< Real64 > AMat1; // AMat factored by (delt/2^k)
-		Array2D< Real64 > AMato; // AMat raised to the previous power (power of AMat1-1)
-		Array2D< Real64 > AMatN; // Current value of AMat raised to power n (n = 1,2...)
+		Real32 AMatRowNorm; // Row norm for AMat
+		Real32 AMatRowNormMax; // Largest row norm for AMat
+		Array2D< Real32 > AMat1; // AMat factored by (delt/2^k)
+		Array2D< Real32 > AMato; // AMat raised to the previous power (power of AMat1-1)
+		Array2D< Real32 > AMatN; // Current value of AMat raised to power n (n = 1,2...)
 		bool Backup; // Used when numerics get to small in Exponentiation
-		Real64 CheckVal; // Used to avoid possible overflow from Double->REAL(r64)->Integer
-		Real64 fact; // Intermediate calculation variable (delt/2^k)
+		Real32 CheckVal; // Used to avoid possible overflow from Double->REAL(r64)->Integer
+		Real32 fact; // Intermediate calculation variable (delt/2^k)
 		int i; // Loop counter
 		int ic; // Loop counter
 		int ict; // Loop counter
@@ -1554,7 +1554,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Array2D< Real64 > AMat1; // Intermediate calculation matrix equivalent at first to AMat
+		Array2D< Real32 > AMat1; // Intermediate calculation matrix equivalent at first to AMat
 		int ic; // Loop counter
 		int ir; // Loop counter
 		int irr; // Loop counter
@@ -1657,7 +1657,7 @@ namespace ConductionTransferFunctionCalc {
 
 	void
 	CalculateGammas(
-		Real64 const delt, // Time increment in fraction of an hour
+		Real32 const delt, // Time increment in fraction of an hour
 		int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
 	)
 	{
@@ -1702,7 +1702,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Array2D< Real64 > ATemp; // Intermediate variable equal to AExp - I
+		Array2D< Real32 > ATemp; // Intermediate variable equal to AExp - I
 		int i; // Loop counter
 		int is1; // Loop counter
 		int j; // Loop counter
@@ -1823,7 +1823,7 @@ namespace ConductionTransferFunctionCalc {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const ConvrgLim( 1.0e-13 ); // Convergence limit (ratio) for cutting off the calculation of further
+		Real32 const ConvrgLim( 1.0e-13 ); // Convergence limit (ratio) for cutting off the calculation of further
 		// CTFs.  This value was found to give suitable accuracy in IBLAST.
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1837,7 +1837,7 @@ namespace ConductionTransferFunctionCalc {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		Real64 avg; // Intermediate calculation variable (average)
+		Real32 avg; // Intermediate calculation variable (average)
 		bool CTFConvrg; // Set after CTFs are calculated, based on whether there are
 		// too many CTFs terms
 		int i; // Loop counter
@@ -1847,15 +1847,15 @@ namespace ConductionTransferFunctionCalc {
 		int is; // Loop counter
 		int is2; // Loop counter
 		int j; // Loop counter
-		Array2D< Real64 > PhiR0; // Product of Phi( = AExp) and R0 matrices from the state
+		Array2D< Real32 > PhiR0; // Product of Phi( = AExp) and R0 matrices from the state
 		// space method
-		Real64 rat; // Intermediate calculation variable (ratio of flux history
+		Real32 rat; // Intermediate calculation variable (ratio of flux history
 		// terms)
-		Array2D< Real64 > Rnew; // Current R matrix
-		Array2D< Real64 > Rold; // R matrix from the last iteration
+		Array2D< Real32 > Rnew; // Current R matrix
+		Array2D< Real32 > Rold; // R matrix from the last iteration
 		int SurfNode; // Loop counter (for nodes at a surface)
-		Real64 SurfNodeFac; // Multiplying factor applied to various surface nodes
-		Real64 trace; // Trace of the product of Phi( = AExp) and R0
+		Real32 SurfNodeFac; // Multiplying factor applied to various surface nodes
+		Real32 trace; // Trace of the product of Phi( = AExp) and R0
 
 		// FLOW:
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1265,7 +1265,7 @@ namespace PipeHeatTransfer {
 		int const NumSections( 20 );
 		Real64 const ConvCrit( 0.05 );
 		int const MaxIterations( 200 );
-		Real64 const StefBoltzmann( 5.6697e-08 ); // Stefan-Boltzmann constant
+		Real32 const StefBoltzmann( 5.6697e-08 ); // Stefan-Boltzmann constant
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int IterationIndex( 0 ); // Index when stepping through equations

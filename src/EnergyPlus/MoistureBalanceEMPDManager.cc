@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -370,7 +370,7 @@ namespace MoistureBalanceEMPDManager {
 
 		// USE STATEMENTS:
 		using DataHeatBalFanSys::MAT;
-		using Psychrometrics::PsyRhovFnTdbWPb_fast;
+		using Psychrometrics::PsyRhovFnTdbWPb;
 		using Psychrometrics::PsyRhovFnTdbRh;
 
 		// Locals
@@ -405,7 +405,7 @@ namespace MoistureBalanceEMPDManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			ZoneNum = Surface( SurfNum ).Zone;
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
-			Real64 const rv_air_in_initval = min( PsyRhovFnTdbWPb_fast( MAT( ZoneNum ), max( ZoneAirHumRat( ZoneNum ), 1.0e-5 ), OutBaroPress ), PsyRhovFnTdbRh( MAT( ZoneNum ), 1.0, "InitMoistureBalanceEMPD" ) );
+			Real64 const rv_air_in_initval = min( PsyRhovFnTdbWPb( MAT( ZoneNum ), max( ZoneAirHumRat( ZoneNum ), 1.0e-5 ), OutBaroPress ), PsyRhovFnTdbRh( MAT( ZoneNum ), 1.0, "InitMoistureBalanceEMPD" ) );
 			RVSurfaceOld( SurfNum ) = rv_air_in_initval;
 			RVSurface( SurfNum ) = rv_air_in_initval;
 			RVSurfLayer( SurfNum ) = rv_air_in_initval;
@@ -470,7 +470,7 @@ namespace MoistureBalanceEMPDManager {
 		using Psychrometrics::PsyRhFnTdbRhov;
 		using Psychrometrics::PsyRhovFnTdbRh;
 		using Psychrometrics::PsyPsatFnTemp;
-		using Psychrometrics::PsyRhovFnTdbWPb_fast;
+		using Psychrometrics::PsyRhovFnTdbWPb;
 		using DataMoistureBalanceEMPD::Lam;
 
 		// Locals

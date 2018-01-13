@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -8339,7 +8339,7 @@ namespace SolarShading {
 					SlatAng = SurfaceWindow( ISurf ).SlatAngThisTS;
 					PermeabilityA = std::sin( SlatAng ) - Blind( BlNum ).SlatThickness / Blind( BlNum ).SlatSeparation;
 					PermeabilityB = 1.0 - ( std::abs( Blind( BlNum ).SlatWidth * std::cos( SlatAng ) ) + Blind( BlNum ).SlatThickness * std::sin( SlatAng ) ) / Blind( BlNum ).SlatSeparation;
-					SurfaceWindow( ISurf ).BlindAirFlowPermeability = min( 1.0, max( 0.0, PermeabilityA, PermeabilityB ) );
+					SurfaceWindow( ISurf ).BlindAirFlowPermeability = min( 1.0f, max( 0.0f, PermeabilityA, PermeabilityB ) );
 				}
 			} // End of check if interior or exterior blind in place
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,26 +78,26 @@ namespace ConductionTransferFunctionCalc {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern Array2D< Real64 > AExp; // Exponential of AMat
-	extern Array2D< Real64 > AInv; // Inverse of AMat
-	extern Array2D< Real64 > AMat; // "A" matrix from Seem's dissertation
+	extern Array2D< Real32 > AExp; // Exponential of AMat
+	extern Array2D< Real32 > AInv; // Inverse of AMat
+	extern Array2D< Real32 > AMat; // "A" matrix from Seem's dissertation
 	// (constant coefficients of linear system)
-	extern Array1D< Real64 > BMat; // "B" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > CMat; // "C" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > DMat; // "D" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > e; // Coefficients for the surface flux history term
-	extern Array2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
+	extern Array1D< Real32 > BMat; // "B" matrix of state space method (non-zero elements)
+	extern Array1D< Real32 > CMat; // "C" matrix of state space method (non-zero elements)
+	extern Array1D< Real32> DMat; // "D" matrix of state space method (non-zero elements)
+	extern Array1D< Real32 > e; // Coefficients for the surface flux history term
+	extern Array2D< Real32 > Gamma1; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
-	extern Array2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
+	extern Array2D< Real32 > Gamma2; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
 	extern int NodeSource; // Node at which a source or sink is present
 	extern int NodeUserTemp; // Node where user wishes to calculate a temperature
 	// (for constructions with sources/sinks only)
 	extern int rcmax; // Total number of nodes in the construct (<= MaxTotNodes)
-	extern Array3D< Real64 > s; // Coefficients for the surface temperature history terms
-	extern Array2D< Real64 > s0; // Coefficients for the current surface temperature terms
-	extern Real64 TinyLimit;
-	extern Array2D< Real64 > IdenMatrix; // Identity Matrix
+	extern Array3D< Real32 > s; // Coefficients for the surface temperature history terms
+	extern Array2D< Real32 > s0; // Coefficients for the current surface temperature terms
+	extern Real32 TinyLimit;
+	extern Array2D< Real32 > IdenMatrix; // Identity Matrix
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
@@ -114,7 +114,7 @@ namespace ConductionTransferFunctionCalc {
 
 	void
 	CalculateGammas(
-		Real64 const delt, // Time increment in fraction of an hour
+		Real32 const delt, // Time increment in fraction of an hour
 		int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
 	);
 

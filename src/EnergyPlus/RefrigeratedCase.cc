@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -332,26 +332,26 @@ namespace RefrigeratedCase {
 	int const SecondarySystem( 2 );
 
 	// Following constant approp for R22, future may make f(refrigerant)
-	Real64 const CaseSuperheat( 4.0 ); // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
-	Real64 const TransCaseSuperheat( 10.0 ); // case superheat for transcritical CO2 systems (C)
+	Real32 const CaseSuperheat( 4.0 ); // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
+	Real32 const TransCaseSuperheat( 10.0 ); // case superheat for transcritical CO2 systems (C)
 	// Next two constants used to autosize evap condenser
-	Real64 const CondPumpRatePower( 0.004266 ); // evap condenser pump rated, Wpump/Wcapacity (15 W/ton)
-	Real64 const AirVolRateEvapCond( 0.000144 ); // evap cond air flow rate for autosize, equiv 850 cfm/ton (m3/W-s)
-	Real64 const EvapCutOutTdb( 4.0 ); // shut off evap water flow if outdoor drybulb < evapcutOutTdb (C)
+	Real32 const CondPumpRatePower( 0.004266 ); // evap condenser pump rated, Wpump/Wcapacity (15 W/ton)
+	Real32 const AirVolRateEvapCond( 0.000144 ); // evap cond air flow rate for autosize, equiv 850 cfm/ton (m3/W-s)
+	Real32 const EvapCutOutTdb( 4.0 ); // shut off evap water flow if outdoor drybulb < evapcutOutTdb (C)
 	// Miscellaneous constants
-	Real64 const MyLargeNumber( 1.0e9 );
-	Real64 const MySmallNumber( 1.0e-9 );
-	Real64 const Rair( 0.3169 ); // Air resistance used with Heat Balance anti-sweat (AS) heater
-	Real64 const IceMeltEnthalpy( 335000.0 ); // heat of fusion of water J/kg
-	Real64 const TempTooHotToFrost( 5.0 ); // C, used to check for frosting conditions on evaporator coils
-	Real64 const IcetoVaporEnthalpy( 2833000.0 ); // J/kg to freeze water vapor to ice
-	Real64 const WatertoVaporEnthalpy( 2.5e6 ); // at 0C
-	Real64 const SpecificHeatIce( 2000.0 ); // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
-	Real64 const CondAirVolExponentDry( 1.58 ); // exponent for forced air over a cylinder, = 1/.633
+	Real32 const MyLargeNumber( 1.0e9 );
+	Real32 const MySmallNumber( 1.0e-9 );
+	Real32 const Rair( 0.3169 ); // Air resistance used with Heat Balance anti-sweat (AS) heater
+	Real32 const IceMeltEnthalpy( 335000.0 ); // heat of fusion of water J/kg
+	Real32 const TempTooHotToFrost( 5.0 ); // C, used to check for frosting conditions on evaporator coils
+	Real32 const IcetoVaporEnthalpy( 2833000.0 ); // J/kg to freeze water vapor to ice
+	Real32 const WatertoVaporEnthalpy( 2.5e6 ); // at 0C
+	Real32 const SpecificHeatIce( 2000.0 ); // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
+	Real32 const CondAirVolExponentDry( 1.58 ); // exponent for forced air over a cylinder, = 1/.633
 	//per ASHRAE 2005 (page 3.15)
-	Real64 const CondAirVolExponentEvap( 1.32 ); // exponent for evap condenser air vol flow, = 1/.76
+	Real32 const CondAirVolExponentEvap( 1.32 ); // exponent for evap condenser air vol flow, = 1/.76
 	//per Manske, 1999
-	Real64 const EvaporatorAirVolExponent( 1.54 ); // exponent for evapaporator air vol flow, = 1/.65
+	Real32 const EvaporatorAirVolExponent( 1.54 ); // exponent for evapaporator air vol flow, = 1/.65
 	//per Manske, 1999, page 35
 
 	Real64 const FanHalfSpeedRatio( 0.1768 ); // = 1/(2**2.5) for power step for two speed fan
@@ -9152,7 +9152,7 @@ namespace RefrigeratedCase {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const BleedRateConstant( 5.0E-10 ); // water purge rate for evaporative
+		Real32 const BleedRateConstant( 5.0E-10 ); // water purge rate for evaporative
 		//  condensers (m3/W-s) equal to 3 GPM per 100 tons (BAC Engineering Reference)
 
 		// INTERFACE BLOCK SPECIFICATIONS:

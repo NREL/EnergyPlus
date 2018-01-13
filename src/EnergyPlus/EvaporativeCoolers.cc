@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1225,7 +1225,7 @@ namespace EvaporativeCoolers {
 					if ( CoolerOnMainAirLoop ) {
 						IndirectVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					} else if ( CoolerOnOApath ) {
-						IndirectVolFlowRateDes = std::max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.50*FinalSysSizing( CurSysNum ).DesMainVolFlow );
+						IndirectVolFlowRateDes = std::max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.5f*FinalSysSizing( CurSysNum ).DesMainVolFlow );
 					}
 					// Face air velocity of 3m/s is assumed
 					PadAreaDes = IndirectVolFlowRateDes / 3.0;
@@ -1344,7 +1344,7 @@ namespace EvaporativeCoolers {
 					if ( CoolerOnMainAirLoop ) {
 						IndirectVolFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					} else if ( CoolerOnOApath ) {
-						IndirectVolFlowRateDes = std::max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.5*FinalSysSizing( CurSysNum ).DesMainVolFlow );
+						IndirectVolFlowRateDes = std::max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.5f*FinalSysSizing( CurSysNum ).DesMainVolFlow );
 					}
 					// Face air velocity of 3m/s is assumed
 					PadAreaDes = IndirectVolFlowRateDes / 3.0;

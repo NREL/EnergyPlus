@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2701,10 +2701,10 @@ namespace EconomicTariff {
 						pushStack( abs( a ), noVar );
 					} else if ( SELECT_CASE_var == opINTEGER ) {
 						popStack( a, aPt );
-						pushStack( Array1D_double( Array1D_int( a ) ), noVar );
+						pushStack( Array1D_float( Array1D_int( a ) ), noVar );
 					} else if ( SELECT_CASE_var == opSIGN ) {
 						popStack( a, aPt );
-						pushStack( sign( 1.0, a ), noVar );
+						pushStack( sign( 1.0f, a ), noVar );
 						//        CASE (opROUND)
 						//          CALL popStack(b,bPt)
 						//          CALL popStack(a,aPt)

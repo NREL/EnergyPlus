@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -769,7 +769,7 @@ namespace HeatBalanceManager {
 				TMP = index( BuildingName, char( 3 ) );
 			}
 			// Building Azimuth (no validation)
-			BuildingAzimuth = mod( BuildingNumbers( 1 ), 360.0 );
+			BuildingAzimuth = mod( BuildingNumbers( 1 ), 360.0f );
 			// Terrain
 			if ( AlphaName( 2 ) == "COUNTRY" || AlphaName( 2 ) == "1" ) {
 				SiteWindExp = 0.14;
@@ -1040,7 +1040,7 @@ namespace HeatBalanceManager {
 		if ( NumObjects > 0 ) {
 			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Building Rotation for Appendix G
-			BuildingRotationAppendixG = mod( BuildingNumbers( 1 ), 360.0 );
+			BuildingRotationAppendixG = mod( BuildingNumbers( 1 ), 360.0f );
 		}
 
 		// A new object is added by L. Gu, 12/09

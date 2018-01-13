@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6795,7 +6795,7 @@ namespace DaylightingManager {
 		Real64 FA; // Intermediate variables
 		Real64 FB;
 
-		static Array2D< Real64 > const PF( 5, 7, reshape2< Real64, int >( { 1.00, 0.492, 0.226, 0.128, 0.081, 0.061, 0.057, 0.123, 0.119, 0.065, 0.043, 0.029, 0.026, 0.023, 0.019, 0.026, 0.019, 0.016, 0.014, 0.011, 0.011, 0.008, 0.008, 0.008, 0.008, 0.008, 0.006, 0.006, 0.0, 0.0, 0.003, 0.003, 0.003, 0.003, 0.003 }, { 5, 7 } ) ); // Position factor array // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const PF( 5, 7, reshape2< Real64, int >( { 1.00f, 0.492f, 0.226f, 0.128f, 0.081f, 0.061f, 0.057f, 0.123f, 0.119f, 0.065f, 0.043f, 0.029f, 0.026f, 0.023f, 0.019f, 0.026f, 0.019f, 0.016f, 0.014f, 0.011f, 0.011f, 0.008f, 0.008f, 0.008f, 0.008f, 0.008f, 0.006f, 0.006f, 0.0f, 0.0f, 0.003f, 0.003f, 0.003f, 0.003f, 0.003f }, { 5, 7 } ) ); // Position factor array // Explicit reshape2 template args are work-around for VC++2013 bug
 
 		// FLOW:
 		DayltgGlarePositionFactor = 0.0;

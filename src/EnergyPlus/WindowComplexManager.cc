@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -133,7 +133,7 @@ namespace WindowComplexManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 
-	Real64 const sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
+	Real32 const sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
 	Real64 const PressureDefault( 101325.0 );
 
 	int const Calculate_Geometry( 1 );

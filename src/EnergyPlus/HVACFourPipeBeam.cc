@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -675,7 +675,7 @@ namespace FourPipeBeam {
 			Real64 minFlow( 0.0 );
 			Real64 maxFlowCool( 0.0 );
 			minFlow = std::min( DataEnvironment::StdRhoAir * originalTermUnitSizeMaxVDot, FinalZoneSizing( CurZoneEqNum ).DesOAFlow * DataEnvironment::StdRhoAir );
-			minFlow = std::max( 0.0, minFlow );
+			minFlow = std::max( 0.0f, minFlow );
 			//max flow is as if the air supply was sufficient to provide all the conditioning
 
 			if ( beamCoolingPresent ) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,7 +131,7 @@ namespace WindowManager {
 	//MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
-	Real64 const sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
+	Real32 const sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
 	Real64 const TKelvin( KelvinConv ); // conversion from Kelvin to Celsius
 	int const nume( 107 ); // Number of wavelength values in solar spectrum
 	int const numt3( 81 ); // Number of wavelength values in the photopic response
@@ -1714,9 +1714,9 @@ namespace WindowManager {
 			W21 = W1 - W2;
 			W23 = W3 - W2;
 			if ( Rectangle ) {
-				SurfaceWindow( SurfNum ).WinCenter = W2 + ( W23 + W21 ) / 2.0;
+				SurfaceWindow( SurfNum ).WinCenter = W2 + ( W23 + W21 ) / 2.0f;
 			} else if ( Triangle ) {
-				SurfaceWindow( SurfNum ).WinCenter = W2 + ( W23 + W21 ) / 3.0;
+				SurfaceWindow( SurfNum ).WinCenter = W2 + ( W23 + W21 ) / 3.0f;
 			}
 		} // End of surface loop
 
@@ -2515,7 +2515,7 @@ namespace WindowManager {
 					}
 					if ( i >= 1 ) {
 						// Find the closest item
-						iMinDT = minloc( deltaTemp, deltaTemp > 0.0 );
+						iMinDT = minloc( deltaTemp, deltaTemp > 0.0f );
 						// Use the new TC window construction
 						ConstrNum = IDConst( iMinDT( 1 ) );
 						surface.Construction = ConstrNum;
