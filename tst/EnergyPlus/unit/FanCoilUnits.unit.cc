@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,6 +155,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -456,6 +457,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -760,6 +762,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1149,6 +1152,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1450,6 +1454,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1804,6 +1809,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -2185,7 +2191,7 @@ namespace EnergyPlus {
 		std::string const idf_objects = delimited_string( {
 			" Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
 			" ZoneHVAC:EquipmentConnections, EAST ZONE, Zone1Equipment, Zone1Inlets, Zone1Exhausts, Zone 1 Node, Zone 1 Outlet Node;",
-			" ZoneHVAC:EquipmentList, Zone1Equipment, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
+			" ZoneHVAC:EquipmentList, Zone1Equipment, SequentialLoad, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
 			" OutdoorAir:NodeList, Zone1FCOAIn;",
 			" OutdoorAir:Mixer, Zone1FanCoilOAMixer, Zone1OAMixOut, Zone1FCOAIn, Zone1FCExh, Zone1FCAirIn;",
 			" Fan:ConstantVolume, Zone1FanCoilFan, FCAvailSch, 0.5, 75.0, 0.6, 0.9, 1.0, Zone1OAMixOut, Zone1FCFanOut;",
@@ -2428,6 +2434,7 @@ namespace EnergyPlus {
 
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",

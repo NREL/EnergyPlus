@@ -82,7 +82,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,4;
 
@@ -2283,10 +2283,11 @@
     ZONE 1 @ 200 601 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 1 @ 200 601 0 T NODE,  !- Zone Air Node Name
-    ZONE 1 @ 200 601 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 1 @ 200 601 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 1 @ 200 601 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 1 @ 200 601 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2357,10 +2358,11 @@
     ZONE 2 @ 200 200 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 2 @ 200 200 0 T NODE,  !- Zone Air Node Name
-    ZONE 2 @ 200 200 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 2 @ 200 200 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 2 @ 200 200 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 2 @ 200 200 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2431,10 +2433,11 @@
     ZONE 3 @ 200 610 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 3 @ 200 610 0 T NODE,  !- Zone Air Node Name
-    ZONE 3 @ 200 610 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 3 @ 200 610 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 3 @ 200 610 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 3 @ 200 610 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2505,10 +2508,11 @@
     ZONE 4 @ 200 600 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 4 @ 200 600 0 T NODE,  !- Zone Air Node Name
-    ZONE 4 @ 200 600 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 4 @ 200 600 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 4 @ 200 600 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 4 @ 200 600 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2579,10 +2583,11 @@
     ZONE 5 @ 200 601 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 5 @ 200 601 1 T NODE,  !- Zone Air Node Name
-    ZONE 5 @ 200 601 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 5 @ 200 601 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 5 @ 200 601 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 5 @ 200 601 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2653,10 +2658,11 @@
     ZONE 6 @ 200 200 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 6 @ 200 200 1 T NODE,  !- Zone Air Node Name
-    ZONE 6 @ 200 200 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 6 @ 200 200 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 6 @ 200 200 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 6 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2727,10 +2733,11 @@
     ZONE 7 @ 200 610 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 7 @ 200 610 1 T NODE,  !- Zone Air Node Name
-    ZONE 7 @ 200 610 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 7 @ 200 610 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 7 @ 200 610 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 7 @ 200 610 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2801,10 +2808,11 @@
     ZONE 8 @ 200 200 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 8 @ 200 200 1 T NODE,  !- Zone Air Node Name
-    ZONE 8 @ 200 200 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 8 @ 200 200 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 8 @ 200 200 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 8 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2875,10 +2883,11 @@
     ZONE 9 @ 200 600 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 9 @ 200 600 1 T NODE,  !- Zone Air Node Name
-    ZONE 9 @ 200 600 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 9 @ 200 600 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 9 @ 200 600 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 9 @ 200 600 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

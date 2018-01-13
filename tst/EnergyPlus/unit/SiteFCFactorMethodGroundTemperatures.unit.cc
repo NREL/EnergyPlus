@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,6 @@ using namespace EnergyPlus::GroundTemperatureManager;
 TEST_F( EnergyPlusFixture, SiteFCFactorMethodGroundTempTest )
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:FCFactorMethod,",
 		"	21.00,	!- January",
 		"	22.00,	!- February",
@@ -79,7 +78,7 @@ TEST_F( EnergyPlusFixture, SiteFCFactorMethodGroundTempTest )
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	
+
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

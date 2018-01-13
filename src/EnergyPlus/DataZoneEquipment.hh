@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -142,6 +142,14 @@ namespace DataZoneEquipment {
 	// Utility routines for module
 
 	// Types
+
+	enum class LoadDist 
+	{
+		SequentialLoading,
+		UniformLoading,
+		UniformPLRLoading,
+		SequentialUniformPLRLoading
+	};
 
 	struct EquipMeterData
 	{
@@ -424,7 +432,6 @@ namespace DataZoneEquipment {
 		Real64 TotPlantSupplyOther;
 		Real64 PlantSupplyOtherEff;
 		Real64 PeakPlantSupplyOtherEff;
-		Real64 Capacity;
 		int OpMode;
 
 		// Default Constructor
@@ -449,7 +456,6 @@ namespace DataZoneEquipment {
 			TotPlantSupplyOther( 0.0 ),
 			PlantSupplyOtherEff( 0.0 ),
 			PeakPlantSupplyOtherEff( 0.0 ),
-			Capacity( 0.0 ),
 			OpMode( 0 )
 		{}
 
@@ -459,20 +465,34 @@ namespace DataZoneEquipment {
 	{
 		// Members
 		std::string Name; // Name of the equipment list
+		DataZoneEquipment::LoadDist LoadDistScheme; // load distribution scheme
 		int NumOfEquipTypes; // Number of items on this list
+		int NumAvailHeatEquip; // Number of pieces of equipment available for heating
+		int NumAvailCoolEquip; // Number of pieces of equipment available for cooling
 		Array1D_string EquipType;
 		Array1D_int EquipType_Num;
 		Array1D_string EquipName;
 		Array1D_int EquipIndex;
 		Array1D_int CoolingPriority;
 		Array1D_int HeatingPriority;
+		Array1D_int CoolingCapacity; // Current cooling capacity (negative) [W]
+		Array1D_int HeatingCapacity; // Current heating capacity (positive) [W]
 		Array1D< EquipmentData > EquipData; // Index of energy output report data
 
 		// Default Constructor
 		EquipList() :
-			NumOfEquipTypes( 0 )
+			LoadDistScheme( DataZoneEquipment::LoadDist::SequentialLoading ),
+			NumOfEquipTypes( 0 ),
+			NumAvailHeatEquip( 0 ),
+			NumAvailCoolEquip( 0 )
 		{}
 
+		void
+		getPrioritiesforInletNode(
+			int const inletNodeNum, // Zone inlet node number to match
+			int & coolingPriority, // Cooling priority num for matching equipment
+			int & heatingPriority // Heating priority num for matching equipment
+		);
 	};
 
 	struct ControlList

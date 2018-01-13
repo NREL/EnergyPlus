@@ -899,11 +899,11 @@ When the calculated regeneration outlet air conditions do not follow these guide
 
 \subsection{Plant Loop Deep-Ground-To-Water Vertical U-Tube Field Heat Exchanger}\label{plant-loop-deep-ground-to-water-vertical-u-tube-field-heat-exchanger}
 
-This model (Object: GroundHeatExchanger:Vertical) documentation is derived from the M.S. thesis of Arunachalam Murugappan, which is available on the Oklahoma State University web site \url{http://www.hvac.okstate.edu/}.~ Eskilson (1987) Yavuzturk and Spitler (1999) developed the long and short time response factors respectively, which are used in determining the borehole temperature responses. Response factors are infinite series of numbers, which relate the current value of a variable to past values of other variables at discrete time intervals.~ These response factors are referred as \emph{g}-functions. The variable time-step model presented here uses both long time-step \emph{g}-functions and short time-step \emph{g}-functions to predict the boreholes response to short term fluctuations in the load.
+This model (GroundHeatExchanger:System) is used to determine the borehole temperature response. Response factors, which are the non-dimensional temperature response of the borehole field to a heat pulse over a given time period, need to be precomputed before the model can simulate the ground heat exchanger. These response factors are referred to as \emph{g}-functions. The variable time-step model presented here uses both long time-step \emph{g}-functions and short time-step \emph{g}-functions to predict the boreholes response to short term fluctuations in the load.
 
 \subsubsection{Long Time-Step Response Factors}\label{long-time-step-response-factors}
 
-Eskilson developed \emph{g}-functions for various borehole configurations. He plotted the g function curves for different sets of borehole spacing to borehole length ratio \(B/H\) ~typically for .05, 0.1, 0.15, 0.2, 0.3 and ∞ (∞ represents the single borehole configuration. All the plots were for the ratio of 0.0005 between the borehole radius and the borehole length \({r_b}/H\) . For any other radius a simple relation between the two radii as given by Eskilson (1987) can be used. Eskilson gives the \emph{g}-function curves for 38 different configurations.
+Eskilson(1987) originally developed \emph{g}-functions for various borehole configurations. He plotted the g-function curves for different sets of borehole spacing to borehole length ratio \(B/H\) ~typically for .05, 0.1, 0.15, 0.2, 0.3 and ∞ (∞ represents the single borehole configuration). For any other radius a simple relation between the two radii as given by Eskilson (1987) can be used. Eskilson gives the \emph{g}-function curves for 38 different configurations.
 
 Figure~\ref{fig:short-time-step-g-function-curve-as-an} shows the \emph{g}-function plotted against the non-dimensional time defined as \(\ln (t/{t_s})\) , \({t_s} = {H^2}/9\alpha\) ~for various configurations of vertical boreholes with \emph{B/H} ratio of .1 along with single borehole. It is seen from this figure that the thermal interaction between boreholes increases with time and with the number of boreholes in field.
 
@@ -913,35 +913,31 @@ Figure~\ref{fig:short-time-step-g-function-curve-as-an} shows the \emph{g}-funct
 \caption{Short Time Step g Function Curve as an Extension of Long Time Step g Function Curves for Different Configuration of Boreholes (Eskilson 1987, Yavuzturk 1999). \protect \label{fig:short-time-step-g-function-curve-as-an}}
 \end{figure}
 
-The \emph{g}-functions developed by Eskilson are valid only after time estimated by Eskilson as \(5r_b^2/\alpha\) . This time varies from 3-6 hours for a typical borehole field. This is because the analytical line source model, based on which the Eskilson's model was developed, does not give a prompt increase in borehole wall temperature at \(r = {r_b}\) . It gives acceptable results only after the non-dimensional times of \(\alpha t/r_b^2 > 5\) . But to model short time responses of a borehole we need response factors, which can give accurate results down to minutes.
+The \emph{g}-functions developed by Eskilson are given only down to values of $\ln t/t_s = -4.5$, which for typical system and soil types can be on the order of 100 days. The values can be extended by the applying a line source model down to a time of $t = 5r_b^2/\alpha$. This time varies from 3-6 hours for a typical borehole field. This is because the analytical line source model, based on which the Eskilson model was developed, does not give a prompt increase in borehole wall temperature at \(r = {r_b}\) . It gives acceptable results only after the non-dimensional times of \(\alpha t/r_b^2 > 5\). But to model short time responses of a borehole we need response factors which can give accurate results down to minutes.
+
+In order to generate the long time-step response factors on the fly, EnergyPlus uses the model developed by Marcotte \& Pasquier(2009) which uses a discretized line source model. The \emph{g}-functions are generated using the following equation. The boreholes are discretized into segments. The temperature response of each segment on all other segments is then used to determine response factor for that particular geometry. The model estimates surface effects by creating ``imaginary" boreholes which are mirrored about the ground surface.
+
+\begin{equation}
+g = \frac{1}{2 H_T} \sum_{i=1}^N \sum_{j=1}^N \left( \int_{u_1^i}^{u_2^i} \int_{u_1^i}^{u_2^i} \frac{\erfc\left( \frac{d(u_i, u_j)}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j)} - \frac{\erfc\left( \frac{d(u_i, u_j^{'})}{2\sqrt{\alpha t}}\right)}{d(u_i, u_j^{'})}\right)
+\end{equation}
+
+where,
+
+\begin{align}
+	N &= \mbox{Number of boreholes} \\
+	H_T &= \mbox{Length of borehole} \\
+	\alpha &= \mbox{Ground thermal diffusivity} \\
+	t &= \mbox{Simulation time} \\
+	u_1 &= \mbox{Starting discretization point for borhole} \\
+	u_2 &= \mbox{Final discretization point for borehole} \\
+	d(u_i, u_j) &= \mbox{Distance between current point and point on other borehole} \\
+	d(u_i, u_j^{'}) &= \mbox{Distance between current point and point on other imaginary borehole}
+\end{align}
+
 
 \subsubsection{Short Time-Step Response Factors}\label{short-time-step-response-factors}
 
-Yavuzturk and Spitler (1999) developed short time step response factors using a transient, two-dimensional, implicit finite volume model on a polar grid.
-
-The circular u-tube pipe in the ground loop heat exchanger was approximated as a pie sector of equivalent perimeter.~ A constant heat flux for the heat transfer form/to U-tube, a zero heat flux in the angular direction and a constant far field temperature in the radial axis makes up the three boundary condition and undisturbed far field temperature as the initial condition. The numerical model accounts for the thermal resistance due to individual borehole elements; such as resistance of the pipe and grout material and the convection resistance due to the heat transfer fluid in the pipes. The long time step \emph{g}-functions discussed in the previous section do not account for such effects.
-
-The short time-step \emph{g}-functions are the same for different borehole configurations. This is because there is no thermal interaction between the boreholes for times less than 200 hrs during which the short time-step \emph{g}-functions apply. So it is suggested to use the short time-step \emph{g} function for time steps in the range of 2.5 min and 200 hours and the long time-step \emph{g}-functions for time steps longer than 200 hours. The \emph{g} function for any time can be found by linear interpolation between the bounding known values.
-
-\subsubsection{Development of the Variable Short Time Step Model}\label{development-of-the-variable-short-time-step-model}
-
-The variable time step model was developed as an extension of the model presented by Yavuzturk and Spitler (1999). The variable, short time step model uses a similar algorithm and extends it to accommodate sub-hourly responses, variable time steps and explicit equations to calculate the outlet fluid temperature of the ground loop heat exchanger.
-
-The uniform time-steps model developed by Yavuzturk and Spitler (1999) is able to pre-calculate all the g-functions at the beginning of the simulation. The variable time-step model on the other hand must calculate the \emph{g}-functions when the borehole response calculation for each time step is carried out. For every time step a different set of \emph{g}-functions is needed in the variable time step model as the time at which the \emph{g}-function is to be applied for the past loads changes for each time-steps.
-
-This is made clear from the illustration in Figure~\ref{fig:variable-timestep-ground-loop-heat-exchanger}, which shows a simulation in progress. The boxes with numbers represent the sub-hourly loads. The time (in hrs) at which these loads occurred are shown by solid arrows above the respective load boxes. The right-most solid arrow gives the current simulation time, which is 3.31 hrs. The times given below the boxes, pointed by dashed arrows, are the time at which the \emph{g}-functions are to be estimated and applied to the respective sub hourly loads (boxes) for the current time.
-
-For example, let us take the sub hourly loads 1,2 \& 3. These loads occurred at 0 hrs, 0.16 hrs \& 0.28 hrs. The response of the borehole temperature for the current time step is calculated by applying the \emph{g­-}functions at 3.15 hrs, 3.03 hrs \& 2.5 hrs respectively. Thus to calculate the present borehole temperature, the sub hourly loads 1-12 are superposed using the corresponding \emph{g} functions at times given by the dashed lines.~ This gives the borehole temperature at hr 3.31. However, for the previous time step, which occurred at 3.15 hrs, the g-functions for the loads 1, 2 \& 3 are at 2.99 hrs 2.87 hrs and 2.42 hrs, and the over all response is obtained by superposing the loads 1-11.
-
-Thus for each time step since the time step increments are not uniform we need to store the simulation times at which these time-steps occurred, and calculate corresponding \emph{g}-functions at each time-step.
-
-\begin{figure}[hbtp] % fig 254
-\centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5655.png}
-\caption{Variable Timestep Ground Loop Heat Exchanger Model Schematic Explaining the \emph{g} Function Estimation. \protect \label{fig:variable-timestep-ground-loop-heat-exchanger}}
-\end{figure}
-
-Yavuzturk model calculates the outlet fluid temperature by iteration beginning with the undisturbed mean temperature of the surrounding ground as an initial guess. This aggravates the time taken by an already computationally intensive algorithm. To circumvent this a set of explicit equations were formulated to estimate the outlet fluid temperature.
+The short timestep response is calculated by applying the model developed by Xu and Spitler (2006). This model maps the 2D geometry of the borehole onto a 1D radial geometry which preserves the thermal mass of the system, including the fluid. The multipole method (Claesson and Helstr{\"o}m, 2011) is used to correct the conductivity of the pipe and grout so the correct borehole resistance is maintained. The temperature response of the 1D domain is solved using a finite volume approach. The temperature at the borehole wall is then used to compute the g-function for short time-steps.
 
 \subsubsection{Description of the Load Aggregation Scheme}\label{description-of-the-load-aggregation-scheme}
 
@@ -1109,9 +1105,13 @@ Compute the hourly loads as each hour and monthly loads as each month passes. Ca
 
 Eskilson, P. 1987. Thermal Analysis of Heat Extraction Boreholes. Ph.D.~Thesis, Department of Mathematical Physics, University of Lund, Lund, Sweden.
 
+Claesson, J., G. Helstr{\"o}m. 2011. Multipole method to calculate borehole thermal resistances in a borehole heat exchanger. HVAC\&R Research. 17(6), 895-911.
+
 Yavuzturk, C. 1999. Modeling of Vertical Ground Loop Heat Exchangers for Ground Source Heat Pump Systems. Ph.D.~Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University, Stillwater, Oklahoma.
 
-Yavuzturk, C., J.D. Spitler. 1999.\href{http://www.hvac.okstate.edu/research/Documents/ASHRAE/Yavuzturk_Spitler_99.pdf}{A Short Time Step Response Factor Model for Vertical Ground Loop Heat Exchangers.} \emph{ASHRAE Transactions}. 105(2):475-485.
+Yavuzturk, C., J.D. Spitler. 1999. A Short Time Step Response Factor Model for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2):475-485.
+
+Xu, X., J.D. Spitler. 2006. Modeling of Vertical Ground Loop Heat Exchangers with Variable Convective and Thermal Mass of Fluid. Proceedings of the 10th International Conference on Thermal Energy Storage-Ecostock 2006, Pomona, NJ.
 
 \subsection{GroundHeatExchanger:Slinky}\label{groundheatexchangerslinky}
 

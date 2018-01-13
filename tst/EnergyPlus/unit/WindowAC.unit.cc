@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,7 +69,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	// this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
 	// set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
 	std::string const idf_objects = delimited_string( {
-	" Version,8.8;",
+	" Version,8.9;",
 
 	"  Timestep,6;",
 
@@ -255,6 +255,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	"  ZoneHVAC:EquipmentList,",
 	"    Zone1Equipment,          !- Name",
+	"    SequentialLoad,          !- Load Distribution Scheme",
 	"    ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type",
 	"    Zone1WindAC,             !- Zone Equipment 1 Name",
 	"    1,                       !- Zone Equipment 1 Cooling Sequence",
