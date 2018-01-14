@@ -333,7 +333,6 @@ namespace EnergyPlus {
 
 		int const SysNum( 1 );
 		int const InletNode = Sys( SysNum ).InletNodeNum;
-		int const OutletNode = Sys( SysNum ).OutletNodeNum;
 		int const ZonePtr = Sys( SysNum ).ActualZoneNum;
 		int const ZoneAirNodeNum = ZoneEquipConfig( ZonePtr ).ZoneNode;
 		Schedule( Sys( SysNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
@@ -465,7 +464,6 @@ namespace EnergyPlus {
 
 		int const SysNum( 1 );
 		int const InletNode = Sys( SysNum ).InletNodeNum;
-		int const OutletNode = Sys( SysNum ).OutletNodeNum;
 		int const ZonePtr = Sys( SysNum ).ActualZoneNum;
 		int const ZoneAirNodeNum = ZoneEquipConfig( ZonePtr ).ZoneNode;
 		Schedule( Sys( SysNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
