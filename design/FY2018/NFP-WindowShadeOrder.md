@@ -5,6 +5,7 @@ Window Shade Order
 
  - December 21, 2017
  - January 10, 2018
+ - January 15, 2018 - Added design section
  
 
 ## Justification for New Feature ##
@@ -80,7 +81,7 @@ WindowProperty:ShadingControl,
 
 ```
 
-The revised objects 
+The Shading Control Name is removed and is shown above with a minus sign. The revised objects are shown below with additional fields with plus signs.
 
 ```
 FenestrationSurface:Detailed,
@@ -147,7 +148,7 @@ Test cases that use multiple windows where the order of the window shading deplo
 
 Remove "Shading Control Type" field from FenestrationSurface:Detailed, Window and GlazedDoor objects.
 
-Rename the WindowProperty:ShadingControl object to WindowShadingControl and replace the reference to this aboject where ever it occurs.
+Rename the WindowProperty:ShadingControl object to WindowShadingControl and replace the reference to this object wherever it occurs.
 
 ### WindowShadingControl
 
@@ -235,5 +236,33 @@ To help provide backward compatibility the transition program will set WindowSha
 ## References ##
 
 None.
+
+## Design ##
+
+In order to read the objects that have changed, the following will be modified:
+
+- GetHTSubSurfaceData() and GetRectSubSurfaces() and GetWindowShadingControlData() in SurfaceGeometry.cc
+- SurfData struct will be modified to remove  the member WindowShadingControlPtr
+- WindowShadingControlData struct will be modified to add the new input fields  
+
+WindowShadingControlPtr is used in:
+
+- DaylightingDevices.cc
+- DaylightingManager.cc
+- DElightManagerF.cc
+- EMSManager.cc
+- HeatBalanceSurfaceManager.cc
+- SolarShading.cc
+- SurfaceGeometry.cc
+- WindowManager.cc
+
+In most cases, the code is just checking if the suface has shading, so those should be easy to fix. In other cases, more extensive changes will be required. Upon a more detailed code review, it might be advantageous to leave the struct alone and just populate it from the new WindowShadingControl object.
+
+While the object is changing name from WindowProperty:ShadingControl to WindowShadingControl, the same WindowShadingControl() array will be used with just the underlying struct modified. The addition of members for the Shading Control Sequence Number, the Daylighting Control Object Name, Multiple Suface Control Type and an array for each Fenestration Suface will be made.
+
+The DayltgInteriorIllum() function is in DaylightingManager.cc is the main function to be updated to support the new ordered window shading controls. The function will be modified to traverse the list of SurfaceWindows in an order established by the revised objects. A sort of the WindowShadingControl objects will be made once based on the Shading Control Sequence Number during GetInput and not repeated during timestep simulation.
+
+Testing will be done by comparing the results on a timestep basis with develop for buildings with multiple window shades. 
+
 
 
