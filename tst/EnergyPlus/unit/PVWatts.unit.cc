@@ -55,6 +55,10 @@
 // EnergyPlus Headers
 #include <PVWatts.hh>
 #include <DataSurfaces.hh>
+#include <DataHVACGlobals.hh>
+#include <DataGlobals.hh>
+#include <DataEnvironment.hh>
+#include <WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -117,7 +121,8 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
 		"21,",
 		"175,",
 		",",
-		"0.5;"
+		"0.5;",
+		"Output:Variable,*,Generator Produced DC Electric Power,timestep;"
 	});
 	process_idf(idfTxt);
 	EXPECT_FALSE(has_err_output());
@@ -132,5 +137,42 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
 	EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
 	EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
 	EXPECT_EQ(static_cast<int>(PVWattsGenerators.size()), 3);
+
+}
+
+TEST_F( EnergyPlusFixture, PVWattsGenerator_Calc )
+{
+	using namespace PVWatts;
+	// USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw
+	// 6/15 at 7am
+	DataGlobals::TimeStep = 1;
+	DataGlobals::TimeStepZone = 1.0;
+	DataHVACGlobals::TimeStepSys = 1.0;
+	DataGlobals::BeginTimeStepFlag = true;
+	DataGlobals::MinutesPerTimeStep = 60;
+	DataGlobals::NumOfTimeStepInHour = 1;
+	WeatherManager::AllocateWeatherData(); // gets us the albedo array initialized
+	DataEnvironment::Year = 1986;
+	DataEnvironment::Month = 6;
+	DataEnvironment::DayOfMonth = 15;
+	DataGlobals::HourOfDay = 8; // 8th hour of day, 7-8am
+	WeatherManager::WeatherFileLatitude = 33.45;
+	WeatherManager::WeatherFileLongitude = -111.98;
+	WeatherManager::WeatherFileTimeZone = -7;
+	DataEnvironment::BeamSolarRad = 728;
+	DataEnvironment::DifSolarRad = 70;
+	DataEnvironment::WindSpeed = 3.1;
+	DataEnvironment::OutDryBulbTemp = 31.7;
+
+	PVWattsGenerator pvw("PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
+	pvw.setCellTemperature(30.345);
+	pvw.setPlaneOfArrayIrradiance(92.257);
+	pvw.calc();
+	Real64 generatorPower, generatorEnergy, thermalPower, thermalEnergy;
+	pvw.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
+	EXPECT_DOUBLE_EQ(thermalPower, 0.0);
+	EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
+	EXPECT_NEAR(generatorPower, 884.137, 0.001);
+	EXPECT_NEAR(generatorEnergy, 884.137 * 60 * 60, 1);
 
 }

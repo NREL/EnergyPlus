@@ -400,6 +400,13 @@ namespace PVWatts {
 		DataSurfaces::SurfaceData& getSurface();
 		Real64 getGroundCoverageRatio();
 
+		Real64 getCellTempearture();
+		Real64 getPlaneOfArrayIrradiance();
+		void setCellTemperature(Real64 cellTemp);
+		void setPlaneOfArrayIrradiance(Real64 poa);
+
+		void setupOutputVariables();
+
 		void calc();
 
 		void getResults(Real64& GeneratorPower, Real64& GeneratorEnergy, Real64& ThermalPower, Real64& ThermalEnergy);
@@ -414,6 +421,7 @@ namespace PVWatts {
 
 	PVWattsGenerator& GetOrCreatePVWattsGenerator(std::string const & GeneratorName);
 
+	void clear_state();
 
 }
 

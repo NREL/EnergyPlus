@@ -67,7 +67,7 @@ namespace PVWatts {
 
 	std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-	PVWattsGenerator::PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses, GeometryType geometryType, Real64 tilt, Real64 azimuth, size_t surfaceNum, Real64 groundCoverageRatio) : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0)
+	PVWattsGenerator::PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses, GeometryType geometryType, Real64 tilt, Real64 azimuth, size_t surfaceNum, Real64 groundCoverageRatio) : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0), m_cellTemperature(20.0), m_planeOfArrayIrradiance(0.0)
 	{
 		using General::RoundSigDigits;
 		bool errorsFound(false);
@@ -173,8 +173,12 @@ namespace PVWatts {
 
 		// Set up the pvwatts cell temperature member
 		const Real64 pvwatts_height = 5.0;
-		m_tccalc = std::unique_ptr< pvwatts_celltemp >( new pvwatts_celltemp( m_inoct + 273.15, pvwatts_height, DataHVACGlobals::TimeStepSys ) );
+		m_tccalc = std::unique_ptr< pvwatts_celltemp >( new pvwatts_celltemp( m_inoct + 273.15, pvwatts_height, DataGlobals::TimeStepZone ) );
 
+	}
+
+	void PVWattsGenerator::setupOutputVariables()
+	{
 		// Set up output variables
 		SetupOutputVariable("Generator Produced DC Electric Power", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
 		SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, m_outputDCEnergy, "System", "Sum", m_name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
@@ -228,7 +232,10 @@ namespace PVWatts {
 			return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum);
 		}
 		const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
-		return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
+
+		PVWattsGenerator pvwattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
+		pvwattsGenerator.setupOutputVariables();
+		return pvwattsGenerator;
 	}
 
 	Real64 PVWattsGenerator::getDCSystemCapacity()
@@ -276,6 +283,24 @@ namespace PVWatts {
 		return m_groundCoverageRatio;
 	}
 
+	Real64 PVWattsGenerator::getCellTempearture()
+	{
+		return m_cellTemperature;
+	}
+
+	void PVWattsGenerator::setCellTemperature(Real64 cellTemp) {
+		m_cellTemperature = cellTemp;
+	}
+
+	Real64 PVWattsGenerator::getPlaneOfArrayIrradiance() {
+		return m_planeOfArrayIrradiance;
+	}
+
+	void PVWattsGenerator::setPlaneOfArrayIrradiance(Real64 poa)
+	{
+		m_planeOfArrayIrradiance = poa;
+	}
+
 	void PVWattsGenerator::calc()
 	{
 		using DataGlobals::TimeStep;
@@ -283,8 +308,6 @@ namespace PVWatts {
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
-
-		//Real64 TimeElapsed = HourOfDay + TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTim eElapsed;
 
 		// We only run this once for each zone time step.
 		if ( !DataGlobals::BeginTimeStepFlag ) {
@@ -304,7 +327,7 @@ namespace PVWatts {
 		}
 
 		// process_irradiance
-		IrradianceOutput irr_st = processIrradiance(DataEnvironment::Year, DataEnvironment::Month, DataEnvironment::DayOfMonth, HourOfDay, TimeStep * DataGlobals::MinutesPerTimeStep, TimeStepZone, WeatherManager::WeatherFileLatitude, WeatherManager::WeatherFileLongitude, WeatherManager::WeatherFileTimeZone, DataEnvironment::BeamSolarRad, DataEnvironment::DifSolarRad, albedo);
+		IrradianceOutput irr_st = processIrradiance(DataEnvironment::Year, DataEnvironment::Month, DataEnvironment::DayOfMonth, HourOfDay - 1, (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep, TimeStepZone, WeatherManager::WeatherFileLatitude, WeatherManager::WeatherFileLongitude, WeatherManager::WeatherFileTimeZone, DataEnvironment::BeamSolarRad, DataEnvironment::DifSolarRad, albedo);
 
 		// powerout
 		// TODO: Change shad_beam to account for shading of other surfaces.
@@ -360,7 +383,8 @@ namespace PVWatts {
 
 		const Real64 &gcr = m_groundCoverageRatio;
 
-		DCPowerOutput out;
+		Real64 poa, tpoa, pvt, dc;
+
 
 		if ( irr_st.sunup > 0 ) {
 			if ( m_trackMode == 1 && m_shadeMode1x == 0 ) {
@@ -400,37 +424,39 @@ namespace PVWatts {
 			// apply sky diffuse shading factor (specified as constant, nominally 1.0 if disabled in UI)
 			irr_st.iskydiff *= shad_diff;
 
-			out.poa = irr_st.ibeam + irr_st.iskydiff + irr_st.ignddiff;
+			poa = irr_st.ibeam + irr_st.iskydiff + irr_st.ignddiff;
 
 			Real64 wspd_corr = wspd < 0 ? 0 : wspd;
 
 			// module cover
-			out.tpoa = out.poa;
+			tpoa = poa;
 			if ( irr_st.aoi > 0.5 && irr_st.aoi < 89.5 )
 			{
 				double mod = iam( irr_st.aoi, m_useARGlass );
-				out.tpoa = out.poa - ( 1.0 - mod )*dni*cosd(irr_st.aoi);
-				if( out.tpoa < 0.0 ) out.tpoa = 0.0;
-				if( out.tpoa > out.poa ) out.tpoa = out.poa;
+				tpoa = poa - ( 1.0 - mod )*dni*cosd(irr_st.aoi);
+				if( tpoa < 0.0 ) tpoa = 0.0;
+				if( tpoa > poa ) tpoa = poa;
 			}
 
 			// cell temperature
-			out.pvt = (*m_tccalc)( out.poa, wspd_corr, tdry );
+			pvt = (*m_tccalc)( poa, wspd_corr, tdry );
 
 			// dc power output (Watts)
-			out.dc = m_dcSystemCapacity * ( 1.0 + m_gamma * ( out.pvt - 25.0 ) ) * out.tpoa;
+			dc = m_dcSystemCapacity * ( 1.0 + m_gamma * ( pvt - 25.0 ) ) * tpoa / 1000.0;
 
 			// dc losses
-			out.dc *= 1.0 - m_systemLosses;
+			dc *= 1.0 - m_systemLosses;
 
 		} else {
-			out.poa = 0.0;
-			out.tpoa = 0.0;
-			out.pvt = tdry;
-			out.dc = 0.0;
+			poa = 0.0;
+			tpoa = 0.0;
+			pvt = tdry;
+			dc = 0.0;
 		}
 
-		return out;
+		DCPowerOutput pwrOutput = { poa, tpoa, pvt, dc };
+
+		return pwrOutput;
 	}
 
 	PVWattsGenerator& GetOrCreatePVWattsGenerator(std::string const & GeneratorName) {
@@ -2713,6 +2739,11 @@ namespace PVWatts {
 		if ( _theta2_deg ) *_theta2_deg = theta2 * 180/M_PI;
 
 		return tr * exp( -k * l_thick / cos(theta2) );
+	}
+
+	void clear_state()
+	{
+		PVWattsGenerators.clear();
 	}
 
 }
