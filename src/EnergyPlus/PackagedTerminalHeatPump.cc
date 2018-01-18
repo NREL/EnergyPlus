@@ -3801,6 +3801,10 @@ namespace PackagedTerminalHeatPump {
 			} // from IF(PTUnit(PTUnitNum)%SuppHeatCoilType_Num == Coil_HeatingSteam) THEN
 		} // from IF(FirstHVACIteration .AND. PartLoadFrac > 0.0) THEN
 
+		// Initialize each time step
+//		PTUnit( PTUnitNum ).CoolCoilWaterFlowRatio = 0.0; // water cooling coils are not allowed in PTUnit model
+		PTUnit( PTUnitNum ).HeatCoilWaterFlowRatio = 0.0;
+
 		SetAverageAirFlow( PTUnitNum, PartLoadFrac, OnOffAirFlowRatio );
 
 	}
@@ -4242,6 +4246,8 @@ namespace PackagedTerminalHeatPump {
 				TempSize = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = TempSize;
+				DataConstantUsedForSizing = 0.0;
+				DataFractionUsedForSizing = 0.0;
 			}
 		}
 
@@ -4573,15 +4579,17 @@ namespace PackagedTerminalHeatPump {
 
 		if ( PTUnit( PTUnitNum ).simASHRAEModel ) {
 
-			int AirLoopNum = 0;
-			int CompressorOnFlag = 0;
-			auto & SZVAVModel( PTUnit( PTUnitNum ) );
-			// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-			SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
+			if ( ( CoolingLoad && FullOutput < QZnReq ) || ( HeatingLoad && FullOutput > QZnReq ) ) {
+				int AirLoopNum = 0;
+				int CompressorOnFlag = 0;
+				auto & SZVAVModel( PTUnit( PTUnitNum ) );
+				// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
+				SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoCompOutput, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
+			}
 
 		} else {
 
-				if ( CoolingLoad ) {
+			if ( CoolingLoad ) {
 				// Since we are cooling, we expect FullOutput < NoCompOutput
 				// Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
 				if ( FullOutput >= NoCompOutput ) {
@@ -4910,7 +4918,11 @@ namespace PackagedTerminalHeatPump {
 					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex, QActual, False, OpMode, PartLoadFrac );
 				} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 					//       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
-					mdot = PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow * PartLoadFrac;
+					if ( PTUnit( PTUnitNum ).HeatCoilWaterFlowRatio == 0.0 ) {
+						mdot = PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow * PartLoadFrac;
+					} else {
+						mdot = PTUnit( PTUnitNum ).HeatCoilWaterFlowRatio * PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow;
+					}
 
 					SetComponentFlowRate( mdot, PTUnit( PTUnitNum ).HeatCoilFluidInletNode, PTUnit( PTUnitNum ).PlantCoilOutletNode, PTUnit( PTUnitNum ).HeatCoilLoopNum, PTUnit( PTUnitNum ).HeatCoilLoopSide, PTUnit( PTUnitNum ).HeatCoilBranchNum, PTUnit( PTUnitNum ).HeatCoilCompNum );
 
@@ -7344,7 +7356,7 @@ namespace PackagedTerminalHeatPump {
 		} else {
 
 			Node( AirControlNode ).MassFlowRate = airMdot;
-			PTUnit( UnitarySysNum ).FanPartLoadRatio = ( ( airMdot - ( systemMaxAirFlowRate * lowSpeedRatio ) ) / ( ( 1.0 - lowSpeedRatio ) * systemMaxAirFlowRate ) );
+			PTUnit( UnitarySysNum ).FanPartLoadRatio = max( 0.0, ( ( airMdot - ( systemMaxAirFlowRate * lowSpeedRatio ) ) / ( ( 1.0 - lowSpeedRatio ) * systemMaxAirFlowRate ) ) );
 
 			if ( WaterControlNode > 0 ) {
 				waterMdot = highWaterMdot * PartLoadRatio;

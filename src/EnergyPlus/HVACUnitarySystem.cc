@@ -6797,6 +6797,7 @@ namespace HVACUnitarySystem {
 		if ( !HeatingLoad && !CoolingLoad && MoistureLoad >= 0.0 ) return;
 
 		CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutputOff, LatOutputOff, HXUnitOn, _, _, CompressorONFlag );
+		Real64 NoSensibleOutput = SensOutputOff;
 		FullSensibleOutput = SensOutputOff;
 		NoLoadOutletTemp = Node( OutletNode ).Temp;
 
@@ -7111,7 +7112,7 @@ namespace HVACUnitarySystem {
 
 			auto & SZVAVModel( UnitarySystem( UnitarySysNum ) );
 			// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-			SZVAVModel::calcSZVAVModel (SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadRatio, NoLoadOutletTemp, FullSensibleOutput, FullLoadAirOutletTemp, CompressorONFlag );
+			SZVAVModel::calcSZVAVModel (SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadRatio, NoSensibleOutput, NoLoadOutletTemp, FullSensibleOutput, FullLoadAirOutletTemp, CompressorONFlag );
 
 		} else { // not ASHRAE model
 
@@ -7545,7 +7546,7 @@ namespace HVACUnitarySystem {
 		} else {
 
 			Node( AirControlNode ).MassFlowRate = airMdot;
-			UnitarySystem( UnitarySysNum ).FanPartLoadRatio = ( ( airMdot - ( systemMaxAirFlowRate * lowSpeedRatio ) ) / ( ( 1.0 - lowSpeedRatio ) * systemMaxAirFlowRate ) );
+			UnitarySystem( UnitarySysNum ).FanPartLoadRatio = max( 0.0, ( ( airMdot - ( systemMaxAirFlowRate * lowSpeedRatio ) ) / ( ( 1.0 - lowSpeedRatio ) * systemMaxAirFlowRate ) ) );
 
 			if(	WaterControlNode > 0 ) {
 				waterMdot = highWaterMdot * PartLoadRatio;

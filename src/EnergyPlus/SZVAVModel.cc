@@ -101,7 +101,7 @@ namespace SZVAVModel {
 
 	void
 	calcSZVAVModel(
-		HVACUnitarySystem::UnitarySystemData SZVAVModel,
+		HVACUnitarySystem::UnitarySystemData & SZVAVModel,
 		int const & SysIndex,
 		bool const & FirstHVACIteration,
 		bool const & CoolingLoad,
@@ -111,6 +111,7 @@ namespace SZVAVModel {
 		bool const & HXUnitOn,
 		int const & AirLoopNum,
 		Real64 & PartLoadRatio,
+		Real64 const & NoLoadSensibleOutput,
 		Real64 const & NoLoadOutletTemp,
 		Real64 const & FullSensibleOutput,
 		Real64 const & FullLoadAirOutletTemp,
@@ -564,7 +565,7 @@ namespace SZVAVModel {
 
 	void
 	calcSZVAVModel(
-		PackagedTerminalHeatPump::PTUnitData SZVAVModel,
+		PackagedTerminalHeatPump::PTUnitData & SZVAVModel,
 		int const & SysIndex,
 		bool const & FirstHVACIteration,
 		bool const & CoolingLoad,
@@ -574,6 +575,7 @@ namespace SZVAVModel {
 		bool const & HXUnitOn,
 		int const & AirLoopNum,
 		Real64 & PartLoadRatio,
+		Real64 const & NoLoadSensibleOutput,
 		Real64 const & NoLoadOutletTemp,
 		Real64 const & FullSensibleOutput,
 		Real64 const & FullLoadAirOutletTemp,
