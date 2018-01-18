@@ -90146,8 +90146,12 @@ UtilityCost:Tariff,
         \key kBtu
         \key MCF
         \key CCF
+        \key m3
+        \key gal
+        \key kgal
         \note A choice that allows several different predefined conversion factors to be used; otherwise user
-        \note defined conversion factors are used as defined in the next two fields.
+        \note defined conversion factors are used as defined in the next two fields. If left blank m3 is used for water meters 
+        \note and kWh are used for all other meters.
    N1,  \field Energy Conversion Factor
         \type real
         \note Is a multiplier used to convert energy into the units specified by the utility in their tariff. If
