@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2620,7 +2620,17 @@ namespace RuntimeLanguageProcessor {
 					ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
 				}
 			} else if ( SELECT_CASE_var == FuncCurveValue ) {
-				ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number, Operand( 5 ).Number, Operand( 6 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				if ( Operand( 3 ).Type == 0 && Operand( 4 ).Type == 0 && Operand( 5 ).Type == 0 && Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else if ( Operand( 4 ).Type == 0 && Operand( 5 ).Type == 0 && Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else if ( Operand( 5 ).Type == 0 && Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else if ( Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number, Operand( 5 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number, Operand( 5 ).Number, Operand( 6 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				}
 
 			} else {
 				// throw Error!
