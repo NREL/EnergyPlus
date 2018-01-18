@@ -32899,11 +32899,15 @@ ZoneControl:Thermostat,
        \key ThermostatSetpoint:SingleCooling
        \key ThermostatSetpoint:SingleHeatingOrCooling
        \key ThermostatSetpoint:DualSetpoint
-  A11; \field Control 4 Name
+  A11, \field Control 4 Name
        \note Control names are names of individual control objects (e.g. ThermostatSetpoint:SingleHeating)
        \note Schedule values in these objects list actual setpoint temperatures for the control types
        \type object-list
        \object-list ControlTypeNames
+  N1 ; \field Temperature Difference Between Cutout And Setpoint
+       \units deltaC
+       \type real
+       \minimum= 0
 
 ZoneControl:Thermostat:OperativeTemperature,
        \memo This object can be used with the ZoneList option on a thermostat or with one
