@@ -111,7 +111,6 @@ namespace SZVAVModel {
 		bool const & HXUnitOn,
 		int const & AirLoopNum,
 		Real64 & PartLoadRatio,
-		Real64 const & NoLoadSensibleOutput,
 		Real64 const & NoLoadOutletTemp,
 		Real64 const & FullSensibleOutput,
 		Real64 const & FullLoadAirOutletTemp,
@@ -506,7 +505,7 @@ namespace SZVAVModel {
 
 				} else { // Step 9: not enough cooling or heating
 
-					if ( CoolingLoad && FullSensibleOutput < ZoneLoad || HeatingLoad && FullSensibleOutput > ZoneLoad ) {
+					if ( ( CoolingLoad && FullSensibleOutput < ZoneLoad ) || ( HeatingLoad && FullSensibleOutput > ZoneLoad ) ) {
 
 						// Region 3: air flow rate at max while modulating coil capacity to meet load
 						Par( 9 ) = lowWaterMdot; // max water flow at low speed fan
@@ -575,7 +574,6 @@ namespace SZVAVModel {
 		bool const & HXUnitOn,
 		int const & AirLoopNum,
 		Real64 & PartLoadRatio,
-		Real64 const & NoLoadSensibleOutput,
 		Real64 const & NoLoadOutletTemp,
 		Real64 const & FullSensibleOutput,
 		Real64 const & FullLoadAirOutletTemp,
@@ -749,8 +747,6 @@ namespace SZVAVModel {
 
 		bool coilActive = DataLoopNode::Node( coilAirInletNode ).Temp - DataLoopNode::Node( coilAirOutletNode ).Temp;
 		Real64 outletTemp = DataLoopNode::Node( OutletNode ).Temp;
-		Real64 LowSpeedMaxCapacity = TempSensOutput;
-		Real64 LowSpeedOutletTemp = outletTemp;
 
 		// Step 2: if capacity exceeds load check temperature limits
 		// no need to check temperature limits if load exceeds full capacity at low fan speed
@@ -983,7 +979,7 @@ namespace SZVAVModel {
 
 				} else { // Step 9: not enough cooling or heating
 
-					if ( CoolingLoad && FullSensibleOutput < ZoneLoad || HeatingLoad && FullSensibleOutput > ZoneLoad ) {
+					if ( ( CoolingLoad && FullSensibleOutput < ZoneLoad ) || ( HeatingLoad && FullSensibleOutput > ZoneLoad ) ) {
 
 						// Region 3: air flow rate at max while modulating coil capacity to meet load
 						Par( 9 ) = lowWaterMdot; // max water flow at low speed fan

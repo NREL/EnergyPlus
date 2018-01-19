@@ -4584,7 +4584,7 @@ namespace PackagedTerminalHeatPump {
 				int CompressorOnFlag = 0;
 				auto & SZVAVModel( PTUnit( PTUnitNum ) );
 				// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-				SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoCompOutput, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
+				SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
 			}
 
 		} else {

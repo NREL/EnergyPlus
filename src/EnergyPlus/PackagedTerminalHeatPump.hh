@@ -261,8 +261,8 @@ namespace PackagedTerminalHeatPump {
 		// variables used in SZVAV model:
 		std::string Name; // name of unit
 		std::string UnitType; // type of unit
-		int NodeNumOfControlledZone; // node number of control zone
 		int MaxIterIndex; // used in PLR calculations for sensible load
+		int NodeNumOfControlledZone; // node number of control zone
 		int RegulaFalsIFailedIndex; // used in PLR calculations for sensible load
 		Real64 FanPartLoadRatio; // fan part-load ratio for time step
 		Real64 CoolCoilWaterFlowRatio; // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
@@ -415,8 +415,8 @@ namespace PackagedTerminalHeatPump {
 			ControlZoneMassFlowFrac( 1.0 ),
 			// variables used in SZVAV model:
 			MaxIterIndex( 0 ),
-			RegulaFalsIFailedIndex( 0 ),
 			NodeNumOfControlledZone( 0 ),
+			RegulaFalsIFailedIndex( 0 ),
 			FanPartLoadRatio( 0.0 ),
 			CoolCoilWaterFlowRatio( 0.0 ),
 			HeatCoilWaterFlowRatio( 0.0 ),

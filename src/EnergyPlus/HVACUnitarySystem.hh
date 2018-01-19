@@ -458,8 +458,8 @@ namespace HVACUnitarySystem {
 		// variables used in SZVAV model:
 		std::string Name; // name of unit
 		std::string UnitType; // type of unit
-		int NodeNumOfControlledZone; // Node number of controlled zone
 		int MaxIterIndex; // used in PLR calculations for sensible load
+		int NodeNumOfControlledZone; // Node number of controlled zone
 		int RegulaFalsIFailedIndex; // used in PLR calculations for sensible load
 		Real64 FanPartLoadRatio; // Unitary system fan part load ratio
 		Real64 CoolCoilWaterFlowRatio; // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
@@ -731,8 +731,8 @@ namespace HVACUnitarySystem {
 
 			// SZVAV variables
 			MaxIterIndex( 0 ),
-			RegulaFalsIFailedIndex( 0 ),
 			NodeNumOfControlledZone( 0 ),
+			RegulaFalsIFailedIndex( 0 ),
 			FanPartLoadRatio( 0.0 ),
 			CoolCoilWaterFlowRatio( 0.0 ),
 			HeatCoilWaterFlowRatio( 0.0 ),
