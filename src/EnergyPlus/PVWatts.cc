@@ -853,10 +853,10 @@ namespace PVWatts {
 						double *tst,
 						double *hextra )
 	{
-		if ( solazi != 0 ) *solazi = sun[0] * (180/M_PI);
-		if ( solzen != 0 ) *solzen = sun[1] * (180/M_PI);
-		if ( solelv != 0 ) *solelv = sun[2] * (180/M_PI);
-		if ( soldec != 0 ) *soldec = sun[3] * (180/M_PI);
+		if ( solazi != 0 ) *solazi = sun[0] * (180/DataGlobals::Pi);
+		if ( solzen != 0 ) *solzen = sun[1] * (180/DataGlobals::Pi);
+		if ( solelv != 0 ) *solelv = sun[2] * (180/DataGlobals::Pi);
+		if ( soldec != 0 ) *soldec = sun[3] * (180/DataGlobals::Pi);
 		if ( sunrise != 0 ) *sunrise = sun[4];
 		if ( sunset != 0 ) *sunset = sun[5];
 		if ( sunup != 0 ) *sunup = tms[2];
@@ -871,11 +871,11 @@ namespace PVWatts {
 						   double *axisrot,
 						   double *btdiff )
 	{
-		if ( aoi != 0 ) *aoi = angle[0] * (180/M_PI);
-		if ( surftilt != 0 ) *surftilt = angle[1] * (180/M_PI);
-		if ( surfazi != 0 ) *surfazi = angle[2] * (180/M_PI);
-		if ( axisrot != 0 ) *axisrot = angle[3] * (180/M_PI);
-		if ( btdiff != 0 ) *btdiff = angle[4] * (180/M_PI);
+		if ( aoi != 0 ) *aoi = angle[0] * (180/DataGlobals::Pi);
+		if ( surftilt != 0 ) *surftilt = angle[1] * (180/DataGlobals::Pi);
+		if ( surfazi != 0 ) *surfazi = angle[2] * (180/DataGlobals::Pi);
+		if ( axisrot != 0 ) *axisrot = angle[3] * (180/DataGlobals::Pi);
+		if ( btdiff != 0 ) *btdiff = angle[4] * (180/DataGlobals::Pi);
 	}
 
 	void irrad::get_poa( double *beam, double *skydiff, double *gnddiff,
@@ -1382,9 +1382,9 @@ namespace PVWatts {
 		den = cos(eclong);
 		ra  = atan(num/den);                         /* Right ascension in radians */
 		if( den < 0.0 )
-			ra = ra + M_PI;
+			ra = ra + DataGlobals::Pi;
 		else if( num < 0.0 )
-			ra = ra + 2.0*M_PI;
+			ra = ra + 2.0*DataGlobals::Pi;
 
 		dec = asin( sin(oblqec)*sin(eclong) );       /* Declination in radians */
 
@@ -1400,24 +1400,24 @@ namespace PVWatts {
 		lmst = lmst*15.0*DTOR;         /* Local mean sidereal time in radians */
 
 		ha = lmst - ra;
-		if( ha < -M_PI )
-			ha = ha + 2*M_PI;
-		else if( ha > M_PI )
-			ha = ha - 2*M_PI;             /* Hour angle in radians between -pi and pi */
+		if( ha < -DataGlobals::Pi )
+			ha = ha + 2*DataGlobals::Pi;
+		else if( ha > DataGlobals::Pi )
+			ha = ha - 2*DataGlobals::Pi;             /* Hour angle in radians between -pi and pi */
 
 		lat = lat*DTOR;                /* Change latitude to radians */
 
 		arg = sin(dec)*sin(lat) + cos(dec)*cos(lat)*cos(ha);  /* For elevation in radians */
 		if( arg > 1.0 )
-			elv = M_PI/2.0;
+			elv = DataGlobals::Pi/2.0;
 		else if( arg < -1.0 )
-			elv = -M_PI/2.0;
+			elv = -DataGlobals::Pi/2.0;
 		else
 			elv = asin(arg);
 
 		if( cos(elv) == 0.0 )
 		{
-			azm = M_PI;         /* Assign azimuth = 180 deg if elv = 90 or -90 */
+			azm = DataGlobals::Pi;         /* Assign azimuth = 180 deg if elv = 90 or -90 */
 		}
 		else
 		{                 /* For solar azimuth in radians per Iqbal */
@@ -1425,14 +1425,14 @@ namespace PVWatts {
 			if( arg > 1.0 )
 				azm = 0.0;              /* Azimuth(radians)*/
 			else if( arg < -1.0 )
-				azm = M_PI;
+				azm = DataGlobals::Pi;
 			else
 				azm = acos(arg);
 
-			if( ( ha <= 0.0 && ha >= -M_PI) || ha >= M_PI )
-				azm = M_PI - azm;
+			if( ( ha <= 0.0 && ha >= -DataGlobals::Pi) || ha >= DataGlobals::Pi )
+				azm = DataGlobals::Pi - azm;
 			else
-				azm = M_PI + azm;
+				azm = DataGlobals::Pi + azm;
 		}
 
 		elv = elv/DTOR;          /* Change to degrees for atmospheric correction */
@@ -1455,7 +1455,7 @@ namespace PVWatts {
 		if( arg >= 1.0 )
 			ws = 0.0;                         /* No sunrise, continuous nights */
 		else if( arg <= -1.0 )
-			ws = M_PI;                          /* No sunset, continuous days */
+			ws = DataGlobals::Pi;                          /* No sunset, continuous days */
 		else
 			ws = acos(arg);                   /* Sunrise hour angle in radians */
 
@@ -1469,9 +1469,9 @@ namespace PVWatts {
 		tst = hour + minute/60.0 + (lng/15.0 - tz) + E;  /* True solar time (hr) */
 
 		/* 25aug2011 apd: addition of calculation of horizontal extraterrestrial irradiance */
-		zen = 0.5*M_PI - elv;
-		Gon = 1367*(1+0.033*cos( 360.0/365.0*day_of_year(month,day)*M_PI/180 )); /* D&B eq 1.4.1a, using solar constant=1367 W/m2 */
-		if (zen > 0 && zen < M_PI/2) /* if sun is up */
+		zen = 0.5*DataGlobals::Pi - elv;
+		Gon = 1367*(1+0.033*cos( 360.0/365.0*day_of_year(month,day)*DataGlobals::Pi/180 )); /* D&B eq 1.4.1a, using solar constant=1367 W/m2 */
+		if (zen > 0 && zen < DataGlobals::Pi/2) /* if sun is up */
 			hextra = Gon*cos(zen); /* elevation is incidence angle (zen=90-elv) with horizontal */
 		else if (zen == 0)
 			hextra = Gon;
@@ -1538,7 +1538,7 @@ namespace PVWatts {
 				arg = sin(zen)*cos(azm-sazm)*sin(tilt) + cos(zen)*cos(tilt);
 				rot = 0;
 				if( arg < -1.0 )
-					inc = M_PI;
+					inc = DataGlobals::Pi;
 				else if( arg > 1.0  )
 					inc = 0.0;
 				else
@@ -1551,19 +1551,19 @@ namespace PVWatts {
 				/* Find rotation angle of axis for peak tracking */
 				if( fabs( cos(xtilt) ) < 0.001745 )    /* 89.9 to 90.1 degrees */
 				{          /* For vertical axis only */
-					if( xsazm <= M_PI )
+					if( xsazm <= DataGlobals::Pi )
 					{
-						if( azm <= xsazm + M_PI )
+						if( azm <= xsazm + DataGlobals::Pi )
 							rot = azm - xsazm;
 						else
-							rot = azm - xsazm - 2.0*M_PI;
+							rot = azm - xsazm - 2.0*DataGlobals::Pi;
 					}
 					else        /* For xsazm > pi */
 					{
-						if( azm >= xsazm - M_PI )
+						if( azm >= xsazm - DataGlobals::Pi )
 							rot = azm - xsazm;
 						else
-							rot = azm - xsazm + 2.0*M_PI;
+							rot = azm - xsazm + 2.0*DataGlobals::Pi;
 					}
 				}
 				else          /* For other than vertical axis */
@@ -1571,36 +1571,36 @@ namespace PVWatts {
 					arg = sin(zen)*sin(azm-xsazm)/
 					( sin(zen)*cos(azm-xsazm)*sin(xtilt) + cos(zen)*cos(xtilt) );
 					if( arg < -99999.9 )
-						rot = -M_PI/2.0;
+						rot = -DataGlobals::Pi/2.0;
 					else if( arg > 99999.9 )
-						rot = M_PI/2.0;
+						rot = DataGlobals::Pi/2.0;
 					else
 						rot = atan(arg);
 					/* Put rot in II or III quadrant if needed */
-					if( xsazm <= M_PI )
+					if( xsazm <= DataGlobals::Pi )
 					{
-						if( azm > xsazm && azm <= xsazm + M_PI )
+						if( azm > xsazm && azm <= xsazm + DataGlobals::Pi )
 						{     /* Ensure positive rotation */
 							if( rot < 0.0 )
-								rot = M_PI + rot;   /* Put in II quadrant: 90 to 180 deg */
+								rot = DataGlobals::Pi + rot;   /* Put in II quadrant: 90 to 180 deg */
 						}
 						else
 						{     /* Ensure negative rotation  */
 							if( rot > 0.0 )
-								rot = rot - M_PI;   /* Put in III quadrant: -90 to -180 deg */
+								rot = rot - DataGlobals::Pi;   /* Put in III quadrant: -90 to -180 deg */
 						}
 					}
 					else        /* For xsazm > pi */
 					{
-						if( azm < xsazm && azm >= xsazm - M_PI )
+						if( azm < xsazm && azm >= xsazm - DataGlobals::Pi )
 						{     /* Ensure negative rotation  */
 							if( rot > 0.0 )
-								rot = rot - M_PI;   /* Put in III quadrant: -90 to -180 deg */
+								rot = rot - DataGlobals::Pi;   /* Put in III quadrant: -90 to -180 deg */
 						}
 						else
 						{     /* Ensure positive rotation */
 							if( rot < 0.0 )
-								rot = M_PI + rot;   /* Put in II quadrant: 90 to 180 deg */
+								rot = DataGlobals::Pi + rot;   /* Put in II quadrant: 90 to 180 deg */
 						}
 					}
 				}
@@ -1616,51 +1616,51 @@ namespace PVWatts {
 				if ( en_backtrack )
 				{
 					// find backtracking rotation angle
-					double backrot = backtrack( azm*180/M_PI, zen*180/M_PI, // solar azimuth, zenith (deg)
+					double backrot = backtrack( azm*180/DataGlobals::Pi, zen*180/DataGlobals::Pi, // solar azimuth, zenith (deg)
 											   tilt, sazm, // axis tilt, axis azimuth (deg)
-											   rlim*180/M_PI, gcr, // rotation limit, GCR
-											   rot*180/M_PI ); // ideal rotation angle
+											   rlim*180/DataGlobals::Pi, gcr, // rotation limit, GCR
+											   rot*180/DataGlobals::Pi ); // ideal rotation angle
 
-					btdiff = backrot - rot*180/M_PI; // log the difference (degrees)
-					btdiff *= M_PI/180; // convert output to radians
-					rot = backrot * M_PI/180; // convert backtracked rotation angle to radians
+					btdiff = backrot - rot*180/DataGlobals::Pi; // log the difference (degrees)
+					btdiff *= DataGlobals::Pi/180; // convert output to radians
+					rot = backrot * DataGlobals::Pi/180; // convert backtracked rotation angle to radians
 				}
 
 
 				/* Find tilt angle for the tracking surface */
 				arg = cos(xtilt)*cos(rot);
 				if( arg < -1.0 )
-					tilt = M_PI;
+					tilt = DataGlobals::Pi;
 				else if( arg > 1.0  )
 					tilt = 0.0;
 				else
 					tilt = acos(arg);
 				/* Find surface azimuth for the tracking surface */
 				if( tilt == 0.0 )
-					sazm = M_PI;     /* Assign any value if tilt is zero */
+					sazm = DataGlobals::Pi;     /* Assign any value if tilt is zero */
 				else
 				{
 					arg = sin(rot)/sin(tilt);
 					if( arg < -1.0 )
-						sazm = 1.5*M_PI + xsazm;
+						sazm = 1.5*DataGlobals::Pi + xsazm;
 					else if( arg > 1.0  )
-						sazm = 0.5*M_PI + xsazm;
-					else if( rot < -0.5*M_PI )
-						sazm = xsazm - M_PI - asin(arg);
-					else if( rot > 0.5*M_PI )
-						sazm = xsazm + M_PI - asin(arg);
+						sazm = 0.5*DataGlobals::Pi + xsazm;
+					else if( rot < -0.5*DataGlobals::Pi )
+						sazm = xsazm - DataGlobals::Pi - asin(arg);
+					else if( rot > 0.5*DataGlobals::Pi )
+						sazm = xsazm + DataGlobals::Pi - asin(arg);
 					else
 						sazm = asin(arg) + xsazm;
-					if( sazm > 2.0*M_PI )       /* Keep between 0 and 2pi */
-						sazm = sazm - 2.0*M_PI;
+					if( sazm > 2.0*DataGlobals::Pi )       /* Keep between 0 and 2pi */
+						sazm = sazm - 2.0*DataGlobals::Pi;
 					else if( sazm < 0.0 )
-						sazm = sazm + 2.0*M_PI;
+						sazm = sazm + 2.0*DataGlobals::Pi;
 				}
 				/* printf("zen=%6.1f azm-sazm=%6.1f tilt=%6.1f arg=%7.4f\n",zen/DTOR,(azm-sazm)/DTOR,tilt/DTOR,arg); */
 				/* Find incident angle */
 				arg = sin(zen)*cos(azm-sazm)*sin(tilt) + cos(zen)*cos(tilt);
 				if( arg < -1.0 )
-					inc = M_PI;
+					inc = DataGlobals::Pi;
 				else if( arg > 1.0  )
 					inc = 0.0;
 				else
@@ -1967,7 +1967,7 @@ namespace PVWatts {
 		 diffc[1] = circumsolar
 		 diffc[2] = horizon brightening
 		 */
-		double r90(M_PI/2), r80( 80.0/180*M_PI ), r65(65.0/180*M_PI);
+		double r90(DataGlobals::Pi/2), r80( 80.0/180*DataGlobals::Pi ), r65(65.0/180*DataGlobals::Pi);
 		/*
 		 if ( (angle[0] != pA->inc[pA->i]) || (wfPOA != pA->POA[ pA->i ])) {
 		 std::cout << "Error wih POA decomp" << std::endl;
@@ -2020,7 +2020,7 @@ namespace PVWatts {
 			avgKtp /= count;
 
 			//Calculate Kt
-			double am = Min(15.25, 1.0 / (cos(sun[1]) + 0.15 * (pow(93.9 - sun[1]*180/M_PI, -1.253)))); // air mass
+			double am = Min(15.25, 1.0 / (cos(sun[1]) + 0.15 * (pow(93.9 - sun[1]*180/DataGlobals::Pi, -1.253)))); // air mass
 			double ktpam = am * exp(-0.0001184 * pA->elev);
 			double Kt = avgKtp *( 1.031 * exp( -1.4/ (0.9 + 9.4/ktpam) ) + 0.1);
 
@@ -2729,14 +2729,14 @@ namespace PVWatts {
 	{
 		// reference: duffie & beckman, Ch 5.3
 
-		double theta1 = theta1_deg * M_PI/180.0;
+		double theta1 = theta1_deg * DataGlobals::Pi/180.0;
 		double theta2 = asin( n_incoming / n_cover * sin(theta1 ) ); // snell's law, assuming n_air = 1.0
 		// fresnel's equation for non-reflected unpolarized radiation as an average of perpendicular and parallel components
 		double tr = 1 - 0.5 *
 		( pow( sin(theta2-theta1), 2 )/pow( sin(theta2+theta1), 2)
 		 + pow( tan(theta2-theta1), 2 )/pow( tan(theta2+theta1), 2 ) );
 
-		if ( _theta2_deg ) *_theta2_deg = theta2 * 180/M_PI;
+		if ( _theta2_deg ) *_theta2_deg = theta2 * 180/DataGlobals::Pi;
 
 		return tr * exp( -k * l_thick / cos(theta2) );
 	}
