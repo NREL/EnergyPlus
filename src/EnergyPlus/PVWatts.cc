@@ -322,7 +322,7 @@ namespace PVWatts {
 		m_tccalc->set_last_values(m_lastCellTemperature, m_lastPlaneOfArrayIrradiance);
 
 		Real64 albedo = WeatherManager::TodayAlbedo(TimeStep, HourOfDay);
-		if (not ( std::isfinite(albedo) && albedo > 0.0 && albedo < 1 )) {
+		if (!( std::isfinite(albedo) && albedo > 0.0 && albedo < 1 )) {
 			albedo = 0.2;
 		}
 
