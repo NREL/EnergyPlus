@@ -563,10 +563,9 @@ namespace HVACControllers {
 		bool & NodeNotFound // true if matching actuator node not found
 	);
 
-	void
+	int
 	GetControllerIndex(
-		std::string const & ControllerName, // name of coil controller
-		int & ControllerIndex // input actuator node number
+		std::string const & ControllerName // name of coil controller
 	);
 
 } // HVACControllers

@@ -3616,10 +3616,9 @@ Label100: ;
 
 	}
 
-	void
+	int
 	GetControllerIndex(
-		std::string const & ControllerName, // name of coil controller
-		int & ControllerIndex // input actuator node number
+		std::string const & ControllerName // name of coil controller
 	) {
 
 		// SUBROUTINE INFORMATION:
@@ -3632,18 +3631,17 @@ Label100: ;
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int ControlNum;
-
 		if ( GetControllerInputFlag ) {
 			GetControllerInput();
 			GetControllerInputFlag = false;
 		}
 
-		ControllerIndex = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		int ControllerIndex = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControllerIndex == 0 ) {
 			ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 		}
+
+		return ControllerIndex;
 
 	}
 
