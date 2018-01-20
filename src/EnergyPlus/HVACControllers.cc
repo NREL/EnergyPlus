@@ -3625,18 +3625,14 @@ Label100: ;
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   January 2018
 
-		// PURPOSE OF THIS FUNCTION:
 		// This subroutine finds the controllers actuator node number
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		if ( GetControllerInputFlag ) {
 			GetControllerInput();
 			GetControllerInputFlag = false;
 		}
 
-		int ControllerIndex = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		int ControllerIndex = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControllerIndex == 0 ) {
 			ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 		}

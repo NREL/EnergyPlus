@@ -2688,8 +2688,6 @@ namespace SimAirServingZones {
 		bool IsUpToDateFlag;
 		// Iteration counter
 		static int Iter( 0 );
-		// Controller DO loop index
-		int AirLoopControlNum;
 		// Number of times that the maximum iterations was exceeded
 		static int ErrCount( 0 );
 		// Number of times that the maximum iterations was exceeded
@@ -2721,7 +2719,7 @@ namespace SimAirServingZones {
 		if ( PrimaryAirSystem( AirLoopNum ).SizeAirloopCoil ) { // one time flag to initialize controller index and size coils if needed
 			// Loop through the controllers first to set the controller index in the PrimaryAirSystem array. 
 			// Need to actaully simulate controller to get controller index.
-			for ( AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
+			for ( int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
 				PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ) = HVACControllers::GetControllerIndex( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ) );
 				HVACControllers::ControllerProps( PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ) ).AirLoopControllerIndex = AirLoopControlNum;
 			}
@@ -2732,7 +2730,7 @@ namespace SimAirServingZones {
 
 		// This call to ManageControllers reinitializes the controllers actuated variables to zero
 		// E.g., actuator inlet water flow
-		for ( AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
+		for ( int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
 
 			// BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA system
 			// ControllerConvergedFlag is returned true here for water coils in OA system
@@ -2748,7 +2746,7 @@ namespace SimAirServingZones {
 		IsUpToDateFlag = true;
 
 		// Loop over the air sys controllers until convergence or MaxIter iterations
-		for ( AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
+		for ( int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
 
 			Iter = 0;
 			ControllerConvergedFlag = false;
@@ -2831,7 +2829,7 @@ namespace SimAirServingZones {
 		}
 
 		// Check that all active controllers are still convergence
-		for ( AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
+		for ( int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
 
 			ControllerConvergedFlag = false;
 
