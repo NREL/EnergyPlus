@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -391,7 +391,7 @@ namespace HeatBalanceSurfaceManager {
 		Real64 TUC; // Intermediate calculation variable (temperature at user specified location)
 
 		// RJH DElight Modification Begin
-		Real64 dPowerReducFac; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
+		Real32 dPowerReducFac; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
 		Real64 dHISKFFC; // double value for argument passing
 		Real64 dHISUNFFC; // double value for argument passing
 		Real64 dSOLCOS1; // double value for argument passing
@@ -5210,13 +5210,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
-	Real64 const IterDampConst( 5.0 ); // Damping constant for inside surface temperature iterations
+	Real32 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
+	Real32 const IterDampConst( 5.0 ); // Damping constant for inside surface temperature iterations
 	int const ItersReevalConvCoeff( 30 ); // Number of iterations between inside convection coefficient reevaluations
-	Real64 const MaxAllowedDelTemp( 0.002 ); // Convergence criteria for inside surface temperatures
+	Real32 const MaxAllowedDelTemp( 0.002 ); // Convergence criteria for inside surface temperatures
 	int const MaxIterations( 500 ); // Maximum number of iterations allowed for inside surface temps
 	int const IterationsForCondFDRelaxChange( 5 ); // number of iterations for inside temps that triggers a change
-	Real64 const SmallNumber( 0.0001 ); // avoid numerical junk causing problems?
+	Real32 const SmallNumber( 0.0001 ); // avoid numerical junk causing problems?
 	// in the CondFD relaxation factor.
 	int const MinEMPDIterations( 4 ); // Minimum number of iterations required for EMPD solution
 	static std::string const rhoAirZone( "RhoAirZone" );
@@ -5243,9 +5243,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	int ZoneNum; // Zone number the current surface is attached to
 	int ConstrNumSh; // Shaded construction number for a window
 	int RoughSurf; // Outside surface roughness
-	Real64 EmisOut; // Glass outside surface emissivity
+	Real32 EmisOut; // Glass outside surface emissivity
 
-	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
+	static Array1D< Real32 > TempInsOld; // Holds previous iteration's value for convergence check
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
 	Real64 TempSurfInSat; // Local temporary surface dew point temperature
 
@@ -5256,22 +5256,22 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static int ErrCount( 0 );
 	int PipeNum; // TDD pipe object number
 	int SurfNum2; // TDD:DIFFUSER object number
-	Real64 Ueff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
+	Real32 Ueff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
 
 	int ZoneEquipConfigNum;
 	//  LOGICAL           :: ControlledZoneAirFlag
 	int NodeNum;
-	Real64 SumSysMCp; // Zone sum of air system MassFlowRate*Cp
-	Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
-	Real64 MassFlowRate;
-	Real64 NodeTemp;
-	Real64 CpAir;
-	static Array1D< Real64 > RefAirTemp; // reference air temperatures
+	Real32 SumSysMCp; // Zone sum of air system MassFlowRate*Cp
+	Real32 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
+	Real32 MassFlowRate;
+	Real32 NodeTemp;
+	Real32 CpAir;
+	static Array1D< Real32 > RefAirTemp; // reference air temperatures
 	static bool MyEnvrnFlag( true );
 	//  LOGICAL, SAVE     :: DoThisLoop
 	static int InsideSurfErrCount( 0 );
-	Real64 Wsurf; // Moisture ratio for HAMT
-	Real64 RhoAirZone; // Zone moisture density for HAMT
+	Real32 Wsurf; // Moisture ratio for HAMT
+	Real32 RhoAirZone; // Zone moisture density for HAMT
 	int OtherSideZoneNum; // Zone Number index for other side of an interzone partition HAMT
 	static int WarmupSurfTemp;
 	static int TimeStepInDay( 0 ); // time step number
@@ -5464,15 +5464,15 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 			ConstrNum = surface.Construction;
 			auto const & construct( Construct( ConstrNum ) );
-			Real64 const MAT_zone( MAT( ZoneNum ) );
-			Real64 const ZoneAirHumRat_zone( max( ZoneAirHumRat( ZoneNum ), 1.0e-5 ) );
+			Real32 const MAT_zone( MAT( ZoneNum ) );
+			Real32 const ZoneAirHumRat_zone( max( ZoneAirHumRat( ZoneNum ), 1.0e-5 ) );
 
 			// Calculate the inside surface moisture quantities
 			// calculate the inside surface moisture transfer conditions
 			// check for saturation conditions of air
-			Real64 const HConvIn_surf( HConvInFD( SurfNum ) = HConvIn( SurfNum ) );
-			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb_fast( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
-			HMassConvInFD( SurfNum ) = HConvIn_surf / ( PsyRhoAirFnPbTdbW_fast( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb_fast( ZoneAirHumRat_zone, MAT_zone ) );
+			Real32 const HConvIn_surf( HConvInFD( SurfNum ) = HConvIn( SurfNum ) );
+			RhoVaporAirIn( SurfNum ) = min( PsyRhovFnTdbWPb( MAT_zone, ZoneAirHumRat_zone, OutBaroPress ), PsyRhovFnTdbRh( MAT_zone, 1.0, HBSurfManInsideSurf ) );
+			HMassConvInFD( SurfNum ) = HConvIn_surf / ( PsyRhoAirFnPbTdbW( OutBaroPress, MAT_zone, ZoneAirHumRat_zone ) * PsyCpAirFnWTdb( ZoneAirHumRat_zone, MAT_zone ) );
 
 			// Perform heat balance on the inside face of the surface ...
 			// The following are possibilities here:
@@ -5498,8 +5498,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), MAT_zone, TempSurfInSat );
 					}
 					//Pre-calculate a few terms
-					Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) + ( QRadSurfAFNDuct( SurfNum ) / TimeStepZoneSec ) );
-					Real64 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + HConvIn_surf + IterDampConst ) );
+					Real32 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) + ( QRadSurfAFNDuct( SurfNum ) / TimeStepZoneSec ) );
+					Real32 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + HConvIn_surf + IterDampConst ) );
 					// Calculate the current inside surface temperature
 					if ( ( ! surface.IsPool ) || ( ( surface.IsPool ) && ( abs( QPoolSurfNumerator( SurfNum ) ) < SmallNumber ) && ( abs( PoolHeatTransCoefs( SurfNum ) ) < SmallNumber ) ) ) {
 						if ( construct.SourceSinkPresent ) {
@@ -5522,7 +5522,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 					if ( construct.SourceSinkPresent ) { // Set the appropriate parameters for the radiant system
 
 						// Radiant system does not need the damping coefficient terms (hopefully) // Partitions are assumed to be symmetric
-						Real64 const RadSysDiv( 1.0 / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + HConvIn_surf ) );
+						Real32 const RadSysDiv( 1.0 / ( construct.CTFInside( 0 ) - construct.CTFCross( 0 ) + HConvIn_surf ) );
 						RadSysToHBConstCoef( SurfNum ) = RadSysTiHBConstCoef( SurfNum ) = TempTerm * RadSysDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection from surface to zone air | Radiant flux from high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard heater | Net radiant exchange with other zone surfaces | Cond term (both partition sides same temp) | Cond term (both partition sides same temp) | Convection and damping term
 						RadSysToHBTinCoef( SurfNum ) = RadSysTiHBToutCoef( SurfNum ) = 0.0; // The outside temp is assumed to be equal to the inside temp for a partition
 						RadSysToHBQsrcCoef( SurfNum ) = RadSysTiHBQsrcCoef( SurfNum ) = construct.CTFSourceIn( 0 ) * RadSysDiv; // QTF term for the source | Cond term (both partition sides same temp) | Cond term (both partition sides same temp) | Convection and damping term
@@ -5569,8 +5569,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 								CalcMoistureBalanceEMPD( SurfNum, TempSurfInTmp( SurfNum ), MAT_zone, TempSurfInSat );
 							}
 							//Pre-calculate a few terms
-							Real64 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) + ( QRadSurfAFNDuct( SurfNum ) / TimeStepZoneSec ) );
-							Real64 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) + HConvIn_surf + IterDampConst ) );
+							Real32 const TempTerm( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn_surf * RefAirTemp( SurfNum ) + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + NetLWRadToSurf( SurfNum ) + ( QRadSurfAFNDuct( SurfNum ) / TimeStepZoneSec ) );
+							Real32 const TempDiv( 1.0 / ( construct.CTFInside( 0 ) + HConvIn_surf + IterDampConst ) );
 							// Calculate the current inside surface temperature
 							if ( ( ! surface.IsPool ) || ( ( surface.IsPool ) && ( abs( QPoolSurfNumerator( SurfNum ) ) < SmallNumber ) && ( abs( PoolHeatTransCoefs( SurfNum ) ) < SmallNumber ) ) ) {
 								if ( construct.SourceSinkPresent ) {
@@ -5593,7 +5593,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 							if ( construct.SourceSinkPresent ) { // Set the appropriate parameters for the radiant system
 
 								// Radiant system does not need the damping coefficient terms (hopefully)
-								Real64 const RadSysDiv( 1.0 / ( construct.CTFInside( 0 ) + HConvIn_surf ) );
+								Real32 const RadSysDiv( 1.0 / ( construct.CTFInside( 0 ) + HConvIn_surf ) );
 								RadSysTiHBConstCoef( SurfNum ) = TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection from surface to zone air | Radiant flux from high temp radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard heater | Net radiant exchange with other zone surfaces | Cond term (both partition sides same temp) | Convection and damping term
 								RadSysTiHBToutCoef( SurfNum ) = construct.CTFCross( 0 ) * RadSysDiv; // Outside temp=inside temp for a partition | Cond term (both partition sides same temp) | Convection and damping term
 								RadSysTiHBQsrcCoef( SurfNum ) = construct.CTFSourceIn( 0 ) * RadSysDiv; // QTF term for the source | Cond term (both partition sides same temp) | Convection and damping term
@@ -5679,7 +5679,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 						//   = QRadSWwinAbs(SurfNum,1)/2.0
 						TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum ) = ( QRadThermInAbs( SurfNum ) + QRadSWwinAbs( 1, SurfNum ) / 2.0 + HConvIn_surf * RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) + Ueff * TH( 1, 1, SurfNum2 ) ) / ( Ueff + HConvIn_surf + IterDampConst ); // LW radiation from internal sources | SW radiation from internal sources and solar | Convection from surface to zone air | Net radiant exchange with other zone surfaces | Iterative damping term (for stability) | Current conduction from the outside surface | Coefficient for conduction (current time) | Convection and damping term
 
-						Real64 const Sigma_Temp_4( Sigma * pow_4( TempSurfIn( SurfNum ) ) );
+						Real32 const Sigma_Temp_4( Sigma * pow_4( TempSurfIn( SurfNum ) ) );
 
 						// Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
 						WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + HConvIn_surf * surface.Area * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) + Construct( surface.Construction ).InsideAbsorpThermal * surface.Area * ( Sigma_Temp_4 - ( SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QCoolingPanelSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) ) ) - QS( surface.Zone ) * surface.Area * Construct( surface.Construction ).TransDiff; // Transmitted solar | Convection | IR exchange | IR

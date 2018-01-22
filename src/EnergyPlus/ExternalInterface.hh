@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,10 +76,10 @@ namespace EnergyPlus {
 namespace ExternalInterface {
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern Real64 tComm;
-	extern Real64 tStop;
-	extern Real64 tStart;
-	extern Real64 hStep;
+	extern double tComm;
+	extern double tStop;
+	extern double tStart;
+	extern double hStep;
 	extern bool FlagReIni;
 	extern std::string FMURootWorkingFolder;
 	extern int LEN_FMU_ROOT_DIR;
@@ -150,7 +150,7 @@ namespace ExternalInterface {
 	struct  fmuOutputVariableScheduleType {
 
 		std::string Name; // Name of fmu output variable --> schedule in energyplus
-		Real64 RealVarValue; // = Real value at the Zone Time Step
+		Real32 RealVarValue; // = Real value at the Zone Time Step
 		int ValueReference; // = fmiValueReference specific to FMU variable
 
 		// Default Constructor
@@ -303,7 +303,7 @@ namespace ExternalInterface {
 	struct FMUType {
 
 		std::string Name; // FMU Filename
-		Real64 TimeOut; // Default TimeOut value
+		Real32 TimeOut; // Default TimeOut value
 		int Visible; // Default Visible value
 		int Interactive; // Default Interactive value
 		int LoggingOn; // Default LoggingOn value

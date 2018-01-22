@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -166,7 +166,7 @@ namespace WeatherManager {
 	int const GregorianToJulian( 1 ); // JGDate argument for Gregorian to Julian Date conversion
 	int const JulianToGregorian( 2 ); // JGDate argument for Julian to Gregorian Date conversion
 
-	Real64 const Sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
+	Real32 const Sigma( 5.6697e-8 ); // Stefan-Boltzmann constant
 	Real64 const TKelvin( KelvinConv ); // conversion from Kelvin to Celsius
 
 	static std::string const BlankString;
@@ -726,7 +726,7 @@ namespace WeatherManager {
 		}
 		CheckLocationValidity();
 		if ( DataEnvironment::varyingOrientationSchedIndex > 0 ) {
-			DataHeatBalance::BuildingAzimuth = mod( ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingOrientationSchedIndex ), 360.0 );
+			DataHeatBalance::BuildingAzimuth = mod( ScheduleManager::GetCurrentScheduleValue( DataEnvironment::varyingOrientationSchedIndex ), 360.0f );
 			SurfaceGeometry::CosBldgRelNorth = std::cos( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
 			SurfaceGeometry::SinBldgRelNorth = std::sin( -( DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG ) * DataGlobals::DegToRadians );
 			for ( size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum ) {
@@ -6638,7 +6638,7 @@ Label9999: ;
 			if ( ! lNumericFieldBlanks( 9 ) ) PressureEntered = true;
 			DesDayInput( EnvrnNum ).PressureEntered = PressureEntered;
 			DesDayInput( EnvrnNum ).WindSpeed = rNumericArgs( 10 ); // Wind Speed (m/s)
-			DesDayInput( EnvrnNum ).WindDir = mod( rNumericArgs( 11 ), 360.0 ); // Wind Direction
+			DesDayInput( EnvrnNum ).WindDir = mod( rNumericArgs( 11 ), 360.0f ); // Wind Direction
 			// (degrees clockwise from North, N=0, E=90, S=180, W=270)
 			//   N1,  \field Month
 			//   N2,  \field Day of Month
@@ -8169,13 +8169,13 @@ Label9999: ;
 			longh( -i ) = longh( -i + 1 ) - 15.0;
 		}
 		temp = Longitude;
-		temp = mod( temp, 360.0 );
+		temp = mod( temp, 360.0f );
 
 		if ( temp > 180.0 ) temp -= 180.0;
 		for ( i = -12; i <= 12; ++i ) {
 			if ( temp > longl( i ) && temp <= longh( i ) ) {
 				tz = i;
-				tz = mod( tz, 24.0 );
+				tz = mod( tz, 24.0f );
 				GetSTM = tz;
 				break;
 			}

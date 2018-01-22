@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -831,11 +831,11 @@ namespace TranspiredCollector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K
+		Real32 const nu( 15.66e-6 ); // kinematic viscosity (m**2/s) for air at 300 K
 		// (Mills 1999 Heat Transfer)
-		Real64 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K
+		Real32 const k( 0.0267 ); // thermal conductivity (W/m K) for air at 300 K
 		// (Mills 1999 Heat Transfer)
-		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
+		Real32 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 		//  REAL(r64), PARAMETER  :: KelvinConv = KelvinConv         ! Conversion from Celsius to Kelvin
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

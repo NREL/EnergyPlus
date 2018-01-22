@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -181,7 +181,7 @@ namespace HeatBalanceIntRadExchange {
 		// Argument array dimensioning
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
+		Real32 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
 		static gio::Fmt fmtLD( "*" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1191,7 +1191,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		//  Enforce reciprocity by averaging AiFij and AjFji
-		FixedAF = 0.5 * ( AF + transpose( AF ) ); //Performance Slow way to average with transpose (heap use)
+		FixedAF = 0.5f * ( AF + transpose( AF ) ); //Performance Slow way to average with transpose (heap use)
 
 		AF.deallocate();
 
@@ -1268,7 +1268,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 
 			//  Enforce reciprocity by averaging AiFij and AjFji
-			FixedAF = 0.5 * ( FixedAF + transpose( FixedAF ) );
+			FixedAF = 0.5f * ( FixedAF + transpose( FixedAF ) );
 
 			//  Form FixedF matrix
 			for ( i = 1; i <= N; ++i ) {
@@ -1288,7 +1288,7 @@ namespace HeatBalanceIntRadExchange {
 			ConvrgOld = ConvrgNew;
 			if ( NumIterations > 400 ) { //  If everything goes bad,enforce reciprocity and go home.
 				//  Enforce reciprocity by averaging AiFij and AjFji
-				FixedAF = 0.5 * ( FixedAF + transpose( FixedAF ) );
+				FixedAF = 0.5f * ( FixedAF + transpose( FixedAF ) );
 
 				//  Form FixedF matrix
 				for ( i = 1; i <= N; ++i ) {

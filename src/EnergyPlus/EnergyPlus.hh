@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,7 +70,7 @@ using namespace ObjexxFCL::fmt;
 // Types
 typedef  std::int32_t  Int32;
 typedef  std::int64_t  Int64;
-typedef  float         Real32; // Platform-specific: C++ has no defined precision floating point types
-typedef  double        Real64; // Platform-specific: C++ has no defined precision floating point types
+typedef  double         Real32; // Platform-specific: C++ has no defined precision floating point types
+typedef  float         Real64; // Platform-specific: C++ has no defined precision floating point types
 
 #endif

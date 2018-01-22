@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1339,8 +1339,8 @@ namespace WaterToAirHeatPumpSimple {
 						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
 						PreDefTableEntry( pdchCoolCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedPowerCool / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
 					} else {
-						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
-						PreDefTableEntry( pdchCoolCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
+						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, 0.0f );
+						PreDefTableEntry( pdchCoolCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, 0.0f );
 					}
 				} else { // Hardsized with sizing data
 					if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0 && !HardSizeNoDesRun ) {
@@ -1367,7 +1367,7 @@ namespace WaterToAirHeatPumpSimple {
 					if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal != 0.0 ) {
 						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal );
 					} else {
-						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
+						PreDefTableEntry( pdchCoolCoilSHR, SimpleWatertoAirHP( HPNum ).Name, 0.0f );
 					}
 				} else {
 					if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens > 0.0 && RatedCapCoolSensDes > 0.0 ) {
@@ -1466,7 +1466,7 @@ namespace WaterToAirHeatPumpSimple {
 				if ( SimpleWatertoAirHP( HPNum ).RatedCapHeat != 0.0 ) {
 					PreDefTableEntry( pdchHeatCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, SimpleWatertoAirHP( HPNum ).RatedPowerHeat / SimpleWatertoAirHP( HPNum ).RatedCapHeat );
 				} else {
-					PreDefTableEntry( pdchHeatCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, 0.0 );
+					PreDefTableEntry( pdchHeatCoilNomEff, SimpleWatertoAirHP( HPNum ).Name, 0.0f );
 				}
 			} else {
 				if ( SimpleWatertoAirHP( HPNum ).RatedCapHeat > 0.0 && RatedCapHeatDes > 0.0 && ! HardSizeNoDesRun ) {

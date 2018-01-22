@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,7 +83,7 @@ namespace TARCOGParams {
 	// Data
 	//REAL(r64), parameter :: StefanBoltzmannConst    = 5.6697d-8     ! Stefan-Boltzman constant (5.6697e-8 [W/m^2K^4])
 	//REAL(r64), parameter :: GravityConstant = 9.807d0
-	Real64 const e( 2.718281828459 );
+	Real32 const e( 2.718281828459 );
 	//REAL(r64), parameter :: MaxHr = 100  ! used in iterations in case temperatures on surfaces reaches identical values
 	Real64 const DeflectionRelaxation( 0.005 ); // Deflection relaxation parameter
 	int const DeflectionMaxIterations( 400 ); // maximum number of deflection iterations

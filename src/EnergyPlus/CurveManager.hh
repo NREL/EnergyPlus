@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -538,6 +538,17 @@ namespace CurveManager {
 		Optional< Real64 > Var2Max = _, // Maximum values of 2nd independent variable
 		Optional< Real64 > Var3Min = _, // Minimum values of 2nd independent variable
 		Optional< Real64 > Var3Max = _ // Maximum values of 2nd independent variable
+	);
+
+	void
+	GetCurveMinMaxValues(
+		int const CurveIndex, // index of curve in curve array
+		Real32 & Var1Min, // Minimum values of 1st independent variable
+		Real32 & Var1Max, // Maximum values of 1st independent variable
+		Optional< Real32 > Var2Min = _, // Minimum values of 2nd independent variable
+		Optional< Real32 > Var2Max = _, // Maximum values of 2nd independent variable
+		Optional< Real32 > Var3Min = _, // Minimum values of 2nd independent variable
+		Optional< Real32 > Var3Max = _ // Maximum values of 2nd independent variable
 	);
 
 	void

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -129,8 +129,8 @@ namespace PondGroundHeatExchanger {
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
 	static std::string const fluidNameWater( "WATER" );
-	Real64 const SmallNum( 1.0e-30 ); // Very small number to avoid div0 errors
-	Real64 const StefBoltzmann( 5.6697e-08 ); // Stefan-Boltzmann constant
+	Real32 const SmallNum( 1.0e-30 ); // Very small number to avoid div0 errors
+	Real32 const StefBoltzmann( 5.6697e-08 ); // Stefan-Boltzmann constant
 	//  REAL(r64), PARAMETER :: KelvinConv    = KelvinConv           ! Conversion from Celsius to Kelvin
 
 	// DERIVED TYPE DEFINITIONS

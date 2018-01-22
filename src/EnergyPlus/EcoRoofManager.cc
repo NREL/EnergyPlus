@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -185,9 +185,9 @@ namespace EcoRoofManager {
 		Real64 const Kv( 0.4 ); // Von Karmen's constant (source FASST)
 		Real64 const rch( 0.63 ); // Turbulent Schimdt Number
 		Real64 const rche( 0.71 ); // Turbulent Prandtl Number
-		Real64 const Rair( 0.286e3 ); // Gas Constant of air J/Kg K
+		Real32 const Rair( 0.286e3 ); // Gas Constant of air J/Kg K
 		Real64 const g1( 9.81 ); // Gravity. In m/sec^2.
-		Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant W/m^2K^4
+		Real32 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant W/m^2K^4
 		Real64 const Cpa( 1005.6 ); // Specific heat of Water Vapor. (J/Kg.K)
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:

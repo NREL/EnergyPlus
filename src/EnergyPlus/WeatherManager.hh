@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,7 +110,7 @@ namespace WeatherManager {
 	extern int const GregorianToJulian; // JGDate argument for Gregorian to Julian Date conversion
 	extern int const JulianToGregorian; // JGDate argument for Julian to Gregorian Date conversion
 
-	extern Real64 const Sigma; // Stefan-Boltzmann constant
+	extern Real32 const Sigma; // Stefan-Boltzmann constant
 	extern Real64 const TKelvin; // conversion from Kelvin to Celsius
 
 	extern Array1D_string const DaysOfWeek;

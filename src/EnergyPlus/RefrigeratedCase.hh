@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -168,26 +168,26 @@ namespace RefrigeratedCase {
 	extern int const SecondarySystem;
 
 	// Following constant approp for R22, future may make f(refrigerant)
-	extern Real64 const CaseSuperheat; // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
-	extern Real64 const TransCaseSuperheat; // case superheat for transcritical CO2 systems (C)
+	extern Real32 const CaseSuperheat; // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
+	extern Real32 const TransCaseSuperheat; // case superheat for transcritical CO2 systems (C)
 	// Next two constants used to autosize evap condenser
-	extern Real64 const CondPumpRatePower; // evap condenser pump rated, Wpump/Wcapacity (15 W/ton)
-	extern Real64 const AirVolRateEvapCond; // evap cond air flow rate for autosize, equiv 850 cfm/ton (m3/W-s)
-	extern Real64 const EvapCutOutTdb; // shut off evap water flow if outdoor drybulb < evapcutOutTdb (C)
+	extern Real32 const CondPumpRatePower; // evap condenser pump rated, Wpump/Wcapacity (15 W/ton)
+	extern Real32 const AirVolRateEvapCond; // evap cond air flow rate for autosize, equiv 850 cfm/ton (m3/W-s)
+	extern Real32 const EvapCutOutTdb; // shut off evap water flow if outdoor drybulb < evapcutOutTdb (C)
 	// Miscellaneous constants
-	extern Real64 const MyLargeNumber;
-	extern Real64 const MySmallNumber;
-	extern Real64 const Rair; // Air resistance used with Heat Balance anti-sweat (AS) heater
-	extern Real64 const IceMeltEnthalpy; // heat of fusion of water J/kg
-	extern Real64 const TempTooHotToFrost; // C, used to check for frosting conditions on evaporator coils
-	extern Real64 const IcetoVaporEnthalpy; // J/kg to freeze water vapor to ice
-	extern Real64 const WatertoVaporEnthalpy; // at 0C
-	extern Real64 const SpecificHeatIce; // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
-	extern Real64 const CondAirVolExponentDry; // exponent for forced air over a cylinder, = 1/.633
+	extern Real32 const MyLargeNumber;
+	extern Real32 const MySmallNumber;
+	extern Real32 const Rair; // Air resistance used with Heat Balance anti-sweat (AS) heater
+	extern Real32 const IceMeltEnthalpy; // heat of fusion of water J/kg
+	extern Real32 const TempTooHotToFrost; // C, used to check for frosting conditions on evaporator coils
+	extern Real32 const IcetoVaporEnthalpy; // J/kg to freeze water vapor to ice
+	extern Real32 const WatertoVaporEnthalpy; // at 0C
+	extern Real32 const SpecificHeatIce; // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
+	extern Real32 const CondAirVolExponentDry; // exponent for forced air over a cylinder, = 1/.633
 	//per ASHRAE 2005 (page 3.15)
-	extern Real64 const CondAirVolExponentEvap; // exponent for evap condenser air vol flow, = 1/.76
+	extern Real32 const CondAirVolExponentEvap; // exponent for evap condenser air vol flow, = 1/.76
 	//per Manske, 1999
-	extern Real64 const EvaporatorAirVolExponent; // exponent for evapaporator air vol flow, = 1/.65
+	extern Real32 const EvaporatorAirVolExponent; // exponent for evapaporator air vol flow, = 1/.65
 	//per Manske, 1999, page 35
 
 	extern Real64 const FanHalfSpeedRatio; // = 1/(2**2.5) for power step for two speed fan

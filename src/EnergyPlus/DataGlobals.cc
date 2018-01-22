@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,20 +102,20 @@ namespace DataGlobals {
 	int const ksRunPeriodWeather( 3 );
 	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
 	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
-	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data prior to the simulation
+	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data proir to the simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
 
 	Real64 const MaxEXPArg( 709.78 ); // maximum exponent in EXP() function
-	Real64 const Pi( 3.14159265358979324 ); // Pi 3.1415926535897932384626435
-	Real64 const PiOvr2( Pi / 2.0 ); // Pi/2
-	Real64 const TwoPi( 2.0 * Pi ); // 2*Pi 6.2831853071795864769252868
+	Real32 const Pi( 3.14159265358979324 ); // Pi 3.1415926535897932384626435
+	Real32 const PiOvr2( Pi / 2.0 ); // Pi/2
+	Real32 const TwoPi( 2.0 * Pi ); // 2*Pi 6.2831853071795864769252868
 	Real64 const GravityConstant( 9.807 );
-	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
-	Real64 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
+	Real32 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
+	Real32 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
-	Real64 const HoursInDay( 24.0 ); // Number of Hours in Day
+	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
 	Real64 const BigNumber( HUGE_( 1.0 ) ); // Max Number real used for initializations
 	Real64 const rTinyValue( EPSILON( 1.0 ) ); // Tiny value to replace use of TINY(x)
@@ -128,8 +128,8 @@ namespace DataGlobals {
 	Real64 const CWInitConvTemp( 5.05 ); // [deg C], standard init chilled water vol to mass flow conversion temp
 	Real64 const HWInitConvTemp( 60.0 ); // [deg C], standard init hot water vol to mass flow conversion temp
 
-	Real64 const StefanBoltzmann( 5.6697E-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
-	Real64 const UniversalGasConst( 8314.462175 ); // (J/mol*K)
+	Real32 const StefanBoltzmann( 5.6697E-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
+	Real32 const UniversalGasConst( 8314.462175 ); // (J/mol*K)
 
 	// Parameters for EMS Calling Points
 	int const emsCallFromZoneSizing( 1 ); // Identity where EMS called from

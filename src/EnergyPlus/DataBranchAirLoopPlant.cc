@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,7 +83,8 @@ namespace DataBranchAirLoopPlant {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	// Parameters for tolerance
-	Real64 const MassFlowTolerance( 0.000000001 ); // minimum significant mass flow rate (kg/s)
+	// Real64 const MassFlowTolerance( 0.000000001 ); // minimum significant mass flow rate (kg/s)
+	Real64 const MassFlowTolerance( 0.000001 ); // minimum significant mass flow rate (kg/s)
 
 	// Pressure Curve Type: None, pressure, or generic curve (if generic it will be a postive value which is the curve manager index)
 	int const PressureCurve_Error( -1 );

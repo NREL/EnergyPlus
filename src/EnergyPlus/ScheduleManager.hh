@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -97,13 +97,6 @@ namespace ScheduleManager {
 	extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
 	extern bool ScheduleDSTSFileWarningIssued;
 
-
-	enum class ScheduleInterpolation {
-		No,                       // no interpolation
-		Average,                  // interpolation only to resolve time intervals not matching timestep lengths (this was previously interpolate:yes)
-		Linear                    // linear interpolation from the previous time to the current time for the entire schedule
-	};
-
 	//Derived Types Variables
 
 	// Types
@@ -134,7 +127,7 @@ namespace ScheduleManager {
 		// Members
 		std::string Name; // Day Schedule Name
 		int ScheduleTypePtr; // Index of Schedule Type
-		ScheduleInterpolation IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
+		bool IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
 		bool Used; // Indicator for this schedule being "used".
 		Array2D< Real64 > TSValue; // Value array by simulation timestep
 		Real64 TSValMax; // maximum of all TSValue's
@@ -143,7 +136,7 @@ namespace ScheduleManager {
 		// Default Constructor
 		DayScheduleData() :
 			ScheduleTypePtr( 0 ),
-			IntervalInterpolated( ScheduleInterpolation::No ),
+			IntervalInterpolated( false ),
 			Used( false ),
 			TSValMax( 0.0 ),
 			TSValMin( 0.0 )
@@ -255,6 +248,12 @@ namespace ScheduleManager {
 	void
 	ExternalInterfaceSetSchedule(
 		int & ScheduleIndex,
+		Real32 & Value // The new value for the schedule
+	);
+
+	void
+	ExternalInterfaceSetSchedule(
+		int & ScheduleIndex,
 		Real64 & Value // The new value for the schedule
 	);
 
@@ -269,7 +268,7 @@ namespace ScheduleManager {
 		bool & ErrorsFound,
 		std::string const & DayScheduleName, // Name (used for errors)
 		std::string const & ErrContext, // Context (used for errors)
-		ScheduleInterpolation interpolationKind  // enumeration on how to interpolate values in schedule
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
 		);
 
 	void
@@ -280,8 +279,8 @@ namespace ScheduleManager {
 		bool & ErrorsFound, // True if errors found in this field
 		std::string const & DayScheduleName, // originating day schedule name
 		std::string const & FullFieldValue, // Full Input field value
-		ScheduleInterpolation interpolationKind  // enumeration on how to interpolate values in schedule
-	);
+		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
+		);
 
 	bool
 	isMinuteMultipleOfTimestep( int minute, int numMinutesPerTimestep );

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -437,7 +437,7 @@ namespace Vectors {
 		az = mod( 450.0 - az, 360.0 );
 		az += 90.0;
 		if ( az < 0.0 ) az += 360.0;
-		az = mod( az, 360.0 );
+		az = mod( az, 360.0f );
 
 		// Clean up angle precision
 		if ( std::abs( az - 360.0 ) < 1.0e-3 ) { // Bring small angles to zero

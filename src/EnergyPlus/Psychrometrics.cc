@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,6 +63,8 @@
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
+
+#define EP_nocache_Psychrometrics
 
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
@@ -984,7 +986,7 @@ namespace Psychrometrics {
 		// USE STATEMENTS:
 
 		// Return value
-		Real64 T; // result=> saturation temperature {C}
+		Real32 T; // result=> saturation temperature {C}
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -999,17 +1001,17 @@ namespace Psychrometrics {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 T1; // APPROXIMATE SATURATION TEMPERATURE (C)
-		Real64 T2; // APPROXIMATE SATURATION TEMPERATURE (C)
-		Real64 TN; // NEW ASSUMED SATURATION TEMPERATURE (C)
-		Real64 H1; // APPROXIMATE ENTHALPY (J/KG)
-		Real64 H2; // APPROXIMATE ENTHALPY (J/KG)
-		Real64 Y1; // ERROR IN ENTHALPY
-		Real64 Y2; // ERROR IN ENTHALPY
+		Real32 T1; // APPROXIMATE SATURATION TEMPERATURE (C)
+		Real32 T2; // APPROXIMATE SATURATION TEMPERATURE (C)
+		Real32 TN; // NEW ASSUMED SATURATION TEMPERATURE (C)
+		Real32 H1; // APPROXIMATE ENTHALPY (J/KG)
+		Real32 H2; // APPROXIMATE ENTHALPY (J/KG)
+		Real32 Y1; // ERROR IN ENTHALPY
+		Real32 Y2; // ERROR IN ENTHALPY
 		int IterCount;
-		Real64 HH; // temporary enthalpy (calculation) value
+		Real32 HH; // temporary enthalpy (calculation) value
 		bool FlagError; // Set when errors should be flagged
-		Real64 Hloc; // local value of H
+		Real32 Hloc; // local value of H
 
 		//                                      CHECK H IN RANGE.
 		HH = H + 1.78637e4;
