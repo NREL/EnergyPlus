@@ -514,6 +514,8 @@ namespace DXCoils {
 		Real64 ActualSC; // Actual subcooling degrees [C]
 		Real64 RateBFVRFIUEvap; // VRF Iutdoor Unit Evaporator Rated Bypass Factor
 		Real64 RateBFVRFIUCond; // VRF Iutdoor Unit Condenser Rated Bypass Factor
+		int CAPFTErrIndex; // index/pointer to recurring error structure for CAPFT curve value <= 0.0
+		int EIRFTErrIndex; // index/pointer to recurring error structure for EIRFT curve value <= 0.0
 
 		// Default Constructor
 		DXCoilData() :
@@ -753,7 +755,9 @@ namespace DXCoils {
 			ActualSH( 0.0 ),
 			ActualSC( 0.0 ),
 			RateBFVRFIUEvap( 0.0592 ),
-			RateBFVRFIUCond( 0.1360 )
+			RateBFVRFIUCond( 0.1360 ),
+			CAPFTErrIndex( 0 ),
+			EIRFTErrIndex( 0 )
 		{}
 
 	};
