@@ -13,7 +13,7 @@
 ! System:   None.
 ! Plant:    A chain of 4plant loops that connect LoadProfile:Plant objects to DistrictCooling and DistrictHeating by heat exchangers
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -232,7 +232,7 @@
     USE Heat Supply Heating Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowBothUnMixed,    !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     HeatingSetpointModulated,!- Control Type
     Use heat Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -430,7 +430,7 @@
     USE Cool Supply Cooling Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowBothUnMixed,    !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     CoolingSetpointModulated,!- Control Type
     Use Cool Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -635,7 +635,7 @@
     TRANSFER HX Supply Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowBothUnMixed,    !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     DualDeadbandSetpointModulated,  !- Control Type
     TRANSFER Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}

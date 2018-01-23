@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4972,19 +4972,20 @@ namespace SingleDuct {
 				if ( ZoneSizingInput.allocated( ) ) {
 					for ( int SizingInputNum = 1; SizingInputNum <= NumZoneSizingInput; ++SizingInputNum ) {
 						if ( ZoneSizingInput( SizingInputNum ).ZoneNum == SysATMixer( ATMixerNum ).ZoneNum ) {
-							SysATMixer( ATMixerNum ).OARequirementsPtr = SizingInputNum;
 							if ( ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex == 0 ) {
 								ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
-								ShowContinueError( "If " + cAlphaFieldNames( 8 ) + "is blank, the input of Design Specification Outdoor Air Object Name in Sizing:Zone is needed. Otherwise the mixer outdoor airflow rate is zero." );
+								ShowContinueError( cAlphaFieldNames( 8 ) + " is blank in both the mixer and the Sizing:Zone object for the same zone." );
+								ShowContinueError( "The mixer outdoor airflow rate is set to zero." );
 								SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = 0.0;
 							} else {
-								SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex, SysATMixer( ATMixerNum ).ZoneNum, false, false );
+								SysATMixer( ATMixerNum ).OARequirementsPtr = ZoneSizingInput( SizingInputNum ).ZoneDesignSpecOAIndex;
+								SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( SysATMixer( ATMixerNum ).OARequirementsPtr, SysATMixer( ATMixerNum ).ZoneNum, false, false );
 								SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false;
 							}
 						}
 					}
 				} else {
-					ShowWarningError( "If " + cAlphaFieldNames( 8 ) + "is blank and there is no Sizing:Zone in the same zone, the mixer outdoor airflow rate is set to zero." );
+					ShowWarningError( cAlphaFieldNames( 8 ) + "is blank and there is no Sizing:Zone for the same zone. The mixer outdoor airflow rate is set to zero." );
 					SysATMixer( ATMixerNum ).DesignPrimaryAirVolRate = 0.0;
 				}
 			}

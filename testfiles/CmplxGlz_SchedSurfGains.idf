@@ -75,7 +75,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -451,6 +451,7 @@
 
   ZoneHVAC:EquipmentList,
     Room 102 EQUIPMENT,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Room 102 Ideal Loads,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -464,7 +465,7 @@
     Room 102 INLETS,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Room 102 NODE,           !- Zone Air Node Name
-    Room 102 OUTLET;         !- Zone Return Air Node Name
+    Room 102 OUTLET;         !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: NODELIST ===========
 

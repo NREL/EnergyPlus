@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,6 +111,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -118,6 +119,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -305,7 +307,7 @@ namespace EnergyPlus {
 		bool FirstHVACIteration( false );
 
 		std::string const idf_objects = delimited_string( {
-			" Version,8.8;",
+			" Version,8.9;",
 
 			"  Zone,",
 			"    SPACE2-1,                !- Name",
@@ -366,6 +368,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -373,6 +376,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE3-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE3-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -380,6 +384,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",

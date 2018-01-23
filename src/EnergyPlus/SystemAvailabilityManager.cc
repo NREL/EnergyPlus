@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2168,13 +2168,13 @@ namespace SystemAvailabilityManager {
 		static Array1D_bool ZoneCompNCControlType;
 		int CyclingRunTimeControlType; 
 
-		// reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
-		if ( WarmupFlag && BeginDayFlag ) {
-			PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
-			PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps;
-		}
-
 		if ( present( ZoneEquipType ) ) {
+			if ( WarmupFlag && BeginDayFlag ) {
+				// reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
+				ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime = SimTimeSteps;
+				ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime = SimTimeSteps;
+			}
+
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
 			if (CalcNCycSysAvailMgr_OneTimeFlag) {
@@ -2182,6 +2182,12 @@ namespace SystemAvailabilityManager {
 				CalcNCycSysAvailMgr_OneTimeFlag = false;
 			}
 		} else {
+			if ( WarmupFlag && BeginDayFlag ) {
+				// reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
+				PriAirSysAvailMgr( PriAirSysNum ).StartTime = SimTimeSteps;
+				PriAirSysAvailMgr( PriAirSysNum ).StopTime = SimTimeSteps;
+			}
+
 			StartTime = PriAirSysAvailMgr( PriAirSysNum ).StartTime;
 			StopTime = PriAirSysAvailMgr( PriAirSysNum ).StopTime;
 		}
