@@ -147,13 +147,13 @@ namespace EnergyPlus {
 		class CSetting
 		{
 		public:
-			CSetting() :Runtime_Fraction(0), Mode(0), Outside_Air_Fraction(0), Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
+			CSetting() :Runtime_Fraction(0), Mode(0), Outside_Air_Fraction(0), Unscaled_Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
 				SupplyAirTemperature(0), Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), 
 				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0) {}
 			Real64 Runtime_Fraction;															  
 			Real64 Mode;																		  
 			Real64 Outside_Air_Fraction;														  
-			Real64 Supply_Air_Mass_Flow_Rate;													  
+			Real64 Unscaled_Supply_Air_Mass_Flow_Rate;													  
 			Real64 ScaledSupply_Air_Mass_Flow_Rate;
 			Real64 Supply_Air_Ventilation_Volume;
 			Real64 ScaledSupply_Air_Ventilation_Volume;
@@ -183,7 +183,7 @@ namespace EnergyPlus {
 				swap(Runtime_Fraction, other.Runtime_Fraction);
 				swap(Mode, other.Mode);
 				swap(Outside_Air_Fraction, other.Outside_Air_Fraction);
-				swap(Supply_Air_Mass_Flow_Rate, other.Supply_Air_Mass_Flow_Rate);
+				swap(Unscaled_Supply_Air_Mass_Flow_Rate, other.Unscaled_Supply_Air_Mass_Flow_Rate);
 				swap(Supply_Air_Ventilation_Volume, other.Supply_Air_Ventilation_Volume);
 				swap(Supply_Air_Mass_Flow_Rate_Ratio, other.Supply_Air_Mass_Flow_Rate_Ratio);
 				swap(ScaledSupply_Air_Mass_Flow_Rate, other.ScaledSupply_Air_Mass_Flow_Rate);
@@ -275,6 +275,8 @@ namespace EnergyPlus {
 			Real64 WaterConsumptionRate;	   //
 			Real64 WaterConsumption;		   //
 			Real64 ExternalStaticPressure;	   //
+			Real64 QSensZoneOut ;
+			Real64 QLatentZoneOut ;
 
 			Real64 RequestedLoadToHeatingSetpoint;
 			Real64 RequestedLoadToCoolingSetpoint;
@@ -371,7 +373,7 @@ namespace EnergyPlus {
 			bool MeetsSupplyAirTOC(Real64 Tosa);
 			bool MeetsSupplyAirRHOC(Real64 Wosa);
 			Real64 CheckVal_T(Real64 T);
-			Real64 CheckVal_W(Real64 W);
+			Real64 CheckVal_W(Real64 W, Real64 T, Real64 P);
 			bool SetStandByMode(CMode* pMode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
 			Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
 			int SetOperatingSetting(CStepInputs StepIns);
