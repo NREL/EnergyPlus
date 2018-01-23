@@ -68954,7 +68954,7 @@ GroundHeatExchanger:Vertical:Properties,
   N1,   \field Depth of Top of Borehole
         \required-field
         \type real
-        \units m-K
+        \units m
         \minimum 0.0
   N2,   \field Borehole Length
         \required-field
@@ -68966,6 +68966,7 @@ GroundHeatExchanger:Vertical:Properties,
         \type real
         \minimum> 0.0
         \units m
+        \ip-units in
   N4,   \field Grout Thermal Conductivity
         \required-field
         \type real
