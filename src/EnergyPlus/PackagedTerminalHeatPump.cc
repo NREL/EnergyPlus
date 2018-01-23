@@ -442,6 +442,7 @@ namespace PackagedTerminalHeatPump {
 			}
 		} else {
 			PartLoadFrac = 0.0;
+			PTUnit( PTUnitNum ).FanPartLoadRatio = 0.0; // SZVAV will operate at minimum fan speed
 			OnOffAirFlowRatio = 1.0;
 			SupHeaterLoad = 0.0;
 			if ( PTUnit( PTUnitNum ).NumOfSpeedCooling > 0 ) {
@@ -1408,7 +1409,7 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 
-			// check for specific input requirements for ASHRAE90.1 model
+			// check for specific input requirements for SZVAV model
 			if ( PTUnit( PTUnitNum ).ControlType == CCM_ASHRAE ) {
 
 				// MaxNoCoolHeatAirVolFlow should be greater than 0
@@ -1423,22 +1424,22 @@ namespace PackagedTerminalHeatPump {
 				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed ) {
 					if ( DisplayExtraWarnings ) {
 						ShowWarningError( CurrentModuleObject + ": " + PTUnit( PTUnitNum ).Name );
-						ShowContinueError( "ASHRAE90.1 control method requires specific cooling coil types." );
+						ShowContinueError( "Single Zone VAV control method requires specific cooling coil types." );
 						ShowContinueError( "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed." );
 						ShowContinueError( "The input cooling coil type = " + PTUnit( PTUnitNum ).DXCoolCoilType + ". This coil will not be modeled using the ASHRAE 90.1 algorithm." );
 					}
-					// mark this coil as non-ASHRAE90 type
+					// mark this coil as non-SZVAV type
 					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
 				}
 				// only allow for DX heating coils at this time
 				if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num != CoilDX_HeatingEmpirical ) {
 					if ( DisplayExtraWarnings ) {
 						ShowWarningError( CurrentModuleObject + ": " + PTUnit( PTUnitNum ).Name );
-						ShowContinueError( "ASHRAE90.1 control method requires specific heating coil types." );
+						ShowContinueError( "Single Zone VAV control method requires specific heating coil types." );
 						ShowContinueError( "Valid heating coil type is Coil:Heating:DX:SingleSpeed." );
 						ShowContinueError( "The input heating coil type = " + PTUnit( PTUnitNum ).DXHeatCoilType + ". This coil will not be modeled using the ASHRAE 90.1 algorithm." );
 					}
-					// mark this coil as non-ASHRAE90 type
+					// mark this coil as non-SZVAV type
 					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 				}
 			}
@@ -2114,7 +2115,7 @@ namespace PackagedTerminalHeatPump {
 				// MaxNoCoolHeatAirVolFlow should be greater than 0
 				if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow == 0 ) {
 					ShowWarningError( CurrentModuleObject + " illegal " + cNumericFields( 3 ) + " = " + TrimSigDigits( Numbers( 3 ), 3 ) );
-					ShowContinueError( "... when " + cAlphaFields( 19 ) + " = " + Alphas( 19 ) + " the minimum operating air flow rate should be autosized or > 0." );
+					ShowContinueError( "... when " + cAlphaFields( 17 ) + " = " + Alphas( 17 ) + " the minimum operating air flow rate should be autosized or > 0." );
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 					//					ErrorsFound = true;
 				}
@@ -3250,6 +3251,7 @@ namespace PackagedTerminalHeatPump {
 
 				//fill outlet node for coil
 				PTUnit( PTUnitNum ).PlantCoilOutletNode = PlantLoop( PTUnit( PTUnitNum ).HeatCoilLoopNum ).LoopSide( PTUnit( PTUnitNum ).HeatCoilLoopSide ).Branch( PTUnit( PTUnitNum ).HeatCoilBranchNum ).Comp( PTUnit( PTUnitNum ).HeatCoilCompNum ).NodeNumOut;
+				PTUnit( PTUnitNum ).HeatCoilFluidOutletNodeNum = PTUnit( PTUnitNum ).PlantCoilOutletNode;
 				MyPlantScanFlag( PTUnitNum ) = false;
 
 			} else if ( ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingWater ) || ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num == Coil_HeatingSteam ) ) {
@@ -3617,12 +3619,13 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		PTUnit( PTUnitNum ).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
-													// allows non-ASHSRAE compliant coil types to be modeled using non-ASHAR90 method. Constant fan operating mode is required.
 		if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) {
 			if ( CoolingLoad ) {
 				if ( PTUnit( PTUnitNum ).validASHRAECoolCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
 			} else if ( HeatingLoad ) {
 				if ( PTUnit( PTUnitNum ).validASHRAEHeatCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+			} else if ( PTUnit( PTUnitNum ).validASHRAECoolCoil || PTUnit( PTUnitNum ).validASHRAEHeatCoil ) {
+				PTUnit( PTUnitNum ).simASHRAEModel = true;
 			}
 		}
 
@@ -3630,7 +3633,7 @@ namespace PackagedTerminalHeatPump {
 
 		if ( ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil || PTUnit( PTUnitNum ).ATMixerExists ) && GetCurrentScheduleValue( PTUnit( PTUnitNum ).SchedPtr ) > 0.0 && ( ( GetCurrentScheduleValue( PTUnit( PTUnitNum ).FanAvailSchedPtr ) > 0.0 || ZoneCompTurnFansOn ) && ! ZoneCompTurnFansOff ) ) {
 
-			if ( PTUnit( PTUnitNum ).simASHRAEModel ) PTUnit( PTUnitNum ).FanPartLoadRatio = 0.0;
+			if ( PTUnit( PTUnitNum ).simASHRAEModel ) PTUnit( PTUnitNum ).FanPartLoadRatio = 0.0; // check unit output at low fan speed
 			SupHeaterLoad = 0.0;
 			if ( PTUnit( PTUnitNum ).useVSCoilModel ) {
 				CalcVarSpeedHeatPump( PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0, OnOffAirFlowRatio, SupHeaterLoad, false );
@@ -3741,6 +3744,17 @@ namespace PackagedTerminalHeatPump {
 				}
 			}
 			ZoneLoad = QZnReq;
+			// Check SZVAV model after fan operation is tested. Constant fan operating mode is required.
+			PTUnit( PTUnitNum ).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
+			if ( PTUnit( PTUnitNum ).OpMode == ContFanCycCoil ) {
+				if ( CoolingLoad ) {
+					if ( PTUnit( PTUnitNum ).validASHRAECoolCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+				} else if ( HeatingLoad ) {
+					if ( PTUnit( PTUnitNum ).validASHRAEHeatCoil ) PTUnit( PTUnitNum ).simASHRAEModel = true;
+				} else if ( PTUnit( PTUnitNum ).validASHRAECoolCoil || PTUnit( PTUnitNum ).validASHRAEHeatCoil ) {
+					PTUnit( PTUnitNum ).simASHRAEModel = true;
+				}
+			}
 		}
 
 		// get operating capacity of water and steam coil (dependent on entering water/steam temperature)
@@ -4445,9 +4459,9 @@ namespace PackagedTerminalHeatPump {
 
 			SizingMethod = ASHRAEMaxSATHeatingSizing;
 			if ( PTUnit( PTUnitNum ).ZoneEquipType == PkgTermHPAirToAir_Num ) {
-				FieldNum = 12; // Minimum Supply Air Temperature in Cooling Mode
+				FieldNum = 12; // Maximum Supply Air Temperature in Heating Mode
 			} else if ( PTUnit( PTUnitNum ).ZoneEquipType == PkgTermACAirToAir_Num ) {
-				FieldNum = 8; // Minimum Supply Air Temperature in Cooling Mode
+				FieldNum = 8; // Maximum Supply Air Temperature in Heating Mode
 			}
 			SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [C]";
 			if ( SizingDesRunThisZone ) {
@@ -4584,7 +4598,7 @@ namespace PackagedTerminalHeatPump {
 				int CompressorOnFlag = 0;
 				auto & SZVAVModel( PTUnit( PTUnitNum ) );
 				// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-				SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoCompOutput, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
+				SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
 			}
 
 		} else {

@@ -7112,7 +7112,7 @@ namespace HVACUnitarySystem {
 
 			auto & SZVAVModel( UnitarySystem( UnitarySysNum ) );
 			// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-			SZVAVModel::calcSZVAVModel (SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadRatio, NoSensibleOutput, NoLoadOutletTemp, FullSensibleOutput, FullLoadAirOutletTemp, CompressorONFlag );
+			SZVAVModel::calcSZVAVModel (SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadRatio, NoLoadOutletTemp, FullSensibleOutput, FullLoadAirOutletTemp, CompressorONFlag );
 
 		} else { // not ASHRAE model
 
