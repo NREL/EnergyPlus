@@ -1147,16 +1147,35 @@ namespace StandardRatings {
 
 		TotalHeatingCapH3Test = RatedTotalCapacity * CapTempModFacH3Test * TotCapFlowModFac;
 		NetHeatingCapH3Test = TotalHeatingCapH3Test + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
-		// check CAP curve values
-		if ( TotCapTempModFacRated < 0.0 ) {
-			ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( TotCapTempModFacRated, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
-			ShowContinueError( " ...Net heating capacity at high temperature is set to zero. The curve value must be > 0. Check the curve." );
-			NetHeatingCapRated = 0.0;
-		}
-		if ( TotalHeatingCapH3Test < 0.0 ) {
-			ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( CapTempModFacH3Test, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
-			ShowContinueError( " ...Net heating capacity at low temperature is set to zero. The curve value must be > 0. Check the curve." );
-			NetHeatingCapH3Test = 0.0;
+
+		// check CAP curves value
+		if ( TotCapTempModFacRated < 0.0 || TotalHeatingCapH3Test || EIRTempModFacRated < 0.0 || EIRTempModFacH2Test < 0.0 || EIRTempModFacH2Test < 0.0 ) {
+			if ( TotCapTempModFacRated < 0.0 ) {
+				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( TotCapTempModFacRated, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
+				ShowContinueError( " ...Net heating capacity at high temperature is set to zero. The curve value must be > 0. Check the curve." );
+				NetHeatingCapRated = 0.0;
+			}
+			if ( TotalHeatingCapH3Test < 0.0 ) {
+				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( CapTempModFacH3Test, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
+				ShowContinueError( " ...Net heating capacity at low temperature is set to zero. The curve value must be > 0. Check the curve." );
+				NetHeatingCapH3Test = 0.0;
+			}
+			// check EIR curve values
+			if ( EIRTempModFacRated < 0.0 ) {
+				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacRated, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
+				ShowContinueError( " ...HSPF value calculation is incorrect. The curve value must be > 0. Check the curve." );
+			}
+			if ( EIRTempModFacH2Test < 0.0 ) {
+				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacH2Test, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
+				ShowContinueError( " ...HSPF value calculation is incorrect. The curve value must be > 0. Check the curve." );
+			}
+			if ( EIRTempModFacH3Test < 0.0 ) {
+				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacH3Test, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
+				ShowContinueError( " ...HSPF value calculation is incorrect. The curve value must be > 0. Check the curve." );
+			}
+			ShowContinueError( " ...HSPF value calculation is incorrect. HSPF value has been reset to 0.0 and simulation is continuing." );
+			HSPF = 0.0;
+			return;
 		}
 
 		if ( RatedCOP > 0.0 ) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
@@ -1276,24 +1295,6 @@ namespace StandardRatings {
 		if ( TotalElectricalEnergy != 0.0 ) {
 			HSPF = TotalBuildingLoad * DemandDeforstCredit / TotalElectricalEnergy;
 		}
-		// check the ERI curve values
-		if ( EIRTempModFacRated < 0.0 || EIRTempModFacH2Test < 0.0 || EIRTempModFacH2Test < 0.0 ) {
-			// check EIR curve values
-			if ( EIRTempModFacRated < 0.0 ) {
-				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacRated, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
-				ShowContinueError( " ...HSPF value calculation is incorrect. The curve value must be > 0. Check the curve." );
-			}
-			if ( EIRTempModFacH2Test < 0.0 ) {
-				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacH2Test, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
-				ShowContinueError( " ...HSPF value calculation is incorrect. The curve value must be > 0. Check the curve." );
-			}
-			if ( EIRTempModFacH3Test < 0.0 ) {
-				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacH3Test, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
-				ShowContinueError( " ...HSPF value calculation is incorrect. The curve value must be > 0. Check the curve." );
-			}
-			ShowContinueError( " ...HSPF value calculation is incorrect. HSPF value has been reset to 0.0 and simulation is continuing." );
-		}
-
 	}
 
 	void

@@ -139,6 +139,7 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  StandardRatings.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
