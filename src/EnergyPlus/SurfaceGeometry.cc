@@ -6378,7 +6378,7 @@ namespace SurfaceGeometry {
 					ErrorsFoundSingleSurf = true;
 				}
 			} else {
-				ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", " + cAlphaFieldNames( 3 ) + " is required." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + Surface( Found ).Name + "\", " + cAlphaFieldNames( 3 ) + " is required." );
 				ErrorsFoundSingleSurf = true;
 			}			
 
