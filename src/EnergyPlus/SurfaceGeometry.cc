@@ -3618,13 +3618,7 @@ namespace SurfaceGeometry {
 		//        \minimum 0.0
 		//        \maximum 1.0
 		//        \default autocalculate
-		//   A6, \field Shading Control Name
-		//        \note enter the name of a WindowProperty:ShadingControl object
-		//        \type object-list
-		//        \object-list WindowShadeControlNames
-		//        \note used for windows and glass doors only
-		//        \note If not specified, window or glass door has no shading (blind, roller shade, etc.)
-		//   A7, \field Frame and Divider Name
+		//   A6, \field Frame and Divider Name
 		//        \note Enter the name of a WindowProperty:FrameAndDivider object
 		//        \type object-list
 		//        \object-list WindowFrameAndDividerNames
@@ -3688,7 +3682,7 @@ namespace SurfaceGeometry {
 		cCurrentModuleObject = "FenestrationSurface:Detailed";
 		GetObjectDefMaxArgs( cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp );
 
-		if ( SurfaceNumAlpha != 7 ) {
+		if ( SurfaceNumAlpha != 6) {
 			ShowSevereError( cCurrentModuleObject + ": Object Definition indicates not = 7 Alpha Objects, Number Indicated=" + TrimSigDigits( SurfaceNumAlpha ) );
 			ErrorsFound = true;
 		}
@@ -3888,35 +3882,35 @@ namespace SurfaceGeometry {
 					ErrorsFound = true;
 				}
 
-				if ( ! cAlphaArgs( 6 ).empty() ) {
-					if ( TotWinShadingControl > 0 ) {
-						SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( 6 ), WindowShadingControl, TotWinShadingControl );
-					}
-					if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
-						ErrorsFound = true;
-					}
+//WSCO			if ( ! cAlphaArgs( 6 ).empty() ) {
+//WSCO				if ( TotWinShadingControl > 0 ) {
+//WSCO					SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( 6 ), WindowShadingControl, TotWinShadingControl );
+//WSCO				}
+//WSCO				if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
+//WSCO					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
+//WSCO					ErrorsFound = true;
+//WSCO				}
 
-					// Error if this is not an exterior window and shading device has been specified
-					// PETER: should doors be disallowed too?
-					if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {
+//WSCO				// Error if this is not an exterior window and shading device has been specified
+//WSCO				// PETER: should doors be disallowed too?
+//WSCO				if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {
 
-						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + " because it is not an exterior window." );
-						ErrorsFound = true;
+//WSCO					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + " because it is not an exterior window." );
+//WSCO					ErrorsFound = true;
 
-					} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL && SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 ) {
+//WSCO				} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL && SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 ) {
 
-						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
-						ShowContinueError( ".. equivalent layer window model does not use shading control object." );
-						ShowContinueError( ".. Shading control is set to none or zero, and simulation continues." );
-						SurfaceTmp( SurfNum ).WindowShadingControlPtr = 0;
-					}
-				}
+//WSCO					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
+//WSCO					ShowContinueError( ".. equivalent layer window model does not use shading control object." );
+//WSCO					ShowContinueError( ".. Shading control is set to none or zero, and simulation continues." );
+//WSCO					SurfaceTmp( SurfNum ).WindowShadingControlPtr = 0;
+//WSCO					}
+//WSCO				}
 
-				CheckWindowShadingControlFrameDivider( "GetHTSubSurfaceData", ErrorsFound, SurfNum, 7 );
+//WSCO			CheckWindowShadingControlFrameDivider( "GetHTSubSurfaceData", ErrorsFound, SurfNum, 7 );
 
 				if ( SurfaceTmp( SurfNum ).Sides == 3 ) { // Triangular window
-					if ( ! cAlphaArgs( 7 ).empty() ) {
+					if ( ! cAlphaArgs( 6 ).empty() ) {
 						ShowWarningError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 						ShowContinueError( ".. because it is a triangular window and cannot have a frame or divider or reveal reflection." );
 						ShowContinueError( "Frame, divider and reveal reflection will be ignored for this window." );
