@@ -211,9 +211,11 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( NetHeatingCapRatedHighTemp, NetHeatingCapRated );
 		// evaluate capacity curves
 		Real64 CapTempModFacH2Test = CurveValue( Coil.CCapFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test );
+		EXPECT_GT( CapTempModFacH2Test, 0.0 );
 		Real64 CapTempModFacH3Test = CurveValue( Coil.CCapFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test );
 		// if CapTempModFacH3Test curves value is less than zero, NetHeatingCapRatedLowTemp is set to zero
 		EXPECT_LT( CapTempModFacH3Test, 0.0 );
+
 		// check heating capacity at low temperature
 		EXPECT_DOUBLE_EQ( NetHeatingCapRatedLowTemp, 0.0 );
 		// evaluate EIR curves
