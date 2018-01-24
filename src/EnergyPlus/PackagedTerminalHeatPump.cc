@@ -4583,22 +4583,25 @@ namespace PackagedTerminalHeatPump {
 		// Get result when DX coil is off
 		PTUnit( PTUnitNum ).FanPartLoadRatio = 0.0; // set SZVAV model variable
 		CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-		Real64 NoLoadOutletTemp = Node( PTUnit( PTUnitNum ).AirOutNode ).Temp;
 
 		// Get full load result
 		PartLoadFrac = 1.0;
 		PTUnit( PTUnitNum ).FanPartLoadRatio = 1.0; // set SZVAV model variable
 		CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
-		Real64 FullLoadOutletTemp = Node( PTUnit( PTUnitNum ).AirOutNode ).Temp;
 
 		if ( PTUnit( PTUnitNum ).simASHRAEModel ) {
 
 			if ( ( CoolingLoad && FullOutput < QZnReq ) || ( HeatingLoad && FullOutput > QZnReq ) ) {
-				int AirLoopNum = 0;
-				int CompressorOnFlag = 0;
-				auto & SZVAVModel( PTUnit( PTUnitNum ) );
-				// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-				SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, NoLoadOutletTemp, FullOutput, FullLoadOutletTemp, CompressorOnFlag );
+				if ( ( CoolingLoad && NoCompOutput < QZnReq ) || ( HeatingLoad && NoCompOutput > QZnReq ) ) {
+					PartLoadFrac = 0.0;
+					PTUnit( PTUnitNum ).FanPartLoadRatio = 0.0; // set SZVAV model variable
+				} else {
+					int AirLoopNum = 0;
+					int CompressorOnFlag = 0;
+					auto & SZVAVModel( PTUnit( PTUnitNum ) );
+					// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
+					SZVAVModel::calcSZVAVModel( SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadFrac, CompressorOnFlag );
+				}
 			}
 
 		} else {
