@@ -349,6 +349,7 @@ namespace PoweredInductionUnits {
 		static std::string const RoutineName( "GetPIUs: " ); // include trailing blank space
 		bool SteamMessageNeeded;
 		int FanType_Num; // integer representation of fan type
+		int MixerOutletNodeNum; // primary and secondary air mixer outlet node
 
 		// FLOW
 		// find the number of each type of fan coil unit
@@ -442,6 +443,7 @@ namespace PoweredInductionUnits {
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PIU( PIUNum ).FanName ) ); // call constructor
 				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
 				PIU( PIUNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->availSchedIndex;
+				MixerOutletNodeNum = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->inletNodeNum;
 			} else {
 				bool isNotOkay( false );
 				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
@@ -452,6 +454,7 @@ namespace PoweredInductionUnits {
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
 				Fans::GetFanType( PIU( PIUNum ).FanName, FanType_Num, ErrorsFound );
 				PIU( PIUNum ).FanAvailSchedPtr = Fans::GetFanAvailSchPtr( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
+				MixerOutletNodeNum = Fans::GetFanInletNode( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
 			}
 
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
@@ -481,6 +484,7 @@ namespace PoweredInductionUnits {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					PIU( PIUNum ).ADUNum = ADUNum;
+					AirDistUnit( ADUNum ).InletNodeNum = MixerOutletNodeNum;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -495,7 +499,7 @@ namespace PoweredInductionUnits {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
 						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = MixerOutletNodeNum; // PIU( PIUNum ).PriAirInNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
@@ -592,6 +596,9 @@ namespace PoweredInductionUnits {
 			//      GetOnlySingleNode(cAlphaArgs(11),ErrorsFound,TRIM(cCurrentModuleObject),cAlphaArgs(1), &
 			//                        NodeType_Water,NodeConnectionType_Actuator,1,ObjectIsParent)
 			//  END IF
+			// the mixed air node, which is also the heating coil node is used as ADU inlet node
+			MixerOutletNodeNum = PIU( PIUNum ).HCoilInAirNode;
+
 			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_SimpleHeating ) {
 				PIU( PIUNum ).HotControlNode = GetCoilWaterInletNode( cAlphaArgs( 9 ), cAlphaArgs( 10 ), ErrorsFound );
 			}
@@ -645,6 +652,7 @@ namespace PoweredInductionUnits {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					//      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
+					AirDistUnit( ADUNum ).InletNodeNum = MixerOutletNodeNum;
 					PIU( PIUNum ).ADUNum = ADUNum;
 				}
 			}
@@ -661,7 +669,7 @@ namespace PoweredInductionUnits {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++SupAirIn ) {
 						if ( PIU( PIUNum ).OutAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
-							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = PIU( PIUNum ).PriAirInNode;
+							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).InNode = MixerOutletNodeNum; // PIU( PIUNum ).PriAirInNode;
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;

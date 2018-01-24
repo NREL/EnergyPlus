@@ -1421,6 +1421,9 @@ namespace SimAirServingZones {
 		using DataContaminantBalance::OutdoorGC;
 		using General::FindNumberInList;
 		using Fans::GetFanIndex;
+		using MixerComponent::MixerConditions;
+		using MixerComponent::NumMixers;
+		using MixerComponent::MixerCond;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -1767,6 +1770,56 @@ namespace SimAirServingZones {
 							}
 						}
 						ControlledZoneLoop_exit: ;
+
+						for ( int MixerNum = 1; MixerNum <= NumMixers; ++MixerNum ) {
+							for ( NodeNum = 1; NodeNum <= MixerCond( MixerNum ).NumInletNodes; ++NodeNum ) {
+								if ( SupplyAirPath( SupAirPathNum ).OutletNode( SupAirPathOutNodeNum ) == MixerCond( MixerNum ).InletNode( NodeNum ) ) {
+									// loop over all controlled zones.
+									for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+										if ( !ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+										// Loop over the zone air mixer unit inlets for each controlled zone.
+										// Look for a match between the zone mixer outlet node and the air distribution unit inlet node.
+										// When match found save the controlled zone number in CtrlZoneNumsCool 
+										for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
+
+											if ( MixerCond( MixerNum ).OutletNode == ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ) {
+												if ( FindNumberInList( CtrlZoneNum, CtrlZoneNumsCool, NumZonesCool ) == 0 ) {
+													++NumZonesCool;
+													// Set Duct Type for branch for dual duct
+													if ( NumZonesCool == 1 && OutBranchNum > 1 ) {
+														PrimaryAirSystem( AirLoopNum ).Branch( OutBranchNum ).DuctType = Cooling;
+													}
+													if ( NumZonesCool == 1 ) {
+														AirToZoneNodeInfo( AirLoopNum ).SupplyDuctType( OutNum ) = Cooling;
+													}
+													CtrlZoneNumsCool( NumZonesCool ) = CtrlZoneNum;
+													ZoneInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).InletNode( ZoneInNum );
+													TermInletNodesCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode;
+													TermUnitSizingNumsCool( NumZonesCool ) = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).TermUnitSizingIndex;
+													if ( AirLoopNum > 0 ) {
+														if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) {
+															ZoneEquipConfig( CtrlZoneNum ).ZoneHasAirLoopWithOASys = true;
+														}
+													}
+													ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum ) = AirLoopNum;
+												}
+												FoundSupPathZoneConnect = true;
+
+												//set the supply air path
+												ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).SupplyAirPathExists = true;
+
+												//Once a match is found between a supply air path outlet node and an air distribution inlet
+												//node, we go on to the next supply air path outlet.  Therefore, *both* the air distribution
+												//unit loop and the controlled zone loop may be exited.
+												goto ControlledZoneLoop_exit2;
+											}
+										}
+									}
+								}
+							}
+						}
+
+						ControlledZoneLoop_exit2:;
 
 						//If the supply air path is not connected to either a heating or a cooling air distribution
 						//unit...we have a problem!
