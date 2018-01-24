@@ -59,6 +59,7 @@
 #include <DataGlobals.hh>
 #include <DataEnvironment.hh>
 #include <WeatherManager.hh>
+#include <ElectricPowerServiceManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -79,7 +80,18 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_Constructor )
 	EXPECT_DOUBLE_EQ(0.4, pvw.getGroundCoverageRatio());
 
 	ASSERT_THROW(PVWattsGenerator pvw2("", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1), std::runtime_error);
-	std::string const error_string = "   ** Severe  ** PVWatts: name cannot be blank.\n   ** Severe  ** PVWatts: DC system capacity must be greater than zero.\n   ** Severe  ** PVWatts: Invalid system loss value 1.10\n   ** Severe  ** PVWatts: Invalid tilt: 91.00\n   ** Severe  ** PVWatts: Invalid azimuth: 360.00\n   ** Severe  ** PVWatts: Invalid ground coverage ratio: -0.10\n   **  Fatal  ** Errors found in getting PVWatts input\n   ...Summary of Errors that led to program termination:\n   ..... Reference severe error count=6\n   ..... Last severe error=PVWatts: Invalid ground coverage ratio: -0.10\n";
+	std::string const error_string = delimited_string({
+		"   ** Severe  ** PVWatts: name cannot be blank.",
+		"   ** Severe  ** PVWatts: DC system capacity must be greater than zero.",
+		"   ** Severe  ** PVWatts: Invalid system loss value 1.10",
+		"   ** Severe  ** PVWatts: Invalid tilt: 91.00",
+		"   ** Severe  ** PVWatts: Invalid azimuth: 360.00",
+		"   ** Severe  ** PVWatts: Invalid ground coverage ratio: -0.10",
+		"   **  Fatal  ** Errors found in getting PVWatts input",
+		"   ...Summary of Errors that led to program termination:",
+		"   ..... Reference severe error count=6",
+		"   ..... Last severe error=PVWatts: Invalid ground coverage ratio: -0.10"
+	});
 	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 }
 
@@ -174,5 +186,67 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_Calc )
 	EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
 	EXPECT_NEAR(generatorPower, 884.137, 0.001);
 	EXPECT_NEAR(generatorEnergy, 884.137 * 60 * 60, 1);
+
+}
+
+TEST_F( EnergyPlusFixture, PVWattsInverter_Constructor )
+{
+	const std::string idfTxt = delimited_string({
+		"Version, 8.8;",
+		"ElectricLoadCenter:Distribution,",
+		"ELC1,",
+		"GeneratorList1,",
+		"Baseload,",
+		",",
+		",",
+		",",
+		"DirectCurrentWithInverter,",
+		"Inverter1;",
+		"ElectricLoadCenter:Inverter:PVWatts,",
+		"Inverter1,",
+		"1.10,",
+		"0.96;",
+		"ElectricLoadCenter:Generators,",
+		"GeneratorList1,",
+		"PVWattsArray1,",
+		"Generator:PVWatts,",
+		"1500,",
+		",",
+		",",
+		"PVWattsArray2,",
+		"Generator:PVWatts,",
+		"2500,",
+		",",
+		";",
+		"Generator:PVWatts,",
+		"PVWattsArray1,",
+		"5,",
+		"1500,",
+		"Standard,",
+		"OneAxis,",
+		",",
+		",",
+		",",
+		";",
+		"Generator:PVWatts,",
+		"PVWattsArray2,",
+		"5,",
+		"2500,",
+		"Standard,",
+		"OneAxis,",
+		",",
+		",",
+		",",
+		",",
+		",",
+		";"
+	});
+	ASSERT_FALSE(process_idf(idfTxt));
+	auto eplc(ElectPowerLoadCenter(1));
+	ASSERT_TRUE(eplc.inverterPresent);
+	EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
+	DataHVACGlobals::TimeStepSys = 1.0;
+	eplc.inverterObj->simulate(884.018);
+	EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
 
 }
