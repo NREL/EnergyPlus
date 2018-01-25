@@ -75,6 +75,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
@@ -657,6 +658,13 @@ namespace UnitHeater {
 			}
 		}
 
+		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) {
+			if ( UnitHeat( UnitHeatNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				coilSelectionReportObj->setCoilSupplyFanInfo( UnitHeat( UnitHeatNum ).HCoilName, UnitHeat( UnitHeatNum ).HCoilTypeCh, UnitHeat( UnitHeatNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitHeat( UnitHeatNum ).Fan_Index );
+			} else {
+				coilSelectionReportObj->setCoilSupplyFanInfo( UnitHeat( UnitHeatNum ).HCoilName, UnitHeat( UnitHeatNum ).HCoilTypeCh, UnitHeat( UnitHeatNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitHeat( UnitHeatNum ).Fan_Index );
+			}
+		}
 	}
 
 	void

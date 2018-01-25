@@ -63,10 +63,12 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <FaultsManager.hh>
+#include <Fans.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACFan.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -75,6 +77,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 
@@ -687,7 +690,7 @@ namespace SteamCoils {
 		Real64 DesVolFlow;
 		Real64 MinFlowFrac;
 		Real64 OutAirFrac;
-		Real64 TempSteamIn;
+		Real64 TempSteamIn( 100.0 );
 		Real64 EnthSteamInDry;
 		Real64 EnthSteamOutWet;
 		Real64 LatentHeatSteam;
@@ -714,10 +717,12 @@ namespace SteamCoils {
 		CpWater = 0.0;
 		RhoAirStd = PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0 );
 		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
+		bool coilWasAutosized( false ); //coil report
 
 		// If this is a steam coil
 		// Find the appropriate steam Plant Sizing object
 		if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
+			coilWasAutosized =  true; //coil report
 			PltSizSteamNum = MyPlantSizingIndex( "steam heating coil", SteamCoil( CoilNum ).Name, SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).SteamOutletNodeNum, ErrorsFound );
 		}
 
@@ -818,6 +823,24 @@ namespace SteamCoils {
 					ReportSizingOutput( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 				}
 				DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
+				//Coil report, set fan info for airloopnum
+				switch ( DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum ){
+				case DataAirSystems::structArrayLegacyFanModels: {
+					int SupFanNum = DataAirSystems::PrimaryAirSystem( CurSysNum ).SupFanNum;
+					if (  SupFanNum > 0 ) {
+						coilSelectionReportObj->setCoilSupplyFanInfo( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", Fans::Fan( DataAirSystems::PrimaryAirSystem( CurSysNum ).SupFanNum ).FanName, DataAirSystems::structArrayLegacyFanModels, DataAirSystems::PrimaryAirSystem( CurSysNum ).SupFanNum );
+					}
+
+					break;
+				}
+				case DataAirSystems::objectVectorOOFanSystemModel: {
+					if ( DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanVecIndex >= 0 ) {
+						coilSelectionReportObj->setCoilSupplyFanInfo( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", HVACFan::fanObjs[ DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanVecIndex ]->name, DataAirSystems::objectVectorOOFanSystemModel, DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanVecIndex );
+					}
+					break;
+				}
+				}
+
 				// if this is a zone coil
 			} else if ( CurZoneEqNum > 0 ) {
 				CheckZoneSizing( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name );
@@ -831,14 +854,17 @@ namespace SteamCoils {
 							SteamCoil( CoilNum ).MaxSteamVolFlowRate = 0.0;
 						}
 						// if coil is part of a zonal unit, calc coil load to get hot Steam flow rate
+						DesCoilLoad = TermUnitSizing( CurTermUnitSizingNum ).DesHeatingLoad; //coil report
+						DesVolFlow = TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow * TermUnitSizing( CurTermUnitSizingNum ).ReheatAirFlowMult; //coil report
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						DesVolFlow = DesMassFlow / RhoAirStd;
 						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 						if ( DesCoilLoad >= SmallLoad ) {
-							TempSteamIn = 100.0; // DSU? Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
+							TempSteamIn = 100.0; 
 							// RefrigIndex is set during GetInput for this module
 							EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamCoil( CoilNum ).FluidIndex, RoutineName );
 							EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, SteamCoil( CoilNum ).FluidIndex, RoutineName );
@@ -880,10 +906,30 @@ namespace SteamCoils {
 		// save the design Steam volumetric flow rate for use by the Steam loop sizing algorithms
 		RegisterPlantCompDesignFlow( SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 
+		coilSelectionReportObj->setCoilHeatingCapacity( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, CurSysNum, CurZoneEqNum, CurOASysNum, 0.0, 1.0, -999.0,-999.0 );
+		coilSelectionReportObj->setCoilWaterHeaterCapacity( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, PltSizSteamNum, SteamCoil( CoilNum ).LoopNum );
+		coilSelectionReportObj->setCoilWaterFlow( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", SteamCoil( CoilNum ).MaxSteamVolFlowRate, coilWasAutosized, PltSizSteamNum, SteamCoil( CoilNum ).LoopNum ); 
+		coilSelectionReportObj->setCoilEntWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn ); //coil  report
+		coilSelectionReportObj->setCoilLvgWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn - SteamCoil( CoilNum ).DegOfSubcooling ); //coil report
+		coilSelectionReportObj->setCoilWaterDeltaT( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , SteamCoil( CoilNum ).DegOfSubcooling );  //coil report
+		SteamCoil( CoilNum ).DesCoilCapacity = DesCoilLoad;
+		SteamCoil( CoilNum ).DesAirVolFlow = DesVolFlow;
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding Steam coil sizing errors cause program termination" );
 		}
 
+		//There is no standard rating for heating coils at this point, so fill with dummy flag values
+		coilSelectionReportObj->setRatedCoilConditions( 
+			SteamCoil( CoilNum ).Name,
+			"Coil:Heating:Steam",
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,-999.0,-999.0,
+			-999.0,-999.0, -999.0, -999.0 );
 	}
 
 	// End Initialization Section of the Module

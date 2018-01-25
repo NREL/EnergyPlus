@@ -55,6 +55,7 @@
 #include <HVACDXSystem.hh>
 #include <BranchNodeConnections.hh>
 #include <DataAirLoop.hh>
+#include <DataAirSystems.hh> //coil report
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -63,15 +64,18 @@
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <EMSManager.hh>
+#include <Fans.hh> //coil report
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <HVACFan.hh> //coil report
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PackagedThermalStorageCoil.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh> //coil report
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 #include <VariableSpeedCoils.hh>
@@ -619,7 +623,11 @@ namespace HVACDXSystem {
 			// considered as as 100% DOAS DX cooling coil
 			if ( DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil ) {
 				// set the system DX Coil application type to the child DX coil
-				SetDXCoilTypeData( DXCoolingSystem( DXCoolSysNum ).CoolingCoilName );
+				if ( ! ( DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) ) {
+					SetDXCoilTypeData( DXCoolingSystem( DXCoolSysNum ).CoolingCoilName );				
+				} else {
+					ShowWarningError( "CoilSystem:Cooling:DX named " + DXCoolingSystem( DXCoolSysNum ).Name + " entered with both variable speed DX coil and outdoor air mode set to YES, however VS coil model does not have a special outdoor air mode" );
+				}
 			}
 			// DOAS DX Cooling Coil Leaving Minimum Air Temperature
 			if ( NumNums > 0 ) {
@@ -775,6 +783,28 @@ namespace HVACDXSystem {
 			MySetPointCheckFlag = false;
 		}
 
+		if ( ! DXCoolingSystem( DXSystemNum ).VSCoilFanInfoSet && AirLoopNum > 0 ) {
+			if ( DXCoolingSystem( DXSystemNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) {
+				
+				switch ( DataAirSystems::PrimaryAirSystem( AirLoopNum ).supFanModelTypeEnum ){
+				case DataAirSystems::structArrayLegacyFanModels: {
+					int SupFanNum = DataAirSystems::PrimaryAirSystem( AirLoopNum ).SupFanNum;
+					if (  SupFanNum > 0 ) {
+						coilSelectionReportObj->setCoilSupplyFanInfo( DXCoolingSystem( DXSystemNum ).CoolingCoilName, DXCoolingSystem( DXSystemNum ).CoolingCoilType, Fans::Fan( DataAirSystems::PrimaryAirSystem( AirLoopNum ).SupFanNum ).FanName, DataAirSystems::structArrayLegacyFanModels, DataAirSystems::PrimaryAirSystem( AirLoopNum ).SupFanNum );
+					}
+
+					break;
+				}
+				case DataAirSystems::objectVectorOOFanSystemModel: {
+					if ( DataAirSystems::PrimaryAirSystem( AirLoopNum ).supFanVecIndex >= 0 ) {
+						coilSelectionReportObj->setCoilSupplyFanInfo( DXCoolingSystem( DXSystemNum ).CoolingCoilName, DXCoolingSystem( DXSystemNum ).CoolingCoilType, HVACFan::fanObjs[ DataAirSystems::PrimaryAirSystem( AirLoopNum ).supFanVecIndex ]->name, DataAirSystems::objectVectorOOFanSystemModel, DataAirSystems::PrimaryAirSystem( AirLoopNum ).supFanVecIndex );
+					}
+					break;
+				}
+				}
+				DXCoolingSystem( DXSystemNum ).VSCoilFanInfoSet = true;
+			}
+		} // else if ( )  on OA system ??
 		// These initializations are done every iteration
 		if ( AirLoopNum == -1 ) { // This IF-TEHN routine is just for ZoneHVAC:OUTDOORAIRUNIT
 			OutNode = DXCoolingSystem( DXSystemNum ).DXCoolingCoilOutletNodeNum;
@@ -2890,8 +2920,9 @@ namespace HVACDXSystem {
 		if ( NumDXSystem > 0 ) {
 			DXCoolSysNum = FindItemInList( DXCoilSysName, DXCoolingSystem );
 			if ( DXCoolSysNum > 0 && DXCoolingSystem( DXCoolSysNum ).ISHundredPercentDOASDXCoil ) {
-				//DXCoolingSystem(DXCoolSysNum)%ISHundredPercentDOASDXCoil = .TRUE.
-				SetDXCoilTypeData( DXCoolingSystem( DXCoolSysNum ).CoolingCoilName );
+				if ( ! ( DXCoolingSystem( DXCoolSysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) ) {
+					SetDXCoilTypeData( DXCoolingSystem( DXCoolSysNum ).CoolingCoilName );
+				}
 			}
 		}
 

@@ -96,6 +96,8 @@ namespace OutputReportPredefined {
 	extern int pdchFanEndUse;
 	extern int pdchFanPwr;
 	extern int pdchFanPwrPerFlow;
+	extern int pdchFanDesDay;
+	extern int pdchFanPkTime;
 	// Pump subtable
 	extern int pdstPump;
 	extern int pdchPumpType;
@@ -329,6 +331,107 @@ namespace OutputReportPredefined {
 	extern int pdchPlantSizPkTimeDayOfSim;
 	extern int pdchPlantSizPkTimeHour;
 	extern int pdchPlantSizPkTimeMin;
+
+	// Coil Selection Table
+	extern int pdrCoilSummaryTable;
+	extern int pdstCoilSummaryCoilSelection;
+	extern int pdchCoilName;
+	extern int pdchCoilLocation;
+	extern int pdchCoilHVACType;
+	extern int pdchCoilHVACName;
+	extern int pdchCoilZoneName;
+	extern int pdchCoilType;
+	extern int pdchSysSizingMethCoinc;
+	extern int pdchSysSizingMethCap;
+	extern int pdchSysSizingMethAir;
+
+	extern int pdchCoilIsCapAutosized;
+	extern int pdchCoilIsAirFlowAutosized;
+	extern int pdchCoilIsWaterFlowAutosized;
+	extern int pdchCoilIsOATreated;
+
+	extern int pdchCoilFinalTotalCap;
+	extern int pdchCoilFinalSensCap;
+	extern int pdchCoilFinalAirVolFlowRate;
+	extern int pdchCoilFinalPlantVolFlowRate;
+
+	extern int pdchCoilDDnameSensIdealPeak;
+	extern int pdchCoilDateTimeSensIdealPeak;
+	extern int pdchCoilDDnameTotIdealPeak;
+	extern int pdchCoilDateTimeTotIdealPeak;
+	extern int pdchCoilDDnameAirFlowIdealPeak;
+	extern int pdchCoilDateTimeAirFlowIdealPeak;
+	extern int pdchCoilTotalCapIdealPeak;
+	extern int pdchCoilSensCapIdealPeak;
+	extern int pdchCoilOffRatingCapacityModifierIdealPeak;
+	extern int pdchCoilAirMassFlowIdealPeak;
+	extern int pdchCoilAirVolumeFlowIdealPeak;
+	extern int pdchCoilEntDryBulbIdealPeak;
+	extern int pdchCoilEntWetBulbIdealPeak;
+	extern int pdchCoilEntHumRatIdealPeak;
+	extern int pdchCoilEntEnthalpyIdealPeak;
+	extern int pdchCoilLvgDryBulbIdealPeak;
+	extern int pdchCoilLvgWetBulbIdealPeak;
+	extern int pdchCoilLvgHumRatIdealPeak;
+	extern int pdchCoilLvgEnthalpyIdealPeak;
+	extern int pdchCoilWaterMassFlowIdealPeak;
+	extern int pdchCoilEntWaterTempIdealPeak;
+	extern int pdchCoilLvgWaterTempIdealPeak;
+	extern int pdchCoilWaterDeltaTempIdealPeak;
+	extern int pdchCoilRatedTotalCap;
+	extern int pdchCoilRatedSensCap;
+	extern int pdchCoilRatedAirMass;
+	extern int pdchCoilRatedEntDryBulb;
+	extern int pdchCoilRatedEntWetBulb;
+	extern int pdchCoilRatedEntHumRat;
+	extern int pdchCoilRatedEntEnthalpy;
+	extern int pdchCoilRatedLvgDryBulb;
+	extern int pdchCoilRatedLvgWetBulb;
+	extern int pdchCoilRatedLvgHumRat;
+	extern int pdchCoilRatedLvgEnthalpy;
+
+
+	extern int pdchFanAssociatedWithCoilName;
+	extern int pdchFanAssociatedWithCoilType;
+	extern int pdchFanAssociatedVdotSize;
+	extern int pdchFanAssociatedMdotSize;
+
+	extern int pdchFanHeatGainIdealPeak;
+	extern int pdchCoilNetTotalCapacityIdealPeak;
+	extern int pdchCoilPlantLoopName;
+	extern int pdchPlantMassFlowMaximum;
+	extern int pdchPlantRetTempDesign;
+	extern int pdchPlantSupTempDesign;
+	extern int pdchPlantDeltaTempDesign;
+	extern int pdchPlantCapacity;
+	extern int pdchCoilCapPrcntPlantCapacity;
+	extern int pdchCoilFlowPrcntPlantFlow;
+	extern int pdchOADryBulbIdealPeak;
+	extern int pdchOAHumRatIdealPeak;
+	extern int pdchOAWetBulbatIdealPeak;
+	extern int pdchOAVolFlowIdealPeak;
+	extern int pdchOAFlowPrcntIdealPeak;
+	extern int pdchAirSysRADryBulbIdealPeak;
+	extern int pdchAirSysRAHumRatIdealPeak;
+	extern int pdchZoneAirTempIdealPeak;
+	extern int pdchZoneAirDryBulbIdealPeak;
+	extern int pdchZoneAirHumRatIdealPeak;
+	extern int pdchZoneAirRelHumIdealPeak;
+//	extern int pdchAirSysFanHeatGain;
+	extern int pdchCoilUA;
+	extern int pdchZoneSensibleLoadIdealPeak;
+	extern int pdchZoneLatentLoadIdealPeak;
+	extern int pdchCoilIdealSizCapOverSimPeak;
+	extern int pdchCoilIdealSizCapUnderSimPeak;
+	extern int pdchReheatCoilMultiplier;
+	extern int pdchFlowCapRatioLowCapIncreaseRatio;
+	extern int pdchFlowCapRatioHiCapDecreaseRatio;
+	extern int pdchPlantFluidSpecificHeat;
+	extern int pdchPlantFluidDensity;
+	extern int pdchMoistAirSpecificHeat;
+	extern int pdchDryAirSpecificHeat;
+	extern int pdchStandRhoAir;
+	// CoilSelectin Table
 
 	//System summary
 	extern int pdrSystem;

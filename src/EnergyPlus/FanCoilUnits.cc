@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <FanCoilUnits.hh>
 #include <BranchNodeConnections.hh>
+#include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -79,6 +80,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SingleDuct.hh>
@@ -927,6 +929,15 @@ namespace FanCoilUnits {
 			SetupOutputVariable( "Fan Coil Availability Status", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).AvailStatus, "System", "Average", FanCoil( FanCoilNum ).Name );
 		}
 
+		for ( FanCoilNum = 1; FanCoilNum <= NumFanCoils; ++FanCoilNum ) {
+			if ( FanCoil( FanCoilNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).CCoilName , FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel , FanCoil( FanCoilNum ).FanIndex );
+				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).HCoilName , FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel , FanCoil( FanCoilNum ).FanIndex );
+			} else {
+				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).CCoilName , FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::structArrayLegacyFanModels , FanCoil( FanCoilNum ).FanIndex );
+				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).HCoilName , FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::structArrayLegacyFanModels , FanCoil( FanCoilNum ).FanIndex );
+			}
+		}
 	}
 
 	void
@@ -1802,7 +1813,7 @@ namespace FanCoilUnits {
 					FanCoil( FanCoilNum ).DesZoneCoolingLoad = -1.0 * FanCoil( FanCoilNum ).DesCoolingLoad;
 					FanCoil( FanCoilNum ).DesZoneHeatingLoad = FanCoil( FanCoilNum ).DesHeatingLoad;
 
-		}
+				}
 			}
 
 		} // if ( CurZoneEqNum > 0 )
