@@ -1148,19 +1148,19 @@ namespace StandardRatings {
 		TotalHeatingCapH3Test = RatedTotalCapacity * CapTempModFacH3Test * TotCapFlowModFac;
 		NetHeatingCapH3Test = TotalHeatingCapH3Test + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
 
-		// check CAP curves value
-		if ( TotCapTempModFacRated < 0.0 || TotalHeatingCapH2Test || TotalHeatingCapH3Test || EIRTempModFacRated < 0.0 || EIRTempModFacH2Test < 0.0 || EIRTempModFacH2Test < 0.0 ) {
+		// check curves value
+		if ( TotCapTempModFacRated < 0.0 || CapTempModFacH2Test < 0.0 || CapTempModFacH3Test < 0.0 || EIRTempModFacRated < 0.0 || EIRTempModFacH2Test < 0.0 || EIRTempModFacH3Test < 0.0 ) {
 			if ( TotCapTempModFacRated < 0.0 ) {
 				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( TotCapTempModFacRated, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
 				ShowContinueError( " ...Net heating capacity at high temperature is set to zero. The curve value must be > 0. Check the curve." );
 				NetHeatingCapRated = 0.0;
 			}
-			if ( TotalHeatingCapH3Test < 0.0 ) {
+			if ( CapTempModFacH3Test < 0.0 ) {
 				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( CapTempModFacH3Test, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
 				ShowContinueError( " ...Net heating capacity at low temperature is set to zero. The curve value must be > 0. Check the curve." );
 				NetHeatingCapH3Test = 0.0;
 			}
-			if ( TotalHeatingCapH2Test < 0.0 ) {
+			if ( CapTempModFacH2Test < 0.0 ) {
 				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( CapTempModFacH2Test, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
 				ShowContinueError( " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve." );
 				NetHeatingCapH3Test = 0.0;
