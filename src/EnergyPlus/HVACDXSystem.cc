@@ -1824,6 +1824,7 @@ namespace HVACDXSystem {
 
 									if ( ( TempSpeedOut - TempSpeedReqst ) < Acc ) {
 										SpeedNum = I;
+										FullOutput = TempSpeedOut; // save in case warning message is reported
 										break;
 									}
 								}
@@ -1839,7 +1840,7 @@ namespace HVACDXSystem {
 											++DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIter;
 											ShowWarningError( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + DXCoolingSystem( DXSystemNum ).Name );
 											ShowContinueError( "Estimated part-load ratio  = " + RoundSigDigits( ( ReqOutput / FullOutput ), 3 ) );
-											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
+											ShowContinueError( "Calculated part-load ratio = " + RoundSigDigits( SpeedRatio, 3 ) ); // speed ratio is surrogate for PLR
 											ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 										}
 										ShowRecurringWarningErrorAtEnd( DXCoolingSystem( DXSystemNum ).DXCoolingSystemType + " \"" + DXCoolingSystem( DXSystemNum ).Name + "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.", DXCoolingSystem( DXSystemNum ).DXCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac );

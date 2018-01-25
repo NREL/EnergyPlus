@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
 
@@ -2662,4 +2663,145 @@ namespace EnergyPlus {
 		ASSERT_EQ( -60.0, VariableSpeedCoils::VarSpeedCoil( 1 ).MinOATCompressor ); // removed the minimum limit of -50.0C
 	}
 
+	TEST_F( EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP ) {
+		std::string const idf_objects = delimited_string( {
+			"  Coil:Cooling:DX:VariableSpeed,",
+			"    PSZ-AC_1:5_CoolC Standard 4-compressor IPAK,  !- Name",
+			"    PSZ-AC_1:5_OA-PSZ-AC_1:5_CoolCNode,           !- Air Inlet Node Name",
+			"    PSZ-AC_1:5_CoolC-PSZ-AC_1:5_HeatCNode,        !- Air Outlet Node Name",
+			"    5,                       !- Number of Speeds {dimensionless}",
+			"    5,                       !- Nominal Speed Level {dimensionless}",
+			"    autosize,                !- Rated Total Cooling Capacity At Selected Nominal Speed Level {w}",
+			"    autosize,                !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+			"    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+			"    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+			"    PLF Curve,               !- Energy Part Load Fraction Curve Name",
+			"    PSZ-AC_1:5 OA Node,      !- Condenser Air Inlet Node Name",
+			"    AirCooled,               !- Condenser Type",
+			"    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+			"    ,                        !- Crankcase Heater Capacity {W}",
+			"    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+			"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+			"    ,                        !- Supply Water Storage Tank Name",
+			"    ,                        !- Condensate Collection Water Storage Tank Name",
+			"    ,                        !- Basin Heater Capacity {W/K}",
+			"    2,                       !- Basin Heater Setpoint Temperature {C}",
+			"    ,                        !- Basin Heater Operating Schedule Name",
+			"    33861.72,                !- Speed 1 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+			"    0.70,                    !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+			"    4.328973,                !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
+			"    1.396964,                !- Speed 1 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+			"    ,                        !- Speed 1 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+			"    ,                        !- Speed 1 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+			"    CapacityCurve,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+			"    CAPFF Curve,             !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+			"    PowerCurve,              !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+			"    EIRFF Curve,             !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+			"    35516.08,                !- Speed 2 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+			"    0.78,                    !- Speed 2 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+			"    4.540061,                !- Speed 2 Reference Unit COP At Rated Conditions {dimensionless}",
+			"    1.88779,                 !- Speed 2 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+			"    ,                        !- Speed 2 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+			"    ,                        !- Speed 2 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+			"    CapacityCurve,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+			"    CAPFF Curve,             !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+			"    PowerCurve,              !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+			"    EIRFF Curve,             !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+			"    65133.17,                !- Speed 3 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+			"    0.70,                    !- Speed 3 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+			"    4.164418,                !- Speed 3 Reference Unit COP At Rated Conditions {dimensionless}",
+			"    2.831685,                !- Speed 3 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+			"    ,                        !- Speed 3 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+			"    ,                        !- Speed 3 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+			"    CapacityCurve,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+			"    CAPFF Curve,             !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+			"    PowerCurve,              !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+			"    EIRFF Curve,             !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+			"    119583.3,                !- Speed 4 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+			"    0.62,                    !- Speed 4 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+			"    3.469661,                !- Speed 4 Reference Unit COP At Rated Conditions {dimensionless}",
+			"    3.553764,                !- Speed 4 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+			"    ,                        !- Speed 4 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+			"    ,                        !- Speed 4 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+			"    CapacityCurve,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+			"    CAPFF Curve,             !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+			"    PowerCurve,              !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+			"    EIRFF Curve,             !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+			"    132769.7,                !- Speed 5 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+			"    0.69,                    !- Speed 5 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+			"    3.822957,                !- Speed 5 Reference Unit COP At Rated Conditions {dimensionless}",
+			"    5.66336932,              !- Speed 5 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+			"    ,                        !- Speed 5 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+			"    ,                        !- Speed 5 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+			"    CapacityCurve,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+			"    CAPFF Curve,             !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+			"    PowerCurve,              !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+			"    EIRFF Curve;             !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+			"Curve:Biquadratic,",
+			"    CapacityCurve, 1, 0, 0, 0, 0, 0, 10, 25.5, 7.2, 48.8, , , Temperature, Temperature, Dimensionless;",
+			"Curve:Biquadratic,",
+			"    PowerCurve, 1, 0, 0, 0, 0, 0, 10, 25.5, 7.2, 48.8, , , Temperature, Temperature, Dimensionless;",
+			"Curve:Cubic,",
+			"    CAPFF Curve, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless;",
+			"Curve:Cubic,",
+			"    EIRFF Curve, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless;",
+			"Curve:Quadratic,",
+			"    PLF Curve, 0.85, 0.8333, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless;",
+
+		} );
+
+		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		VariableSpeedCoils::GetVarSpeedCoilInput();
+
+		Real64 LSInletDBTemp = 24.0; // conditions at 24 DB / 20 Wb found at http://www.sugartech.co.za/psychro/index.php 
+		Real64 LSInletHumRat = 0.013019367;
+		Real64 LSInletEnth = 57256.90248;
+		Real64 LSInletWBTemp = 20.0;
+		Real64 AirMassFlowRatio = VariableSpeedCoils::VarSpeedCoil( 1 ).MSRatedAirVolFlowRate( 1 );
+		Real64 WaterMassFlowRatio = 0.0;
+		Real64 LSMassFlowRate = 1.45;
+		Real64 CBFSpeed = 0.000001;
+		Real64 MSRatedTotCap = VariableSpeedCoils::VarSpeedCoil( 1 ).MSRatedTotCap( 1 );
+		int MSCapFTemp = VariableSpeedCoils::VarSpeedCoil( 1 ).MSCCapFTemp( 1 );
+		int MSCapAirFFlow = VariableSpeedCoils::VarSpeedCoil( 1 ).MSCCapAirFFlow( 1 );
+		int MSCapWaterFFlow = VariableSpeedCoils::VarSpeedCoil( 1 ).MSCCapWaterFFlow( 1 );
+		Real64 QLoadTotal = 0.0;
+		Real64 QLoadTotal1 = 0.0;
+		Real64 QLoadTotal2 = 0.0;
+		Real64 SHR = VariableSpeedCoils::VarSpeedCoil( 1 ).MSRatedSHR( 1 );
+		Real64 SSInletTemp = 24.0;
+		Real64 InletAirPressure = 101320.0;
+
+		VariableSpeedCoils::CalcTotCapSHR_VSWSHP( LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1 );
+
+		// same calculations as in CalcTotCapSHR_VSWSHP (except CapFTemp term is 1 so no need to add that calc here)
+		Real64 hDelta = MSRatedTotCap / LSMassFlowRate; // Change in air enthalpy across the cooling coil [J/kg]
+		Real64 hADP = LSInletEnth - hDelta / ( 1.0 - CBFSpeed ); // Apparatus dew point enthalpy [J/kg]
+		Real64 tADP = Psychrometrics::PsyTsatFnHPb( hADP, InletAirPressure ); // Apparatus dew point temperature [C]
+		Real64 wADP = Psychrometrics::PsyWFnTdbH( tADP, hADP ); // Apparatus dew point humidity ratio [kg/kg]
+		Real64 hTinwADP = Psychrometrics::PsyHFnTdbW( LSInletDBTemp, wADP ); // Enthalpy at inlet dry-bulb and wADP [J/kg]
+		Real64 SHRCalc = min( ( hTinwADP - hADP ) / ( LSInletEnth - hADP ), 1.0 ); // temporary calculated value of SHR
+
+		// expect SHR to be < 1
+		EXPECT_NEAR( SHR, 0.5275102, 0.000001 );
+		EXPECT_NEAR( SHR, SHRCalc, 0.000001 );
+		EXPECT_NEAR( QLoadTotal1, 33861.7200, 0.00001 );
+		EXPECT_NEAR( QLoadTotal2, 0.0, 0.00001 );
+		EXPECT_NEAR( QLoadTotal, 33861.7200, 0.00001 );
+
+		Real64 OutletTemp = LSInletDBTemp - ( 1.0 - CBFSpeed ) * ( LSInletDBTemp - tADP );
+		Real64 OutletHumRat = LSInletHumRat - ( 1.0 - CBFSpeed ) * ( LSInletHumRat - wADP );
+		Real64 OutletEnthalpy = LSInletEnth - hDelta;
+		Real64 OutletAirRH = Psychrometrics::PsyRhFnTdbWPb( OutletTemp, OutletHumRat, InletAirPressure );
+
+		// outlet conditions should be very near the saturation curve
+		EXPECT_NEAR( OutletTemp, tADP, 0.0001 );
+		EXPECT_NEAR( OutletHumRat, wADP, 0.00000001 ); // CalcTotCapSHR_VSWSHP provides correct SHR even when CBF is very small
+		EXPECT_NEAR( OutletEnthalpy, hADP, 0.1 );
+		EXPECT_NEAR( OutletAirRH, 0.999, 0.001 );
+		EXPECT_LT( OutletAirRH, 1.0 );
+
+	}
 }
