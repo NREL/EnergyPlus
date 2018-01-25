@@ -90,7 +90,7 @@ private:
 	json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
 
 	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
-								json const & obj_loc );
+								json const & obj_loc, int idfObjectCount );
 
 	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
 

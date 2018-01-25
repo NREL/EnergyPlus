@@ -137,6 +137,17 @@ namespace EnergyPlus {
 			Optional< Array1D_string > NumericFieldNames = _
 		);
 
+		int
+		getIDFObjNum(
+			std::string const & Object,
+			int const Number
+		);
+
+		int
+		getJSONObjNum(
+			std::string const & Object,
+			int const Number
+		);
 
 		int
 		getObjectItemNum(
