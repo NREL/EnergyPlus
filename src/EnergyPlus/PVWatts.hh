@@ -388,7 +388,7 @@ namespace PVWatts {
 	public:
 		static PVWattsGenerator createFromIdfObj(int objNum);
 
-		PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4);
+		PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4, bool setupOutputVariables=false);
 
 		Real64 getDCSystemCapacity();
 		ModuleType getModuleType();
@@ -404,8 +404,6 @@ namespace PVWatts {
 		Real64 getPlaneOfArrayIrradiance();
 		void setCellTemperature(Real64 cellTemp);
 		void setPlaneOfArrayIrradiance(Real64 poa);
-
-		void setupOutputVariables();
 
 		void calc();
 

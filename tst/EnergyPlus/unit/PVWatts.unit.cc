@@ -99,7 +99,7 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputs )
 {
 	using namespace PVWatts;
 	const std::string idfTxt = delimited_string({
-		"Version, 8.8;",
+		"Version, 8.9;",
 		"Generator:PVWatts,",
 		"PVWattsArray1,",
 		"5,",
@@ -192,7 +192,7 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_Calc )
 TEST_F( EnergyPlusFixture, PVWattsInverter_Constructor )
 {
 	const std::string idfTxt = delimited_string({
-		"Version, 8.8;",
+		"Version, 8.9;",
 		"ElectricLoadCenter:Distribution,",
 		"ELC1,",
 		"GeneratorList1,",
