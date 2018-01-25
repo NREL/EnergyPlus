@@ -5370,6 +5370,11 @@ Label9999: ;
 			GetRunPeriodData( TotRunPers, ErrorsFound );
 		}
 
+		if ( FullAnnualRun ){
+			// GetRunPeriodData may have reset the value of TotRunPers
+			NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
+		}
+
 		if ( RPD1 >= 1 || RPD2 >= 1 || TotRunPers >= 1 || FullAnnualRun ) {
 			GetSpecialDayPeriodData( ErrorsFound );
 			GetDSTData( ErrorsFound );
@@ -5795,6 +5800,8 @@ Label9999: ;
 			if ( RunPeriodInput( 1 ).DayOfWeek != 0 && ! ErrorsFound ) {
 				SetupWeekDaysByMonth( RunPeriodInput( 1 ).StartMonth, RunPeriodInput( 1 ).StartDay, RunPeriodInput( 1 ).DayOfWeek, RunPeriodInput( 1 ).MonWeekDay );
 			}
+		} else if ( TotRunPers > 1 && FullAnnualRun ) {
+			TotRunPers = 1;
 		}
 	}
 
