@@ -181,7 +181,7 @@ namespace WeatherManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	int YearofSim( 1 ); // The Present year of Simulation.
+	int YearOfSim( 1 ); // The Present year of Simulation.
 	int const NumDaysInYear( 365 );
 	int EnvironmentReportNbr( 0 ); // Report number for the environment stamp
 	std::string EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)
@@ -359,7 +359,7 @@ namespace WeatherManager {
 	clear_state()
 	{
 		Debugout = false ;
-		YearofSim = 1 ; // The Present year of Simulation.
+		YearOfSim = 1 ; // The Present year of Simulation.
 		EnvironmentReportNbr = 0 ; // Report number for the environment stamp
 		EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
 		TimeStampReportNbr = 0; // Report number for the time stamp
@@ -2118,7 +2118,9 @@ namespace WeatherManager {
 							}
 							SetSpecialDayDates( Environment( Envrn ).MonWeekDay );
 						}
-						++YearofSim;
+						++YearOfSim;
+						DataGlobals::CalendarYear += 1;
+						DataGlobals::CalendarYearChr = std::to_string( DataGlobals::CalendarYear );
 						FirstSimDayofYear = 1;
 						ReadWeatherForDay( FirstSimDayofYear, Envrn, false ); // Read tomorrow's weather
 					} else {
@@ -5223,7 +5225,7 @@ Label9999: ;
 		static std::string DailyString( ",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily " );
 		static std::string MonthlyString( ",2,Cumulative Days of Simulation[],Month[]  ! When Monthly " );
 		static std::string RunPeriodString( ",1,Cumulative Days of Simulation[] ! When Run Period " );
-		static std::string YearlyString( ",2,Cumulative Days of Simulation[],Calendar Year of Simulation[] ! When Annual " );
+		static std::string YearlyString( ",1,Calendar Year of Simulation[] ! When Annual " );
 
 		AssignReportNumber( EnvironmentReportNbr );
 		if ( EnvironmentReportNbr != 1 ) { //  problem

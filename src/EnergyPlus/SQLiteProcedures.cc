@@ -73,6 +73,7 @@ const int SQLite::LocalReportHourly   =  1;   // Write out at 'EndHourFlag'
 const int SQLite::LocalReportDaily    =  2;   // Write out at 'EndDayFlag'
 const int SQLite::LocalReportMonthly  =  3;   // Write out at end of month (must be determined)
 const int SQLite::LocalReportSim      =  4;   // Write out once per environment 'EndEnvrnFlag'
+const int SQLite::LocalReportYearly   =  5;   // Write out once per year
 const int SQLite::ReportNameId        =  1;
 const int SQLite::ReportForStringId   =  2;
 const int SQLite::TableNameId         =  3;
@@ -1743,31 +1744,25 @@ void SQLite::createSQLiteTimeIndexRecord(
 }
 
 void SQLite::createYearlyTimeIndexRecord(
-	int const reportingInterval,
-	int const EP_UNUSED( recordIndex ),
 	int const simulationYear,
-	int const cumlativeSimulationDays,
-	int const curEnvirNum,
-	bool const warmupFlag
+	int const curEnvirNum
 )
 {
 	if ( m_writeOutputToSQLite ) {
 		int intStartMinute( 0 );
-		int intervalInMinutes( 60 );
 
 		++m_sqlDBTimeIndex;
 
-		intervalInMinutes = 60*24*cumlativeSimulationDays;
 		sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-		sqliteBindNULL(m_timeIndexInsertStmt, 2);
+		sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
 		sqliteBindNULL(m_timeIndexInsertStmt, 3);
 		sqliteBindNULL(m_timeIndexInsertStmt, 4);
 		sqliteBindNULL(m_timeIndexInsertStmt, 5);
 		sqliteBindNULL(m_timeIndexInsertStmt, 6);
 		sqliteBindNULL(m_timeIndexInsertStmt, 7);
-		sqliteBindInteger(m_timeIndexInsertStmt, 8, intervalInMinutes);
-		sqliteBindInteger(m_timeIndexInsertStmt, 9, reportingInterval);
-		sqliteBindInteger(m_timeIndexInsertStmt, 10, cumlativeSimulationDays);
+		sqliteBindNULL(m_timeIndexInsertStmt, 8);
+		sqliteBindInteger(m_timeIndexInsertStmt, 9, LocalReportYearly);
+		sqliteBindNULL(m_timeIndexInsertStmt, 10);
 		sqliteBindNULL(m_timeIndexInsertStmt, 11);
 		sqliteBindInteger(m_timeIndexInsertStmt, 12, curEnvirNum);
 

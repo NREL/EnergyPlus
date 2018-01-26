@@ -1106,7 +1106,7 @@ namespace OutputProcessor {
 	ProduceMinMaxStringWStartMinute(
 		std::string & String, // Current value
 		int const DateValue, // Date of min/max
-		int const ReportFreq // Reporting Frequency
+		ReportingFrequency const ReportFreq // Reporting Frequency
 	)
 	{
 
@@ -1156,24 +1156,30 @@ namespace OutputProcessor {
 
 		DecodeMonDayHrMin( DateValue, Mon, Day, Hour, Minute );
 
-		if ( ReportFreq == 1 ) { // Hourly -- used in meters
+		switch( ReportFreq ) {
+		case ReportingFrequency::Hourly: // Hourly -- used in meters
 			StartMinute = Minute - MinutesPerTimeStep + 1;
 			gio::write( StrOut, HrFormat ) << strip( String ) << StartMinute << Minute;
+			break;
 
-		} else if ( ReportFreq == 2 ) { // Daily
+		case ReportingFrequency::Daily: // Daily
 			StartMinute = Minute - MinutesPerTimeStep + 1;
 			gio::write( StrOut, DayFormat ) << strip( String ) << Hour << StartMinute << Minute;
+			break;
 
-		} else if ( ReportFreq == 3 ) { // Monthly
+		case ReportingFrequency::Monthly: // Monthly
 			StartMinute = Minute - MinutesPerTimeStep + 1;
 			gio::write( StrOut, MonthFormat ) << strip( String ) << Day << Hour << StartMinute << Minute;
+			break;
 
-		} else if ( ReportFreq == 4 ) { // Environment
+		case ReportingFrequency::Simulation: // Environment
 			StartMinute = Minute - MinutesPerTimeStep + 1;
 			gio::write( StrOut, EnvrnFormat ) << strip( String ) << Mon << Day << Hour << StartMinute << Minute;
+			break;
 
-		} else { // Each, TimeStep, Hourly dont have this
+		default: // Each, TimeStep, Hourly dont have this
 			StrOut = BlankString;
+			break;
 		}
 
 		String = StrOut;
@@ -2292,6 +2298,16 @@ namespace OutputProcessor {
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).MNRptNum );
 			gio::write( EnergyMeters( NumEnergyMeters ).MNRptNumChr, fmtLD ) << EnergyMeters( NumEnergyMeters ).MNRptNum;
 			strip( EnergyMeters( NumEnergyMeters ).MNRptNumChr );
+			EnergyMeters( NumEnergyMeters ).YRValue = 0.0;
+			EnergyMeters( NumEnergyMeters ).YRMaxVal = MaxSetValue;
+			EnergyMeters( NumEnergyMeters ).YRMaxValDate = 0;
+			EnergyMeters( NumEnergyMeters ).YRMinVal = MinSetValue;
+			EnergyMeters( NumEnergyMeters ).YRMinValDate = 0;
+			EnergyMeters( NumEnergyMeters ).RptYR = false;
+			EnergyMeters( NumEnergyMeters ).RptYRFO = false;
+			AssignReportNumber( EnergyMeters( NumEnergyMeters ).YRRptNum );
+			gio::write( EnergyMeters( NumEnergyMeters ).YRRptNumChr, fmtLD ) << EnergyMeters( NumEnergyMeters ).YRRptNum;
+			strip( EnergyMeters( NumEnergyMeters ).YRRptNumChr );
 			EnergyMeters( NumEnergyMeters ).SMValue = 0.0;
 			EnergyMeters( NumEnergyMeters ).SMMaxVal = MaxSetValue;
 			EnergyMeters( NumEnergyMeters ).SMMaxValDate = 0;
@@ -2986,6 +3002,8 @@ namespace OutputProcessor {
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).DYMaxVal, EnergyMeters( Meter ).DYMaxValDate, EnergyMeters( Meter ).DYMinVal, EnergyMeters( Meter ).DYMinValDate );
 				EnergyMeters( Meter ).MNValue += MeterValue( Meter );
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).MNMaxVal, EnergyMeters( Meter ).MNMaxValDate, EnergyMeters( Meter ).MNMinVal, EnergyMeters( Meter ).MNMinValDate );
+				EnergyMeters( Meter ).YRValue += MeterValue( Meter );
+				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).YRMaxVal, EnergyMeters( Meter ).YRMaxValDate, EnergyMeters( Meter ).YRMinVal, EnergyMeters( Meter ).YRMinValDate );
 				EnergyMeters( Meter ).SMValue += MeterValue( Meter );
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).SMMaxVal, EnergyMeters( Meter ).SMMaxValDate, EnergyMeters( Meter ).SMMinVal, EnergyMeters( Meter ).SMMinValDate );
 				if ( isFinalYear ){
@@ -3000,6 +3018,8 @@ namespace OutputProcessor {
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).DYMaxVal, EnergyMeters( Meter ).DYMaxValDate, EnergyMeters( Meter ).DYMinVal, EnergyMeters( Meter ).DYMinValDate );
 				EnergyMeters( Meter ).MNValue += EnergyMeters( Meter ).TSValue;
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).MNMaxVal, EnergyMeters( Meter ).MNMaxValDate, EnergyMeters( Meter ).MNMinVal, EnergyMeters( Meter ).MNMinValDate );
+				EnergyMeters( Meter ).YRValue += EnergyMeters( Meter ).TSValue;
+				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).YRMaxVal, EnergyMeters( Meter ).YRMaxValDate, EnergyMeters( Meter ).YRMinVal, EnergyMeters( Meter ).YRMinValDate );
 				EnergyMeters( Meter ).SMValue += EnergyMeters( Meter ).TSValue;
 				SetMinMax( EnergyMeters( Meter ).TSValue, TimeStamp, EnergyMeters( Meter ).SMMaxVal, EnergyMeters( Meter ).SMMaxValDate, EnergyMeters( Meter ).SMMinVal, EnergyMeters( Meter ).SMMinValDate );
 				if ( isFinalYear ){
@@ -3070,6 +3090,12 @@ namespace OutputProcessor {
 			EnergyMeters( Meter ).MNMinVal = MinSetValue;
 			EnergyMeters( Meter ).MNMinValDate = 0;
 
+			EnergyMeters( Meter ).YRValue = 0.0;
+			EnergyMeters( Meter ).YRMaxVal = MaxSetValue;
+			EnergyMeters( Meter ).YRMaxValDate = 0;
+			EnergyMeters( Meter ).YRMinVal = MinSetValue;
+			EnergyMeters( Meter ).YRMinValDate = 0;
+
 			EnergyMeters( Meter ).SMValue = 0.0;
 			EnergyMeters( Meter ).SMMaxVal = MaxSetValue;
 			EnergyMeters( Meter ).SMMaxValDate = 0;
@@ -3086,7 +3112,7 @@ namespace OutputProcessor {
 
 		for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 			auto & rVar( RVariableTypes(Loop).VarPtr() );
-			if ( rVar.frequency == ReportingFrequency::Monthly || rVar.frequency == ReportingFrequency::Simulation ) {
+			if ( rVar.frequency == ReportingFrequency::Monthly || rVar.frequency == ReportingFrequency::Yearly || rVar.frequency == ReportingFrequency::Simulation) {
 				rVar.StoreValue = 0.0;
 				rVar.NumStored = 0;
 			}
@@ -3094,7 +3120,7 @@ namespace OutputProcessor {
 
 		for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 			auto & iVar( IVariableTypes( Loop ).VarPtr() );
-			if ( iVar.frequency == ReportingFrequency::Monthly || iVar.frequency == ReportingFrequency::Simulation ) {
+			if ( iVar.frequency == ReportingFrequency::Monthly || iVar.frequency == ReportingFrequency::Yearly || iVar.frequency == ReportingFrequency::Simulation ) {
 				iVar.StoreValue = 0;
 				iVar.NumStored = 0;
 			}
@@ -3464,6 +3490,74 @@ namespace OutputProcessor {
 				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).MNAccRptNum;
 				strip( cReportID );
 				WriteCumulativeReportMeterData( EnergyMeters( Loop ).MNAccRptNum, cReportID, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccMNFO );
+			}
+		}
+
+	}
+
+	void
+	ReportYRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jason DeGraw
+		//       DATE WRITTEN   January 2018
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine reports on the meters that have been requested for
+		// reporting on each year.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataGlobals::mtr_stream;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Loop; // Loop Control
+		bool PrintTimeStamp;
+		std::string cReportID;
+
+		PrintTimeStamp = true;
+		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
+			if ( ! EnergyMeters( Loop ).RptYR && ! EnergyMeters( Loop ).RptAccYR ) continue;
+			if ( PrintTimeStamp ) {
+				WriteYearlyTimeStamp( mtr_stream, YearlyStampReportNbr, YearlyStampReportChr, DataGlobals::CalendarYear, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL );
+				PrintTimeStamp = false;
+				PrintTimeStampToSQL = false;
+			}
+
+			if ( EnergyMeters( Loop ).RptYR ) {
+				WriteReportMeterData( EnergyMeters( Loop ).YRRptNum, EnergyMeters( Loop ).YRRptNumChr, EnergyMeters( Loop ).YRValue, ReportingFrequency::Yearly, EnergyMeters( Loop ).YRMinVal, EnergyMeters( Loop ).YRMinValDate, EnergyMeters( Loop ).YRMaxVal, EnergyMeters( Loop ).YRMaxValDate, EnergyMeters( Loop ).RptYRFO );
+				EnergyMeters( Loop ).YRValue = 0.0;
+				EnergyMeters( Loop ).YRMinVal = MinSetValue;
+				EnergyMeters( Loop ).YRMaxVal = MaxSetValue;
+			}
+
+			if ( EnergyMeters( Loop ).RptAccYR ) {
+				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).YRAccRptNum;
+				strip( cReportID );
+				WriteCumulativeReportMeterData( EnergyMeters( Loop ).YRAccRptNum, cReportID, EnergyMeters( Loop ).YRValue, EnergyMeters( Loop ).RptAccYRFO );
 			}
 		}
 
@@ -4060,7 +4154,8 @@ namespace OutputProcessor {
 		std::ostream * out_stream_p, // Output stream pointer
 		int const reportID, // The ID of the time stamp
 		std::string const & reportIDString, // The ID of the time stamp
-		std::string const & YearOfSimChr, // the year of the simulation
+		int const yearOfSim, // the year of the simulation
+		std::string const & yearOfSimChr, // the year of the simulation
 		bool writeToSQL
 	)
 	{
@@ -4102,15 +4197,15 @@ namespace OutputProcessor {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static int const N( 100 );
 		static char stamp[ N ];
-		assert( reportIDString.length() + YearOfSimChr.length() + 26 < N ); // Check will fit in stamp size
+		assert( reportIDString.length() + yearOfSimChr.length() + 26 < N ); // Check will fit in stamp size
 
 		if ( ( ! out_stream_p ) || ( ! *out_stream_p ) ) return; // Stream
 		std::ostream & out_stream(*out_stream_p);
 
-		std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
+		std::sprintf( stamp, "%s,%s", reportIDString.c_str(), yearOfSimChr.c_str() );
 		out_stream << stamp << NL;
 		if ( writeToSQL && sqlite ) {
-			sqlite->createSQLiteTimeIndexRecord( static_cast<int>( ReportingFrequency::Yearly ), reportID, DayOfSim, DataEnvironment::CurEnvirNum );
+			sqlite->createYearlyTimeIndexRecord( DataGlobals::CalendarYear, DataEnvironment::CurEnvirNum );
 		}
 	}
 
@@ -6353,13 +6448,13 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
-					WriteRealVariableOutput( RVariableTypes( Loop ).VarPtr, ReportingFrequency::Simulation );
+					WriteRealVariableOutput( RVariableTypes( Loop ).VarPtr, ReportingFrequency::Yearly );
 				}
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
-					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportingFrequency::Simulation );
+					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportingFrequency::Yearly );
 				}
 			} // Number of I Variables
 		} // Index Type (Zone, HVAC)
@@ -6946,6 +7041,36 @@ SetInitialMeterReportingAndOutputNames(
 				indexGroupKey = DetermineIndexGroupKeyFromMeterName( EnergyMeters( WhichMeter ).Name );
 				indexGroup = DetermineIndexGroupFromMeterGroup( EnergyMeters( WhichMeter ) );
 				WriteMeterDictionaryItem( FrequencyIndicator, StoreType::Summed, EnergyMeters( WhichMeter ).MNAccRptNum, indexGroupKey, indexGroup, TrimSigDigits( EnergyMeters( WhichMeter ).MNAccRptNum ), EnergyMeters( WhichMeter ).Name, EnergyMeters( WhichMeter ).Units, true, MeterFileOnlyIndicator );
+			}
+		}
+	} else if ( FrequencyIndicator == ReportingFrequency::Yearly ) {
+		if ( ! CumulativeIndicator ) {
+			if ( MeterFileOnlyIndicator ) {
+				if ( EnergyMeters( WhichMeter ).RptYR ) {
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Annual), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
+				}
+			}
+			if ( ! EnergyMeters( WhichMeter ).RptYR ) {
+				EnergyMeters( WhichMeter ).RptYR = true;
+				if ( MeterFileOnlyIndicator ) EnergyMeters( WhichMeter ).RptYRFO = true;
+				if ( ! MeterFileOnlyIndicator ) TrackingYearlyVariables = true;
+				indexGroupKey = DetermineIndexGroupKeyFromMeterName( EnergyMeters( WhichMeter ).Name );
+				indexGroup = DetermineIndexGroupFromMeterGroup( EnergyMeters( WhichMeter ) );
+				WriteMeterDictionaryItem( FrequencyIndicator, StoreType::Summed, EnergyMeters( WhichMeter ).YRRptNum, indexGroupKey, indexGroup, EnergyMeters( WhichMeter ).YRRptNumChr, EnergyMeters( WhichMeter ).Name, EnergyMeters( WhichMeter ).Units, false, MeterFileOnlyIndicator );
+			}
+		} else {
+			if ( MeterFileOnlyIndicator ) {
+				if ( EnergyMeters( WhichMeter ).RptAccYR ) {
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Annual), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName+" and " + DataStringGlobals::outputMtrFileName );
+				}
+			}
+			if ( ! EnergyMeters( WhichMeter ).RptAccYR ) {
+				EnergyMeters( WhichMeter ).RptAccYR = true;
+				if ( MeterFileOnlyIndicator ) EnergyMeters( WhichMeter ).RptAccYRFO = true;
+				if ( ! MeterFileOnlyIndicator ) TrackingYearlyVariables = true;
+				indexGroupKey = DetermineIndexGroupKeyFromMeterName( EnergyMeters( WhichMeter ).Name );
+				indexGroup = DetermineIndexGroupFromMeterGroup( EnergyMeters( WhichMeter ) );
+				WriteMeterDictionaryItem( FrequencyIndicator, StoreType::Summed, EnergyMeters( WhichMeter ).YRAccRptNum, indexGroupKey, indexGroup, TrimSigDigits( EnergyMeters( WhichMeter ).YRAccRptNum ), EnergyMeters( WhichMeter ).Name, EnergyMeters( WhichMeter ).Units, true, MeterFileOnlyIndicator );
 			}
 		}
 	} else if ( FrequencyIndicator == ReportingFrequency::Simulation ) {
@@ -8230,6 +8355,15 @@ InitPollutionMeterReporting( std::string const & ReportFreqName )
 					EnergyMeters( Meter ).RptMN = true;
 					TrackingMonthlyVariables = true;
 					WriteMeterDictionaryItem( ReportFreq, StoreType::Summed, EnergyMeters( Meter ).MNRptNum, indexGroupKey, indexGroup, EnergyMeters( Meter ).MNRptNumChr, EnergyMeters( Meter ).Name, EnergyMeters( Meter ).Units, false, false );
+				}
+			} else if ( ReportFreq == ReportingFrequency::Yearly ) {
+				if ( EnergyMeters( Meter ).RptYR ) {
+					EnergyMeters( Meter ).RptYR = true;
+					TrackingYearlyVariables = true;
+				} else {
+					EnergyMeters( Meter ).RptYR = true;
+					TrackingMonthlyVariables = true;
+					WriteMeterDictionaryItem( ReportFreq, StoreType::Summed, EnergyMeters( Meter ).YRRptNum, indexGroupKey, indexGroup, EnergyMeters( Meter ).YRRptNumChr, EnergyMeters( Meter ).Name, EnergyMeters( Meter ).Units, false, false );
 				}
 			} else if ( ReportFreq == ReportingFrequency::Simulation ) {
 				if ( EnergyMeters( Meter ).RptSM ) {

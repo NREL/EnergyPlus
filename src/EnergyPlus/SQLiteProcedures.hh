@@ -183,12 +183,8 @@ public:
 	);
 
 	void createYearlyTimeIndexRecord(
-		int const reportingInterval,
-		int const recordIndex,
 		int const simulationYear,
-		int const cumlativeSimulationDays,
-		int const curEnvirNum,
-		bool const warmupFlag = false
+		int const curEnvirNum
 	);
 
 	void addSQLiteZoneSizingRecord(
@@ -389,6 +385,7 @@ private:
 	static const int LocalReportDaily;     //  Write out at 'EndDayFlag'
 	static const int LocalReportMonthly;   //  Write out at end of month (must be determined)
 	static const int LocalReportSim;       //  Write out once per environment 'EndEnvrnFlag'
+	static const int LocalReportYearly;    //  Write out once per year
 	static const int ReportNameId;
 	static const int ReportForStringId;
 	static const int TableNameId;

@@ -530,6 +530,15 @@ namespace OutputProcessor {
 		Real64 SMMinVal; // Minimum Value (Sim)
 		int SMMinValDate; // Date stamp of minimum
 		int SMRptNum; // Report Number for SM Values
+		std::string YRRptNumChr; // Report Number for YR Values (character -- for printing)
+		Real64 YRValue; // Yearly Value
+		bool RptYR; // Report at End of Year
+		bool RptYRFO; // Report at End of Year -- meter file only
+		Real64 YRMaxVal; // Maximum Value (Year)
+		int YRMaxValDate; // Date stamp of maximum
+		Real64 YRMinVal; // Minimum Value (Year)
+		int YRMinValDate; // Date stamp of minimum
+		int YRRptNum; // Report Number for YR Values
 		std::string SMRptNumChr; // Report Number for SM Values (character -- for printing)
 		Real64 LastSMValue; // Simulation Value
 		Real64 LastSMMaxVal; // Maximum Value (Sim)
@@ -549,12 +558,15 @@ namespace OutputProcessor {
 		bool RptAccDYFO; // Report Cumulative Meter at Day -- meter file only
 		bool RptAccMN; // Report Cumulative Meter at Month
 		bool RptAccMNFO; // Report Cumulative Meter at Month -- meter file only
+		bool RptAccYR; // Report Cumulative Meter at Run Period
+		bool RptAccYRFO; // Report Cumulative Meter at Run Period -- meter file only
 		bool RptAccSM; // Report Cumulative Meter at Run Period
 		bool RptAccSMFO; // Report Cumulative Meter at Run Period -- meter file only
 		int TSAccRptNum; // Report Number for Acc Values
 		int HRAccRptNum; // Report Number for Acc Values
 		int DYAccRptNum; // Report Number for Acc Values
 		int MNAccRptNum; // Report Number for Acc Values
+		int YRAccRptNum; // Report Number for Acc Values
 		int SMAccRptNum; // Report Number for Acc Values
 		int InstMeterCacheStart; // index of the beginning of the instant meter cache
 		int InstMeterCacheEnd; // index of the end of the instant meter cache
@@ -594,6 +606,14 @@ namespace OutputProcessor {
 			MNMinVal( 99999.0 ),
 			MNMinValDate( 0 ),
 			MNRptNum( 0 ),
+			YRValue( 0.0 ),
+			RptYR( false ),
+			RptYRFO( false ),
+			YRMaxVal( -99999.0 ),
+			YRMaxValDate( 0 ),
+			YRMinVal( 99999.0 ),
+			YRMinValDate( 0 ),
+			YRRptNum( 0 ),
 			SMValue( 0.0 ),
 			RptSM( false ),
 			RptSMFO( false ),
@@ -620,12 +640,15 @@ namespace OutputProcessor {
 			RptAccDYFO( false ),
 			RptAccMN( false ),
 			RptAccMNFO( false ),
+			RptAccYR( false ),
+			RptAccYRFO( false ),
 			RptAccSM( false ),
 			RptAccSMFO( false ),
 			TSAccRptNum( 0 ),
 			HRAccRptNum( 0 ),
 			DYAccRptNum( 0 ),
 			MNAccRptNum( 0 ),
+			YRAccRptNum( 0 ),
 			SMAccRptNum( 0 ),
 			InstMeterCacheStart( 0 ),
 			InstMeterCacheEnd( 0 )
@@ -914,6 +937,16 @@ namespace OutputProcessor {
 		Optional< Real64 const > StartMinute = _, // The starting minute of the reporting interval
 		Optional_int_const DST = _, // A flag indicating whether daylight savings time is observed
 		Optional_string_const DayType = _ // The day tied for the data (e.g., Monday)
+	);
+
+	void
+	WriteYearlyTimeStamp(
+		std::ostream * out_stream_p, // Output stream pointer
+		int const reportID, // The ID of the time stamp
+		std::string const & reportIDString, // The ID of the time stamp
+		int const yearOfSim, // the year of the simulation
+		std::string const & yearOfSimChr, // the year of the simulation
+		bool writeToSQL
 	);
 
 	void
