@@ -145,6 +145,8 @@ namespace PoweredInductionUnits {
 		Real64 HeatingEnergy; // unit heat addition to zone [J]
 		Real64 SensCoolRate; // unit sensible heat removal rate from zone [W]
 		Real64 SensCoolEnergy; // unit sensible heat removal from zone [J]
+		int CtrlZoneNum; // index to control zone
+		int CtrlZoneInNodeIndex; // index to the control zone inlet node
 
 		// Default Constructor
 		PowIndUnitData() :
@@ -194,7 +196,9 @@ namespace PoweredInductionUnits {
 			HeatingRate( 0.0 ),
 			HeatingEnergy( 0.0 ),
 			SensCoolRate( 0.0 ),
-			SensCoolEnergy( 0.0 )
+			SensCoolEnergy( 0.0 ),
+			CtrlZoneNum( 0 ),
+			CtrlZoneInNodeIndex( 0 )
 		{}
 
 	};
