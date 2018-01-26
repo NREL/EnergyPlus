@@ -1,0 +1,91 @@
+Coil:Cooling:DX,
+ A1, \field Name
+
+ ! Topology/configuration
+Air Inlet Node Name
+Air Outlet Node Name
+Availability Schedule Name
+Zone Name for Condenser Placement
+
+ ! Crankcase and compressor operation stuff
+Crankcase Heater Capacity
+Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+
+ ! Part load fraction stuff
+Part Load Fraction Correlation Curve Name
+Apply Part Load Fraction to Speeds Greater than 1
+Energy Part Load Fraction Curve Name
+
+ ! Rated conditions
+Evaporative Condenser Pump Rated Power Consumption
+Rated Air Flow Rate
+Rated Evaporator Fan Power Per Volume Flow Rate
+Gross Rated Cooling COP
+Gross Rated Heating Capacity
+Gross Rated Sensible Heat Ratio
+Gross Rated Total Cooling Capacity
+Rated Supply Fan Power Per Volume Flow Rate
+
+ ! Misc parameters
+Unit Internal Static Air Pressure
+Maximum Cycling Rate
+
+ ! Moisture/Latent
+Number of Enhanced Dehumidification Modes
+Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
+Latent Capacity Time Constant
+Apply Latent Degradation to Speeds Greater than 1
+Nominal Time for Condensate Removal to Begin
+Nominal Time for Condensate to Begin Leaving the Coil
+Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+Dehumidification Mode 1 Stage 1 Coil Performance Name
+Dehumidification Mode 1 Stage 1 Coil Performance Object Type
+Dehumidification Mode 1 Stage 1+2 Coil Performance Name
+Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type
+Condensate Collection Water Storage Tank Name
+
+ ! Evaporative condenser parameters
+Evaporative Condenser Air Flow Rate
+Evaporative Condenser Effectiveness
+
+ ! Specialized stage objects
+Number of Capacity Stages
+Normal Mode Stage 1 Coil Performance Name
+Normal Mode Stage 1 Coil Performance Object Type
+Normal Mode Stage 1+2 Coil Performance Name
+Normal Mode Stage 1+2 Coil Performance Object Type
+
+ ! Data for each speed
+Number of Speeds
+Speed 1 Energy Input Ratio Function of Temperature Curve Name
+Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
+Speed 1 Part Load Fraction Correlation Curve Name
+Speed 1 Rated Air Flow Rate
+Speed 1 Rated Waste Heat Fraction of Power Input
+Speed 1 Reference Unit Rated Air Flow Rate
+Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+Speed 1 Waste Heat Function of Temperature Curve Name
+Speed 1 Evaporative Condenser Air Flow Rate
+Speed 1 Evaporative Condenser Effectiveness
+Speed 1 Gross Rated Cooling COP
+Speed 1 Gross Rated Heating Capacity
+Speed 1 Gross Rated Sensible Heat Ratio
+Speed 1 Gross Rated Total Cooling Capacity
+Speed 1 Latent Capacity Time Constant
+Speed 1 Maximum Cycling Rate
+Speed 1 Nominal Time for Condensate Removal to Begin
+Speed 1 Rated Evaporative Condenser Pump Power Consumption
+Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate
+Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+Speed 1 Reference Unit Gross Rated Cooling COP
+Speed 1 Reference Unit Gross Rated Sensible Heat Ratio
+Speed 1 Reference Unit Gross Rated Total Cooling Capacity
+Speed 1 Reference Unit Rated Condenser Air Flow Rate
+Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling
+Speed 1 Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+Speed 1 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
+
