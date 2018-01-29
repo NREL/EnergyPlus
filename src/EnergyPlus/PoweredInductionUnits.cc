@@ -836,7 +836,7 @@ namespace PoweredInductionUnits {
 			}
 
 			// Find airloop associated with PIU terminal unit
-			if ( ( PIU( PIUNum ).CtrlZoneNum > 0 ) && (PIU( PIUNum ).CtrlZoneInNodeIndex > 0 ) ) {
+			if ( ( PIU( PIUNum ).CtrlZoneNum > 0 ) && ( PIU( PIUNum ).CtrlZoneInNodeIndex > 0 ) ) {
 				int AirLoopNum = ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).CtrlZoneInNodeIndex );
 				AirDistUnit( PIU( PIUNum ).ADUNum ).AirLoopNum = AirLoopNum;
 			}

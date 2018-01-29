@@ -116,6 +116,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -329,6 +330,7 @@ namespace EnergyPlus {
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();
+		FaultsManager::clear_state();
 		FluidProperties::clear_state();
 		Furnaces::clear_state();
 		GlobalNames::clear_state();
