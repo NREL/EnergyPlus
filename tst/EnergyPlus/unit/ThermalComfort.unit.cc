@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,6 +66,8 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
@@ -79,6 +81,8 @@ using namespace EnergyPlus::InternalHeatGains;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::DataHeatBalSurface;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
@@ -748,6 +752,104 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
 
 	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPMV, -1.201, 0.005 );
 	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 35.3, 0.1 );
+}
+
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT )
+{
+
+	int ZoneNum( 1 );
+	int SurfNum( 1 );
+	Real64 RadTemp;
+	
+	TH.deallocate();
+	Surface.deallocate();
+	Construct.deallocate();
+	Zone.deallocate();
+	AngleFactorList.allocate( 1 );
+	TotSurfaces = 3;
+	NumOfZones = 1;
+	TH.allocate( 2, 2, TotSurfaces );
+	Surface.allocate( TotSurfaces );
+	Construct.allocate( TotSurfaces );
+	Zone.allocate( 1 );
+	
+	Surface( 1 ).Area = 20.0;
+	Surface( 2 ).Area = 15.0;
+	Surface( 3 ).Area = 10.0;
+	Surface( 1 ).HeatTransSurf = true;
+	Surface( 2 ).HeatTransSurf = true;
+	Surface( 3 ).HeatTransSurf = true;
+	Surface( 1 ).Construction = 1;
+	Surface( 2 ).Construction = 2;
+	Surface( 3 ).Construction = 3;
+	Construct( 1 ).InsideAbsorpThermal = 1.0;
+	Construct( 2 ).InsideAbsorpThermal = 0.9;
+	Construct( 3 ).InsideAbsorpThermal = 0.8;
+	Surface( 1 ).Zone = 1;
+	Surface( 2 ).Zone = 1;
+	Surface( 3 ).Zone = 1;
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 3;
+	TH( 2, 1, 1 ) = 20.0;
+	TH( 2, 1, 2 ) = 15.0;
+	TH( 2, 1, 3 ) = 10.0;
+	
+	SurfNum = 1;
+	ThermalComfort::clear_state( );
+	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
+	EXPECT_NEAR( RadTemp, 16.6, 0.1 );
+	
+	SurfNum = 2;
+	ThermalComfort::clear_state( );
+	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
+	EXPECT_NEAR( RadTemp, 16.1, 0.1 );
+
+	SurfNum = 3;
+	ThermalComfort::clear_state( );
+	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
+	EXPECT_NEAR( RadTemp, 14.0, 0.1 );
+	
+}
+
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT )
+{
+
+	Real64 RadTemp;
+	
+	AngleFactorList.allocate( 1 );
+	AngleFactorList( 1 ).TotAngleFacSurfaces = 3;
+	AngleFactorList( 1 ).SurfacePtr.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
+	AngleFactorList( 1 ).AngleFactor.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
+
+	AngleFactorList( 1 ).SurfacePtr( 1 ) = 1;
+	AngleFactorList( 1 ).SurfacePtr( 2 ) = 2;
+	AngleFactorList( 1 ).SurfacePtr( 3 ) = 3;
+	AngleFactorList( 1 ).AngleFactor( 1 ) = 0.5;
+	AngleFactorList( 1 ).AngleFactor( 2 ) = 0.3;
+	AngleFactorList( 1 ).AngleFactor( 3 ) = 0.2;
+	
+	TH.deallocate();
+	TotSurfaces = AngleFactorList( 1 ).TotAngleFacSurfaces;
+	TH.allocate( 2, 2, TotSurfaces );
+	Surface.deallocate();
+	Construct.deallocate();
+	Surface.allocate( TotSurfaces );
+	Construct.allocate( TotSurfaces );
+
+	TH( 2, 1, 1 ) = 20.0;
+	TH( 2, 1, 2 ) = 15.0;
+	TH( 2, 1, 3 ) = 10.0;
+	Surface( 1 ).Construction = 1;
+	Surface( 2 ).Construction = 2;
+	Surface( 3 ).Construction = 3;
+	Construct( 1 ).InsideAbsorpThermal = 1.0;
+	Construct( 2 ).InsideAbsorpThermal = 0.9;
+	Construct( 3 ).InsideAbsorpThermal = 0.8;
+
+	RadTemp = CalcAngleFactorMRT( 1 );
+	EXPECT_NEAR( RadTemp, 16.9, 0.1 );
+
+	
 }
 
 
