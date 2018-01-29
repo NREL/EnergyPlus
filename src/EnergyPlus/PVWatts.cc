@@ -67,7 +67,7 @@ namespace PVWatts {
 
 	std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-	PVWattsGenerator::PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses, GeometryType geometryType, Real64 tilt, Real64 azimuth, size_t surfaceNum, Real64 groundCoverageRatio, bool setupOutputVariables) : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0), m_cellTemperature(20.0), m_planeOfArrayIrradiance(0.0), m_outputDCPower(1000.0)
+	PVWattsGenerator::PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses, GeometryType geometryType, Real64 tilt, Real64 azimuth, size_t surfaceNum, Real64 groundCoverageRatio) : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0), m_cellTemperature(20.0), m_planeOfArrayIrradiance(0.0), m_outputDCPower(1000.0)
 	{
 		using General::RoundSigDigits;
 		bool errorsFound(false);
@@ -175,12 +175,14 @@ namespace PVWatts {
 		const Real64 pvwatts_height = 5.0;
 		m_tccalc = std::unique_ptr< pvwatts_celltemp >( new pvwatts_celltemp( m_inoct + 273.15, pvwatts_height, DataGlobals::TimeStepZone ) );
 
-		if ( setupOutputVariables ) {
-			// Set up output variables
-			SetupOutputVariable("Generator Produced DC Electric Power", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
-			SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, m_outputDCEnergy, "System", "Sum", m_name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
-			SetupOutputVariable( "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name );
-		}
+	}
+
+	void PVWattsGenerator::setupOutputVariables()
+	{
+		// Set up output variables
+		SetupOutputVariable("Generator Produced DC Electric Power", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
+		SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, m_outputDCEnergy, "System", "Sum", m_name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
+		SetupOutputVariable( "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name );
 	}
 
 	PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
@@ -227,11 +229,11 @@ namespace PVWatts {
 			surfaceNum = FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), DataSurfaces::Surface);
 		}
 		if ( NumNums < NumFields::GROUND_COVERAGE_RATIO ) {
-			return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4, true);
+			return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
 		}
 		const Real64 groundCoverageRatio(rNumericArgs(NumFields::GROUND_COVERAGE_RATIO));
 
-		PVWattsGenerator pvwattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio, true);
+		PVWattsGenerator pvwattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, groundCoverageRatio);
 		return pvwattsGenerator;
 	}
 
@@ -467,7 +469,9 @@ namespace PVWatts {
 		if ( it == PVWattsGenerators.end() ) {
 			// It's not in the map, add it.
 			PVWattsGenerators.insert(std::make_pair(ObjNum, PVWattsGenerator::createFromIdfObj(ObjNum)));
-			return PVWattsGenerators.find(ObjNum)->second;
+			PVWattsGenerator& pvw(PVWattsGenerators.find(ObjNum)->second);
+			pvw.setupOutputVariables();
+			return pvw;
 		} else {
 			return it->second;
 		}
