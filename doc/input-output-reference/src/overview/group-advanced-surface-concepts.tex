@@ -2635,6 +2635,57 @@ ZoneProperty:LocalEnvironment,
     OutdoorAirNode:0001;          !- Outdoor Air Node Name    
 \end{lstlisting}
 
+
+\subsection{SurfaceProperty:HeatBalanceSourceTerm}\label{surfacePropertyHeatBalanceSourceTerm}
+
+The object allows additional heat source term of the surface boundary condition in the surface heat balance calculation for Advanced/Research Usage. The object specifies an exterior surface with the additional heat source term described by a schedule of heat rates (can be positive or negative values) in W/m^2. The heat rates are pre-calculated outside EnergyPlus.
+
+\subsubsection{Field: Surface Name}\label{field-surface-name}
+
+This is the name of the surface that will be assigned to use the additional heat source term in heat balance calculation
+
+\subsubsection{Field: Heat Source Location}\label{field-heat-source-location}
+
+This field indicates whether the heat source applies at inside or outside the surface.
+
+\subsubsection{Field: Heat Source Term Schedule Name}\label{field-heat-source-term-schedule-name}
+
+This field points to the additional heat source schedule. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
+
+\begin{lstlisting}
+SurfaceProperty:HeatBalanceSourceTerm,
+    Zn001:Wall001,                !- Surface Name
+    Outside,                           !- Heat Source Location
+    HeatSourceSch:001;          !- Heat Source Term Schedule Name
+\end{lstlisting}
+
+\subsection{ZoneProperty:LocalEnvironment}\label{ZonePropertylocalEnvironment}
+
+The object links to a \textbf{Zone} object and is used when there is a need to calculate zone level environmental data externally and import them into the simulation to override existing environmental data, including local air temperature and humidity, wind velocity and direction. links to an \textbf{OutdoorAir:Node} object declared by \textbf{Field: Outdoor Air Node Name}. The reference local outdoor air node provides ambient conditions for the calculation of infiltration and ventilation at the zone level.
+
+\subsubsection{Field: Name}\label{field-zone-localenv-name}
+
+This is the unique name of the zone property.
+
+\subsubsection{Field: Zone Name}\label{field-zone-name}
+
+This is the name of the zone that will be assigned to use the local environmental data defined in the next field. This should be a name of a surface defined elsewhere.
+
+\subsubsection{Field: Outdoor Air Node Name}\label{field-zone-outdoor-air-node-name}
+
+This field is used to import local environmental data from local outdoor air nodes, including dry and wet bulb temperature, wind speed and wind direction. This should be a name of a \textbf{OutdoorAir:Node} object.
+
+An example IDF object follows.
+
+\begin{lstlisting}
+ZoneProperty:LocalEnvironment,
+    LocEnv:Zn001,                 !- Name
+    Zn001,                        !- Exterior Surface Name
+    OutdoorAirNode:0001;          !- Outdoor Air Node Name    
+\end{lstlisting}
+
+
+
 \subsection{Zone Property View Factors}\label{zone-property-view-factors}
 
 EnergyPlus has two options for specifying the thermal radiation exchange view factors between surfaces in a zone: the approximate option and the user input option. Because the actual geometric arrangement within a zone is very complex, the approximate method of including thermal mass and other forced exchanges is more realistic than trying to come up with ``exact'' view factors. However, in some research situations it might be desirable to have control of the view factors used. For this reason, a user input mode has been included in EnergyPlus. The two modes are described in the next sections.
