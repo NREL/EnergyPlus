@@ -2488,8 +2488,8 @@ namespace ThermalComfort {
 					deltaT = ZTAV( iZone ) - ZoneThermostatSetPointHi( iZone );
 				}
 				
-				if ( Zone( iZone ).HasApproachTempToReturnAir ) {
-					deltaT = TempTstatAir( iZone ) - Zone( iZone ) .AdjustedTempToReturnAir;
+				if ( Zone( iZone ).HasAdjustedReturnTempByITE) {
+					deltaT = TempTstatAir( iZone ) - Zone( iZone ) .AdjustedReturnTempByITE;
 				}
 				if ( deltaT > deviationFromSetPtThresholdClg ) {
 					ThermalComfortSetPoint( iZone ).notMetCooling = TimeStepZone;

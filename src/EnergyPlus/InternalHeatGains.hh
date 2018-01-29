@@ -89,6 +89,9 @@ namespace InternalHeatGains {
 	InitInternalHeatGains();
 
 	void
+	CheckReturnAirHeatGain();
+
+	void
 	CalcZoneITEq();
 
 	void

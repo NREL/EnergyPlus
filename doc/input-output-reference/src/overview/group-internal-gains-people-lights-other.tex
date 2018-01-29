@@ -2208,7 +2208,7 @@ This field is the name of the thermal zone (ref: Zone) which contains this Elect
 
 \paragraph{Field: Air Flow Calculation Method}\label{field-air-flow-calculation-method}
 
-This field specifies the method used to calculate the IT inlet temperature and zone return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution. When FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
+This field specifies the method used to calculate the IT inlet temperature and zone return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution. When FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The FlowControlWithApproachTemperatures only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
 
 The default method is FlowFromSystem.
 
@@ -2340,11 +2340,11 @@ The difference schedule of the IT inlet temperature from the AHU supply air temp
 
 \paragraph{Field: Return Temperature Difference}\label{field-return-temperature-difference}
 
-The difference of the unit outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+The difference of the return outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
 
 \paragraph{Field: Return Temperature Difference Schedule}\label{field-return-temperature-difference-schedule}
 
-The difference schedule of the unit outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+The difference schedule of the return outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
 
 An IDF example:
 

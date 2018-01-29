@@ -3358,8 +3358,8 @@ namespace ZoneTempPredictorCorrector {
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 
 			//
-			if ( DataHeatBalance::Zone( ZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
-				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedTempToReturnAir - TempIndZnLd( ZoneNum );
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
 			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
@@ -3393,8 +3393,8 @@ namespace ZoneTempPredictorCorrector {
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-			if ( DataHeatBalance::Zone( ZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
-				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedTempToReturnAir - TempIndZnLd( ZoneNum );
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
 			}
 
 			//PH 3/2/04      ZoneSysEnergyDemand(ZoneNum)%TotalOutputRequired = LoadToHeatingSetPoint ! = LoadToCoolingSetPoint
@@ -3463,8 +3463,8 @@ namespace ZoneTempPredictorCorrector {
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-			if ( DataHeatBalance::Zone( ZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
-				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedTempToReturnAir - TempIndZnLd( ZoneNum );
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
 			}
 
 			// Possible combinations:

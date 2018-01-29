@@ -21162,6 +21162,7 @@ ElectricEquipment:ITE:AirCooled,
        \note FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction
        \note and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple
        \note ITE objects defined for one zone, the same calculation method should apply.
+       \note The FlowControlWithApproachTemperatures only applies to ITE zones with single duct VAV terminal unit. 
        \note Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
        \type choice
        \key FlowFromSystem
@@ -21351,13 +21352,13 @@ ElectricEquipment:ITE:AirCooled,
        \type object-list
        \object-list ScheduleNames
   N11, \field Return Temperature Difference
-       \note The difference of the unit outlet temperature from the well mixed zone temperature.
+       \note The difference of the return outlet temperature from the well mixed zone temperature.
        \note Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures.
        \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
        \type real
        \units deltaC
   A21; \field Return Temperature Difference Schedule
-       \note The difference schedule of the unit outlet temperature from the well mixed zone temperature.
+       \note The difference schedule of the return outlet temperature from the well mixed zone temperature.
        \note Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. 
        \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
        \type object-list

@@ -643,13 +643,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
 	DataHeatBalFanSys::MAT( 1 ) = 24.0;
 	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.008;
-	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneHasAirFlowWindowReturn = false;
-	DataHeatBalance::ZnRpt( 1 ).LtsRetAirGainRate = 0.0;
 
 	InternalHeatGains::GetInternalHeatGainsInput();
 
 	DataLoopNode::Node( 1 ).Temp = 45.0;
 	InternalHeatGains::CalcZoneITEq();
-	ASSERT_DOUBLE_EQ( DataHeatBalance::ZoneITEq( 1 ).AirOutletDryBulbT + DataHeatBalance::ZoneITEq( 1 ).ReturnApproachTemp, DataHeatBalance::Zone( 1 ).AdjustedTempToReturnAir );
+	ASSERT_DOUBLE_EQ( DataHeatBalance::ZoneITEq( 1 ).AirOutletDryBulbT + DataHeatBalance::ZoneITEq( 1 ).ReturnApproachTemp, DataHeatBalance::Zone( 1 ).AdjustedReturnTempByITE );
 	ASSERT_DOUBLE_EQ( DataLoopNode::Node( 1 ).Temp + DataHeatBalance::ZoneITEq( 1 ).SupplyApproachTemp, DataHeatBalance::ZoneITEq( 1 ).AirInletDryBulbT );
 }

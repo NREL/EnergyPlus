@@ -1370,8 +1370,11 @@ namespace DataHeatBalance {
 		int AirHBimBalanceErrIndex; // error management counter
 		bool NoHeatToReturnAir; // TRUE means that heat to return air should be added to the zone load
 		bool RefrigCaseRA; // TRUE means there is potentially heat removal from return air
-		bool HasApproachTempToReturnAir; // TRUE means that return temp to return air is different from the zone mixed air temp
-		Real64 AdjustedTempToReturnAir; // Diff of the return temp from the zone mixed air temp
+		bool HasAdjustedReturnTempByITE; // TRUE means that return temp to return air is adjusted by return temperature of ITE object
+		Real64 AdjustedReturnTempByITE; // Diff of the return temp from the zone mixed air temp adjusted by ITE object
+
+		bool HasLtsRetAirGain; // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature 
+		bool HasAirFlowWindowReturn; // TRUE means that zone has return air flow from windows
 		// from refrigeration cases for this zone
 		Real64 InternalHeatGains; // internal loads (W)
 		Real64 NominalInfilVent; // internal infiltration/ventilation
@@ -1470,8 +1473,10 @@ namespace DataHeatBalance {
 			AirHBimBalanceErrIndex( 0 ),
 			NoHeatToReturnAir( false ),
 			RefrigCaseRA( false ),
-			HasApproachTempToReturnAir( false ),
-			AdjustedTempToReturnAir( 0.0 ),
+			HasAdjustedReturnTempByITE( false ),
+			AdjustedReturnTempByITE( 0.0 ),
+			HasLtsRetAirGain( false ),
+			HasAirFlowWindowReturn( false ),
 			InternalHeatGains( 0.0 ),
 			NominalInfilVent( 0.0 ),
 			NominalMixing( 0.0 ),

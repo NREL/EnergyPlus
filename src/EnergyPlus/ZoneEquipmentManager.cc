@@ -729,15 +729,15 @@ namespace ZoneEquipmentManager {
 						Temp = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTemp;
 						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 						DeltaTemp = Temp - Node( ZoneNode ).Temp;
-						if ( DataHeatBalance::Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {						
-							DeltaTemp = Temp - DataHeatBalance::Zone( ActualZoneNum ).AdjustedTempToReturnAir;
+						if ( DataHeatBalance::Zone( ActualZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+							DeltaTemp = Temp - DataHeatBalance::Zone( ActualZoneNum ).AdjustedReturnTempByITE;
 						}
 						// If the user specify the design cooling supply air temperature difference, then
 					} else {
 						DeltaTemp = -std::abs( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTempDiff );
 						Temp = DeltaTemp + Node( ZoneNode ).Temp;
-						if ( DataHeatBalance::Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
-							Temp = DeltaTemp + DataHeatBalance::Zone( ActualZoneNum ).AdjustedTempToReturnAir;
+						if ( DataHeatBalance::Zone( ActualZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+							Temp = DeltaTemp + DataHeatBalance::Zone( ActualZoneNum ).AdjustedReturnTempByITE;
 						}
 						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 					}
@@ -4647,12 +4647,9 @@ namespace ZoneEquipmentManager {
 						} else {
 							Node( ReturnNode ).Temp = TempRetAir;
 						}
-						// Overwrite heat-to-return from ITE objects
-						if ( Zone( ActualZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
-							if ( ZoneEquipConfig( ZoneNum ).ZoneHasAirFlowWindowReturn ) {
-								ShowFatalError( "Return air heat gains from window are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures." );
-							}
-							TempRetAir = Zone( ActualZoneNum ).AdjustedTempToReturnAir;
+						// Overwrite heat-to-return from ITE objects, other return air flow from window or lights are not allowed in this situation
+						if ( Zone( ActualZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+							TempRetAir = Zone( ActualZoneNum ).AdjustedReturnTempByITE;
 							Node( ReturnNode ).Temp = TempRetAir;
 						}
 					} else { // No return air flow

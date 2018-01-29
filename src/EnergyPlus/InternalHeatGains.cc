@@ -214,6 +214,8 @@ namespace InternalHeatGains {
 
 		ReportInternalHeatGains();
 
+		CheckReturnAirHeatGain();
+
 		//for the load component report, gather the load components for each timestep but not when doing pulse
 		if ( ZoneSizingCalc ) GatherComponentLoadsIntGain();
 
@@ -1200,6 +1202,8 @@ namespace InternalHeatGains {
 					}
 					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, returnNodeNum );
 
+
+					if ( Lights( Loop ).FractionReturnAir > 0 ) Zone( Lights( Loop ).ZonePtr ).HasLtsRetAirGain = true;
 					// send values to predefined lighting summary report
 					liteName = Lights( Loop ).Name;
 					zonePt = Lights( Loop ).ZonePtr;
@@ -2326,7 +2330,7 @@ namespace InternalHeatGains {
 		// Note that this object type does not support ZoneList due to node names in input fields
 		ZoneITEq.allocate( NumZoneITEqStatements );
 
-		if ( NumZoneITEqStatements > 0 ) {
+ 		if ( NumZoneITEqStatements > 0 ) {
 			Loop = 0;
 			for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
 				AlphaName = BlankString;
@@ -2346,14 +2350,8 @@ namespace InternalHeatGains {
 					}
 					else if ( SameString( AlphaName( 3 ), "FlowControlWithApproachTemperatures" ) ) {
 						ZoneITEq( Loop ).FlowControlWithApproachTemps = true;
-						Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir = true;
+						Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).NoHeatToReturnAir = false;
-						if ( ZnRpt.size() > 0 && ZnRpt( ZoneITEq( Loop ).ZonePtr ).LtsRetAirGainRate > 0.0 ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
-							ShowContinueError( "Other return air heat gains from window or lights are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures." );
-							ErrorsFound = true;
-						}
-
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
 						ErrorsFound = true;
@@ -2689,7 +2687,7 @@ namespace InternalHeatGains {
 
 			} // Item - Number of ZoneITEq objects
 			for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
-				if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir && ( !ZoneITEq( Loop ).FlowControlWithApproachTemps ) ) {
+				if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE && ( !ZoneITEq( Loop ).FlowControlWithApproachTemps ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method " + AlphaName( 3 ) + " for Zone: " + AlphaName( 2 ) );
 					ShowContinueError( "...Multiple flow control methods apply to one zone. " );
 					ErrorsFound = true;
@@ -3812,6 +3810,31 @@ namespace InternalHeatGains {
 	}
 
 	void
+	CheckReturnAirHeatGain()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Xuan Luo
+		//       DATE WRITTEN   Jan 2018
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine currently creates the values for standard "zone loads" reporting
+		// from the heat balance module.
+
+		// Using/Aliasing
+		using DataHeatBalance::Zone;
+		using DataZoneEquipment::ZoneEquipConfig;
+
+		for ( int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( Zone( ZoneNum ).HasAdjustedReturnTempByITE && Zone( ZoneNum ).HasLtsRetAirGain ) {
+				ShowFatalError( "Return air heat gains from lights are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures in zones with ITE objects." );
+			}
+			if ( Zone( ZoneNum ).HasAdjustedReturnTempByITE && Zone( ZoneNum ).HasAirFlowWindowReturn ) {
+				ShowFatalError( "Return air heat gains from windows are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures in zones with ITE objects." );
+			}
+		}
+	}
+
+	void
 	CalcZoneITEq()
 	{
 
@@ -4089,7 +4112,7 @@ namespace InternalHeatGains {
 				// If a room air model, then the only convective heat gain to the zone heat balance is the UPS heat gain
 				ZoneITEq( Loop ).ConGainRateToZone = UPSHeatGain;
 			}
-			if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasApproachTempToReturnAir ) {
+			if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE) {
 				ZoneITEMap[ ZoneITEq( Loop ).ZonePtr ].push_back( Loop );
 			}			
 
@@ -4201,7 +4224,7 @@ namespace InternalHeatGains {
 		Real64 totalRate;
 		Real64 TAirReturn;
 		while ( it != ZoneITEMap.end() ) {
-			if ( Zone( it->first ).HasApproachTempToReturnAir ) {
+			if ( Zone( it->first ).HasAdjustedReturnTempByITE ) {
 				totalGain = 0;
 				totalRate = 0;
 				for ( int i : it->second ) {
@@ -4215,8 +4238,8 @@ namespace InternalHeatGains {
 					totalGain += ZoneITEq( i ).AirMassFlow * TAirReturn;
 				}
 				if ( totalRate != 0 ) {
-					Zone( it->first ).AdjustedTempToReturnAir = totalGain / totalRate;
-					ZnRpt( it->first ).ITEAdjReturnTemp = Zone( it->first ).AdjustedTempToReturnAir;
+					Zone( it->first ).AdjustedReturnTempByITE = totalGain / totalRate;
+					ZnRpt( it->first ).ITEAdjReturnTemp = Zone( it->first ).AdjustedReturnTempByITE;
 				}
 			}
 			it++;
