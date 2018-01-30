@@ -2723,13 +2723,8 @@ namespace SingleDuct {
 		if ( ( QTotLoad < 0.0 ) && ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( TempControlType( ZoneNum ) != SingleHeatingSetPoint ) && ( GetCurrentScheduleValue( Sys( SysNum ).SchedPtr ) > 0.0 ) ) {
 			// Calculate the flow required for cooling
 			DeltaTemp = CpAirAvg * ( SysInlet( SysNum ).AirTemp - ZoneTemp );
-<<<<<<< .merge_file_a20296
 			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
 				DeltaTemp = CpAirAvg * ( SysInlet( SysNum ).AirTemp - DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE);
-=======
-			if ( DataHeatBalance::Zone( ZoneNum ).HasApproachTempToReturnAir && !( DataGlobals::BeginSimFlag ) ) {
-				DeltaTemp = CpAirAvg * ( SysInlet( SysNum ).AirTemp - DataHeatBalance::Zone( ZoneNum ).AdjustedTempToReturnAir );
->>>>>>> .merge_file_a18600
 			}
 
 			//Need to check DeltaTemp and ensure that it is not zero
