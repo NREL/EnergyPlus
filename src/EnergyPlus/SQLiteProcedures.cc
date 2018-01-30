@@ -1584,6 +1584,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 	int const EP_UNUSED( recordIndex ),
 	int const cumlativeSimulationDays,
 	int const curEnvirNum,
+	int const simulationYear,
 	Optional_int_const month,
 	Optional_int_const dayOfMonth,
 	Optional_int_const hour,
@@ -1617,7 +1618,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			adjustReportingHourAndMinutes(t_hour, intEndMinute);
 
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindNULL(m_timeIndexInsertStmt, 2);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
 			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
 			sqliteBindInteger(m_timeIndexInsertStmt, 4, dayOfMonth());
 			sqliteBindInteger(m_timeIndexInsertStmt, 5, t_hour);
@@ -1643,7 +1644,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			++m_sqlDBTimeIndex;
 
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindNULL(m_timeIndexInsertStmt, 2);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
 			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
 			sqliteBindInteger(m_timeIndexInsertStmt, 4, dayOfMonth());
 			sqliteBindInteger(m_timeIndexInsertStmt, 5, hour());
@@ -1669,7 +1670,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 
 			intervalInMinutes = 60*24;
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindNULL(m_timeIndexInsertStmt, 2);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
 			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
 			sqliteBindInteger(m_timeIndexInsertStmt, 4, dayOfMonth());
 			sqliteBindInteger(m_timeIndexInsertStmt, 5, 24);
@@ -1695,7 +1696,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 
 			intervalInMinutes = 60*24*lastDayOfMonth[month() - 1];
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindNULL(m_timeIndexInsertStmt, 2);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
 			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
 			sqliteBindInteger(m_timeIndexInsertStmt, 4, lastDayOfMonth[month() - 1]);
 			sqliteBindInteger(m_timeIndexInsertStmt, 5, 24);

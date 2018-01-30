@@ -172,6 +172,7 @@ public:
 		int const recordIndex,
 		int const CumlativeSimulationDays,
 		int const curEnvirNum,
+		int const simulationYear,
 		Optional_int_const Month = _,
 		Optional_int_const DayOfMonth = _,
 		Optional_int_const Hour = _,

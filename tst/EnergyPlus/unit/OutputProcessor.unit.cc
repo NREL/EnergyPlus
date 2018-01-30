@@ -623,7 +623,7 @@ namespace EnergyPlus {
 		{
 			DataGlobals::MinutesPerTimeStep = 10;
 
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false ) );
@@ -711,7 +711,7 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportRealData )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 ) );
@@ -790,7 +790,7 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportIntegerData )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 ) );
@@ -869,7 +869,7 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_1 )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 999 ); } );
@@ -1211,7 +1211,7 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
 			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
@@ -1364,7 +1364,7 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
@@ -1537,7 +1537,7 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, true ) );
@@ -1573,7 +1573,7 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_2 )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );

@@ -4119,35 +4119,35 @@ namespace OutputProcessor {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), StartMinute(), EndMinute(), DayType().c_str() );
 			out_stream << stamp << NL;
 			if ( writeToSQL && sqlite ) {
-				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType, DataGlobals::WarmupFlag );
+				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType, DataGlobals::WarmupFlag );
 			}
 			break;
 		case ReportingFrequency::Hourly:
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), 0.0, 60.0, DayType().c_str() );
 			out_stream << stamp << NL;
 			if ( writeToSQL && sqlite ) {
-				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, _, _, DST, DayType, DataGlobals::WarmupFlag );
+				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear, Month, DayOfMonth, Hour, _, _, DST, DayType, DataGlobals::WarmupFlag );
 				}
 			break;
 		case ReportingFrequency::Daily:
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str() );
 			out_stream << stamp << NL;
 			if ( writeToSQL && sqlite ) {
-				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, _, _, _, DST, DayType, DataGlobals::WarmupFlag );
+				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear, Month, DayOfMonth, _, _, _, DST, DayType, DataGlobals::WarmupFlag );
 			}
 			break;
 		case ReportingFrequency::Monthly:
 			std::sprintf( stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month() );
 			out_stream << stamp << NL;
 			if ( writeToSQL && sqlite ) {
-				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month );
+				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear, Month );
 			}
 			break;
 		case ReportingFrequency::Simulation:
 			std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
 			out_stream << stamp << NL;
 			if ( writeToSQL && sqlite ) {
-				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum );
+				sqlite->createSQLiteTimeIndexRecord( static_cast<int>( reportingInterval ), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear );
 			}
 			break;
 		default:
