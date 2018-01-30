@@ -307,7 +307,7 @@ namespace PVWatts {
 
 	double ModifiedDISC(const double g[3], const double z[3], double td, double alt, int doy, double &dn);
 
-	void ModifiedDISC(const double kt[3], const double kt1[3], const double g[3], const double z[3], double td, double alt, int doy, double &dn);
+	void ModifiedDISC(const double kt[3], const double kt1[3], const double g[3], const double z[3], double td, int doy, double &dn);
 
 	//static int julian(int yr,int month,int day);
 

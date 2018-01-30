@@ -2034,7 +2034,7 @@ namespace PVWatts {
 			double gti[3]  = {-999, pA->POA[ pA->i ], -999 };
 			double zen[3]  = {-999, sun[1]          , -999 }; // Might need to be Zenith angle instead of inciden
 
-			ModifiedDISC( Kt_, Ktp_, gti, zen, pA->tDew, pA->elev, pA->doy, dn);
+			ModifiedDISC( Kt_, Ktp_, gti, zen, pA->tDew, pA->doy, dn);
 
 			// Calculate DHI and GHI
 			double ct = cos(angle[1]);
@@ -2506,7 +2506,7 @@ namespace PVWatts {
 		return kt1[1];
 	}   // End of ModifiedDISC
 
-	void ModifiedDISC(const double kt[3], const double kt1[3], const double g[3], const double z[3], double td, double alt, int doy, double &dn) // aka DIRINT model
+	void ModifiedDISC(const double kt[3], const double kt1[3], const double g[3], const double z[3], double td, int doy, double &dn) // aka DIRINT model
 	{
 		// Calculates direct normal (beam) radiation from global horizontal radiation.
 		// Arguments passed to function:
