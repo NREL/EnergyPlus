@@ -3616,6 +3616,31 @@ Label100: ;
 
 	}
 
+	int
+	GetControllerIndex(
+		std::string const & ControllerName // name of coil controller
+	) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad, FSEC
+		//       DATE WRITTEN   January 2018
+
+		// This subroutine finds the controllers actuator node number
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		int ControllerIndex = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		if ( ControllerIndex == 0 ) {
+			ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
+		}
+
+		return ControllerIndex;
+
+	}
+
 } // HVACControllers
 
 } // EnergyPlus
