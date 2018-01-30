@@ -310,7 +310,6 @@ namespace EnergyPlus {
 
 		int const PIUNum = 1;
 		int const ADUNum = 1;
-		bool const FirstHVACIteration = true;
 
 		ASSERT_EQ( 1, NumSeriesPIUs );
 		EXPECT_EQ( "SPACE1-1 ATU", AirDistUnit( ADUNum ).Name ); // ADU name
@@ -321,8 +320,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest ) {
-
-		bool ErrorsFound( false );
 
 		std::string const idf_objects = delimited_string( {
 
