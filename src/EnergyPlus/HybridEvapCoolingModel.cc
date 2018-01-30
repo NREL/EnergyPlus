@@ -999,7 +999,7 @@ namespace EnergyPlus {//***************
 			int MAXIMUM_OPERATIONAL_SETTINGS = 5;
 			ModeCounter = 0;
 			
-			DebugBreak = 9; // remove
+			DebugBreak = 16; // remove
 	
 			CurrentOperatingSettings.resize(5);
 
@@ -1295,6 +1295,8 @@ namespace EnergyPlus {//***************
 				oStandBy.SupplyAirTemperature = Tra;
 				oStandBy.SupplyAirW = Wra;
 				oStandBy.Mode = 0;
+				oStandBy.Mixed_Air_Temperature= Tra;
+				oStandBy.Mixed_Air_W=Wra;
 			}
 			else
 			{
@@ -2203,36 +2205,38 @@ namespace EnergyPlus {//***************
 			Real64 QLatentSystemOut = 0;
 			// Even if its off or in standby we still need to continue to calculate standby loads
 			// All powers are calculated in Watts amd energies in Joules
+			
+			SupplyVentilationVolume = CalculateTimeStepAverage(SYSTEMOUTPUTS::VENTILATION_AIR_V);
+			if (StdRhoAir > 1)
+			{
+				SupplyVentilationAir = SupplyVentilationVolume * StdRhoAir;
+			}
+			else
+			{
+				SupplyVentilationAir = SupplyVentilationVolume * 1.225;
+			}
+			// set timestep average outlet condition, considering all operating conditions and runtimes.
+			OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
+			OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
+			 
+			OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure); //could also use outlet pressure instead of fixed
+			Real64 OperatingAverageMixedAirTemperature = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_TEMP);
+			Real64 OperatingMixedAirW = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
+			Real64 MixedAirEnthalpy = PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);
+			OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); //consider if inlet and outlet presures are different
+			OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
+
+			if (StdRhoAir > 1)
+			{
+				OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
+			}
+			else
+			{
+				OutletVolumetricFlowRate = OutletMassFlowRate / 1.225;
+			}
+			
 			if (!StandBy)
 			{
-				SupplyVentilationVolume = CalculateTimeStepAverage(SYSTEMOUTPUTS::VENTILATION_AIR_V);
-				if (StdRhoAir > 1)
-				{
-					SupplyVentilationAir = SupplyVentilationVolume * StdRhoAir;
-				}
-				else
-				{
-					SupplyVentilationAir = SupplyVentilationVolume * 1.225;
-				}
-				// set timestep average outlet condition, considering all operating conditions and runtimes.
-				OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
-				OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
-
-				OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure); //could also use outlet pressure instead of fixed
-				Real64 OperatingAverageMixedAirTemperature = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_TEMP);
-				Real64 OperatingMixedAirW = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
-				Real64 MixedAirEnthalpy = PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);
-				OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); //consider if inlet and outlet presures are different
-				OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
-
-				if (StdRhoAir > 1)
-				{
-					OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
-				}
-				else
-				{
-					OutletVolumetricFlowRate = OutletMassFlowRate / 1.225;
-				}
 				if (OutletMassFlowRate > 0)
 				{
 					averageOSAF = SupplyVentilationAir / OutletMassFlowRate;
@@ -2256,7 +2260,7 @@ namespace EnergyPlus {//***************
 				//Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
 				//Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}		
 				QSensZoneOut = 1000 * OutletMassFlowRate* 0.5* (Returncp + Outletcp)*(StepIns.Tra - OutletTemp);// 
-				Real64 OutletMassFlowRateDry = OutletMassFlowRate*(1 - Wsa);
+				Real64 OutletMassFlowRateDry = OutletMassFlowRate * (1 - Wsa);
 				QLatentZoneOut = 1000 * 2257 * OutletMassFlowRateDry* (InletHumRat - OutletHumRat);
 				QTotZoneOut = OutletMassFlowRateDry * (InletEnthalpy - OutletEnthalpy);
 				Real64 QLatentCheck = QTotZoneOut - QSensZoneOut;
@@ -2265,11 +2269,11 @@ namespace EnergyPlus {//***************
 				//System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
 				//System Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA + OSAF*(h_OSA - h_RA) - h_SA) {kJ/kgDryAir}
 
-				Real64 SystemTimeStepCp = Returncp + averageOSAF*(Outdoorcp - Returncp) + Outletcp;//cpRA + OSAF*(cpOSA-cpRA) + cpSA
-				Real64 SystemTimeStepW = InletHumRat + averageOSAF*(Wosa - Wra) - OutletHumRat;//HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA
-				Real64 SystemTimeStepT = StepIns.Tra + averageOSAF*(StepIns.Tosa - StepIns.Tra) - OutletTemp;//T_RA + OSAF *(T_OSA - T_RA) - T_SA
+				Real64 SystemTimeStepCp = Returncp + averageOSAF * (Outdoorcp - Returncp) + Outletcp;//cpRA + OSAF*(cpOSA-cpRA) + cpSA
+				Real64 SystemTimeStepW = InletHumRat + averageOSAF * (Wosa - Wra) - OutletHumRat;//HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA
+				Real64 SystemTimeStepT = StepIns.Tra + averageOSAF * (StepIns.Tosa - StepIns.Tra) - OutletTemp;//T_RA + OSAF *(T_OSA - T_RA) - T_SA
 				QSensSystemOut = 1000 * 0.5* SystemTimeStepCp *OutletMassFlowRate* SystemTimeStepT;//kw  dynamic cp
-				
+
 				QLatentSystemOut = 1000 * 2257 * OutletMassFlowRateDry*SystemTimeStepW;
 				QTotSystemOut = OutletMassFlowRateDry * (MixedAirEnthalpy - OutletEnthalpy);
 				QLatentCheck = QTotSystemOut - QSensSystemOut;
@@ -2278,44 +2282,51 @@ namespace EnergyPlus {//***************
 				ResetOutputs();
 				//set UNIT outputs for cooling and heating 
 				if (QTotZoneOut > 0) // zone cooling is possitive, else remain zero
-				{	UnitTotalCoolingRate = std::abs(QTotZoneOut);
+				{
+					UnitTotalCoolingRate = std::abs(QTotZoneOut);
 					UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour;
 				}
 				else
-				{	UnitTotalHeatingRate = std::abs(QTotZoneOut);
+				{
+					UnitTotalHeatingRate = std::abs(QTotZoneOut);
 					UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * SecInHour;
 				}
-					
+
 				if (QSensZoneOut > 0) // zone cooling is possitive, else remain zero
-				{	UnitSensibleCoolingRate = std::abs(QSensZoneOut);
+				{
+					UnitSensibleCoolingRate = std::abs(QSensZoneOut);
 					UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour;
 				}
 				else
-				{	UnitSensibleHeatingRate = std::abs(QSensZoneOut);
+				{
+					UnitSensibleHeatingRate = std::abs(QSensZoneOut);
 					UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * SecInHour;
 				}
 
-				if((UnitTotalCoolingRate - UnitSensibleCoolingRate)>0)
+				if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) > 0)
 				{
 					UnitLatentCoolingRate = UnitTotalCoolingRate - UnitSensibleCoolingRate;
 					UnitLatentCoolingEnergy = UnitTotalCoolingEnergy - UnitSensibleCoolingEnergy;
 				}
 				if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) < 0)
-				{	UnitLatentHeatingRate = UnitTotalHeatingRate - UnitSensibleHeatingRate;
+				{
+					UnitLatentHeatingRate = UnitTotalHeatingRate - UnitSensibleHeatingRate;
 					UnitLatentHeatingEnergy = UnitTotalHeatingEnergy - UnitSensibleHeatingEnergy;
 				}
 
 				//set SYSTEM outputs
 				if (QTotSystemOut > 0) // system cooling
-				{	SystemTotalCoolingRate = std::abs(QTotSystemOut);
+				{
+					SystemTotalCoolingRate = std::abs(QTotSystemOut);
 					SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * SecInHour;
 				}
 				else
-				{	SystemTotalHeatingRate = std::abs(QTotSystemOut);
+				{
+					SystemTotalHeatingRate = std::abs(QTotSystemOut);
 					SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * SecInHour;
 				}
 
-				if(QSensSystemOut> 0) //system sensible cooling
+				if (QSensSystemOut > 0) //system sensible cooling
 				{
 					SystemSensibleCoolingRate = std::abs(QSensSystemOut);
 					SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * SecInHour;
@@ -2325,7 +2336,7 @@ namespace EnergyPlus {//***************
 					SystemSensibleHeatingRate = std::abs(QSensSystemOut);
 					SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * SecInHour;
 				}
-				if(( SystemTotalCoolingRate - SystemSensibleCoolingRate)>0)
+				if ((SystemTotalCoolingRate - SystemSensibleCoolingRate) > 0)
 				{
 					SystemLatentCoolingRate = SystemTotalCoolingRate - SystemSensibleCoolingRate;
 					SystemLatentCoolingEnergy = SystemTotalCoolingEnergy - SystemSensibleCoolingEnergy;
@@ -2335,23 +2346,38 @@ namespace EnergyPlus {//***************
 					SystemLatentHeatingRate = SystemTotalHeatingRate - SystemSensibleHeatingRate;
 					SystemLatentHeatingEnergy = SystemTotalHeatingEnergy - SystemSensibleHeatingEnergy;
 				}
-				// set timestep outputs calculated considering different runtime fractions.
-				SupplyFanElectricPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER);
-				SupplyFanElectricEnergy = SupplyFanElectricPower*TimeStepSys * SecInHour;
-				SecondaryFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
-				SecondaryFuelConsumption = SecondaryFuelConsumptionRate*TimeStepSys * SecInHour;
-				ThirdFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
-				ThirdFuelConsumption = ThirdFuelConsumptionRate*TimeStepSys * SecInHour;
-				WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
-				WaterConsumption = WaterConsumptionRate*TimeStepSys * SecInHour;
-				ExternalStaticPressure=CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
-					
-					
-				// fuel use in calculation is in Kw, powers are typically output in EP in Watts, so do conversion here. 
-				FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
-				FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
 			}
 			else // unit is in standby so reset conditioning outputs
+			{
+				QTotZoneOut = 0;
+				QSensZoneOut = 0;
+				QLatentZoneOut = 0;
+				QTotSystemOut = 0;
+				QSensSystemOut = 0;
+				QLatentSystemOut = 0;
+				// reset outputs
+				ResetOutputs();
+			//FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
+			//FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
+			}
+
+			// set timestep outputs calculated considering different runtime fractions.
+			SupplyFanElectricPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER);
+			SupplyFanElectricEnergy = SupplyFanElectricPower*TimeStepSys * SecInHour;
+			SecondaryFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
+			SecondaryFuelConsumption = SecondaryFuelConsumptionRate*TimeStepSys * SecInHour;
+			ThirdFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
+			ThirdFuelConsumption = ThirdFuelConsumptionRate*TimeStepSys * SecInHour;
+			WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
+			WaterConsumption = WaterConsumptionRate*TimeStepSys * SecInHour;
+			ExternalStaticPressure=CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
+					
+					
+			// fuel use in calculation is in Kw, powers are typically output in EP in Watts, so do conversion here. 
+			FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
+			FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
+			
+			/*else // unit is in standby so reset conditioning outputs
 			{
 				QTotZoneOut = 0;
 				QSensZoneOut = 0;
@@ -2363,7 +2389,7 @@ namespace EnergyPlus {//***************
 				ResetOutputs();
 				FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
 				FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
-			}
+			}*/
 	
 		}
 
