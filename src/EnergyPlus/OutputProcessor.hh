@@ -522,7 +522,6 @@ namespace OutputProcessor {
 		int MNMinValDate; // Date stamp of minimum
 		int MNRptNum; // Report Number for MN Values
 		std::string MNRptNumChr; // Report Number for MN Values (character -- for printing)
-		Real64 SMValue; // Simulation Value
 		bool RptSM; // Report at End of Environment/Simulation
 		bool RptSMFO; // Report at End of Environment/Simulation -- meter file only
 		Real64 SMMaxVal; // Maximum Value (Sim)
@@ -539,6 +538,7 @@ namespace OutputProcessor {
 		Real64 YRMinVal; // Minimum Value (Year)
 		int YRMinValDate; // Date stamp of minimum
 		int YRRptNum; // Report Number for YR Values
+		Real64 SMValue; // Simulation Value
 		std::string SMRptNumChr; // Report Number for SM Values (character -- for printing)
 		Real64 LastSMValue; // Simulation Value
 		Real64 LastSMMaxVal; // Maximum Value (Sim)
@@ -942,9 +942,7 @@ namespace OutputProcessor {
 	void
 	WriteYearlyTimeStamp(
 		std::ostream * out_stream_p, // Output stream pointer
-		int const reportID, // The ID of the time stamp
 		std::string const & reportIDString, // The ID of the time stamp
-		int const yearOfSim, // the year of the simulation
 		std::string const & yearOfSimChr, // the year of the simulation
 		bool writeToSQL
 	);

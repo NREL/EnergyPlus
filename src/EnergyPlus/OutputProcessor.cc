@@ -794,7 +794,7 @@ namespace OutputProcessor {
 	}
 
 	static std::string
-	frequencyNotice( StoreType storeType, ReportingFrequency reportingInterval )
+	frequencyNotice( StoreType EP_UNUSED(storeType), ReportingFrequency reportingInterval )
 	{
 		switch ( reportingInterval ) {
 		case ReportingFrequency::EachCall:
@@ -811,6 +811,9 @@ namespace OutputProcessor {
 			break;
 		case ReportingFrequency::Monthly:
 			return " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+			break;
+		case ReportingFrequency::Yearly:
+			return " !Annual [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
 			break;
 		case ReportingFrequency::Simulation:
 			return " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
@@ -960,7 +963,6 @@ namespace OutputProcessor {
 		int NumAlpha;
 		int NumNumbers;
 		int IOStat;
-		int Item;
 		static bool ErrorsFound( false ); // If errors detected in input
 		std::string cCurrentModuleObject;
 		Array1D_string cAlphaArgs( 4 );
@@ -1090,6 +1092,9 @@ namespace OutputProcessor {
 		case ReportingFrequency::Monthly:
 			gio::write( StrOut, MonthFormat ) << strip( String ) << Day << Hour << Minute;
 			break;
+		case ReportingFrequency::Yearly:
+			gio::write( StrOut, EnvrnFormat ) << strip( String ) << Mon << Day << Hour << Minute;
+			break;
 		case ReportingFrequency::Simulation:
 			gio::write( StrOut, EnvrnFormat ) << strip( String ) << Mon << Day << Hour << Minute;
 			break;
@@ -1170,6 +1175,11 @@ namespace OutputProcessor {
 		case ReportingFrequency::Monthly: // Monthly
 			StartMinute = Minute - MinutesPerTimeStep + 1;
 			gio::write( StrOut, MonthFormat ) << strip( String ) << Day << Hour << StartMinute << Minute;
+			break;
+
+		case ReportingFrequency::Yearly: // Yearly
+			StartMinute = Minute - MinutesPerTimeStep + 1;
+			gio::write( StrOut, EnvrnFormat ) << strip( String ) << Mon << Day << Hour << StartMinute << Minute;
 			break;
 
 		case ReportingFrequency::Simulation: // Environment
@@ -1618,7 +1628,7 @@ namespace OutputProcessor {
 		cCurrentModuleObject = "Meter:Custom";
 		NumCustomMeters = GetNumObjectsFound( cCurrentModuleObject );
 
-        //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
+		//make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
 		std::unordered_set<std::string> namesOfMeterCustom;
 		namesOfMeterCustom.reserve(NumCustomMeters);
 
@@ -3542,7 +3552,7 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptYR && ! EnergyMeters( Loop ).RptAccYR ) continue;
 			if ( PrintTimeStamp ) {
-				WriteYearlyTimeStamp( mtr_stream, YearlyStampReportNbr, YearlyStampReportChr, DataGlobals::CalendarYear, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL );
+				WriteYearlyTimeStamp( mtr_stream, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL );
 				PrintTimeStamp = false;
 				PrintTimeStampToSQL = false;
 			}
@@ -4152,9 +4162,7 @@ namespace OutputProcessor {
 	void
 	WriteYearlyTimeStamp(
 		std::ostream * out_stream_p, // Output stream pointer
-		int const reportID, // The ID of the time stamp
 		std::string const & reportIDString, // The ID of the time stamp
-		int const yearOfSim, // the year of the simulation
 		std::string const & yearOfSimChr, // the year of the simulation
 		bool writeToSQL
 	)
@@ -4303,6 +4311,12 @@ namespace OutputProcessor {
 				*eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
 			}
 			break;
+		case ReportingFrequency::Yearly:
+			TrackingYearlyVariables = true;
+			if ( eso_stream ) {
+				*eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
+			}
+			break;
 			// No default available?
 		}
 
@@ -4427,6 +4441,28 @@ namespace OutputProcessor {
 				} else if (eso_stream) {
 					lenString = index( FreqString, '[' );
 					*eso_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString.substr( 0, lenString ) << NL;
+				}
+			}
+			break;
+		case ReportingFrequency::Yearly: //  5
+			if ( ! cumulativeMeterFlag ) {
+				if ( mtr_stream ) {
+					*mtr_stream << reportIDChr << ",11," << meterName << " [" << UnitsString << ']' << FreqString << NL;
+				}
+			} else if ( mtr_stream ) {
+				lenString = index( FreqString, '[' );
+				*mtr_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString.substr( 0, lenString ) << NL;
+			}
+			if ( ! meterFileOnlyFlag ) {
+				if ( ! cumulativeMeterFlag ) {
+					if ( eso_stream ) {
+						*eso_stream << reportIDChr << ",11," << meterName << " [" << UnitsString << ']' << FreqString << NL;
+					}
+				} else {
+					lenString = index( FreqString, '[' );
+					if ( eso_stream ) {
+						*eso_stream << reportIDChr << ",1,Cumulative " << meterName << " [" << UnitsString << ']' << FreqString.substr( 0, lenString ) << NL;
+					}
 				}
 			}
 			break;
@@ -6439,31 +6475,6 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		NumHoursInMonth = 0;
 	} // Month Block
 
-	// Yearly Block
-	if ( EndYearFlag ) {
-		if ( TrackingYearlyVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportingFrequency::Simulation, YearlyStampReportNbr, YearlyStampReportChr, DayOfSim, DayOfSimChr, true );
-			TimePrint = false;
-		}
-		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
-			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
-				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
-					WriteRealVariableOutput( RVariableTypes( Loop ).VarPtr, ReportingFrequency::Yearly );
-				}
-			} // Number of R Variables
-
-			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
-				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
-					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportingFrequency::Yearly );
-				}
-			} // Number of I Variables
-		} // Index Type (Zone, HVAC)
-
-		ReportSMMeters( TimePrint );
-
-		NumHoursInSim = 0;
-	}
-
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
@@ -6487,6 +6498,32 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		ReportSMMeters( TimePrint );
 
 		NumHoursInSim = 0;
+	}
+
+	// Yearly Block
+	if ( EndYearFlag ) {
+		if ( TrackingYearlyVariables ) {
+			WriteYearlyTimeStamp( eso_stream, YearlyStampReportChr, DataGlobals::CalendarYearChr, true );
+			TimePrint = false;
+		}
+		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
+			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
+				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
+					WriteRealVariableOutput( RVariableTypes( Loop ).VarPtr, ReportingFrequency::Yearly );
+				}
+			} // Number of R Variables
+
+			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
+				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
+					WriteIntegerVariableOutput( IVariableTypes( Loop ).VarPtr, ReportingFrequency::Yearly );
+				}
+			} // Number of I Variables
+		} // Index Type (Zone, HVAC)
+
+		ReportYRMeters( TimePrint );
+
+		DataGlobals::CalendarYear += 1;
+		DataGlobals::CalendarYearChr = std::to_string( DataGlobals::CalendarYear );
 	}
 
 }

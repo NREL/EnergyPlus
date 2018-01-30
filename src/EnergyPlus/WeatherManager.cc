@@ -959,6 +959,8 @@ namespace WeatherManager {
 			KindOfSim = Environment( Envrn ).KindOfEnvrn;
 			DayOfYear = Environment( Envrn ).StartJDay;
 			DayOfMonth = Environment( Envrn ).StartDay;
+			DataGlobals::CalendarYear = Environment( Envrn ).StartYear;
+			DataGlobals::CalendarYearChr = std::to_string( DataGlobals::CalendarYear );
 			Month = Environment( Envrn ).StartMonth;
 			NumOfDayInEnvrn = Environment( Envrn ).TotalDays; // Set day loop maximum from DataGlobals
 			if ( ! DoingSizing && ! KickOffSimulation ) {
