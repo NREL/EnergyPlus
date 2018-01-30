@@ -758,19 +758,19 @@ namespace EnergyPlus {//***************
 				{
 					CSetting *po = &ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings[i];			
 					std::ostringstream strs;
-					strs << "Zone Hybrid Unitary HVAC Runtime Fraction in Setting " << index; //<< " []";
+					strs << "Zone Hybrid Unitary HVAC Runtime Fraction in Setting " << index;
 					SetupOutputVariable(strs.str(), OutputProcessor::Unit::None, po->Runtime_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Mode in Setting " << index;// << " []";
+					strs << "Zone Hybrid Unitary HVAC Mode in Setting " << index;
 					SetupOutputVariable(strs.str(), OutputProcessor::Unit::None,po->Mode,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Outside Air Fraction in Setting " << index;// << " []";
+					strs << "Zone Hybrid Unitary HVAC Outside Air Fraction in Setting " << index;
 					SetupOutputVariable(strs.str(),OutputProcessor::Unit::kg_s, po->Outside_Air_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting " << index;// << " [kg/s]";
+					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting " << index;
 					SetupOutputVariable(strs.str(), OutputProcessor::Unit::kg_s, po->Unscaled_Supply_Air_Mass_Flow_Rate,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting " << index;// << " []";
+					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting " << index;
 					SetupOutputVariable(strs.str(), OutputProcessor::Unit::None, po->Supply_Air_Mass_Flow_Rate_Ratio,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					strs.str("");
 					index++; 

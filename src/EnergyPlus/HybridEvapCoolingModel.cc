@@ -998,7 +998,7 @@ namespace EnergyPlus {//***************
 			
 			int MAXIMUM_OPERATIONAL_SETTINGS = 5;
 			ModeCounter = 0;
-			
+			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
 			DebugBreak = 16; // remove
 	
 			CurrentOperatingSettings.resize(5);
@@ -2130,7 +2130,7 @@ namespace EnergyPlus {//***************
 
 			// REFERENCES:
 			// na
-			// remove
+			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
 			if ((DataGlobals::HourOfDay == DebugBreak) && !WarmupFlag)
 			{
 				int k = 1;//debug step
