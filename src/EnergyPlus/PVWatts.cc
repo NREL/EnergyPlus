@@ -57,6 +57,7 @@
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <DataHVACGlobals.hh>
+#include <DataHeatBalance.hh>
 #include <DataGlobals.hh>
 #include <WeatherManager.hh>
 #include <DataEnvironment.hh>
@@ -224,7 +225,7 @@ namespace PVWatts {
 		const Real64 azimuth(rNumericArgs(NumFields::AZIMUTH_ANGLE));
 		int surfaceNum;
 		if (lAlphaFieldBlanks(AlphaFields::SURFACE_NAME)) {
-				surfaceNum = 0;
+			surfaceNum = 0;
 		} else {
 			surfaceNum = FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), DataSurfaces::Surface);
 		}
@@ -329,8 +330,10 @@ namespace PVWatts {
 		IrradianceOutput irr_st = processIrradiance(DataEnvironment::Year, DataEnvironment::Month, DataEnvironment::DayOfMonth, HourOfDay - 1, (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep, TimeStepZone, WeatherManager::WeatherFileLatitude, WeatherManager::WeatherFileLongitude, WeatherManager::WeatherFileTimeZone, DataEnvironment::BeamSolarRad, DataEnvironment::DifSolarRad, albedo);
 
 		// powerout
-		// TODO: Change shad_beam to account for shading of other surfaces.
 		Real64 shad_beam = 1.0;
+		if ( m_geometryType == GeometryType::SURFACE ) {
+			shad_beam = DataHeatBalance::SunlitFrac( TimeStep, HourOfDay, m_surfaceNum );
+		}
 		DCPowerOutput pwr_st = powerout(shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, DataEnvironment::WindSpeed, DataEnvironment::OutDryBulbTemp, irr_st);
 
 		// Report out

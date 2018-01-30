@@ -2,7 +2,7 @@
 Version, 8.9;
 
 Building,
-  Water Heater DHW Plant Loop Example,  !- Name
+  PVWatts Test Case,  !- Name
   0.0,                     !- North Axis {deg}
   Suburbs,                 !- Terrain
   0.04,                    !- Loads Convergence Tolerance Value
@@ -19,6 +19,17 @@ SimulationControl,
   No,                      !- Do Plant Sizing Calculation
   No,                      !- Run Simulation for Sizing Periods
   Yes;                     !- Run Simulation for Weather File Run Periods
+
+  RunPeriod,
+    All Year,                !- Name
+    1, 1,                    !- Begin
+    12, 31,                  !- End
+    UseWeatherFile,          !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 GlobalGeometryRules,
   UpperLeftCorner,         !- Starting Vertex Position
@@ -89,16 +100,55 @@ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
      0.588,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
      1.653;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
 
-RunPeriod,
-  All Year,                !- Name
-  1, 1,                    !- Begin
-  12, 31,                  !- End
-  UseWeatherFile,          !- Day of Week for Start Day
-  Yes,                     !- Use Weather File Holidays and Special Days
-  Yes,                     !- Use Weather File Daylight Saving Period
-  No,                      !- Apply Weekend Holiday Rule
-  Yes,                     !- Use Weather File Rain Indicators
-  Yes;                     !- Use Weather File Snow Indicators
+Material:NoMass,
+  R13LAYER,                !- Name
+  Rough,                   !- Roughness
+  2.290965,                !- Thermal Resistance {m2-K/W}
+  0.9000000,               !- Thermal Absorptance
+  0.7500000,               !- Solar Absorptance
+  0.7500000;               !- Visible Absorptance
+
+Material:NoMass,
+  R31LAYER,                !- Name
+  Rough,                   !- Roughness
+  5.456,                   !- Thermal Resistance {m2-K/W}
+  0.9000000,               !- Thermal Absorptance
+  0.7500000,               !- Solar Absorptance
+  0.7500000;               !- Visible Absorptance
+
+Material,
+  C5 - 4 IN HW CONCRETE,   !- Name
+  MediumRough,             !- Roughness
+  0.1014984,               !- Thickness {m}
+  1.729577,                !- Conductivity {W/m-K}
+  2242.585,                !- Density {kg/m3}
+  836.8000,                !- Specific Heat {J/kg-K}
+  0.9000000,               !- Thermal Absorptance
+  0.6500000,               !- Solar Absorptance
+  0.6500000;               !- Visible Absorptance
+
+Construction,
+  R13WALL,                 !- Name
+  R13LAYER;                !- Outside Layer
+
+Construction,
+  FLOOR,                   !- Name
+  C5 - 4 IN HW CONCRETE;   !- Outside Layer
+
+Construction,
+  ROOF31,                  !- Name
+  R31LAYER;                !- Outside Layer
+
+Zone,
+  ZONE ONE,                !- Name
+  0,                       !- Direction of Relative North {deg}
+  0,                       !- X Origin {m}
+  0,                       !- Y Origin {m}
+  0,                       !- Z Origin {m}
+  1,                       !- Type
+  1,                       !- Multiplier
+  autocalculate,           !- Ceiling Height {m}
+  autocalculate;           !- Volume {m3}
 
 ScheduleTypeLimits,
   OnOff,
@@ -110,6 +160,102 @@ Schedule:Constant,
   AlwaysOn,
   OnOff,
   1;
+
+BuildingSurface:Detailed,
+  Zn001:Wall001,           !- Name
+  Wall,                    !- Surface Type
+  R13WALL,                 !- Construction Name
+  ZONE ONE,                !- Zone Name
+  Outdoors,                !- Outside Boundary Condition
+  ,                        !- Outside Boundary Condition Object
+  SunExposed,              !- Sun Exposure
+  WindExposed,             !- Wind Exposure
+  0.5000000,               !- View Factor to Ground
+  4,                       !- Number of Vertices
+  0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+  0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+  15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+  15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+BuildingSurface:Detailed,
+  Zn001:Wall002,           !- Name
+  Wall,                    !- Surface Type
+  R13WALL,                 !- Construction Name
+  ZONE ONE,                !- Zone Name
+  Outdoors,                !- Outside Boundary Condition
+  ,                        !- Outside Boundary Condition Object
+  SunExposed,              !- Sun Exposure
+  WindExposed,             !- Wind Exposure
+  0.5000000,               !- View Factor to Ground
+  4,                       !- Number of Vertices
+  15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+  15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+  15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
+  15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+BuildingSurface:Detailed,
+  Zn001:Wall003,           !- Name
+  Wall,                    !- Surface Type
+  R13WALL,                 !- Construction Name
+  ZONE ONE,                !- Zone Name
+  Outdoors,                !- Outside Boundary Condition
+  ,                        !- Outside Boundary Condition Object
+  SunExposed,              !- Sun Exposure
+  WindExposed,             !- Wind Exposure
+  0.5000000,               !- View Factor to Ground
+  4,                       !- Number of Vertices
+  15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+  15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
+  0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
+  0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+BuildingSurface:Detailed,
+  Zn001:Wall004,           !- Name
+  Wall,                    !- Surface Type
+  R13WALL,                 !- Construction Name
+  ZONE ONE,                !- Zone Name
+  Outdoors,                !- Outside Boundary Condition
+  ,                        !- Outside Boundary Condition Object
+  SunExposed,              !- Sun Exposure
+  WindExposed,             !- Wind Exposure
+  0.5000000,               !- View Factor to Ground
+  4,                       !- Number of Vertices
+  0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+  0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
+  0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+  0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+BuildingSurface:Detailed,
+  Zn001:Flr001,            !- Name
+  Floor,                   !- Surface Type
+  FLOOR,                   !- Construction Name
+  ZONE ONE,                !- Zone Name
+  Adiabatic,               !- Outside Boundary Condition
+  ,                        !- Outside Boundary Condition Object
+  NoSun,                   !- Sun Exposure
+  NoWind,                  !- Wind Exposure
+  1.000000,                !- View Factor to Ground
+  4,                       !- Number of Vertices
+  15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+  0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+  0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+  15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+BuildingSurface:Detailed,
+  Zn001:Roof001,           !- Name
+  Roof,                    !- Surface Type
+  ROOF31,                  !- Construction Name
+  ZONE ONE,                !- Zone Name
+  Outdoors,                !- Outside Boundary Condition
+  ,                        !- Outside Boundary Condition Object
+  SunExposed,              !- Sun Exposure
+  WindExposed,             !- Wind Exposure
+  0,                       !- View Factor to Ground
+  4,                       !- Number of Vertices
+  0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+  0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+  15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+  15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
 ElectricLoadCenter:Distribution,
   ELC1,                       !- Name
@@ -132,7 +278,17 @@ ElectricLoadCenter:Generators,
   Generator:PVWatts,          !- Generator 1 Object Type
   4000,                       !- Generator 1 Rated Electric Power Output {W}
   AlwaysOn,                   !- Generator 1 Availability Schedule Name
-  ;                           !- Generator 1 Rated Thermal to Electrical Power Ratio
+  ,                           !- Generator 1 Rated Thermal to Electrical Power Ratio
+  PVWatts2,                   !- Generator 2 Name
+  Generator:PVWatts,          !- Generator 2 Object Type
+  3000,                       !- Generator 2 Rated Electric Power Output {W}
+  AlwaysOn,                   !- Generator 2 Availability Schedule Name
+  ,                           !- Generator 2 Rated Thermal to Electrical Power Ratio
+  PVWatts3,                   !- Generator 3 Name
+  Generator:PVWatts,          !- Generator 3 Object Type
+  3000,                       !- Generator 3 Rated Electric Power Output {W}
+  AlwaysOn,                   !- Generator 3 Availability Schedule Name
+  ;                           !- Generator 3 Rated Thermal to Electrical Power Ratio
 
 Generator:PVWatts,
   PVWatts1,                   !- Name
@@ -144,6 +300,57 @@ Generator:PVWatts,
   TiltAzimuth,                !- Array Geometry Type
   20,                         !- Tilt Angle
   180;                        !- Azimuth Angle
+
+Shading:Site:Detailed,
+  FlatSurface,             !- Name
+  ,                        !- Transmittance Schedule Name
+  4,                       !- Number of Vertices
+  40.0,2.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+  40.0,0.00,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+  45.0,0.00,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+  45.0,2.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+Generator:PVWatts,
+  PVWatts2,                   !- Name
+  5,                          !- Version
+  3000,                       !- DC System Capacity
+  Premium,                    !- Module Type
+  FixedOpenRack,              !- Array Type
+  0.14,                       !- System Losses
+  Surface,                    !- Array Geometry Type
+  ,                           !- Tilt Angle
+  ,                           !- Azimuth Angle
+  FlatSurface;                !- Surface Name
+
+Shading:Site:Detailed,
+  FlatSurfaceShadetoEast,  !- Name
+  ,                        !- Transmittance Schedule Name
+  4,                       !- Number of Vertices
+  0.0,25.0,12.0,  !- X,Y,Z ==> Vertex 1 {m}
+  0.0,20.00,12.0,  !- X,Y,Z ==> Vertex 2 {m}
+  5.0,20.00,12.0,  !- X,Y,Z ==> Vertex 3 {m}
+  5.0,25.0,12.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+Shading:Site:Detailed,
+  ShadetoEast,             !- Name
+  ,                        !- Transmittance Schedule Name
+  4,                       !- Number of Vertices
+  5.0,25.0,22.0,  !- X,Y,Z ==> Vertex 1 {m}
+  5.0,25.00,12.0,  !- X,Y,Z ==> Vertex 2 {m}
+  5.0,20.00,12.0,  !- X,Y,Z ==> Vertex 3 {m}
+  5.0,20.0,22.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+Generator:PVWatts,
+  PVWatts3,                   !- Name
+  5,                          !- Version
+  3000,                       !- DC System Capacity
+  Premium,                    !- Module Type
+  FixedOpenRack,              !- Array Type
+  0.14,                       !- System Losses
+  Surface,                    !- Array Geometry Type
+  ,                           !- Tilt Angle
+  ,                           !- Azimuth Angle
+  FlatSurfaceShadetoEast;     !- Surface Name
 
 Output:VariableDictionary, regular;
 
