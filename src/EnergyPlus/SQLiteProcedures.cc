@@ -1752,7 +1752,6 @@ void SQLite::createYearlyTimeIndexRecord(
 )
 {
 	if ( m_writeOutputToSQLite ) {
-		int intStartMinute( 0 );
 
 		++m_sqlDBTimeIndex;
 
