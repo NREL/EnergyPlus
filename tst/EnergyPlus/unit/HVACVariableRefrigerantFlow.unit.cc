@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2546,6 +2546,7 @@ namespace EnergyPlus {
 			" ",
 			"ZoneHVAC:EquipmentList,",
 			"  SPACE1-1 Eq,             !- Name",
+			"  SequentialLoad,          !- Load Distribution Scheme",
 			"  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
 			"  TU1,                     !- Zone Equipment 1 Name",
 			"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3257,6 +3258,7 @@ namespace EnergyPlus {
 			" ",
 			"ZoneHVAC:EquipmentList,",
 			"  SPACE1-1 Eq,             !- Name",
+			"  SequentialLoad,          !- Load Distribution Scheme",
 			"  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
 			"  TU1,                     !- Zone Equipment 1 Name",
 			"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3883,6 +3885,7 @@ namespace EnergyPlus {
 			" ",
 			"ZoneHVAC:EquipmentList,",
 			"  SPACE1-1 Eq,             !- Name",
+			"  SequentialLoad,          !- Load Distribution Scheme",
 			"  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
 			"  TU1,                     !- Zone Equipment 1 Name",
 			"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -4768,6 +4771,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Level1:Office1 Equipment,!- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
 			"    Level1:Office1 VRF Indoor Unit,  !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",

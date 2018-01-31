@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <DataHeatBalance.hh>
 
 namespace EnergyPlus {
 
@@ -316,6 +317,18 @@ namespace HeatBalFiniteDiffManager {
 	CheckFDSurfaceTempLimits(
 		int const SurfNum, // surface number
 		Real64 const CheckTemperature // calculated temperature, not reset
+	);
+
+	void
+	adjustPropertiesForPhaseChange(
+		int finiteDifferenceLayerIndex,
+		int surfaceIndex,
+		const DataHeatBalance::MaterialProperties & materialDefinition,
+		Real64 temperaturePrevious,
+		Real64 temperatureUpdated,
+		Real64 & updatedSpecificHeat,
+		Real64 & updatedDensity,
+		Real64 & updatedThermalConductivity
 	);
 
 } // HeatBalFiniteDiffManager

@@ -54,7 +54,7 @@
 ! Environmental Emissions:
 ! Utility Tariffs:
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     AutoBuilt Model,         !- Name
@@ -5904,7 +5904,7 @@
     ZN1_S_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN1_S_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN1_S_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN1_S_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN2_E_Space_1,           !- Zone Name
@@ -5912,7 +5912,7 @@
     ZN2_E_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN2_E_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN2_E_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN2_E_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN3_N_Space_1,           !- Zone Name
@@ -5920,7 +5920,7 @@
     ZN3_N_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN3_N_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN3_N_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN3_N_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN4_W_Space_1,           !- Zone Name
@@ -5928,7 +5928,7 @@
     ZN4_W_Space_1 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN4_W_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN4_W_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN4_W_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN5_Core_Space_1,        !- Zone Name
@@ -5936,7 +5936,7 @@
     ZN5_Core_Space_1 Inlets, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN5_Core_Space_1 Zone Air Node,  !- Zone Air Node Name
-    ZN5_Core_Space_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN5_Core_Space_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN6_S_Space_2,           !- Zone Name
@@ -5944,7 +5944,7 @@
     ZN6_S_Space_2 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN6_S_Space_2 Zone Air Node,  !- Zone Air Node Name
-    ZN6_S_Space_2 Return Outlet;  !- Zone Return Air Node Name
+    ZN6_S_Space_2 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN7_E_Space_2,           !- Zone Name
@@ -5952,7 +5952,7 @@
     ZN7_E_Space_2 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN7_E_Space_2 Zone Air Node,  !- Zone Air Node Name
-    ZN7_E_Space_2 Return Outlet;  !- Zone Return Air Node Name
+    ZN7_E_Space_2 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN8_N_Space_2,           !- Zone Name
@@ -5960,7 +5960,7 @@
     ZN8_N_Space_2 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN8_N_Space_2 Zone Air Node,  !- Zone Air Node Name
-    ZN8_N_Space_2 Return Outlet;  !- Zone Return Air Node Name
+    ZN8_N_Space_2 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN9_W_Space_2,           !- Zone Name
@@ -5968,7 +5968,7 @@
     ZN9_W_Space_2 Inlets,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN9_W_Space_2 Zone Air Node,  !- Zone Air Node Name
-    ZN9_W_Space_2 Return Outlet;  !- Zone Return Air Node Name
+    ZN9_W_Space_2 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZN10_Core_Space_2,       !- Zone Name
@@ -5976,10 +5976,11 @@
     ZN10_Core_Space_2 Inlets,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN10_Core_Space_2 Zone Air Node,  !- Zone Air Node Name
-    ZN10_Core_Space_2 Return Outlet;  !- Zone Return Air Node Name
+    ZN10_Core_Space_2 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN1_S_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN1_S_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5987,6 +5988,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN2_E_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN2_E_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5994,6 +5996,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN3_N_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN3_N_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6001,6 +6004,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN4_W_Space_1 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN4_W_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6008,6 +6012,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN5_Core_Space_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN5_Core_Space_1 ATU,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6015,6 +6020,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN6_S_Space_2 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN6_S_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6022,6 +6028,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN7_E_Space_2 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN7_E_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6029,6 +6036,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN8_N_Space_2 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN8_N_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6036,6 +6044,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN9_W_Space_2 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN9_W_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6043,6 +6052,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN10_Core_Space_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN10_Core_Space_2 ATU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7110,7 +7120,7 @@
 ! Number of Months
 
   UtilityCost:Qualify,
-    MaxDemand2000kw,         !- Name
+    MaxDemand2000kw,         !- Utility Cost Qualify Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -7129,7 +7139,7 @@
 ! Number of Months
 
   UtilityCost:Qualify,
-    MinDemand500kw,          !- Name
+    MinDemand500kw,          !- Utility Cost Qualify Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -7148,7 +7158,7 @@
 ! Number of Months
 
   UtilityCost:Qualify,
-    MaxDemand500kw,          !- Name
+    MaxDemand500kw,          !- Utility Cost Qualify Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -7167,7 +7177,7 @@
 ! Number of Months
 
   UtilityCost:Qualify,
-    MinDemand20kw,           !- Name
+    MinDemand20kw,           !- Utility Cost Qualify Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -7186,7 +7196,7 @@
 ! Number of Months
 
   UtilityCost:Qualify,
-    MaxDemand20kw,           !- Name
+    MaxDemand20kw,           !- Utility Cost Qualify Name
     FPL_GS-1_nonDemand,      !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -7203,7 +7213,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    Non-fuelEnergyCharge,    !- Name
+    Non-fuelEnergyCharge,    !- Utility Cost Charge Simple Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7218,7 +7228,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    fuelEnergyCharge,        !- Name
+    fuelEnergyCharge,        !- Utility Cost Charge Simple Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7233,7 +7243,7 @@
 ! Cost Per Unit Value (or Variable
 
   UtilityCost:Charge:Simple,
-    ConservationEnergyCharge,!- Name
+    ConservationEnergyCharge,!- Utility Cost Charge Simple Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7248,7 +7258,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    EnvironmentalEnergyCharge,  !- Name
+    EnvironmentalEnergyCharge,  !- Utility Cost Charge Simple Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7263,7 +7273,7 @@
 ! Cost Per Unit Value (or Variable
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -7278,7 +7288,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    Non-fuelEnergyCharge,    !- Name
+    Non-fuelEnergyCharge,    !- Utility Cost Charge Simple Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7293,7 +7303,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    fuelEnergyCharge,        !- Name
+    fuelEnergyCharge,        !- Utility Cost Charge Simple Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7308,7 +7318,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    ConservationEnergyCharge,!- Name
+    ConservationEnergyCharge,!- Utility Cost Charge Simple Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7323,7 +7333,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    EnvironmentalEnergyCharge,  !- Name
+    EnvironmentalEnergyCharge,  !- Utility Cost Charge Simple Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7338,7 +7348,7 @@
 ! Cost Per Unit Value (or Variable
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -7353,7 +7363,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    Non-fuelEnergyCharge,    !- Name
+    Non-fuelEnergyCharge,    !- Utility Cost Charge Simple Name
     FPL_GS-1_nonDemand,      !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7368,7 +7378,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    fuelEnergyCharge,        !- Name
+    fuelEnergyCharge,        !- Utility Cost Charge Simple Name
     FPL_GS-1_nonDemand,      !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7383,7 +7393,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    Conservation,            !- Name
+    Conservation,            !- Utility Cost Charge Simple Name
     FPL_GS-1_nonDemand,      !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7398,7 +7408,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    Capacity,                !- Name
+    Capacity,                !- Utility Cost Charge Simple Name
     FPL_GS-1_nonDemand,      !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7413,7 +7423,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    Capacity,                !- Name
+    Capacity,                !- Utility Cost Charge Simple Name
     FPL_GS-1_nonDemand,      !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7428,7 +7438,7 @@
 ! Cost Per Unit Value (or Variable
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     FPL_GS-1_nonDemand,      !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -7443,7 +7453,7 @@
 ! Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     FL_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -7458,7 +7468,7 @@
 ! Cost Per Unit Value (or Variable
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     FL_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -7476,7 +7486,7 @@
 ! Block 1 Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -7497,7 +7507,7 @@
 ! Block 1 Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Block,
-    AnnualDemandCapacityCharge,  !- Name
+    AnnualDemandCapacityCharge,  !- Utility Cost Charge Block Name
     FPL_GSLD-1_GeneralServiceLargeDemand,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -7520,7 +7530,7 @@
 ! Block 2 Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -7545,7 +7555,7 @@
 ! Block 2 Cost Per Unit Value (or Variable)
 
   UtilityCost:Charge:Block,
-    AnnualDemandCapacityCharge,  !- Name
+    AnnualDemandCapacityCharge,  !- Utility Cost Charge Block Name
     FPL_GSD-1_GeneralServiceDemand,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -210,6 +210,21 @@ namespace CoolingPanelSimple {
 			CoolingPanelInletTempFlowReSimIndex( 0 )
 		{}
 
+		void
+		CalcCoolingPanel( int const CoolingPanelNum );
+		
+		void
+		SetCoolingPanelControlTemp(
+			Real64 & ControlTemp,
+			int const ZoneNum
+		);
+		
+		bool
+		SizeCoolingPanelUA( );
+
+		void
+		ReportCoolingPanel( );
+		
 	};
 
 	struct CoolingPanelSysNumericFieldData
@@ -256,24 +271,6 @@ namespace CoolingPanelSimple {
 		int const CoolingPanelNum
 	);
 
-	bool
- 	SizeCoolingPanelUA(
-		int const CoolingPanelNum
-	);
-
-	void
-	CalcCoolingPanel(
-		int & CoolingPanelNum
-	);
-
-	void
-	SetCoolingPanelControlTemp(
-		Real64 & ControlTemp,
-		int const CoolingPanelNum,
-		 int const ZoneNum
-	);
-
-
 	void
 	UpdateCoolingPanel( int const CoolingPanelNum );
 
@@ -282,9 +279,6 @@ namespace CoolingPanelSimple {
 
 	void
 	DistributeCoolingPanelRadGains();
-
-	void
-	ReportCoolingPanel( int const CoolingPanelNum );
 
 	Real64
 	SumHATsurf( int const ZoneNum ); // Zone number

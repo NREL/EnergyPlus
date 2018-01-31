@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6394,7 +6394,7 @@ namespace ConvectionCoefficients {
 			FlowRegimeStack( 0 ) = InConvFlowRegime_A3;
 		} else { // is controlled, lets see by how and if that means is currently active
 
-			if ( ! ( ZoneEquipConfig( ZoneNum ).EquipListIndex > 0 ) ) {
+			if ( ! ( ZoneEquipConfig( ZoneNum ).EquipListIndex > 0 ) || SysSizingCalc || ZoneSizingCalc || ! ZoneEquipSimulatedOnce ) {
 				FlowRegimeStack( 0 ) = InConvFlowRegime_A3;
 			} else {
 
