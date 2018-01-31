@@ -576,6 +576,7 @@ namespace SolarShading {
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::SameString;
+		using InputProcessor::FindItemInList;
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
 		using DataSystemVariables::SutherlandHodgman;
@@ -583,6 +584,8 @@ namespace SolarShading {
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		using DataSystemVariables::UseScheduledSunlitFrac;
 		using DataSystemVariables::ReportExtShadingSunlitFrac;
+		using DataSystemVariables::DisableGroupSelfShading;
+		using DataSystemVariables::DisableAllSelfShading;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -602,6 +605,7 @@ namespace SolarShading {
 		int NumNumbers;
 		int NumAlphas;
 		int IOStat;
+		int Found = 0;
 
 		rNumericArgs( {1,4} ) = 0.0; // so if nothing gotten, defaults will be maintained.
 		cAlphaArgs( 1 ) = "";
@@ -736,6 +740,94 @@ namespace SolarShading {
 		else {
 			cAlphaArgs( 5 ) = "No";
 			ReportExtShadingSunlitFrac = false;
+		}
+
+		bool DisableSelfShadingWithinGroup = false;
+		bool DisableSelfShadingBetweenGroup = false;
+
+		if ( NumAlphas >= 6 ) {
+			if ( SameString( cAlphaArgs( 6 ), "Yes" ) ) {
+				DisableSelfShadingWithinGroup = true;
+				cAlphaArgs( 6 ) = "Yes";
+			} else if ( SameString( cAlphaArgs( 6 ), "No" ) ) {
+				cAlphaArgs( 6 ) = "No";
+			} else {
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 6 ) + "\", all shading effects would be considered." );
+			}
+		} else {
+			cAlphaArgs( 6 ) = "No";
+		}
+
+		if ( NumAlphas >= 7 ) {
+			if ( SameString( cAlphaArgs( 7 ), "Yes" ) ) {
+				DisableSelfShadingBetweenGroup = true;
+				cAlphaArgs( 7 ) = "Yes";
+			} else if ( SameString( cAlphaArgs( 7 ), "No" ) ) {
+				cAlphaArgs( 7 ) = "No";
+			} else {
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 7 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 7 ) + "\", all shading effects would be considered." );
+			}
+		} else {
+			cAlphaArgs( 7 ) = "No";
+		}
+
+		if ( DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup ) {
+			DisableAllSelfShading = true;
+		} else if ( DisableSelfShadingBetweenGroup || DisableSelfShadingWithinGroup ) {
+			DisableGroupSelfShading = true;
+		}
+
+		int SurfZoneGroup, CurZoneGroup;
+		if ( DisableGroupSelfShading ) {
+			Array1D_int DisableSelfShadingGroups;
+			int NumOfShadingGroups;
+			if ( NumAlphas >= 8 ) {
+				// Read all shading groups
+				NumOfShadingGroups = NumAlphas - 7;
+				DisableSelfShadingGroups.allocate( NumOfShadingGroups );				
+				for ( int i = 1; i <= NumOfShadingGroups; i++ ) {
+					Found = FindItemInList( cAlphaArgs( i + 7 ), ZoneList, NumOfZoneLists );
+					if ( Found != 0 ) DisableSelfShadingGroups( i ) = Found;
+				}
+				
+				for ( int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++ ) {
+					if ( Surface( SurfNum ).ExtBoundCond == 0 ) { // Loop through all exterior surfaces
+						SurfZoneGroup = 0;
+						// Check the shading zone group of each exterior surface
+						for ( int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++ ) { // Loop through all defined shading groups
+							CurZoneGroup = DisableSelfShadingGroups( ZoneGroupLoop );
+							for ( int ZoneNum = 1; ZoneNum <= ZoneList( CurZoneGroup ).NumOfZones; ZoneNum++ ) { // Loop through all zones in the zone list
+								if ( Surface( SurfNum ).Zone == ZoneList( CurZoneGroup ).Zone( ZoneNum ) ) {
+									SurfZoneGroup = CurZoneGroup;
+									break;
+								}
+							}
+						}
+						// if a surface is not in any zone group, no self shading is disabled for this surface
+						if ( SurfZoneGroup != 0 ) {
+							// if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
+							// if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
+							for ( int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++ ) { // Loop through all defined shading groups
+								CurZoneGroup = DisableSelfShadingGroups( ZoneGroupLoop );
+								if ( SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup ) {
+									for ( int ZoneNum = 1; ZoneNum <= ZoneList( CurZoneGroup ).NumOfZones; ZoneNum++ ) { // Loop through all zones in the zone list
+										Surface( SurfNum ).DisabledShadowingZoneList.push_back( ZoneList( CurZoneGroup ).Zone( ZoneNum ) ) ;
+									}
+								} else if ( SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup ) {
+									for ( int ZoneNum = 1; ZoneNum <= ZoneList( CurZoneGroup ).NumOfZones; ZoneNum++ ) {
+										Surface( SurfNum ).DisabledShadowingZoneList.push_back( ZoneList( CurZoneGroup ).Zone( ZoneNum ) ) ;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else {
+				ShowFatalError( "No Shading groups are defined when disabling grouped self shading." );
+			}
 		}
 
 		if ( ! DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
@@ -3739,7 +3831,7 @@ namespace SolarShading {
 			}
 			CosIncAng( iTimeStep, iHour, SurfNum ) = CTHETA( SurfNum );
 		}
-		
+
 		if ( UseScheduledSunlitFrac ) {
 			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).SchedExternalShadingFrac ) {
@@ -4520,6 +4612,8 @@ namespace SolarShading {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleMinValue;
 		using ScheduleManager::GetScheduleName;
+		using DataSystemVariables::DisableAllSelfShading;
+		using DataSystemVariables::DisableGroupSelfShading;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4591,6 +4685,23 @@ namespace SolarShading {
 							if ( LookUpScheduleValue( surface.SchedShadowSurfIndex, iHour, TS ) == 1.0 ) continue;
 						}
 					}
+				}
+				// Elimate shawdowing surfaces that is supposed to be disabled.
+				if ( DisableAllSelfShading ) {					
+					if ( surface.Zone != 0 ) {
+						continue; // Disable all shadowing surfaces in all zones. Attached shading surfaces are not part of a zone, zone value is 0.
+					}
+				} else if ( DisableGroupSelfShading ) {
+					std::vector< int > DisabledZones = Surface( CurSurf ).DisabledShadowingZoneList;
+					bool isDisabledShadowSurf = false;
+					for ( int i : DisabledZones ) {
+						int test = surface.Zone;
+						if ( surface.Zone == i ) {
+							isDisabledShadowSurf = true;
+							break;
+						}
+					}
+					if ( isDisabledShadowSurf ) continue; // Disable all shadowing surfaces in all disabled zones.
 				}
 
 				//      IF ((.NOT.Surface(GSSNR)%HeatTransSurf) .AND. &
