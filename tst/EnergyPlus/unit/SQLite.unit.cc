@@ -281,12 +281,12 @@ namespace EnergyPlus {
 		ASSERT_EQ(7ul, result.size());
 		// some of these are odd.........
 		std::vector<std::string> testResult0 {"1", "", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
-		std::vector<std::string> testResult1 {"2", "", "1", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
-		std::vector<std::string> testResult2 {"3", "", "1", "1", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
-		std::vector<std::string> testResult3 {"4", "", "1", "2", "2", "0", "0", "60", "1", "1", "SummerDesignDay", "0", ""};
-		std::vector<std::string> testResult4 {"5", "", "1", "1", "1", "0", "0", "60", "0", "1", "WinterDesignDay", "0", "0"};
-		std::vector<std::string> testResult5 {"6", "", "1", "2", "2", "0", "0", "60", "-1", "1", "SummerDesignDay", "0", "0"};
-		std::vector<std::string> testResult6 {"7", "", "1", "3", "3", "0", "0", "60", "-1", "1", "SummerDesignDay", "1", "1"};
+		std::vector<std::string> testResult1 {"2", "2017", "1", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+		std::vector<std::string> testResult2 {"3", "2017", "1", "1", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
+		std::vector<std::string> testResult3 {"4", "2017", "1", "2", "2", "0", "0", "60", "1", "1", "SummerDesignDay", "0", ""};
+		std::vector<std::string> testResult4 {"5", "2017", "1", "1", "1", "0", "0", "60", "0", "1", "WinterDesignDay", "0", "0"};
+		std::vector<std::string> testResult5 {"6", "2017", "1", "2", "2", "0", "0", "60", "-1", "1", "SummerDesignDay", "0", "0"};
+		std::vector<std::string> testResult6 {"7", "2017", "1", "3", "3", "0", "0", "60", "-1", "1", "SummerDesignDay", "1", "1"};
 		EXPECT_EQ(testResult0, result[0]);
 		EXPECT_EQ(testResult1, result[1]);
 		EXPECT_EQ(testResult2, result[2]);

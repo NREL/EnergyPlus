@@ -2332,6 +2332,7 @@ namespace OutputProcessor {
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).HRAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).DYAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).MNAccRptNum );
+			AssignReportNumber( EnergyMeters( NumEnergyMeters ).YRAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).SMAccRptNum );
 			EnergyMeters( NumEnergyMeters ).FinYrSMValue = 0.0;
 			EnergyMeters( NumEnergyMeters ).FinYrSMMaxVal = MaxSetValue;

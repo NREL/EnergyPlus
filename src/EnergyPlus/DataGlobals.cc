@@ -269,6 +269,8 @@ namespace DataGlobals {
 		BeginTimeStepFlag = false;
 		DayOfSim = 0;
 		DayOfSimChr = "0";
+		CalendarYear = 0;
+		CalendarYearChr = "0";
 		EndEnvrnFlag = false;
 		EndDesignDayEnvrnsFlag = false;
 		EndDayFlag = false;

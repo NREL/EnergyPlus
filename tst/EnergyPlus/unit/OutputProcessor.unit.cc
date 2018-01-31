@@ -161,7 +161,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
+			std::vector<std::string> testResult0 {"1", "0", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
@@ -231,7 +231,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
+			std::vector<std::string> testResult0 {"1", "0", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9", "2,9999.9" } ) ) );
@@ -296,7 +296,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", ""};
+			std::vector<std::string> testResult0 {"1", "0", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay", "1,999.9", "2,9999.9" } ) ) );
 
@@ -368,7 +368,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
+			std::vector<std::string> testResult0 {"1", "0", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay", "1,999.9,4283136.251683925, 1,10,4283136.252484382, 1,60", "2,9999.9,4283136.251683925, 1,10,4283136.252484382, 1,60" } ) ) );
 
@@ -444,7 +444,7 @@ namespace EnergyPlus {
 
 			ASSERT_EQ(1ul, result.size());
 
-			std::vector<std::string> testResult0 {"1", "", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+			std::vector<std::string> testResult0 {"1", "0", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
 			EXPECT_EQ( testResult0, result[0] );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12", "1,999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60", "2,9999.9,4283136.251683925,21, 1,10,4283136.252484382,21, 1,60" } ) ) );
 
@@ -544,6 +544,84 @@ namespace EnergyPlus {
 
 		}
 
+		TEST_F( SQLiteFixture, OutputProcessor_reportYRMeters )
+		{
+			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+
+			NumEnergyMeters = 2;
+			EnergyMeters.allocate( NumEnergyMeters );
+			EnergyMeters( 1 ).RptYR = true;
+			EnergyMeters( 1 ).RptYRFO = true;
+			EnergyMeters( 1 ).RptAccYR = false;
+			EnergyMeters( 1 ).RptAccYRFO = false;
+			EnergyMeters( 1 ).YRRptNum = 1;
+			EnergyMeters( 1 ).YRRptNumChr = "1";
+			EnergyMeters( 1 ).YRValue = 999.9;
+			EnergyMeters( 1 ).YRAccRptNum = 1;
+			EnergyMeters( 1 ).YRValue = 999.9;
+			EnergyMeters( 1 ).YRMaxVal = 4283136.2524843821;
+			EnergyMeters( 1 ).YRMaxValDate = 12210160;
+			EnergyMeters( 1 ).YRMinVal = 4283136.2516839253;
+			EnergyMeters( 1 ).YRMinValDate = 12210110;
+
+			EnergyMeters( 2 ).RptYR = true;
+			EnergyMeters( 2 ).RptYRFO = true;
+			EnergyMeters( 2 ).RptAccYR = false;
+			EnergyMeters( 2 ).RptAccYRFO = false;
+			EnergyMeters( 2 ).YRRptNum = 2;
+			EnergyMeters( 2 ).YRRptNumChr = "2";
+			EnergyMeters( 2 ).YRValue = 9999.9;
+			EnergyMeters( 2 ).YRAccRptNum = 2;
+			EnergyMeters( 2 ).YRValue = 9999.9;
+			EnergyMeters( 2 ).YRMaxVal = 4283136.2524843821;
+			EnergyMeters( 2 ).YRMaxValDate = 12210160;
+			EnergyMeters( 2 ).YRMinVal = 4283136.2516839253;
+			EnergyMeters( 2 ).YRMinValDate = 12210110;
+
+			YearlyStampReportNbr = 1;
+			YearlyStampReportChr = "1";
+			DataGlobals::DayOfSim = 1;
+			DataGlobals::DayOfSimChr = "1";
+			DataGlobals::HourOfDay = 1;
+			DataGlobals::CalendarYear = 2017;
+			DataGlobals::CalendarYearChr = "2017";
+			DataEnvironment::Month = 12;
+			DataEnvironment::DayOfMonth = 21;
+			DataEnvironment::DSTIndicator = 0;
+			DataEnvironment::DayOfWeek = 2;
+			DataEnvironment::HolidayIndex = 3;
+
+			functionUsingSQLite( std::bind( OutputProcessor::ReportYRMeters, true ) );
+
+			auto result = queryResult("SELECT * FROM Time;", "Time");
+
+			ASSERT_EQ(1ul, result.size());
+
+			std::vector<std::string> testResult0 {"1", "2017", "", "", "", "", "", "", "5", "", "", "0", ""};
+			EXPECT_EQ( testResult0, result[0] );
+			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,2017", "1,999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60", "2,9999.9,4283136.251683925,12,21, 1,10,4283136.252484382,12,21, 1,60" } ) ) );
+
+			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
+			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
+
+			std::vector< std::vector<std::string> > reportData(
+			{
+				{"1", "1", "1", "999.9"},
+				{"2", "1", "2", "9999.9"}
+			});
+
+			std::vector< std::vector<std::string> > reportExtendedData(
+			{
+				{"1","1","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"},
+				{"2","2","4283136.25248438","12","21","1","1","0","4283136.25168393","12","21","0","11","10"}
+			});
+
+			EXPECT_EQ( reportData, reportDataResults );
+			EXPECT_EQ( reportExtendedData, reportExtendedDataResults );
+
+		}
+
 		TEST_F( SQLiteFixture, OutputProcessor_writeTimeStampFormatData )
 		{
 			int TimeStepStampReportNbr = 1;
@@ -607,11 +685,11 @@ namespace EnergyPlus {
 
 			std::vector< std::vector<std::string> > timeData(
 			{
-				{"1", "", "12", "21", "0", "10", "0", "10", "0", "1", "WinterDesignDay", "0", "0"},
-				{"2", "", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"},
-				{"3", "", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", "0"},
-				{"4", "", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", "0"},
-				{"5", "", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", "0"},
+				{"1", "0", "12", "21", "0", "10", "0", "10", "0", "1", "WinterDesignDay", "0", "0"},
+				{"2", "0", "12", "21", "0", "10", "0", "10", "-1", "1", "WinterDesignDay", "0", "0"},
+				{"3", "0", "12", "21", "1", "0", "0", "60", "1", "1", "WinterDesignDay", "0", "0"},
+				{"4", "0", "12", "21", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", "0"},
+				{"5", "0", "12", "31", "24", "0", "", "44640", "3", "1", "", "0", "0"},
 				{"6", "", "", "", "", "", "", "1440", "4", "1", "", "0", "0"}
 			});
 
@@ -1865,12 +1943,14 @@ namespace EnergyPlus {
 			EXPECT_EQ( 2, EnergyMeters( 1 ).HRRptNum );
 			EXPECT_EQ( 3, EnergyMeters( 1 ).DYRptNum );
 			EXPECT_EQ( 4, EnergyMeters( 1 ).MNRptNum );
-			EXPECT_EQ( 5, EnergyMeters( 1 ).SMRptNum );
-			EXPECT_EQ( 6, EnergyMeters( 1 ).TSAccRptNum );
-			EXPECT_EQ( 7, EnergyMeters( 1 ).HRAccRptNum );
-			EXPECT_EQ( 8, EnergyMeters( 1 ).DYAccRptNum );
-			EXPECT_EQ( 9, EnergyMeters( 1 ).MNAccRptNum );
-			EXPECT_EQ( 10, EnergyMeters( 1 ).SMAccRptNum );
+			EXPECT_EQ( 5, EnergyMeters( 1 ).YRRptNum );
+			EXPECT_EQ( 6, EnergyMeters( 1 ).SMRptNum );
+			EXPECT_EQ( 7, EnergyMeters( 1 ).TSAccRptNum );
+			EXPECT_EQ( 8, EnergyMeters( 1 ).HRAccRptNum );
+			EXPECT_EQ( 9, EnergyMeters( 1 ).DYAccRptNum );
+			EXPECT_EQ( 10, EnergyMeters( 1 ).MNAccRptNum );
+			EXPECT_EQ( 11, EnergyMeters( 1 ).YRAccRptNum );
+			EXPECT_EQ( 12, EnergyMeters( 1 ).SMAccRptNum );
 
 			EXPECT_EQ( 1, NumEnergyMeters );
 			EXPECT_EQ( 1ul, EnergyMeters.size() );
@@ -3059,10 +3139,10 @@ namespace EnergyPlus {
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
 			std::vector< std::vector<std::string> > timeData({
-				{"1", "", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
-				{"2", "", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
-				{"3", "", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
-				{"4", "", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
+				{"1", "0", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
+				{"2", "0", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
+				{"3", "0", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
+				{"4", "0", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
 				{"5", "", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
 			});
 
@@ -3080,7 +3160,7 @@ namespace EnergyPlus {
 				{ "8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Hourly", "", "J" },
 				{ "9", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Daily", "", "J" },
 				{ "10", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Monthly", "", "J" },
-				{ "11", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
+				{ "12", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
 			});
 
 			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
@@ -3098,7 +3178,7 @@ namespace EnergyPlus {
 				{ "7", "4", "4", "0.0" },
 				{ "8", "4", "10", "4995.0" },
 				{ "9", "5", "5", "0.0" },
-				{ "10", "5", "11", "4995.0" },
+				{ "10", "5", "12", "4995.0" },
 			});
 
 			std::vector< std::vector<std::string> > reportExtendedData({
@@ -3123,7 +3203,7 @@ namespace EnergyPlus {
 				"8,1,Electricity:Facility [J] !Hourly",
 				"9,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"10,9,Electricity:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"1,0.0",
 				"7,4995.0",
@@ -3138,7 +3218,7 @@ namespace EnergyPlus {
 				"10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
 				"5,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
-				"11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
+				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -3146,7 +3226,7 @@ namespace EnergyPlus {
 				"8,1,Electricity:Facility [J] !Hourly",
 				"9,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"10,9,Electricity:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				"11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"7,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
@@ -3156,7 +3236,7 @@ namespace EnergyPlus {
 				",365,12",
 				"10,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
-				"11,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
+				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 		}
 
@@ -3245,10 +3325,10 @@ namespace EnergyPlus {
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
 			std::vector< std::vector<std::string> > timeData({
-				{"1", "", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
-				{"2", "", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
-				{"3", "", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
-				{"4", "", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
+				{"1", "0", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0"},
+				{"2", "0", "12", "31", "24", "0", "0", "60", "1", "365", "Tuesday", "0", "0"},
+				{"3", "0", "12", "31", "24", "0", "0", "1440", "2", "365", "Tuesday", "0", "0"},
+				{"4", "0", "12", "31", "24", "0", "", "44640", "3", "365", "", "0", "0"},
 				{"5", "", "", "", "", "", "", "525600", "4", "365", "", "0", "0"},
 			});
 
@@ -3267,9 +3347,9 @@ namespace EnergyPlus {
 				{ "9", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Hourly", "", "J" },
 				{ "10", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Daily", "", "J" },
 				{ "11", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Monthly", "", "J" },
-				{ "12", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
-				{ "152", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W" },
-				{ "153", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W" },
+				{ "13", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
+				{ "180", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W" },
+				{ "181", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W" },
 			});
 
 			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
@@ -3288,7 +3368,7 @@ namespace EnergyPlus {
 				{ "8", "4", "5", "0.0" },
 				{ "9", "4", "11", "4995.0" },
 				{ "10", "5", "6", "0.0" },
-				{ "11", "5", "12", "4995.0" },
+				{ "11", "5", "13", "4995.0" },
 			});
 
 			std::vector< std::vector<std::string> > reportExtendedData({
@@ -3310,13 +3390,13 @@ namespace EnergyPlus {
 				"4,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-				"152,1,Boiler1,Boiler Heating Rate [W] !Each Call",
-				"153,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+				"180,1,Boiler1,Boiler Heating Rate [W] !Each Call",
+				"181,1,Boiler1,Boiler Gas Rate [W] !Each Call",
 				"8,1,Electricity:Facility [J] !Each Call",
 				"9,1,Electricity:Facility [J] !Hourly",
 				"10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"11,9,Electricity:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"13,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"1,0.0",
 				"2,0.0",
@@ -3332,7 +3412,7 @@ namespace EnergyPlus {
 				"11,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
 				"6,0.0,0.0,12,31,24,60,0.0,12,31,24,60",
-				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
+				"13,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -3340,7 +3420,7 @@ namespace EnergyPlus {
 				"9,1,Electricity:Facility [J] !Hourly",
 				"10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"11,9,Electricity:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"13,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
 				"8,4995.0",
 				",365,12,31, 0,24, 0.00,60.00,Tuesday",
@@ -3350,7 +3430,7 @@ namespace EnergyPlus {
 				",365,12",
 				"11,4995.0,4995.0,31,24,60,4995.0,31,24,60",
 				",365",
-				"12,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
+				"13,4995.0,4995.0,12,31,24,60,4995.0,12,31,24,60",
 			} ) );
 
 		}
@@ -3440,7 +3520,7 @@ namespace EnergyPlus {
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
 			std::vector< std::vector<std::string> > timeData({
-				{ "1", "", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0" },
+				{ "1", "0", "12", "31", "24", "0", "0", "10", "-1", "365", "Tuesday", "0", "0" },
 			});
 
 			EXPECT_EQ( timeData, timeResults );
@@ -3458,9 +3538,9 @@ namespace EnergyPlus {
 				{ "9", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Hourly", "", "J" },
 				{ "10", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Daily", "", "J" },
 				{ "11", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Monthly", "", "J" },
-				{ "12", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
-				{ "152", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W" },
-				{ "153", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W" },
+				{ "13", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Electricity:Facility", "Run Period", "", "J" },
+				{ "180", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W" },
+				{ "181", "0", "Avg", "System", "Zone", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W" },
 			});
 
 			EXPECT_EQ( reportDataDictionary, reportDataDictionaryResults );
@@ -3469,8 +3549,8 @@ namespace EnergyPlus {
 			auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
 			std::vector< std::vector<std::string> > reportData({
-				{ "1", "1", "152", "999.0" },
-				{ "2", "1", "153", "999.0" },
+				{ "1", "1", "180", "999.0" },
+				{ "2", "1", "181", "999.0" },
 			});
 
 			std::vector< std::vector<std::string> > reportExtendedData({});
@@ -3485,16 +3565,16 @@ namespace EnergyPlus {
 				"4,7,Environment,Site Outdoor Air Drybulb Temperature [C] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
 				"6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-				"152,1,Boiler1,Boiler Heating Rate [W] !Each Call",
-				"153,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+				"180,1,Boiler1,Boiler Heating Rate [W] !Each Call",
+				"181,1,Boiler1,Boiler Gas Rate [W] !Each Call",
 				"8,1,Electricity:Facility [J] !Each Call",
 				"9,1,Electricity:Facility [J] !Hourly",
 				"10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"11,9,Electricity:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"13,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				",365,12,31, 0,24,50.00,60.00,Tuesday",
-				"152,999.0",
-				"153,999.0",
+				"180,999.0",
+				"181,999.0",
 			} ) );
 
 			compare_mtr_stream( delimited_string( {
@@ -3502,7 +3582,7 @@ namespace EnergyPlus {
 				"9,1,Electricity:Facility [J] !Hourly",
 				"10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
 				"11,9,Electricity:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
-				"12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"13,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 			} ) );
 
 		}
@@ -3594,7 +3674,7 @@ namespace EnergyPlus {
 
 			compare_eso_stream( delimited_string( {
 				"7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-				"38,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+				"44,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
 				"7,1.1",
 				"2,365,12,31, 0,24,20.00,30.00,Tuesday",
@@ -3608,7 +3688,7 @@ namespace EnergyPlus {
 				"2,365,12,31, 0,24,60.00,70.00,Tuesday",
 				"7,2.2",
 				"5,365",
-				"38,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+				"44,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
 			} ) );
 
 
@@ -3632,7 +3712,7 @@ namespace EnergyPlus {
 				"2,365,12,31, 0,24,10.00,20.00,Tuesday",
 				"7,200.0",
 				"5,365",
-				"38,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
+				"44,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
 			} ) );
 
 		}

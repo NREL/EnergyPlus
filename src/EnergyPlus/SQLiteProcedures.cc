@@ -1511,6 +1511,7 @@ void SQLite::createSQLiteReportDataRecord(
 				case LocalReportDaily:
 				case LocalReportMonthly:
 				case LocalReportSim:
+				case LocalReportYearly:
 					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
 					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
 
@@ -1547,6 +1548,7 @@ void SQLite::createSQLiteReportDataRecord(
 				case LocalReportDaily:
 				case LocalReportMonthly:
 				case LocalReportSim:
+				case LocalReportYearly:
 					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
 					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
 

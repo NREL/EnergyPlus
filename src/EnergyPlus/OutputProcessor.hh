@@ -902,6 +902,11 @@ namespace OutputProcessor {
 	);
 
 	void
+	ReportYRMeters(
+		bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+	);
+
+	void
 	ReportForTabularReports();
 
 	std::string
