@@ -537,6 +537,8 @@ This object is used to control some details of EnergyPlus's solar, shadowing and
 
 This object also allows setting up global flags to import and export exterior shading calculations results. This enables importing pre-calculated results of the shading fractions for each exterior building surface from external simulation tools. This also enables reusing the shading results for parametric runs which usually do not change external shading.
 
+The object also allows input to disable self-shading effect from exterior surfaces from all zones, or from a subset of zones. Two flags are defined to enable the maximal flexibility of various interpretation of self-shading: one to disable shading between zones of a same zone group, the other to disable shading between different zone groups. The shading by exterior surfaces of the specified zones groups will be bypassed.
+
 \subsubsection{Inputs}\label{inputs-10-019}
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method-000}
@@ -572,6 +574,16 @@ The sunlit fraction to overwrite accounts for the shading of both direct and sky
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
 This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. If \textbf{Yes} is chosen, the calculated results will be exported as "eplusshading.csv" file. Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. The default choice is \textbf{No}.
 
+\paragraph{Field: Disable Shading Within A Zone Group}\label{field-disable-shading-within-a-zone-group}
+This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the shading effect by other exterior surfaces of all zones in the target Zone Group is disabled. If \textbf{Yes} is chosen, the zones in a self-shading group will not self-shade each other, but they will cast shadows on all other zones in the model. Any zones not listed in a self-shading group will shade any zone in the model. If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both, Self-Shading Groups should be defined. If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes, all self-shading effect by all zones will be disabled.
+
+\paragraph{Field: Disable Shading Between Zone Groups}\label{field-disable-shading-between-zone-groups}
+This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the shading effect by all exterior surfaces of all other zones apart from the target Zone Group is disabled. If \textbf{Yes} is chosen, the zones in a self-shading group will still self-shade each other, but they will not cast shadows on all other zones in the model. Any zones not listed in a self-shading group will shade any zone in the model. If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both, Self-Shading Groups should be defined. If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes, all self-shading effect by all zones will be disabled.
+
+\paragraph{Field: Shading Group ZoneList Name}\label{field-shading-group-zoneList-name}
+The shading zones group specifies the self-shading group defined in \textbf{field:Disable Shading Within A Zone Group} and \textbf{field:Disable Shading Between Zone Groups}.
+This field is extensible.
+
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
 \begin{lstlisting}
@@ -580,6 +592,8 @@ ShadowCalculation,AverageOverDaysInFrequency,1;
 ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
 
 ShadowCalculation, AverageOverDaysInFrequency, , , , , ScheduledShading, YES;
+
+ShadowCalculation, AverageOverDaysInFrequency, , , , , , , , Yes, No, ShadingZoneGroup;
 \end{lstlisting}
 
 Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.

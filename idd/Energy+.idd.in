@@ -558,18 +558,24 @@ ShadowCalculation,
        \key No
        \default No
        \note If Yes is chosen, the calculated external shading fraction results will be saved to an external CSV file with surface names as the column headers.
-  A6 , \field Disable Shading within A Zone Group
+  A6 , \field Disable Shading Within A Zone Group
        \note If Yes, for all surfaces in a targeted Zone Group,
        \note the shading effect by all other exterior surfaces of all zones within this Zone Group is disabled.
-       \note Specify Self-Shading Groups to limit self-shading by defining Zone Groups.
+       \note If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both,
+       \note specify Self-Shading Groups to limit self-shading by defining Zone Groups.
+       \note If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes,
+	   \note all self-shading effect will be disabled.
        \type choice
        \key Yes
        \key No
        \default No
-  A7 , \field Disable Shading between Zone Groups
+  A7 , \field Disable Shading Between Zone Groups
        \note If Yes, for all surfaces in a targeted Zone Group,
        \note the shading effect by other exterior surfaces of all zones in other Zone Groups is disabled.
-       \note Specify Self-Shading Groups to limit self-shading by defining Zone Groups.
+       \note If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both,
+       \note specify Self-Shading Groups to limit self-shading by defining Zone Groups.
+       \note If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes,
+	   \note all self-shading effect will be disabled.
        \type choice
        \key Yes
        \key No

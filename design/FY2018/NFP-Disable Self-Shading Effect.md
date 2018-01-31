@@ -18,36 +18,44 @@ Currently in EnergyPlus, if the Solar Distribution is not set to MinimalShadowin
 
 # Approaches 
 
-We propose to add a new field “Disable Self-shading Effect” to the ShadowCalculation object, which will skip the self-shading calculations in EnergyPlus.
+We propose to add a fields to the ShadowCalculation object to disable self-shading effect from exterior surfaces from all zones, or from a subset of zones. To address the cases with multiple buildings in a single EnergyPlus model (IDF file), two flags are defined to enable the maximal flexibility of various interpretation of self-shading: one to disable shading between zones of a same zone group, the other to disable shading between different zone groups. 
 
 	ShadowCalculation,
-	  A6 ; \field Disable Self-shading Effect
-	       \note If Yes, the shading effect by all other exterior surfaces of all zones is disabled
-	       \note If multiple buildings are defined in one IDF file, an BuildingComplex object is required when Disable Self-shading Effect = Yes.
+	  A6 , \field Disable Shading Within A Zone Group
+	       \note If Yes, for all surfaces in a targeted Zone Group,
+	       \note the shading effect by all other exterior surfaces of all zones within this Zone Group is disabled. 
+	       \note The zones in a self-shading group will not self-shade each other, but they will cast shadows on all other zones in the model.
+	       \note Any zones not listed in a self-shading group will shade any zone in the model.
+	       \note If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both,
+	       \note specify Self-Shading Groups to limit self-shading.
+	       \note If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes,
+		   \note all self-shading effect by all zones will be disabled.
 	       \type choice
 	       \key Yes
 	       \key No
-	       \default No       
-
-To address the cases with multiple buildings in a single EnergyPlus model (IDF file), we propose to add a new object BuildingComplex to explicitly define the buildings and their zones/spaces. This object will enable EnergyPlus to skip self-shading from exterior surfaces of individual zones of a building on other zones of the same building, while considering the shading of exterior surfaces of all zones of a building on exterior surfaces of other buildings. This object is only needed when users need to disable self-shading for multiple buildings in their models.
-
-	BuildingComplex,
-	       \unique-object
-	       \memo This object is used to define multiple buildings and their zones, currently it is only used when self-shading effect is to be disabled.
-	       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
-	       \min-fields 5
-	   A1, \field Name
-	       \type alpha
-	   A2, \field Building 1 Name 
-	       \type alpha
-	   A3, \field Building 1 ZoneList Name
-	       \type alpha
-	   A4, \field Building 2 Name 
-	       \type alpha
-	   A5, \field Building 2 ZoneList Name
-	       \type alpha
-	   …
-	   ;
+	       \default No
+	  A7 , \field Disable Shading Between Zone Groups
+	       \note If Yes, for all surfaces in a targeted Zone Group,
+	       \note the shading effect by other exterior surfaces of all zones in other Zone Groups is disabled.
+	       \note If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both,
+	       \note specify Self-Shading Groups to limit self-shading.
+	       \note The zones in a self-shading group will still self-shade each other, but they will not cast shadows on all other zones in the model.
+	       \note Any zones not listed in a self-shading group will shade any zone in the model.
+	       \note If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes,
+		   \note all self-shading effect by all zones will be disabled.
+	       \type choice
+	       \key Yes
+	       \key No
+	       \default No
+	  A8 , \field Shading Group 1 ZoneList Name
+	       \note The shading zones group specifies the self-shading group defined in field:Disable Shading Within A Zone Group and
+	       \note field:Disable Shading Between Zone Groups
+	       \type object-list
+	       \object-list ZoneListNames
+	  A9 , \field Shading Group 2 ZoneList Name
+	       \type object-list
+	       \object-list ZoneListNames
+      ...
 
 
 # Testing/Validation/Data Sources
