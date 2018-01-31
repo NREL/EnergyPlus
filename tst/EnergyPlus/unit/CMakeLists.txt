@@ -29,6 +29,7 @@ set( test_src
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
   ChillerIndirectAbsorption.unit.cc
+  Coils/CoilCoolingDX.unit.cc
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
