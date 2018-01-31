@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -85,6 +85,9 @@ namespace EconomicTariff {
 	extern int const conversionKBTU;
 	extern int const conversionMCF; // thousand cubic feet
 	extern int const conversionCCF; // hundred cubic feet
+	extern int const conversionM3; // cubic meter
+	extern int const conversionGAL;
+	extern int const conversionKGAL; // thousand gallons
 
 	extern Array1D_string const convEneStrings;
 	extern Array1D_string const convDemStrings;
@@ -221,6 +224,12 @@ namespace EconomicTariff {
 	extern int const kindMeterElecSurplusSold;
 	extern int const kindMeterElecNet;
 
+	extern int const kindMeterNotWater;
+	extern int const kindMeterWater;
+
+	extern int const kindMeterNotGas;
+	extern int const kindMeterGas;
+
 	extern int const varUnitTypeEnergy;
 	extern int const varUnitTypeDemand;
 	extern int const varUnitTypeDimensionless;
@@ -315,6 +324,8 @@ namespace EconomicTariff {
 		std::string reportMeter; // name of the report meter
 		int reportMeterIndx; // index of the report meter
 		int kindElectricMtr; // kind of electric meter - see enumerated list above, 0 is not electric
+		int kindWaterMtr; // kinf of water meter - 0 (default) is not water, 1 is water
+		int kindGasMtr; // kinf of gas meter - 0 (default) is not gas, 1 is gas
 		int resourceNum; // based on list of DataGlobalConstants
 		int convChoice; // enumerated choice index of the conversion factor
 		Real64 energyConv; // energy conversion factor
@@ -420,6 +431,8 @@ namespace EconomicTariff {
 		TariffType() :
 			reportMeterIndx( 0 ),
 			kindElectricMtr( 0 ),
+			kindWaterMtr( 0 ),
+			kindGasMtr( 0 ),
 			resourceNum( 0 ),
 			convChoice( 0 ),
 			energyConv( 0.0 ),
