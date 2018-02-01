@@ -74,7 +74,7 @@
 ! HVAC:                       single duct VAV with hot water reheat, single boiler, chiller and
 !                             cooling tower, supply air temperature = 19C
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -469,48 +469,12 @@
     CP01;                    !- Layer 5
 
   Construction,
-    CEILING-1,               !- Name
-    CP01,                    !- Outside Layer
-    HF-A3,                   !- Layer 2
-    AL33,                    !- Layer 3
-    CC24;                    !- Layer 4
-
-  Construction,
-    SLAB-1,                  !- Name
-    SOIL,                    !- Outside Layer
-    6inSlab_158;             !- Layer 2
-
-  Construction,
-    INTWALL-1,               !- Name
-    GP02,                    !- Outside Layer
-    AL21,                    !- Layer 2
-    GP02;                    !- Layer 3
-
-  Construction,
     Medium Furniture,        !- Name
     MediumFurniture;         !- Outside Layer
 
   Construction,
-    T-24Window_rshg31,       !- Name
-    LoE SPEC SEL TINT 6MM,   !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    T-24Window_rshg34,       !- Name
-    REF D TINT 6MM,          !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
     T-24Window_rshg41,       !- Name
     LoE TINT 6MM,            !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    T-24Window_rshg43,       !- Name
-    LoE SPEC SEL CLEAR 6MM,  !- Outside Layer
     AIR 6MM,                 !- Layer 2
     CLEAR 6MM;               !- Layer 3
 
@@ -2033,10 +1997,11 @@
     ZONE1Inlet,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE1 Node,              !- Zone Air Node Name
-    ZONE1 Outlet Node;       !- Zone Return Air Node Name
+    ZONE1 Outlet Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZONE1 AHU,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

@@ -1470,7 +1470,7 @@ This alpha input field defines the user-defined name of the fan used by this coo
 
 \paragraph{Field: Design Supply Air Flow Rate {[}m\(^{3}\)/s{]}}\label{field-design-supply-air-flow-rate-m3s}
 
-This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value is typically consistent with the maximum air flow rate of the fan, but it can be less if desired.
+This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value must be less than or equal to the maximum air flow rate of the fan.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-001}
 
@@ -1616,7 +1616,7 @@ The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to
 \caption{Zone Outdoor Air Unit Schematic \protect \label{fig:zone-outdoor-air-unit-schematic}}
 \end{figure}
 
-Zones may contain one or more zone outdoor air units.~ The user can choose to have each unit have its own exhaust fan or may choose to have only one unit have a exhaust fan that will handle the flow of all of the zone outdoor air units.~ Note that the user will need to account for any flow balance among the zone outdoor air units on the supply and exhaust sides.
+When an AirloopHVAC serves the same zone, it is strongly recommended that the outdoor and exhaust air flow rates are balanced. In addition, the exhaust airflow rate and air schedule should be the same as outdoor air flow rate and outdoor air schedule, respectively. Otherwise, possible unbalanced flows will cause improper return airflow unless ZoneAirMassFlowConservation is active.  
 
 The full input for zone outdoor air units is described below using a variety of fields.
 
@@ -3862,9 +3862,11 @@ This is the availability status of the Stand Alone ERV~ fan. This status flag is
 
 \subsection{ZoneHVAC:TerminalUnit:VariableRefrigerantFlow}\label{zonehvacterminalunitvariablerefrigerantflow}
 
-Zone terminal units with variable refrigerant flow DX coils are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. AirConditioner:VariableRefrigerantFlow object). The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a ZoneHVAC:EquipmentConnections object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the ZoneHVAC:EquipmentList). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
+Zone terminal units with variable refrigerant flow DX coils are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. AirConditioner:VariableRefrigerantFlow objects). The zone terminal units are connected to a zone using the inlet and exhaust node names specified in a ZoneHVAC:EquipmentConnections object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the ZoneHVAC:EquipmentList). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher)
 
-The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. A supply air fan is also required and can be modeled as either draw through or blow through.
+The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating. 
+
+A supply air fan is also required and can be modeled as either draw through or blow through. The Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume if AirConditioner:VariableRefrigerantFlow is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
 
 \subsubsection{Inputs}\label{inputs-14-018}
 
@@ -3926,7 +3928,9 @@ The second choice stands for ``draw through fan''. This means that the unit cons
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-8}
 
-This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff} or \textit{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textit{Fan:OnOff}, \textit{Fan:ConstantVolume}, \textit{Fan:SystemModel} or \textit{Fan:VariableVolume}. The Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume if AirConditioner:VariableRefrigerantFlow is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
+
+Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0). The Fan:SystemModel may be used to model either of these fan operating characteristics.
 
 \paragraph{Field: Supply Air Fan Object Name}\label{field-supply-air-fan-object-name}
 

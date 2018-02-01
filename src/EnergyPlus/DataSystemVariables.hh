@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -70,6 +71,7 @@ namespace DataSystemVariables {
 
 	extern std::string const DDOnlyEnvVar; // Only run design days
 	extern std::string const ReverseDDEnvVar; // Reverse DD during run
+	extern std::string const DisableGLHECachingEnvVar; // GLHE Caching
 	extern std::string const FullAnnualSimulation; // Generate annual run
 	extern std::string const cDeveloperFlag;
 	extern std::string const cDisplayAllWarnings;
@@ -111,6 +113,7 @@ namespace DataSystemVariables {
 	// MODULE VARIABLE DECLARATIONS:
 	extern bool DDOnly; // TRUE if design days (sizingperiod:*) only are to be run.
 	extern bool ReverseDD; // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
+	extern bool DisableGLHECaching; // TRUE if GLHE caching is to be disabled, for example, during unit tests
 	extern bool FullAnnualRun; // TRUE if full annual simulation is to be run.
 	extern bool DeveloperFlag; // TRUE if developer flag is turned on. (turns on more displays to console)
 	extern bool TimingFlag; // TRUE if timing flag is turned on. (turns on more timing displays to console)

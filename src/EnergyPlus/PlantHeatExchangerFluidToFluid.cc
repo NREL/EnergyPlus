@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -524,18 +525,18 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
 
-			SetupOutputVariable( "Fluid Heat Exchanger Heat Transfer Rate [W]", FluidHX( CompLoop ).HeatTransferRate, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, FluidHX( CompLoop ).HeatTransferRate, "System", "Average", FluidHX( CompLoop ).Name );
 
-			SetupOutputVariable( "Fluid Heat Exchanger Heat Transfer Energy [J]", FluidHX( CompLoop ).HeatTransferEnergy, "System", "Sum", FluidHX( CompLoop ).Name, _, "ENERGYTRANSFER", FluidHX( CompLoop ).HeatTransferMeteringEndUse, _, "Plant" );
+			SetupOutputVariable( "Fluid Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, FluidHX( CompLoop ).HeatTransferEnergy, "System", "Sum", FluidHX( CompLoop ).Name, _, "ENERGYTRANSFER", FluidHX( CompLoop ).HeatTransferMeteringEndUse, _, "Plant" );
 
-			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Mass Flow Rate [kg/s]", FluidHX( CompLoop ).SupplySideLoop.InletMassFlowRate, "System", "Average", FluidHX( CompLoop ).Name );
-			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Inlet Temperature [C]", FluidHX( CompLoop ).SupplySideLoop.InletTemp, "System", "Average", FluidHX( CompLoop ).Name );
-			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Outlet Temperature [C]", FluidHX( CompLoop ).SupplySideLoop.OutletTemp, "System", "Average", FluidHX( CompLoop ).Name );
-			SetupOutputVariable( "Fluid Heat Exchanger Loop Demand Side Mass Flow Rate [kg/s]", FluidHX( CompLoop ).DemandSideLoop.InletMassFlowRate, "System", "Average", FluidHX( CompLoop ).Name );
-			SetupOutputVariable( "Fluid Heat Exchanger Loop Demand Side Inlet Temperature [C]", FluidHX( CompLoop ).DemandSideLoop.InletTemp, "System", "Average", FluidHX( CompLoop ).Name );
-			SetupOutputVariable( "Fluid Heat Exchanger Loop Demand Side Outlet Temperature [C]", FluidHX( CompLoop ).DemandSideLoop.OutletTemp, "System", "Average", FluidHX( CompLoop ).Name );
-			SetupOutputVariable( "Fluid Heat Exchanger Operation Status [ ]", FluidHX( CompLoop ).OperationStatus, "System", "Average", FluidHX( CompLoop ).Name );
-			SetupOutputVariable( "Fluid Heat Exchanger Effectiveness [ ]", FluidHX( CompLoop ).Effectiveness, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Mass Flow Rate", OutputProcessor::Unit::kg_s, FluidHX( CompLoop ).SupplySideLoop.InletMassFlowRate, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Inlet Temperature", OutputProcessor::Unit::C, FluidHX( CompLoop ).SupplySideLoop.InletTemp, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Loop Supply Side Outlet Temperature", OutputProcessor::Unit::C, FluidHX( CompLoop ).SupplySideLoop.OutletTemp, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Loop Demand Side Mass Flow Rate", OutputProcessor::Unit::kg_s, FluidHX( CompLoop ).DemandSideLoop.InletMassFlowRate, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Loop Demand Side Inlet Temperature", OutputProcessor::Unit::C, FluidHX( CompLoop ).DemandSideLoop.InletTemp, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Loop Demand Side Outlet Temperature", OutputProcessor::Unit::C, FluidHX( CompLoop ).DemandSideLoop.OutletTemp, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Operation Status", OutputProcessor::Unit::None, FluidHX( CompLoop ).OperationStatus, "System", "Average", FluidHX( CompLoop ).Name );
+			SetupOutputVariable( "Fluid Heat Exchanger Effectiveness", OutputProcessor::Unit::None, FluidHX( CompLoop ).Effectiveness, "System", "Average", FluidHX( CompLoop ).Name );
 		}
 
 	}

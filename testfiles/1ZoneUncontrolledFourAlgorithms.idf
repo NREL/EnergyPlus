@@ -85,7 +85,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,20;
 
@@ -224,10 +224,6 @@
     0.9000000,               !- Thermal Absorptance
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
-
-  Construction,
-    R13WALL,                 !- Name
-    R13LAYER;                !- Outside Layer
 
   Construction,
     FLOOR,                   !- Name
@@ -688,8 +684,6 @@
 
   Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
 
-  Output:Variable,*,Surface Inside Face Heat Balance Calculation Iteration Count,hourly;
-
   Output:Variable,*,Other Equipment Total Heating Rate,hourly;
 
   Output:Variable,*,Zone Other Equipment Total Heating Rate,hourly;
@@ -733,7 +727,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     352,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost
@@ -746,7 +740,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     -352,                    !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost

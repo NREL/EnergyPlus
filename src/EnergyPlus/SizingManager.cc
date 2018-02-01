@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2001,9 +2002,9 @@ namespace SizingManager {
 			}}
 			{ auto const coolOAOption( cAlphaArgs( i100PercentOACoolingAlphaNum ) );
 			if ( coolOAOption == "YES" ) {
-				SysSizInput( SysSizIndex ).CoolOAOption = 1;
+				SysSizInput( SysSizIndex ).CoolOAOption = AllOA;
 			} else if ( coolOAOption == "NO" ) {
-				SysSizInput( SysSizIndex ).CoolOAOption = 2;
+				SysSizInput( SysSizIndex ).CoolOAOption = MinOA;
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
 				ShowContinueError("... incorrect " + cAlphaFieldNames( i100PercentOACoolingAlphaNum ) + "=\"" + cAlphaArgs( i100PercentOACoolingAlphaNum ) + "\".");
@@ -3462,7 +3463,12 @@ namespace SizingManager {
 			if( DataSizing::NumAirTerminalSizingSpec > 0 ) {
 				// Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
 				// Cooling
-				Real64 coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				Real64 coolFlowRatio = 1.0;
+				if ( thisTUSizing.SpecDesCoolSATRatio > 0.0 ) {
+					coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				} else {
+					coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac;
+				}
 				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
 				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * coolFlowRatio;
 				thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
@@ -3477,7 +3483,12 @@ namespace SizingManager {
 				thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
 				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
 				// Heating
-				Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				Real64 heatFlowRatio = 1.0;
+				if ( thisTUSizing.SpecDesHeatSATRatio > 0.0 ) {
+					heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				} else {
+					heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac;
+				}
 				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
 				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * heatFlowRatio;
 				thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
@@ -3492,9 +3503,17 @@ namespace SizingManager {
 				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
 				// Outdoor air
 				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
-				thisTUFZSizing.DesCoolOAFlowFrac = min(thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0);
+				if ( coolFlowRatio > 0.0 ) {
+					thisTUFZSizing.DesCoolOAFlowFrac = min( thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0 );
+				} else {
+					thisTUFZSizing.DesCoolOAFlowFrac = 0.0;
+				}
 				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
-				thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				if ( heatFlowRatio > 0.0 ) {
+					thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				} else {
+					thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
+				}
 				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
 			}
 		}

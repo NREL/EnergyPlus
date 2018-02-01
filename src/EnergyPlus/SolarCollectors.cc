@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -488,17 +489,17 @@ namespace SolarCollectors {
 				}
 
 				// Setup report variables
-				SetupOutputVariable( "Solar Collector Incident Angle Modifier []", Collector( CollectorNum ).IncidentAngleModifier, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Incident Angle Modifier", OutputProcessor::Unit::None, Collector( CollectorNum ).IncidentAngleModifier, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Efficiency []", Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Efficiency", OutputProcessor::Unit::None, Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Transfer Rate [W]", Collector( CollectorNum ).Power, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, Collector( CollectorNum ).Power, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Gain Rate [W]", Collector( CollectorNum ).HeatGain, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Gain Rate", OutputProcessor::Unit::W, Collector( CollectorNum ).HeatGain, "System", "Average", Collector( CollectorNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Loss Rate [W]", Collector( CollectorNum ).HeatLoss, "System", "Average", Collector( FlatPlateUnitsNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Loss Rate", OutputProcessor::Unit::W, Collector( CollectorNum ).HeatLoss, "System", "Average", Collector( FlatPlateUnitsNum ).Name );
 
-				SetupOutputVariable( "Solar Collector Heat Transfer Energy [J]", Collector( CollectorNum ).Energy, "System", "Sum", Collector( FlatPlateUnitsNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Heat Transfer Energy", OutputProcessor::Unit::J, Collector( CollectorNum ).Energy, "System", "Sum", Collector( FlatPlateUnitsNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 
 				TestCompSet( CurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Water Nodes" );
 
@@ -703,17 +704,17 @@ namespace SolarCollectors {
 				}
 
 				// Setup report variables
-				SetupOutputVariable( "Solar Collector Transmittance Absorptance Product []", Collector( CollectorNum ).TauAlpha, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Overall Top Heat Loss Coefficient [W/m2-C]", Collector( CollectorNum ).UTopLoss, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Absorber Plate Temperature [C]", Collector( CollectorNum ).TempOfAbsPlate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Storage Water Temperature [C]", Collector( CollectorNum ).TempOfWater, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Thermal Efficiency []", Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Storage Heat Transfer Rate [W]", Collector( CollectorNum ).StoredHeatRate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Storage Heat Transfer Energy [J]", Collector( CollectorNum ).StoredHeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
-				SetupOutputVariable( "Solar Collector Skin Heat Transfer Rate [W]", Collector( CollectorNum ).SkinHeatLossRate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Skin Heat Transfer Energy [J]", Collector( CollectorNum ).CollHeatLossEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
-				SetupOutputVariable( "Solar Collector Heat Transfer Rate [W]", Collector( CollectorNum ).HeatRate, "System", "Average", Collector( CollectorNum ).Name );
-				SetupOutputVariable( "Solar Collector Heat Transfer Energy [J]", Collector( CollectorNum ).HeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Transmittance Absorptance Product", OutputProcessor::Unit::None, Collector( CollectorNum ).TauAlpha, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Overall Top Heat Loss Coefficient", OutputProcessor::Unit::W_m2C, Collector( CollectorNum ).UTopLoss, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Absorber Plate Temperature", OutputProcessor::Unit::C, Collector( CollectorNum ).TempOfAbsPlate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Storage Water Temperature", OutputProcessor::Unit::C, Collector( CollectorNum ).TempOfWater, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Thermal Efficiency", OutputProcessor::Unit::None, Collector( CollectorNum ).Efficiency, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Storage Heat Transfer Rate", OutputProcessor::Unit::W, Collector( CollectorNum ).StoredHeatRate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Storage Heat Transfer Energy", OutputProcessor::Unit::J, Collector( CollectorNum ).StoredHeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Skin Heat Transfer Rate", OutputProcessor::Unit::W, Collector( CollectorNum ).SkinHeatLossRate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Skin Heat Transfer Energy", OutputProcessor::Unit::J, Collector( CollectorNum ).CollHeatLossEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, Collector( CollectorNum ).HeatRate, "System", "Average", Collector( CollectorNum ).Name );
+				SetupOutputVariable( "Solar Collector Heat Transfer Energy", OutputProcessor::Unit::J, Collector( CollectorNum ).HeatEnergy, "System", "Sum", Collector( CollectorNum ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 
 				TestCompSet( CurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 6 ), cAlphaArgs( 7 ), "Water Nodes" );
 
@@ -1664,12 +1665,13 @@ namespace SolarCollectors {
 		// get the incidence and refraction angles
 		IncAngle = IncidentAngle;
 		ParamNum = Collector( ColleNum ).Parameters;
+		Real64 const sin_IncAngle( std::sin( IncAngle ) );
 
 		for ( nCover = 1; nCover <= Parameters( ParamNum ).NumOfCovers; ++nCover ) {
 
 			CoverRefrIndex = Parameters( ParamNum ).RefractiveIndex( nCover );
 
-			RefrAngle = std::asin( std::sin( IncAngle ) * AirRefIndex / CoverRefrIndex );
+			RefrAngle = std::asin( sin_IncAngle * AirRefIndex / CoverRefrIndex );
 
 			// transmitted component with absorption only considered:
 			TransAbsOnly( nCover ) = std::exp( -Parameters( ParamNum ).ExtCoefTimesThickness( nCover ) / std::cos( RefrAngle ) );

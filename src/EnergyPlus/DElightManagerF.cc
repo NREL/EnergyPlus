@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -569,7 +570,7 @@ namespace DElightManagerF {
 								if ( refPt.indexToFracAndIllum != 0 ){
 									gio::write( unit, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << znDayl.FracZoneDaylit( refPt.indexToFracAndIllum ) << znDayl.IllumSetPoint( refPt.indexToFracAndIllum ) * LUX2FC << znDayl.LightControlType;
 									// RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
-									SetupOutputVariable( "Daylighting Reference Point Illuminance [lux]", znDayl.DaylIllumAtRefPt( refPt.indexToFracAndIllum ), "Zone", "Average", refPt.Name );
+									SetupOutputVariable( "Daylighting Reference Point Illuminance", OutputProcessor::Unit::lux, znDayl.DaylIllumAtRefPt( refPt.indexToFracAndIllum ), "Zone", "Average", refPt.Name );
 								} else {
 									gio::write( unit, Format_913 ) << cNameWOBlanks << RefPt_WCS_Coord( 1 ) * M2FT << RefPt_WCS_Coord( 2 ) * M2FT << RefPt_WCS_Coord( 3 ) * M2FT << 0.0 << 0.0 * LUX2FC << znDayl.LightControlType; // should never happen but just in case send zero fraction and illuminance
 								}

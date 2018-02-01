@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -678,9 +679,9 @@ bool KivaManager::setupKivaInstances()
 			// Calculate total exposed perimeter attributes
 			std::vector<bool> isExposedPerimeter;
 
-			bool userSetExposedPerimeter;
-			bool useDetailedExposedPerimeter;
-			Real64 exposedFraction;
+			bool userSetExposedPerimeter = false;
+			bool useDetailedExposedPerimeter = false;
+			Real64 exposedFraction = 0.0;
 
 			auto& expPerimMap = SurfaceGeometry::exposedFoundationPerimeter.surfaceMap;
 			if ( expPerimMap.count( surfNum ) == 1 ) {
@@ -694,8 +695,8 @@ bool KivaManager::setupKivaInstances()
 					exposedFraction = expPerimMap[surfNum].exposedFraction;
 				}
 			} else {
-				userSetExposedPerimeter = false;
-				useDetailedExposedPerimeter = true;
+				ErrorsFound = true;
+				ShowSevereError( "Surface=\"" + Surfaces( surfNum ).Name + "\", references a Foundation Outside Boundary Condition but there is no corresponding SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER object defined." );
 			}
 
 			Kiva::Polygon floorPolygon;
@@ -762,7 +763,6 @@ bool KivaManager::setupKivaInstances()
 
 			// setup map to point floor surface to all related kiva instances
 			std::vector<std::pair<int, Kiva::Surface::SurfaceType>> floorSurfaceMaps;
-
 
 			// Loop through combinations and assign instances until there is no remaining exposed pereimeter
 			bool assignKivaInstances = true;
@@ -884,10 +884,23 @@ bool KivaManager::setupKivaInstances()
 					fnd.inputBlocks.push_back( footing );
 				}
 
+				Real64 initDeepGroundDepth = fnd.deepGroundDepth;
 				for ( auto& block : fnd.inputBlocks ) {
+					// Change temporary zero depth indicators to default foundation depth
 					if ( block.depth == 0.0 ) {
 						block.depth = fnd.foundationDepth;
 					}
+					if ( settings.deepGroundBoundary == Settings::AUTO ) {
+						// Ensure automatically set deep ground depth is at least 1 meater below lowest block
+						if ( block.z + block.depth + 1.0 > fnd.deepGroundDepth ) {
+							fnd.deepGroundDepth = block.z + block.depth + 1.0;
+						}
+					}
+				}
+
+				if ( fnd.deepGroundDepth > initDeepGroundDepth ) {
+					ShowWarningError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", the autocalculated deep ground depth (" + General::TrimSigDigits( initDeepGroundDepth, 3 ) + " m) is shallower than foundation construction elements (" + General::TrimSigDigits( fnd.deepGroundDepth - 1.0, 3 ) + " m)" );
+					ShowContinueError( "The deep ground depth will be set one meter below the lowest element (" + General::TrimSigDigits( fnd.deepGroundDepth, 3 ) + " m)" );
 				}
 
 				// polygon

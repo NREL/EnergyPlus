@@ -5,7 +5,7 @@
 !1ZoneUncontrolledCondFDWithVariableKat24C.idf
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -451,16 +451,6 @@
   Output:Variable,*,CondFD Surface Temperature Node 4;
 
   Output:Variable,*,CondFD Surface Temperature Node 5;
-
-  Output:Variable,*,CondFD Surface Temperature Node 6;
-
-  Output:Variable,*,CondFD Surface Temperature Node 7;
-
-  Output:Variable,*,CondFD Surface Temperature Node 8;
-
-  Output:Variable,*,CondFD Surface Temperature Node 9;
-
-  Output:Variable,*,CondFD Surface Temperature Node 10;
 
   Output:Diagnostics,
     DisplayAdvancedReportVariables;  !- Key 1

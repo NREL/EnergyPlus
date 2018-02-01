@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -154,7 +155,7 @@ namespace ZoneAirLoopEquipmentManager {
 		bool const FirstHVACIteration,
 		Real64 & SysOutputProvided,
 		Real64 & NonAirSysOutput,
-		Real64 & LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
+		Real64 & LatOutputProvided, // Latent add/removal supplied by air dist unit (kg/s), dehumid = negative
 		int const ActualZoneNum,
 		int & ControlledZoneNum,
 		int & CompIndex
@@ -476,10 +477,10 @@ namespace ZoneAirLoopEquipmentManager {
 
 			} //End of Air Dist Do Loop
 			for ( AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum ) {
-				SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy [J]", AirDistUnit( AirDistUnitNum ).HeatGain, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
-				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy [J]", AirDistUnit( AirDistUnitNum ).CoolGain, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
-				SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate [W]", AirDistUnit( AirDistUnitNum ).HeatRate, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
-				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate [W]", AirDistUnit( AirDistUnitNum ).CoolRate, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy", OutputProcessor::Unit::J, AirDistUnit( AirDistUnitNum ).HeatGain, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, AirDistUnit( AirDistUnitNum ).CoolGain, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate", OutputProcessor::Unit::W, AirDistUnit( AirDistUnitNum ).HeatRate, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
+				SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, AirDistUnit( AirDistUnitNum ).CoolRate, "System", "Sum", AirDistUnit( AirDistUnitNum ).Name );
 			}
 		}
 		if ( ErrorsFound ) {
@@ -513,10 +514,8 @@ namespace ZoneAirLoopEquipmentManager {
 			{ auto & thisADU( AirDistUnit( AirDistUnitNum ) );
 			{ auto & thisZoneEqConfig( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ) );
 			thisADU.ZoneNum = ActualZoneNum;
-			thisZoneEqConfig.ADUNum = AirDistUnitNum;
-
-			if ( thisADU.UpStreamLeak || thisADU.DownStreamLeak ) {
-				thisZoneEqConfig.SupLeakToRetPlen = true;
+			for ( int inletNum = 1; inletNum <= thisZoneEqConfig.NumInletNodes; ++inletNum ){
+				if ( thisZoneEqConfig.InletNode( inletNum ) == thisADU.OutletNodeNum ) thisZoneEqConfig.InletNodeADUNum( inletNum ) = AirDistUnitNum;
 			}}
 
 			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
@@ -534,6 +533,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// every time step
 		AirDistUnit( AirDistUnitNum ).MassFlowRateDnStrLk = 0.0;
+		AirDistUnit( AirDistUnitNum ).MassFlowRateUpStrLk = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateTU = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateSup = 0.0;
@@ -713,6 +713,19 @@ namespace ZoneAirLoopEquipmentManager {
 					Node( OutNodeNum ).MassFlowRateMinAvail = max( 0.0, MassFlowRateMinAvail - AirDistUnit( AirDistUnitNum ).MassFlowRateDnStrLk - AirDistUnit( AirDistUnitNum ).MassFlowRateUpStrLk );
 					AirDistUnit( AirDistUnitNum ).MaxAvailDelta = MassFlowRateMaxAvail - Node( OutNodeNum ).MassFlowRateMaxAvail;
 					AirDistUnit( AirDistUnitNum ).MinAvailDelta = MassFlowRateMinAvail - Node( OutNodeNum ).MassFlowRateMinAvail;
+				} else {
+					// if no leaks, or a terminal unit type not supported for leaks
+					int termUnitType = AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompNum );
+					if ( ( termUnitType == DualDuctConstVolume ) || ( termUnitType == DualDuctVAV ) || ( termUnitType == DualDuctVAVOutdoorAir ) ) {
+						// Use ADU outlet node flow for dual duct terminal units (which don't support leaks)
+						AirDistUnit( AirDistUnitNum ).MassFlowRateTU = Node( OutNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = Node( OutNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateSup = Node( OutNodeNum ).MassFlowRate;
+					} else {
+						AirDistUnit( AirDistUnitNum ).MassFlowRateTU = Node( InNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateZSup = Node( InNodeNum ).MassFlowRate;
+						AirDistUnit( AirDistUnitNum ).MassFlowRateSup = Node( InNodeNum ).MassFlowRate;
+					}
 				}
 			}
 		}

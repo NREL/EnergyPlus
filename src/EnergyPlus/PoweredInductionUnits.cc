@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -308,6 +309,7 @@ namespace PoweredInductionUnits {
 		int ADUNum;
 		static std::string const RoutineName( "GetPIUs: " ); // include trailing blank space
 		bool SteamMessageNeeded;
+		int FanType_Num; // integer representation of fan type
 
 		// FLOW
 		// find the number of each type of fan coil unit
@@ -395,7 +397,7 @@ namespace PoweredInductionUnits {
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PIU( PIUNum ).FanName ) ); // call constructor
 				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
-
+				PIU( PIUNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->availSchedIndex;
 			} else {
 				bool isNotOkay( false );
 				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
@@ -404,6 +406,8 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 				}
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+				Fans::GetFanType( PIU( PIUNum ).FanName, FanType_Num, ErrorsFound );
+				PIU( PIUNum ).FanAvailSchedPtr = Fans::GetFanAvailSchPtr( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
 			}
 
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
@@ -552,6 +556,7 @@ namespace PoweredInductionUnits {
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PIU( PIUNum ).FanName ) ); // call constructor
 				PIU( PIUNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( PIU( PIUNum ).FanName );
+				PIU( PIUNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->availSchedIndex;
 			} else {
 				bool isNotOkay( false );
 				ValidateComponent( "FAN:CONSTANTVOLUME", PIU( PIUNum ).FanName, isNotOkay, "GetPIUs"  );
@@ -560,6 +565,8 @@ namespace PoweredInductionUnits {
 					ErrorsFound = true;
 				}
 				PIU( PIUNum ).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+				Fans::GetFanType( PIU( PIUNum ).FanName, FanType_Num, ErrorsFound );
+				PIU( PIUNum ).FanAvailSchedPtr = Fans::GetFanAvailSchPtr( DataHVACGlobals::cFanTypes( FanType_Num ), PIU( PIUNum ).FanName, ErrorsFound );
 			}
 			PIU( PIUNum ).HCoil = cAlphaArgs( 10 ); // name of heating coil object
 			ValidateComponent( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil" );
@@ -626,10 +633,10 @@ namespace PoweredInductionUnits {
 
 		for ( PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum ) {
 			// Setup Report variables for the Fan Coils
-			SetupOutputVariable( "Zone Air Terminal Heating Rate [W]", PIU( PIUNum ).HeatingRate, "System", "Average", PIU( PIUNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Heating Energy [J]", PIU( PIUNum ).HeatingEnergy, "System", "Sum", PIU( PIUNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate [W]", PIU( PIUNum ).SensCoolRate, "System", "Average", PIU( PIUNum ).Name );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy [J]", PIU( PIUNum ).SensCoolEnergy, "System", "Sum", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Heating Rate", OutputProcessor::Unit::W, PIU( PIUNum ).HeatingRate, "System", "Average", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Heating Energy", OutputProcessor::Unit::J, PIU( PIUNum ).HeatingEnergy, "System", "Sum", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, PIU( PIUNum ).SensCoolRate, "System", "Average", PIU( PIUNum ).Name );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, PIU( PIUNum ).SensCoolEnergy, "System", "Sum", PIU( PIUNum ).Name );
 
 		}
 
@@ -1330,6 +1337,9 @@ namespace PoweredInductionUnits {
 		Real64 MinSteamFlow;
 		Real64 MaxSteamFlow;
 		Real64 mdot; // local plant fluid flow rate kg/s
+		// Initialize local fan flags to global system flags
+		bool PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );  // If True, overrides fan schedule and cycles PIU fan on
+		bool PIUTurnFansOff = DataHVACGlobals::TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
 
 		// FLOW
 
@@ -1364,6 +1374,7 @@ namespace PoweredInductionUnits {
 			}
 		}
 		if ( GetCurrentScheduleValue( PIU( PIUNum ).SchedPtr ) <= 0.0 ) UnitOn = false;
+		if ( ( GetCurrentScheduleValue( PIU( PIUNum ).FanAvailSchedPtr ) <= 0.0 || PIUTurnFansOff ) && ! PIUTurnFansOn ) UnitOn = false;
 		if ( PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow ) PriOn = false;
 		// Set the mass flow rates
 		if ( UnitOn ) {
@@ -1371,7 +1382,13 @@ namespace PoweredInductionUnits {
 			if ( ! PriOn ) {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
-				SecAirMassFlow = PIU( PIUNum ).MaxTotAirMassFlow;
+				// PIU fan off if there is no heating load, also reset fan flag if fan should be off
+				if ( QZnReq <= SmallLoad ) {
+					SecAirMassFlow = 0.0;
+					PIUTurnFansOn = false;
+				} else {
+					SecAirMassFlow = PIU( PIUNum ).MaxTotAirMassFlow;
+				}
 			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
 				// in deadband or very small load: set primary air flow to the minimum
 				PriAirMassFlow = PriAirMassFlowMin;
@@ -1388,9 +1405,9 @@ namespace PoweredInductionUnits {
 				Node( SecNode ).MassFlowRate = PIU( PIUNum ).MaxTotAirMassFlow;
 				SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num ); // fire the mixer
 				if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+					HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, PIUTurnFansOn , PIUTurnFansOff ,_ );
 				} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-					Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+					Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff ); // fire the fan
 				}
 
 				FanDeltaTemp = Node( HCoilInAirNode ).Temp - Node( SecNode ).Temp;
@@ -1422,9 +1439,9 @@ namespace PoweredInductionUnits {
 		SimAirMixer( PIU( PIUNum ).MixerName, PIU( PIUNum ).Mixer_Num );
 		// fire the fan
 		if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _,_,_,_ );
+			HVACFan::fanObjs[ PIU( PIUNum ).Fan_Index ]->simulate( _, PIUTurnFansOn, PIUTurnFansOff, _ );
 		} else if ( PIU( PIUNum ).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume ) {
-			Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index ); // fire the fan
+			Fans::SimulateFanComponents( PIU( PIUNum ).FanName, FirstHVACIteration, PIU( PIUNum ).Fan_Index, _, PIUTurnFansOn, PIUTurnFansOff ); // fire the fan
 		}
 		// check if heating coil is off
 		QActualHeating = QToHeatSetPt - Node( HCoilInAirNode ).MassFlowRate * CpAirZn * ( Node( HCoilInAirNode ).Temp - Node( ZoneNode ).Temp );
@@ -1484,6 +1501,7 @@ namespace PoweredInductionUnits {
 		} else {
 			PlenumInducedMassFlow = 0.0;
 		}
+		DataDefineEquip::AirDistUnit( PIU( PIUNum ).ADUNum ).MassFlowRatePlenInd = PlenumInducedMassFlow;
 		Node( OutletNode ).MassFlowRateMax = PIU( PIUNum ).MaxTotAirMassFlow;
 
 	}
@@ -1592,41 +1610,32 @@ namespace PoweredInductionUnits {
 		// Set the mass flow rates
 		if ( UnitOn ) {
 			// unit is on
-			// Special controls if FanOnFlowFrac = 0.0
+			// Calculate if reheat is needed
 			bool ReheatRequired = false;
-			if (PIU(PIUNum).FanOnFlowFrac <= 0.0) {
-				// Calculate if reheat is needed
-				Real64 qMinPrimary = PriAirMassFlowMin * ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
-				if (  qMinPrimary < QToHeatSetPt ) ReheatRequired = true;
-			}
+			Real64 qMinPrimary = PriAirMassFlowMin * ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
+			if (  qMinPrimary < QToHeatSetPt ) ReheatRequired = true;
 
 			if ( ! PriOn ) {
 				// no primary air flow
 				PriAirMassFlow = 0.0;
-				// PIU fan off if FanOnFlowFrac is 0.0 and there is no heating load, also reset fan flag if fan should be off
-				if ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) {
-					if ( QZnReq <= SmallLoad ) {
-						SecAirMassFlow = 0.0;
-						PIUTurnFansOn = false;
-					} else {
-						SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-						PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
-					}
-				} else {
-					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-				}
-			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
-				// in deadband or very small load: set primary air flow to the minimum
-				PriAirMassFlow = PriAirMassFlowMin;
-				// PIU fan off if FanOnFlowFrac is 0.0 and reheat is not needed, also reset fan flag if fan should be off
-				if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && ReheatRequired ) {
-					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
-					PIUTurnFansOn = true;
-				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
+				// PIU fan off if there is no heating load, also reset fan flag if fan should be off
+				if ( QZnReq <= SmallLoad ) {
 					SecAirMassFlow = 0.0;
 					PIUTurnFansOn = false;
 				} else {
 					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+					PIUTurnFansOn = ( DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn );
+				}
+			} else if ( CurDeadBandOrSetback( ZoneNum ) || std::abs( QZnReq ) < SmallLoad ) {
+				// in deadband or very small load: set primary air flow to the minimum
+				PriAirMassFlow = PriAirMassFlowMin;
+				// PIU fan off if reheat is not needed, also reset fan flag if fan should be off
+				if ( ReheatRequired ) {
+					SecAirMassFlow = PIU( PIUNum ).MaxSecAirMassFlow;
+					PIUTurnFansOn = true;
+				} else {
+					SecAirMassFlow = 0.0;
+					PIUTurnFansOn = false;
 				}
 			} else if ( QZnReq > SmallLoad ) {
 				// heating: set primary air flow to the minimum
@@ -1651,12 +1660,8 @@ namespace PoweredInductionUnits {
 				PriAirMassFlow = QZnReq / ( CpAirZn * min( -SmallTempDiff, ( Node( PriNode ).Temp - Node( ZoneNode ).Temp ) ) );
 				PriAirMassFlow = min( max( PriAirMassFlow, PriAirMassFlowMin ), PriAirMassFlowMax );
 				// check for fan on or off
-				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && ( PIU( PIUNum ).FanOnFlowFrac > 0.0 ) ) {
-					SecAirMassFlow = 0.0; // Fan is off; no secondary air
-					PIUTurnFansOn = false;
-				} else if ( ( PIU( PIUNum ).FanOnFlowFrac <= 0.0 ) && !ReheatRequired ) {
-					// if FanOnFlowFrac is 0, then fan does not run for cooling load unless reheat is required, also reset fan flag if fan should be off
-					SecAirMassFlow = 0.0; // Fan is off; no secondary air
+				if ( ( PriAirMassFlow > PIU( PIUNum ).FanOnAirMassFlow ) && !ReheatRequired ) {
+					SecAirMassFlow = 0.0; // Fan is off unless reheat is required; no secondary air; also reset fan flag
 					PIUTurnFansOn = false;
 				} else {
 					// fan is on; recalc primary air flow
@@ -1740,6 +1745,7 @@ namespace PoweredInductionUnits {
 		} else {
 			PlenumInducedMassFlow = 0.0;
 		}
+		DataDefineEquip::AirDistUnit( PIU( PIUNum ).ADUNum ).MassFlowRatePlenInd = PlenumInducedMassFlow;
 		Node( OutletNode ).MassFlowRateMax = PIU( PIUNum ).MaxPriAirMassFlow;
 
 	}

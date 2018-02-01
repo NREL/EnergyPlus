@@ -27,7 +27,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2332,6 +2332,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2343,6 +2344,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2354,6 +2356,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2365,6 +2368,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2376,6 +2380,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2393,7 +2398,7 @@
     SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 Fan Coil Return,!- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE1-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2401,7 +2406,7 @@
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Fan Coil Return,!- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE2-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2409,7 +2414,7 @@
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Fan Coil Return,!- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE3-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE3-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2417,7 +2422,7 @@
     SPACE4-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 Fan Coil Return,!- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE4-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE4-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2425,7 +2430,7 @@
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 Fan Coil Return,!- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE5-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:VARIABLEVOLUME ===========
 

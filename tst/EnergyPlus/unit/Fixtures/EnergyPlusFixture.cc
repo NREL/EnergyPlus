@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -165,6 +166,7 @@
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
@@ -369,7 +371,12 @@ namespace EnergyPlus {
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		HybridModel::clear_state();
+<<<<<<< HEAD
 		EnergyPlus::inputProcessor->clear_state();
+=======
+		HysteresisPhaseChange::clear_state();
+		InputProcessor::clear_state();
+>>>>>>> NREL/develop
 		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();

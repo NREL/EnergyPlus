@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,11 +58,10 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
- 
+
 TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1 )
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
 		"	Test,	!- Name of ground temperature object",
 		"	1.08,		!- Soil Thermal Conductivity",
@@ -72,8 +72,13 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1 )
 		"	1;			!- Phase Shift of Minimum Surface Temperature",
 	});
 
+<<<<<<< HEAD
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	
+=======
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+>>>>>>> NREL/develop
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );
@@ -91,7 +96,6 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1 )
 TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2 ) // lNumericFieldBlanks not working correctly for this test
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
 		"	Test,	!- Name of ground temperature object",
 		"	1.08,		!- Soil Thermal Conductivity",
@@ -100,6 +104,7 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2 ) // lNumericFiel
 		"	,			!- Average Surface Temperature",
 		"	,			!- Average Amplitude of Surface Temperature",
 		"	;			!- Phase Shift of Minimum Surface Temperature",
+
 		"Site:GroundTemperature:Shallow,",
 		"	16.00,	!- January",
 		"	15.00,	!- February",
@@ -109,14 +114,19 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2 ) // lNumericFiel
 		"	19.00,	!- June",
 		"	20.00,	!- July",
 		"	21.00,	!- August",
-		"	20.00,	!- Septeber",
+		"	20.00,	!- September",
 		"	19.00,	!- October",
 		"	18.00,	!- November",
 		"	17.00;	!- December",
 	});
 
+<<<<<<< HEAD
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	
+=======
+	ASSERT_FALSE( process_idf( idf_objects ) );
+
+>>>>>>> NREL/develop
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

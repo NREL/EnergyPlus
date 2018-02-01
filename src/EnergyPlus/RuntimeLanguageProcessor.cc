@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,7 +58,7 @@
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/random.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <RuntimeLanguageProcessor.hh>
@@ -211,8 +212,12 @@ namespace RuntimeLanguageProcessor {
 		ActualDateAndTimeNum = 0;
 		ActualTimeNum = 0;
 		WarmUpFlagNum = 0;
+<<<<<<< HEAD
 		ErlStackUniqueNames.clear();
 		RuntimeReportVarUniqueNames.clear();
+=======
+
+>>>>>>> NREL/develop
 	}
 
 	void
@@ -2602,7 +2607,17 @@ namespace RuntimeLanguageProcessor {
 					ReturnValue.Error = "Variable used with built-in trend function is not associated with a registered trend variable";
 				}
 			} else if ( SELECT_CASE_var == FuncCurveValue ) {
-				ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number, Operand( 5 ).Number, Operand( 6 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				if ( Operand( 3 ).Type == 0 && Operand( 4 ).Type == 0 && Operand( 5 ).Type == 0 && Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else if ( Operand( 4 ).Type == 0 && Operand( 5 ).Type == 0 && Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else if ( Operand( 5 ).Type == 0 && Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else if ( Operand( 6 ).Type == 0 ) {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number, Operand( 5 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				} else {
+					ReturnValue = SetErlValueNumber( CurveValue( std::floor( Operand( 1 ).Number ), Operand( 2 ).Number, Operand( 3 ).Number, Operand( 4 ).Number, Operand( 5 ).Number, Operand( 6 ).Number ) ); // curve index | X value | Y value, 2nd independent | Z Value, 3rd independent | 4th independent | 5th independent
+				}
 
 			} else {
 				// throw Error!
@@ -2688,6 +2703,7 @@ namespace RuntimeLanguageProcessor {
 		std::string::size_type lbracket;
 		std::string UnitsA;
 		std::string UnitsB;
+		OutputProcessor::Unit curUnit( OutputProcessor::Unit::None );
 		std::string::size_type ptr;
 
 		// FLOW:
@@ -2779,19 +2795,31 @@ namespace RuntimeLanguageProcessor {
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
+<<<<<<< HEAD
 						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
+=======
+						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
+>>>>>>> NREL/develop
 							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
+<<<<<<< HEAD
 						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
+=======
+						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
+>>>>>>> NREL/develop
 							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
+<<<<<<< HEAD
 						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
+=======
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
+>>>>>>> NREL/develop
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 					}
@@ -2801,7 +2829,11 @@ namespace RuntimeLanguageProcessor {
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
+<<<<<<< HEAD
 						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
+=======
+						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
+>>>>>>> NREL/develop
 							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
@@ -3128,7 +3160,7 @@ namespace RuntimeLanguageProcessor {
 							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
+					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3200,7 +3232,11 @@ namespace RuntimeLanguageProcessor {
 						ErrorsFound = true;
 					}}
 
-					SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					if ( curUnit != OutputProcessor::Unit::unknown ) {
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS" );
+					} else {
+						SetupOutputVariable( cAlphaArgs( 1 ), OutputProcessor::Unit::customEMS, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _ , _ , _ , _ , _ , _ , _ , _ , _ , UnitsB );
+					}
 					// Last field is index key, no indexing here so mimic weather output data
 
 				} // RuntimeReportVarNum
@@ -3262,7 +3298,7 @@ namespace RuntimeLanguageProcessor {
 							ShowContinueError( "...Units entered in " + cAlphaFieldNames( 1 ) + " (deprecated use)=\"" + UnitsA + "\"" );
 						}
 					}
-					cAlphaArgs( 1 ) += " [" + UnitsB + ']';
+					curUnit = OutputProcessor::unitStringToEnum( UnitsB );
 
 					RuntimeReportVar( RuntimeReportVarNum ).Name = cAlphaArgs( 1 );
 
@@ -3456,9 +3492,9 @@ namespace RuntimeLanguageProcessor {
 					if ( ! lAlphaFieldBlanks( 8 ) ) {
 						EndUseSubCatString = cAlphaArgs( 8 );
 
-						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, EndUseSubCatString, GroupTypeString );
 					} else { // no subcat
-						SetupOutputVariable( cAlphaArgs( 1 ), RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
+						SetupOutputVariable( cAlphaArgs( 1 ), curUnit, RuntimeReportVar( RuntimeReportVarNum ).Value, FreqString, VarTypeString, "EMS", _, ResourceTypeString, EndUseTypeString, _, GroupTypeString );
 					}
 
 				}

@@ -1,35 +1,42 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><title>EnergyPlus README</title><style></style></head><body id="preview">
 <p><img src="ep.gif" alt="ep.gif (6134 bytes)"><br>
-Version 8.7.0<br>
-31 March 2017<br>
+Version 8.8.0<br>
+30 September 2017<br>
 <em>EnergyPlus is a trademark of the US Department of Energy.</em></p>
 <h1><a id="EnergyPlus_8"></a>EnergyPlus</h1>
 <h2><a id="What_it_is_What_it_is_not_10"></a>What it is, What it is not</h2>
 <p>EnergyPlus is a simulation program designed for modeling buildings with all their associated heating, cooling, lighting, ventilating, and other energy flows. EnergyPlus is a stand-alone simulation engine without a ‘user friendly’ graphical interface . . . EnergyPlus reads input and writes output as text files.</p>
 <p>Utilities and tools for creating, editing, and running input files that come with EnergyPlus include IDF Editor and EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development. For the latest tools, please see <a href="https://energyplus.net/interfaces">this EnergyPlus website for third party interfaces</a>.</p>
 <p>A number of third-party tools are available to create EnergyPlus input files (IDF). For the latest tools, please see <a href="https://energyplus.net/input-files">this EnergyPlus website for third party IDF creation tools</a>. Some of these may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older files to current EnergyPlus version (you may need to use the Multiple Version Conversions set – see below.</p>
-<h2><a id="Whats_going_on_in_V86_18"></a>What’s going on in V8.7?</h2>
-<p>Will there be any considerable difference between version 8.6 and 8.7?</p>
+<h2><a id="Whats_going_on_in_V86_18"></a>What’s going on in V8.8?</h2>
+<p>Will there be any considerable difference between version 8.7 and 8.8?</p>
 <ul>
 <li>Yes… and no. The basic structure of EnergyPlus is still as it has been but there are some significant changes that you will want to be aware of. As always, there are a number of new features and bug fixes. The highlights of features for this version are listed below—see <a href="https://github.com/NREL/EnergyPlus/releases/latest">EnergyPlus Features Page</a> for a complete list of new features added in this and previous versions.</li>
 </ul>
 <p>How about IDF and IDD? Do they remain unchanged?</p>
 <ul>
-<li>There are a few key changes in the V8.7 IDD. For best results, use the transition program to transfer from the earlier V8.6 files. Use the IDFVersionUpdater program for best results.</li>
+<li>There are a few key changes in the V8.8 IDD. For best results, use the transition program to transfer from the earlier V8.7 files. Use the IDFVersionUpdater program for best results.</li>
 </ul>
-<p>Is version 8.7 backward compatible? Can I run v8.6 file in v8.7?</p>
+<p>Is version 8.8 backward compatible? Can I run v8.7 file in v8.8?</p>
 <ul>
 <li>
-<p>There have been changes in the following objects which require conversion. Either read and follow the Rules spreadsheet or use the IDFVersionUpdater utility. The “Rules” spreadsheet that contains information on exact object changes that you can do by hand. The updater program is described more fully in the Auxiliary Programs document. For the v8.7 release, the following objects require conversion (from V8.6):</p>
+<p>There have been changes in the following objects which require conversion. Either read and follow the Rules spreadsheet or use the IDFVersionUpdater utility. The “Rules” spreadsheet that contains information on exact object changes that you can do by hand. The updater program is described more fully in the Auxiliary Programs document. For the v8.8 release, the following objects require conversion (from V8.7):</p>
 <ul>
+<li>AvailabilityManager:NightCycle</li>
+<li>ZoneControl:ContaminantController</li>
+<li>ZoneHVAC:IdealLoadsAirSystem</li>
+<li>Table:TwoIndependentVariables</li>
+<li>Output:Surfaces:List</li>
+<li>SurfaceProperty:ExposedFoundationPerimeter</li>
+<li>Foundation:Kiva:Settings</li>
+<li>UnitarySystemPerformance:Multispeed</li>
+<li>Coil:Cooling:DX:SingleSpeed</li>
+<li>Coil:Cooling:DX:TwoSpeed</li>
 <li>Coil:Cooling:DX:MultiSpeed</li>
-<li>Coil:Heating:DX:MultiSpeed</li>
-<li>CoolingTower:SingleSpeed</li>
-<li>CoolingTower:TwoSpeed</li>
-<li>CoolingTower:VariableSpeed:Merkel</li>
-<li>AirflowNetwork:SimlationControl</li>
-<li>ZoneCapacitanceMultiplier:ResearchSpecial</li>
-<li>WaterHeater:HeatPump:WrappedCondenser</li>
+<li>Coil:Cooling:DX:VariableSpeed</li>
+<li>Coil:Cooling:DX:TwoStageWithHumidityControlMode</li>
+<li>ZoneHVAC:PackagedTerminalHeatPump</li>
+<li>WindowMaterial:Blind:EquivalentLayer</li>
 </ul>
 </li>
 </ul>
@@ -44,7 +51,7 @@ Version 8.7.0<br>
 </ul>
 <h2><a id="Weather_Data_63"></a>Weather Data</h2>
 <p>A small subset of weather files that are available on the web site are also installed in the WeatherData folder. EnergyPlus uses these files directly for annual simulations. The Weather Converter program that is part of EnergyPlus can read these weather files and provide .csv (comma separated variable) as well as statistics reports about the included (or other) files.  Weather data for more than 2100 locations in more than 100 countries can be downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
-<h2><a id="Highlights_of_this_release_V860_67"></a>Highlights of this release (V8.7.0)</h2>
+<h2><a id="Highlights_of_this_release_V860_67"></a>Highlights of this release (V8.8.0)</h2>
 <p>The highlights – improved and new features – are displayed by category.</p>
 <h3><a id="Core_changes_to_EnergyPlus_71"></a>Core changes to EnergyPlus</h3>
 <p>There were many bug fixes and new features added for this release.  Some new features were still added, check the installed changelog file for full details.</p>
@@ -54,26 +61,32 @@ Version 8.7.0<br>
 </ul>
 <h3><a id="Prominent_New_Features_79"></a>Prominent New Features</h3>
 <ul>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5705">#5705</a> : Modeling HVAC Operational Faults – Chiller Supply Water Temperature Sensor Offset</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5766">#5766</a> : Modeling HVAC Operational Faults (1) Condenser Supply Water Temperature Sensor Offset (2) Cooling Tower Scaling</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5786">#5786</a> : Modeling HVAC Operational Faults – Coil Supply Air Temperature Sensor Offset</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5901">#5901</a> : Add Kiva foundation heat transfer calculations</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/6014">#6014</a> : New fan input object Fan:SystemModel</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/6017">#6017</a> : Allow regular expressions as keys for Output:Variable</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5994">#5994</a> : ASHRAE 90.1 SZVAV control for Unitary Systems</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/6021">#6021</a> : Include radiatitve heat transfer in airflow network ducts</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5943">#5943</a> : Variable Speed DX Coil Enhancements</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5740">#5740</a> : Fill Plant Equipment Autosizing Gaps</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5797">#5797</a> : Thermostat based on Adaptive Thermal Comfort Model</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5882">#5882</a> : Hybrid Zone Model</li>
-<li><a href="https://github.com/NREL/EnergyPlus/pull/5924">#5924</a> : Allow polygonal windows in AirflowNetwork</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/5923">#5923</a> : Add tabular reporting capabilities inspired by Checksum report</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6087">#6087</a> : Enhanced Phase Change Material Simulation</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6103">#6103</a> : Enhance Proportional Demand Control Ventilation (DCV)</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6104">#6104</a> : Allow multiple solvers to find a root in HVAC system simulations</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6108">#6108</a> : Allow up to 10 speeds in UnitarySystemPerformance:Multispeed</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6114">#6114</a> : Glazing enhancements - input glazing properties as a function of incident angle</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6134">#6134</a> : Allow Min/Max Temperature control variable for Outdoor Air Reset SetPointManager</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6150">#6150</a> : Update LEED Summary Report</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6158">#6158</a> : Add user input for DX cooling coil low ambient temp cutout</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6179">#6179</a> : Add option to AvailabilityManager:NightCycle to run just until the zone temperature recovers</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6188">#6188</a> : Enable Building Rotation, Movement, and a Water Boundary Condition</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6210">#6210</a> : Allow AirloopHVAC:ReturnPlenum to be used with Ideal Loads Air System</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6223">#6223</a> : Add DesignSpecification:OutdoorAir field and control to terminal units and fix DOA airflow distribution to ZoneHVAC units</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6227">#6227</a> : Improving Building Energy Simulation in an Urban Context</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6245">#6245</a> : Improved Airflow Calculations for BSDF window types
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6248">#6248</a> : Add air terminal unit sizing option, allow air loops with no return path, and partially allow multiple air loops serving the same zone</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6252">#6252</a> : Add a new field of Per Person Ventilation Rate Mode to AirTerminal:SingleDuct:Uncontrolled and AirTerminal:SingleDuct:Mixer</li>
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6291">#6291</a> : IDFEditor - Add new Duplicate Object and Change function; support new units
+<li><a href="https://github.com/NREL/EnergyPlus/pull/6335">#6335</a> : Use local nodes for airflow network calculation
 </ul>
 <h3><a id="Platforms_90"></a>Platforms</h3>
 <ul>
-<li>Windows 7 &amp; 8</li>
+<li>Windows 7, 8 &amp; 8</li>
 <li>Linux (Ubuntu 14.04 and compatible) 64 bit versions; (32-bit and RHEL-compatible versions may be available via Helpdesk)</li>
 <li>Mac OSX 10.9 64 bit versions</li>
-<li>EnergyPlus V8.6 has been tested on all of these platforms</li>
+<li>EnergyPlus V8.8 has been tested on all of these platforms</li>
 <li><em>EnergyPlus does intensive computations, and based on configuration, can write massive amounts of data to disk. For best performance, computers should have a ubstantial amount of memory and high speed hard drives.</em></li>
 </ul>
 <p>And many other enhancements throughout.</p>
@@ -105,7 +118,7 @@ Version 8.7.0<br>
 </li>
 </ol>
 <p>If you have any other questions, contact <a href="mailto:energyplus-support@gard.com">EnergyPlus Support</a>.</p>
-<p>Copyright © 1996-2017 The Board of Trustees of the University of Illinois and The Regents of the University of California through Ernest Orlando Lawrence Berkeley National Laboratory. All rights reserved.</p>
+<p>Copyright © 1996-2017 The Board of Trustees of the University of Illinois, The Regents of the University of California through Ernest Orlando Lawrence Berkeley National Laboratory, Oak Ridge National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All rights reserved.</p>
 <p>Other Notices and Acknowledgments are found in the <a href="Documentation/Acknowledgments.pdf">Acknowledgments</a> document.</p>
 
 </body></html>

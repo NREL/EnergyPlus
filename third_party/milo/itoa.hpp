@@ -1,24 +1,7 @@
 #ifndef itoa_hpp_INCLUDED
 #define itoa_hpp_INCLUDED
 
-// SSE2 implementation according to http://0x80.pl/articles/sse-itoa.html
-// Modifications: (1) fix incorrect digits (2) accept all ranges (3) write to user provided buffer.
-
-#include <cassert>
-#include <emmintrin.h>
 #include <stdint.h>
-
-#ifdef _MSC_VER
-#include <intrin.h>
-#endif
-
-#ifdef _MSC_VER
-#define ALIGN_PRE __declspec(align(16))
-#define ALIGN_SUF
-#else
-#define ALIGN_PRE
-#define ALIGN_SUF  __attribute__ ((aligned(16)))
-#endif
 
 const char gDigitsLut[200] = {
     '0','0','0','1','0','2','0','3','0','4','0','5','0','6','0','7','0','8','0','9',
@@ -33,6 +16,7 @@ const char gDigitsLut[200] = {
     '9','0','9','1','9','2','9','3','9','4','9','5','9','6','9','7','9','8','9','9'
 };
 
+<<<<<<< HEAD
 const uint32_t kDiv10000 = 0xd1b71759;
 ALIGN_PRE const uint32_t kDiv10000Vector[4] ALIGN_SUF = { kDiv10000, kDiv10000, kDiv10000, kDiv10000 };
 ALIGN_PRE const uint32_t k10000Vector[4] ALIGN_SUF = { 10000, 10000, 10000, 10000 };
@@ -328,6 +312,81 @@ inline void i64toa(int64_t value, char* buffer) {
         u = ~u + 1;
     }
     u64toa(u, buffer);
+=======
+#define BEGIN2(n) \
+    do { \
+        int t = (n); \
+        if(t < 10) *p++ = '0' + t; \
+        else { \
+            t *= 2; \
+            *p++ = gDigitsLut[t]; \
+            *p++ = gDigitsLut[t + 1]; \
+        } \
+    } while(0)
+#define MIDDLE2(n) \
+    do { \
+        int t = (n) * 2; \
+        *p++ = gDigitsLut[t]; \
+        *p++ = gDigitsLut[t + 1]; \
+    } while(0)
+#define BEGIN4(n) \
+    do { \
+        int t4 = (n); \
+        if(t4 < 100) BEGIN2(t4); \
+        else { BEGIN2(t4 / 100); MIDDLE2(t4 % 100); } \
+    } while(0)
+#define MIDDLE4(n) \
+    do { \
+        int t4 = (n); \
+        MIDDLE2(t4 / 100); MIDDLE2(t4 % 100); \
+    } while(0)
+#define BEGIN8(n) \
+    do { \
+        uint32_t t8 = (n); \
+        if(t8 < 10000) BEGIN4(t8); \
+        else { BEGIN4(t8 / 10000); MIDDLE4(t8 % 10000); } \
+    } while(0)
+#define MIDDLE8(n) \
+    do { \
+        uint32_t t8 = (n); \
+        MIDDLE4(t8 / 10000); MIDDLE4(t8 % 10000); \
+    } while(0)
+#define MIDDLE16(n) \
+    do { \
+        uint64_t t16 = (n); \
+        MIDDLE8(t16 / 100000000); MIDDLE8(t16 % 100000000); \
+    } while(0)
+
+inline void u32toa(uint32_t x, char* p) {
+
+    if(x < 100000000) BEGIN8(x);
+    else { BEGIN2(x / 100000000); MIDDLE8(x % 100000000); }
+    *p = 0;
+}
+
+inline void i32toa(int32_t x, char* p) {
+
+    uint64_t t;
+    if(x >= 0) t = x;
+    else *p++ = '-', t = -uint32_t(x);
+    u32toa(t, p);
+}
+
+inline void u64toa(uint64_t x, char* p) {
+
+    if(x < 100000000) BEGIN8(x);
+    else if(x < 10000000000000000) { BEGIN8(x / 100000000); MIDDLE8(x % 100000000); }
+    else { BEGIN4(x / 10000000000000000); MIDDLE16(x % 10000000000000000); }
+    *p = 0;
+}
+
+inline void i64toa(int64_t x, char* p) {
+
+    uint64_t t;
+    if(x >= 0) t = x;
+    else *p++ = '-', t = -uint64_t(x);
+    u64toa(t, p);
+>>>>>>> NREL/develop
 }
 
 #endif // itoa_hpp_INCLUDED

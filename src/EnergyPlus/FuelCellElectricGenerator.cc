@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -947,76 +948,76 @@ namespace FuelCellElectricGenerator {
 			}
 
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
-				SetupOutputVariable( "Generator Produced Electric Power [W]", FuelCell( GeneratorNum ).Report.ACPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Electric Energy [J]", FuelCell( GeneratorNum ).Report.ACEnergyGen, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
-				SetupOutputVariable( "Generator Produced Thermal Rate [W]", FuelCell( GeneratorNum ).Report.qHX, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", FuelCell( GeneratorNum ).Report.HXenergy, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ENERGYTRANSFER", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.ACPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.ACEnergyGen, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.qHX, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.HXenergy, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "ENERGYTRANSFER", "COGENERATION", _, "Plant" );
 
-				SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", FuelCell( GeneratorNum ).Report.FuelEnergyHHV, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "Gas", "COGENERATION", _, "Plant" );
-				SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", FuelCell( GeneratorNum ).Report.FuelEnergyUseRateHHV, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.FuelEnergyHHV, "System", "Sum", FuelCell( GeneratorNum ).Name, _, "Gas", "COGENERATION", _, "Plant" );
+				SetupOutputVariable( "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelEnergyUseRateHHV, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Rate [W]", FuelCell( GeneratorNum ).Report.SkinLossPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Energy [J]", FuelCell( GeneratorNum ).Report.SkinLossEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Convection Heat Transfer Rate [W]", FuelCell( GeneratorNum ).Report.SkinLossConvect, "System", "Average", FuelCell( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Zone Radiation Heat Transfer Rate [W]", FuelCell( GeneratorNum ).Report.SkinLossRadiat, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.SkinLossPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Sensible Heat Transfer Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.SkinLossEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Convection Heat Transfer Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.SkinLossConvect, "System", "Average", FuelCell( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Zone Radiation Heat Transfer Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.SkinLossRadiat, "System", "Average", FuelCell( GeneratorNum ).Name );
 
 				SetupZoneInternalGain( FuelCell( GeneratorNum ).FCPM.ZoneID, "Generator:FuelCell", FuelCell( GeneratorNum ).Name, IntGainTypeOf_GeneratorFuelCell, FuelCell( GeneratorNum ).Report.SkinLossConvect, _, FuelCell( GeneratorNum ).Report.SkinLossRadiat );
 
 				if ( DisplayAdvancedReportVariables ) { // show extra data originally needed for detailed comparative testing
-					SetupOutputVariable( "Generator Air Inlet Temperature [C]", FuelCell( GeneratorNum ).Report.TairInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Air Temperature [C]", FuelCell( GeneratorNum ).Report.TairIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Air Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotAir, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Air Enthalpy [W]", FuelCell( GeneratorNum ).Report.TotAirInEnthalphy, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Blower Electric Power [W]", FuelCell( GeneratorNum ).Report.BlowerPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Blower Electric Energy [J]", FuelCell( GeneratorNum ).Report.BlowerEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Blower Skin Heat Loss Rate [W]", FuelCell( GeneratorNum ).Report.BlowerSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Air Inlet Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TairInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Air Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TairIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Air Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotAir, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Air Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.TotAirInEnthalphy, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Blower Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.BlowerPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Blower Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.BlowerEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Blower Skin Heat Loss Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.BlowerSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Inlet Temperature [C]", FuelCell( GeneratorNum ).Report.TfuelInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Fuel Temperature [C]", FuelCell( GeneratorNum ).Report.TfuelIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotFuel, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Consumption LHV Basis Energy [J]", FuelCell( GeneratorNum ).Report.FuelEnergyLHV, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Consumption Rate LHV Basis [W]", FuelCell( GeneratorNum ).Report.FuelEnergyUseRateLHV, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Inlet Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TfuelInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Fuel Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TfuelIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotFuel, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Consumption LHV Basis Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.FuelEnergyLHV, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Consumption Rate LHV Basis", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelEnergyUseRateLHV, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Power Module Entering Fuel Enthalpy [W]", FuelCell( GeneratorNum ).Report.TotFuelInEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Compressor Electric Power [W]", FuelCell( GeneratorNum ).Report.FuelCompressPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Compressor Electric Energy [J]", FuelCell( GeneratorNum ).Report.FuelCompressEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Compressor Skin Heat Loss Rate [W]", FuelCell( GeneratorNum ).Report.FuelCompressSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Fuel Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.TotFuelInEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Compressor Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelCompressPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.FuelCompressEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Compressor Skin Heat Loss Rate", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.FuelCompressSkinLoss, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Reformer Water Inlet Temperature [C]", FuelCell( GeneratorNum ).Report.TwaterInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Power Module Entering Reforming Water Temperature [C]", FuelCell( GeneratorNum ).Report.TwaterIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Reformer Water Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotWater, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Power [W]", FuelCell( GeneratorNum ).Report.WaterPumpPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Energy [J]", FuelCell( GeneratorNum ).Report.WaterPumpEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Inlet Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TwaterInlet, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Reforming Water Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TwaterIntoFCPM, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotWater, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.WaterPumpPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Reformer Water Pump Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.WaterPumpEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Power Module Entering Reforming Water Enthalpy [W]", FuelCell( GeneratorNum ).Report.WaterIntoFCPMEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Power Module Entering Reforming Water Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.WaterIntoFCPMEnthalpy, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Product Gas Temperature [C]", FuelCell( GeneratorNum ).Report.TprodGas, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas Enthalpy [W]", FuelCell( GeneratorNum ).Report.EnthalProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas Ar Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotProdAr, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas CO2 Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotProdCO2, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas H2O Vapor Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotProdH2O, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas N2 Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotProdN2, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Product Gas O2 Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.NdotProdO2, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.TprodGas, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Enthalpy", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.EnthalProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdGas, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas Ar Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdAr, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas CO2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdCO2, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas H2O Vapor Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdH2O, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas N2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdN2, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Product Gas O2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.NdotProdO2, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Heat Recovery Exit Gas Temperature [C]", FuelCell( GeneratorNum ).Report.THXexh, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Heat Recovery Exit Gas H2O Vapor Fraction [ ]", FuelCell( GeneratorNum ).Report.WaterVaporFractExh, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Heat Recovery Water Condensate Molar Flow Rate [kmol/s]", FuelCell( GeneratorNum ).Report.CondensateRate, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Heat Recovery Exit Gas Temperature", OutputProcessor::Unit::C, FuelCell( GeneratorNum ).Report.THXexh, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Heat Recovery Exit Gas H2O Vapor Fraction", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.WaterVaporFractExh, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Heat Recovery Water Condensate Molar Flow Rate", OutputProcessor::Unit::kmol_s, FuelCell( GeneratorNum ).Report.CondensateRate, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Inverter Loss Power [W]", FuelCell( GeneratorNum ).Report.PCUlosses, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Produced DC Electric Power [W]", FuelCell( GeneratorNum ).Report.DCPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Power Efficiency [ ]", FuelCell( GeneratorNum ).Report.DCPowerEff, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Inverter Loss Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.PCUlosses, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Produced DC Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.DCPowerGen, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Power Efficiency", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.DCPowerEff, "System", "Average", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Electric Storage Charge State [J]", FuelCell( GeneratorNum ).Report.ElectEnergyinStorage, "System", "Average", FuelCell( GeneratorNum ).Name ); //? 'Sum'
-					SetupOutputVariable( "Generator DC Storage Charging Power [W]", FuelCell( GeneratorNum ).Report.StoredPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Charging Energy [J]", FuelCell( GeneratorNum ).Report.StoredEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Discharging Power [W]", FuelCell( GeneratorNum ).Report.DrawnPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator DC Storage Discharging Energy [J]", FuelCell( GeneratorNum ).Report.DrawnEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Ancillary AC Electric Power [W]", FuelCell( GeneratorNum ).Report.ACancillariesPower, "System", "Average", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Ancillary AC Electric Energy [J]", FuelCell( GeneratorNum ).Report.ACancillariesEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Electric Storage Charge State", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.ElectEnergyinStorage, "System", "Average", FuelCell( GeneratorNum ).Name ); //? 'Sum'
+					SetupOutputVariable( "Generator DC Storage Charging Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.StoredPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Charging Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.StoredEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Discharging Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.DrawnPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator DC Storage Discharging Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.DrawnEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Ancillary AC Electric Power", OutputProcessor::Unit::W, FuelCell( GeneratorNum ).Report.ACancillariesPower, "System", "Average", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Ancillary AC Electric Energy", OutputProcessor::Unit::J, FuelCell( GeneratorNum ).Report.ACancillariesEnergy, "System", "Sum", FuelCell( GeneratorNum ).Name );
 
-					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count [ ]", FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
-					SetupOutputVariable( "Generator Root Solver Iteration Count [ ]", FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Fuel Cell Model Iteration Count", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.SeqSubstIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
+					SetupOutputVariable( "Generator Root Solver Iteration Count", OutputProcessor::Unit::None, FuelCell( GeneratorNum ).Report.RegulaFalsiIterations, "System", "Sum", FuelCell( GeneratorNum ).Name );
 				}
 			}
 
@@ -1860,7 +1861,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -1891,8 +1892,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID;
@@ -1912,8 +1911,16 @@ namespace FuelCellElectricGenerator {
 		// two different themodynamic curve fits might be used
 
 		tempCp = 0.0;
-		Tkel = ( FluidTemp + KelvinConv );
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
+
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
+
 
 		for ( thisConstit = 1; thisConstit <= FuelCell( GeneratorNum ).AirSup.NumConstituents; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AirSup.GasLibID( thisConstit );
@@ -1926,7 +1933,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -1937,7 +1944,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -1956,7 +1963,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -1987,8 +1994,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHair;
 		Real64 HairI;
 		int thisConstit; // loop index
@@ -2007,11 +2012,19 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHair = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= FuelCell( GeneratorNum ).AirSup.NumConstituents; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AirSup.GasLibID( thisConstit );
@@ -2026,7 +2039,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HairI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
+					HairI = ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H );
 
 					tempHair += HairI * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
@@ -2039,7 +2052,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2057,7 +2070,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2088,8 +2101,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2104,11 +2115,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).NumConstituents; ++thisConstit ) {
 			gasID = FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).GasLibID( thisConstit );
@@ -2121,7 +2139,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2131,7 +2149,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -2150,7 +2168,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2181,8 +2199,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHfuel;
 		Real64 HfuelI;
 		int thisConstit; // loop index
@@ -2201,11 +2217,19 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHfuel = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).NumConstituents; ++thisConstit ) {
 			gasID = FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).GasLibID( thisConstit );
@@ -2219,7 +2243,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HfuelI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
+					HfuelI = ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H );
 
 					tempHfuel += HfuelI * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
@@ -2233,7 +2257,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2251,7 +2275,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   August 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2282,8 +2306,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempHprodGases;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2301,11 +2323,19 @@ namespace FuelCellElectricGenerator {
 		Real64 A5; // NASA poly coeff
 		Real64 A6; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempHprodGases = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_4_Tsho( pow_4( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= 5; ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).FCPM.GasLibID( thisConstit );
@@ -2319,7 +2349,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					tempHprodGases += ( ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempHprodGases += ( ( A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
 					A1 = GasPhaseThermoChemistryData( gasID ).NASA_A1;
@@ -2329,7 +2359,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 				}
 			} // gasid > 0
 		}
@@ -2390,8 +2420,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2406,11 +2434,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).FCPM.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).FCPM.GasLibID( thisConstit );
@@ -2423,7 +2458,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2433,7 +2468,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2497,8 +2532,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2513,11 +2546,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).AuxilHeat.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).AuxilHeat.GasLibID( thisConstit );
@@ -2530,7 +2570,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2540,7 +2580,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2604,8 +2644,6 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 Tkel; // temp for NASA eq. in Kelvin
 		Real64 tempCp;
 		int thisConstit; // loop index
 		int gasID; // look up into Gas structure
@@ -2620,11 +2658,18 @@ namespace FuelCellElectricGenerator {
 		Real64 A4; // NASA poly coeff
 		Real64 A5; // NASA poly coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-		Tkel = ( FluidTemp + KelvinConv );
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+		Real64 const Tkel = ( FluidTemp + KelvinConv ); // temp for NASA eq. in Kelvin
+
 		// loop through fuel constituents and sum up Cp
 
 		tempCp = 0.0;
+
+		Real64 const pow_2_Tsho( pow_2( Tsho ) );
+		Real64 const pow_3_Tsho( pow_3( Tsho ) );
+		Real64 const pow_2_Tkel( pow_2( Tkel ) );
+		Real64 const pow_3_Tkel( pow_3( Tkel ) );
+		Real64 const pow_4_Tkel( pow_4( Tkel ) );
 
 		for ( thisConstit = 1; thisConstit <= isize( FuelCell( GeneratorNum ).ExhaustHX.GasLibID ); ++thisConstit ) {
 			gasID = FuelCell( GeneratorNum ).ExhaustHX.GasLibID( thisConstit );
@@ -2637,7 +2682,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2647,7 +2692,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2667,7 +2712,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   December 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2697,23 +2742,15 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
-		Real64 F; // shomate coeff
+		Real64 const A = 29.0373; // shomate coeff
+		Real64 const B = 10.2573; // shomate coeff
+		Real64 const C = 2.81048; // shomate coeff
+		Real64 const D = -0.95914; // shomate coeff
+		Real64 const E = 0.11725; // shomate coeff
+		Real64 const F = -250.569; // shomate coeff
 		//  REAL(r64) :: H ! shomate coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = 29.0373;
-		B = 10.2573;
-		C = 2.81048;
-		D = -0.95914;
-		E = 0.11725;
-		F = -250.569;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
 		HGasWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
@@ -2727,7 +2764,7 @@ namespace FuelCellElectricGenerator {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         B griffith
+		//       AUTHOR         B Griffith
 		//       DATE WRITTEN   December 2005
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
@@ -2757,24 +2794,15 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
-		Real64 F; // shomate coeff
-		Real64 H; // shomate coeff
+		Real64 const A = -203.606; // shomate coeff
+		Real64 const B = 1523.29; // shomate coeff
+		Real64 const C = -3196.413; // shomate coeff
+		Real64 const D = 2474.455; // shomate coeff
+		Real64 const E = 3.85533; // shomate coeff
+		Real64 const F = -256.5478; // shomate coeff
+		// Real64 const H = -285.8304; // shomate coeff (currently unused)
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = -203.606;
-		B = 1523.29;
-		C = -3196.413;
-		D = 2474.455;
-		E = 3.85533;
-		F = -256.5478;
-		H = -285.8304;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
 		HLiqWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
@@ -2831,20 +2859,13 @@ namespace FuelCellElectricGenerator {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Tsho; // temp for Shomate eq  in (Kelvin/1000)
-		Real64 A; // shomate coeff
-		Real64 B; // shomate coeff
-		Real64 C; // shomate coeff
-		Real64 D; // shomate coeff
-		Real64 E; // shomate coeff
+		Real64 const A = -203.606; // shomate coeff
+		Real64 const B = 1523.29; // shomate coeff
+		Real64 const C = -3196.413; // shomate coeff
+		Real64 const D = 2474.455; // shomate coeff
+		Real64 const E = 3.85533; // shomate coeff
 
-		Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
-
-		A = -203.606;
-		B = 1523.29;
-		C = -3196.413;
-		D = 2474.455;
-		E = 3.85533;
+		Real64 const Tsho = ( FluidTemp + KelvinConv ) / 1000.0;
 
 		Cp = A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho );
 

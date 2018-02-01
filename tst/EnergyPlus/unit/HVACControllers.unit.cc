@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -53,10 +54,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <DataAirLoop.hh>
+#include <DataConvergParams.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
 
@@ -141,17 +146,17 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType ) {
 		std::string const idf_objects = delimited_string( {
-			" Version,8.3;",
+
 			" Coil:Cooling:Water,",
 			"	Chilled Water Coil,	!- Name",
 			"	AvailSched,			!- Availability Schedule Name",
-			"	autosize,			!- Design Water Flow Rate { m3 / s }",
-			"	autosize,			!- Design Air Flow Rate { m3 / s }",
-			"	autosize,			!- Design Inlet Water Temperature { C }",
-			"	autosize,			!- Design Inlet Air Temperature { C }",
-			"	autosize,			!- Design Outlet Air Temperature { C }",
-			"	autosize,			!- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
-			"	autosize,			!- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+			"	0.01,				!- Design Water Flow Rate { m3 / s }",
+			"	1.0,				!- Design Air Flow Rate { m3 / s }",
+			"	7.2,				!- Design Inlet Water Temperature { C }",
+			"	32.0,				!- Design Inlet Air Temperature { C }",
+			"	12.0,				!- Design Outlet Air Temperature { C }",
+			"	0.01,				!- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+			"	0.07,				!- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
 			"	Water Inlet Node,	!- Water Inlet Node Name",
 			"	Water Outlet Node,  !- Water Outlet Node Name",
 			"	Air Inlet Node,		!- Air Inlet Node Name",
@@ -165,8 +170,8 @@ namespace EnergyPlus {
 			"	FLOW,				!- Actuator Variable",
 			"	Air Outlet Node,	!- Sensor Node Name",
 			"	Water Inlet Node,	!- Actuator Node Name",
-			"	autosize,			!- Controller Convergence Tolerance { deltaC }",
-			"	autosize,			!- Maximum Actuated Flow { m3 / s }",
+			"	0.001,				!- Controller Convergence Tolerance { deltaC }",
+			"	0.01,				!- Maximum Actuated Flow { m3 / s }",
 			"	0.0;				!- Minimum Actuated Flow { m3 / s }",
 			" SetpointManager:Scheduled,",
 			"	HumRatSPManager,	!- Name",
@@ -204,6 +209,64 @@ namespace EnergyPlus {
 		// ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
 		ControllerProps( 1 ).HumRatCntrlType = GetHumidityRatioVariableType( ControllerProps( 1 ).SensedNode );
 		ASSERT_EQ( iCtrlVarType_MaxHumRat, ControllerProps( 1 ).HumRatCntrlType );
+
+		// test index for air loop controllers
+		// before controllers are simulated, AirLoopControllerIndex = 0
+		ASSERT_EQ( 0, ControllerProps( 1 ).AirLoopControllerIndex );
+
+		OutputReportPredefined::SetPredefinedTables();
+		DataHVACGlobals::NumPrimaryAirSys = 1;
+		DataAirLoop::PriAirSysAvailMgr.allocate( 1 );
+		DataAirLoop::AirLoopControlInfo.allocate( 1 );
+		DataAirLoop::AirToZoneNodeInfo.allocate( 1 );
+		DataAirLoop::AirToZoneNodeInfo( 1 ).NumSupplyNodes = 1;
+		DataAirLoop::AirToZoneNodeInfo( 1 ).AirLoopSupplyNodeNum.allocate( 1 );
+		DataAirLoop::AirToZoneNodeInfo( 1 ).AirLoopSupplyNodeNum( 1 ) = 1;
+		DataAirLoop::AirToZoneNodeInfo( 1 ).ZoneEquipSupplyNodeNum.allocate( 1 );
+		DataAirLoop::AirToZoneNodeInfo( 1 ).ZoneEquipSupplyNodeNum( 1 ) = 4;
+		DataConvergParams::AirLoopConvergence.allocate( 1 );
+		DataConvergParams::AirLoopConvergence( 1 ).HVACMassFlowNotConverged.allocate( 2 );
+		DataConvergParams::AirLoopConvergence( 1 ).HVACHumRatNotConverged.allocate( 2 );
+		DataConvergParams::AirLoopConvergence( 1 ).HVACTempNotConverged.allocate( 2 );
+		DataConvergParams::AirLoopConvergence( 1 ).HVACEnergyNotConverged.allocate( 2 );
+		DataConvergParams::AirLoopConvergence( 1 ).HVACEnthalpyNotConverged.allocate( 2 );
+		DataConvergParams::AirLoopConvergence( 1 ).HVACPressureNotConverged.allocate( 2 );
+		DataAirSystems::PrimaryAirSystem.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).NumBranches = 1;
+		DataAirSystems::PrimaryAirSystem( 1 ).NumControllers = 1;
+		DataAirSystems::PrimaryAirSystem( 1 ).ControllerIndex.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).ControllerIndex( 1 ) = 0;
+		DataAirSystems::PrimaryAirSystem( 1 ).ControllerName.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).ControllerName( 1 ) = "CW COIL CONTROLLER";
+		DataAirSystems::PrimaryAirSystem( 1 ).ControlConverged.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNumIn = 4;
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNumOut = 1;
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).TotalNodes = 1;
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNum.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).NodeNum( 1 ) = 1;
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = "CHILLED WATER COIL";
+		DataAirSystems::PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).CompType_Num = 5; // WaterCoil_Cooling
+		DataPlant::PlantLoop.allocate( 1 );
+		DataPlant::TotNumLoops = 1;
+		DataPlant::PlantLoop( 1 ).LoopSide.allocate( 2 );
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).TotalBranches = 1;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 1;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = 39;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 3;
+		DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "CHILLED WATER COIL";
+		bool SimZoneEquipment( false );
+		SimAirServingZones::SimAirLoops( true, SimZoneEquipment );
+
+		// after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
+		ASSERT_EQ( 1, DataAirSystems::PrimaryAirSystem( 1 ).NumControllers );
+		ASSERT_EQ( 1, DataAirSystems::PrimaryAirSystem( 1 ).ControllerIndex( 1 ) );
+		ASSERT_EQ( 1, ControllerProps( 1 ).AirLoopControllerIndex );
 
 	}
 

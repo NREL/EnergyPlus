@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -44,13 +45,10 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <string>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
+#include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
 #include <TARCOGOutput.hh>
@@ -1312,19 +1310,19 @@ namespace TARCOGOutput {
 			gio::write( WINCogFile, Format_2020 ) << xwght( i );
 			gio::write( WINCogFile, Format_2031 );
 			gio::write( Format_2020 ) << xgcon( 1, 1 );
-			for ( j = 2; i <= 3; ++j ) {
+			for ( j = 2; j <= 3; ++j ) {
 				gio::write( WINCogFile, Format_2030 ) << xgcon( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2032 );
 			gio::write( Format_2020 ) << xgvis( 1, 1 );
-			for ( j = 2; i <= 3; ++j ) {
+			for ( j = 2; j <= 3; ++j ) {
 				gio::write( WINCogFile, Format_2030 ) << xgvis( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2033 );
 			gio::write( Format_2020 ) << xgcp( 1, 1 );
-			for ( j = 2; i <= 3; ++j ) {
+			for ( j = 2; j <= 3; ++j ) {
 				gio::write( WINCogFile, Format_2030 ) << xgcp( j, i );
 			}
 			gio::write( WINCogFile );
@@ -1551,43 +1549,102 @@ namespace TARCOGOutput {
 			InArgumentsFile = GetNewUnitNumber();
 			//      open(newunit=InArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode,  &
 			//              position=FilePosition, form='formatted', iostat=nperr)
-			{ IOFlags flags; flags.ACCESS( FileMode ); flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( FilePosition ); gio::open( InArgumentsFile, DBGD + DebugOutputFileName, flags ); nperr = flags.ios(); }
+			{
+				IOFlags flags;
+				flags.ACCESS( FileMode );
+				flags.FORM( "formatted" );
+				flags.STATUS( "unknown" );
+				flags.POSITION( FilePosition );
+				gio::open( InArgumentsFile, DBGD + DebugOutputFileName, flags );
+				nperr = flags.ios();
+			}
 
 			//      if (nperr.ne.0)  open(newunit=InArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode,  &
 			//              position=FilePosition, form='formatted', iostat=nperr)
-			if ( nperr != 0 ) { IOFlags flags; flags.ACCESS( FileMode ); flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( FilePosition ); gio::open( InArgumentsFile, DebugOutputFileName, flags ); nperr = flags.ios(); }
+			if ( nperr != 0 ) {
+				IOFlags flags;
+				flags.ACCESS( FileMode );
+				flags.FORM( "formatted" );
+				flags.STATUS( "unknown" );
+				flags.POSITION( FilePosition );
+				gio::open( InArgumentsFile, DebugOutputFileName, flags );
+				nperr = flags.ios();
+			}
 
 			OutArgumentsFile = InArgumentsFile;
 
 			WINCogFile = GetNewUnitNumber();
 			//      open(newunit=WINCogFile,  file=TRIM(DBGD)//TRIM(WinCogFileName),  status='unknown', access=FileMode, &
 			//             position=FilePosition, form='formatted', iostat=nperr)
-			{ IOFlags flags; flags.ACCESS( FileMode ); flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( FilePosition ); gio::open( WINCogFile, DBGD + WinCogFileName, flags ); nperr = flags.ios(); }
+			{
+				IOFlags flags;
+				flags.ACCESS( FileMode );
+				flags.FORM( "formatted" );
+				flags.STATUS( "unknown" );
+				flags.POSITION( FilePosition );
+				gio::open( WINCogFile, DBGD + WinCogFileName, flags );
+				nperr = flags.ios();
+			}
 			//      if (nperr.ne.0) open(newunit=WINCogFile,  file=TRIM(WinCogFileName),  status='unknown', access=FileMode, &
 			//                            position=FilePosition, form='formatted', iostat=nperr)
-			if ( nperr != 0 ) { IOFlags flags; flags.ACCESS( FileMode ); flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( FilePosition ); gio::open( WINCogFile, WinCogFileName, flags ); nperr = flags.ios(); }
+			if ( nperr != 0 ) {
+				IOFlags flags;
+				flags.ACCESS( FileMode );
+				flags.FORM( "formatted" );
+				flags.STATUS( "unknown" );
+				flags.POSITION( FilePosition );
+				gio::open( WINCogFile, WinCogFileName, flags );
+				nperr = flags.ios();
+			}
 
 			if ( Debug_mode == saveIntermediateResults ) {
 				TarcogIterationsFileNumber = GetNewUnitNumber();
 				//        open(newunit=TarcogIterationsFileNumber,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
 				//              form='formatted', iostat=nperr)
-				{ IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DBGD + DataStringGlobals::TarcogIterationsFileName, flags ); nperr = flags.ios(); }
+				{
+					IOFlags flags;
+					flags.FORM( "formatted" );
+					flags.STATUS( "unknown" );
+					flags.POSITION( "APPEND" );
+					gio::open( TarcogIterationsFileNumber, DBGD + DataStringGlobals::TarcogIterationsFileName, flags );
+					nperr = flags.ios();
+				}
 
 				//        if (nperr.ne.0)  open(newunit=TarcogIterationsFileNumber, file='TarcogIterations.dbg',status='unknown', position='APPEND',  &
 				//              &  form='formatted', iostat=nperr)
-				if ( nperr != 0 ) { IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DataStringGlobals::TarcogIterationsFileName, flags ); nperr = flags.ios(); }
+				if ( nperr != 0 ) {
+					IOFlags flags;
+					flags.FORM( "formatted" );
+					flags.STATUS( "unknown" );
+					flags.POSITION( "APPEND" );
+					gio::open( TarcogIterationsFileNumber, DataStringGlobals::TarcogIterationsFileName, flags );
+					nperr = flags.ios();
+				}
 
 				IterationCSVFileNumber = GetNewUnitNumber();
 				//        open(newunit=IterationCSVFileNumber,  file=TRIM(DBGD)//TRIM(IterationCSVName),  status='unknown', position='APPEND',  &
 				//              form='formatted', iostat=nperr)
-				{ IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( IterationCSVFileNumber, DBGD + IterationCSVName, flags ); nperr = flags.ios(); }
+				{
+					IOFlags flags;
+					flags.FORM( "formatted" );
+					flags.STATUS( "unknown" );
+					flags.POSITION( "APPEND" );
+					gio::open( IterationCSVFileNumber, DBGD + IterationCSVName, flags );
+					nperr = flags.ios();
+				}
 
 				//        if (nperr.ne.0)  open(newunit=IterationCSVFileNumber,  file=TRIM(IterationCSVName),  status='unknown', position='APPEND',  &
 				//              form='formatted', iostat=nperr)
-				if ( nperr != 0 ) { IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( IterationCSVFileNumber, IterationCSVName, flags ); nperr = flags.ios(); }
+				if ( nperr != 0 ) {
+					IOFlags flags;
+					flags.FORM( "formatted" );
+					flags.STATUS( "unknown" );
+					flags.POSITION( "APPEND" );
+					gio::open( IterationCSVFileNumber, IterationCSVName, flags );
+					nperr = flags.ios();
+				}
 			}
 		}
-
 	}
 
 } // TARCOGOutput

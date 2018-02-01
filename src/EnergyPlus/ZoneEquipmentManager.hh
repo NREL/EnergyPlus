@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -146,8 +147,13 @@ namespace ZoneEquipmentManager {
 	void
 	InitSystemOutputRequired(
 		int const ZoneNum,
-		Real64 & SysOutputProvided,
-		Real64 & LatOutputProvided
+		bool const FirstHVACIteration
+	);
+
+	void
+	DistributeSystemOutputRequired(
+		int const ActualZoneNum,
+		bool const FirstHVACIteration
 	);
 
 	void
@@ -162,6 +168,13 @@ namespace ZoneEquipmentManager {
 	CalcZoneMassBalance();
 
 	void
+	CalcZoneReturnFlows(
+		int const ZoneNum,
+		Real64 & ExpTotalReturnMassFlow, // Expected total return air mass flow rate
+		Real64 & FinalTotalReturnMassFlow // Final total return air mass flow rate
+	);
+
+	void
 	CalcAirFlowSimple(
 		int const SysTimestepLoop = 0, // System time step index
 		bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
@@ -174,13 +187,15 @@ namespace ZoneEquipmentManager {
 	CalcZoneMixingFlowRateOfReceivingZone(
 		int const ZoneNum,
 		Real64 & ZoneMixingAirMassFlowRate
-		);
+	);
 
 	void
 	CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum);
 
 	void
-	CalcZoneLeavingConditions();
+	CalcZoneLeavingConditions(
+		bool const FirstHVACIteration
+	);
 
 	void
 	UpdateZoneEquipment( bool & SimAir );

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -385,6 +386,7 @@ namespace DataHVACGlobals {
 	bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
+	int MinAirLoopIterationsAfterFirst( 1 ); // minimum number of HVAC iterations after FirstHVACIteration (must be at least 2 for sequenced loads to operate on air loops)
 
 	int const NumZoneHVACTerminalTypes( 37 );
 
@@ -578,6 +580,7 @@ namespace DataHVACGlobals {
 		SimZoneEquipmentFlag = true;
 		SimNonZoneEquipmentFlag = true;
 		ZoneMassBalanceHVACReSim = true;
+		MinAirLoopIterationsAfterFirst = 1;
 		ZoneComp.deallocate();
 		CompSetPtEquip.deallocate();
 		OptStartData = OptStartDataType();

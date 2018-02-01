@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2815,65 +2816,65 @@ namespace CurveManager {
 			if ( SELECT_CASE_var == CurveType_TableMultiIV ) {
 				{ auto const SELECT_CASE_var1( TableLookup( PerfCurve( CurveIndex ).TableIndex ).NumIndependentVars );
 				if ( SELECT_CASE_var1 == 1 ) { //- 1 independent variable
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( SELECT_CASE_var1 == 2 ) { //- 2 independent variables
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( SELECT_CASE_var1 == 3 ) { //- 3 independent variables
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 3 Value []", PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( SELECT_CASE_var1 == 4 ) { //- 4 independent variables
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 3 Value []", PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 4 Value []", PerfCurve( CurveIndex ).CurveInput4, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 4 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput4, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( SELECT_CASE_var1 == 5 ) { //- 5 independent variables
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 3 Value []", PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 4 Value []", PerfCurve( CurveIndex ).CurveInput4, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 5 Value []", PerfCurve( CurveIndex ).CurveInput5, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 4 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput4, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 5 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput5, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else {
 				}}
 			} else if ( SELECT_CASE_var == CurveType_TableOneIV ) {
 				// CurrentModuleObject='Table:OneIndependentVariable'
-				SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+				SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 			} else if ( SELECT_CASE_var == CurveType_TableTwoIV ) {
 				// CurrentModuleObject='Table:TwoIndependentVariables'
-				SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-				SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+				SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+				SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 			} else {
 				{ auto const SELECT_CASE_var1( PerfCurve( CurveIndex ).CurveType );
 				if ( ( SELECT_CASE_var1 == Linear ) || ( SELECT_CASE_var1 == Quadratic ) || ( SELECT_CASE_var1 == Cubic ) || ( SELECT_CASE_var1 == Quartic ) || ( SELECT_CASE_var1 == Exponent ) || ( SELECT_CASE_var1 == FuncPressDrop ) ) {
 					// CurrentModuleObject='Curve:Linear/Quadratic/Cubic/Quartic/Exponent/Functional:PressureDrop'
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( ( SELECT_CASE_var1 == BiQuadratic ) || ( SELECT_CASE_var1 == QuadraticLinear ) || ( SELECT_CASE_var1 == BiCubic ) || ( SELECT_CASE_var1 == CubicLinear ) ) {
 					// CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic/CubicLinear'
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( ( SELECT_CASE_var1 == TriQuadratic ) || ( SELECT_CASE_var1 == ChillerPartLoadWithLift ) ) {
 					// CurrentModuleObject='Curve:TriQuadratic'
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 3 Value []", PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( SELECT_CASE_var1 == QuadLinear ) {
 					// CurrentModuleObject='Curve:QuadLinear'
-					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 3 Value []", PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-					SetupOutputVariable( "Performance Curve Input Variable 4 Value []", PerfCurve( CurveIndex ).CurveInput4, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+					SetupOutputVariable( "Performance Curve Input Variable 4 Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveInput4, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				}}
 			}}
 			// set the output up last so it shows up after the input in the csv file
-			SetupOutputVariable( "Performance Curve Output Value []", PerfCurve( CurveIndex ).CurveOutput, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
+			SetupOutputVariable( "Performance Curve Output Value", OutputProcessor::Unit::None, PerfCurve( CurveIndex ).CurveOutput, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 		}
 
 		for ( CurveIndex = 1; CurveIndex <= NumPressureCurves; ++CurveIndex ) {
-			SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PressureCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
-			SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PressureCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
-			SetupOutputVariable( "Performance Curve Input Variable 3 Value []", PressureCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
-			SetupOutputVariable( "Performance Curve Output Value []", PressureCurve( CurveIndex ).CurveOutput, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
+			SetupOutputVariable( "Performance Curve Input Variable 1 Value", OutputProcessor::Unit::None, PressureCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
+			SetupOutputVariable( "Performance Curve Input Variable 2 Value", OutputProcessor::Unit::None, PressureCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
+			SetupOutputVariable( "Performance Curve Input Variable 3 Value", OutputProcessor::Unit::None, PressureCurve( CurveIndex ).CurveInput3, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
+			SetupOutputVariable( "Performance Curve Output Value", OutputProcessor::Unit::None, PressureCurve( CurveIndex ).CurveOutput, "HVAC", "Average", PressureCurve( CurveIndex ).Name );
 		}
 
 		if ( AnyEnergyManagementSystemInModel ) { // provide hook for possible EMS control
@@ -4216,10 +4217,10 @@ Label999: ;
 			V2 = max( min( Var2, PerfCurve( CurveIndex ).Var2Max ), PerfCurve( CurveIndex ).Var2Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 2 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine when only 1 is required." );
+					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine when only 1 is required. The excess arguments are ignored." );
+					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 2.0, 2.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 1 ) {
@@ -4236,10 +4237,10 @@ Label999: ;
 			V3 = max( min( Var3, PerfCurve( CurveIndex ).Var3Max ), PerfCurve( CurveIndex ).Var3Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 3 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine when 2 or less are required." );
+					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine when 2 or less are required. The excess arguments are ignored." );
+					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 3.0, 3.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 2 ) {
@@ -4256,10 +4257,10 @@ Label999: ;
 			V4 = max( min( Var4, PerfCurve( CurveIndex ).Var4Max ), PerfCurve( CurveIndex ).Var4Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 4 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine when 3 or less are required." );
+					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine when 3 or less are required. The excess arguments are ignored." );
+					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 4.0, 4.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 3 ) {
@@ -4276,10 +4277,10 @@ Label999: ;
 			V5 = max( min( Var5, PerfCurve( CurveIndex ).Var5Max ), PerfCurve( CurveIndex ).Var5Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 5 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine when 4 or less are required." );
+					ShowWarningError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine when 4 or less are required. The excess arguments are ignored." );
+					PerfCurve( CurveIndex ).NumIVHighErrorIndex += 1;
 				}
-				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 5.0, 5.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 4 ) {
@@ -4447,7 +4448,7 @@ Label999: ;
 		// then set up the partials of Phi with respect to a, the partial of Phi with respect to b, etc.
 		// PartialPhiRespectToa = 2 * SUM1ToN[1*(Zi-(a+bXi+cYi))] = 0
 		// PartialPhiRespectTob = 2 * SUM1ToN[Xi(Zi-(a+bXi+cYi))] = 0
-		// PartialPhiRespectTob = 2 * SUM1ToN[Yi(Zi-(a+bXi+cYi))] = 0
+		// PartialPhiRespectToc = 2 * SUM1ToN[Yi(Zi-(a+bXi+cYi))] = 0
 		// then set up the square matrix by solving the above partials.
 		// SUM1ToN(Zi)   = a * SUM1ToN(1)  + b * SUM1ToN(Xi)   + c * SUM1ToN(Yi)
 		// SUM1ToN(ZiXi) = a * SUM1ToN(Xi) + b * SUM1ToN(Xi)^2 + c * SUM1ToN(XiYi)

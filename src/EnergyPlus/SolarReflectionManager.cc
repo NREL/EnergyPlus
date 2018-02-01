@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -395,6 +396,10 @@ namespace SolarReflectionManager {
 			// Phi = 0 at the horizon; Phi = Pi/2 at the zenith
 
 			PhiSurf = std::asin( SolReflRecSurf( RecSurfNum ).NormVec.z );
+			Real64 const tan_PhiSurf = std::tan( PhiSurf );
+			Real64 const sin_PhiSurf = std::sin( PhiSurf );
+			Real64 const cos_PhiSurf = std::cos( PhiSurf );
+
 			if ( std::abs( SolReflRecSurf( RecSurfNum ).NormVec.x ) > 1.0e-5 || std::abs( SolReflRecSurf( RecSurfNum ).NormVec.y ) > 1.0e-5 ) {
 				ThetaSurf = std::atan2( SolReflRecSurf( RecSurfNum ).NormVec.y, SolReflRecSurf( RecSurfNum ).NormVec.x );
 			} else {
@@ -420,7 +425,7 @@ namespace SolarReflectionManager {
 						ThetaMin = -Pi;
 						ThetaMax = Pi;
 					} else {
-						ACosTanTan = std::acos( -std::tan( Phi ) * std::tan( PhiSurf ) );
+						ACosTanTan = std::acos( -std::tan( Phi ) * tan_PhiSurf );
 						ThetaMin = ThetaSurf - std::abs( ACosTanTan );
 						ThetaMax = ThetaSurf + std::abs( ACosTanTan );
 					}
@@ -430,7 +435,7 @@ namespace SolarReflectionManager {
 						ThetaMin = -Pi;
 						ThetaMax = Pi;
 					} else {
-						ACosTanTan = std::acos( -std::tan( Phi ) * std::tan( PhiSurf ) );
+						ACosTanTan = std::acos( -std::tan( Phi ) * tan_PhiSurf );
 						ThetaMin = ThetaSurf - std::abs( ACosTanTan );
 						ThetaMax = ThetaSurf + std::abs( ACosTanTan );
 					}
@@ -445,7 +450,7 @@ namespace SolarReflectionManager {
 					URay.x = CPhi * std::cos( Theta );
 					URay.y = CPhi * std::sin( Theta );
 					// Cosine of angle of incidence of ray on receiving surface
-					CosIncAngRay = SPhi * std::sin( PhiSurf ) + CPhi * std::cos( PhiSurf ) * std::cos( Theta - ThetaSurf );
+					CosIncAngRay = SPhi * sin_PhiSurf + CPhi * cos_PhiSurf * std::cos( Theta - ThetaSurf );
 					if ( CosIncAngRay < 0.0 ) continue; // Ray is behind receiving surface (although there shouldn't be any)
 					++RayNum;
 					SolReflRecSurf( RecSurfNum ).RayVec( RayNum ) = URay;
@@ -1145,26 +1150,36 @@ namespace SolarReflectionManager {
 		bool hitObs; // True iff obstruction is hit
 		static Vector3< Real64 > HitPtObs( 0.0 ); // Hit point on an obstruction (m)
 		//unused  REAL(r64)         :: ObsHitPt(3)          =0.0 ! Hit point on obstruction (m)
-		static Real64 dOmega( 0.0 ); // Solid angle increment (steradians)
-		static Real64 CosIncAngRayToSky( 0.0 ); // Cosine of incidence angle on ground of ray to sky
 		static Real64 SkyReflSolRadiance( 0.0 ); // Reflected radiance at hit point divided by unobstructed
 		//  sky diffuse horizontal irradiance
 		static Real64 dReflSkySol( 0.0 ); // Contribution to reflection factor at a receiving point
 		//  from sky solar reflected from a hit point
-		static Real64 Phi( 0.0 ); // Altitude angle and increment (radians)
-		static Real64 DPhi( 0.0 ); // Altitude angle and increment (radians)
-		static Real64 SPhi( 0.0 ); // Sine of Phi
-		static Real64 CPhi( 0.0 ); // Cosine of Phi
-		static Real64 Theta( 0.0 ); // Azimuth angle (radians)
-		static Real64 DTheta( 0.0 ); // Azimuth increment (radians)
-		static int IPhi( 0 ); // Altitude angle index
-		static int ITheta( 0 ); // Azimuth angle index
 		static Vector3< Real64 > URay( 0.0 ); // Unit vector along ray from ground hit point
 		static Vector3< Real64 > SurfVertToGndPt( 0.0 ); // Vector from a vertex of possible obstructing surface to ground
 		//  hit point (m)
 		static Vector3< Real64 > SurfVert( 0.0 ); // Surface vertex (m)
-		static Real64 dReflSkyGnd( 0.0 ); // Factor for ground radiance due to direct sky diffuse reflection
 		// FLOW:
+
+		Real64 const DPhi( PiOvr2 / ( AltAngStepsForSolReflCalc / 2.0 ) ); // Altitude angle and increment (radians)
+		Real64 const DTheta( 2.0 * Pi / ( 2.0 * AzimAngStepsForSolReflCalc ) ); // Azimuth increment (radians)
+
+		// Pre-compute these constants
+		// Initialize the 0 index with dummy value so the iterators line up below
+		std::vector<Real64> sin_Phi( { -1 } );
+		std::vector<Real64> cos_Phi( { -1 } );
+		for( int IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
+			Real64 Phi( ( IPhi - 0.5 ) * DPhi); // Altitude angle and increment (radians)
+			sin_Phi.push_back( std::sin( Phi ) );
+			cos_Phi.push_back( std::cos( Phi ) );
+		}
+
+		std::vector<Real64> sin_Theta( { -1 } );
+		std::vector<Real64> cos_Theta( { -1 } );
+		for( int ITheta = 1; ITheta <= 2 * AzimAngStepsForSolReflCalc; ++ITheta ) {
+			Real64 Theta = ( ITheta - 0.5 ) * DTheta; // Azimuth angle (radians)
+			sin_Theta.push_back( std::sin( Theta ) );
+			cos_Theta.push_back( std::cos( Theta ) );
+		}
 
 		DisplayString( "Calculating Sky Diffuse Exterior Solar Reflection Factors" );
 		ReflSkySolObs = 0.0;
@@ -1218,24 +1233,18 @@ namespace SolarReflectionManager {
 						// Divide hemisphere centered at ground hit point into elements of altitude Phi and
 						// azimuth Theta and create upward-going ray unit vector at each Phi,Theta pair.
 						// Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
-						DPhi = PiOvr2 / ( AltAngStepsForSolReflCalc / 2.0 );
-						dReflSkyGnd = 0.0;
+						Real64 dReflSkyGnd = 0.0; // Factor for ground radiance due to direct sky diffuse reflection
 						// Altitude loop
-						for ( IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
-							Phi = ( IPhi - 0.5 ) * DPhi;
-							SPhi = std::sin( Phi );
-							CPhi = std::cos( Phi );
+						for ( int IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
 							// Third component of ray unit vector in (Theta,Phi) direction
-							URay( 3 ) = SPhi;
-							DTheta = 2.0 * Pi / ( 2.0 * AzimAngStepsForSolReflCalc );
-							dOmega = CPhi * DTheta * DPhi;
+							URay( 3 ) = sin_Phi[ IPhi ];
+							Real64 dOmega = cos_Phi[ IPhi ] * DTheta * DPhi; // Solid angle increment (steradians)
 							// Cosine of angle of incidence of ray on ground
-							CosIncAngRayToSky = SPhi;
+							Real64 CosIncAngRayToSky = sin_Phi[ IPhi ]; // Cosine of incidence angle on ground of ray to sky
 							// Azimuth loop
-							for ( ITheta = 1; ITheta <= 2 * AzimAngStepsForSolReflCalc; ++ITheta ) {
-								Theta = ( ITheta - 0.5 ) * DTheta;
-								URay.x = CPhi * std::cos( Theta );
-								URay.y = CPhi * std::sin( Theta );
+							for ( int ITheta = 1; ITheta <= 2 * AzimAngStepsForSolReflCalc; ++ITheta ) {
+								URay.x = cos_Phi[ IPhi ] * cos_Theta[ ITheta ];
+								URay.y = cos_Phi[ IPhi ] * sin_Theta[ ITheta ];
 								// Does this ray hit an obstruction?
 								hitObs = false;
 								for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
