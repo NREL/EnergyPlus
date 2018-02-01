@@ -184,6 +184,7 @@ namespace PVWatts {
 		SetupOutputVariable("Generator Produced DC Electric Power", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
 		SetupOutputVariable( "Generator Produced DC Electric Energy", OutputProcessor::Unit::J, m_outputDCEnergy, "System", "Sum", m_name, _, "ElectricityProduced", "Photovoltaics", _, "Plant" );
 		SetupOutputVariable( "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name );
+		SetupOutputVariable( "Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name );
 	}
 
 	PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
