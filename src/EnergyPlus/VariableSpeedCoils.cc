@@ -1334,7 +1334,7 @@ namespace VariableSpeedCoils {
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySensible, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
 			SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLatent, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
-			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
 
 			VarSpeedCoil( DXCoilNum ).RatedCapCoolSens = AutoSize; //always auto-sized, to be determined in the sizing calculation
 
@@ -2022,7 +2022,7 @@ namespace VariableSpeedCoils {
 			// CurrentModuleObject = "Coil:Heating:DX:Variablespeed "
 			SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).Energy, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "Heating", _, "System" );
 			SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergyLoadTotal, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Heating Coil Source Side Heat Transfer Energy", OutputProcessor::Unit::J, VarSpeedCoil( DXCoilNum ).EnergySource, "System", "Summed", VarSpeedCoil( DXCoilNum ).Name );
 
 			//create predefined report entries
 			PreDefTableEntry( pdchHeatCoilType, VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject );
@@ -2715,8 +2715,7 @@ namespace VariableSpeedCoils {
 		static bool ErrorsFound( false ); // TRUE when errors found, air loop initialization error
 		Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
 		int Mode; // Performance mode for MultiMode DX coil; Always 1 for other coil types
-		Real64 RatedHeatPumpIndoorAirTemp;
-		// Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
+		Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
 		Real64 RatedHeatPumpIndoorHumRat; // Inlet humidity ratio to heat pump evaporator at rated conditions [kg/kg]
 		Real64 WaterFlowScale; // water flow scaling factor match rated flow rate
 
@@ -3147,6 +3146,7 @@ namespace VariableSpeedCoils {
 		bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
 		Real64 HPInletAirHumRat; // Rated inlet air humidity ratio for heat pump water heater [kgWater/kgDryAir]
 		Real64 HPWHCoolCapacity; //estimate cooling capacity in HPWH
+		Real64 LoadSideInletWBTempCalcTemp; // dummy variable used in function call
 
 		UpperSpeed = VarSpeedCoil( DXCoilNum ).NumOfSpeeds;
 		NormSpeed = VarSpeedCoil( DXCoilNum ).NormSpedLevel;
@@ -3824,7 +3824,7 @@ namespace VariableSpeedCoils {
 			RatedInletEnth = PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
 			CBFRated = AdjustCBF( VarSpeedCoil( DXCoilNum ).MSRatedCBF( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( NormSpeed ), RatedAirMassFlowRate );
 			if ( CBFRated > 0.999 ) CBFRated = 0.999;
-			AirMassFlowRatio = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate / VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( NormSpeed );
+			AirMassFlowRatio = RatedAirMassFlowRate / VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( NormSpeed );
 
 			if ( VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( NormSpeed ) > 1.0e-10 ) {
 				WaterMassFlowRatio = VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate / VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( NormSpeed );
@@ -3832,7 +3832,7 @@ namespace VariableSpeedCoils {
 				WaterMassFlowRatio = 1.0;
 			}
 
-			CalcTotCapSHR_VSWSHP( RatedInletAirTemp, RatedInletAirHumRat, RatedInletEnth, RatedInletWetBulbTemp, AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, CBFRated, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( NormSpeed ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1 );
+			CalcTotCapSHR_VSWSHP( RatedInletAirTemp, RatedInletAirHumRat, RatedInletEnth, RatedInletWetBulbTemp, AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, CBFRated, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( NormSpeed ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1, LoadSideInletWBTempCalcTemp );
 
 			RatedCapCoolSensDes = VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal * SHR;
 		} else if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate >= SmallAirVolFlow &&
@@ -4071,6 +4071,7 @@ namespace VariableSpeedCoils {
 		Real64 LoadSideInletWBTemp_Unit; // calc conditions for unit
 		Real64 LoadSideInletHumRat_Unit; // calc conditions for unit
 		Real64 LoadSideInletEnth_Unit; // calc conditions for unit
+		Real64 LoadSideInletWBTempCalc; // adjusted inlet WB temp representing dry coil condition [C]
 		Real64 CpAir_Unit; // calc conditions for unit
 		Real64 AirMassFlowRatio; // airflow ratio at low speed
 		Real64 WaterMassFlowRatio; // airflow ratio at high speed
@@ -4247,12 +4248,14 @@ namespace VariableSpeedCoils {
 		CpAir_Unit = PsyCpAirFnWTdb( LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit );
 
 		RuntimeFrac = 1.0;
+		OnOffFanPartLoadFraction = 1.0;
 		VarSpeedCoil( DXCoilNum ).RunFrac = 1.0;
 		if ( ( SpeedNum == 1 ) && ( PartLoadRatio < 1.0 ) ) {
 			PLF = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, PartLoadRatio );
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
+			OnOffFanPartLoadFraction = PLF; // save PLF for fan model
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -4300,7 +4303,13 @@ namespace VariableSpeedCoils {
 					WaterMassFlowRatio = SourceSideMassFlowRate / VarSpeedCoil( DXCoilNum ).DesignWaterMassFlowRate;
 				}
 
-				EIRTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), LoadSideInletWBTemp, SourceSideInletTemp );
+				CBFSpeed = AdjustCBF( VarSpeedCoil( DXCoilNum ).MSRatedCBF( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedCal ), LoadSideMassFlowRate );
+
+				if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
+
+				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1, LoadSideInletWBTempCalc );
+
+				EIRTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), LoadSideInletWBTempCalc, SourceSideInletTemp );
 				EIRAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( SpeedCal ), AirMassFlowRatio );
 
 				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) {
@@ -4310,12 +4319,6 @@ namespace VariableSpeedCoils {
 				}
 
 				EIR = ( 1.0 / VarSpeedCoil( DXCoilNum ).MSRatedCOP( SpeedCal ) ) * EIRTempModFac * EIRAirFFModFac * EIRWaterFFModFac;
-
-				CBFSpeed = AdjustCBF( VarSpeedCoil( DXCoilNum ).MSRatedCBF( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedCal ), LoadSideMassFlowRate );
-
-				if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
-
-				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1 );
 
 				Winput = QLoadTotal * EIR;
 
@@ -4341,10 +4344,10 @@ namespace VariableSpeedCoils {
 				if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
 
 				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ),
-									  VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, SpeedRatio, 2 );
+									  VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, SpeedRatio, 2, LoadSideInletWBTempCalc );
 
 				SpeedCal = SpeedNum - 1;
-				EIRTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), LoadSideInletWBTemp, SourceSideInletTemp );
+				EIRTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), LoadSideInletWBTempCalc, SourceSideInletTemp );
 				EIRAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( SpeedCal ), AirMassFlowRatio );
 
 				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) {
@@ -4741,12 +4744,14 @@ namespace VariableSpeedCoils {
 
 		//part-load calculation
 		RuntimeFrac = 1.0;
+		OnOffFanPartLoadFraction = 1.0;
 		VarSpeedCoil( DXCoilNum ).RunFrac = 1.0;
 		if ( ( SpeedNum == 1 ) && ( PartLoadRatio < 1.0 ) ) {
 			PLF = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, PartLoadRatio );
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
+			OnOffFanPartLoadFraction = PLF; // save PLF for fan model
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -5309,11 +5314,13 @@ namespace VariableSpeedCoils {
 
 		RuntimeFrac = 1.0;
 		VarSpeedCoil( DXCoilNum ).RunFrac = 1.0;
+		OnOffFanPartLoadFraction = 1.0;
 		if ( ( SpeedNum == 1 ) && ( PartLoadRatio < 1.0 ) ) {
 			PLF = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, PartLoadRatio );
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
+			OnOffFanPartLoadFraction = PLF; // save PLF for fan model
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -6375,7 +6382,8 @@ namespace VariableSpeedCoils {
 		Real64 const CondInletTemp, // Condenser inlet temperature [C]
 		Real64 const Pressure, // air pressure [Pa]
 		Real64 const SpeedRatio, // from 0.0 to 1.0
-		int const NumSpeeds // number of speeds for input
+		int const NumSpeeds, // number of speeds for input
+		Real64 & LoadSideInletWBTempCalc // inlet air WB temp adjustment for dry coil condition [C]
 	) {
 
 		// SUBROUTINE INFORMATION:
@@ -6535,6 +6543,7 @@ namespace VariableSpeedCoils {
 		TotCap1 = TotCapCalc1;
 		TotCap2 = TotCapCalc2;
 		TotCapSpeed = TotCapCalc;
+		LoadSideInletWBTempCalc = InletWetBulbCalc;
 
 		// IF(SHR < 0.3d0) SHR = 0.3d0
 

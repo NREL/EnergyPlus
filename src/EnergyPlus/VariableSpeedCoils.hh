@@ -555,7 +555,8 @@ namespace VariableSpeedCoils {
 		Real64 const CondInletTemp, // Condenser inlet temperature [C]
 		Real64 const Pressure, // air pressure [Pa]
 		Real64 const SpeedRatio, // from 0.0 to 1.0
-		int const NumSpeeds // number of speeds for input
+		int const NumSpeeds, // number of speeds for input
+		Real64 & LoadSideInletWBTempCalc // inlet air WB temp adjustment for dry coil condition [C]
 	);
 
 	void
