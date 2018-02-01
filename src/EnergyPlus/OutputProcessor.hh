@@ -489,12 +489,14 @@ namespace OutputProcessor {
 		int RT_forIPUnits; // Resource type number for IP Units (tabular) reporting
 		int TypeOfMeter; // type of meter
 		int SourceMeter; // for custom decrement meters, this is the meter number for the subtraction
+
 		Real64 TSValue; // TimeStep Value
 		Real64 CurTSValue; // Current TimeStep Value (internal access)
 		bool RptTS; // Report at End of TimeStep (Zone)
 		bool RptTSFO; // Report at End of TimeStep (Zone) -- meter file only
 		int TSRptNum; // Report Number for TS Values
 		std::string TSRptNumChr; // Report Number for TS Values (character -- for printing)
+
 		Real64 HRValue; // Hourly Value
 		bool RptHR; // Report at End of Hour
 		bool RptHRFO; // Report at End of Hour -- meter file only
@@ -504,6 +506,7 @@ namespace OutputProcessor {
 		int HRMinValDate; // Date stamp of minimum
 		int HRRptNum; // Report Number for HR Values
 		std::string HRRptNumChr; // Report Number for HR Values (character -- for printing)
+
 		Real64 DYValue; // Daily Value
 		bool RptDY; // Report at End of Day
 		bool RptDYFO; // Report at End of Day -- meter file only
@@ -513,6 +516,7 @@ namespace OutputProcessor {
 		int DYMinValDate; // Date stamp of minimum
 		int DYRptNum; // Report Number for DY Values
 		std::string DYRptNumChr; // Report Number for DY Values (character -- for printing)
+
 		Real64 MNValue; // Monthly Value
 		bool RptMN; // Report at End of Month
 		bool RptMNFO; // Report at End of Month -- meter file only
@@ -522,6 +526,18 @@ namespace OutputProcessor {
 		int MNMinValDate; // Date stamp of minimum
 		int MNRptNum; // Report Number for MN Values
 		std::string MNRptNumChr; // Report Number for MN Values (character -- for printing)
+
+		Real64 YRValue; // Yearly Value
+		bool RptYR; // Report at End of Year
+		bool RptYRFO; // Report at End of Year
+		Real64 YRMaxVal; // Maximum Value (Yearly)
+		int YRMaxValDate; // Date stamp of maximum
+		Real64 YRMinVal; // Minimum Value (Yearly)
+		int YRMinValDate; // Date stamp of minimum
+		int YRRptNum; // Report Number for YR Values
+		std::string YRRptNumChr; // Report Number for YR Values (character -- for printing)
+
+		Real64 SMValue; // Simulation Value
 		bool RptSM; // Report at End of Environment/Simulation
 		bool RptSMFO; // Report at End of Environment/Simulation -- meter file only
 		Real64 SMMaxVal; // Maximum Value (Sim)
@@ -529,17 +545,8 @@ namespace OutputProcessor {
 		Real64 SMMinVal; // Minimum Value (Sim)
 		int SMMinValDate; // Date stamp of minimum
 		int SMRptNum; // Report Number for SM Values
-		std::string YRRptNumChr; // Report Number for YR Values (character -- for printing)
-		Real64 YRValue; // Yearly Value
-		bool RptYR; // Report at End of Year
-		bool RptYRFO; // Report at End of Year -- meter file only
-		Real64 YRMaxVal; // Maximum Value (Year)
-		int YRMaxValDate; // Date stamp of maximum
-		Real64 YRMinVal; // Minimum Value (Year)
-		int YRMinValDate; // Date stamp of minimum
-		int YRRptNum; // Report Number for YR Values
-		Real64 SMValue; // Simulation Value
 		std::string SMRptNumChr; // Report Number for SM Values (character -- for printing)
+
 		Real64 LastSMValue; // Simulation Value
 		Real64 LastSMMaxVal; // Maximum Value (Sim)
 		int LastSMMaxValDate; // Date stamp of maximum
@@ -558,8 +565,8 @@ namespace OutputProcessor {
 		bool RptAccDYFO; // Report Cumulative Meter at Day -- meter file only
 		bool RptAccMN; // Report Cumulative Meter at Month
 		bool RptAccMNFO; // Report Cumulative Meter at Month -- meter file only
-		bool RptAccYR; // Report Cumulative Meter at Run Period
-		bool RptAccYRFO; // Report Cumulative Meter at Run Period -- meter file only
+		bool RptAccYR; // Report Cumulative Meter at Year
+		bool RptAccYRFO; // Report Cumulative Meter at Year -- meter file only
 		bool RptAccSM; // Report Cumulative Meter at Run Period
 		bool RptAccSMFO; // Report Cumulative Meter at Run Period -- meter file only
 		int TSAccRptNum; // Report Number for Acc Values
@@ -614,6 +621,7 @@ namespace OutputProcessor {
 			YRMinVal( 99999.0 ),
 			YRMinValDate( 0 ),
 			YRRptNum( 0 ),
+			SMValue(0.0),
 			RptSM( false ),
 			RptSMFO( false ),
 			SMMaxVal( -99999.0 ),
@@ -621,7 +629,6 @@ namespace OutputProcessor {
 			SMMinVal( 99999.0 ),
 			SMMinValDate( 0 ),
 			SMRptNum( 0 ),
-			SMValue( 0.0 ),
 			LastSMValue( 0.0 ),
 			LastSMMaxVal( -99999.0 ),
 			LastSMMaxValDate( 0 ),
