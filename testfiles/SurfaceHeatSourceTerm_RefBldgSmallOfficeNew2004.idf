@@ -4685,7 +4685,11 @@
   Output:Variable,*,Air System Fan Electric Energy,HOURLY;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
+  
+  Output:Variable,*,Surface Inside Face Heat Source Gain Rate per Area,hourly;
 
+  Output:Variable,*,Surface Outside Face Heat Source Gain Rate per Area,hourly;
+  
 ! ***REPORT TABLES***
 
   OutputControl:Table:Style,

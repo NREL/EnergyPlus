@@ -16142,14 +16142,14 @@ SurfaceProperty:HeatBalanceSourceTerm,
        \required-field
        \type object-list
        \object-list SurfaceNames
-  A2 , \field Inside Surface Heat Source Term Schedule Name
+  A2 , \field Inside Face Heat Source Term Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note The value of this schedule is the source term value for the inside face of this surface
        \note If this field is left blank, no inside surface source term will be applied.
        \note The schedule values are heat rate per surface area (W/m2), when positive
        \note schedule values indicate heat gain and negative values indicates loss.
-  A3 ; \field Outside Surface Heat Source Term Schedule Name
+  A3 ; \field Outside Face Heat Source Term Schedule Name
        \type object-list
        \object-list ScheduleNames
        \note The value of this schedule is the source term value for the outside face of this surface

@@ -1603,6 +1603,10 @@ namespace HeatBalanceSurfaceManager {
 				SetupOutputVariable( "Surface Outside Face Forced Convection Model Equation Index", OutputProcessor::Unit::None, Surface( loop ).OutConvHfModelEq, "Zone", "Average", Surface( loop ).Name );
 				SetupOutputVariable( "Surface Outside Face Natural Convection Model Equation Index", OutputProcessor::Unit::None, Surface( loop ).OutConvHnModelEq, "Zone", "Average", Surface( loop ).Name );
 			}
+
+			SetupOutputVariable( "Surface Inside Face Heat Source Gain Rate per Area", OutputProcessor::Unit::W_m2, QAdditionalHeatSourceInside( loop ), "Zone", "Average", Surface( loop ).Name );
+			SetupOutputVariable( "Surface Outside Face Heat Source Gain Rate per Area", OutputProcessor::Unit::W_m2, QAdditionalHeatSourceOutside( loop ), "Zone", "Average", Surface( loop ).Name );
+
 			//     ENDIF
 			if ( DisplayAdvancedReportVariables ) {
 				SetupOutputVariable( "Surface Construction Index", OutputProcessor::Unit::None, Surface( loop ).Construction, "Zone", "Average", Surface( loop ).Name );
@@ -4740,7 +4744,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 		// Calculate heat extract due to additional heat flux source term as the surface boundary condition 
 
-		if ( Surface( SurfNum ).OutsideHeatSourceTermSchedule != 0 ) {
+		if ( Surface( SurfNum ).OutsideHeatSourceTermSchedule ) {
 			QAdditionalHeatSourceOutside( SurfNum ) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue( Surface( SurfNum ).OutsideHeatSourceTermSchedule );
 		}
 
@@ -5445,7 +5449,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	// Calculate heat extract due to additional heat flux source term as the surface boundary condition 
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-		if ( Surface( SurfNum ).InsideHeatSourceTermSchedule != 0 ) {
+		if ( Surface( SurfNum ).InsideHeatSourceTermSchedule ) {
 			QAdditionalHeatSourceInside( SurfNum ) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue( Surface( SurfNum ).InsideHeatSourceTermSchedule );
 		}
 	}

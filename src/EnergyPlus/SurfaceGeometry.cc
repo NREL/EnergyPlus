@@ -6361,7 +6361,7 @@ namespace SurfaceGeometry {
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
 				ErrorsFound = true;
-			} else if ( Surface( Found ).InsideHeatSourceTermSchedule > 0 || Surface( Found ).OutsideHeatSourceTermSchedule > 0 ) {
+			} else if ( Surface( Found ).InsideHeatSourceTermSchedule || Surface( Found ).OutsideHeatSourceTermSchedule ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", multiple SurfaceProperty:HeatBalanceSourceTerm objects applied to the same surface." );
 				ErrorsFound = true;
 			}

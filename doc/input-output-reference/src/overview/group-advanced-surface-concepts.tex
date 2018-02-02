@@ -2635,7 +2635,6 @@ ZoneProperty:LocalEnvironment,
     OutdoorAirNode:0001;          !- Outdoor Air Node Name    
 \end{lstlisting}
 
-
 \subsection{SurfaceProperty:HeatBalanceSourceTerm}\label{surfacePropertyHeatBalanceSourceTerm}
 
 The object allows additional heat source term of the surface boundary condition in the surface heat balance calculation. The object specifies a surface with the additional heat source term described by a schedule of heat rates (can be positive or negative values) in W/m^2. A heat source can be added	to either or both the inside and outside of the same surface. The heat rates are pre-calculated outside EnergyPlus.
@@ -2644,47 +2643,20 @@ The object allows additional heat source term of the surface boundary condition 
 
 This is the name of the surface that will be assigned to use the additional heat source term in heat balance calculation
 
-\subsubsection{Field: Inside Surface Heat Source Term Schedule Name}\label{field-inside-heat-source-term-schedule-name}
+\subsubsection{Field: Inside Face Heat Source Term Schedule Name}\label{field-inside-heat-source-term-schedule-name}
 
 The value of this schedule is the source term value for the inside face of this surface. If this field is left blank, no inside surface source term will be applied. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
 
-\subsubsection{Field: Outside Surface Heat Source Term Schedule Name}\label{field-outside-heat-source-term-schedule-name}
+\subsubsection{Field: Outside Face Heat Source Term Schedule Name}\label{field-outside-heat-source-term-schedule-name}
 
 The value of this schedule is the source term value for the outside face of this surface. If this field is left blank, no outside surface source term will be applied. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
 
 \begin{lstlisting}
 SurfaceProperty:HeatBalanceSourceTerm,
     Zn001:Wall001,                !- Surface Name
-    ,                             !- Inside Surface Heat Source Term Schedule Name
-    HeatSourceSch:001;            !- Outside Surface Heat Source Term Schedule Name
+    ,                                      !- Inside Face Heat Source Term Schedule Name
+    HeatSourceSch:001;          !- Outside Face Heat Source Term Schedule Name
 \end{lstlisting}
-
-\subsection{ZoneProperty:LocalEnvironment}\label{ZonePropertylocalEnvironment}
-
-The object links to a \textbf{Zone} object and is used when there is a need to calculate zone level environmental data externally and import them into the simulation to override existing environmental data, including local air temperature and humidity, wind velocity and direction. links to an \textbf{OutdoorAir:Node} object declared by \textbf{Field: Outdoor Air Node Name}. The reference local outdoor air node provides ambient conditions for the calculation of infiltration and ventilation at the zone level.
-
-\subsubsection{Field: Name}\label{field-zone-localenv-name}
-
-This is the unique name of the zone property.
-
-\subsubsection{Field: Zone Name}\label{field-zone-name}
-
-This is the name of the zone that will be assigned to use the local environmental data defined in the next field. This should be a name of a surface defined elsewhere.
-
-\subsubsection{Field: Outdoor Air Node Name}\label{field-zone-outdoor-air-node-name}
-
-This field is used to import local environmental data from local outdoor air nodes, including dry and wet bulb temperature, wind speed and wind direction. This should be a name of a \textbf{OutdoorAir:Node} object.
-
-An example IDF object follows.
-
-\begin{lstlisting}
-ZoneProperty:LocalEnvironment,
-    LocEnv:Zn001,                 !- Name
-    Zn001,                        !- Exterior Surface Name
-    OutdoorAirNode:0001;          !- Outdoor Air Node Name    
-\end{lstlisting}
-
-
 
 \subsection{Zone Property View Factors}\label{zone-property-view-factors}
 
