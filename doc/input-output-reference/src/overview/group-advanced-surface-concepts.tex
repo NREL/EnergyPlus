@@ -2638,25 +2638,25 @@ ZoneProperty:LocalEnvironment,
 
 \subsection{SurfaceProperty:HeatBalanceSourceTerm}\label{surfacePropertyHeatBalanceSourceTerm}
 
-The object allows additional heat source term of the surface boundary condition in the surface heat balance calculation for Advanced/Research Usage. The object specifies an exterior surface with the additional heat source term described by a schedule of heat rates (can be positive or negative values) in W/m^2. The heat rates are pre-calculated outside EnergyPlus.
+The object allows additional heat source term of the surface boundary condition in the surface heat balance calculation. The object specifies a surface with the additional heat source term described by a schedule of heat rates (can be positive or negative values) in W/m^2. A heat source can be added	to either or both the inside and outside of the same surface. The heat rates are pre-calculated outside EnergyPlus.
 
 \subsubsection{Field: Surface Name}\label{field-surface-name}
 
 This is the name of the surface that will be assigned to use the additional heat source term in heat balance calculation
 
-\subsubsection{Field: Heat Source Location}\label{field-heat-source-location}
+\subsubsection{Field: Inside Surface Heat Source Term Schedule Name}\label{field-inside-heat-source-term-schedule-name}
 
-This field indicates whether the heat source applies at inside or outside the surface.
+The value of this schedule is the source term value for the inside face of this surface. If this field is left blank, no inside surface source term will be applied. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
 
-\subsubsection{Field: Heat Source Term Schedule Name}\label{field-heat-source-term-schedule-name}
+\subsubsection{Field: Outside Surface Heat Source Term Schedule Name}\label{field-outside-heat-source-term-schedule-name}
 
-This field points to the additional heat source schedule. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
+The value of this schedule is the source term value for the outside face of this surface. If this field is left blank, no outside surface source term will be applied. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
 
 \begin{lstlisting}
 SurfaceProperty:HeatBalanceSourceTerm,
     Zn001:Wall001,                !- Surface Name
-    Outside,                           !- Heat Source Location
-    HeatSourceSch:001;          !- Heat Source Term Schedule Name
+    ,                             !- Inside Surface Heat Source Term Schedule Name
+    HeatSourceSch:001;            !- Outside Surface Heat Source Term Schedule Name
 \end{lstlisting}
 
 \subsection{ZoneProperty:LocalEnvironment}\label{ZonePropertylocalEnvironment}

@@ -4739,10 +4739,9 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 		QRadLWOutSrdSurfs( SurfNum ) = 0.0;
 
 		// Calculate heat extract due to additional heat flux source term as the surface boundary condition 
-		if( Surface( SurfNum ).HasAdditionalHeatSourceTerm ) {
-			if ( Surface( SurfNum ).OutsideAddHeatSourceTerm ) {
-				QAdditionalHeatSourceOutside( SurfNum ) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue( Surface( SurfNum ).AdditionalHeatSourceTermSch );
-			}
+
+		if ( Surface( SurfNum ).OutsideHeatSourceTermSchedule != 0 ) {
+			QAdditionalHeatSourceOutside( SurfNum ) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue( Surface( SurfNum ).OutsideHeatSourceTermSchedule );
 		}
 
 		// Calculate the current outside surface temperature TH(SurfNum,1,1) for the
@@ -5446,10 +5445,8 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 	// Calculate heat extract due to additional heat flux source term as the surface boundary condition 
 	for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-		if( Surface( SurfNum ).HasAdditionalHeatSourceTerm ) {
-			if ( ! Surface( SurfNum ).OutsideAddHeatSourceTerm ) {
-				QAdditionalHeatSourceInside( SurfNum ) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue( Surface( SurfNum ).AdditionalHeatSourceTermSch );
-			}
+		if ( Surface( SurfNum ).InsideHeatSourceTermSchedule != 0 ) {
+			QAdditionalHeatSourceInside( SurfNum ) = EnergyPlus::ScheduleManager::GetCurrentScheduleValue( Surface( SurfNum ).InsideHeatSourceTermSchedule );
 		}
 	}
 

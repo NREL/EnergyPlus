@@ -2387,13 +2387,13 @@ namespace EnergyPlus {
 			"",
 			"  SurfaceProperty:HeatBalanceSourceTerm,",
 			"    Living:North,               !- Surface Name",
-			"	 Outside,                    !- Heat Source Location",
-			"    Sche_Q_Evap_Cool;           !- Heat Source Term Schedule Name{ W / m2 }",
+			"	 ,                           !- Inside Surface Heat Source Term Schedule Name",
+			"    Sche_Q_Evap_Cool;           !- Outside Surface Heat Source Term Schedule Name",
 			"",
 			"  SurfaceProperty:HeatBalanceSourceTerm,",
-			"    Living:Ceiling,               !- Surface Name",
-			"	 Inside,                       !- Heat Source Location",
-			"    Sche_Q_Add_Heat;              !- Heat Source Term Schedule Name{ W / m2 }"
+			"    Living:Ceiling,             !- Surface Name",
+			"	 Sche_Q_Add_Heat,            !- Inside Surface Heat Source Term Schedule Name",
+			"    ;                           !- Outside Surface Heat Source Term Schedule Name"
 		} );
 
 		ASSERT_FALSE( process_idf( idf_objects ) );

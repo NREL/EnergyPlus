@@ -1,4 +1,4 @@
-! RefBldgSmallOfficeNew2004_HeatSourceTerm.idf
+! SurfaceHeatSourceTerm_RefBldgSmallOfficeNew2004.idf
 !
 ! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
 !
@@ -9,6 +9,8 @@
 ! ASHRAE Standards 90.1-2004 and 62-1999
 !
 ! Description:  Single story, five zone office building.
+! Highlights:   Illustrates the use of a surface property object to import additional heat source schedule
+!                 to the inside or outside of surface objects.
 ! Form:         Area = 511 m2 (5,500 ft2); Number of Stories = 1; Shape = rectangle, Aspect ratio = 1.5
 ! Envelope:     Envelope thermal properties vary with climate according to ASHRAE Standard 90.1-2004.
 !               Opaque constructions: mass walls; attic roof; slab-on-grade floor
