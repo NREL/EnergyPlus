@@ -519,7 +519,7 @@ namespace SizingManager {
 				ShowFatalError( RoutineName + "Out of \"range\" values found in input" );
 			}
 			SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
-
+			SimAirServingZones::SizeSysOutdoorAir(); // System OA can be sized now that TermUnitFinalZoneSizing is initialized
 			ResetEnvironmentCounter();
 			CurEnvirNumSimDay = 0;
 			CurOverallSimDay = 0;
