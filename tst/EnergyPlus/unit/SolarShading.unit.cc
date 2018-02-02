@@ -1459,7 +1459,8 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 
 	for ( int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++ ) {
 		if ( Surface( SurfNum ).ExtBoundCond == 0 && Surface( SurfNum ).Zone != 0 ) {
-			EXPECT_EQ( 1, Surface( SurfNum ).DisabledShadowingZoneList.size() );
+			int ZoneSize = Surface(SurfNum).DisabledShadowingZoneList.size();
+			EXPECT_EQ( 1, ZoneSize );
 			std::vector< int > DisabledZones = Surface( SurfNum ).DisabledShadowingZoneList;
 			for ( int i : DisabledZones ) {
 				EXPECT_EQ( 1, i );

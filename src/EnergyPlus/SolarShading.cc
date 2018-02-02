@@ -4695,7 +4695,6 @@ namespace SolarShading {
 					std::vector< int > DisabledZones = Surface( CurSurf ).DisabledShadowingZoneList;
 					bool isDisabledShadowSurf = false;
 					for ( int i : DisabledZones ) {
-						int test = surface.Zone;
 						if ( surface.Zone == i ) {
 							isDisabledShadowSurf = true;
 							break;
