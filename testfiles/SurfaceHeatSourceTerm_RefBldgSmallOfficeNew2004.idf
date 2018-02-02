@@ -1335,23 +1335,23 @@
 
   SurfaceProperty:HeatBalanceSourceTerm,
     Perimeter_ZN_1_wall_south,     !- Surface Name 
-	Outside,                       !- Heat Source Location
-    Sche_Q_Evap_Cool;              !- Heat Source Term Schedule Name {W/m2}
+	,                              !- Inside face Heat Source Term Schedule Name
+    Sche_Q_Evap_Cool;              !- Outside face Heat Source Term Schedule Name
        
   SurfaceProperty:HeatBalanceSourceTerm,
     Perimeter_ZN_2_wall_east,      !- Surface Name
-	Inside,                        !- Heat Source Location
-    Sche_Q_Add_Heat;               !- Heat Source Term Schedule Name {W/m2}
+	Sche_Q_Add_Heat,               !- Inside face Heat Source Term Schedule Name
+    ;                              !- Outside face Heat Source Term Schedule Name
        
   SurfaceProperty:HeatBalanceSourceTerm,
     Perimeter_ZN_3_wall_north,     !- Surface Name 
-	,                              !- Heat Source Location
-    Sche_Q_Evap_Cool;              !- Heat Source Term Schedule Name {W/m2}
+	,                              !- Inside face Heat Source Term Schedule Name
+    Sche_Q_Evap_Cool;              !- Outside face Heat Source Term Schedule Name
        
   SurfaceProperty:HeatBalanceSourceTerm,
     Perimeter_ZN_4_wall_west,      !- Surface Name
-	,                              !- Heat Source Location
-    Sche_Q_Evap_Cool;              !- Heat Source Term Schedule Name {W/m2}
+	,                              !- Inside face Heat Source Term Schedule Name
+    Sche_Q_Evap_Cool;              !- Outside face Heat Source Term Schedule Name
 	
   Schedule:Compact,
     Sche_Q_Evap_Cool,        !- Name
