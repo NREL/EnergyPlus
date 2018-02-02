@@ -5970,7 +5970,6 @@ namespace SimAirServingZones {
 					//            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtCoolPeak + RetTempRise * &
 					//           (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
 					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
-					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtCoolPeak;
 				}
 				RetTempRise = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak - TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtHeatPeak;
 				if ( RetTempRise > 0.01 ) {
@@ -5979,7 +5978,6 @@ namespace SimAirServingZones {
 					//            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtHeatPeak + RetTempRise * &
 					//            (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
 					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
-					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak;
 				}
 				for ( TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex ) {
 					RetTempRise = TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolZoneRetTempSeq( TimeStepIndex ) - TermUnitFinalZoneSizing( TermUnitSizingIndex ).CoolZoneTempSeq( TimeStepIndex );

@@ -95,27 +95,27 @@ namespace EnergyPlus {
 			Real64 SysCoolingEv; // system ventilation effectiveness
 			int CtrlZoneNum; // controlled zone number
 			
-			FinalZoneSizing.allocate( 2 );
+			TermUnitFinalZoneSizing.allocate( 2 );
 			
 			Xs = 0.2516;
 			ZoneOAFrac = 0.8265;
 			VozClg = .06245;
 			SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
 			CtrlZoneNum = 1;
-			FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.7;
+			TermUnitFinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.7;
 			LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 			EXPECT_DOUBLE_EQ( 0.7, SysCoolingEv );
-			EXPECT_NEAR( 0.5516, FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone, 0.0001 );
-			EXPECT_NEAR( 0.1132, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 0.0001 );
+			EXPECT_NEAR( 0.5516, TermUnitFinalZoneSizing( CtrlZoneNum ).ZpzClgByZone, 0.0001 );
+			EXPECT_NEAR( 0.1132, TermUnitFinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin, 0.0001 );
 			ZoneOAFrac = 0.4894;
 			VozClg = 0.02759;
 			SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
 			CtrlZoneNum = 2;
-			FinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.7;
+			TermUnitFinalZoneSizing( CtrlZoneNum ).ZoneVentilationEff = 0.7;
 			LimitZoneVentEff( Xs, VozClg, CtrlZoneNum, SysCoolingEv );
 			EXPECT_NEAR( 0.7622, SysCoolingEv, .0001 );
 
-			FinalZoneSizing.deallocate();
+			TermUnitFinalZoneSizing.deallocate();
 
 	}
 	TEST_F( EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1 ) {

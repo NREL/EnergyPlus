@@ -2648,6 +2648,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac ) {
 		"    Zone 1 Return Node;       !- Zone Return Air Node Name",
 		"ZoneHVAC:EquipmentList,",
 		"    Zone 1 Equipment,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Zone 1 ADU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
