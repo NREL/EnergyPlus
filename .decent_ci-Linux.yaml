@@ -58,7 +58,7 @@ compilers:
     build_package_generator: "STGZ"
     version: "4.8"
     skip_packaging: true
-    release_only: true
+    release_only: false
     s3_upload: doc-build
     s3_upload_bucket: energyplus
     skip_regression: true
