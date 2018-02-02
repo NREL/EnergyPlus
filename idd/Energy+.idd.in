@@ -11614,7 +11614,7 @@ Floor:Interzone,
 FenestrationSurface:Detailed,
        \memo Allows for detailed entry of subsurfaces
        \memo (windows, doors, glass doors, tubular daylighting devices).
-       \min-fields 19
+       \min-fields 18
        \format vertices
   A1 , \field Name
        \required-field

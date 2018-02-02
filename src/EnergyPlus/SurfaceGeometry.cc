@@ -1771,7 +1771,7 @@ namespace SurfaceGeometry {
 
 					if ( errFlag ) {
 						ErrorsFound = true;
-						ShowContinueError( "WindowProperty:ShadingControl " + WindowShadingControl( WinShadingControlPtr ).Name + " has errors, program will terminate." );
+						ShowContinueError( "WindowShadingControl " + WindowShadingControl( WinShadingControlPtr ).Name + " has errors, program will terminate." );
 					}
 
 					// TH 5/17/2010. Fixed for CR 8121. Overwrite the blind slat angle with the constant scheduled value
@@ -1795,7 +1795,7 @@ namespace SurfaceGeometry {
 					if ( Surface( SurfNum ).WindowShadingControlPtr == ShadingCtrl ) WinShadingCtrlReferenced = true;
 				}
 				if ( ! WinShadingCtrlReferenced ) {
-					ShowWarningError( RoutineName + "WindowProperty:ShadingControl: \"" + WindowShadingControl( ShadingCtrl ).Name + "\" is not referenced by any window." );
+					ShowWarningError( RoutineName + "WindowShadingControl: \"" + WindowShadingControl( ShadingCtrl ).Name + "\" is not referenced by any window." );
 				}
 			}
 		}
@@ -4327,10 +4327,10 @@ namespace SurfaceGeometry {
 				TotLayers = Construct( ConstrNum ).TotLayers;
 				TotShLayers = Construct( ConstrNumSh ).TotLayers;
 				if ( TotShLayers - 1 != TotLayers ) {
-					ShowWarningError( "WindowProperty:ShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, shaded should have 1 more layers than unshaded." );
+					ShowWarningError( "WindowShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, shaded should have 1 more layers than unshaded." );
 					ShowContinueError( "Unshaded construction=" + Construct( ConstrNum ).Name );
 					ShowContinueError( "Shaded construction=" + Construct( ConstrNumSh ).Name );
-					ShowContinueError( "If preceding two constructions are same name, you have likely specified a WindowProperty:ShadingControl (Field #3) with the Window Construction rather than a shaded construction." );
+					ShowContinueError( "If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) with the Window Construction rather than a shaded construction." );
 				}
 				for ( Lay = 1; Lay <= Construct( ConstrNum ).TotLayers; ++Lay ) {
 					if ( Construct( ConstrNum ).LayerPoint( Lay ) != Construct( ConstrNumSh ).LayerPoint( Lay ) ) {
@@ -4347,10 +4347,10 @@ namespace SurfaceGeometry {
 				TotLayers = Construct( ConstrNum ).TotLayers;
 				TotShLayers = Construct( ConstrNumSh ).TotLayers;
 				if ( TotShLayers - 1 != TotLayers ) {
-					ShowWarningError( "WindowProperty:ShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded constructions, shaded should have 1 more layer than unshaded." );
+					ShowWarningError( "WindowShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded constructions, shaded should have 1 more layer than unshaded." );
 					ShowContinueError( "Unshaded construction=" + Construct( ConstrNum ).Name );
 					ShowContinueError( "Shaded construction=" + Construct( ConstrNumSh ).Name );
-					ShowContinueError( "If preceding two constructions have the same name, you have likely specified a WindowProperty:ShadingControl (Field #3) with the Window Construction rather than a shaded construction." );
+					ShowContinueError( "If preceding two constructions have the same name, you have likely specified a WindowShadingControl (Field #3) with the Window Construction rather than a shaded construction." );
 				}
 				for ( Lay = 1; Lay <= Construct( ConstrNum ).TotLayers; ++Lay ) {
 					if ( Construct( ConstrNum ).LayerPoint( Lay ) != Construct( ConstrNumSh ).LayerPoint( Lay + 1 ) ) {
@@ -4378,10 +4378,10 @@ namespace SurfaceGeometry {
 				TotLayers = Construct( ConstrNum ).TotLayers;
 				TotShLayers = Construct( ConstrNumSh ).TotLayers;
 				if ( TotShLayers - 2 != TotLayers ) {
-					ShowWarningError( "WindowProperty:ShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, shaded should have 2 more layers than unshaded." );
+					ShowWarningError( "WindowShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, shaded should have 2 more layers than unshaded." );
 					ShowContinueError( "Unshaded construction=" + Construct( ConstrNum ).Name );
 					ShowContinueError( "Shaded construction=" + Construct( ConstrNumSh ).Name );
-					ShowContinueError( "If preceding two constructions are same name, you have likely specified a WindowProperty:ShadingControl (Field #3) with the Window Construction rather than a shaded construction." );
+					ShowContinueError( "If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) with the Window Construction rather than a shaded construction." );
 				}
 				if ( Construct( ConstrNum ).LayerPoint( TotLayers ) != Construct( ConstrNumSh ).LayerPoint( TotShLayers ) ) {
 					ShowSevereError( cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match." );
@@ -4563,7 +4563,7 @@ namespace SurfaceGeometry {
 			if ( NumShades != 0 ) {
 				ShowSevereError( cRoutineName + ": Window \"" + SubSurfaceName + "\" must not directly reference" );
 				ShowContinueError( "a Construction (i.e, \"" + SubSurfaceConstruction + "\") with a shading device." );
-				ShowContinueError( "Use WindowProperty:ShadingControl to specify a shading device for a window." );
+				ShowContinueError( "Use WindowShadingControl to specify a shading device for a window." );
 				ErrorsFound = true;
 			}
 		}
@@ -7310,7 +7310,7 @@ namespace SurfaceGeometry {
 
 		// FLOW:
 		// Get the total number of window shading control blocks
-		cCurrentModuleObject = "WindowProperty:ShadingControl";
+		cCurrentModuleObject = "WindowShadingControl";
 		TotWinShadingControl = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotWinShadingControl == 0 ) return;
 
@@ -8850,7 +8850,7 @@ namespace SurfaceGeometry {
 						}}
 						if ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Window ) {
 							ShowSevereError( cCurrentModuleObject + ", " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"" );
-							ShowContinueError( "invalid use on a Window. Use WindowProperty:ShadingControl instead." );
+							ShowContinueError( "invalid use on a Window. Use WindowShadingControl instead." );
 							ErrorsFound = true;
 						}
 					}
