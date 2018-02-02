@@ -9,8 +9,11 @@
 
 # This is actually faster.
 
+
+
 func() {
-  find src -name "*.hpp" -o -name "*.h" -o -name "*.hh" -o -name "*.cc" -o -name "*.cpp" -o -name "*.c" | xargs -n 1 -I '{}' diff  --unchanged-line-format="" --new-line-format="" --old-line-format="{ \"filename\": \"{}\", \"line\": %dn, \"messagetype\": \"warning\", \"message\": \"Formatting does not meet standards, See .clang_format and apply formatting.\", \"tool\": \"format-checker\" }%c'\012'" "{}" <(clang-format-3.9 "{}") 
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  find src -name "*.hpp" -o -name "*.h" -o -name "*.hh" -o -name "*.cc" -o -name "*.cpp" -o -name "*.c" | xargs -n 1 -I '{}' $DIR/verify_file_formatting.sh '{}'
 }
 
 NUMERRORS=$(func | wc -l)
