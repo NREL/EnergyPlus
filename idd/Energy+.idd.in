@@ -7104,25 +7104,25 @@ MaterialProperty:PhaseChangeHysteresis,
        \required-field
        \units J/kg-K
        \type real
-       \minimum >0
+       \minimum> 0
   N5 , \field High Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N6 , \field Peak Melting Temperature
        \note The temperature at which the melting curve peaks
        \required-field
        \units C
        \type real
-       \minimum >0
+       \minimum> 0
   N7 , \field Low Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N8 , \field Solid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully solid
        \required-field
@@ -7140,25 +7140,25 @@ MaterialProperty:PhaseChangeHysteresis,
        \required-field
        \units J/kg-K
        \type real
-       \minimum >0
+       \minimum> 0
   N11, \field High Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N12, \field Peak Freezing Temperature
        \note The temperature at which the freezing curve peaks
        \required-field
        \units C
        \type real
-       \minimum >0
+       \minimum> 0
   N13; \field Low Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
 
 MaterialProperty:VariableThermalConductivity,
     \memo Additional properties for temperature dependent thermal conductivity
@@ -44343,7 +44343,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity
-  N11, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N11, \field Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44499,7 +44499,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 2.
-  N24, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N24, \field Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44652,7 +44652,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 3.
-  N37, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N37, \field Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44800,7 +44800,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 4
-  N50, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N50, \field Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
