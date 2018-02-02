@@ -16136,7 +16136,7 @@ SurfaceProperty:HeatTransferAlgorithm:Construction,
 
 SurfaceProperty:HeatBalanceSourceTerm,
        \memo Allows an additional heat source term to be added to the inside or outside surface boundary.
-       \memo A heat source can be added	to either or both the inside and outside of the same surface.   
+       \memo A heat source can be added to either or both the inside and outside of the same surface.   
        \min-fields 3
   A1 , \field Surface Name
        \required-field
