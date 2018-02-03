@@ -1969,7 +1969,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.5, MSHPMassFlowRateHigh );
 
-	// constant fan mode should not drop to idle flow rate as speed = 1
+	// constant fan mode should not drop to idle flow rate at speed = 1
 	UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
 
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
@@ -2023,9 +2023,9 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = true;
 	CoolingLoad = false;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
-	EXPECT_EQ( 0.25, CompOffMassFlow );
+	EXPECT_EQ( 0.0, CompOffMassFlow );
 	EXPECT_EQ( 0.25, CompOnMassFlow );
-	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.0, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
 
 	// cooling load at various speeds
@@ -2051,9 +2051,9 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = false;
 	CoolingLoad = true;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
-	EXPECT_EQ( 0.2, CompOffMassFlow ); // CompOffMassFlow equal to idle mass flow rate
+	EXPECT_EQ( 0.0, CompOffMassFlow ); // CompOffMassFlow equal to 0 mass flow rate for cycling fan
 	EXPECT_EQ( 0.3, CompOnMassFlow );
-	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.0, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
 
 	// constant fan mode should not drop to idle flow rate at speed = 1
@@ -3771,7 +3771,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 
 	// test model performance
 	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts
-	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).CoolMassFlowRate( UnitarySystem( 1 ).CoolingSpeedNum ) );
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).CoolMassFlowRate( UnitarySystem( 1 ).CoolingSpeedNum ) * UnitarySystem( 1 ).PartLoadFrac ); // cycling fan
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
 }
