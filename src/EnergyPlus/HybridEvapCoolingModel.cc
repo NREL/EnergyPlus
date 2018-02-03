@@ -980,7 +980,9 @@ namespace EnergyPlus {//***************
 			HeatingRequested(false),
 			VentilationRequested(false),
 			DehumidificationRequested(false),
-			HumidificationRequested(false)
+			HumidificationRequested(false),
+			//debug
+			RawHR(0)
 		{
 			WarnOnceFlag = false;
 			cp = 1; //kJ/degreesC.kg default value, reset during calculation
@@ -999,7 +1001,7 @@ namespace EnergyPlus {//***************
 			int MAXIMUM_OPERATIONAL_SETTINGS = 5;
 			ModeCounter = 0;
 			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
-			DebugBreak = 16; // remove
+			DebugBreak = 12; // remove
 	
 			CurrentOperatingSettings.resize(5);
 
@@ -1032,6 +1034,7 @@ namespace EnergyPlus {//***************
 			SystemSensibleHeatingEnergy = 0;
 			SystemLatentHeatingRate = 0;
 			SystemLatentHeatingEnergy = 0;
+			RequestedLoadToHeatingSetpoint = 0;
 			RequestedLoadToCoolingSetpoint = 0;
 			RequestedHumdificationMass = 0;
 			RequestedHumdificationLoad = 0;
@@ -1050,6 +1053,8 @@ namespace EnergyPlus {//***************
 			ExternalStaticPressure = 0;	 
 			QLatentZoneOut = 0;
 			QSensZoneOut = 0;
+			//debug
+			//RawHR = 0;
 		}
 
 		void Model::InitializeModelParams()
@@ -1718,6 +1723,7 @@ namespace EnergyPlus {//***************
 								pCandidateSetting->oMode = Mode;
 								pCandidateSetting->SupplyAirTemperature = Tsa;
 								pCandidateSetting->SupplyAirW = CheckVal_W(Wsa, Tsa, OutletPressure);
+								pCandidateSetting->RawW = Wsa;
 								pCandidateSetting->Mode = Mode.ModeID;
 								
 								Settings.push_back(std::move(pCandidateSetting));
@@ -1937,6 +1943,7 @@ namespace EnergyPlus {//***************
 				ErrorCode = 0;
 				//save the optimal setting in the 
 				CurrentOperatingSettings[0] = pOptimal;
+				RawHR = pOptimal.RawW;
 				PrimaryModeRuntimeFraction=pOptimal.Runtime_Fraction;
 				oStandBy.Runtime_Fraction = (1 - PrimaryModeRuntimeFraction );
 				if (oStandBy.Runtime_Fraction < 0)
@@ -1958,6 +1965,7 @@ namespace EnergyPlus {//***************
 						pOptimal.ElectricalPower = 0;
 					}
 					pOptimal.Runtime_Fraction = 1;
+					RawHR = pOptimal.RawW;
 					CurrentOperatingSettings[0] = pOptimal;
 					PrimaryMode = pOptimal.Mode;
 					PrimaryModeRuntimeFraction = 1;
@@ -1966,7 +1974,7 @@ namespace EnergyPlus {//***************
 				else
 				{
 					oStandBy.Runtime_Fraction=1;
-
+					//RawHR = 0;
 					CurrentOperatingSettings[0] = oStandBy;
 					ErrorCode = -1;
 					StandBy = true;
@@ -2128,7 +2136,7 @@ namespace EnergyPlus {//***************
 			// METHODOLOGY EMPLOYED:
 			// na
 
-			// REFERENCES:
+			// REFERENCES: OutletVolumetricFlowRate, SupplyVentilationVolume, MinOA_Msa, SupplyVentilationAir
 			// na
 			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
 			if ((DataGlobals::HourOfDay == DebugBreak) && !WarmupFlag)
@@ -2136,6 +2144,9 @@ namespace EnergyPlus {//***************
 				int k = 1;//debug step
 			}
 			// set requested loads to output variables
+			RequestedLoadToHeatingSetpoint = RequestedCoolingLoad;
+			RequestedLoadToCoolingSetpoint = RequestedHeatingLoad;
+
 			RequestedHumdificationMass = OutputRequiredToHumidify;
 			RequestedHumdificationLoad = OutputRequiredToHumidify * 2257 / 1000; // [kW];
 			RequestedHumdificationEnergy = OutputRequiredToHumidify * 2257 * TimeStepSys * SecInHour; // [j]
@@ -2193,7 +2204,7 @@ namespace EnergyPlus {//***************
 			else
 			{
 				// set the operating conditions and respective part load fractions.
-				ErrorCode = SetOperatingSetting(StepIns);
+				ErrorCode = SetOperatingSetting(StepIns); 
 			}
 			
 			Real64 QTotZoneOut = 0;
@@ -2218,7 +2229,7 @@ namespace EnergyPlus {//***************
 			// set timestep average outlet condition, considering all operating conditions and runtimes.
 			OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
 			OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
-			 
+	
 			OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure); //could also use outlet pressure instead of fixed
 			Real64 OperatingAverageMixedAirTemperature = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_TEMP);
 			Real64 OperatingMixedAirW = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
@@ -2356,9 +2367,10 @@ namespace EnergyPlus {//***************
 				QSensSystemOut = 0;
 				QLatentSystemOut = 0;
 				// reset outputs
+				RawHR = 0;
 				ResetOutputs();
-			//FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
-			//FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
+				
+	
 			}
 
 			// set timestep outputs calculated considering different runtime fractions.
@@ -2377,19 +2389,7 @@ namespace EnergyPlus {//***************
 			FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
 			FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
 			
-			/*else // unit is in standby so reset conditioning outputs
-			{
-				QTotZoneOut = 0;
-				QSensZoneOut = 0;
-				QLatentZoneOut = 0;
-				QTotSystemOut = 0;
-				QSensSystemOut = 0;
-				QLatentSystemOut = 0;
-				// reset outputs 
-				ResetOutputs();
-				FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
-				FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
-			}*/
+		
 	
 		}
 

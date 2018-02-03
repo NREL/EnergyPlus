@@ -149,7 +149,7 @@ namespace EnergyPlus {
 		public:
 			CSetting() :Runtime_Fraction(0), Mode(0), Outside_Air_Fraction(0), Unscaled_Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
 				SupplyAirTemperature(0), Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), 
-				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0) {}
+				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0), RawW(0){}
 			Real64 Runtime_Fraction;															  
 			Real64 Mode;																		  
 			Real64 Outside_Air_Fraction;														  
@@ -174,6 +174,8 @@ namespace EnergyPlus {
 			Real64 ThirdFuelConsumptionRate;   //
 			Real64 WaterConsumptionRate;	   //
 			Real64 ExternalStaticPressure;	   //
+			//Debug values
+			Real64 RawW;
 
 			// add other fuels, or change name to be fuel
 			CMode oMode;
@@ -205,6 +207,7 @@ namespace EnergyPlus {
 				swap(WaterConsumptionRate, other.WaterConsumptionRate);
 				swap(ExternalStaticPressure, other.ExternalStaticPressure);
 				swap(oMode, other.oMode);
+				swap(RawW, other.RawW);
 				return *this;
 			}
 		};
@@ -351,7 +354,9 @@ namespace EnergyPlus {
 			std::vector<int>  Psa_curve_pointer;
 			std::vector<CMode>  OperatingModes;
 			std::vector<CSetting> CurrentOperatingSettings;
+			//debug values
 			int DebugBreak;
+			Real64 RawHR;
 
 			CSetting pOptimal;
 			CSetting oStandBy;
