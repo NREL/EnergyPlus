@@ -12040,7 +12040,7 @@ WindowShadingControl,
        \key BetweenGlassShade
        \key BetweenGlassBlind
        \key SwitchableGlazing
-  A3 , \field Construction with Shading Name
+  A3 , \field Construction with Shading Name 
        \type object-list
        \object-list ConstructionNames
        \note Required if Shading Type = SwitchableGlazing
@@ -12154,7 +12154,6 @@ WindowShadingControl,
        \type real
        \ip-units unknown
   A11, \field Daylighting Control Object Name
-       \required-field
        \type object-list
        \object-list DaylightingControlNames
        \note Reference to the Daylighting:Controls object that provides the glare and illuminance control to the zone.
