@@ -2130,12 +2130,8 @@ namespace WeatherManager {
 				}
 			}
 
-			EndYearFlag = false;
 			if ( DayOfMonth == EndDayOfMonth( Month ) ) {
 				EndMonthFlag = true;
-				if ( Month == 12 ) {
-					EndYearFlag = true;
-				}
 			}
 
 			// Set Tomorrow's date data
@@ -2381,7 +2377,6 @@ namespace WeatherManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static char full_date[ 11 ];
 		static char time_stamp[ 10 ];
 		static char day_stamp[ 6 ];
 		static std::string const RoutineName( "SetCurrentWeather" );
@@ -2411,8 +2406,6 @@ namespace WeatherManager {
 
 		UpdateScheduleValues();
 
-		std::sprintf( full_date, "%04d-%02d-%02d", Year, Month, DayOfMonth );
-		currentTimestamp = full_date;
 		std::sprintf( time_stamp, "%02d/%02d %02d:", Month, DayOfMonth, HourOfDay - 1 );
 		CurMnDyHr = time_stamp;
 		std::sprintf( day_stamp, "%02d/%02d", Month, DayOfMonth );

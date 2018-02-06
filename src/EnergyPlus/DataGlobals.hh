@@ -152,7 +152,6 @@ namespace DataGlobals {
 	// (last time step of last hour of last day of environ which is a design day)
 	extern bool EndDayFlag; // True at the end of each day (last time step of last hour of day)
 	extern bool EndHourFlag; // True at the end of each hour (last time step of hour)
-	extern bool EndYearFlag; // True at the end of each year, for the entire last day of the year
 	extern int PreviousHour; // Previous Hour Index
 	extern int HourOfDay; // Counter for hours in a simulation day
 	extern Real64 WeightPreviousHour; // Weighting of value for previous hour
