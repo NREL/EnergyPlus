@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,7 +74,7 @@ namespace GroundTemperatureManager {
 	int const objectType_SiteFCFactorMethodGroundTemp( 6 );
 	int const objectType_XingGroundTemp( 7 );
 
-	Array1D_string const CurrentModuleObjects( 7, { "Site:Groundtemperature:Undisturbed:KusudaAchenbach", "Site:GroundTemperature:Undisturbed:FiniteDifference", "Site:GroundTemperature:BuildingSurface", "Site:GroundTemperature:Shallow", "Site:GroundTemperature:Deep", "Site:GroundTemperature:FCfactorMethod", "Site:GroundTemperature:Undisturbed:Xing"} );
+	Array1D_string const CurrentModuleObjects( 7, { "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "Site:GroundTemperature:Undisturbed:FiniteDifference", "Site:GroundTemperature:BuildingSurface", "Site:GroundTemperature:Shallow", "Site:GroundTemperature:Deep", "Site:GroundTemperature:FCfactorMethod", "Site:GroundTemperature:Undisturbed:Xing"} );
 
 	std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
 
@@ -93,7 +93,7 @@ namespace GroundTemperatureManager {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Called by objects requireing ground temperature models. Determines type and calls appropriate factory method.
+		// Called by objects requiring ground temperature models. Determines type and calls appropriate factory method.
 
 		// USE STATEMENTS:
 		using InputProcessor::MakeUPPERCase;

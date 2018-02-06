@@ -63,6 +63,7 @@ set( test_src
   FluidProperties.unit.cc
   Furnaces.unit.cc
   General.unit.cc
+  GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc

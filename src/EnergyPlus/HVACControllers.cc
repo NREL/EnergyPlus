@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3613,6 +3613,31 @@ Label100: ;
 			WaterInletNodeNum = ControllerProps( ControlNum ).ActuatedNode;
 			NodeNotFound = false;
 		}
+
+	}
+
+	int
+	GetControllerIndex(
+		std::string const & ControllerName // name of coil controller
+	) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad, FSEC
+		//       DATE WRITTEN   January 2018
+
+		// This subroutine finds the controllers actuator node number
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		int ControllerIndex = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		if ( ControllerIndex == 0 ) {
+			ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
+		}
+
+		return ControllerIndex;
 
 	}
 

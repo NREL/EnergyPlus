@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,6 +80,13 @@ ControlCompOutput(
 	Optional_int_const LoopSide = _, // for plant components, plant loop side index
 	Optional_int_const BranchIndex = _, // for plant components, plant branch index
 	Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
+);
+	
+bool
+BBConvergeCheck(
+	int const SimCompNum,
+	Real64 const MaxFlow,
+	Real64 const MinFlow
 );
 
 void

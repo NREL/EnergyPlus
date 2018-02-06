@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -277,6 +277,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Add a section to check #6119 by L. Gu on 5/16/17
+	CorrectZoneHumRat( 1 );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
+
+	// Issue 6233
+	Zone( 1 ).IsControlled = true;
 	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
@@ -1150,7 +1155,7 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 	// J.Glazer - August 2017
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.8;",
+		"Version,8.9;",
 		" ",
 		"ScheduleTypeLimits,",
 		"  Any Number;              !- Name",

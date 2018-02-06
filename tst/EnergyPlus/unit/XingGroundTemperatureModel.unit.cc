@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,11 +58,10 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
- 
+
 TEST_F( EnergyPlusFixture, XingGroundTempsModelTest )
 {
 	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
 		"Site:GroundTemperature:Undisturbed:Xing,",
 		"	Test,			!- Name of object",
 		"	1.08,			!- Soil Thermal Conductivity {W/m-K}",
@@ -76,7 +75,7 @@ TEST_F( EnergyPlusFixture, XingGroundTempsModelTest )
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	
+
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

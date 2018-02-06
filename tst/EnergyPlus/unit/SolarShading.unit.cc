@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -298,7 +298,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_polygon_contains_point )
 TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 {
 	std::string const idf_objects = delimited_string( {
-		"  Version,8.8;                                                                       ",
+		"  Version,8.9;                                                                       ",
 		"  Building,                                                                          ",
 		"    DemoFDT,                 !- Name                                                 ",
 		"    0,                       !- North Axis {deg}                                     ",
@@ -678,7 +678,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 {
 	std::string const idf_objects = delimited_string( {
-		"  Version,8.8;                                                                       ",
+		"  Version,8.9;                                                                       ",
 		"  Building,                                                                          ",
 		"    DemoFDT,                 !- Name                                                 ",
 		"    0,                       !- North Axis {deg}                                     ",
