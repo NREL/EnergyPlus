@@ -22,16 +22,19 @@ if( 179D_COMPLIANCE )
 
   configure_file("${CMAKE_SOURCE_DIR}/cmake/179D_Generate_Reports.sh.in" "${CMAKE_BINARY_DIR}/179D_Generate_Reports.sh")
 
-  add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc-build/179d_compliance/RESULTS5-2A.xlsx
+  add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/179D_Reports/RESULTS5-2A.xlsx
 		  COMMAND sh ${CMAKE_BINARY_DIR}/179D_Generate_Reports.sh
-                  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/doc-build/179d_compliance
-                  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/OS_EP_Bestest-prefix/src/OS_EP_Bestest/results ${CMAKE_BINARY_DIR}/doc-build/179d_compliance
+                  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/179D_Reports
+                  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/OS_EP_Bestest-prefix/src/OS_EP_Bestest/results ${CMAKE_BINARY_DIR}/179D_Reports
+                  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/OS_EP_Bestest-prefix/src/OS_EP_Bestest/results/bestest_zips ${CMAKE_BINARY_DIR}/179D_Reports
+                  COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/179D_Reports/bestest_zips
+                  COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/179D_Reports/resources
 		  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/OS_EP_Bestest-prefix/src/OS_EP_Bestest
 		  DEPENDS OS_EP_Bestest energyplus
 		  )
 
   add_custom_target( OS_EP_Bestest_Files ALL
-		     DEPENDS ${CMAKE_BINARY_DIR}/doc-build/179d_compliance/RESULTS5-2A.xlsx
+		     DEPENDS ${CMAKE_BINARY_DIR}/179D_Reports/RESULTS5-2A.xlsx
 		  )  
 
   # todo, place output file in ${CMAKE_BINARY_DIR}/doc-build

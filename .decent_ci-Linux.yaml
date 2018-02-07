@@ -59,7 +59,7 @@ compilers:
     version: "4.8"
     skip_packaging: true
     release_only: false
-    s3_upload: doc-build
+    s3_upload: 179D_Reports
     s3_upload_bucket: energyplus
     skip_regression: true
     cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -D179D_COMPLIANCE:BOOL=ON
