@@ -10,31 +10,34 @@
 class CoilCoolingDXInputSpecification {
 
     std::string name;
-    std::string air_inlet_node_name;
-    std::string air_outlet_node_name;
+    std::string evaporator_inlet_node_name;
+    std::string evaporator_outlet_node_name;
     std::string availability_schedule_name;
-    std::string zone_name_for_condenser_placement;
+    std::string condenser_zone_name;
+	std::string condenser_inlet_node_name;
+	std::string condenser_outlet_node_name;
+	std::string performance_object_name;
+	std::string condensate_collection_water_storage_tank_name;
+	std::string evaporative_condenser_supply_water_storage_tank_name;
 
-    Real64 crankcase_heater_capacity;
-    Real64 minimum_outdoor_db_temperature_for_compressor_operation;
-    Real64 maximum_outdoor_db_temperature_for_crankcase_heater_operation;
+	CoilCoolingDXInputSpecification();
 
-    Real64 evaporative_condenser_pump_rated_power_consumption;
-    Real64 rated_evaporator_fan_power_per_volume_flow_rate;
-    Real64 unit_internal_static_pressure;
-    Real64 maximum_cycling_rate;
+};
 
-    std::string condensate_collection_water_storage_tank_name;
+class CoilCoolingDXPerformanceCurveFitSpecification {
 
-    Real64 evaporative_condenser_air_flow_rate;
-    Real64 evaporative_condenser_effectiveness;
+	std::string name;
+	Real64 crankcase_heater_capacity;
+	Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
+	Real64 maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
+	Real64 unit_internal_itatic_air_pressure;
+	std::string method_for_switching_modes;
+	std::string operating_mode_number_schedule_name;
+	Real64 basin_heater_capacity;
+	Real64 basin_heater_setpoint_temperature;
+	std::string basin_heater_operating_shedule_name;
 
-    std::string method_for_switching_modes;
-    int number_of_operating_modes;
-
-    std::vector< CoilCoolingDXOperatingMode > operatingModes;
-
-    CoilCoolingDXInputSpecification();
+	std::vector< std::string > operating_modes;
 
 };
 
