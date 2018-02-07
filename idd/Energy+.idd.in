@@ -4502,7 +4502,7 @@ Schedule:Constant,
   N1 ; \field Hourly Value
        \type real
        \default 0
-	   
+
 Schedule:File:Shading,
        \min-fields 1
        \memo A Schedule:File:Shading points to a text computer file that has

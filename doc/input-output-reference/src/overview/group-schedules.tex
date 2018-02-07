@@ -453,32 +453,94 @@ ScheduleTypeLimits,
   Availability; !- Unit Type
 \end{lstlisting}
 
-\subsection{Schedule:File:Shading}\label{schedulefileshading}
+\subsection{Schedule:File}\label{schedulefile}
 
-The Schedule:File:Shading object allows shading schedules to be imported altogether from a file. The object can also be used to read in hourly schedules of the sunlit fraction of all exterior surfaces computed by other software or developed in a spreadsheet or other utility.
+At times, data is available from a building being monitored or for factors that change throughout the year. The Schedule:File object allows this type of data to be used in EnergyPlus as a schedule. Schedule:File can also be used to read in hourly or sub-hourly schedules computed by other software or developed in a spreadsheet or other utility.
 
-The format for the data file can be either Comma-separated values (CSV) or JSON. The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. To map to the surface, each column should name its column header exactly the same with the surface name defined in the Surface:Detailed object. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued. The first row of data must be for January 1, hour 1. The first column with the time stamps is skipped.
+The format for the data file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. The file may contain header lines that are skipped. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued. Multiple schedules may be created using a single external data file or multiple external data files may be used. The first row of data must be for January 1, hour 1 (or timestep 1 for subhourly files).
 
-With a Schedule:File:Shading object defined, the shading schedules for all exterior surfaces (if defined) can be imported altogether without repeatedly defining Schedule:File objects.
+Schedule:File may be used along with the FuelFactors object and TDV files in the DataSets directory to compute Time Dependent Valuation based source energy as used by the California Energy Commission's Title 24 Energy Code. See Fuel Factor for more discussion on Time Dependent Valuation.
 
-\subsubsection{Inputs}\label{inputs-schedule-file-shading}
+Two optional fields: \textbf{Interpolate to Timestep} and \textbf{Minutes per Item} allow for the input of sub-hourly schedules (similar to the Schedule:Day:List object).
+
+\subsubsection{Inputs}\label{inputs-9-019}
+
+\paragraph{Field: Name}\label{field-name-8-018}
+
+This field should contain a unique (between Schedule:Year, Schedule:Compact, and Schedule:File) designation for the schedule. It is referenced by various ``scheduled'' items (e.g.~Lights, People, Infiltration, FuelFactors) to define the appropriate schedule values.
+
+\paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-6}
+
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see ScheduleTypeLimits object above), then the restrictions from the referenced object will be used to validate the hourly field values (below).
 
 \paragraph{Field: File Name}\label{field-file-name}
 
-This field contains the name of the file that contains the data for the shading schedules. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+This field contains the name of the file that contains the data for the schedule. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 
-\paragraph{Field: File Format}\label{field-file-format}
+\paragraph{Field: Column Number}\label{field-column-number}
 
-The field indicates the format of the shading schedule to be imported. The format can either be CSV or JSON.
+The column that contains the value to be used in the schedule. The first column is column one. If no data for a row appears for a referenced column the value of zero is used for the schedule value for that hour.
+
+\paragraph{Field: Rows to Skip at Top}\label{field-rows-to-skip-at-top}
+
+Many times the data in a file contains rows (lines) that are describing the files or contain the names of each column. These rows need to be skipped and the number of skipped rows should be entered for this field. The next row after the skipped rows must contain data for January 1, hour 1.
+
+\paragraph{Field: Number of Hours of Data}\label{field-number-of-hours-of-data}
+
+The value entered in this field should be either 8760 or 8784 as the number of hours of data. 8760 does not include the extra 24 hours for a leap year (if needed). 8784 will include the possibility of leap year data which can be processed according to leap year indicators in the weather file or specified elsewhere. Note if the simulation does not have a leap year specified but the schedule file contains 8784 hours of data, the first 8760 hours of data will be used. The schedule manager will not know to skip the 24 hours representing February 29.
+
+\paragraph{Field: Column Separator}\label{field-column-separator-001}
+
+This field specifies the character used to separate columns of data if the file has more than one column. The choices are: Comma, Tab, Fixed (spaces fill each column to a fixed width), or Semicolon. The default is Comma.
+
+\paragraph{Field: Interpolate to Timestep}\label{field-interpolate-to-timestep-2}
+
+The value contained in this field directs how to apply values that aren't coincident with the given timestep (ref: TimeStep object) intervals. If ``Yes'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value.
+
+For example, if ``yes'' is entered and the minutes per item is 15 minutes (say a value of 0 for the first 15 minutes, then .5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be .25. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5.
+
+\paragraph{Field: Minutes Per Item}\label{field-minutes-per-item-1}
+
+This field represents the number of minutes for each item -- in this case each line of the file. The value here must be \(\le\) 60 and evenly divisible into 60 (same as the timestep limits).
 
 Here is an IDF example:
 
 \begin{lstlisting}
 Schedule:File,
-  eplusshading.csv,   !- Name of File
-  CSV;                !- Column Number
+  elecTDVfromCZ01res, !- Name
+  Any Number,         !- ScheduleType
+  TDV_kBtu_CTZ01.csv, !- Name of File
+  2,                  !- Column Number
+  4,                  !- Rows to Skip at Top
+  8760,               !- Number of Hours of Data
+  Comma;              !- Column Separator
 \end{lstlisting}
 
+or with a relational path:
+
+\begin{lstlisting}
+Schedule:File,
+  elecTDVfromCZ01res, !- Name
+  Any Number,         !- ScheduleType
+  DataSets\TDV\TDV_kBtu_CTZ01.csv,  !- Name of File
+  2,                  !- Column Number
+  4;                  !- Rows to Skip at Top
+\end{lstlisting}
+
+A sub-hourly indication. Note that this is identical to an hourly file because there are 60 minutes per item -- the number of hours defaults to 8760 and the column separator defaults to a comma. If the number of minutes per item had been, say, 15, then the file would need to contain 8760*4 or 35,040 rows for this item.
+
+\begin{lstlisting}
+Schedule:File,
+  elecTDVfromCZ06com, !- Name
+  Any Number,         !- Schedule Type Limits Name
+  DataSets\TDV\TDV_2008_kBtu_CTZ06.csv, !- File Name
+  1,                  !- Column Number
+  4,                  !- Rows to Skip at Top
+  ,                   !- Number of Hours of Data
+  ,                   !- Column Separator
+  ,                   !- Interpolate to Timestep
+  60;                 !- Minutes per Item
+\end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-031}
 
@@ -508,3 +570,28 @@ Output:Variable,People_Shopping_Sch,Schedule Value,hourly;
 Output:Variable,Activity_Shopping_Sch,Schedule Value,hourly;
 \end{lstlisting}
 
+\subsection{Schedule:File:Shading}\label{schedulefileshading}
+
+The Schedule:File:Shading object allows shading schedules to be imported altogether from a file. The object can also be used to read in hourly schedules of the sunlit fraction of all exterior surfaces computed by other software or developed in a spreadsheet or other utility.
+
+The format for the data file can be either Comma-separated values (CSV) or JSON. The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. To map to the surface, each column should name its column header exactly the same with the surface name defined in the Surface:Detailed object. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued. The first row of data must be for January 1, hour 1. The first column with the time stamps is skipped.
+
+With a Schedule:File:Shading object defined, the shading schedules for all exterior surfaces (if defined) can be imported altogether without repeatedly defining Schedule:File objects.
+
+\subsubsection{Inputs}\label{inputs-schedule-file-shading}
+
+\paragraph{Field: File Name}\label{field-file-name}
+
+This field contains the name of the file that contains the data for the shading schedules. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+\paragraph{Field: File Format}\label{field-file-format}
+
+The field indicates the format of the shading schedule to be imported. The format can either be CSV or JSON.
+
+Here is an IDF example:
+
+\begin{lstlisting}
+Schedule:File,
+  eplusshading.csv,   !- Name of File
+  CSV;                !- Column Number
+\end{lstlisting}

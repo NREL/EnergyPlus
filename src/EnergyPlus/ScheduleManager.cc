@@ -640,11 +640,11 @@ namespace ScheduleManager {
 			}
 			if ( rowCnt < rowLimitMinCount ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than " + RoundSigDigits( numHourlyValues ) + " hourly values read from file." );
-				ShowContinueError( "..Number read=" + TrimSigDigits( ( rowCnt * 60 ) / MinutesPerItem ) + '.' );
+				ShowContinueError( "..Number read=" + rowCnt + '.' );
 			}
 			if ( rowCnt < rowLimitMinCount ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than specified hourly values read from file." );
-				ShowContinueError( "..Specified Number of Hourly Values=" + TrimSigDigits( numHourlyValues ) + " Actual number of hourly values included=" + TrimSigDigits( ( rowCnt * 60 ) / MinutesPerItem ) );
+				ShowContinueError( "..Specified Hourly Values. Actual number of hourly values included=" + rowCnt );
 			}
 			if ( rowCnt == rowLimitCount ) ScheduleFileShadingLeapYear = true;
 		}
