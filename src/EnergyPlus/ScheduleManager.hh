@@ -48,6 +48,9 @@
 #ifndef ScheduleManager_hh_INCLUDED
 #define ScheduleManager_hh_INCLUDED
 
+// C++ Headers
+#include <map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
@@ -96,6 +99,8 @@ namespace ScheduleManager {
 	//Logical Variables for Module
 	extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
 	extern bool ScheduleDSTSFileWarningIssued;
+
+	extern bool ScheduleFileShadingProcessed; // This is false unless there is a Schedule:File:Shading object.
 
 
 	enum class ScheduleInterpolation {

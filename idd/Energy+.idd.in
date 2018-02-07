@@ -549,6 +549,7 @@ ShadowCalculation,
        \type choice
        \key ScheduledShading
        \key InternalCalculation
+       \key ImportedShading
        \default InternalCalculation
        \note If ScheduledShading is chosen, the External Shading Fraction Schedule Name is required.
   A5 ; \field Output External Shading Calculation Results
@@ -4501,7 +4502,21 @@ Schedule:Constant,
   N1 ; \field Hourly Value
        \type real
        \default 0
-
+	   
+Schedule:File:Shading,
+       \min-fields 1
+       \memo A Schedule:File:Shading points to a text computer file that has
+       \memo hourly/sub-hourly sunlit fraction data for all exterior surfaces.
+  A1 , \field File Name
+       \memo The name of the file that writes all shading data.
+       \required-field
+       \retaincase
+  A2 ; \field File Format
+       \type choice
+       \key CSV
+       \key JSON
+       \default CSV
+	   
 Schedule:File,
  \min-fields 5
        \memo A Schedule:File points to a text computer file that has 8760-8784 hours of data.

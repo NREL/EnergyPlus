@@ -132,8 +132,8 @@ namespace DataSystemVariables {
 	extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
 	extern bool UseScheduledSunlitFrac; // when true, the external shading calculation results will be exported
 	extern bool ReportExtShadingSunlitFrac; // when true, the sunlit fraction for all surfaces are exported as a csv format output
-
-	// This update the value during the warmup added for FMI
+	extern bool UseImportedSunlitFrac; // when true, the sunlit fraction for all surfaces are imported altogether as a CSV file
+    // This update the value during the warmup added for FMI
 	extern Real64 Elapsed_Time; // For showing elapsed time at end of run
 	extern Real64 Time_Start; // Call to CPU_Time for start time of simulation
 	extern Real64 Time_Finish; // Call to CPU_Time for end time of simulation

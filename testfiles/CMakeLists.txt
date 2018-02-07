@@ -580,6 +580,7 @@ ADD_SIMULATION_TEST(IDF_FILE gasAbsorptionChillerHeater.idf EPW_FILE USA_IL_Chic
 ADD_SIMULATION_TEST(IDF_FILE SurfaceZonePropTest_LocalEnv.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SurfacePropTest_SurfLWR.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest_ExternalFraction.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest_ImportedShading.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_MultiZone_LocalNode.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 
 # Additional files in subdirectories
