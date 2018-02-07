@@ -68,7 +68,7 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::ScheduleManager;
 
-TEST_F( EnergyPlusFixture, RunPeriod_SkyTempTest )
+TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
 {
 	std::string const idf_objects = delimited_string({
 		"Version,",
@@ -76,84 +76,91 @@ TEST_F( EnergyPlusFixture, RunPeriod_SkyTempTest )
 		"SimulationControl, NO, NO, NO, YES, YES;",
 		"Timestep,4;",
 		"RunPeriod,",
-		",                        !- Name",
+		"RP1,                     !- Name",
 		"2,                       !- Begin Month",
 		"29,                      !- Begin Day of Month",
 		"2016,                    !- Begin Year",
 		"3,                       !- End Month",
 		"3,                       !- End Day of Month",
 		",                        !- End Year",
-		"Tuesday,                 !- Day of Week for Start Day",
+		"Monday,                  !- Day of Week for Start Day",
+		"No,                      !- Apply Weekend Holiday Rule",
+		"Yes,                     !- Use Weather File Rain Indicators",
+		"Yes;                     !- Use Weather File Snow Indicators",
+		"RunPeriod,",
+		"RP2,                     !- Name",
+		"2,                       !- Begin Month",
+		"29,                      !- Begin Day of Month",
+		",                        !- Begin Year",
+		"3,                       !- End Month",
+		"3,                       !- End Day of Month",
+		",                        !- End Year",
+		"Wednesday,               !- Day of Week for Start Day",
+		"No,                      !- Apply Weekend Holiday Rule",
+		"Yes,                     !- Use Weather File Rain Indicators",
+		"Yes;                     !- Use Weather File Snow Indicators",
+		"RunPeriod,",
+		"RP3,                     !- Name",
+		"1,                       !- Begin Month",
+		"1,                       !- Begin Day of Month",
+		",                        !- Begin Year",
+		"12,                      !- End Month",
+		"31,                      !- End Day of Month",
+		",                        !- End Year",
+		"Thursday,                !- Day of Week for Start Day",
+		"No,                      !- Apply Weekend Holiday Rule",
+		"Yes,                     !- Use Weather File Rain Indicators",
+		"Yes;                     !- Use Weather File Snow Indicators",
+		"RunPeriod,",
+		"RP4,                     !- Name",
+		"1,                       !- Begin Month",
+		"1,                       !- Begin Day of Month",
+		",                        !- Begin Year",
+		"12,                      !- End Month",
+		"31,                      !- End Day of Month",
+		",                        !- End Year",
+		",                        !- Day of Week for Start Day",
 		"No,                      !- Apply Weekend Holiday Rule",
 		"Yes,                     !- Use Weather File Rain Indicators",
 		"Yes;                     !- Use Weather File Snow Indicators",
 		"BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
-		"Schedule:Compact,",
-		"TskySchedule,                !- Name",
-		",              !- Schedule Type Limits Name",
-		"Through: 2/26, For: AllOtherDays,  Until: 24:00, 2.26,",
-		"Through: 2/27, For: AllOtherDays,  Until: 24:00, 2.27,",
-		"Through: 2/28, For: AllOtherDays,  Until: 24:00, 2.28,",
-		"Through: 3/1, For: AllOtherDays,  Until: 24:00, 3.01,",
-		"Through: 3/2, For: AllOtherDays,  Until: 24:00, 3.02,",
-		"Through: 12/31, For: AllOtherDays,  Until: 24:00, 12.31;",
-		"WeatherProperty:SkyTemperature,",
-		",                        !- Name",
-		"ScheduleValue,           !- Calculation Type",
-		"TskySchedule;                  !- Schedule Name",
-		"Site:WaterMainsTemperature,",
-		"Schedule,             !- Calculation Method",
-		"TskySchedule,                        !- Temperature Schedule Name",
-		",                   !- Annual Average Outdoor Air Temperature{ C }",
-		";                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures{ deltaC }",
-		"Output:Variable,*,Schedule Value,hourly;",
-		"Output:Variable,*,Site Sky Temperature,hourly;",
-		"Output:Variable,*,Site Mains Water Temperature,hourly; !- Zone Average[C]",
-		"  Site:Location,",
-		"    USA IL-CHICAGO-OHARE,    !- Name",
-		"    41.77,                   !- Latitude {deg}",
-		"    -87.75,                  !- Longitude {deg}",
-		"    -6.00,                   !- Time Zone {hr}",
-		"    190;                     !- Elevation {m}",
+
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	bool errors;
-	int totalrps( 1 );
-	WeatherManager::GetRunPeriodData( totalrps, errors) ;
-	EXPECT_EQ( WeatherManager::WeekDay::Tuesday, WeatherManager::RunPeriodInput[ 0 ].startWeekDay );
-	EXPECT_EQ( 2007, WeatherManager::RunPeriodInput[ 0 ].startYear );
-	EXPECT_EQ( 2454159, WeatherManager::RunPeriodInput[ 0 ].startJulianDate );
-	EXPECT_EQ( 2454163, WeatherManager::RunPeriodInput[ 0 ].endJulianDate);
+	bool errors_in_input( false );
+	int totalrps( 4 );
+	WeatherManager::GetRunPeriodData( totalrps, errors_in_input );
+	EXPECT_FALSE( errors_in_input );
 
-	Array2D< Real64 > TomorrowSkyTemp; // Sky temperature
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-	TomorrowSkyTemp.allocate( DataGlobals::NumOfTimeStepInHour, 24 );
-	TomorrowSkyTemp = 0.0;
+	EXPECT_EQ( WeatherManager::WeekDay::Monday, WeatherManager::RunPeriodInput[0].startWeekDay );
+	EXPECT_EQ( 2016, WeatherManager::RunPeriodInput[0].startYear );
+	EXPECT_EQ( 2016, WeatherManager::RunPeriodInput[0].startYear );
+	EXPECT_EQ( 2457448, WeatherManager::RunPeriodInput[0].startJulianDate );
+	EXPECT_EQ( 2457451, WeatherManager::RunPeriodInput[0].endJulianDate );
 
-	//Febuary 27
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 58, 3);
-	EXPECT_NEAR(2.27, TomorrowSkyTemp(1,1), .001);
+	EXPECT_EQ( WeatherManager::WeekDay::Wednesday, WeatherManager::RunPeriodInput[1].startWeekDay );
+	EXPECT_EQ( 2012, WeatherManager::RunPeriodInput[1].startYear );
+	EXPECT_EQ( 2012, WeatherManager::RunPeriodInput[1].startYear );
+	EXPECT_EQ( 2455987, WeatherManager::RunPeriodInput[1].startJulianDate );
+	EXPECT_EQ( 2455990, WeatherManager::RunPeriodInput[1].endJulianDate );
 
-	//Febuary 28
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 59, 4);
-	EXPECT_NEAR(2.28, TomorrowSkyTemp(1, 1), .001);
+	EXPECT_EQ( WeatherManager::WeekDay::Thursday, WeatherManager::RunPeriodInput[2].startWeekDay );
+	EXPECT_EQ( 2015, WeatherManager::RunPeriodInput[2].startYear );
+	EXPECT_EQ( 2015, WeatherManager::RunPeriodInput[2].startYear );
+	EXPECT_EQ( 2457024, WeatherManager::RunPeriodInput[2].startJulianDate );
+	EXPECT_EQ( 2457388, WeatherManager::RunPeriodInput[2].endJulianDate );
 
-	//March 1
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 60, 5);
-	EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
+	EXPECT_EQ( WeatherManager::WeekDay::Sunday, WeatherManager::RunPeriodInput[3].startWeekDay );
+	EXPECT_EQ( 2017, WeatherManager::RunPeriodInput[3].startYear );
+	EXPECT_EQ( 2017, WeatherManager::RunPeriodInput[3].startYear );
+	EXPECT_EQ( 2457755, WeatherManager::RunPeriodInput[3].startJulianDate );
+	EXPECT_EQ( 2458119, WeatherManager::RunPeriodInput[3].endJulianDate );
 
-	//Not March 2, this "Day" is ignored unless its a leap year, otherwise same data as March 1
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 61, 6);
-	EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
-
-	//March 2
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 62, 6);
-	EXPECT_NEAR(3.02, TomorrowSkyTemp(1, 1), .001);
 }
 
-TEST_F( EnergyPlusFixture, RunPeriod_BadYears )
+
+TEST_F( EnergyPlusFixture, RunPeriod_EndYearOnly )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,",
@@ -173,119 +180,14 @@ TEST_F( EnergyPlusFixture, RunPeriod_BadYears )
 		"Yes,                     !- Use Weather File Rain Indicators",
 		"Yes;                     !- Use Weather File Snow Indicators",
 		"BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
-		"Schedule:Compact,",
-		"TskySchedule,                !- Name",
-		",              !- Schedule Type Limits Name",
-		"Through: 2/26, For: AllOtherDays,  Until: 24:00, 2.26,",
-		"Through: 2/27, For: AllOtherDays,  Until: 24:00, 2.27,",
-		"Through: 2/28, For: AllOtherDays,  Until: 24:00, 2.28,",
-		"Through: 3/1, For: AllOtherDays,  Until: 24:00, 3.01,",
-		"Through: 3/2, For: AllOtherDays,  Until: 24:00, 3.02,",
-		"Through: 12/31, For: AllOtherDays,  Until: 24:00, 12.31;",
-		"WeatherProperty:SkyTemperature,",
-		",                        !- Name",
-		"ScheduleValue,           !- Calculation Type",
-		"TskySchedule;                  !- Schedule Name",
-		"Site:WaterMainsTemperature,",
-		"Schedule,             !- Calculation Method",
-		"TskySchedule,                        !- Temperature Schedule Name",
-		",                   !- Annual Average Outdoor Air Temperature{ C }",
-		";                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures{ deltaC }",
-		"Output:Variable,*,Schedule Value,hourly;",
-		"Output:Variable,*,Site Sky Temperature,hourly;",
-		"Output:Variable,*,Site Mains Water Temperature,hourly; !- Zone Average[C]",
-		"  Site:Location,",
-		"    USA IL-CHICAGO-OHARE,    !- Name",
-		"    41.77,                   !- Latitude {deg}",
-		"    -87.75,                  !- Longitude {deg}",
-		"    -6.00,                   !- Time Zone {hr}",
-		"    190;                     !- Elevation {m}",
 	});
 
 	ASSERT_FALSE( process_idf( idf_objects ) );
-	bool errors;
+	bool errors_in_input( false );
 	int totalrps( 1 );
-	WeatherManager::GetRunPeriodData( totalrps, errors) ;
-	EXPECT_EQ( WeatherManager::WeekDay::Tuesday, WeatherManager::RunPeriodInput[ 0 ].startWeekDay );
-	EXPECT_EQ( 2007, WeatherManager::RunPeriodInput[ 0 ].startYear );
-	EXPECT_EQ( 2454159, WeatherManager::RunPeriodInput[ 0 ].startJulianDate );
-	EXPECT_EQ( 2454163, WeatherManager::RunPeriodInput[ 0 ].endJulianDate);
+	WeatherManager::GetRunPeriodData( totalrps, errors_in_input );
 
-	Array2D< Real64 > TomorrowSkyTemp; // Sky temperature
-	DataGlobals::NumOfTimeStepInHour = 4;
-	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-	TomorrowSkyTemp.allocate( DataGlobals::NumOfTimeStepInHour, 24 );
-	TomorrowSkyTemp = 0.0;
-
-	//Febuary 27
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 58, 3);
-	EXPECT_NEAR(2.27, TomorrowSkyTemp(1,1), .001);
-
-	//Febuary 28
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 59, 4);
-	EXPECT_NEAR(2.28, TomorrowSkyTemp(1, 1), .001);
-
-	//March 1
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 60, 5);
-	EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
-
-	//Not March 2, this "Day" is ignored unless its a leap year, otherwise same data as March 1
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 61, 6);
-	EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
-
-	//March 2
-	ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 62, 6);
-	EXPECT_NEAR(3.02, TomorrowSkyTemp(1, 1), .001);
-}
-
-TEST_F( EnergyPlusFixture, RunPeriod_JGDate_Test )
-{
-	// used http://aa.usno.navy.mil/data/docs/JulianDate.php
-	//
-	int julianDate;
-	int gregorianYear;
-	int gregorianMonth;
-	int gregorianDay;
-
-	gregorianYear = 2016;  // when test was made
-	gregorianMonth = 5;
-	gregorianDay = 25;
-	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 2457534, julianDate );
-	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 2016, gregorianYear );
-	EXPECT_EQ( 5, gregorianMonth );
-	EXPECT_EQ( 25, gregorianDay );
-
-	gregorianYear = 2015;  // a year before when test was made
-	gregorianMonth = 5;
-	gregorianDay = 25;
-	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 2457168, julianDate );
-	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 2015, gregorianYear );
-	EXPECT_EQ( 5, gregorianMonth );
-	EXPECT_EQ( 25, gregorianDay );
-
-	gregorianYear = 1966; // a fine date in history
-	gregorianMonth = 7;
-	gregorianDay = 16;
-	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 2439323, julianDate );
-	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 1966, gregorianYear );
-	EXPECT_EQ( 7, gregorianMonth );
-	EXPECT_EQ( 16, gregorianDay );
-
-	gregorianYear = 2000;  //complex leap year
-	gregorianMonth = 12;
-	gregorianDay = 31;
-	JGDate( GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 2451910, julianDate );
-	JGDate( JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay );
-	EXPECT_EQ( 2000, gregorianYear );
-	EXPECT_EQ( 12, gregorianMonth );
-	EXPECT_EQ( 31, gregorianDay );
+	EXPECT_TRUE( errors_in_input );
 
 }
 

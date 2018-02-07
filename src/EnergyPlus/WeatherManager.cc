@@ -5715,7 +5715,7 @@ Label9999: ;
 				}
 			} else {
 				// Non leap-day end date
-				if ( !validMonthDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay ) ) {
+				if ( !validMonthDay( RunPeriodInput( Loop ).endMonth, RunPeriodInput( Loop ).endDay ) ) {
 					ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", Invalid input end month/day (" + TrimSigDigits( RunPeriodInput( Loop ).StartMonth ) + '/' + TrimSigDigits( RunPeriodInput( Loop ).StartDay ) + ')' );
 					ErrorsFound = true;
 				} else { // Month/day is valid
@@ -9590,9 +9590,9 @@ Label9998: ;
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Split the former JGDate is a gregorian date to actual julian date
-		// converter.  the advantage of storing a julian date in the
-		// jdate format rather than a 5 digit format is that any
+		// Split the former JGDate function in two. Convert a gregorian
+		// date to actual julian date.  the advantage of storing a julian date
+		// in the jdate format rather than a 5 digit format is that any
 		// number of days can be add or subtracted to jdate and
 		// that result is a proper julian date.
 

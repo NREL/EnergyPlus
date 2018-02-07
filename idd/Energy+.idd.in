@@ -1266,7 +1266,6 @@ RunPeriod,
        \key Thursday
        \key Friday
        \key Saturday
-       \key UseWeatherFile
   A3,  \field Apply Weekend Holiday Rule
        \note if yes and single day holiday falls on weekend, "holiday" occurs on following Monday
        \type choice
