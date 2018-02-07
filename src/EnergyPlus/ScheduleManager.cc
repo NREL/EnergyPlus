@@ -639,12 +639,12 @@ namespace ScheduleManager {
 				ShowContinueError( "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error." );
 			}
 			if ( rowCnt < rowLimitMinCount ) {
-				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than " + RoundSigDigits( numHourlyValues ) + " hourly values read from file." );
-				ShowContinueError( "..Number read=" + rowCnt + '.' );
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than 8760 hourly values read from file." );
+				ShowContinueError( "..Number read=" + std::to_string( rowCnt ) + '.' );
 			}
 			if ( rowCnt < rowLimitMinCount ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than specified hourly values read from file." );
-				ShowContinueError( "..Specified Hourly Values. Actual number of hourly values included=" + rowCnt );
+				ShowContinueError( " Actual number of hourly values included=" + std::to_string( rowCnt ) + "." );
 			}
 			if ( rowCnt == rowLimitCount ) ScheduleFileShadingLeapYear = true;
 		}

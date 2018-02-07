@@ -198,7 +198,7 @@
 
   ShadowCalculation,
     AverageOverDaysInFrequency,  !- Calculation Method
-    ,                            !- Calculation Frequency
+    1,                           !- Calculation Frequency
     ,                            !- Maximum Figures in Shadow Overlap Calculations
 	,
 	,
