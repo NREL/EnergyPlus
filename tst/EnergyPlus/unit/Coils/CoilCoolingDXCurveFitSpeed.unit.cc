@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -36,7 +36,8 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
       " SHRFF;                "
     } );
 
-    ASSERT_FALSE( process_idf( idf_objects, false ) );
+    bool ok = !process_idf( idf_objects, false );
+    CoilCoolingDXCurveFitSpeed thisSpeed("Speed1Name");
 //
 //    GetBoilerInput();
 //

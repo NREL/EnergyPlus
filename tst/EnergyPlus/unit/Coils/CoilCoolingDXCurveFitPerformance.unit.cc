@@ -29,7 +29,8 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitPerformanceInput )
       " OperatingMode2;                  "
     } );
 
-    ASSERT_FALSE( process_idf( idf_objects, false ) );
+    bool ok = !process_idf( idf_objects, false );
+    int i = 1;
 //
 //    GetBoilerInput();
 //

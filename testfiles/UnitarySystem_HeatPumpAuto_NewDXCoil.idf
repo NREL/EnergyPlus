@@ -1,7 +1,9 @@
-!-Generator IDFEditor 1.34
+!-Generator IDFEditor 1.50
 !-Option OriginalOrderTop UseSpecialFormat
+
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
+
 ! UnitarySystem_HeatPumpAuto.idf
 ! Basic file description:  Heat pump with DX coil for cooling.
 !                          1 story building divided into 3 interior conditioned zones. Roof with no plenum.
@@ -101,10 +103,9 @@
 ! HTML Report:                    Predefined All Summary
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
+Version,8.9;
 
-  Version,8.9;
-
-  Building,
+Building,
     NONE,                    !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
@@ -114,22 +115,19 @@
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
-  Timestep,6;
+Timestep,6;
+SurfaceConvectionAlgorithm:Inside,TARP;
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  SurfaceConvectionAlgorithm:Inside,TARP;
-
-  SurfaceConvectionAlgorithm:Outside,DOE-2;
-
-  HeatBalanceAlgorithm,ConductionTransferFunction;
-
-  SimulationControl,
+SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-  RunPeriod,
+RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
@@ -142,7 +140,7 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-  RunPeriod,
+RunPeriod,
     ,                        !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
@@ -155,7 +153,7 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-  Site:Location,
+Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
     41.78,                   !- Latitude {deg}
     -87.75,                  !- Longitude {deg}
@@ -163,8 +161,7 @@
     190.00;                  !- Elevation {m}
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-
-  SizingPeriod:DesignDay,
+SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
     1,                       !- Month
     21,                      !- Day of Month
@@ -193,8 +190,7 @@
     0.0;                     !- Sky Clearness
 
 ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
-
-  SizingPeriod:DesignDay,
+SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
     7,                       !- Month
     21,                      !- Day of Month
@@ -222,9 +218,9 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
 
-  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
+Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
-  Material,
+Material,
     A1 - 1 IN STUCCO,        !- Name
     Smooth,                  !- Roughness
     2.5389841E-02,           !- Thickness {m}
@@ -235,7 +231,7 @@
     0.9200000,               !- Solar Absorptance
     0.9200000;               !- Visible Absorptance
 
-  Material,
+Material,
     C4 - 4 IN COMMON BRICK,  !- Name
     Rough,                   !- Roughness
     0.1014984,               !- Thickness {m}
@@ -246,7 +242,7 @@
     0.7600000,               !- Solar Absorptance
     0.7600000;               !- Visible Absorptance
 
-  Material,
+Material,
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
     Smooth,                  !- Roughness
     1.9050000E-02,           !- Thickness {m}
@@ -257,7 +253,7 @@
     0.9200000,               !- Solar Absorptance
     0.9200000;               !- Visible Absorptance
 
-  Material,
+Material,
     C6 - 8 IN CLAY TILE,     !- Name
     Smooth,                  !- Roughness
     0.2033016,               !- Thickness {m}
@@ -268,7 +264,7 @@
     0.8200000,               !- Solar Absorptance
     0.8200000;               !- Visible Absorptance
 
-  Material,
+Material,
     C10 - 8 IN HW CONCRETE,  !- Name
     MediumRough,             !- Roughness
     0.2033016,               !- Thickness {m}
@@ -279,7 +275,7 @@
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-  Material,
+Material,
     E2 - 1 / 2 IN SLAG OR STONE,  !- Name
     Rough,                   !- Roughness
     1.2710161E-02,           !- Thickness {m}
@@ -290,7 +286,7 @@
     0.5500000,               !- Solar Absorptance
     0.5500000;               !- Visible Absorptance
 
-  Material,
+Material,
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
     Rough,                   !- Roughness
     9.5402403E-03,           !- Thickness {m}
@@ -301,7 +297,7 @@
     0.7500000,               !- Solar Absorptance
     0.7500000;               !- Visible Absorptance
 
-  Material,
+Material,
     B5 - 1 IN DENSE INSULATION,  !- Name
     VeryRough,               !- Roughness
     2.5389841E-02,           !- Thickness {m}
@@ -312,7 +308,7 @@
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
-  Material,
+Material,
     C12 - 2 IN HW CONCRETE,  !- Name
     MediumRough,             !- Roughness
     5.0901599E-02,           !- Thickness {m}
@@ -323,7 +319,7 @@
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-  WindowMaterial:Glazing,
+WindowMaterial:Glazing,
     WIN-LAY-GLASS-LIGHT,     !- Name
     SpectralAverage,         !- Optical Data Type
     ,                        !- Window Glass Spectral Data Set Name
@@ -339,72 +335,66 @@
     0.84,                    !- Back Side Infrared Hemispherical Emissivity
     0.9;                     !- Conductivity {W/m-K}
 
-  Construction,
+Construction,
     EXTWALL80,               !- Name
     A1 - 1 IN STUCCO,        !- Outside Layer
     C4 - 4 IN COMMON BRICK,  !- Layer 2
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
-  Construction,
+Construction,
     PARTITION06,             !- Name
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
     C6 - 8 IN CLAY TILE,     !- Layer 2
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
-  Construction,
+Construction,
     FLOOR SLAB 8 IN,         !- Name
     C10 - 8 IN HW CONCRETE;  !- Outside Layer
 
-  Construction,
+Construction,
     ROOF34,                  !- Name
     E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
     B5 - 1 IN DENSE INSULATION,  !- Layer 3
     C12 - 2 IN HW CONCRETE;  !- Layer 4
 
-  Construction,
+Construction,
     WIN-CON-LIGHT,           !- Name
     WIN-LAY-GLASS-LIGHT;     !- Outside Layer
 
-  Zone,
+Zone,
     West Zone,               !- Name
     0,                       !- Direction of Relative North {deg}
-    0,                       !- X Origin {m}
-    0,                       !- Y Origin {m}
-    0,                       !- Z Origin {m}
+    0, 0, 0,                            !- X,Y,Z  {m}
     1,                       !- Type
     1,                       !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate;           !- Volume {m3}
 
-  Zone,
+Zone,
     EAST ZONE,               !- Name
     0,                       !- Direction of Relative North {deg}
-    0,                       !- X Origin {m}
-    0,                       !- Y Origin {m}
-    0,                       !- Z Origin {m}
+    0, 0, 0,                            !- X,Y,Z  {m}
     1,                       !- Type
     1,                       !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate;           !- Volume {m3}
 
-  Zone,
+Zone,
     NORTH ZONE,              !- Name
     0,                       !- Direction of Relative North {deg}
-    0,                       !- X Origin {m}
-    0,                       !- Y Origin {m}
-    0,                       !- Z Origin {m}
+    0, 0, 0,                            !- X,Y,Z  {m}
     1,                       !- Type
     1,                       !- Multiplier
     autocalculate,           !- Ceiling Height {m}
     autocalculate;           !- Volume {m3}
 
-  GlobalGeometryRules,
+GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
     World;                   !- Coordinate System
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -415,12 +405,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 0, 3.048000,                     !- X,Y,Z  1 {m}
+    0, 0, 0,                            !- X,Y,Z  2 {m}
+    6.096000, 0, 0,                     !- X,Y,Z  3 {m}
+    6.096000, 0, 3.048000;              !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn001:Wall002,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -431,12 +421,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 6.096000, 3.048000,              !- X,Y,Z  1 {m}
+    0, 6.096000, 0,                     !- X,Y,Z  2 {m}
+    0, 0, 0,                            !- X,Y,Z  3 {m}
+    0, 0, 3.048000;                     !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn001:Wall003,           !- Name
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
@@ -447,12 +437,12 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000, 6.096000, 3.048000,       !- X,Y,Z  1 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  2 {m}
+    0, 6.096000, 0,                     !- X,Y,Z  3 {m}
+    0, 6.096000, 3.048000;              !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn001:Wall004,           !- Name
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
@@ -463,12 +453,12 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000, 0, 3.048000,              !- X,Y,Z  1 {m}
+    6.096000, 0, 0,                     !- X,Y,Z  2 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  3 {m}
+    6.096000, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn001:Flr001,            !- Name
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
@@ -479,12 +469,12 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 0, 0,                            !- X,Y,Z  1 {m}
+    0, 6.096000, 0,                     !- X,Y,Z  2 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  3 {m}
+    6.096000, 0, 0;                     !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn001:Roof001,           !- Name
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
@@ -495,12 +485,12 @@
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 6.096000, 3.048000,              !- X,Y,Z  1 {m}
+    0, 0, 3.048000,                     !- X,Y,Z  2 {m}
+    6.096000, 0, 3.048000,              !- X,Y,Z  3 {m}
+    6.096000, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn002:Wall001,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -511,12 +501,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    12.19200,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    12.19200, 6.096000, 3.048000,       !- X,Y,Z  1 {m}
+    12.19200, 6.096000, 0,              !- X,Y,Z  2 {m}
+    9.144000, 6.096000, 0,              !- X,Y,Z  3 {m}
+    9.144000, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn002:Wall002,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -527,12 +517,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000, 0, 3.048000,              !- X,Y,Z  1 {m}
+    6.096000, 0, 0,                     !- X,Y,Z  2 {m}
+    12.19200, 0, 0,                     !- X,Y,Z  3 {m}
+    12.19200, 0, 3.048000;              !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn002:Wall003,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -543,12 +533,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    12.19200,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    12.19200, 0, 3.048000,              !- X,Y,Z  1 {m}
+    12.19200, 0, 0,                     !- X,Y,Z  2 {m}
+    12.19200, 6.096000, 0,              !- X,Y,Z  3 {m}
+    12.19200, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn002:Wall004,           !- Name
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
@@ -559,12 +549,12 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000, 6.096000, 3.048000,       !- X,Y,Z  1 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  2 {m}
+    6.096000, 0, 0,                     !- X,Y,Z  3 {m}
+    6.096000, 0, 3.048000;              !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn002:Wall005,           !- Name
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
@@ -575,12 +565,12 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    9.144000, 6.096000, 3.048000,       !- X,Y,Z  1 {m}
+    9.144000, 6.096000, 0,              !- X,Y,Z  2 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  3 {m}
+    6.096000, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn002:Flr001,            !- Name
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
@@ -591,12 +581,12 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096000,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000, 0, 0,                     !- X,Y,Z  1 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  2 {m}
+    12.19200, 6.096000, 0,              !- X,Y,Z  3 {m}
+    12.19200, 0, 0;                     !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn002:Roof001,           !- Name
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
@@ -607,12 +597,12 @@
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000, 6.096000, 3.048000,       !- X,Y,Z  1 {m}
+    6.096000, 0, 3.048000,              !- X,Y,Z  2 {m}
+    12.19200, 0, 3.048000,              !- X,Y,Z  3 {m}
+    12.19200, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn003:Wall001,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -623,12 +613,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}
-    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 12.19200, 3.048000,              !- X,Y,Z  1 {m}
+    0, 12.19200, 0,                     !- X,Y,Z  2 {m}
+    0, 6.096000, 0,                     !- X,Y,Z  3 {m}
+    0, 6.096000, 3.048000;              !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn003:Wall002,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -639,12 +629,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.144000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}
-    0,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    9.144000, 12.19200, 3.048000,       !- X,Y,Z  1 {m}
+    9.144000, 12.19200, 0,              !- X,Y,Z  2 {m}
+    0, 12.19200, 0,                     !- X,Y,Z  3 {m}
+    0, 12.19200, 3.048000;              !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn003:Wall003,           !- Name
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
@@ -655,12 +645,12 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}
-    9.144000,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    9.144000, 6.096000, 3.048000,       !- X,Y,Z  1 {m}
+    9.144000, 6.096000, 0,              !- X,Y,Z  2 {m}
+    9.144000, 12.19200, 0,              !- X,Y,Z  3 {m}
+    9.144000, 12.19200, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn003:Wall004,           !- Name
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
@@ -671,12 +661,12 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 6.096000, 3.048000,              !- X,Y,Z  1 {m}
+    0, 6.096000, 0,                     !- X,Y,Z  2 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  3 {m}
+    6.096000, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn003:Wall005,           !- Name
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
@@ -687,12 +677,12 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}
-    9.144000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}
-    9.144000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000, 6.096000, 3.048000,       !- X,Y,Z  1 {m}
+    6.096000, 6.096000, 0,              !- X,Y,Z  2 {m}
+    9.144000, 6.096000, 0,              !- X,Y,Z  3 {m}
+    9.144000, 6.096000, 3.048000;       !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn003:Flr001,            !- Name
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
@@ -703,12 +693,12 @@
     NoWind,                  !- Wind Exposure
     1.000000,                !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,6.096000,0,  !- X,Y,Z ==> Vertex 1 {m}
-    0,12.19200,0,  !- X,Y,Z ==> Vertex 2 {m}
-    9.144000,12.19200,0,  !- X,Y,Z ==> Vertex 3 {m}
-    9.144000,6.096000,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 6.096000, 0,                     !- X,Y,Z  1 {m}
+    0, 12.19200, 0,                     !- X,Y,Z  2 {m}
+    9.144000, 12.19200, 0,              !- X,Y,Z  3 {m}
+    9.144000, 6.096000, 0;              !- X,Y,Z  4 {m}
 
-  BuildingSurface:Detailed,
+BuildingSurface:Detailed,
     Zn003:Roof001,           !- Name
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
@@ -719,12 +709,12 @@
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}
-    9.144000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 3 {m}
-    9.144000,12.19200,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    0, 12.19200, 3.048000,              !- X,Y,Z  1 {m}
+    0, 6.096000, 3.048000,              !- X,Y,Z  2 {m}
+    9.144000, 6.096000, 3.048000,       !- X,Y,Z  3 {m}
+    9.144000, 12.19200, 3.048000;       !- X,Y,Z  4 {m}
 
-  FenestrationSurface:Detailed,
+FenestrationSurface:Detailed,
     Zn001:Wall001:Win001,    !- Name
     Window,                  !- Surface Type
     WIN-CON-LIGHT,           !- Construction Name
@@ -735,210 +725,210 @@
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
-    0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}
-    0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}
-    5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}
-    5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}
+    0.548000, 0, 2.5000,                !- X,Y,Z  1 {m}
+    0.548000, 0, 0.5000,                !- X,Y,Z  2 {m}
+    5.548000, 0, 0.5000,                !- X,Y,Z  3 {m}
+    5.548000, 0, 2.5000;                !- X,Y,Z  4 {m}
 
-  ScheduleTypeLimits,
+ScheduleTypeLimits,
     Any Number;              !- Name
 
-  ScheduleTypeLimits,
+ScheduleTypeLimits,
     Fraction,                !- Name
     0.0,                     !- Lower Limit Value
     1.0,                     !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-  ScheduleTypeLimits,
+ScheduleTypeLimits,
     Temperature,             !- Name
     -60,                     !- Lower Limit Value
     200,                     !- Upper Limit Value
     CONTINUOUS,              !- Numeric Type
     Temperature;             !- Unit Type
 
-  ScheduleTypeLimits,
+ScheduleTypeLimits,
     Control Type,            !- Name
     0,                       !- Lower Limit Value
     4,                       !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
-  ScheduleTypeLimits,
+ScheduleTypeLimits,
     On/Off,                  !- Name
     0,                       !- Lower Limit Value
     1,                       !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
-  Schedule:Compact,
+Schedule:Compact,
     Activity Sch,            !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,131.80;     !- Field 3
+    Until: 24:00, 131.80;    !- Field 4
 
-  Schedule:Compact,
+Schedule:Compact,
     Work Eff Sch,            !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,0.00;       !- Field 3
+    Until: 24:00, 0.00;      !- Field 4
 
-  Schedule:Compact,
+Schedule:Compact,
     Clothing Sch,            !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,1.00;       !- Field 3
+    Until: 24:00, 1.00;      !- Field 4
 
-  Schedule:Compact,
+Schedule:Compact,
     Air Velo Sch,            !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,0.137;      !- Field 3
+    Until: 24:00, 0.137;     !- Field 4
 
-  Schedule:Compact,
+Schedule:Compact,
     Office Occupancy,        !- Name
     ANY NUMBER,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 6:00,0.00,        !- Field 3
-    Until: 7:00,0.10,        !- Field 5
-    Until: 8:00,0.50,        !- Field 7
-    Until: 12:00,1.00,       !- Field 9
-    Until: 13:00,0.50,       !- Field 11
-    Until: 16:00,1.00,       !- Field 13
-    Until: 17:00,0.50,       !- Field 15
-    Until: 18:00,0.10,       !- Field 17
-    Until: 24:00,0.00,       !- Field 19
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 21
-    Until: 24:00,0.00,       !- Field 22
+    Until: 6:00, 0.00,       !- Field 4
+    Until: 7:00, 0.10,       !- Field 6
+    Until: 8:00, 0.50,       !- Field 8
+    Until: 12:00, 1.00,      !- Field 10
+    Until: 13:00, 0.50,      !- Field 12
+    Until: 16:00, 1.00,      !- Field 14
+    Until: 17:00, 0.50,      !- Field 16
+    Until: 18:00, 0.10,      !- Field 18
+    Until: 24:00, 0.00,      !- Field 20
+    For: Weekends Holidays CustomDay1 CustomDay2,  !- Field 21
+    Until: 24:00, 0.00,      !- Field 23
     For: SummerDesignDay,    !- Field 24
-    Until: 24:00,1.00,       !- Field 25
+    Until: 24:00, 1.00,      !- Field 26
     For: WinterDesignDay,    !- Field 27
-    Until: 24:00,5.00E-002;  !- Field 28
+    Until: 24:00, 5.00E-002; !- Field 29
 
-  Schedule:Compact,
+Schedule:Compact,
     Intermittent,            !- Name
     ANY NUMBER,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 8:00,0.00,        !- Field 3
-    Until: 18:00,1.00,       !- Field 5
-    Until: 24:00,0.00,       !- Field 7
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 9
-    Until: 24:00,0.00,       !- Field 10
+    Until: 8:00, 0.00,       !- Field 4
+    Until: 18:00, 1.00,      !- Field 6
+    Until: 24:00, 0.00,      !- Field 8
+    For: Weekends Holidays CustomDay1 CustomDay2,  !- Field 9
+    Until: 24:00, 0.00,      !- Field 11
     For: SummerDesignDay,    !- Field 12
-    Until: 24:00,1.00,       !- Field 13
+    Until: 24:00, 1.00,      !- Field 14
     For: WinterDesignDay,    !- Field 15
-    Until: 24:00,0.15;       !- Field 16
+    Until: 24:00, 0.15;      !- Field 17
 
-  Schedule:Compact,
+Schedule:Compact,
     Office Lighting,         !- Name
     ANY NUMBER,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 6:00,5.00E-002,   !- Field 3
-    Until: 7:00,0.20,        !- Field 5
-    Until: 17:00,1.00,       !- Field 7
-    Until: 18:00,0.50,       !- Field 9
-    Until: 24:00,5.00E-002,  !- Field 11
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
-    Until: 24:00,5.00E-002,  !- Field 14
+    Until: 6:00, 5.00E-002,  !- Field 4
+    Until: 7:00, 0.20,       !- Field 6
+    Until: 17:00, 1.00,      !- Field 8
+    Until: 18:00, 0.50,      !- Field 10
+    Until: 24:00, 5.00E-002, !- Field 12
+    For: Weekends Holidays CustomDay1 CustomDay2,  !- Field 13
+    Until: 24:00, 5.00E-002, !- Field 15
     For: SummerDesignDay,    !- Field 16
-    Until: 24:00,1.00,       !- Field 17
+    Until: 24:00, 1.00,      !- Field 18
     For: WinterDesignDay,    !- Field 19
-    Until: 24:00,0.15;       !- Field 20
+    Until: 24:00, 0.15;      !- Field 21
 
-  Schedule:Compact,
+Schedule:Compact,
     FANANDCOILAVAILSCHED,    !- Name
     FRACTION,                !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,1.00,       !- Field 3
+    Until: 24:00, 1.00,      !- Field 4
     Through: 9/30,           !- Field 5
     For: Weekdays,           !- Field 6
-    Until: 7:00,0.00,        !- Field 7
-    Until: 17:00,1.00,       !- Field 9
-    Until: 24:00,0.00,       !- Field 11
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
-    Until: 24:00,0.00,       !- Field 14
-    For: SummerDesignDay WinterDesignDay, !- Field 16
-    Until: 24:00,1.00,       !- Field 17
+    Until: 7:00, 0.00,       !- Field 8
+    Until: 17:00, 1.00,      !- Field 10
+    Until: 24:00, 0.00,      !- Field 12
+    For: Weekends Holidays CustomDay1 CustomDay2,  !- Field 13
+    Until: 24:00, 0.00,      !- Field 15
+    For: SummerDesignDay WinterDesignDay,  !- Field 16
+    Until: 24:00, 1.00,      !- Field 18
     Through: 12/31,          !- Field 19
     For: Alldays,            !- Field 20
-    Until: 24:00,1.00;       !- Field 21
+    Until: 24:00, 1.00;      !- Field 22
 
-  Schedule:Compact,
+Schedule:Compact,
     OUTDOORAIRAVAILSCHED,    !- Name
     FRACTION,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 7:00,0.00,        !- Field 3
-    Until: 17:00,1.00,       !- Field 5
-    Until: 24:00,0.00,       !- Field 7
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 9
-    Until: 24:00,0.00,       !- Field 10
-    For: SummerDesignDay WinterDesignDay, !- Field 12
-    Until: 24:00,1.00;       !- Field 13
+    Until: 7:00, 0.00,       !- Field 4
+    Until: 17:00, 1.00,      !- Field 6
+    Until: 24:00, 0.00,      !- Field 8
+    For: Weekends Holidays CustomDay1 CustomDay2,  !- Field 9
+    Until: 24:00, 0.00,      !- Field 11
+    For: SummerDesignDay WinterDesignDay,  !- Field 12
+    Until: 24:00, 1.00;      !- Field 14
 
-  Schedule:Compact,
+Schedule:Compact,
     OAFRACTIONSCHED,         !- Name
     FRACTION,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays Weekends Holidays CustomDay1 CustomDay2, !- Field 2
-    Until: 7:00,0.00,        !- Field 3
-    Until: 17:00,1.00,       !- Field 5
-    Until: 24:00,0.00,       !- Field 7
-    For: SummerDesignDay WinterDesignDay, !- Field 9
-    Until: 24:00,1.00;       !- Field 10
+    For: Weekdays Weekends Holidays CustomDay1 CustomDay2,  !- Field 2
+    Until: 7:00, 0.00,       !- Field 4
+    Until: 17:00, 1.00,      !- Field 6
+    Until: 24:00, 0.00,      !- Field 8
+    For: SummerDesignDay WinterDesignDay,  !- Field 9
+    Until: 24:00, 1.00;      !- Field 11
 
-  Schedule:Compact,
+Schedule:Compact,
     HEATING SETPOINTS,       !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays Weekends Holidays CustomDay1 CustomDay2, !- Field 2
-    Until: 7:00,15.00,       !- Field 3
-    Until: 17:00,20.00,      !- Field 5
-    Until: 24:00,15.00,      !- Field 7
+    For: Weekdays Weekends Holidays CustomDay1 CustomDay2,  !- Field 2
+    Until: 7:00, 15.00,      !- Field 4
+    Until: 17:00, 20.00,     !- Field 6
+    Until: 24:00, 15.00,     !- Field 8
     For: SummerDesignDay,    !- Field 9
-    Until: 24:00,15.00,      !- Field 10
+    Until: 24:00, 15.00,     !- Field 11
     For: WinterDesignDay,    !- Field 12
-    Until: 24:00,20.00;      !- Field 13
+    Until: 24:00, 20.00;     !- Field 14
 
-  Schedule:Compact,
+Schedule:Compact,
     COOLING SETPOINTS,       !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays Weekends Holidays CustomDay1 CustomDay2, !- Field 2
-    Until: 7:00,30.00,       !- Field 3
-    Until: 17:00,24.00,      !- Field 5
-    Until: 24:00,30.00,      !- Field 7
+    For: Weekdays Weekends Holidays CustomDay1 CustomDay2,  !- Field 2
+    Until: 7:00, 30.00,      !- Field 4
+    Until: 17:00, 24.00,     !- Field 6
+    Until: 24:00, 30.00,     !- Field 8
     For: SummerDesignDay,    !- Field 9
-    Until: 24:00,24.00,      !- Field 10
+    Until: 24:00, 24.00,     !- Field 11
     For: WinterDesignDay,    !- Field 12
-    Until: 24:00,50.00;      !- Field 13
+    Until: 24:00, 50.00;     !- Field 14
 
-  Schedule:Compact,
+Schedule:Compact,
     ZONE CONTROL TYPE SCHED, !- Name
     CONTROL TYPE,            !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,1,          !- Field 3
+    Until: 24:00, 1,         !- Field 4
     Through: 9/30,           !- Field 5
     For: Alldays,            !- Field 6
-    Until: 24:00,2,          !- Field 7
+    Until: 24:00, 2,         !- Field 8
     Through: 12/31,          !- Field 9
     For: Alldays,            !- Field 10
-    Until: 24:00,1;          !- Field 11
+    Until: 24:00, 1;         !- Field 12
 
-  Schedule:Compact,
+Schedule:Compact,
     CyclingFanSchedule,      !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,0.0;        !- Field 3
+    Until: 24:00, 0.0;       !- Field 4
 
-  People,
+People,
     WestPeople,              !- Name
     West Zone,               !- Zone or ZoneList Name
     Office Occupancy,        !- Number of People Schedule Name
@@ -960,7 +950,7 @@
     Air Velo Sch,            !- Air Velocity Schedule Name
     FANGER;                  !- Thermal Comfort Model 1 Type
 
-  People,
+People,
     EastPeople,              !- Name
     EAST ZONE,               !- Zone or ZoneList Name
     Office Occupancy,        !- Number of People Schedule Name
@@ -982,7 +972,7 @@
     Air Velo Sch,            !- Air Velocity Schedule Name
     FANGER;                  !- Thermal Comfort Model 1 Type
 
-  People,
+People,
     NorthPeople,             !- Name
     NORTH ZONE,              !- Zone or ZoneList Name
     Office Occupancy,        !- Number of People Schedule Name
@@ -1004,7 +994,7 @@
     Air Velo Sch,            !- Air Velocity Schedule Name
     FANGER;                  !- Thermal Comfort Model 1 Type
 
-  Lights,
+Lights,
     EAST ZONE Lights 1,      !- Name
     EAST ZONE,               !- Zone or ZoneList Name
     Office Lighting,         !- Schedule Name
@@ -1018,7 +1008,7 @@
     0,                       !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
 
-  Lights,
+Lights,
     NORTH ZONE Lights 1,     !- Name
     NORTH ZONE,              !- Zone or ZoneList Name
     Office Lighting,         !- Schedule Name
@@ -1032,7 +1022,7 @@
     0,                       !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
 
-  ElectricEquipment,
+ElectricEquipment,
     West Zone ElecEq 1,      !- Name
     West Zone,               !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
@@ -1044,7 +1034,7 @@
     0.3000000,               !- Fraction Radiant
     0;                       !- Fraction Lost
 
-  ElectricEquipment,
+ElectricEquipment,
     EAST ZONE ElecEq 1,      !- Name
     EAST ZONE,               !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
@@ -1056,7 +1046,7 @@
     0.3000000,               !- Fraction Radiant
     0;                       !- Fraction Lost
 
-  ElectricEquipment,
+ElectricEquipment,
     NORTH ZONE ElecEq 1,     !- Name
     NORTH ZONE,              !- Zone or ZoneList Name
     Intermittent,            !- Schedule Name
@@ -1068,7 +1058,7 @@
     0.3000000,               !- Fraction Radiant
     0;                       !- Fraction Lost
 
-  Sizing:Zone,
+Sizing:Zone,
     West Zone,               !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
     14.,                     !- Zone Cooling Design Supply Air Temperature {C}
@@ -1087,19 +1077,16 @@
     ,                        !- Cooling Minimum Air Flow {m3/s}
     ,                        !- Cooling Minimum Air Flow Fraction
     DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    0;                       !- Heating Design Air Flow Rate {m3/s}
 
-  DesignSpecification:OutdoorAir,
+DesignSpecification:OutdoorAir,
     SZ DSOA West Zone,       !- Name
     flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
-  Sizing:Zone,
+Sizing:Zone,
     EAST ZONE,               !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
     14.,                     !- Zone Cooling Design Supply Air Temperature {C}
@@ -1118,19 +1105,16 @@
     ,                        !- Cooling Minimum Air Flow {m3/s}
     ,                        !- Cooling Minimum Air Flow Fraction
     DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    0;                       !- Heating Design Air Flow Rate {m3/s}
 
-  DesignSpecification:OutdoorAir,
+DesignSpecification:OutdoorAir,
     SZ DSOA EAST ZONE,       !- Name
     flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
-  Sizing:Zone,
+Sizing:Zone,
     NORTH ZONE,              !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
     14.,                     !- Zone Cooling Design Supply Air Temperature {C}
@@ -1149,19 +1133,16 @@
     ,                        !- Cooling Minimum Air Flow {m3/s}
     ,                        !- Cooling Minimum Air Flow Fraction
     DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    0;                       !- Heating Design Air Flow Rate {m3/s}
 
-  DesignSpecification:OutdoorAir,
+DesignSpecification:OutdoorAir,
     SZ DSOA NORTH ZONE,      !- Name
     flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
-  Sizing:System,
+Sizing:System,
     Heat Pump Sys 1,         !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
@@ -1200,7 +1181,7 @@
     ,                        !- Fraction of Autosized Heating Design Capacity
     VAV;                     !- Central Cooling Capacity Control Method
 
-  Curve:Biquadratic,
+Curve:Biquadratic,
     HPACCoolCapFT,           !- Name
     0.766956,                !- Coefficient1 Constant
     0.0107756,               !- Coefficient2 x
@@ -1218,7 +1199,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Curve:Biquadratic,
+Curve:Biquadratic,
     HPACCOOLEIRFT,           !- Name
     0.297145,                !- Coefficient1 Constant
     0.0430933,               !- Coefficient2 x
@@ -1236,7 +1217,7 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Curve:Cubic,
+Curve:Cubic,
     HPACHeatCapFT,           !- Name
     0.758746,                !- Coefficient1 Constant
     0.027626,                !- Coefficient2 x
@@ -1249,7 +1230,7 @@
     Temperature,             !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
-  Curve:Cubic,
+Curve:Cubic,
     HPACHeatCapFFF,          !- Name
     0.84,                    !- Coefficient1 Constant
     0.16,                    !- Coefficient2 x
@@ -1258,7 +1239,7 @@
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-  Curve:Cubic,
+Curve:Cubic,
     HPACHeatEIRFT,           !- Name
     1.19248,                 !- Coefficient1 Constant
     -0.0300438,              !- Coefficient2 x
@@ -1271,7 +1252,7 @@
     Temperature,             !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
-  Curve:Quadratic,
+Curve:Quadratic,
     HPACCoolCapFFF,          !- Name
     0.8,                     !- Coefficient1 Constant
     0.2,                     !- Coefficient2 x
@@ -1279,7 +1260,7 @@
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-  Curve:Quadratic,
+Curve:Quadratic,
     HPACCOOLEIRFFF,          !- Name
     1.156,                   !- Coefficient1 Constant
     -0.1816,                 !- Coefficient2 x
@@ -1287,7 +1268,7 @@
     0.5,                     !- Minimum Value of x
     1.5;                     !- Maximum Value of x
 
-  Curve:Quadratic,
+Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
     0.85,                    !- Coefficient1 Constant
     0.15,                    !- Coefficient2 x
@@ -1295,7 +1276,7 @@
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 
-  Curve:Quadratic,
+Curve:Quadratic,
     HPACHeatEIRFFF,          !- Name
     1.3824,                  !- Coefficient1 Constant
     -0.4336,                 !- Coefficient2 x
@@ -1303,39 +1284,39 @@
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 
-  NodeList,
+NodeList,
     OutsideAirInletNodes,    !- Name
     Outside Air Inlet Node;  !- Node 1 Name
 
-  NodeList,
+NodeList,
     Zone1Inlets,             !- Name
     Zone 1 Inlet Node;       !- Node 1 Name
 
-  NodeList,
+NodeList,
     Zone2Inlets,             !- Name
     Zone 2 Inlet Node;       !- Node 1 Name
 
-  NodeList,
+NodeList,
     Zone3Inlets,             !- Name
     Zone 3 Inlet Node;       !- Node 1 Name
 
-  NodeList,
+NodeList,
     West Zone List,          !- Name
     Zone 1 Node;             !- Node 1 Name
 
-  NodeList,
+NodeList,
     East Zone List,          !- Name
     Zone 2 Node;             !- Node 1 Name
 
-  NodeList,
+NodeList,
     North Zone List,         !- Name
     Zone 3 Node;             !- Node 1 Name
 
-  BranchList,
+BranchList,
     Air Loop Branches,       !- Name
     Air Loop Main Branch;    !- Branch 1 Name
 
-  Branch,
+Branch,
     Air Loop Main Branch,    !- Name
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
@@ -1347,7 +1328,7 @@
     Mixed Air Node,          !- Component 2 Inlet Node Name
     Air Loop Outlet Node;    !- Component 2 Outlet Node Name
 
-  AirLoopHVAC,
+AirLoopHVAC,
     Heat Pump Sys 1,         !- Name
     ,                        !- Controller List Name
     Heat Pump 1 Avail List,  !- Availability Manager List Name
@@ -1359,51 +1340,51 @@
     Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
     Air Loop Outlet Node;    !- Supply Side Outlet Node Names
 
-  AirLoopHVAC:ControllerList,
+AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name
     Controller:OutdoorAir,   !- Controller 1 Object Type
     OA Controller 1;         !- Controller 1 Name
 
-  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     OA Sys 1 Equipment,      !- Name
     OutdoorAir:Mixer,        !- Component 1 Object Type
     OA Mixing Box 1;         !- Component 1 Name
 
-  AirLoopHVAC:OutdoorAirSystem,
+AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
     OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
     Outdoor Air 1 Avail List;!- Availability Manager List Name
 
-  OutdoorAir:NodeList,
+OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
 
-  OutdoorAir:Mixer,
+OutdoorAir:Mixer,
     OA Mixing Box 1,         !- Name
     Mixed Air Node,          !- Mixed Air Node Name
     Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
     Relief Air Outlet Node,  !- Relief Air Stream Node Name
     Outdoor Air Mixer Inlet Node;  !- Return Air Stream Node Name
 
-  AvailabilityManagerAssignmentList,
+AvailabilityManagerAssignmentList,
     Heat Pump 1 Avail List,  !- Name
     AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
     Heat Pump 1 Avail;       !- Availability Manager 1 Name
 
-  AvailabilityManagerAssignmentList,
+AvailabilityManagerAssignmentList,
     Outdoor Air 1 Avail List,!- Name
     AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
     Outdoor Air 1 Avail;     !- Availability Manager 1 Name
 
-  AvailabilityManager:Scheduled,
+AvailabilityManager:Scheduled,
     Heat Pump 1 Avail,       !- Name
     FanAndCoilAvailSched;    !- Schedule Name
 
-  AvailabilityManager:Scheduled,
+AvailabilityManager:Scheduled,
     Outdoor Air 1 Avail,     !- Name
     OutdoorAirAvailSched;    !- Schedule Name
 
-  Controller:OutdoorAir,
+Controller:OutdoorAir,
     OA Controller 1,         !- Name
     Relief Air Outlet Node,  !- Relief Air Outlet Node Name
     Outdoor Air Mixer Inlet Node,  !- Return Air Node Name
@@ -1422,7 +1403,7 @@
     ProportionalMinimum,     !- Minimum Limit Type
     OAFractionSched;         !- Minimum Outdoor Air Schedule Name
 
-  ZoneHVAC:EquipmentConnections,
+ZoneHVAC:EquipmentConnections,
     West Zone,               !- Zone Name
     Zone1Equipment,          !- Zone Conditioning Equipment List Name
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
@@ -1430,7 +1411,7 @@
     Zone 1 Node,             !- Zone Air Node Name
     Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
-  ZoneHVAC:EquipmentConnections,
+ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
     Zone2Equipment,          !- Zone Conditioning Equipment List Name
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
@@ -1438,7 +1419,7 @@
     Zone 2 Node,             !- Zone Air Node Name
     Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
-  ZoneHVAC:EquipmentConnections,
+ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
     Zone3Equipment,          !- Zone Conditioning Equipment List Name
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
@@ -1446,7 +1427,7 @@
     Zone 3 Node,             !- Zone Air Node Name
     Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
-  ZoneHVAC:EquipmentList,
+ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
@@ -1454,7 +1435,7 @@
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
-  ZoneHVAC:EquipmentList,
+ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
@@ -1462,7 +1443,7 @@
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
-  ZoneHVAC:EquipmentList,
+ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
@@ -1470,7 +1451,7 @@
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
-  AirLoopHVAC:UnitarySystem,
+AirLoopHVAC:UnitarySystem,
     DXAC Heat Pump 1,        !- Name
     Load,                    !- Control Type
     East Zone,               !- Controlling Zone or Thermostat Location
@@ -1485,7 +1466,7 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
-    Coil:Cooling:DX,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
@@ -1512,25 +1493,25 @@
     autosize,                !- Maximum Supply Air Temperature {C}
     21;                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
 
-  AirTerminal:SingleDuct:Uncontrolled,
+AirTerminal:SingleDuct:Uncontrolled,
     Zone1DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 1 Inlet Node,       !- Zone Supply Air Node Name
     autosize;                !- Maximum Air Flow Rate {m3/s}
 
-  AirTerminal:SingleDuct:Uncontrolled,
+AirTerminal:SingleDuct:Uncontrolled,
     Zone2DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 2 Inlet Node,       !- Zone Supply Air Node Name
     autosize;                !- Maximum Air Flow Rate {m3/s}
 
-  AirTerminal:SingleDuct:Uncontrolled,
+AirTerminal:SingleDuct:Uncontrolled,
     Zone3DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone 3 Inlet Node,       !- Zone Supply Air Node Name
     autosize;                !- Maximum Air Flow Rate {m3/s}
 
-  ZoneControl:Thermostat,
+ZoneControl:Thermostat,
     Zone 1 Thermostat,       !- Name
     West Zone,               !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
@@ -1539,7 +1520,7 @@
     ThermostatSetpoint:SingleCooling,  !- Control 2 Object Type
     Cooling Setpoint with SB;!- Control 2 Name
 
-  ZoneControl:Thermostat,
+ZoneControl:Thermostat,
     Zone 2 Thermostat,       !- Name
     EAST ZONE,               !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
@@ -1548,7 +1529,7 @@
     ThermostatSetpoint:SingleCooling,  !- Control 2 Object Type
     Cooling Setpoint with SB;!- Control 2 Name
 
-  ZoneControl:Thermostat,
+ZoneControl:Thermostat,
     Zone 3 Thermostat,       !- Name
     NORTH ZONE,              !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
@@ -1557,41 +1538,41 @@
     ThermostatSetpoint:SingleCooling,  !- Control 2 Object Type
     Cooling Setpoint with SB;!- Control 2 Name
 
-  ThermostatSetpoint:SingleHeating,
+ThermostatSetpoint:SingleHeating,
     Heating Setpoint with SB,!- Name
     Heating Setpoints;       !- Setpoint Temperature Schedule Name
 
-  ThermostatSetpoint:SingleCooling,
+ThermostatSetpoint:SingleCooling,
     Cooling Setpoint with SB,!- Name
     Cooling Setpoints;       !- Setpoint Temperature Schedule Name
 
-  AirLoopHVAC:SupplyPath,
+AirLoopHVAC:SupplyPath,
     HeatPumpSupplyPath,      !- Name
     Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
     AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
     Zone Supply Air Splitter;!- Component 1 Name
 
-  AirLoopHVAC:ReturnPath,
+AirLoopHVAC:ReturnPath,
     HeatPumpReturnPath,      !- Name
     Return Air Mixer Outlet, !- Return Air Path Outlet Node Name
     AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
     Zone Return Air Mixer;   !- Component 1 Name
 
-  AirLoopHVAC:ZoneSplitter,
+AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
     Zone 1 Inlet Node,       !- Outlet 1 Node Name
     Zone 2 Inlet Node,       !- Outlet 2 Node Name
     Zone 3 Inlet Node;       !- Outlet 3 Node Name
 
-  AirLoopHVAC:ZoneMixer,
+AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name
     Return Air Mixer Outlet, !- Outlet Node Name
     Zone 1 Outlet Node,      !- Inlet 1 Node Name
     Zone 2 Outlet Node,      !- Inlet 2 Node Name
     Zone 3 Outlet Node;      !- Inlet 3 Node Name
 
-  Coil:Heating:Fuel,
+Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -1600,66 +1581,63 @@
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-  Coil:Cooling:DX,
-    Heat Pump ACDXCoil 1,           !- Name
-    DX Cooling Coil Air Inlet Node, !- Evaporator Inlet Node Name
-    Heating Coil Air Inlet Node,    !- Evaporator Outlet Node Name
-    FanAndCoilAvailSched,           !- Availability Schedule Name
-    ,                               !- Condenser Zone Name
-    ,                               !- Condenser Inlet Node Name
-    ,                               !- Condenser Outlet Node Name
-    NewDXCoilPerformanceInput,      !- Performance Object Name
-    ,                               !- Condensate Collection Water Storage Tank Name
-    ;                               !- Evaporative Condenser Supply Water Storage Tank Name
+Coil:Cooling:DX,
+    Heat Pump ACDXCoil 1,    !- Name
+    DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    NewDXCoilPerformanceInput;  !- Performance Object Name
 
-  Coil:Cooling:DX:Performance:CurveFit,
-    NewDXCoilPerformanceInput,      !- Name
-    ,                               !- Crankcase Heater Capacity
-    ,                               !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
-    ,                               !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
-    ,                               !- Unit Internal Static Air Pressure
-    ,                               !- Method for Switching Operating Modes
-    ,                               !- Operating Mode Number Schedule Name
-    ,                               !- Basin Heater Capacity {W/K}
-    ,                               !- Basin Heater Setpoint Temperature {C}
-    NewDXCoilOperatingMode;         !- Operating Mode 1 Name
+Coil:Cooling:DX:CurveFit:Performance,
+    NewDXCoilPerformanceInput,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Method for Switching Operating Modes
+    ,                        !- Operating Mode Number Schedule Name
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    NewDXCoilOperatingMode;  !- Operating Mode 1 Name
 
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    NewDXCoilOperatingMode,         !- Name
-    autosize,                       !- Gross Rated Total Cooling Capacity {W}
-    autosize,                       !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                               !- Rated Condenser Air Flow Rate {m3/s}
-    ,                               !- Maximum Cycling Rate
-    ,                               !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-    ,                               !- Latent Capacity Time Constant
-    ,                               !- Nominal Time for Condensate Removal to Begin
-    ,                               !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,                      !- Condeser Type
-    ,                               !- Nominal Speed Number
-    NewDXCoilSpeedData;             !- Speed 1 Name
+Coil:Cooling:DX:CurveFit:OperatingMode,
+    NewDXCoilOperatingMode,  !- Name
+    autosize,                !- Rated Gross Total Cooling Capacity {W}
+    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    AirCooled,               !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    MultiSpeed,              !- Capacity Control Method
+    ,                        !- Nominal Speed Number
+    NewDXCoilSpeed1Data;     !- Speed 1 Name
 
 Coil:Cooling:DX:CurveFit:Speed,
-    NewDXCoilSpeedData,             !- Name
-    1.0,                            !- Gross Rated Total Cooling Capacity Ratio to Nominal
-    autosize,                       !- Gross Rated Sensible Heat Ratio
-    3.0,                            !- Gross Rated Cooling COP {W/W}
-    1.0,                            !- Rated Evaporator Air Flow Rate to Nominal
-    1.0,                            !- Rated Condenser Air Flow Rate Ratio to Nominal
-    1.0,                            !- Active Fraction of Coil Face Area
-    ,                               !- Rated Evaporator Condenser Pump Power Consumption
-    ,                               !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                               !- Evaporator Condenser Effectiveness
-    HPACCoolCapFT,                  !- Total Cooling Capacity Function of Temperature Curve Name
-    HPACCoolCapFFF,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    HPACCOOLEIRFT,                  !- Energy Input Ratio Function of Temperature Curve Name
-    HPACCOOLEIRFFF,                 !- Energy Input Ratio Function of Flow Fraction Curve Name
-    HPACCOOLPLFFPLR,                !- Part Load Fraction Correlation Curve Name
-    ,                               !- Rated Waste Heat Fraction of Power Input
-    ,                               !- Waste Heat Function of Temperature Curve Name
-    ,                               !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                               !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    NewDXCoilSpeed1Data,     !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    autosize,                !- Gross Sensible Heat Ratio
+    3.0,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Air Flow Fraction Curve Name
+    HPACCOOLPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
-  Coil:Heating:DX:SingleSpeed,
+Coil:Heating:DX:SingleSpeed,
     Heat Pump DX Heating Coil 1,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     autosize,                !- Gross Rated Heating Capacity {W}
@@ -1684,7 +1662,7 @@ Coil:Cooling:DX:CurveFit:Speed,
     0.166667,                !- Defrost Time Period Fraction
     autosize;                !- Resistive Defrost Heater Capacity {W}
 
-  Fan:SystemModel,
+Fan:SystemModel,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Mixed Air Node,          !- Air Inlet Node Name
@@ -1701,81 +1679,50 @@ Coil:Cooling:DX:CurveFit:Speed,
     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
     0.7;                     !- Fan Total Efficiency
 
-  Output:Variable,*,Unitary System Fan Part Load Ratio,hourly;
+Output:Variable,*,Unitary System Fan Part Load Ratio,hourly;
+Output:Variable,*,Unitary System Compressor Part Load Ratio,hourly;
+Output:Variable,*,Zone Air System Sensible Heating Energy,hourly;
+Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly;
+Output:Variable,*,Zone Air Temperature,hourly;
+Output:Variable,*,Zone Air Relative Humidity,hourly;
+Output:Variable,*,Zone Air Humidity Ratio,hourly;
+Output:Variable,*,Fan Electric Power,hourly;
+Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
+Output:Variable,*,Cooling Coil Total Cooling Energy,hourly;
+Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
+Output:Variable,*,Cooling Coil Sensible Cooling Energy,hourly;
+Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly;
+Output:Variable,*,Cooling Coil Latent Cooling Energy,hourly;
+Output:Variable,*,Cooling Coil Electric Power,hourly;
+Output:Variable,*,Cooling Coil Electric Energy,hourly;
+Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
+Output:Variable,*,Heating Coil Total Heating Rate,hourly;
+Output:Variable,*,Heating Coil Total Heating Energy,hourly;
+Output:Variable,*,Heating Coil Electric Power,hourly;
+Output:Variable,*,Heating Coil Defrost Electric Power,hourly;
+Output:Variable,*,Heating Coil Air Heating Energy,hourly;
+Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+Output:Variable,*,Heating Coil Gas Rate,hourly;
+Output:Variable,*,Heating Coil Defrost Electric Energy,hourly;
+Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
+Output:Meter:MeterFileOnly,Electricity:Building,monthly;
+Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
+Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
+Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
+Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
+Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
+Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
+Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+Output:VariableDictionary,IDF;
+Output:Surfaces:Drawing,dxf;
+Output:Constructions,Constructions;
 
-  Output:Variable,*,Unitary System Compressor Part Load Ratio,hourly;
-
-  Output:Variable,*,Zone Air System Sensible Heating Energy,hourly;
-
-  Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly;
-
-  Output:Variable,*,Zone Air Temperature,hourly;
-
-  Output:Variable,*,Zone Air Relative Humidity,hourly;
-
-  Output:Variable,*,Zone Air Humidity Ratio,hourly;
-
-  Output:Variable,*,Fan Electric Power,hourly;
-
-Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Total Cooling Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Sensible Cooling Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Latent Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Latent Cooling Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Electric Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,Cooling Coil Runtime Fraction,hourly; !- HVAC Average []
-
-  Output:Variable,*,Heating Coil Total Heating Rate,hourly;
-
-  Output:Variable,*,Heating Coil Total Heating Energy,hourly;
-
-  Output:Variable,*,Heating Coil Electric Power,hourly;
-
-  Output:Variable,*,Heating Coil Defrost Electric Power,hourly;
-
-  Output:Variable,*,Heating Coil Air Heating Energy,hourly;
-
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
-
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
-
-  Output:Variable,*,Heating Coil Defrost Electric Energy,hourly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,monthly;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
-
-  Output:VariableDictionary,IDF;
-
-  Output:Surfaces:Drawing,dxf;
-
-  Output:Constructions,Constructions;
-
-  OutputControl:Table:Style,
+OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
-  Output:Table:SummaryReports,
+Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
