@@ -1,4 +1,4 @@
-#include <CoilCoolingDXCurveFitSpeed.hh>
+#include <Coils/CoilCoolingDXCurveFitSpeed.hh>
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed() {}
+CoilCoolingDXCurveFitSpeedInputSpecification::CoilCoolingDXCurveFitSpeedInputSpecification() {}
 

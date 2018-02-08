@@ -21,6 +21,8 @@ class CoilCoolingDXCurveFitPerformanceInputSpecification {
 
 	std::vector< std::string > operating_modes;
 
+	CoilCoolingDXCurveFitPerformanceInputSpecification();
+
 };
 
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITPERFORMANCE
