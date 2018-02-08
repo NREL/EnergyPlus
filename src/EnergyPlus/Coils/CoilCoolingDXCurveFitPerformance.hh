@@ -10,6 +10,7 @@
 
 class CoilCoolingDXCurveFitPerformanceInputSpecification {
 
+public:
 	std::string name;
 	Real64 crankcase_heater_capacity;
 	Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
@@ -23,14 +24,17 @@ class CoilCoolingDXCurveFitPerformanceInputSpecification {
 
 	std::vector< std::string > operating_modes;
 
-	CoilCoolingDXCurveFitPerformanceInputSpecification();
-
 };
 
 class CoilCoolingDXCurveFitPerformance {
 
+	std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
+
 public:
-	CoilCoolingDXCurveFitPerformance();
+	void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
+	CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
+	CoilCoolingDXCurveFitPerformance() {} // allow a blank empty default constructor, won't really be used
+	CoilCoolingDXCurveFitPerformance(std::string name);
 	std::string name;
 	Real64 crankcaseHeaterCap;
 	Real64 minOutdoorDrybulb;

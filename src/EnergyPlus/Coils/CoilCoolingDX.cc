@@ -2,23 +2,18 @@
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <InputProcessor.hh>
+#include <NodeInputManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-CoilCoolingDXInputSpecification::CoilCoolingDXInputSpecification() {
-
-}
-
 void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data) {
     this->original_input_specs = input_data;
-
     bool errorsFound = false;
     this->name = input_data.name;
     this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
-
-    DataLoopNode::GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
+    // other construction below
+    NodeInputManager::GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
 }
 
 CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
@@ -32,8 +27,7 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         InputProcessor::GetObjectItem(CoilCoolingDX::object_name, coilNum, cAlphaArgs, NumAlphas, rNumericArgs,
-                                      NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames,
-                                      cNumericFieldNames);
+                                      NumNumbers, IOStatus);
         if (!InputProcessor::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }

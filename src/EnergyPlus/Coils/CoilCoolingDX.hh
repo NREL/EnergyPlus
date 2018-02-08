@@ -20,10 +20,6 @@ public:
 	std::string performance_object_name;
 	std::string condensate_collection_water_storage_tank_name;
 	std::string evaporative_condenser_supply_water_storage_tank_name;
-
-public:
-	CoilCoolingDXInputSpecification();
-
 };
 
 class CoilCoolingDX {

@@ -9,6 +9,7 @@
 
 class CoilCoolingDXCurveFitOperatingModeInputSpecification {
 
+public:
 	std::string name;
 	Real64 gross_rated_total_cooling_capacity;
 	Real64 rated_evaporator_air_flow_rate;
@@ -17,19 +18,22 @@ class CoilCoolingDXCurveFitOperatingModeInputSpecification {
 	Real64 ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
 	Real64 latent_capacity_time_constant;
 	Real64 nominal_time_for_condensate_removal_to_begin;
-	bool apply_latent_degradation_to_speeds_greater_than_1;
-	int condenser_type;
-	int nominal_speed_number;
+	std::string apply_latent_degradation_to_speeds_greater_than_1;
+	std::string condenser_type;
+	Real64 nominal_speed_number;
 	std::vector< std::string > speed_data_names;
-
-	CoilCoolingDXCurveFitOperatingModeInputSpecification();
 
 };
 
 class CoilCoolingDXCurveFitOperatingMode {
+	std::string const object_name = "Coil:Cooling:DX:CurveFit:Performance";
 
 public:
-	CoilCoolingDXCurveFitOperatingMode();
+
+	void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
+	CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
+	CoilCoolingDXCurveFitOperatingMode() {}
+	CoilCoolingDXCurveFitOperatingMode(std::string name_to_find);
 	std::string name;
 	Real64 ratedGrossTotalCap;
 	Real64 ratedEvapAirFlowRate;

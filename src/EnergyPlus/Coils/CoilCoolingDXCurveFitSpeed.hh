@@ -8,6 +8,7 @@
 
 class CoilCoolingDXCurveFitSpeedInputSpecification {
 
+public:
 	std::string name;
 	Real64 gross_rated_total_cooling_capacity_ratio_to_nominal;
 	Real64 gross_rated_sensible_heat_ratio;
@@ -28,13 +29,16 @@ class CoilCoolingDXCurveFitSpeedInputSpecification {
 	std::string sensible_heat_ratio_modifier_function_of_temperature_curve_name;
 	std::string sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name;
 
-	CoilCoolingDXCurveFitSpeedInputSpecification();
-
 };
 
 class CoilCoolingDXCurveFitSpeed {
+	std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
 public:
-	CoilCoolingDXCurveFitSpeed();
+	CoilCoolingDXCurveFitSpeed() {}
+	CoilCoolingDXCurveFitSpeed(std::string name);
+	void instantiateFromInputSpec(CoilCoolingDXCurveFitSpeedInputSpecification input_data);
+	CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
+	std::string name;
 };
 
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITSPEED
