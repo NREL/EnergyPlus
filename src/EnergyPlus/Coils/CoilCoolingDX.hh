@@ -9,6 +9,7 @@
 
 class CoilCoolingDXInputSpecification {
 
+public:
 	std::string name;
 	std::string evaporator_inlet_node_name;
 	std::string evaporator_outlet_node_name;
@@ -20,16 +21,22 @@ class CoilCoolingDXInputSpecification {
 	std::string condensate_collection_water_storage_tank_name;
 	std::string evaporative_condenser_supply_water_storage_tank_name;
 
+public:
 	CoilCoolingDXInputSpecification();
 
 };
 
 class CoilCoolingDX {
 
-	CoilCoolingDX(CoilCoolingDXInputSpecification input_data);
+	std::string const object_name = "Coil:Cooling:DX";
+	CoilCoolingDXInputSpecification original_input_specs;
+
+	CoilCoolingDX(std::string name);
+	void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
 
 public:
-  CoilCoolingDXCurveFitPerformance performance;
+	std::string name;
+    CoilCoolingDXCurveFitPerformance performance;
 
 };
 
