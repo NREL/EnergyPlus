@@ -27,7 +27,8 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXInput )
       " EvaporativeCondenserSupplyTankName;                  "
     } );
 
-    ASSERT_FALSE( process_idf( idf_objects, false ) );
+    bool ok = !process_idf( idf_objects, false );
+    int i = 1;
 //
 //    GetBoilerInput();
 //

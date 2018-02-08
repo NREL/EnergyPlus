@@ -56,7 +56,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
         input_specs.sensible_heat_ratio_modifier_function_of_temperature_curve_name = cAlphaArgs(8);
         input_specs.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name = cAlphaArgs(9);
 
-        this->instantiateFromInputSpec(input_specs);
+		this->instantiateFromInputSpec(input_specs);
     }
 
     if (!found_it) {
