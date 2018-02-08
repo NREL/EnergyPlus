@@ -34,7 +34,22 @@ class CoilCoolingDXCurveFitSpeedInputSpecification {
 
 class CoilCoolingDXCurveFitSpeed {
 public:
+
+	Real64 TotalCapacity;
+	int indexCapFT;
+	int indexCapFFF;
+	int indexEIRFT;
+	int indexEIRFFF;
+	int indexPLRFPLF;
+	int indexWHFT;
+	int indexWHFFF;
+	int indexSHRFT;
+	int indexSHRFFF;
+
 	CoilCoolingDXCurveFitSpeed();
+
+	void CalcSpeedOutput(); // Real64 & PLR, Real64 const IDT, Real64 const OAT, Real64 const AirFF );
+
 };
 
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITSPEED
