@@ -43679,12 +43679,14 @@ Coil:Cooling:Water:DetailedGeometry,
 Coil:Cooling:DX,
        \memo New better-than-bacon fantastic DX cooling coil.
        \memo Includes DX evaporator coil, compressor, and condenser.
+       \min-fields 8
    A1, \field Name
        \required-field
        \type alpha
        \reference CoolingCoilsDX
        \reference CoolingCoilsDXSingleSpeed
        \reference CoolingCoilsDXMultiModeOrSingleSpeed
+       \reference CoolingCoilsDXVariableSpeed
        \reference DesuperHeatingCoilSources
        \reference AFNCoilNames
    A2, \field Evaporator Inlet Node Name
@@ -43706,10 +43708,8 @@ Coil:Cooling:DX,
        \type object-list
        \object-list ZoneNames
    A6, \field Condenser Inlet Node Name
-       \required-field
        \type node
    A7, \field Condenser Outlet Node Name
-       \required-field
        \type node
    A8, \field Performance Object Name
        \type object-list
@@ -43722,10 +43722,12 @@ Coil:Cooling:DX,
        \object-list WaterStorageTankNames
 
 Coil:Cooling:DX:CurveFit:Performance,
+       \memo DX cooling coil performance specification.
+       \min-fields 17
    A1, \field Name
        \required-field
        \type alpha
-       \reference CoolingCoilsDX
+       \reference DXCoolingPerformanceNames
    N1, \field Crankcase Heater Capacity
        \type real
        \minimum 0.0
@@ -43750,15 +43752,18 @@ Coil:Cooling:DX:CurveFit:Performance,
        \type real
        \units Pa
        \minimum> 0.0
+       \default 500.0
    A7, \field Method for Switching Operating Modes
        \type choice
-       \key iDunnoWhatTheseAre
+       \key HumidityControl
+       \key Scheduled
+       \default HumidityControl
    A8, \field Operating Mode Number Schedule Name
-       \note Schedule of operating mode numbers, if present, overrides other mode controls.
-       \note Useful for EMS control of operating mode.
+       \note Schedule of operating mode numbers. Used only if Method for Switching Operating Modes
+       \note is Scheduled. Useful for EMS control of operating mode.
        \type object-list
        \object-list ScheduleNames
-   N5, \field Basin Heater Capacity
+   N5, \field Evaporative Condenser Basin Heater Capacity
        \note This field is only used for Condenser Type = EvaporativelyCooled and for periods
        \note when the basin heater is available (field Basin Heater Operating Schedule Name).
        \note For this situation, the heater maintains the basin water temperature at the basin heater
@@ -43768,14 +43773,14 @@ Coil:Cooling:DX:CurveFit:Performance,
        \units W/K
        \minimum 0.0
        \default 0.0
-   N6, \field Basin Heater Setpoint Temperature
+   N6, \field Evaporative Condenser Basin Heater Setpoint Temperature
        \note This field is only used for Condenser Type = EvaporativelyCooled.
        \note Enter the outdoor dry-bulb temperature when the basin heater turns on.
        \type real
        \units C
        \minimum 2.0
        \default 2.0
-  A10, \field Basin Heater Operating Schedule Name
+  A10, \field Evaporative Condenser Basin Heater Operating Schedule Name
        \note This field is only used for Condenser Type = EvaporativelyCooled.
        \note Schedule values greater than 0 allow the basin heater to operate whenever the outdoor
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
@@ -43784,6 +43789,7 @@ Coil:Cooling:DX:CurveFit:Performance,
        \type object-list
        \object-list ScheduleNames
   A11, \field Operating Mode 1 Name
+       \required-field
        \type object-list
        \object-list DXCoolingOperatingModeNames
   A12, \field Operating Mode 2 Name
@@ -43815,6 +43821,8 @@ Coil:Cooling:DX:CurveFit:Performance,
        \object-list DXCoolingOperatingModeNames
 
 Coil:Cooling:DX:CurveFit:OperatingMode,
+       \memo DX cooling coil performance for a single operating mode which may have one or more speeds.
+       \min-fields 13
    A1, \field Name
        \required-field
        \type alpha
@@ -43823,16 +43831,15 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
        \note Total (sensible+latent) cooling capacity not accounting for the effect of supply air fan heat.
        \note Rating point: air entering the evaporator coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
        \note air entering the condenser coil at 35 C dry-bulb/23.9 C wet-bulb.
-       \required-field
        \type real
        \units W
        \minimum> 0.0
        \autosizable
+       \default autosize
        \note gross capacity excluding supply air fan heat
    N2, \field Rated Evaporator Air Flow Rate
        \note Flow rate corresponding to rated total cooling capacity, Rated SHR and Rated COP.
        \note Should be between 0.00004027 m3/s and 0.00006041 m3/s per watt of rated total cooling capacity.
-       \required-field
        \type real
        \units m3/s
        \minimum> 0.0
@@ -43886,10 +43893,10 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
        \key No
        \default No
    A3, \field Condenser Type
-        \type choice
-        \key AirCooled
-        \key EvaporativelyCooled
-        \default AirCooled
+       \type choice
+       \key AirCooled
+       \key EvaporativelyCooled
+       \default AirCooled
    N8, \field Nominal Evaporative Condenser Pump Power
        \note Rated power consumed by the evaporative condenser's water pump
        \type real
@@ -43901,12 +43908,13 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
        \key Staged
        \key VariableSpeed
        \key MultiSpeed
+       \default MultiSpeed
    N8, \field Nominal Speed Number
-        \note Must be lower than or equal to the highest speed number.
-        \note If blank,defaults to the highest speed number.
-        \units dimensionless
-        \type integer
+       \note Must be lower than or equal to the highest speed number.
+       \note If blank, defaults to the highest speed number used.
+       \type integer
    A5, \field Speed 1 Name
+       \required-field
        \type object-list
        \object-list DXCoolingSpeedNames
    A6, \field Speed 2 Name
@@ -43938,6 +43946,8 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
        \object-list DXCoolingSpeedNames
 
 Coil:Cooling:DX:CurveFit:Speed,
+       \memo DX cooling coil performance for a single speed within a single operating mode.
+       \min-fields 15
    A1, \field Name
        \required-field
        \type alpha
@@ -43945,11 +43955,13 @@ Coil:Cooling:DX:CurveFit:Speed,
    N1, \field Gross Total Cooling Capacity Fraction
        \note Ratio of capacity at this speed to the
        \note operating mode Rated Gross Total Cooling Capacity
+       \required-field
        \type real
        \minimum> 0.0
    N2, \field Evaporator Air Flow Rate Fraction
        \note Ratio of capacity at this speed to the
        \note operating mode Rated Evaporator Air Flow Rate
+       \required-field
        \type real
        \minimum> 0.0
    N3, \field Condenser Air Flow Rate Fraction
@@ -43960,11 +43972,11 @@ Coil:Cooling:DX:CurveFit:Speed,
    N4, \field Gross Sensible Heat Ratio
        \note Rated sensible heat ratio (gross sensible capacity/gross total capacity)
        \note sensible and total capacities do not include supply fan heat
-       \required-field
        \type real
        \minimum 0.5
        \maximum 1.0
        \autosizable
+       \default autosize
    N5, \field Gross Cooling COP
        \note Gross cooling capacity divided by power input to the compressor and condenser fan.
        \note Does not include supply fan heat or supply fan electrical energy input.
@@ -43973,27 +43985,84 @@ Coil:Cooling:DX:CurveFit:Speed,
        \minimum> 0.0
        \default 3.0
    N6, \field Active Fraction of Coil Face Area
+       \note The fraction of the cooling coil face which is actively cooled at this speed.
+       \note For non-split-face coils, this should be 1.0.
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 1.0
+   N7, \field Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
-       \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), Energy
-       \note Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER), and the Standard Rating
-       \note (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file.  This value is not
-       \note used for modeling the evaporator fan during simulations.
+       \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
+       \note Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file.
+       \note This value is not used for modeling the evaporator fan during simulations.
        \type real
        \units W/(m3/s)
        \minimum 0.0
        \maximum 1250.0
        \default 773.3
-   N7, \field Rated Evaporator Fan Power Per Volume Flow Rate
    N8, \field Evaporative Condenser Pump Power Fraction
+       \note Ratio of evaporative condenser pump power at this speed to the
+       \note operating mode Nominal Evaporative Condenser Pump Power
+       \type real
+       \minimum> 0.0
+       \default 1.0
    N9, \field Evaporative Condenser Effectiveness    
+       \type real
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.9
    A2, \field Total Cooling Capacity Function of Temperature Curve Name
+       \note curve = a + b*wb + c*wb**2 + d*edb + e*edb**2 + f*wb*edb
+       \note wb = entering wet-bulb temperature (C)
+       \note edb = dry-bulb temperature seen by the condenser (C)
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
    A3, \field Total Cooling Capacity Function of Air Flow Fraction Curve Name
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = Fraction of the full load flow
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
    A4, \field Energy Input Ratio Function of Temperature Curve Name
+       \note curve = a + b*wb + c*wb**2 + d*edb + e*edb**2 + f*wb*edb
+       \note wb = entering wet-bulb temperature (C)
+       \note edb = dry-bulb temperature seen by the condenser (C)
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
    A5, \field Energy Input Ratio Function of Air Flow Fraction Curve Name
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = Fraction of the full load flow
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
    A6, \field Part Load Fraction Correlation Curve Name
+       \note quadratic curve = a + b*PLR + c*PLR**2
+       \note cubic curve = a + b*PLR + c*PLR**2 + d*PLR**3
+       \note PLR = part load ratio (cooling load/steady state capacity)
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
    A7, \field Rated Waste Heat Fraction of Power Input
+       \note Recoverable waste heat at full load and rated conditions
+       \type real
+       \units dimensionless
+       \minimum> 0.0
+       \maximum 1.0
+       \default 0.2
    A8, \field Waste Heat Function of Temperature Curve Name
+       \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
+       \note odb = Outdoor air dry-bulb temperature (C)
+       \note db = entering coil dry-bulb temperature (C)
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
    A9, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
        \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
        \note wb = entering wet-bulb temperature seen by the DX cooling coil (C)
@@ -54845,6 +54914,7 @@ AirLoopHVAC:UnitarySystem,
        \note used only for heat pump configurations (i.e., a DX cooling and DX heating coil is used).
   A14, \field Cooling Coil Object Type
        \type choice
+       \key Coil:Cooling:DX
        \key Coil:Cooling:DX:SingleSpeed
        \key Coil:Cooling:DX:TwoSpeed
        \key Coil:Cooling:DX:MultiSpeed
