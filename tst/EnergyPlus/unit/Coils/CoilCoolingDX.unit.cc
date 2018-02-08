@@ -16,24 +16,15 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXInput )
     std::string const idf_objects = delimited_string( {
       "Coil:Cooling:DX,       ",
       " CoilName,             ",
-      " AirInletNode,         ",
-      " AirOutletNode,        ",
+      " EvapInletNode,         ",
+      " EvapOutletNode,        ",
       " AvailSchedule,        ",
       " ZoneNameForCondenser, ",
-      " 100,                  ",
-      " 200,                  ",
-      " 300,                  ",
-      " 400,                  ",
-      " 500,                  ",
-      " 600,                  ",
-      " 700,                  ",
-      " 800,                  ",
-      " 900,                  ",
-      " 1000,                 ",
-      " MethodA,              ",
-      " 1100,                 ",
-      " ModeA,                ",
-      " ModeB;                "
+      " CondenserInletNode,                  ",
+      " CondenserOutletNode,                  ",
+      " PerformanceObjectName,                  ",
+      " CondensateCollectionTankName,                  ",
+      " EvaporativeCondenserSupplyTankName;                  "
     } );
 
     ASSERT_FALSE( process_idf( idf_objects, false ) );
