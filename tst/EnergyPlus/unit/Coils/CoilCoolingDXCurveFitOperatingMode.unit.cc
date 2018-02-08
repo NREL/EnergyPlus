@@ -10,21 +10,24 @@
 using namespace EnergyPlus;
 
 
-TEST_F( EnergyPlusFixture, CoilCoolingDXInput )
+TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitOperatingModeInput )
 {
 
     std::string const idf_objects = delimited_string( {
-      "Coil:Cooling:DX,       ",
-      " CoilName,             ",
-      " EvapInletNode,         ",
-      " EvapOutletNode,        ",
-      " AvailSchedule,        ",
-      " ZoneNameForCondenser, ",
-      " CondenserInletNode,                  ",
-      " CondenserOutletNode,                  ",
-      " PerformanceObjectName,                  ",
-      " CondensateCollectionTankName,                  ",
-      " EvaporativeCondenserSupplyTankName;                  "
+      "Coil:Cooling:DX:CurveFit:OperatingMode,       ",
+      " OperatingMode1Name,             ",
+      " 12000,         ",
+      " 100,        ",
+      " 200,        ",
+      " 20, ",
+      " 0.5,                  ",
+      " 100,                  ",
+      " 300,                  ",
+      " Yes,                  ",
+      " Evaporative,                  ",
+      " 5,                  ",
+      " OperatingSpeed1,                  ",
+      " OperatingSpeed2;                  "
     } );
 
     ASSERT_FALSE( process_idf( idf_objects, false ) );
