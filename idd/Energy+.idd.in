@@ -43677,86 +43677,338 @@ Coil:Cooling:Water:DetailedGeometry,
        \note object is used for sizing the Design Water Flow Rate.
 
 Coil:Cooling:DX,
-        \memo New better-than-bacon fantastic DX cooling coil.
-        \memo Includes DX evaporator coil, compressor, and condenser.
-    A1, \field Name
-    A2, \field Evaporator Inlet Node Name
-    A3, \field Evaporator Outlet Node Name
-    A4, \field Availability Schedule Name
-    A5, \field Condenser Zone Name
-    A6, \field Condenser Inlet Node Name
-    A7, \field Condenser Outlet Node Name
-    A8, \field Performance Object Name
-    A9, \field Condensate Collection Water Storage Tank Name
-   A10; \field Evaporative Condenser Supply Water Storage Tank Name
+       \memo New better-than-bacon fantastic DX cooling coil.
+       \memo Includes DX evaporator coil, compressor, and condenser.
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference CoolingCoilsDX
+       \reference CoolingCoilsDXSingleSpeed
+       \reference CoolingCoilsDXMultiModeOrSingleSpeed
+       \reference DesuperHeatingCoilSources
+       \reference AFNCoilNames
+   A2, \field Evaporator Inlet Node Name
+       \required-field
+       \type node
+   A3, \field Evaporator Outlet Node Name
+       \required-field
+       \type node
+   A4, \field Availability Schedule Name
+       \note Schedule value > 0 means the coil is available.
+       \note If this field is blank, the coil is always available.
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Condenser Zone Name
+       \note This input field is name of a conditioned or unconditioned zone where the secondary
+       \note coil (condenser) of DX system or a heat pump is to be placed.  This is an optional
+       \note input field specified only when user desires to reject the condenser heat into a
+       \note zone. The heat rejected is modelled as internal sensible heat gain of the zone.
+       \type object-list
+       \object-list ZoneNames
+   A6, \field Condenser Inlet Node Name
+       \required-field
+       \type node
+   A7, \field Condenser Outlet Node Name
+       \required-field
+       \type node
+   A8, \field Performance Object Name
+       \type object-list
+       \object-list DXCoolingPerformanceNames
+   A9, \field Condensate Collection Water Storage Tank Name
+       \type object-list
+       \object-list WaterStorageTankNames
+  A10; \field Evaporative Condenser Supply Water Storage Tank Name
+       \type object-list
+       \object-list WaterStorageTankNames
 
 Coil:Cooling:DX:CurveFit:Performance,
-    A1, \field Name
-    N1, \field Crankcase Heater Capacity
-    N2, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
-    N3, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
-    N4, \field Unit Internal Static Air Pressure
-    A7, \field Method for Switching Operating Modes
-    A8, \field Operating Mode Number Schedule Name
-    N5, \field Basin Heater Capacity
-    N6, \field Basin Heater Setpoint Temperature
-   A10, \field Basin Heater Operating Schedule Name
-   A11, \field Operating Mode 1 Name
-   A12, \field Operating Mode 2 Name
-   A13, \field Operating Mode 3 Name
-   A14, \field Operating Mode 4 Name
-   A15, \field Operating Mode 5 Name
-   A16, \field Operating Mode 6 Name
-   A17, \field Operating Mode 7 Name
-   A18, \field Operating Mode 8 Name
-   A19, \field Operating Mode 9 Name
-   A20; \field Operating Mode 10 Name
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference CoolingCoilsDX
+   N1, \field Crankcase Heater Capacity
+       \type real
+       \minimum 0.0
+       \default 0.0
+       \units W
+       \ip-units W
+   N2, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+       \type real
+       \default -25.0
+       \units C
+   N3, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+       \type real
+       \minimum 0.0
+       \default 10.0
+       \units C
+   N4, \field Unit Internal Static Air Pressure
+       \note Enter pressure drop for the unit containing the coil.
+       \note This value is only used to calculate Energy Efficiency Ratio
+       \note (EER), Integrated Energy Efficiency Ratio (IEER), and the
+       \note Standard Rating (Net) Cooling Capacity. This value is not
+       \note used for modeling the evaporator fan during simulations.
+       \type real
+       \units Pa
+       \minimum> 0.0
+   A7, \field Method for Switching Operating Modes
+       \type choice
+       \key iDunnoWhatTheseAre
+   A8, \field Operating Mode Number Schedule Name
+       \note Schedule of operating mode numbers, if present, overrides other mode controls.
+       \note Useful for EMS control of operating mode.
+       \type object-list
+       \object-list ScheduleNames
+   N5, \field Basin Heater Capacity
+       \note This field is only used for Condenser Type = EvaporativelyCooled and for periods
+       \note when the basin heater is available (field Basin Heater Operating Schedule Name).
+       \note For this situation, the heater maintains the basin water temperature at the basin heater
+       \note setpoint temperature when the outdoor air temperature falls below the setpoint temperature.
+       \note The basin heater only operates when the DX coil is off.
+       \type real
+       \units W/K
+       \minimum 0.0
+       \default 0.0
+   N6, \field Basin Heater Setpoint Temperature
+       \note This field is only used for Condenser Type = EvaporativelyCooled.
+       \note Enter the outdoor dry-bulb temperature when the basin heater turns on.
+       \type real
+       \units C
+       \minimum 2.0
+       \default 2.0
+  A10, \field Basin Heater Operating Schedule Name
+       \note This field is only used for Condenser Type = EvaporativelyCooled.
+       \note Schedule values greater than 0 allow the basin heater to operate whenever the outdoor
+       \note air dry-bulb temperature is below the basin heater setpoint temperature.
+       \note If a schedule name is not entered, the basin heater is allowed to operate
+       \note throughout the entire simulation.
+       \type object-list
+       \object-list ScheduleNames
+  A11, \field Operating Mode 1 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A12, \field Operating Mode 2 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A13, \field Operating Mode 3 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A14, \field Operating Mode 4 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A15, \field Operating Mode 5 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A16, \field Operating Mode 6 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A17, \field Operating Mode 7 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A18, \field Operating Mode 8 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A19, \field Operating Mode 9 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+  A20; \field Operating Mode 10 Name
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
 
 Coil:Cooling:DX:CurveFit:OperatingMode,
-    A1, \field Name
-    N1, \field Rated Gross Total Cooling Capacity
-    N2, \field Rated Evaporator Air Flow Rate
-    N3, \field Rated Condenser Air Flow Rate
-    N4, \field Maximum Cycling Rate
-    N5, \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-    N6, \field Latent Capacity Time Constant
-    N7, \field Nominal Time for Condensate Removal to Begin
-    A2, \field Apply Latent Degradation to Speeds Greater than 1
-    A3, \field Condenser Type
-    N8, \field Nominal Evaporative Condenser Pump Power
-    A4, \field Capacity Control Method    
-    N8, \field Nominal Speed Number
-    A5, \field Speed 1 Name
-    A6, \field Speed 2 Name
-    A7, \field Speed 3 Name
-    A8, \field Speed 4 Name
-    A9, \field Speed 5 Name
-   A10, \field Speed 6 Name
-   A11, \field Speed 7 Name
-   A12, \field Speed 8 Name
-   A13, \field Speed 9 Name
-   A14; \field Speed 10 Name
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference DXCoolingOperatingModeNames
+   N1, \field Rated Gross Total Cooling Capacity
+       \note Total (sensible+latent) cooling capacity not accounting for the effect of supply air fan heat.
+       \note Rating point: air entering the evaporator coil at 26.7 C dry-bulb/19.4 C wet-bulb, and
+       \note air entering the condenser coil at 35 C dry-bulb/23.9 C wet-bulb.
+       \required-field
+       \type real
+       \units W
+       \minimum> 0.0
+       \autosizable
+       \note gross capacity excluding supply air fan heat
+   N2, \field Rated Evaporator Air Flow Rate
+       \note Flow rate corresponding to rated total cooling capacity, Rated SHR and Rated COP.
+       \note Should be between 0.00004027 m3/s and 0.00006041 m3/s per watt of rated total cooling capacity.
+       \required-field
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+   N3, \field Rated Condenser Air Flow Rate
+       \note Used to calculate evaporative condenser water use.
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+   N4, \field Maximum Cycling Rate
+       \note The maximum on-off cycling Rate for the compressor, which occurs at 50% run time
+       \note fraction. Suggested value is 3; zero value means latent degradation model is disabled.
+       \type real
+       \units cycles/hr
+       \minimum 0.0
+       \maximum 5.0
+       \default 0.0
+   N5, \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+       \note Ratio of the initial moisture evaporation rate from the cooling coil (when
+       \note the compressor first turns off) and the coil's steady state latent capacity
+       \note at rated air flow rate and temperature conditions. Suggested value is 1.5; zero value
+       \note means latent degradation model is disabled.
+       \type real
+       \units dimensionless
+       \minimum 0.0
+       \maximum 5.0
+       \default 0.0
+   N6, \field Latent Capacity Time Constant
+       \note Time constant for the cooling coil's latent capacity to reach steady state after
+       \note startup. Suggested value is 45; zero value means latent degradation model is disabled.
+       \type real
+       \units s
+       \minimum 0.0
+       \maximum 500.0
+       \default 0.0
+   N7, \field Nominal Time for Condensate Removal to Begin
+       \note The nominal time for condensate to begin leaving the coil's condensate
+       \note drain line at the coil's rated air flow rate and temperature conditions.
+       \note Nominal time is equal to the ratio of the energy of the coil's maximum
+       \note condensate holding capacity (J) to the coil's steady state latent capacity (W).
+       \note Suggested value is 1000; zero value means latent degradation model is disabled.
+       \type real
+       \units s
+       \minimum 0.0
+       \maximum 3000.0
+       \default 0.0
+   A2, \field Apply Latent Degradation to Speeds Greater than 1
+       \type choice
+       \key Yes
+       \key No
+       \default No
+   A3, \field Condenser Type
+        \type choice
+        \key AirCooled
+        \key EvaporativelyCooled
+        \default AirCooled
+   N8, \field Nominal Evaporative Condenser Pump Power
+       \note Rated power consumed by the evaporative condenser's water pump
+       \type real
+       \units W
+       \minimum 0.0
+       \default 0.0
+       \autosizable
+   A4, \field Capacity Control Method    
+       \key Staged
+       \key VariableSpeed
+       \key MultiSpeed
+   N8, \field Nominal Speed Number
+        \note Must be lower than or equal to the highest speed number.
+        \note If blank,defaults to the highest speed number.
+        \units dimensionless
+        \type integer
+   A5, \field Speed 1 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+   A6, \field Speed 2 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+   A7, \field Speed 3 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+   A8, \field Speed 4 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+   A9, \field Speed 5 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+  A10, \field Speed 6 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+  A11, \field Speed 7 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+  A12, \field Speed 8 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+  A13, \field Speed 9 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
+  A14; \field Speed 10 Name
+       \type object-list
+       \object-list DXCoolingSpeedNames
 
 Coil:Cooling:DX:CurveFit:Speed,
-    A1, \field Name
-    N1, \field Gross Total Cooling Capacity Fraction
-    N2, \field Evaporator Air Flow Rate Fraction
-    N3, \field Condenser Air Flow Rate Fraction
-    N4, \field Gross Sensible Heat Ratio
-    N5, \field Gross Cooling COP
-    N6, \field Active Fraction of Coil Face Area
-    N7, \field Rated Evaporator Fan Power Per Volume Flow Rate
-    N8, \field Evaporative Condenser Pump Power Fraction
-    N9, \field Evaporative Condenser Effectiveness    
-    A2, \field Total Cooling Capacity Function of Temperature Curve Name
-    A3, \field Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    A4, \field Energy Input Ratio Function of Temperature Curve Name
-    A5, \field Energy Input Ratio Function of Air Flow Fraction Curve Name
-    A6, \field Part Load Fraction Correlation Curve Name
-    A7, \field Rated Waste Heat Fraction of Power Input
-    A8, \field Waste Heat Function of Temperature Curve Name
-    A9, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
-   A10; \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+   A1, \field Name
+       \required-field
+       \type alpha
+       \reference DXCoolingSpeedNames
+   N1, \field Gross Total Cooling Capacity Fraction
+       \note Ratio of capacity at this speed to the
+       \note operating mode Rated Gross Total Cooling Capacity
+       \type real
+       \minimum> 0.0
+   N2, \field Evaporator Air Flow Rate Fraction
+       \note Ratio of capacity at this speed to the
+       \note operating mode Rated Evaporator Air Flow Rate
+       \type real
+       \minimum> 0.0
+   N3, \field Condenser Air Flow Rate Fraction
+       \note Ratio of condenser air flow at this speed to the
+       \note operating mode Rated Condenser Air Flow Rate
+       \type real
+       \minimum> 0.0
+   N4, \field Gross Sensible Heat Ratio
+       \note Rated sensible heat ratio (gross sensible capacity/gross total capacity)
+       \note sensible and total capacities do not include supply fan heat
+       \required-field
+       \type real
+       \minimum 0.5
+       \maximum 1.0
+       \autosizable
+   N5, \field Gross Cooling COP
+       \note Gross cooling capacity divided by power input to the compressor and condenser fan.
+       \note Does not include supply fan heat or supply fan electrical energy input.
+       \type real
+       \units W/W
+       \minimum> 0.0
+       \default 3.0
+   N6, \field Active Fraction of Coil Face Area
+       \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
+       \note The test conditions vary external static pressure based on total cooling capacity.
+       \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), Energy
+       \note Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER), and the Standard Rating
+       \note (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file.  This value is not
+       \note used for modeling the evaporator fan during simulations.
+       \type real
+       \units W/(m3/s)
+       \minimum 0.0
+       \maximum 1250.0
+       \default 773.3
+   N7, \field Rated Evaporator Fan Power Per Volume Flow Rate
+   N8, \field Evaporative Condenser Pump Power Fraction
+   N9, \field Evaporative Condenser Effectiveness    
+   A2, \field Total Cooling Capacity Function of Temperature Curve Name
+   A3, \field Total Cooling Capacity Function of Air Flow Fraction Curve Name
+   A4, \field Energy Input Ratio Function of Temperature Curve Name
+   A5, \field Energy Input Ratio Function of Air Flow Fraction Curve Name
+   A6, \field Part Load Fraction Correlation Curve Name
+   A7, \field Rated Waste Heat Fraction of Power Input
+   A8, \field Waste Heat Function of Temperature Curve Name
+   A9, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
+       \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
+       \note wb = entering wet-bulb temperature seen by the DX cooling coil (C)
+       \note db = entering dry-bulb temperature seen by the DX cooling coil (C)
+       \note entering temperature can be outside air or pretreated air.
+       \type object-list
+       \object-list BiquadraticCurves
+       \object-list BiVariateTables
+  A10; \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+       \note quadratic curve = a + b*ff + c*ff**2
+       \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
+       \note ff = fraction of the full load flow
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
 
 Coil:Cooling:DX:SingleSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
