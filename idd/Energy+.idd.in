@@ -43686,7 +43686,7 @@ Coil:Cooling:DX,
     A7, \field Condenser Outlet Node Name
     A8, \field Performance Object Name
     A9, \field Condensate Collection Water Storage Tank Name
-   A10, \field Evaporative Condenser Supply Water Storage Tank Name
+   A10; \field Evaporative Condenser Supply Water Storage Tank Name
 
 Coil:Cooling:DX:CurveFit:Performance,
     A1, \field Name
