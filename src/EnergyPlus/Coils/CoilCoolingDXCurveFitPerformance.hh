@@ -28,8 +28,24 @@ class CoilCoolingDXCurveFitPerformanceInputSpecification {
 };
 
 class CoilCoolingDXCurveFitPerformance {
+
 public:
 	CoilCoolingDXCurveFitPerformance();
+	std::string name;
+	Real64 crankcaseHeaterCap;
+	Real64 minOutdoorDrybulb;
+	Real64 maxOutdoorDrybulb;
+	Real64 unitStatic; // TODO: make curve f(flow)?
+
+	enum ModeMethod {HUMIDITY_CONTROL, SCHEDULE};
+
+	ModeMethod modeMethod;
+
+	int modeScheduleIndex;
+
+	Real64 evapCondBasinHeatCap;
+	Real64 evapCondBasinHeatSetpoint;
+	int evapCondBasinHeatSchedulIndex;
 
 	std::vector<CoilCoolingDXCurveFitOperatingMode> modes;
 };

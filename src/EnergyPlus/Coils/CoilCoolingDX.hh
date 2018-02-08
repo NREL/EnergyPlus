@@ -29,7 +29,16 @@ class CoilCoolingDX {
 	CoilCoolingDX(CoilCoolingDXInputSpecification input_data);
 
 public:
-  CoilCoolingDXCurveFitPerformance performance;
+  std::string name;
+  int evapInletNodeIndex;
+	int evapOutletNodeIndex;
+	int availScheduleIndex;
+	int condZoneIndex;
+	int condInletNodeIndex;
+	int condOutletNodeIndex;
+	CoilCoolingDXCurveFitPerformance performance;  // TODO: Change to unique pointer when we have base class for performance object
+  int condensateTankIndex;
+  int evaporativeCondSupplyTankIndex;
 
 };
 

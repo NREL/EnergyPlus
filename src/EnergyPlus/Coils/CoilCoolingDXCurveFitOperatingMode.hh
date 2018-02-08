@@ -29,8 +29,27 @@ class CoilCoolingDXCurveFitOperatingModeInputSpecification {
 class CoilCoolingDXCurveFitOperatingMode {
 
 public:
-CoilCoolingDXCurveFitOperatingMode();
+	CoilCoolingDXCurveFitOperatingMode();
+	std::string name;
+	Real64 ratedGrossTotalCap;
+	Real64 ratedEvapAirFlowRate;
+	Real64 ratedCondAirFlowRate;
+
+	// Latent degradation model
+	Real64 maxCyclingRate;
+	Real64 evapRateRatio;
+	Real64 latentTimeConst;
+	Real64 timeForCondensateRemoval;
+
+	enum ConenserType {AIRCOOLED, EVAPCOOLED};
+	Real64 nominalEvaporativePumpPower;
+
+	enum CapControlMethod {STAGED, VARIABLE, MULTISPEED};
+
+	int nominalSpeedNum;
+
 	std::vector<CoilCoolingDXCurveFitSpeed> speeds;
+
 
 };
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITOPERATINGMODE
