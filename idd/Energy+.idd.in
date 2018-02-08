@@ -43677,6 +43677,8 @@ Coil:Cooling:Water:DetailedGeometry,
        \note object is used for sizing the Design Water Flow Rate.
 
 Coil:Cooling:DX,
+        \memo New better-than-bacon fantastic DX cooling coil.
+        \memo Includes DX evaporator coil, compressor, and condenser.
     A1, \field Name
     A2, \field Evaporator Inlet Node Name
     A3, \field Evaporator Outlet Node Name
@@ -43712,7 +43714,7 @@ Coil:Cooling:DX:CurveFit:Performance,
 
 Coil:Cooling:DX:CurveFit:OperatingMode,
     A1, \field Name
-    N1, \field Gross Rated Total Cooling Capacity
+    N1, \field Rated Gross Total Cooling Capacity
     N2, \field Rated Evaporator Air Flow Rate
     N3, \field Rated Condenser Air Flow Rate
     N4, \field Maximum Cycling Rate
@@ -43721,29 +43723,31 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
     N7, \field Nominal Time for Condensate Removal to Begin
     A2, \field Apply Latent Degradation to Speeds Greater than 1
     A3, \field Condenser Type
+    N8, \field Nominal Evaporative Condenser Pump Power
+    A4, \field Capacity Control Method    
     N8, \field Nominal Speed Number
-    A4, \field Speed 1 Name
-    A5, \field Speed 2 Name
-    A6, \field Speed 3 Name
-    A7, \field Speed 4 Name
-    A8, \field Speed 5 Name
-    A9, \field Speed 6 Name
-   A10, \field Speed 7 Name
-   A11, \field Speed 8 Name
-   A12, \field Speed 9 Name
-   A13; \field Speed 10 Name
+    A5, \field Speed 1 Name
+    A6, \field Speed 2 Name
+    A7, \field Speed 3 Name
+    A8, \field Speed 4 Name
+    A9, \field Speed 5 Name
+   A10, \field Speed 6 Name
+   A11, \field Speed 7 Name
+   A12, \field Speed 8 Name
+   A13, \field Speed 9 Name
+   A14; \field Speed 10 Name
 
 Coil:Cooling:DX:CurveFit:Speed,
     A1, \field Name
-    N1, \field Gross Rated Total Cooling Capacity Ratio to Nominal
-    N2, \field Gross Rated Sensible Heat Ratio
-    N3, \field Gross Rated Cooling COP
-    N4, \field Rated Air Flow Rate Ratio to Nominal
-    N5, \field Rated Condenser Air Flow Rate Ratio to Nominal
+    N1, \field Gross Total Cooling Capacity Fraction
+    N2, \field Evaporator Air Flow Rate Fraction
+    N3, \field Condenser Air Flow Rate Fraction
+    N4, \field Gross Sensible Heat Ratio
+    N5, \field Gross Cooling COP
     N6, \field Active Fraction of Coil Face Area
-    N7, \field Rated Evaporative Condenser Pump Power Consumption
-    N8, \field Rated Evaporator Fan Power Per Volume Flow Rate
-    N9, \field Evaporative Condenser Effectiveness
+    N7, \field Rated Evaporator Fan Power Per Volume Flow Rate
+    N8, \field Evaporative Condenser Pump Power Fraction
+    N9, \field Evaporative Condenser Effectiveness    
     A2, \field Total Cooling Capacity Function of Temperature Curve Name
     A3, \field Total Cooling Capacity Function of Air Flow Fraction Curve Name
     A4, \field Energy Input Ratio Function of Temperature Curve Name
