@@ -43678,84 +43678,81 @@ Coil:Cooling:Water:DetailedGeometry,
 
 Coil:Cooling:DX,
     A1, \field Name
-    A2, \field Air Inlet Node Name
-    A3, \field Air Outlet Node Name
+    A2, \field Evaporator Inlet Node Name
+    A3, \field Evaporator Outlet Node Name
     A4, \field Availability Schedule Name
-    A5, \field Zone Name for Condenser Placement
+    A5, \field Condenser Zone Name
+    A6, \field Condenser Inlet Node Name
+    A7, \field Condenser Outlet Node Name
+    A8, \field Performance Object Name
+    A9, \field Condensate Collection Water Storage Tank Name
+   A10; \field Evaporative Condenser Supply Water Storage Tank Name
+
+Coil:Cooling:DX:CurveFit:Performance,
+    A1, \field Name
     N1, \field Crankcase Heater Capacity
     N2, \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
     N3, \field Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
-    N4, \field Evaporative Condenser Pump Rated Power Consumption
-    N5, \field Rated Evaporator Fan Power Per Volume Flow Rate
-    N6, \field Unit Internal Static Air Pressure
-    N7, \field Maximum Cycling Rate
-    A6, \field Condensate Collection Water Storage Tank Name
-    N8, \field Evaporative Condenser Air Flow Rate
-    N9, \field Evaporative Condenser Effectiveness
-    A7, \field Method for Switching Modes
-    N10, \field Number of Operating Modes
-    A8, \field Mode 1
-    A9; \field Mode 2
+    N4, \field Unit Internal Static Air Pressure
+    A7, \field Method for Switching Operating Modes
+    A8, \field Operating Mode Number Schedule Name
+    N5, \field Basin Heater Capacity
+    N6, \field Basin Heater Setpoint Temperature
+   A10, \field Basin Heater Operating Schedule Name
+   A11, \field Operating Mode 1 Name
+   A12, \field Operating Mode 2 Name
+   A13, \field Operating Mode 3 Name
+   A14, \field Operating Mode 4 Name
+   A15, \field Operating Mode 5 Name
+   A16, \field Operating Mode 6 Name
+   A17, \field Operating Mode 7 Name
+   A18, \field Operating Mode 8 Name
+   A19, \field Operating Mode 9 Name
+   A20; \field Operating Mode 10 Name
 
-Coil:Cooling:DX:OperatingModeOrSomething,
+Coil:Cooling:DX:CurveFit:OperatingMode,
     A1, \field Name
-    A2, \field Part Load Fraction Correlation Curve Name
-    A3, \field Apply Part Load Fraction to Speeds Greater than 1
-    A4, \field Energy Part Load Fraction Curve Name
-    N1, \field Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
-    N2, \field Latent Capacity Time Constant
-    A5, \field Apply Latent Degradation to Speeds Greater than 1
-    N3, \field Nominal Time for Condensate Removal to Begin
-    N4, \field Nominal Time for Condensate to Begin Leaving the Coil
+    N1, \field Gross Rated Total Cooling Capacity
+    N2, \field Rated Evaporator Air Flow Rate
+    N3, \field Rated Condenser Air Flow Rate
+    N4, \field Maximum Cycling Rate
     N5, \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-    N6, \field Fraction of Air Flow Bypassed Around Coil
-    A6; \field Name of Compressor Speed List
+    N6, \field Latent Capacity Time Constant
+    N7, \field Nominal Time for Condensate Removal to Begin
+    A2, \field Apply Latent Degradation to Speeds Greater than 1
+    A3, \field Condenser Type
+    N8, \field Nominal Speed Number
+    A4, \field Speed 1 Name
+    A5, \field Speed 2 Name
+    A6, \field Speed 3 Name
+    A7, \field Speed 4 Name
+    A8, \field Speed 5 Name
+    A9, \field Speed 6 Name
+   A10, \field Speed 7 Name
+   A11, \field Speed 8 Name
+   A12, \field Speed 9 Name
+   A13; \field Speed 10 Name
 
-Coil:Cooling:DX:SpeedInputDataList,
+Coil:Cooling:DX:CurveFit:Speed,
     A1, \field Name
-    N1, \field Number of Speeds
-    A2, \field Speed 1
-    A3, \field Speed 2
-    A4, \field Speed 3
-    A5, \field Speed 4
-    A6; \field Speed 5
-
-Coil:Cooling:DX:SpeedInputData,
-    A1, \field Name
-    N1, \field Rated Air Flow Rate
-    N2, \field Gross Rated Cooling COP
-    N3, \field Gross Rated Sensible Heat Ratio
-    N4, \field Gross Rated Total Cooling Capacity
-    N5, \field Evaporative Condenser Air Flow Rate
-    N6, \field Evaporative Condenser Effectiveness
-    N7, \field Gross Rated Cooling COP
-    N8, \field Gross Rated Heating Capacity
-    N9, \field Gross Rated Sensible Heat Ratio
-    N10, \field Gross Rated Total Cooling Capacity
-    N11, \field Latent Capacity Time Constant
-    N12, \field Maximum Cycling Rate
-    N13, \field Nominal Time for Condensate Removal to Begin
-    N14, \field Rated Air Flow Rate
-    N15, \field Rated Evaporative Condenser Pump Power Consumption
-    N16, \field Rated Supply Air Fan Power Per Volume Flow Rate
-    N17, \field Rated Waste Heat Fraction of Power Input
-    N18, \field Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-    N19, \field Reference Unit Gross Rated Cooling COP
-    N20, \field Reference Unit Gross Rated Sensible Heat Ratio
-    N21, \field Reference Unit Gross Rated Total Cooling Capacity
-    N22, \field Reference Unit Rated Air Flow Rate
-    N23, \field Reference Unit Rated Condenser Air Flow Rate
-    N24, \field Reference Unit Rated Pad Effectiveness of Evap Precooling
-    A2, \field Energy Input Ratio Function of Air Flow Fraction Curve Name
-    A3, \field Energy Input Ratio Function of Flow Fraction Curve Name
+    N1, \field Gross Rated Total Cooling Capacity Ratio to Nominal
+    N2, \field Gross Rated Sensible Heat Ratio
+    N3, \field Gross Rated Cooling COP
+    N4, \field Rated Air Flow Rate Ratio to Nominal
+    N5, \field Rated Condenser Air Flow Rate Ratio to Nominal
+    N6, \field Active Fraction of Coil Face Area
+    N7, \field Rated Evaporative Condenser Pump Power Consumption
+    N8, \field Rated Evaporator Fan Power Per Volume Flow Rate
+    N9, \field Evaporative Condenser Effectiveness
+    A2, \field Total Cooling Capacity Function of Temperature Curve Name
+    A3, \field Total Cooling Capacity Function of Air Flow Fraction Curve Name
     A4, \field Energy Input Ratio Function of Temperature Curve Name
-    A5, \field Part Load Fraction Correlation Curve Name
-    A6, \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-    A7, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    A8, \field Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    A9, \field Total Cooling Capacity Function of Flow Fraction Curve Name
-    A10, \field Total Cooling Capacity Function of Temperature Curve Name
-    A11; \field Waste Heat Function of Temperature Curve Name
+    A5, \field Energy Input Ratio Function of Air Flow Fraction Curve Name
+    A6, \field Part Load Fraction Correlation Curve Name
+    A7, \field Rated Waste Heat Fraction of Power Input
+    A8, \field Waste Heat Function of Temperature Curve Name
+    A9, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
+   A10; \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 Coil:Cooling:DX:SingleSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
