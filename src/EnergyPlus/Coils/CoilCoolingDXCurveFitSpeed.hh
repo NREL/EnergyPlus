@@ -32,4 +32,9 @@ class CoilCoolingDXCurveFitSpeedInputSpecification {
 
 };
 
+class CoilCoolingDXCurveFitSpeed {
+public:
+	CoilCoolingDXCurveFitSpeed();
+};
+
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITSPEED

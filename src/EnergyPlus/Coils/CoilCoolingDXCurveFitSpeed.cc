@@ -2,3 +2,4 @@
 
 CoilCoolingDXCurveFitSpeedInputSpecification::CoilCoolingDXCurveFitSpeedInputSpecification() {}
 
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed() {}

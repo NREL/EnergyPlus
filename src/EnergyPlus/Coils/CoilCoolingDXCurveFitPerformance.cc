@@ -2,3 +2,4 @@
 
 CoilCoolingDXCurveFitPerformanceInputSpecification::CoilCoolingDXCurveFitPerformanceInputSpecification() {}
 
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance() {}

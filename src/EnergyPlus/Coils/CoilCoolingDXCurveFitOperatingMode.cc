@@ -4,8 +4,7 @@ CoilCoolingDXCurveFitOperatingModeInputSpecification::CoilCoolingDXCurveFitOpera
 
 }
 
-/*
+
 CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode() {
 
 }
-*/

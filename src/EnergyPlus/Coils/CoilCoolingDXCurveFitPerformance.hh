@@ -6,6 +6,8 @@
 
 #include <EnergyPlus.hh>
 
+#include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
+
 class CoilCoolingDXCurveFitPerformanceInputSpecification {
 
 	std::string name;
@@ -23,6 +25,13 @@ class CoilCoolingDXCurveFitPerformanceInputSpecification {
 
 	CoilCoolingDXCurveFitPerformanceInputSpecification();
 
+};
+
+class CoilCoolingDXCurveFitPerformance {
+public:
+	CoilCoolingDXCurveFitPerformance();
+
+	std::vector<CoilCoolingDXCurveFitOperatingMode> modes;
 };
 
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITPERFORMANCE

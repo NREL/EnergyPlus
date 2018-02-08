@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
+#include <Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus.hh>
 
 class CoilCoolingDXInputSpecification {
@@ -28,6 +28,8 @@ class CoilCoolingDX {
 
 	CoilCoolingDX(CoilCoolingDXInputSpecification input_data);
 
+public:
+  CoilCoolingDXCurveFitPerformance performance;
 
 };
 
