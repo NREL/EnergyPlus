@@ -4,6 +4,6 @@ CoilCoolingDXOperatingModeInputSpecification::CoilCoolingDXOperatingModeInputSpe
 
 }
 
-CoilCoolingDXOperatingMode::CoilCoolingDXOperatingMode() {
+CoilCoolingDXOperatingSpeed::CoilCoolingDXOperatingSpeed() {
 
 }
