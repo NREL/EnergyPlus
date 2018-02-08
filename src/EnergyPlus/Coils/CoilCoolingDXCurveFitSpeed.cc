@@ -1,6 +1,7 @@
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <CurveManager.hh>
 #include <DataHVACGlobals.hh>
+#include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <Psychrometrics.hh>
 
@@ -27,6 +28,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 	Real64 OAP( 0.0 ); // outdoor pressure {Pa]
 	Real64 AirFF( 1.0 ); // ratio of air mass flow rate to rated air mass flow rate
 	Real64 RatedTotCap( 0.0 ); // rated total capacity at speed {W}
+	Real64 RatedAirMassFlowRate( 0.0 ); // rated air mass flow rate at speed {kg/s}
 	Real64 RatedSHR( 0.0 ); // rated sensible heat ratio at speed
 	Real64 RatedCBF( 0.0 ); // rated coil bypass factor at speed
 	Real64 RatedEIR( 0.0 ); // rated energy input ratio at speed {W/W}
@@ -34,14 +36,6 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 	int FanOpMode( 0 ); // fan operating mode, constant or cycling fan
 
 	// local variables
-	Real64 SHR; // adjusted sensible heat ratio
-	Real64 CBF; // adjusted coil bypass factor
-	Real64 Counter( 0 ); // loop counter
-	Real64 RF( 0.5 ); // Relaxation factor for dry evaporator iterations
-	Real64 PLF; // part-load factor from PLF curve
-	Real64 hDelta; // enthalpy difference across cooling coil
-	Real64 EIRTempModFac; // EIR as a function of temperature curve result
-	Real64 EIRFlowModFac; // EIR as a function of flow fraction curve result
 	Real64 FullLoadOutAirTemp; // full load outlet air temperature {C}
 	Real64 FullLoadOutAirHumRat; // full load outlet air humidity ratio {kg/kg}
 	Real64 FullLoadOutAirEnth; // full load outlet air enthalpy {J/kg}
@@ -57,15 +51,30 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 		return;
 	}
 	
-	CBF = RatedCBF;
+	Real64 hDelta; // enthalpy difference across cooling coil
+	Real64 A0 = 0.0;
+	Real64 CBF = 0.0;
+	if ( RatedCBF > 0.0 ) {
+		A0 = -std::log( RatedCBF ) * RatedAirMassFlowRate;
+	} else {
+		A0 = 0.0;
+	}
+	Real64 ADiff = -A0 / AirMassFlow;
+	if ( ADiff >= DataPrecisionGlobals::EXP_LowerLimit ) {
+		CBF = std::exp( ADiff );
+	} else {
+		CBF = 0.0;
+	}
 
+	int Counter = 0;
+	Real64 RF = 0.4; // relaxation factor for holding back changes in value during iteration 
 	while ( true ) {
 
 		Real64 TotCapTempModFac = CurveManager::CurveValue( indexCapFT, coilInletT, CondInletTemp );
 		Real64 TotCapFlowModFac = CurveManager::CurveValue( indexCapFFF, AirFF );
-
 		Real64 TotCap = RatedTotCap * TotCapFlowModFac * TotCapTempModFac;
 
+		Real64 SHR = 0.0;
 		if ( indexSHRFT > 0 ) {
 			SHR = DXCoils::CalcSHRUserDefinedCurves( coilInletT, coilInletWB, AirFF, indexSHRFT, indexSHRFFF, RatedSHR );
 			break;
@@ -102,23 +111,21 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 			}
 		}
 
+		Real64 PLF = 1.0;
 		if ( indexPLRFPLF > 0 ) {
 			PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
-		} else {
-			PLF = 1.0;
 		}
 		if ( FanOpMode == DataHVACGlobals::CycFanCycCoil ) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
 
+		Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
 		if ( indexEIRFT > 0 ) {
 			EIRTempModFac = CurveManager::CurveValue( indexEIRFT, coilInletWB, CondInletTemp );
-		} else {
-			EIRTempModFac = 1.0;
 		}
+		Real64 EIRFlowModFac = 1.0; // EIR as a function of flow fraction curve result
 		if ( indexEIRFFF > 0 ) {
 			EIRFlowModFac = CurveManager::CurveValue( indexEIRFFF, AirFF );
-		} else {
-			EIRFlowModFac = 1.0;
 		}
+
 		Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
 
 		FullLoadOutAirEnth = coilInletH - ( TotCap / AirMassFlow );
