@@ -261,6 +261,13 @@ namespace EnergyPlus {//***************
 			}
 			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToHeatingSetpoint = 0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToCoolingSetpoint = 0;
+			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationMass = 0;
+			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationLoad = 0;
+			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationEnergy = 0;
+			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationMass = 0;
+			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationLoad = 0;
+			ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationEnergy = 0;
+
 			ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate = 0.0;
 			ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingEnergy = 0.0;
 

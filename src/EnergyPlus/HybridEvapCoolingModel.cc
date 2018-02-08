@@ -1034,14 +1034,6 @@ namespace EnergyPlus {//***************
 			SystemSensibleHeatingEnergy = 0;
 			SystemLatentHeatingRate = 0;
 			SystemLatentHeatingEnergy = 0;
-			RequestedLoadToHeatingSetpoint = 0;
-			RequestedLoadToCoolingSetpoint = 0;
-			RequestedHumdificationMass = 0;
-			RequestedHumdificationLoad = 0;
-			RequestedHumdificationEnergy = 0;
-			RequestedDeHumdificationMass = 0;
-			RequestedDeHumdificationLoad = 0;
-			RequestedDeHumdificationEnergy = 0;
 			SupplyFanElectricPower = 0;	   
 			SupplyFanElectricEnergy = 0;    
 			SecondaryFuelConsumptionRate = 0;

@@ -127,7 +127,7 @@ namespace EnergyPlus {
 
 			bool ValidPointer(int curve_pointer);
 			bool ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
-			bool ParseMode(int ModeCounter, std::vector<CMode>* OperatingModes3, Real64 correction, Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
+			bool ParseMode(int ModeCounter, std::vector<CMode>* OperatingModes, Real64 correction, Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
 			void InitializeCurve( int curveType, int CurveID);
 			Real64 CalculateCurveVal( Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
 			bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
