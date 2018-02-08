@@ -25,6 +25,8 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitOperatingModeInput )
       " 300,                  ",
       " Yes,                  ",
       " Evaporative,                  ",
+      " 200,",
+      " DiscreteStagedContinuousOrNotBacon,",
       " 5,                  ",
       " OperatingSpeed1,                  ",
       " OperatingSpeed2;                  "
