@@ -4386,6 +4386,15 @@ namespace HVACUnitarySystem {
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_Cooling ) {
 					// call CoilCoolingDX constructor
 					// mine data from coil object
+					coilCoolingDXs.emplace_back(CoolingCoilName);
+					UnitarySystem( UnitarySysNum ).CoolingCoilIndex = (int) coilCoolingDXs.size() - 1;
+
+					auto & newCoil = coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex];
+					int const magicNominalModeNum = 0;
+					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
+					CoolingCoilInletNode = newCoil.evapInletNodeIndex;
+					UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = (int) newCoil.performance.modes[0].speeds.size();
+
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
@@ -8598,6 +8607,7 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( SELECT_CASE_var == CoilDX_Cooling ) { // CoilCoolingDX
+			coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex].simulate();
 		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) { // CoilSystem:Cooling:*:HeatExchangerAssisted
 
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {

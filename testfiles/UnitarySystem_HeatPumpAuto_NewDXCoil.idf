@@ -1589,7 +1589,9 @@ Coil:Cooling:DX,
     ,                        !- Condenser Zone Name
     ,                        !- Condenser Inlet Node Name
     ,                        !- Condenser Outlet Node Name
-    NewDXCoilPerformanceInput;  !- Performance Object Name
+    NewDXCoilPerformanceInput,  !- Performance Object Name
+    ,                               !- Condensate Collection Water Storage Tank Name
+    ;                               !- Evaporative Condenser Supply Water Storage Tank Name
 
 Coil:Cooling:DX:CurveFit:Performance,
     NewDXCoilPerformanceInput,  !- Name
@@ -1618,10 +1620,10 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
     MultiSpeed,              !- Capacity Control Method
     ,                        !- Nominal Speed Number
-    NewDXCoilSpeed1Data;     !- Speed 1 Name
+    NewDXCoilSpeedData1;     !- Speed 1 Name
 
 Coil:Cooling:DX:CurveFit:Speed,
-    NewDXCoilSpeed1Data,     !- Name
+    NewDXCoilSpeedData1,     !- Name
     1.0,                     !- Gross Total Cooling Capacity Fraction
     1.0,                     !- Evaporator Air Flow Rate Fraction
     1.0,                     !- Condenser Air Flow Rate Fraction
@@ -1635,7 +1637,11 @@ Coil:Cooling:DX:CurveFit:Speed,
     HPACCoolCapFFF,          !- Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name
     HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Air Flow Fraction Curve Name
-    HPACCOOLPLFFPLR;         !- Part Load Fraction Correlation Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input
+    ,                        !- Waste Heat Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 Coil:Heating:DX:SingleSpeed,
     Heat Pump DX Heating Coil 1,  !- Name

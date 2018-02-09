@@ -43722,7 +43722,9 @@ Coil:Cooling:DX,
        \object-list WaterStorageTankNames
 
 Coil:Cooling:DX:CurveFit:Performance,
-       \memo DX cooling coil performance specification.
+       \memo DX cooling coil performance specification referencing one or more
+       \memo operating modes. Mode 1 is always the base design operating mode.
+       \memo Additional modes are optional states such as subcool reheat for humidity contro.
        \min-fields 11
    A1, \field Name
        \required-field
@@ -43789,6 +43791,7 @@ Coil:Cooling:DX:CurveFit:Performance,
        \type object-list
        \object-list ScheduleNames
    A5, \field Operating Mode 1 Name
+       \note Operating Mode 1 is always used as the base design operating mode.
        \required-field
        \type object-list
        \object-list DXCoolingOperatingModeNames

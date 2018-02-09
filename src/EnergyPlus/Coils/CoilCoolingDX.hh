@@ -49,6 +49,8 @@ namespace EnergyPlus {
 
 	};
 
+	extern std::vector<CoilCoolingDX> coilCoolingDXs;
+
 }
 
 #endif // ENERGYPLUS_COILS_COILCOOLINGDX
