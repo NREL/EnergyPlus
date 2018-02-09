@@ -33,27 +33,43 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
       " 0.6,                           ",
       " WasteHeatFunctionCurve,        ",
       " SHRFT,                         ",
-      " SHRFF;                         "
+      " SHRFF;                         ",
+      "Curve:Biquadratic,              ",
+      " CapFT,                         ",
+      " 1, 0, 0, 0, 0, 0,              ",
+      " 0, 1, 0, 1;                    ",
+      "Curve:Linear,                   ",
+      " CapFF,                         ",
+      " 1, 0,                          ",
+      " 0, 1;                          ",
+      "Curve:Biquadratic,              ",
+      " EIRFT,                         ",
+      " 1, 0, 0, 0, 0, 0,              ",
+      " 0, 1, 0, 1;                    ",
+      "Curve:Linear,                   ",
+      " EIRFF,                         ",
+      " 1, 0,                          ",
+      " 0, 1;                          ",
+      "Curve:Linear,                   ",
+      " PLFCurveName,                  ",
+      " 0.85, 0.15,                    ",
+      " 0, 1;                          ",
+      "Curve:Biquadratic,              ",
+      " WasteHeatFunctionCurve,        ",
+      " 1, 0, 0, 0, 0, 0,              ",
+      " 0, 1, 0, 1;                    ",
+      "Curve:Biquadratic,              ",
+      " SHRFT,                         ",
+      " 1, 0, 0, 0, 0, 0,              ",
+      " 0, 1, 0, 1;                    ",
+      "Curve:Linear,                   ",
+      " SHRFF,                         ",
+      " 1, 0,                          ",
+      " 0, 1;                          "
     } );
 
     bool ok = !process_idf( idf_objects, false );
     CoilCoolingDXCurveFitSpeed thisSpeed("Speed1Name");
-//
-//    GetBoilerInput();
-//
-//    EXPECT_EQ( Boiler( NumBoilers ).Name, "STEAM BOILER PLANT BOILER" );
-//    EXPECT_EQ( Boiler( NumBoilers ).FuelType, AssignResourceTypeNum( "NATURALGAS" ) );
-//    EXPECT_EQ( Boiler( NumBoilers ).BoilerMaxOperPress, 160000 );
-//    EXPECT_EQ( Boiler( NumBoilers ).Effic, 0.8 );
-//    EXPECT_EQ( Boiler( NumBoilers ).TempUpLimitBoilerOut, 115 );
-//    EXPECT_EQ( Boiler( NumBoilers ).NomCap, AutoSize );
-//    EXPECT_EQ( Boiler( NumBoilers ).MinPartLoadRat, 0.00001 );
-//    EXPECT_EQ( Boiler( NumBoilers ).MaxPartLoadRat, 1.0 );
-//    EXPECT_EQ( Boiler( NumBoilers ).OptPartLoadRat, 0.2 );
-//    EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 1 ), 0.8 );
-//    EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 2 ), 0.1 );
-//    EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 3 ), 0.1 );
-//    EXPECT_EQ( Boiler( NumBoilers ).SizFac, 1.0 );
 
 }
 
