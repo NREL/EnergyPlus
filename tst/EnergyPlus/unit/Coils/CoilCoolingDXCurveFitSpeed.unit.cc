@@ -18,13 +18,13 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
       " Speed1Name,             ",
       " 0.8,         ",
       " 0.745,        ",
-      " 3.1415926,        ",
+      " 3.1415926,        ", // condenser
       " 0.9, ",
-      " 0.9,                  ",
+      " 0.9,                  ",  // COP
       " 0.5,                  ",
       " 300,                  ",
-      " 6.9,                  ",
-      " 0.8,                  ",
+      " 6.9,                  ", // evaporative
+      " 0.8,                  ", // effectiveness
       " CapFT,                  ",
       " CapFF,                  ",
       " EIRFT,                  ",
@@ -60,6 +60,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
 TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 {
 
+	CoilCoolingDXCurveFitSpeed thisspeed;
 	std::string const idf_objects = delimited_string( {
 		"Coil:Cooling:DX:CurveFit:Speed,       ",
 		" Speed1Name,             ",
@@ -86,10 +87,11 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	bool ok = !process_idf( idf_objects, false );
 	CoilCoolingDXCurveFitSpeed thisSpeed( "Speed1Name" );
 
-	thisSpeed.coilInletT = 20.2;
-	thisSpeed.coilInletW = 0.01;
-	thisSpeed.coilInletWB = 19.0;
-	thisSpeed.coilInletH = 35000.0;
+	thisSpeed.PLR = 1.0;
+	thisSpeed.coilInletT = 20.0;
+	thisSpeed.coilInletW = 0.008;
+	thisSpeed.coilInletWB = 14.43;
+	thisSpeed.coilInletH = 40000.0;
 	thisSpeed.CondInletTemp = 35.0;
 	thisSpeed.ambPressure = 101325.0;
 	thisSpeed.AirFF = 1.0;
@@ -102,5 +104,11 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	thisSpeed.FanOpMode = 0;
 
 	thisSpeed.CalcSpeedOutput();
+
+	EXPECT_NEAR( thisSpeed.FullLoadOutAirTemp, 17.057, 0.001 );
+	EXPECT_NEAR( thisSpeed.FullLoadOutAirHumRat, 0.0078, 0.0001 );
+	EXPECT_NEAR( thisSpeed.FullLoadOutAirEnth, 37000.0, 0.1 );
+	EXPECT_NEAR( thisSpeed.FullLoadPower, 900.0, 0.1 );
+	EXPECT_NEAR( thisSpeed.RTF, 1.0, 0.01 );
 
 }

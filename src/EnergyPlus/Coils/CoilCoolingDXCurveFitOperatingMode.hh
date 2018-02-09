@@ -20,6 +20,8 @@ public:
 	Real64 nominal_time_for_condensate_removal_to_begin;
 	std::string apply_latent_degradation_to_speeds_greater_than_1;
 	std::string condenser_type;
+    Real64 nominal_evap_condenser_pump_power;
+    std::string capacity_control;
 	Real64 nominal_speed_number;
 	std::vector< std::string > speed_data_names;
 

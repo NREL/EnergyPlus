@@ -92,14 +92,14 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
 
         input_specs.name = cAlphaArgs(1);
         input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal = rNumericArgs(1);
-        input_specs.gross_rated_sensible_heat_ratio = rNumericArgs(2);
-        input_specs.gross_rated_cooling_COP = rNumericArgs(3);
-        input_specs.rated_air_flow_rate_ratio_to_nominal = rNumericArgs(4);
-        input_specs.rated_condenser_air_flow_rate_ratio_to_nominal = rNumericArgs(5);
+        input_specs.evaporator_air_flow_fraction = rNumericArgs(2);
+		input_specs.condenser_air_flow_fraction = rNumericArgs(3);
+		input_specs.gross_rated_sensible_heat_ratio = rNumericArgs(4);
+        input_specs.gross_rated_cooling_COP = rNumericArgs(5);
         input_specs.active_fraction_of_coil_face_area = rNumericArgs(6);
-        input_specs.rated_evaporative_condenser_pump_power_consumption = rNumericArgs(7);
-        input_specs.rated_evaporator_fan_power_per_volume_flow_rate = rNumericArgs(8);
-        input_specs.evaporative_condenser_effectiveness = rNumericArgs(9);
+        input_specs.rated_evaporator_fan_power_per_volume_flow_rate = rNumericArgs(7);
+		input_specs.rated_evaporative_condenser_pump_power_fraction = rNumericArgs(8);
+		input_specs.evaporative_condenser_effectiveness = rNumericArgs(9);
         input_specs.total_cooling_capacity_function_of_temperature_curve_name = cAlphaArgs(2);
         input_specs.total_cooling_capacity_function_of_air_flow_fraction_curve_name = cAlphaArgs(3);
         input_specs.energy_input_ratio_function_of_temperature_curve_name = cAlphaArgs(4);
@@ -132,6 +132,8 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 		return;
 	}
 	
+	Real64 TotCap = 0.0;
+	Real64 SHR = 0.0;
 	Real64 hDelta; // enthalpy difference across cooling coil
 	Real64 A0 = 0.0; // ratio of UA to Cp
 	Real64 CBF = 0.0; // adjusted coil bypass factor
@@ -166,9 +168,9 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 			TotCapFlowModFac = CurveManager::CurveValue( indexCapFFF, AirFF );
 		}
 
-		Real64 TotCap = RatedTotCap * TotCapFlowModFac * TotCapTempModFac;
+		TotCap = RatedTotCap * TotCapFlowModFac * TotCapTempModFac;
 
-		Real64 SHR = 0.0;
+		SHR = 0.0;
 		if ( indexSHRFT > 0 ) {
 			SHR = DXCoils::CalcSHRUserDefinedCurves( coilInletT, coilInletWB, AirFF, indexSHRFT, indexSHRFFF, RatedSHR );
 			break;
@@ -204,31 +206,29 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 				break;
 			}
 		}
-
-		Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
-		if ( indexPLRFPLF > 0 ) {
-			PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
-		}
-		if ( FanOpMode == DataHVACGlobals::CycFanCycCoil ) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
-
-		Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
-		if ( indexEIRFT > 0 ) {
-			EIRTempModFac = CurveManager::CurveValue( indexEIRFT, coilInletWB, CondInletTemp );
-		}
-		Real64 EIRFlowModFac = 1.0; // EIR as a function of flow fraction curve result
-		if ( indexEIRFFF > 0 ) {
-			EIRFlowModFac = CurveManager::CurveValue( indexEIRFFF, AirFF );
-		}
-
-		Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
-		RTF = PLR / PLF;
-		FullLoadPower = TotCap * EIR * RTF;
-
-		FullLoadOutAirEnth = coilInletH - ( TotCap / AirMassFlow );
-		Real64 hTinwout = coilInletH - ( ( 1.0 - SHR ) * hDelta );
-		FullLoadOutAirHumRat = Psychrometrics::PsyWFnTdbH( coilInletT, hTinwout );
-		FullLoadOutAirTemp = Psychrometrics::PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
-
 	}
+
+	Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
+	if ( indexPLRFPLF > 0 ) {
+		PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
+	}
+	if ( FanOpMode == DataHVACGlobals::CycFanCycCoil ) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
+
+	Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
+	if ( indexEIRFT > 0 ) {
+		EIRTempModFac = CurveManager::CurveValue( indexEIRFT, coilInletWB, CondInletTemp );
+	}
+	Real64 EIRFlowModFac = 1.0; // EIR as a function of flow fraction curve result
+	if ( indexEIRFFF > 0 ) {
+		EIRFlowModFac = CurveManager::CurveValue( indexEIRFFF, AirFF );
+	}
+
+	Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
+	RTF = PLR / PLF;
+	FullLoadPower = TotCap * EIR * RTF;
+	FullLoadOutAirEnth = coilInletH - ( TotCap / AirMassFlow );
+	Real64 hTinwout = coilInletH - ( ( 1.0 - SHR ) * hDelta );
+	FullLoadOutAirHumRat = Psychrometrics::PsyWFnTdbH( coilInletT, hTinwout );
+	FullLoadOutAirTemp = Psychrometrics::PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
 
 }
