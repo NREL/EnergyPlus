@@ -4,6 +4,7 @@
 #include <DataIPShortCuts.hh>
 #include <InputProcessor.hh>
 #include <CurveManager.hh>
+#include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
@@ -76,9 +77,6 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find,
 	FanOpMode( 0 ), // fan operating mode, constant or cycling fan
 
 	// speed class outputs
-	FullLoadOutAirTemp( 0.0 ), // full load outlet air temperature {C}
-	FullLoadOutAirHumRat( 0.0 ), // full load outlet air humidity ratio {kg/kg}
-	FullLoadOutAirEnth( 0.0 ), // full load outlet air enthalpy {J/kg}
 	FullLoadPower( 0.0 ), // full load power at speed {W}
 	RTF( 0.0 ), // coil runtime fraction at speed
 
@@ -159,7 +157,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 		RTF = 0.0;
 		return outletState;
 	}
-	
+
 	Real64 TotCap = 0.0;
 	Real64 SHR = 0.0;
 	Real64 hDelta; // enthalpy difference across cooling coil
@@ -182,7 +180,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 	int Counter = 0; // iteration counter for dry coil condition
 	int const MaxIter( 30 ); // iteration limit
 	Real64 const Tolerance( 0.01 ); // iteration convergence limit
-	Real64 RF = 0.4; // relaxation factor for holding back changes in value during iteration 
+	Real64 RF = 0.4; // relaxation factor for holding back changes in value during iteration
 	while ( true ) {
 
 		Real64 TotCapTempModFac = 1.0;
@@ -238,7 +236,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 		}
 	}
 
-	
+
 	Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
 	if ( indexPLRFPLF > 0 ) {
 		PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
@@ -261,8 +259,41 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 	outletState.h = inletState.h - ( TotCap / AirMassFlow );
 	Real64 hTinwout = inletState.h - ( ( 1.0 - SHR ) * hDelta );
 	outletState.w = Psychrometrics::PsyWFnTdbH( inletState.tdb, hTinwout );
-	outletState.tdb = Psychrometrics::PsyTdbFnHW( FullLoadOutAirEnth, FullLoadOutAirHumRat );
+	outletState.tdb = Psychrometrics::PsyTdbFnHW( outletState.h, outletState.w );
 
 	return outletState;
+
+}
+
+void CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState & in) {
+
+  // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
+
+  // Outlet conditions
+  Psychrometrics::PsychState out;
+
+  Real64 airMassFlowRate = evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW( in.p, in.tdb, in.w);
+  Real64 deltaH = rated_total_capacity / airMassFlowRate;
+  out.p = in.p;
+  out.h = in.h - deltaH;
+  out.w = Psychrometrics::PsyWFnTdbH(out.tdb, in.h - (1.0 - gross_shr)*deltaH); // enthalpy at Tdb,in and Wout
+  out.tdb = Psychrometrics::PsyTdbFnHW(out.h, out.w);
+  out.rh = Psychrometrics::PsyRhFnTdbWPb(out.tdb, out.w, out.p);
+
+  // ADP conditions
+  Psychrometrics::PsychState adp;
+
+  adp.tdb = Psychrometrics::PsyTdpFnWPb(out.w, out.p);
+
+  Real64 tol = 1.0;
+
+  std::size_t iter = 0;
+
+  const std::size_t maxIter(50);
+
+  while( (iter <= maxIter) ) {
+
+  }
+
 
 }

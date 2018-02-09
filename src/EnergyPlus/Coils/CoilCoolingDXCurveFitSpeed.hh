@@ -80,9 +80,6 @@ namespace EnergyPlus {
         int FanOpMode; // fan operating mode, constant or cycling fan
 
         // speed class outputs
-        Real64 FullLoadOutAirTemp; // full load outlet air temperature {C}
-        Real64 FullLoadOutAirHumRat; // full load outlet air humidity ratio {kg/kg}
-        Real64 FullLoadOutAirEnth; // full load outlet air enthalpy {J/kg}
         Real64 FullLoadPower; // full load power at speed {W}
         Real64 RTF; // coil runtime fraction at speed
 
@@ -99,6 +96,7 @@ namespace EnergyPlus {
 
         Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState & inletState); // Real64 & PLR, Real64 const IDT, Real64 const OAT, Real64 const AirFF );
 
+        void CalcBypassFactor(Psychrometrics::PsychState & in);
     };
 }
 
