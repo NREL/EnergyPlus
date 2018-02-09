@@ -60,11 +60,10 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate() {
+void CoilCoolingDXCurveFitPerformance::simulate(Real64 inletTempDB, Real64 inletHumRat, Real64 inletEnthalpy) {
     // do some stuff with performance
     int const modeNum = 1;
     auto & currentMode = this->modes[modeNum-1];
-    Real64 a = 1.0, b = 2.0, c = 3.0;
-    currentMode.CalcOperatingMode(a, b, c);
+    currentMode.CalcOperatingMode(inletTempDB, inletHumRat, inletEnthalpy);
 }
 

@@ -3,6 +3,7 @@
 #include <DataLoopNode.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <OutputProcessor.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -16,8 +17,15 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     bool errorsFound = false;
     this->name = input_data.name;
     this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
+
     // other construction below
-    NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+    this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+    this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_outlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+
+    // setup output variables, should probably be done elsewhere
+    SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name );
+    SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, this->totalCoolingEnergy, "System", "Sum", this->name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+
 }
 
 CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
@@ -57,12 +65,25 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
     }
 }
 
-void CoilCoolingDX::simulate() {
-    // check things
-    // pass things to performance object "simulate" function that will do "something"
+void CoilCoolingDX::simulate(Real64 PLR, int speedNum, Real64 speedRatio) {
+
+    // get inlet conditions from inlet node
+    auto & evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
+    auto & inletTempDB = evapInletNode.Temp;
+    auto & inletHumRat = evapInletNode.HumRat;
+    auto & inletEnthalpy = evapInletNode.Enthalpy;
+
+    // call the simulation, which returns useful data
     auto & myPerformance = this->performance;
-    // access everything on the performance instance here
-    myPerformance.simulate();
+    myPerformance.simulate(inletTempDB, inletHumRat, inletEnthalpy);
+
+    // update outlet conditions
+    auto & evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
+    evapOutletNode.Temp = myPerformance.outletConditions.temperature;
+    evapOutletNode.HumRat = myPerformance.outletConditions.humRat;
+
+    // update report variables
+    this->powerUse = myPerformance.powerUse;
 }
 
             // PlantProfile name

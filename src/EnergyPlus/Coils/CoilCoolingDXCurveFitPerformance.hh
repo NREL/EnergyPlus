@@ -33,7 +33,7 @@ namespace EnergyPlus {
 
 	public:
 		void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
-		void simulate();
+		void simulate(Real64 inletTempDB, Real64 inletHumRat, Real64 inletEnthalpy);
 
 		CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 

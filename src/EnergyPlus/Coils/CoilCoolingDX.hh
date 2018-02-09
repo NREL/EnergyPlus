@@ -34,7 +34,7 @@ namespace EnergyPlus {
 		CoilCoolingDX(std::string name);
 
 		void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
-		void simulate();
+		void simulate(Real64 PLR, int speedNum, Real64 speedRatio);
 
 		std::string name;
 		int evapInletNodeIndex;
@@ -46,6 +46,13 @@ namespace EnergyPlus {
 		CoilCoolingDXCurveFitPerformance performance;  // TODO: Change to unique pointer when we have base class for performance object
 		int condensateTankIndex;
 		int evaporativeCondSupplyTankIndex;
+
+		// DX Coil needs inlet and outlet state member variables
+
+
+		// report variables
+		Real64 totalCoolingEnergyRate;
+		Real64 totalCoolingEnergy;
 
 	};
 
