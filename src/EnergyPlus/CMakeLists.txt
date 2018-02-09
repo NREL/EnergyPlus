@@ -54,6 +54,7 @@ SET( SRC
   Coils/CoilCoolingDXCurveFitOperatingMode.hh
   Coils/CoilCoolingDXCurveFitSpeed.cc
   Coils/CoilCoolingDXCurveFitSpeed.hh
+  Coils/PsychStruct.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
