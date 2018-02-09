@@ -27,11 +27,12 @@ class CoilCoolingDX {
 	std::string const object_name = "Coil:Cooling:DX";
 	CoilCoolingDXInputSpecification original_input_specs;
 
+public:
+
 	CoilCoolingDX(std::string name);
 	void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
 
-public:
-    std::string name;
+	std::string name;
     int evapInletNodeIndex;
 	int evapOutletNodeIndex;
 	int availScheduleIndex;
