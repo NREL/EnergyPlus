@@ -52,4 +52,9 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
     if (!found_it) {
         // error
     }
+
+	void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode() {
+
+	}
+
 }
