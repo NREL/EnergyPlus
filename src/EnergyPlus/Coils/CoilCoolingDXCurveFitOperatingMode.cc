@@ -45,6 +45,12 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         input_specs.apply_latent_degradation_to_speeds_greater_than_1 = cAlphaArgs(2);
         input_specs.condenser_type = cAlphaArgs(3);
         input_specs.nominal_speed_number = rNumericArgs(8);
+        for(int fieldNum=9; fieldNum<=NumAlphas; fieldNum++) {
+            if(cAlphaArgs(fieldNum) == "") {
+                break;
+            }
+            input_specs.speed_data_names.push_back(cAlphaArgs(fieldNum));
+        }
 
         this->instantiateFromInputSpec(input_specs);
     }

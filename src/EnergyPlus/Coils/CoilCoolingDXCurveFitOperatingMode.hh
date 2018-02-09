@@ -26,7 +26,7 @@ public:
 };
 
 class CoilCoolingDXCurveFitOperatingMode {
-	std::string const object_name = "Coil:Cooling:DX:CurveFit:Performance";
+	std::string const object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
 
 public:
 
