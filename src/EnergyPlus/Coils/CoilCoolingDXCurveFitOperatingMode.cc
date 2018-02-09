@@ -12,7 +12,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(
     //bool errorsFound = false;
     this->name = input_data.name;
     for(auto & speed_name : input_data.speed_data_names) {
-        this->speeds.push_back(CoilCoolingDXCurveFitSpeed(speed_name, *this));
+        this->speeds.push_back(CoilCoolingDXCurveFitSpeed(speed_name, this));
     }
 }
 

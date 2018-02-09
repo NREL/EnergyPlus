@@ -8,6 +8,8 @@
 
 namespace EnergyPlus {
 
+    class CoilCoolingDXCurveFitOperatingMode;
+
     class CoilCoolingDXCurveFitSpeedInputSpecification {
 
     public:
@@ -38,13 +40,13 @@ namespace EnergyPlus {
     public:
         CoilCoolingDXCurveFitSpeed() {}
 
-        CoilCoolingDXCurveFitSpeed(std::string name, CoilCoolingDXCurveFitOperatingMode parentMode);
+        CoilCoolingDXCurveFitSpeed(std::string name, CoilCoolingDXCurveFitOperatingMode * parentMode);
 
         void instantiateFromInputSpec(CoilCoolingDXCurveFitSpeedInputSpecification input_data,
-                                      CoilCoolingDXCurveFitOperatingMode parentMode);
+                                      CoilCoolingDXCurveFitOperatingMode * parentMode);
 
         CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
-        CoilCoolingDXCurveFitOperatingMode parentMode;
+        CoilCoolingDXCurveFitOperatingMode * parentMode;
         std::string name;
 
         Real64 TotalCapacity;
