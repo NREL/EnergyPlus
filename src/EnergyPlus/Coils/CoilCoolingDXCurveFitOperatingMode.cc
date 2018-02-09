@@ -44,8 +44,10 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         input_specs.nominal_time_for_condensate_removal_to_begin = rNumericArgs(7);
         input_specs.apply_latent_degradation_to_speeds_greater_than_1 = cAlphaArgs(2);
         input_specs.condenser_type = cAlphaArgs(3);
-        input_specs.nominal_speed_number = rNumericArgs(8);
-        for(int fieldNum=4; fieldNum<=NumAlphas; fieldNum++) {
+        input_specs.nominal_evap_condenser_pump_power = rNumericArgs(8);
+        input_specs.capacity_control = cAlphaArgs(4);
+        input_specs.nominal_speed_number = rNumericArgs(9);
+        for(int fieldNum=5; fieldNum<=NumAlphas; fieldNum++) {
             if(cAlphaArgs(fieldNum) == "") {
                 break;
             }
@@ -59,9 +61,9 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         // error
     }
 
-	void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Real64 & PLR, Real64 & SpeedNum, Real64 & SpeedRatio ) {
-
-		
-	}
+//	void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Real64 & PLR, Real64 & SpeedNum, Real64 & SpeedRatio ) {
+//
+//
+//	}
 
 }
