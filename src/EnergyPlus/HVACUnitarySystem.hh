@@ -488,7 +488,7 @@ namespace HVACUnitarySystem {
 		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
-		
+
 		// Default Constructor
 		UnitarySystemData() :
 			UnitarySystemType_Num( 0 ),

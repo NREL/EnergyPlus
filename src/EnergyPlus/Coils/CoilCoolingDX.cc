@@ -7,6 +7,8 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
+std::vector<CoilCoolingDX> coilCoolingDXs;
+
 void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data) {
     this->original_input_specs = input_data;
     bool errorsFound = false;

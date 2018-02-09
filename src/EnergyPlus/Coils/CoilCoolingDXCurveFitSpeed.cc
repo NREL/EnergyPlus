@@ -144,6 +144,11 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find,
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 
+	// first things first, let's go get the name of our unitary object
+	//auto & compound_object_type = this->parentMode->parentPerformance->parentCoil.compound_object_type;
+	//auto & compound_object_index = this->parentMode->parentPerformance->parentCoil.compound_object_index;
+
+
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	static std::string const RoutineName( "CalcSpeedOutput: " );
 
