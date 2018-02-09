@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -78,6 +79,21 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 
 	CoilCoolingDXCurveFitSpeed thisspeed;
 	std::string const idf_objects = delimited_string( {
+        "Coil:Cooling:DX:CurveFit:OperatingMode, ",
+        " OperatingMode1Name,                    ",
+        " 12000,                                 ",
+        " 100,                                   ",
+        " 200,                                   ",
+        " 2.5,                                   ",
+        " 0.5,                                   ",
+        " 100,                                   ",
+        " 300,                                   ",
+        " Yes,                                   ",
+        " Evaporative,                           ",
+        " 200,                                   ",
+        " DiscreteStagedContinuousOrNotBacon,    ",
+        " 5,                                     ",
+        " Speed1Name;                            ",
 		"Coil:Cooling:DX:CurveFit:Speed,       ",
 		" Speed1Name,             ",
 		" 0.8,         ",
@@ -101,7 +117,8 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	} );
 
 	bool ok = !process_idf( idf_objects, false );
-	CoilCoolingDXCurveFitSpeed thisSpeed( "Speed1Name", nullptr );
+	CoilCoolingDXCurveFitOperatingMode thisMode( "OperatingMode1Name" );
+	auto & thisSpeed = thisMode.speeds[0];
 
 	Psychrometrics::PsychState inletState;
 
