@@ -3261,7 +3261,7 @@ namespace HeatBalanceSurfaceManager {
 					if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) {
 						// Interior shade or blind in place
 						ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
-						if ( Construct( ConstrNumSh ).HasShadeOrBlindLayer ) {
+						if ( SurfaceWindow( SurfNum ).HasShadeOrBlindLayer ) {
 							MatNumSh = Construct( ConstrNumSh ).LayerPoint( Construct( ConstrNumSh ).TotLayers );
 							TauShIR = Material( MatNumSh ).TransThermal;
 							EffShDevEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss( 1 );

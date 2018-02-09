@@ -974,6 +974,7 @@ namespace DataSurfaces {
 		int ExtIntShadePrevTS; // 1 if exterior or interior blind or shade in place previous time step;
 		// 0 otherwise
 		int ShadedConstruction; // For windows with shading, the construction with shading
+		bool HasShadeOrBlindLayer; // mark as true if the window construction has a shade or a blind layer
 		bool SurfDayLightInit; // surface has been initialized for following 5 arrays
 		Array1D< Real64 > SolidAngAtRefPt; // Solid angle subtended by window from daylit ref points 1 and 2
 		Array1D< Real64 > SolidAngAtRefPtWtd; // Solid angle subtended by window from
@@ -1197,6 +1198,7 @@ namespace DataSurfaces {
 			FracTimeShadingDeviceOn( 0.0 ),
 			ExtIntShadePrevTS( 0 ),
 			ShadedConstruction( 0 ),
+			HasShadeOrBlindLayer( false ),
 			SurfDayLightInit( false ),
 			DaylFacPoint( 0 ),
 			VisTransSelected( 0.0 ),

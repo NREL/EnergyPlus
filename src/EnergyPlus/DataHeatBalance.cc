@@ -1234,7 +1234,6 @@ namespace DataHeatBalance {
 				if ( Material( MaterNum ).Group == WindowSimpleGlazing ) ++TotGlassLayers;
 				if ( Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind || Material( MaterNum ).Group == Screen || Material( MaterNum ).Group == ComplexWindowShade ) ++TotShadeLayers;
 				if ( Material( MaterNum ).Group == WindowGas || Material( MaterNum ).Group == WindowGasMixture || Material( MaterNum ).Group == ComplexWindowGap ) ++TotGasLayers;
-				if ( Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind ) Construct( ConstrNum ).HasShadeOrBlindLayer = true;
 				if ( Layer < TotLayers ) {
 					MaterNumNext = Construct( ConstrNum ).LayerPoint( Layer + 1 );
 					// Adjacent layers of same type not allowed
@@ -2167,6 +2166,73 @@ namespace DataHeatBalance {
 		}
 
 		return NominalUwithConvCoeffs;
+	}
+
+	void
+		SetFlagForWindowConstructionWithShadeOrBlindLayer()
+	{
+
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// check fenestrations with shading control and set a flag to true if its construction has 
+		// either shade or blind material layer
+
+
+		// METHODOLOGY EMPLOYED:
+		// Loop through Surface and register any shading controls, and loop through the construction 
+		// material layer
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataSurfaces::ExternalEnvironment;
+		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceWindow;
+		using DataSurfaces::SurfaceClass_Window;
+		using DataSurfaces::TotSurfaces;
+		using DataHeatBalance::Construct;
+		using DataHeatBalance::Material;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static int loopSurfNum( 0 ); // surface index
+		static int ConstrNum( 0 ); // construction index
+		static int NumLayers( 0 ); // number of material layers in a construction
+		static int Layer( 0 ); // construction material layer index
+		static int MaterNum( 0 ); // construction material index
+
+		for ( loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum ) {
+
+			if ( Surface( loopSurfNum ).Class != SurfaceClass_Window ) continue;
+			if ( Surface( loopSurfNum ).ExtBoundCond != ExternalEnvironment ) continue;
+			if ( Surface( loopSurfNum ).WindowShadingControlPtr == 0 ) continue;
+			if ( SurfaceWindow( loopSurfNum ).ShadedConstruction == 0 ) continue;
+
+			ConstrNum = SurfaceWindow( loopSurfNum ).ShadedConstruction;
+			if ( Construct( ConstrNum ).TypeIsWindow ) {
+				NumLayers = Construct( ConstrNum ).TotLayers;
+				for ( Layer = 1; Layer <= NumLayers; ++Layer ) {
+					MaterNum = Construct( ConstrNum ).LayerPoint( Layer );
+					if ( MaterNum == 0 ) continue;
+					if ( Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind ) SurfaceWindow( loopSurfNum ).HasShadeOrBlindLayer = true;;
+				}
+			}
+
+		}
+
 	}
 
 } // DataHeatBalance

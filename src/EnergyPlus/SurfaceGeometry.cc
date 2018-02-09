@@ -329,6 +329,8 @@ namespace SurfaceGeometry {
 
 		if ( ! ErrorsFound && TotStormWin > 0 ) CreateStormWindowConstructions();
 
+		SetFlagForWindowConstructionWithShadeOrBlindLayer();
+
 		CosZoneRelNorth.deallocate();
 		SinZoneRelNorth.deallocate();
 
