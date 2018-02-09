@@ -65,7 +65,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitPerformance::simulate(Psychromet
     // do some stuff with performance
     int const modeNum = 1;
     auto & currentMode = this->modes[modeNum-1];
-    Real64 a=1, b=2, c=3;
+    Real64 a=1, b=1, c=1;
     auto returnState = currentMode.CalcOperatingMode(inletState, a, b, c);
     return returnState;
 }

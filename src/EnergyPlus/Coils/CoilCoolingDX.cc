@@ -19,8 +19,8 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
 
     // other construction below
-    this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
-    this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_outlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+    this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+    this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_outlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
 
     // setup output variables, should probably be done elsewhere
     SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name );
