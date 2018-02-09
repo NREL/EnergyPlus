@@ -59,8 +59,9 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         // error
     }
 
-	void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode() {
+	void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Real64 & PLR, Real64 & SpeedNum, Real64 & SpeedRatio ) {
 
+		
 	}
 
 }

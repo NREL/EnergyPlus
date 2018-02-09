@@ -54,7 +54,7 @@ public:
 
 	std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
-	void CalcOperatingMode();
+	void CalcOperatingMode( Real64 & PLR, Real64 & SpeedNum, Real64 & SpeedRatio );
 
 };
 #endif // ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITOPERATINGMODE
