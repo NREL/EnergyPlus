@@ -17,7 +17,32 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFit
     // continue GetInput processing
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find) {
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find):
+	// speed class inputs
+	PLR( 0.0 ), // coil operating part load ratio
+	coilInletT( 0.0 ), // coil inlet temperature {C}
+	coilInletW( 0.0 ), // coil inlet humidity ratio {kg/kg}
+	coilInletWB( 0.0 ), // coil inlet wet-bulb temperature {C}
+	coilInletH( 0.0 ), // coil inlet enthalpy {J/kg}
+	CondInletTemp( 0.0 ), // condenser inlet node temp or outdoor temp if no condenser node {C}
+	ambPressure( 0.0 ), // outdoor pressure {Pa]
+	AirFF( 0.0 ), // ratio of air mass flow rate to rated air mass flow rate
+	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
+	RatedAirMassFlowRate( 0.0 ), // rated air mass flow rate at speed {kg/s}
+	RatedSHR( 0.0 ), // rated sensible heat ratio at speed
+	RatedCBF( 0.0 ), // rated coil bypass factor at speed
+	RatedEIR( 0.0 ), // rated energy input ratio at speed {W/W}
+	AirMassFlow( 0.0 ), // coil inlet air mass flow rate {kg/s}
+	FanOpMode( 0 ), // fan operating mode, constant or cycling fan
+
+	// speed class outputs
+	FullLoadOutAirTemp( 0.0 ), // full load outlet air temperature {C}
+	FullLoadOutAirHumRat( 0.0 ), // full load outlet air humidity ratio {kg/kg}
+	FullLoadOutAirEnth( 0.0 ), // full load outlet air enthalpy {J/kg}
+	FullLoadPower( 0.0 ), // full load power at speed {W}
+	RTF( 0.0 ) // coil runtime fraction at speed
+
+{
     int numModes = InputProcessor::GetNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numModes <= 0) {
         // error
@@ -68,45 +93,19 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	static std::string const RoutineName( "CalcSpeedOutput: " );
-	static int const MaxIter( 30 );
-	static Real64 const Tolerance( 0.01 );
 
-	// Required information
-	Real64 PLR( 0.0 );
-	Real64 coilInletT( 0.0 ); // coil inlet temperature {C}
-	Real64 coilInletW( 0.0 ); // coil inlet humidity ratio {kg/kg}
-	Real64 coilInletWB( 0.0 ); // coil inlet wet-bulb temperature {C}
-	Real64 coilInletH( 0.0 ); // coil inlet enthalpy {J/kg}
-	Real64 CondInletTemp( 0.0 ); // condenser inlet node temp or outdoor temp if no condenser node {C}
-	Real64 OAP( 0.0 ); // outdoor pressure {Pa]
-	Real64 AirFF( 1.0 ); // ratio of air mass flow rate to rated air mass flow rate
-	Real64 RatedTotCap( 0.0 ); // rated total capacity at speed {W}
-	Real64 RatedAirMassFlowRate( 0.0 ); // rated air mass flow rate at speed {kg/s}
-	Real64 RatedSHR( 0.0 ); // rated sensible heat ratio at speed
-	Real64 RatedCBF( 0.0 ); // rated coil bypass factor at speed
-	Real64 RatedEIR( 0.0 ); // rated energy input ratio at speed {W/W}
-	Real64 AirMassFlow( 0.0 ); // coil inlet air mass flow rate {kg/s}
-	int FanOpMode( 0 ); // fan operating mode, constant or cycling fan
-
-	// local variables
-	Real64 FullLoadOutAirTemp; // full load outlet air temperature {C}
-	Real64 FullLoadOutAirHumRat; // full load outlet air humidity ratio {kg/kg}
-	Real64 FullLoadOutAirEnth; // full load outlet air enthalpy {J/kg}
-
-	// evaluate CapFT curve, can be any curve type, BiQuad, Cubic, etc. How to get inputs to Curve objects?
-
-	// may need to use heat exchanger calculation of bypass factor at off design air mass flow rate here? (i.e., DXCoils line 7452)
-	
 	if ( PLR == 0.0 ) {
 		FullLoadOutAirTemp = coilInletT;
 		FullLoadOutAirHumRat = coilInletW;
 		FullLoadOutAirEnth = coilInletH;
+		FullLoadPower = 0.0;
+		RTF = 0.0;
 		return;
 	}
 	
 	Real64 hDelta; // enthalpy difference across cooling coil
-	Real64 A0 = 0.0;
-	Real64 CBF = 0.0;
+	Real64 A0 = 0.0; // ratio of UA to Cp
+	Real64 CBF = 0.0; // adjusted coil bypass factor
 	if ( RatedCBF > 0.0 ) {
 		A0 = -std::log( RatedCBF ) * RatedAirMassFlowRate;
 	} else {
@@ -119,12 +118,25 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 		CBF = 0.0;
 	}
 
-	int Counter = 0;
+	int Counter = 0; // iteration counter for dry coil condition
+	int const MaxIter( 30 ); // iteration limit
+	Real64 const Tolerance( 0.01 ); // iteration convergence limit
 	Real64 RF = 0.4; // relaxation factor for holding back changes in value during iteration 
 	while ( true ) {
 
-		Real64 TotCapTempModFac = CurveManager::CurveValue( indexCapFT, coilInletT, CondInletTemp );
-		Real64 TotCapFlowModFac = CurveManager::CurveValue( indexCapFFF, AirFF );
+		Real64 TotCapTempModFac = 1.0;
+		if ( indexCapFT > 0 ) {
+			if ( typeCapFT == CurveManager::BiQuadratic ) {
+				TotCapTempModFac = CurveManager::CurveValue( indexCapFT, coilInletWB, CondInletTemp );
+			} else {
+				TotCapTempModFac = CurveManager::CurveValue( indexCapFT, CondInletTemp );
+			}
+		}
+		Real64 TotCapFlowModFac = 1.0;
+		if ( indexCapFFF > 0 ) {
+			TotCapFlowModFac = CurveManager::CurveValue( indexCapFFF, AirFF );
+		}
+
 		Real64 TotCap = RatedTotCap * TotCapFlowModFac * TotCapTempModFac;
 
 		Real64 SHR = 0.0;
@@ -135,7 +147,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 			// Calculate apparatus dew point conditions using TotCap and CBF
 			hDelta = TotCap / AirMassFlow;
 			Real64 hADP = coilInletH - hDelta / ( 1.0 - CBF );
-			Real64 tADP = Psychrometrics::PsyTsatFnHPb( hADP, OAP, RoutineName );
+			Real64 tADP = Psychrometrics::PsyTsatFnHPb( hADP, ambPressure, RoutineName );
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
 			Real64 wADP = Psychrometrics::PsyWFnTdbH( tADP, hADP, RoutineName );
@@ -153,7 +165,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 				// capacity at the dry-out point to determine exiting conditions from coil. This is required
 				// since the TotCapTempModFac doesn't work properly with dry-coil conditions.
 				coilInletW = RF * wADP + ( 1.0 - RF ) * coilInletW;
-				coilInletWB = Psychrometrics::PsyTwbFnTdbWPb( coilInletT, coilInletW, OAP );
+				coilInletWB = Psychrometrics::PsyTwbFnTdbWPb( coilInletT, coilInletW, ambPressure );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRatTemp,InletAirPressure)
 				++Counter;
@@ -164,7 +176,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 			}
 		}
 
-		Real64 PLF = 1.0;
+		Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
 		if ( indexPLRFPLF > 0 ) {
 			PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
 		}
@@ -180,6 +192,8 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput() {
 		}
 
 		Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
+		RTF = PLR / PLF;
+		FullLoadPower = TotCap * EIR * RTF;
 
 		FullLoadOutAirEnth = coilInletH - ( TotCap / AirMassFlow );
 		Real64 hTinwout = coilInletH - ( ( 1.0 - SHR ) * hDelta );
