@@ -85,4 +85,23 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Real64 & PLR, Real64
 
 	thisspeed.CalcSpeedOutput();
 
+	OpModeOutletTemp = thisspeed.FullLoadOutAirTemp;
+	OpModeOutletHumRat = thisspeed.FullLoadOutAirHumRat;
+	OpModeOutletEnth = thisspeed.FullLoadOutAirEnth;
+	OpModePower = thisspeed.FullLoadPower;
+	OpModeRTF = thisspeed.RTF;
+
+	if ( SpeedNum > 1 ) {
+
+		auto & thisspeed( this->speeds[ SpeedNum ] );
+
+		thisspeed.CalcSpeedOutput();
+
+		OpModeOutletTemp = OpModeOutletTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * thisspeed.FullLoadOutAirTemp;
+		OpModeOutletHumRat = OpModeOutletHumRat * SpeedRatio + ( 1.0 - SpeedRatio ) * thisspeed.FullLoadOutAirHumRat;
+		OpModeOutletEnth = OpModeOutletEnth * SpeedRatio + ( 1.0 - SpeedRatio ) * thisspeed.FullLoadOutAirEnth;
+
+
+	}
+
 }

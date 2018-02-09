@@ -103,6 +103,7 @@ namespace Psychrometrics {
 	extern int const iPsyPsatFnTemp_cache;
 	extern int const NumPsychMonitors; // Parameterization of Number of psychrometric routines that
 	extern std::string const blank_string;
+
 #ifdef EP_psych_stats
 	extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 

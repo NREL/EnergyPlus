@@ -60,6 +60,7 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
         this->instantiateFromInputSpec(input_specs);
 
     }
+
     if (!found_it) {
         // error
     }

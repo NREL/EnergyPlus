@@ -53,6 +53,13 @@ namespace EnergyPlus {
         Real64 latentTimeConst;
         Real64 timeForCondensateRemoval;
 
+		// results from coil model at speed
+		Real64 OpModeOutletTemp;
+		Real64 OpModeOutletHumRat;
+		Real64 OpModeOutletEnth;
+		Real64 OpModePower;
+		Real64 OpModeRTF;
+
         enum ConenserType {
             AIRCOOLED, EVAPCOOLED
         };

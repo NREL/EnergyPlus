@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <EnergyPlus.hh>
+#include <Coils/PsychStruct.hh>
 
 namespace EnergyPlus {
 
@@ -63,6 +64,10 @@ namespace EnergyPlus {
 
         // speed class inputs
         Real64 PLR;
+
+        Psychrometrics::PsychState inlet;
+        Psychrometrics::PsychState outlet;
+
         Real64 coilInletT; // coil inlet temperature {C}
         Real64 coilInletW; // coil inlet humidity ratio {kg/kg}
         Real64 coilInletWB; // coil inlet wet-bulb temperature {C}
