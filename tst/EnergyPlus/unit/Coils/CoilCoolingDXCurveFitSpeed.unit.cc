@@ -56,3 +56,27 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
 //    EXPECT_EQ( Boiler( NumBoilers ).SizFac, 1.0 );
 
 }
+
+TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
+{
+
+	CoilCoolingDXCurveFitSpeed thisspeed( );
+
+	thisspeed.coilInletT = 20.2;
+	thisspeed.coilInletW = 0.01;
+	thisspeed.coilInletWB = 19.0;
+	thisspeed.coilInletH = 35000.0;
+	thisspeed.CondInletTemp = 35.0;
+	thisspeed.ambPressure = 101325.0;
+	thisspeed.AirFF = 1.0;
+	thisspeed.RatedTotCap = 3000.0;
+	thisspeed.RatedAirMassFlowRate = 1.0;
+	thisspeed.RatedSHR = 0.75;
+	thisspeed.RatedCBF = 0.09;
+	thisspeed.RatedEIR = 0.30;
+	thisspeed.AirMassFlow = 1.0;
+	thisspeed.FanOpMode = 0;
+
+	thisspeed.CalcSpeedOutput();
+
+}
