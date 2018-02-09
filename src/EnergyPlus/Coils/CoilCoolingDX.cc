@@ -13,7 +13,7 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     this->name = input_data.name;
     this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
     // other construction below
-    NodeInputManager::GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+    NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
 }
 
 CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {

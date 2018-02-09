@@ -11,9 +11,9 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFitSpeedInputSpecification input_data, CoilCoolingDXCurveFitOperatingMode * parentMode ) {
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFitSpeedInputSpecification input_data, CoilCoolingDXCurveFitOperatingMode * _parentMode ) {
     this->original_input_specs = input_data;
-    this->parentMode = parentMode;
+    this->parentMode = _parentMode;
     //bool errorsFound = false;
     this->name = input_data.name;
     this->rated_total_capacity = input_data.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
