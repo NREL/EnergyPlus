@@ -55,6 +55,7 @@ namespace EnergyPlus {
 		// report variables
 		Real64 totalCoolingEnergyRate;
 		Real64 totalCoolingEnergy;
+		Real64 totalPower;
 
 	};
 

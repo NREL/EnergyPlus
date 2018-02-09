@@ -58,6 +58,7 @@ namespace EnergyPlus {
 		Real64 evapCondBasinHeatCap;
 		Real64 evapCondBasinHeatSetpoint;
 		int evapCondBasinHeatSchedulIndex;
+		Real64 powerUse;
 
 		std::vector<CoilCoolingDXCurveFitOperatingMode> modes;
 	};

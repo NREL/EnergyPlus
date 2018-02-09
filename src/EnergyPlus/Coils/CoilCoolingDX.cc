@@ -1,4 +1,7 @@
+#include <ObjexxFCL/Array1D.hh> // needs to be in BranchNodeConnections.hh
+
 #include <Coils/CoilCoolingDX.hh>
+#include <BranchNodeConnections.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <InputProcessor.hh>
@@ -21,8 +24,10 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     // other construction below
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_outlet_node_name, errorsFound, cCurrentModuleObject, input_data.name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+    BranchNodeConnections::TestCompSet( CoilCoolingDX::object_name, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes" );
 
     // setup output variables, should probably be done elsewhere
+    SetupOutputVariable( "Fancy DX Coil Power", OutputProcessor::Unit::W, this->totalPower, "System", "Average", this->name );
     SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name );
     SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, this->totalCoolingEnergy, "System", "Sum", this->name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
 
@@ -84,7 +89,7 @@ void CoilCoolingDX::simulate(Real64 PLR, int speedNum, Real64 speedRatio) {
     evapOutletNode.HumRat = this->outletStateHolder.w;
 
     // update report variables
-    //this->powerUse = myPerformance.powerUse;
+    this->totalPower = myPerformance.powerUse;
 }
 
             // PlantProfile name

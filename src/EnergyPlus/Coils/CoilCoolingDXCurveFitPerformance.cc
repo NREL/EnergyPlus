@@ -12,7 +12,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(
     //bool errorsFound = false;
     this->name = input_data.name;
     for(auto & mode_name : input_data.operating_modes) {
-        this->modes.push_back(CoilCoolingDXCurveFitOperatingMode(mode_name));
+        this->modes.emplace_back(mode_name);
     }
 }
 
@@ -67,6 +67,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitPerformance::simulate(Psychromet
     auto & currentMode = this->modes[modeNum-1];
     Real64 a=1, b=2, c=3;
     auto returnState = currentMode.CalcOperatingMode(inletState, a, b, c);
+    this->powerUse = currentMode.OpModePower;
     return returnState;
 }
 

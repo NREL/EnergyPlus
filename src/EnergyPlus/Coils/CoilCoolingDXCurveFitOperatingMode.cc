@@ -12,7 +12,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(
     //bool errorsFound = false;
     this->name = input_data.name;
     for(auto & speed_name : input_data.speed_data_names) {
-        this->speeds.push_back(CoilCoolingDXCurveFitSpeed(speed_name, this));
+        this->speeds.emplace_back(speed_name, this);
     }
 }
 
@@ -86,7 +86,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
     finalOutletConditions.tdb = outSpeed1.tdb;
 	finalOutletConditions.w = outSpeed1.w;
 	finalOutletConditions.h = outSpeed1.h;
-	OpModePower = thisspeed.FullLoadPower;
+	OpModePower = thisspeed.FullLoadPower; // this should be averaged also?
 	OpModeRTF = thisspeed.RTF;
 
 	if ( SpeedNum > 1 ) {
