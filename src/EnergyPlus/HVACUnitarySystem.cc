@@ -4393,6 +4393,7 @@ namespace HVACUnitarySystem {
 					int const magicNominalModeNum = 0;
 					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = newCoil.performance.modes[magicNominalModeNum].ratedGrossTotalCap;
 					CoolingCoilInletNode = newCoil.evapInletNodeIndex;
+					CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
 					UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = (int) newCoil.performance.modes[0].speeds.size();
 
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
