@@ -14,26 +14,26 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
 {
 
     std::string const idf_objects = delimited_string( {
-      "Coil:Cooling:DX:CurveFit:Speed,       ",
-      " Speed1Name,             ",
-      " 0.8,         ",
-      " 0.745,        ",
-      " 3.1415926,        ", // condenser
-      " 0.9, ",
-      " 0.9,                  ",  // COP
-      " 0.5,                  ",
-      " 300,                  ",
-      " 6.9,                  ", // evaporative
-      " 0.8,                  ", // effectiveness
-      " CapFT,                  ",
-      " CapFF,                  ",
-      " EIRFT,                  ",
-      " EIRFF,                  ",
-      " PLFCurveName,                 ",
-      " 0.6,              ",
-      " WasteHeatFunctionCurve,                 ",
-      " SHRFT,                ",
-      " SHRFF;                "
+      "Coil:Cooling:DX:CurveFit:Speed, ",
+      " Speed1Name,                    ",
+      " 0.8,                           ",
+      " 0.745,                         ",
+      " 3.1415926,                     ", // condenser
+      " 0.9,                           ",
+      " 0.9,                           ", // COP
+      " 0.5,                           ",
+      " 300,                           ",
+      " 6.9,                           ", // evaporative
+      " 0.8,                           ", // effectiveness
+      " CapFT,                         ",
+      " CapFF,                         ",
+      " EIRFT,                         ",
+      " EIRFF,                         ",
+      " PLFCurveName,                  ",
+      " 0.6,                           ",
+      " WasteHeatFunctionCurve,        ",
+      " SHRFT,                         ",
+      " SHRFF;                         "
     } );
 
     bool ok = !process_idf( idf_objects, false );

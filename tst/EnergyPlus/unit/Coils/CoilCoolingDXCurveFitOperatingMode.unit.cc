@@ -14,22 +14,22 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitOperatingModeInput )
 {
 
     std::string const idf_objects = delimited_string( {
-      "Coil:Cooling:DX:CurveFit:OperatingMode,       ",
-      " OperatingMode1Name,             ",
-      " 12000,         ",
-      " 100,        ",
-      " 200,        ",
-      " 2.5, ",
-      " 0.5,                  ",
-      " 100,                  ",
-      " 300,                  ",
-      " Yes,                  ",
-      " Evaporative,                  ",
-      " 200,",
-      " DiscreteStagedContinuousOrNotBacon,",
-      " 5,                  ",
-      " OperatingSpeed1,                  ",
-      " OperatingSpeed2;                  "
+      "Coil:Cooling:DX:CurveFit:OperatingMode, ",
+      " OperatingMode1Name,                    ",
+      " 12000,                                 ",
+      " 100,                                   ",
+      " 200,                                   ",
+      " 2.5,                                   ",
+      " 0.5,                                   ",
+      " 100,                                   ",
+      " 300,                                   ",
+      " Yes,                                   ",
+      " Evaporative,                           ",
+      " 200,                                   ",
+      " DiscreteStagedContinuousOrNotBacon,    ",
+      " 5,                                     ",
+      " OperatingSpeed1,                       ",
+      " OperatingSpeed2;                       "
     } );
 
     bool ok = !process_idf( idf_objects, false );
