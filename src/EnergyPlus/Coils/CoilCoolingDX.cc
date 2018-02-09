@@ -53,8 +53,12 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
     }
 }
 
-CoilCoolingDX::simulate() {
-
+void CoilCoolingDX::simulate() {
+    // check things
+    // pass things to performance object "simulate" function that will do "something"
+    auto & myPerformance = this->performance;
+    // access everything on the performance instance here
+    myPerformance.simulate();
 }
 
             // PlantProfile name

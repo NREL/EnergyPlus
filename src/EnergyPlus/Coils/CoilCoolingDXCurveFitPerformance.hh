@@ -34,6 +34,7 @@ namespace EnergyPlus {
 
 	public:
 		void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
+		void simulate();
 
 		CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 

@@ -60,3 +60,11 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
     }
 }
 
+void CoilCoolingDXCurveFitPerformance::simulate() {
+    // do some stuff with performance
+    int const modeNum = 1;
+    auto & currentMode = this->modes[modeNum-1];
+    Real64 a = 1.0, b = 2.0, c = 3.0;
+    currentMode.CalcOperatingMode(a, b, c);
+}
+
