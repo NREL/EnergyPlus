@@ -18,13 +18,13 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
       " Speed1Name,             ",
       " 0.8,         ",
       " 0.745,        ",
-      " 3.1415926,        ",
+      " 3.1415926,        ", // condenser
       " 0.9, ",
-      " 0.9,                  ",
+      " 0.9,                  ",  // COP
       " 0.5,                  ",
       " 300,                  ",
-      " 6.9,                  ",
-      " 0.8,                  ",
+      " 6.9,                  ", // evaporative
+      " 0.8,                  ", // effectiveness
       " CapFT,                  ",
       " CapFF,                  ",
       " EIRFT,                  ",
@@ -60,7 +60,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
 TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 {
 
-	CoilCoolingDXCurveFitSpeed thisspeed( );
+	CoilCoolingDXCurveFitSpeed thisspeed;
 
 	thisspeed.coilInletT = 20.2;
 	thisspeed.coilInletW = 0.01;

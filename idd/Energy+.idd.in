@@ -44049,21 +44049,21 @@ Coil:Cooling:DX:CurveFit:Speed,
        \type object-list
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
-   A7, \field Rated Waste Heat Fraction of Power Input
+   N10,\field Rated Waste Heat Fraction of Power Input
        \note Recoverable waste heat at full load and rated conditions
        \type real
        \units dimensionless
        \minimum> 0.0
        \maximum 1.0
        \default 0.2
-   A8, \field Waste Heat Function of Temperature Curve Name
+   A7, \field Waste Heat Function of Temperature Curve Name
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
        \type object-list
        \object-list BiquadraticCurves
        \object-list BiVariateTables
-   A9, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
+   A8, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
        \note curve = a + b*wb + c*wb**2 + d*db + e*db**2 + f*wb*db
        \note wb = entering wet-bulb temperature seen by the DX cooling coil (C)
        \note db = entering dry-bulb temperature seen by the DX cooling coil (C)
@@ -44071,7 +44071,7 @@ Coil:Cooling:DX:CurveFit:Speed,
        \type object-list
        \object-list BiquadraticCurves
        \object-list BiVariateTables
-  A10; \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+  A9;  \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow

@@ -63,14 +63,14 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
 
         input_specs.name = cAlphaArgs(1);
         input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal = rNumericArgs(1);
-        input_specs.gross_rated_sensible_heat_ratio = rNumericArgs(2);
-        input_specs.gross_rated_cooling_COP = rNumericArgs(3);
-        input_specs.rated_air_flow_rate_ratio_to_nominal = rNumericArgs(4);
-        input_specs.rated_condenser_air_flow_rate_ratio_to_nominal = rNumericArgs(5);
+        input_specs.evaporator_air_flow_fraction = rNumericArgs(2);
+		input_specs.condenser_air_flow_fraction = rNumericArgs(3);
+		input_specs.gross_rated_sensible_heat_ratio = rNumericArgs(4);
+        input_specs.gross_rated_cooling_COP = rNumericArgs(5);
         input_specs.active_fraction_of_coil_face_area = rNumericArgs(6);
-        input_specs.rated_evaporative_condenser_pump_power_consumption = rNumericArgs(7);
-        input_specs.rated_evaporator_fan_power_per_volume_flow_rate = rNumericArgs(8);
-        input_specs.evaporative_condenser_effectiveness = rNumericArgs(9);
+        input_specs.rated_evaporator_fan_power_per_volume_flow_rate = rNumericArgs(7);
+		input_specs.rated_evaporative_condenser_pump_power_fraction = rNumericArgs(8);
+		input_specs.evaporative_condenser_effectiveness = rNumericArgs(9);
         input_specs.total_cooling_capacity_function_of_temperature_curve_name = cAlphaArgs(2);
         input_specs.total_cooling_capacity_function_of_air_flow_fraction_curve_name = cAlphaArgs(3);
         input_specs.energy_input_ratio_function_of_temperature_curve_name = cAlphaArgs(4);

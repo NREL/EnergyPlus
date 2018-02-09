@@ -13,10 +13,10 @@ public:
 	Real64 gross_rated_total_cooling_capacity_ratio_to_nominal;
 	Real64 gross_rated_sensible_heat_ratio;
 	Real64 gross_rated_cooling_COP;
-	Real64 rated_air_flow_rate_ratio_to_nominal;
-	Real64 rated_condenser_air_flow_rate_ratio_to_nominal;
+	Real64 evaporator_air_flow_fraction;
+	Real64 condenser_air_flow_fraction;
 	Real64 active_fraction_of_coil_face_area;
-	Real64 rated_evaporative_condenser_pump_power_consumption;
+	Real64 rated_evaporative_condenser_pump_power_fraction;
 	Real64 rated_evaporator_fan_power_per_volume_flow_rate;
 	Real64 evaporative_condenser_effectiveness;
 	std::string total_cooling_capacity_function_of_temperature_curve_name;
@@ -28,6 +28,7 @@ public:
 	std::string waste_heat_function_of_temperature_curve_name;
 	std::string sensible_heat_ratio_modifier_function_of_temperature_curve_name;
 	std::string sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name;
+
 
 };
 
