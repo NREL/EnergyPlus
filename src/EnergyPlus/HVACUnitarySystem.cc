@@ -57,7 +57,7 @@
 #include <HVACUnitarySystem.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
-#include <CoilCoolingDX.hh>
+#include <Coils/CoilCoolingDX.hh>
 #include <CurveManager.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
@@ -8598,7 +8598,6 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( SELECT_CASE_var == CoilDX_Cooling ) { // CoilCoolingDX
-			CoilCoolingDX::simulate();
 		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) { // CoilSystem:Cooling:*:HeatExchangerAssisted
 
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {
