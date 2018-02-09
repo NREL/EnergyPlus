@@ -43723,7 +43723,7 @@ Coil:Cooling:DX,
 
 Coil:Cooling:DX:CurveFit:Performance,
        \memo DX cooling coil performance specification.
-       \min-fields 17
+       \min-fields 11
    A1, \field Name
        \required-field
        \type alpha
@@ -43753,12 +43753,12 @@ Coil:Cooling:DX:CurveFit:Performance,
        \units Pa
        \minimum> 0.0
        \default 500.0
-   A7, \field Method for Switching Operating Modes
+   A2, \field Method for Switching Operating Modes
        \type choice
        \key HumidityControl
        \key Scheduled
        \default HumidityControl
-   A8, \field Operating Mode Number Schedule Name
+   A3, \field Operating Mode Number Schedule Name
        \note Schedule of operating mode numbers. Used only if Method for Switching Operating Modes
        \note is Scheduled. Useful for EMS control of operating mode.
        \type object-list
@@ -43780,7 +43780,7 @@ Coil:Cooling:DX:CurveFit:Performance,
        \units C
        \minimum 2.0
        \default 2.0
-  A10, \field Evaporative Condenser Basin Heater Operating Schedule Name
+   A4, \field Evaporative Condenser Basin Heater Operating Schedule Name
        \note This field is only used for Condenser Type = EvaporativelyCooled.
        \note Schedule values greater than 0 allow the basin heater to operate whenever the outdoor
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
@@ -43788,35 +43788,35 @@ Coil:Cooling:DX:CurveFit:Performance,
        \note throughout the entire simulation.
        \type object-list
        \object-list ScheduleNames
-  A11, \field Operating Mode 1 Name
+   A5, \field Operating Mode 1 Name
        \required-field
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A12, \field Operating Mode 2 Name
+   A6, \field Operating Mode 2 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A13, \field Operating Mode 3 Name
+   A7, \field Operating Mode 3 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A14, \field Operating Mode 4 Name
+   A8, \field Operating Mode 4 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A15, \field Operating Mode 5 Name
+   A9, \field Operating Mode 5 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A16, \field Operating Mode 6 Name
+  A10, \field Operating Mode 6 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A17, \field Operating Mode 7 Name
+  A11, \field Operating Mode 7 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A18, \field Operating Mode 8 Name
+  A12, \field Operating Mode 8 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A19, \field Operating Mode 9 Name
+  A13, \field Operating Mode 9 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A20; \field Operating Mode 10 Name
+  A14; \field Operating Mode 10 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
 
@@ -44071,7 +44071,7 @@ Coil:Cooling:DX:CurveFit:Speed,
        \type object-list
        \object-list BiquadraticCurves
        \object-list BiVariateTables
-  A9;  \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+  A10; \field Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
