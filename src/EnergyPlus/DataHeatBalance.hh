@@ -989,6 +989,7 @@ namespace DataHeatBalance {
 		// the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
 		bool IsUsed; // Marked true when the construction is used
 		bool IsUsedCTF; // Mark true when the construction is used for a surface with CTF calculations
+		bool HasShadeOrBlindLayer; // mark as true if the construction is window and has shade or blind as one of the layers
 		Real64 InsideAbsorpVis; // Inside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 OutsideAbsorpVis; // Outside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 InsideAbsorpSolar; // Inside Layer solar absorptance of an opaque surface; not used for windows.
@@ -1153,6 +1154,7 @@ namespace DataHeatBalance {
 			LayerPoint( MaxLayersInConstruct, 0 ),
 			IsUsed( false ),
 			IsUsedCTF( false ),
+			HasShadeOrBlindLayer( false ),
 			InsideAbsorpVis( 0.0 ),
 			OutsideAbsorpVis( 0.0 ),
 			InsideAbsorpSolar( 0.0 ),

@@ -1234,6 +1234,7 @@ namespace DataHeatBalance {
 				if ( Material( MaterNum ).Group == WindowSimpleGlazing ) ++TotGlassLayers;
 				if ( Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind || Material( MaterNum ).Group == Screen || Material( MaterNum ).Group == ComplexWindowShade ) ++TotShadeLayers;
 				if ( Material( MaterNum ).Group == WindowGas || Material( MaterNum ).Group == WindowGasMixture || Material( MaterNum ).Group == ComplexWindowGap ) ++TotGasLayers;
+				if ( Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind ) Construct( ConstrNum ).HasShadeOrBlindLayer = true;
 				if ( Layer < TotLayers ) {
 					MaterNumNext = Construct( ConstrNum ).LayerPoint( Layer + 1 );
 					// Adjacent layers of same type not allowed

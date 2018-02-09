@@ -3261,14 +3261,19 @@ namespace HeatBalanceSurfaceManager {
 					if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) {
 						// Interior shade or blind in place
 						ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
-						MatNumSh = Construct( ConstrNumSh ).LayerPoint( Construct( ConstrNumSh ).TotLayers );
-						TauShIR = Material( MatNumSh ).TransThermal;
-						EffShDevEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss( 1 );
-						if ( ShadeFlag == IntBlindOn ) {
-							TauShIR = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Blind( SurfaceWindow( SurfNum ).BlindNumber ).IRBackTrans );
-							EffShDevEmiss = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, SurfaceWindow( SurfNum ).EffShBlindEmiss );
+						if ( Construct( ConstrNumSh ).HasShadeOrBlindLayer ) {
+							MatNumSh = Construct( ConstrNumSh ).LayerPoint( Construct( ConstrNumSh ).TotLayers );
+							TauShIR = Material( MatNumSh ).TransThermal;
+							EffShDevEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss( 1 );
+							if ( ShadeFlag == IntBlindOn ) {
+								TauShIR = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Blind( SurfaceWindow( SurfNum ).BlindNumber ).IRBackTrans );
+								EffShDevEmiss = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, SurfaceWindow( SurfNum ).EffShBlindEmiss );
+							}
+							SUM1 += SurfaceWindow( SurfNum ).DividerArea * ( EffShDevEmiss + DividerThermAbs * TauShIR );
+						} else {
+							// this is for EMS activated shade/blind but the window construction has no shade/blind layer
+							SUM1 += SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivIn ) * DividerThermAbs;
 						}
-						SUM1 += SurfaceWindow( SurfNum ).DividerArea * ( EffShDevEmiss + DividerThermAbs * TauShIR );
 					} else {
 						SUM1 += SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrDivIn ) * DividerThermAbs;
 					}
