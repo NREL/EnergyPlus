@@ -43822,7 +43822,7 @@ Coil:Cooling:DX:CurveFit:Performance,
 
 Coil:Cooling:DX:CurveFit:OperatingMode,
        \memo DX cooling coil performance for a single operating mode which may have one or more speeds.
-       \min-fields 13
+       \min-fields 14
    A1, \field Name
        \required-field
        \type alpha
@@ -43909,7 +43909,7 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
        \key VariableSpeed
        \key MultiSpeed
        \default MultiSpeed
-   N8, \field Nominal Speed Number
+   N9, \field Nominal Speed Number
        \note Must be lower than or equal to the highest speed number.
        \note If blank, defaults to the highest speed number used.
        \type integer
