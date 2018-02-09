@@ -60,23 +60,47 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
 TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 {
 
-	CoilCoolingDXCurveFitSpeed thisspeed( );
+	std::string const idf_objects = delimited_string( {
+		"Coil:Cooling:DX:CurveFit:Speed,       ",
+		" Speed1Name,             ",
+		" 0.8,         ",
+		" 0.745,        ",
+		" 3.1415926,        ",
+		" 0.9, ",
+		" 0.9,                  ",
+		" 0.5,                  ",
+		" 300,                  ",
+		" 6.9,                  ",
+		" 0.8,                  ",
+		" CapFT,                  ",
+		" CapFF,                  ",
+		" EIRFT,                  ",
+		" EIRFF,                  ",
+		" PLFCurveName,                 ",
+		" 0.6,              ",
+		" WasteHeatFunctionCurve,                 ",
+		" SHRFT,                ",
+		" SHRFF;                "
+	} );
 
-	thisspeed.coilInletT = 20.2;
-	thisspeed.coilInletW = 0.01;
-	thisspeed.coilInletWB = 19.0;
-	thisspeed.coilInletH = 35000.0;
-	thisspeed.CondInletTemp = 35.0;
-	thisspeed.ambPressure = 101325.0;
-	thisspeed.AirFF = 1.0;
-	thisspeed.RatedTotCap = 3000.0;
-	thisspeed.RatedAirMassFlowRate = 1.0;
-	thisspeed.RatedSHR = 0.75;
-	thisspeed.RatedCBF = 0.09;
-	thisspeed.RatedEIR = 0.30;
-	thisspeed.AirMassFlow = 1.0;
-	thisspeed.FanOpMode = 0;
+	bool ok = !process_idf( idf_objects, false );
+	CoilCoolingDXCurveFitSpeed thisSpeed( "Speed1Name" );
 
-	thisspeed.CalcSpeedOutput();
+	thisSpeed.coilInletT = 20.2;
+	thisSpeed.coilInletW = 0.01;
+	thisSpeed.coilInletWB = 19.0;
+	thisSpeed.coilInletH = 35000.0;
+	thisSpeed.CondInletTemp = 35.0;
+	thisSpeed.ambPressure = 101325.0;
+	thisSpeed.AirFF = 1.0;
+	thisSpeed.RatedTotCap = 3000.0;
+	thisSpeed.RatedAirMassFlowRate = 1.0;
+	thisSpeed.RatedSHR = 0.75;
+	thisSpeed.RatedCBF = 0.09;
+	thisSpeed.RatedEIR = 0.30;
+	thisSpeed.AirMassFlow = 1.0;
+	thisSpeed.FanOpMode = 0;
+
+	thisSpeed.CalcSpeedOutput();
 
 }

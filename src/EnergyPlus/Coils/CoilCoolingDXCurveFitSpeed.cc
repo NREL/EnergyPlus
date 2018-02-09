@@ -15,9 +15,38 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFit
     //bool errorsFound = false;
     this->name = input_data.name;
     // continue GetInput processing
+	if ( input_data.total_cooling_capacity_function_of_temperature_curve_name != "" ) {
+		this->indexCapFT = CurveManager::GetCurveIndex( input_data.total_cooling_capacity_function_of_temperature_curve_name );
+	}
+	if ( input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name != "" ) {
+		this->indexCapFFF = CurveManager::GetCurveIndex( input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name );
+	}
+	if ( input_data.energy_input_ratio_function_of_temperature_curve_name != "" ) {
+		this->indexEIRFT = CurveManager::GetCurveIndex( input_data.energy_input_ratio_function_of_temperature_curve_name );
+	}
+	if ( input_data.energy_input_ratio_function_of_air_flow_fraction_curve_name != "" ) {
+		this->indexEIRFFF = CurveManager::GetCurveIndex( input_data.energy_input_ratio_function_of_air_flow_fraction_curve_name );
+	}
+	if ( input_data.part_load_fraction_correlation_curve_name != "" ) {
+		this->indexPLRFPLF = CurveManager::GetCurveIndex( input_data.part_load_fraction_correlation_curve_name );
+	}
 }
 
 CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find):
+
+	// model inputs
+	TotalCapacity( 0.0 ),
+	indexCapFT( 0 ),
+	typeCapFT( 0 ),
+	indexCapFFF( 0 ),
+	indexEIRFT( 0 ),
+	indexEIRFFF( 0 ),
+	indexPLRFPLF( 0 ),
+	indexWHFT( 0 ),
+	indexWHFFF( 0 ),
+	indexSHRFT( 0 ),
+	indexSHRFFF( 0 ),
+
 	// speed class inputs
 	PLR( 0.0 ), // coil operating part load ratio
 	coilInletT( 0.0 ), // coil inlet temperature {C}
