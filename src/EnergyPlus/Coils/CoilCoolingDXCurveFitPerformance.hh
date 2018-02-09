@@ -7,6 +7,7 @@
 #include <EnergyPlus.hh>
 
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
+#include <Coils/PsychStruct.hh>
 
 namespace EnergyPlus {
 
@@ -33,7 +34,7 @@ namespace EnergyPlus {
 
 	public:
 		void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
-		void simulate(Real64 inletTempDB, Real64 inletHumRat, Real64 inletEnthalpy);
+		Psychrometrics::PsychState simulate(Psychrometrics::PsychState & inletState);
 
 		CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 

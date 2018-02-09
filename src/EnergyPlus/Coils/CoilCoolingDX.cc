@@ -70,21 +70,21 @@ void CoilCoolingDX::simulate(Real64 PLR, int speedNum, Real64 speedRatio) {
 
     // get inlet conditions from inlet node
     auto & evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
-    auto & inletTempDB = evapInletNode.Temp;
-    auto & inletHumRat = evapInletNode.HumRat;
-    auto & inletEnthalpy = evapInletNode.Enthalpy;
+    this->inletStateHolder.tdb = evapInletNode.Temp;
+    this->inletStateHolder.h = evapInletNode.Enthalpy;
+    this->inletStateHolder.w = evapInletNode.HumRat;
 
     // call the simulation, which returns useful data
     auto & myPerformance = this->performance;
-    myPerformance.simulate(inletTempDB, inletHumRat, inletEnthalpy);
+    this->outletStateHolder = myPerformance.simulate(this->inletStateHolder);
 
     // update outlet conditions
     auto & evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
-    evapOutletNode.Temp = myPerformance.outletConditions.temperature;
-    evapOutletNode.HumRat = myPerformance.outletConditions.humRat;
+    evapOutletNode.Temp = this->outletStateHolder.tdb;
+    evapOutletNode.HumRat = this->outletStateHolder.w;
 
     // update report variables
-    this->powerUse = myPerformance.powerUse;
+    //this->powerUse = myPerformance.powerUse;
 }
 
             // PlantProfile name

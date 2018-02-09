@@ -8607,7 +8607,7 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( SELECT_CASE_var == CoilDX_Cooling ) { // CoilCoolingDX
-			coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex].simulate();
+			coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex].simulate(1.0, 1, 1.0);
 		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) { // CoilSystem:Cooling:*:HeatExchangerAssisted
 
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {

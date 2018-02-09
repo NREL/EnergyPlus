@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <Coils/PsychStruct.hh>
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -48,7 +49,8 @@ namespace EnergyPlus {
 		int evaporativeCondSupplyTankIndex;
 
 		// DX Coil needs inlet and outlet state member variables
-
+		Psychrometrics::PsychState inletStateHolder;
+		Psychrometrics::PsychState outletStateHolder;
 
 		// report variables
 		Real64 totalCoolingEnergyRate;

@@ -68,10 +68,6 @@ namespace EnergyPlus {
         Psychrometrics::PsychState inlet;
         Psychrometrics::PsychState outlet;
 
-        Real64 coilInletT; // coil inlet temperature {C}
-        Real64 coilInletW; // coil inlet humidity ratio {kg/kg}
-        Real64 coilInletWB; // coil inlet wet-bulb temperature {C}
-        Real64 coilInletH; // coil inlet enthalpy {J/kg}
         Real64 CondInletTemp; // condenser inlet node temp or outdoor temp if no condenser node {C}
         Real64 ambPressure; // outdoor pressure {Pa]
         Real64 AirFF; // ratio of air mass flow rate to rated air mass flow rate
@@ -101,7 +97,7 @@ namespace EnergyPlus {
         Real64 evap_condenser_effectiveness;
         Real64 rated_waste_heat_fraction_of_power_input;
 
-        void CalcSpeedOutput(); // Real64 & PLR, Real64 const IDT, Real64 const OAT, Real64 const AirFF );
+        Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState & inletState); // Real64 & PLR, Real64 const IDT, Real64 const OAT, Real64 const AirFF );
 
     };
 }

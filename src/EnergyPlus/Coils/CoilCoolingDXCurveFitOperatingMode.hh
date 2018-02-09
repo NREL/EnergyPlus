@@ -6,6 +6,7 @@
 
 #include <EnergyPlus.hh>
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
+#include <Coils/PsychStruct.hh>
 
 namespace EnergyPlus {
 
@@ -73,7 +74,7 @@ namespace EnergyPlus {
 
         std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
-        void CalcOperatingMode(Real64 &PLR, Real64 &SpeedNum, Real64 &SpeedRatio);
+        Psychrometrics::PsychState CalcOperatingMode(Psychrometrics::PsychState & inletState, Real64 &PLR, Real64 &SpeedNum, Real64 &SpeedRatio);
 
     };
 

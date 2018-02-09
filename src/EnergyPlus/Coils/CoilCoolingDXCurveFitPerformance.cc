@@ -1,4 +1,5 @@
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <Coils/PsychStruct.hh>
 #include <DataIPShortCuts.hh>
 #include <InputProcessor.hh>
 
@@ -60,10 +61,12 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate(Real64 inletTempDB, Real64 inletHumRat, Real64 inletEnthalpy) {
+Psychrometrics::PsychState CoilCoolingDXCurveFitPerformance::simulate(Psychrometrics::PsychState & inletState) {
     // do some stuff with performance
     int const modeNum = 1;
     auto & currentMode = this->modes[modeNum-1];
-    currentMode.CalcOperatingMode(inletTempDB, inletHumRat, inletEnthalpy);
+    Real64 a=1, b=2, c=3;
+    auto returnState = currentMode.CalcOperatingMode(inletState, a, b, c);
+    return returnState;
 }
 

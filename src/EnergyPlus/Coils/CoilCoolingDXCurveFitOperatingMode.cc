@@ -64,14 +64,10 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
 
 }
 
-void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Real64 & PLR, Real64 & SpeedNum, Real64 & SpeedRatio ) {
+Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Psychrometrics::PsychState & inletState, Real64 & PLR, Real64 & SpeedNum, Real64 & SpeedRatio ) {
 
 	auto & thisspeed( this->speeds[ SpeedNum - 1 ] );
 
-	thisspeed.coilInletT = 20.2;
-	thisspeed.coilInletW = 0.01;
-	thisspeed.coilInletWB = 19.0;
-	thisspeed.coilInletH = 35000.0;
 	thisspeed.CondInletTemp = 35.0;
 	thisspeed.ambPressure = 101325.0;
 	thisspeed.AirFF = 1.0;
@@ -83,11 +79,13 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Real64 & PLR, Real64
 	thisspeed.AirMassFlow = 1.0;
 	thisspeed.FanOpMode = 0;
 
-	thisspeed.CalcSpeedOutput();
+	auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState);
 
-	OpModeOutletTemp = thisspeed.FullLoadOutAirTemp;
-	OpModeOutletHumRat = thisspeed.FullLoadOutAirHumRat;
-	OpModeOutletEnth = thisspeed.FullLoadOutAirEnth;
+    Psychrometrics::PsychState finalOutletConditions;
+
+    finalOutletConditions.tdb = outSpeed1.tdb;
+	finalOutletConditions.w = outSpeed1.w;
+	finalOutletConditions.h = outSpeed1.h;
 	OpModePower = thisspeed.FullLoadPower;
 	OpModeRTF = thisspeed.RTF;
 
@@ -95,13 +93,14 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Real64 & PLR, Real64
 
 		auto & thisspeed( this->speeds[ SpeedNum ] );
 
-		thisspeed.CalcSpeedOutput();
+		auto out = thisspeed.CalcSpeedOutput(inletState);
 
-		OpModeOutletTemp = OpModeOutletTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * thisspeed.FullLoadOutAirTemp;
-		OpModeOutletHumRat = OpModeOutletHumRat * SpeedRatio + ( 1.0 - SpeedRatio ) * thisspeed.FullLoadOutAirHumRat;
-		OpModeOutletEnth = OpModeOutletEnth * SpeedRatio + ( 1.0 - SpeedRatio ) * thisspeed.FullLoadOutAirEnth;
-
+        finalOutletConditions.tdb = finalOutletConditions.tdb * SpeedRatio + ( 1.0 - SpeedRatio ) * out.tdb;
+		finalOutletConditions.w = finalOutletConditions.w * SpeedRatio + ( 1.0 - SpeedRatio ) * out.w;
+		finalOutletConditions.h = finalOutletConditions.h * SpeedRatio + ( 1.0 - SpeedRatio ) * out.h;
 
 	}
+
+    return finalOutletConditions;
 
 }
