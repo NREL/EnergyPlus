@@ -69,7 +69,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedInput )
     } );
 
     bool ok = !process_idf( idf_objects, false );
-    CoilCoolingDXCurveFitSpeed thisSpeed("Speed1Name");
+    CoilCoolingDXCurveFitSpeed thisSpeed("Speed1Name", nullptr);
 
 }
 
@@ -101,7 +101,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	} );
 
 	bool ok = !process_idf( idf_objects, false );
-	CoilCoolingDXCurveFitSpeed thisSpeed( "Speed1Name" );
+	CoilCoolingDXCurveFitSpeed thisSpeed( "Speed1Name", nullptr );
 
 	thisSpeed.PLR = 1.0;
 	thisSpeed.coilInletT = 20.0;

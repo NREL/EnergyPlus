@@ -7,42 +7,47 @@
 #include <Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus.hh>
 
-class CoilCoolingDXInputSpecification {
+namespace EnergyPlus {
 
-public:
-	std::string name;
-	std::string evaporator_inlet_node_name;
-	std::string evaporator_outlet_node_name;
-	std::string availability_schedule_name;
-	std::string condenser_zone_name;
-	std::string condenser_inlet_node_name;
-	std::string condenser_outlet_node_name;
-	std::string performance_object_name;
-	std::string condensate_collection_water_storage_tank_name;
-	std::string evaporative_condenser_supply_water_storage_tank_name;
-};
+	class CoilCoolingDXInputSpecification {
 
-class CoilCoolingDX {
+	public:
+		std::string name;
+		std::string evaporator_inlet_node_name;
+		std::string evaporator_outlet_node_name;
+		std::string availability_schedule_name;
+		std::string condenser_zone_name;
+		std::string condenser_inlet_node_name;
+		std::string condenser_outlet_node_name;
+		std::string performance_object_name;
+		std::string condensate_collection_water_storage_tank_name;
+		std::string evaporative_condenser_supply_water_storage_tank_name;
+	};
 
-	std::string const object_name = "Coil:Cooling:DX";
-	CoilCoolingDXInputSpecification original_input_specs;
+	class CoilCoolingDX {
 
-public:
+		std::string const object_name = "Coil:Cooling:DX";
+		CoilCoolingDXInputSpecification original_input_specs;
 
-	CoilCoolingDX(std::string name);
-	void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
+	public:
 
-	std::string name;
-    int evapInletNodeIndex;
-	int evapOutletNodeIndex;
-	int availScheduleIndex;
-	int condZoneIndex;
-	int condInletNodeIndex;
-	int condOutletNodeIndex;
-	CoilCoolingDXCurveFitPerformance performance;  // TODO: Change to unique pointer when we have base class for performance object
-    int condensateTankIndex;
-    int evaporativeCondSupplyTankIndex;
+		CoilCoolingDX(std::string name);
 
-};
+		void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
+
+		std::string name;
+		int evapInletNodeIndex;
+		int evapOutletNodeIndex;
+		int availScheduleIndex;
+		int condZoneIndex;
+		int condInletNodeIndex;
+		int condOutletNodeIndex;
+		CoilCoolingDXCurveFitPerformance performance;  // TODO: Change to unique pointer when we have base class for performance object
+		int condensateTankIndex;
+		int evaporativeCondSupplyTankIndex;
+
+	};
+
+}
 
 #endif // ENERGYPLUS_COILS_COILCOOLINGDX

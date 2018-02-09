@@ -1,3 +1,4 @@
+#include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <DataIPShortCuts.hh>
 #include <InputProcessor.hh>
@@ -10,11 +11,20 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFitSpeedInputSpecification input_data) {
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFitSpeedInputSpecification input_data, CoilCoolingDXCurveFitOperatingMode parentMode ) {
     this->original_input_specs = input_data;
+    this->parentMode = parentMode;
     //bool errorsFound = false;
     this->name = input_data.name;
-    // continue GetInput processing
+    this->rated_total_capacity = input_data.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode.ratedGrossTotalCap;
+    this->evap_air_flow_rate = input_data.evaporator_air_flow_fraction * parentMode.ratedEvapAirFlowRate;
+    this->condenser_air_flow_rate = input_data.condenser_air_flow_fraction * parentMode.ratedCondAirFlowRate;
+    this->gross_shr = input_data.gross_rated_sensible_heat_ratio;
+    this->active_fraction_of_face_coil_area = input_data.active_fraction_of_coil_face_area;
+    this->rated_evap_fan_power_per_volume_flow_rate = input_data.rated_evaporator_fan_power_per_volume_flow_rate;
+    this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
+    this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
+    this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
 	if ( input_data.total_cooling_capacity_function_of_temperature_curve_name != "" ) {
 		this->indexCapFT = CurveManager::GetCurveIndex( input_data.total_cooling_capacity_function_of_temperature_curve_name );
 	}
@@ -30,9 +40,13 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFit
 	if ( input_data.part_load_fraction_correlation_curve_name != "" ) {
 		this->indexPLRFPLF = CurveManager::GetCurveIndex( input_data.part_load_fraction_correlation_curve_name );
 	}
+    if ( input_data.waste_heat_function_of_temperature_curve_name != "" ) {
+        this->indexWHFT = CurveManager::GetCurveIndex( input_data.waste_heat_function_of_temperature_curve_name );
+    }
+
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find):
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find, CoilCoolingDXCurveFitOperatingMode parentMode):
 
 	// model inputs
 	TotalCapacity( 0.0 ),
@@ -69,8 +83,18 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
 	FullLoadOutAirHumRat( 0.0 ), // full load outlet air humidity ratio {kg/kg}
 	FullLoadOutAirEnth( 0.0 ), // full load outlet air enthalpy {J/kg}
 	FullLoadPower( 0.0 ), // full load power at speed {W}
-	RTF( 0.0 ) // coil runtime fraction at speed
+	RTF( 0.0 ), // coil runtime fraction at speed
 
+    // other data members
+    rated_total_capacity(0.0),
+    evap_air_flow_rate(0.0),
+    condenser_air_flow_rate(0.0),
+    gross_shr(0.0),
+    active_fraction_of_face_coil_area(0.0),
+    rated_evap_fan_power_per_volume_flow_rate(0.0),
+    evap_condenser_pump_power_fraction(0.0),
+    evap_condenser_effectiveness(0.0),
+    rated_waste_heat_fraction_of_power_input(0.0)
 {
     int numModes = InputProcessor::GetNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numModes <= 0) {
@@ -110,7 +134,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find)
         input_specs.sensible_heat_ratio_modifier_function_of_temperature_curve_name = cAlphaArgs(8);
         input_specs.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name = cAlphaArgs(9);
 
-		this->instantiateFromInputSpec(input_specs);
+		this->instantiateFromInputSpec(input_specs, parentMode);
     }
 
     if (!found_it) {

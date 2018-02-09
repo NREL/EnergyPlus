@@ -1,4 +1,5 @@
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
+#include <Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <DataIPShortCuts.hh>
 #include <InputProcessor.hh>
 
@@ -11,7 +12,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(
     //bool errorsFound = false;
     this->name = input_data.name;
     for(auto & speed_name : input_data.speed_data_names) {
-        this->speeds.push_back(CoilCoolingDXCurveFitSpeed(speed_name));
+        this->speeds.push_back(CoilCoolingDXCurveFitSpeed(speed_name, *this));
     }
 }
 
