@@ -57,6 +57,7 @@
 #include <HVACUnitarySystem.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
+#include <CoilCoolingDX.hh>
 #include <CurveManager.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
@@ -4298,6 +4299,8 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = Coil_UserDefined;
 				} else if ( SameString( CoolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage" ) ) {
 					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
+				} else if ( SameString( CoolingCoilType, "Coil:Cooling:DX" ) ) { // CoilCoolingDX
+					UnitarySystem( UnitarySysNum ).CoolingCoilType_Num = CoilDX_Cooling;
 				} else {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 					ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilTypeAlphaNum ) + " = " + Alphas( iCoolingCoilTypeAlphaNum ) );
@@ -4380,6 +4383,9 @@ namespace HVACUnitarySystem {
 						SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound, HeatingCoilPLFCurveIndex );
 					}
 
+				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_Cooling ) {
+					// call CoilCoolingDX constructor
+					// mine data from coil object
 				} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 					ValidateComponent( CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
@@ -8591,6 +8597,8 @@ namespace HVACUnitarySystem {
 			SimDXCoil( BlankString, CompOn, FirstHVACIteration, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio, OnOffAirFlowRatio, CoilCoolHeatRat );
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
+		} else if ( SELECT_CASE_var == CoilDX_Cooling ) { // CoilCoolingDX
+			CoilCoolingDX::simulate();
 		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) { // CoilSystem:Cooling:*:HeatExchangerAssisted
 
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {
