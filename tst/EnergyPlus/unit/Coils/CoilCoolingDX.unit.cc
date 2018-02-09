@@ -74,7 +74,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXInputFullHierarchySingleModeSingleSpeed 
       " 200,",
       " DiscreteStagedContinuousOrNotBacon,",
       " 5,                  ",
-      " Speed1Name,                  ",
+      " Speed1Name;                  ",
       "Coil:Cooling:DX:CurveFit:Speed,       ",
       " Speed1Name,             ",
       " 0.8,         ",
