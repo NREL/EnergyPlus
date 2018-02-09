@@ -53,6 +53,10 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
     }
 }
 
+CoilCoolingDX::simulate() {
+
+}
+
             // PlantProfile name
 //            VerifyName( cAlphaArgs( 1 ), PlantProfile, ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
 //            if ( IsNotOK ) {

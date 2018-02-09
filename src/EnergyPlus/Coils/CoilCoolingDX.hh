@@ -34,6 +34,7 @@ namespace EnergyPlus {
 		CoilCoolingDX(std::string name);
 
 		void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
+		void simulate();
 
 		std::string name;
 		int evapInletNodeIndex;
