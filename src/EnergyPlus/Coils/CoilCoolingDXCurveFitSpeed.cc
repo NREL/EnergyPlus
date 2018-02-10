@@ -29,6 +29,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFit
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
 	if ( input_data.total_cooling_capacity_function_of_temperature_curve_name != "" ) {
 		this->indexCapFT = CurveManager::GetCurveIndex( input_data.total_cooling_capacity_function_of_temperature_curve_name );
+		this->typeCapFT = CurveManager::GetCurveTypeNum( this->indexCapFT );
 	}
 	if ( input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name != "" ) {
 		this->indexCapFFF = CurveManager::GetCurveIndex( input_data.total_cooling_capacity_function_of_air_flow_fraction_curve_name );
@@ -175,7 +176,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 		CBF = 0.0;
 	}
 
-	Real64 inletWetBulb = 17.5;
+	Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( inletState.tdb, inletState.w, ambPressure );
 
 	int Counter = 0; // iteration counter for dry coil condition
 	int const MaxIter( 30 ); // iteration limit

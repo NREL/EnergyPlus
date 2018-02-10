@@ -51,16 +51,16 @@ namespace EnergyPlus {
         std::string name;
 
         Real64 TotalCapacity;
-        int indexCapFT;
-        int typeCapFT;
-        int indexCapFFF;
-        int indexEIRFT;
-        int indexEIRFFF;
-        int indexPLRFPLF;
-        int indexWHFT;
-        int indexWHFFF;
-        int indexSHRFT;
-        int indexSHRFFF;
+        int const indexCapFT;
+        int const typeCapFT;
+        int const indexCapFFF;
+        int const indexEIRFT;
+        int const indexEIRFFF;
+        int const indexPLRFPLF;
+        int const indexWHFT;
+        int const indexWHFFF;
+        int const indexSHRFT;
+        int const indexSHRFFF;
 
         // speed class inputs
         Real64 PLR;

@@ -510,6 +510,9 @@ namespace CurveManager {
 	bool
 	IsCurveOutputTypeValid( std::string const & InOutputType ); // index of curve in curve array
 
+	int
+	GetCurveTypeNum( int const & CurveIndex ); // integer representation of curve type
+
 	std::string
 	GetCurveType( int const CurveIndex ); // index of curve in curve array
 

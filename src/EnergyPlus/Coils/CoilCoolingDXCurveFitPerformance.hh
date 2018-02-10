@@ -46,6 +46,7 @@ namespace EnergyPlus {
 		Real64 minOutdoorDrybulb;
 		Real64 maxOutdoorDrybulb;
 		Real64 unitStatic; // TODO: make curve f(flow)?
+		bool mySizeFlag;
 
 		enum ModeMethod {
 			HUMIDITY_CONTROL, SCHEDULE

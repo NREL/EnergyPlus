@@ -1,7 +1,10 @@
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <DataIPShortCuts.hh>
+#include <DataHVACGlobals.hh>
+#include <DataSizing.hh>
 #include <InputProcessor.hh>
+#include <ReportSizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -56,7 +59,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         }
 
         this->instantiateFromInputSpec(input_specs);
-    }
+	}
 
     if (!found_it) {
         // error
@@ -64,19 +67,50 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
 
 }
 
+void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode() {
+
+	std::string RoutineName = "sizeOperatingMode";
+	std::string CompType = this->object_name;
+	std::string CompName = this->name;
+	bool PrintFlag = true;
+
+	int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+	std::string SizingString = "Rated Evaporator Air Flow Rate";
+	Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
+	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+	this->ratedEvapAirFlowRate = TempSize;
+
+	SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+	SizingString = "Rated Gross Total Cooling Capacity";
+	TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
+	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+	this->ratedGrossTotalCap = TempSize;
+
+	SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+	// Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+	DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
+	DataSizing::DataFractionUsedForSizing = 0.000114;
+	SizingString = "Rated Condenser Air Flow Rate";
+	TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
+	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+	this->ratedCondAirFlowRate = TempSize;
+
+	// where should this be done?
+	this->maxCyclingRate = this->original_input_specs.maximum_cycling_rate;
+	this->latentTimeConst = this->original_input_specs.latent_capacity_time_constant;
+	this->evapRateRatio = this->original_input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
+	this->timeForCondensateRemoval = this->original_input_specs.nominal_time_for_condensate_removal_to_begin;
+
+}
+
 Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Psychrometrics::PsychState & inletState, int & mode, Real64 & PLR, int & speedNum, Real64 & speedRatio, int & fanOpMode ) {
 
 	auto & thisspeed( this->speeds[ max( speedNum - 1, 0 ) ] );
 
-	thisspeed.CondInletTemp = 35.0;
-	thisspeed.ambPressure = 101325.0;
-	thisspeed.AirFF = 1.0;
-	thisspeed.RatedTotCap = 3000.0;
-	thisspeed.RatedAirMassFlowRate = 1.0;
-	thisspeed.RatedSHR = 0.75;
-	thisspeed.RatedCBF = 0.09;
-	thisspeed.RatedEIR = 0.30;
-	thisspeed.AirMassFlow = 1.0;
+	thisspeed.CondInletTemp = inletState.tdb;
+	thisspeed.ambPressure = inletState.p;
+	thisspeed.AirMassFlow = inletState.massFlowRate;
+	thisspeed.AirFF = inletState.massFlowRate / thisspeed.RatedAirMassFlowRate;
 
 	auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, fanOpMode );
 

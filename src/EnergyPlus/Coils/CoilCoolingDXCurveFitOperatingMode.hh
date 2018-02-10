@@ -37,7 +37,9 @@ namespace EnergyPlus {
 
         void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
 
-        CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
+		void sizeOperatingMode();
+
+		CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
 
         CoilCoolingDXCurveFitOperatingMode() {}
 
@@ -74,9 +76,10 @@ namespace EnergyPlus {
 
         std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
-        Psychrometrics::PsychState CalcOperatingMode(Psychrometrics::PsychState & inletState, int & mode, Real64 & PLR, int & speedNum, Real64 & speedRatio, int & fanOpMode );
+		Psychrometrics::PsychState CalcOperatingMode(Psychrometrics::PsychState & inletState, int & mode, Real64 & PLR, int & speedNum, Real64 & speedRatio, int & fanOpMode );
 
     };
+
 
 }
 
