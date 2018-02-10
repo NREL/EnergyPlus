@@ -137,7 +137,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find,
     }
 }
 
-Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrometrics::PsychState & inletState ) {
+Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrometrics::PsychState & inletState, int & fanOpMode ) {
 
 	// first things first, let's go get the name of our unitary object
 	//auto & compound_object_type = this->parentMode->parentPerformance->parentCoil.compound_object_type;
@@ -225,8 +225,6 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 				// since the TotCapTempModFac doesn't work properly with dry-coil conditions.
 				inletState.w = RF * wADP + ( 1.0 - RF ) * inletState.w;
 				inletState.twb = Psychrometrics::PsyTwbFnTdbWPb( inletState.tdb, inletState.w, ambPressure );
-				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-				//  InletAirWetBulbC = PsyTwbFnTdbWPb(InletAirDryBulbTemp,InletAirHumRatTemp,InletAirPressure)
 				++Counter;
 				if ( std::abs( werror ) > Tolerance ) continue; // Recalculate with modified inlet conditions
 				break;
@@ -241,7 +239,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 	if ( indexPLRFPLF > 0 ) {
 		PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
 	}
-	if ( FanOpMode == DataHVACGlobals::CycFanCycCoil ) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
+	if ( fanOpMode == DataHVACGlobals::CycFanCycCoil ) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
 
 	Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
 	if ( indexEIRFT > 0 ) {
@@ -276,7 +274,7 @@ void CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState & i
   Real64 deltaH = rated_total_capacity / airMassFlowRate;
   out.p = in.p;
   out.h = in.h - deltaH;
-  out.w = Psychrometrics::PsyWFnTdbH(out.tdb, in.h - (1.0 - gross_shr)*deltaH); // enthalpy at Tdb,in and Wout
+  out.w = Psychrometrics::PsyWFnTdbH(in.tdb, in.h - (1.0 - gross_shr)*deltaH); // enthalpy at Tdb,in and Wout
   out.tdb = Psychrometrics::PsyTdbFnHW(out.h, out.w);
   out.rh = Psychrometrics::PsyRhFnTdbWPb(out.tdb, out.w, out.p);
 

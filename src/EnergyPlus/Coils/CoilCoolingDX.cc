@@ -2,11 +2,14 @@
 
 #include <Coils/CoilCoolingDX.hh>
 #include <BranchNodeConnections.hh>
+#include <DataGlobals.hh>
+#include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -27,9 +30,15 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     BranchNodeConnections::TestCompSet( CoilCoolingDX::object_name, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes" );
 
     // setup output variables, should probably be done elsewhere
-    SetupOutputVariable( "Fancy DX Coil Power", OutputProcessor::Unit::W, this->totalPower, "System", "Average", this->name );
     SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name );
     SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, this->totalCoolingEnergy, "System", "Sum", this->name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+	SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name );
+	SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name );
+	SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name );
+	SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name );
+	SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, this->elecCoolingPower, "System", "Average", this->name );
+	SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, this->elecCoolingConsumption, "System", "Sum", this->name, _, "Electric", "COOLING", _, "System" );
+	SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name );
 
 }
 
@@ -71,74 +80,38 @@ CoilCoolingDX::CoilCoolingDX(std::string name_to_find) {
     }
 }
 
-void CoilCoolingDX::simulate(Real64 PLR, int speedNum, Real64 speedRatio) {
+void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode) {
 
     // get inlet conditions from inlet node
     auto & evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
     this->inletStateHolder.tdb = evapInletNode.Temp;
     this->inletStateHolder.h = evapInletNode.Enthalpy;
     this->inletStateHolder.w = evapInletNode.HumRat;
+	this->inletStateHolder.massFlowRate = evapInletNode.MassFlowRate;
 
     // call the simulation, which returns useful data
     auto & myPerformance = this->performance;
-    this->outletStateHolder = myPerformance.simulate(this->inletStateHolder);
+    this->outletStateHolder = myPerformance.simulate(this->inletStateHolder, mode, PLR, speedNum, speedRatio, fanOpMode );
 
     // update outlet conditions
     auto & evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
     evapOutletNode.Temp = this->outletStateHolder.tdb;
     evapOutletNode.HumRat = this->outletStateHolder.w;
+	evapOutletNode.Enthalpy = this->outletStateHolder.h;
+	evapOutletNode.MassFlowRate = this->inletStateHolder.massFlowRate; // pass through
+	evapOutletNode.Press = this->inletStateHolder.p; // pass through
 
-    // update report variables
-    this->totalPower = myPerformance.powerUse;
+	// calculate energy conversion factor
+	Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+	// update report variables
+	this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * ( evapOutletNode.Enthalpy - evapInletNode.Enthalpy );
+	this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
+	Real64 minAirHumRat = min( evapInletNode.HumRat, evapOutletNode.HumRat );
+	this->sensCoolingEnergyRate = evapOutletNode.MassFlowRate * ( Psychrometrics::PsyHFnTdbW( evapInletNode.Temp, minAirHumRat ) - Psychrometrics::PsyHFnTdbW( evapOutletNode.Temp, minAirHumRat ) );
+	this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
+	this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
+	this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
+	this->coolingCoilRuntimeFraction = myPerformance.RTF;
+	this->elecCoolingPower = myPerformance.powerUse;
+	this->elecCoolingConsumption = myPerformance.powerUse * reportingConstant;
 }
-
-            // PlantProfile name
-//            VerifyName( cAlphaArgs( 1 ), PlantProfile, ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
-//            if ( IsNotOK ) {
-//                ErrorsFound = true;
-//                if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-//            }
-//            PlantProfile( ProfileNum ).Name = cAlphaArgs( 1 );
-//            PlantProfile( ProfileNum ).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
-//
-//            PlantProfile( ProfileNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-//            PlantProfile( ProfileNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-//
-//            PlantProfile( ProfileNum ).LoadSchedule = GetScheduleIndex( cAlphaArgs( 4 ) );
-//
-//            if ( PlantProfile( ProfileNum ).LoadSchedule == 0 ) {
-//                ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  The Schedule for " + cAlphaFieldNames( 4 ) + " called " + cAlphaArgs( 4 ) + " was not found." );
-//                ErrorsFound = true;
-//            }
-//
-//            PlantProfile( ProfileNum ).PeakVolFlowRate = rNumericArgs( 1 );
-//
-//            PlantProfile( ProfileNum ).FlowRateFracSchedule = GetScheduleIndex( cAlphaArgs( 5 ) );
-//
-//            if ( PlantProfile( ProfileNum ).FlowRateFracSchedule == 0 ) {
-//                ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  The Schedule for " + cAlphaFieldNames( 5 ) + " called " + cAlphaArgs( 5 ) + " was not found." );
-//
-//                ErrorsFound = true;
-//            }
-//
-//            // Check plant connections
-//            TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), cCurrentModuleObject + " Nodes" );
-//
-//            // Setup report variables
-//            SetupOutputVariable( "Plant Load Profile Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantProfile( ProfileNum ).MassFlowRate, "System", "Average", PlantProfile( ProfileNum ).Name );
-//
-//            SetupOutputVariable( "Plant Load Profile Heat Transfer Rate", OutputProcessor::Unit::W, PlantProfile( ProfileNum ).Power, "System", "Average", PlantProfile( ProfileNum ).Name );
-//
-//            SetupOutputVariable( "Plant Load Profile Heat Transfer Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).Energy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "ENERGYTRANSFER", "Heating", _, "Plant" ); // is EndUseKey right?
-//
-//            SetupOutputVariable( "Plant Load Profile Heating Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).HeatingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "Heating", _, "Plant" );
-//
-//            SetupOutputVariable( "Plant Load Profile Cooling Energy", OutputProcessor::Unit::J, PlantProfile( ProfileNum ).CoolingEnergy, "System", "Sum", PlantProfile( ProfileNum ).Name, _, "PLANTLOOPCOOLINGDEMAND", "Cooling", _, "Plant" );
-//
-//            if ( AnyEnergyManagementSystemInModel ) {
-//                SetupEMSActuator( "Plant Load Profile", PlantProfile( ProfileNum ).Name, "Mass Flow Rate", "[kg/s]", PlantProfile( ProfileNum ).EMSOverrideMassFlow, PlantProfile( ProfileNum ).EMSMassFlowValue );
-//                SetupEMSActuator( "Plant Load Profile", PlantProfile( ProfileNum ).Name, "Power", "[W]", PlantProfile( ProfileNum ).EMSOverridePower, PlantProfile( ProfileNum ).EMSPowerValue );
-//            }
-//
-//            if ( ErrorsFound ) ShowFatalError( "Errors in " + cCurrentModuleObject + " input." );
-

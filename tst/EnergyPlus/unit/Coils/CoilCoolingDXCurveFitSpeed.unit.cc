@@ -136,9 +136,9 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	thisSpeed.RatedCBF = 0.09;
 	thisSpeed.RatedEIR = 0.30;
 	thisSpeed.AirMassFlow = 1.0;
-	thisSpeed.FanOpMode = 0;
+	int fanOpMode = 0;
 
-	auto outletConditions = thisSpeed.CalcSpeedOutput(inletState);
+	auto outletConditions = thisSpeed.CalcSpeedOutput(inletState, fanOpMode);
 
 	EXPECT_NEAR( outletConditions.tdb, 17.057, 0.001 );
 	EXPECT_NEAR( outletConditions.w, 0.0078, 0.0001 );

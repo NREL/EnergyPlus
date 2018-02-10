@@ -74,7 +74,7 @@ namespace EnergyPlus {
 
         std::vector<CoilCoolingDXCurveFitSpeed> speeds;
 
-        Psychrometrics::PsychState CalcOperatingMode(Psychrometrics::PsychState & inletState, Real64 &PLR, Real64 &SpeedNum, Real64 &SpeedRatio);
+        Psychrometrics::PsychState CalcOperatingMode(Psychrometrics::PsychState & inletState, int & mode, Real64 & PLR, int & speedNum, Real64 & speedRatio, int & fanOpMode );
 
     };
 

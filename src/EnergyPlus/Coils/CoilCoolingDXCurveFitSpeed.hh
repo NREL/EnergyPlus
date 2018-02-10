@@ -94,7 +94,7 @@ namespace EnergyPlus {
         Real64 evap_condenser_effectiveness;
         Real64 rated_waste_heat_fraction_of_power_input;
 
-        Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState & inletState); // Real64 & PLR, Real64 const IDT, Real64 const OAT, Real64 const AirFF );
+        Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState & inletState, int & fanOpMode);
 
         void CalcBypassFactor(Psychrometrics::PsychState & in);
     };

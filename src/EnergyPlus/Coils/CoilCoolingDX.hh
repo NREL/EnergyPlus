@@ -35,7 +35,7 @@ namespace EnergyPlus {
 		CoilCoolingDX(std::string name);
 
 		void instantiateFromInputSpec(CoilCoolingDXInputSpecification input_data);
-		void simulate(Real64 PLR, int speedNum, Real64 speedRatio);
+		void simulate(int mode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
 
 		std::string name;
 		int evapInletNodeIndex;
@@ -55,7 +55,13 @@ namespace EnergyPlus {
 		// report variables
 		Real64 totalCoolingEnergyRate;
 		Real64 totalCoolingEnergy;
-		Real64 totalPower;
+		Real64 sensCoolingEnergyRate;
+		Real64 sensCoolingEnergy;
+		Real64 latCoolingEnergyRate;
+		Real64 latCoolingEnergy;
+		Real64 elecCoolingPower;
+		Real64 elecCoolingConsumption;
+		Real64 coolingCoilRuntimeFraction;
 
 	};
 

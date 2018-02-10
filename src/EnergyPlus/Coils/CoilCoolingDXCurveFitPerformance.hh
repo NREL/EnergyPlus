@@ -34,7 +34,7 @@ namespace EnergyPlus {
 
 	public:
 		void instantiateFromInputSpec(CoilCoolingDXCurveFitPerformanceInputSpecification input_data);
-		Psychrometrics::PsychState simulate(Psychrometrics::PsychState & inletState);
+		Psychrometrics::PsychState simulate(Psychrometrics::PsychState & inletState, int & mode, Real64 & PLR, int & speedNum, Real64 & speedRatio, int & fanOpMode );
 
 		CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
@@ -59,6 +59,7 @@ namespace EnergyPlus {
 		Real64 evapCondBasinHeatSetpoint;
 		int evapCondBasinHeatSchedulIndex;
 		Real64 powerUse;
+		Real64 RTF;
 
 		std::vector<CoilCoolingDXCurveFitOperatingMode> modes;
 	};

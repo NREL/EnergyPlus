@@ -61,13 +61,11 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
     }
 }
 
-Psychrometrics::PsychState CoilCoolingDXCurveFitPerformance::simulate(Psychrometrics::PsychState & inletState) {
-    // do some stuff with performance
-    int const modeNum = 1;
-    auto & currentMode = this->modes[modeNum-1];
-    Real64 a=1, b=1, c=1;
-    auto returnState = currentMode.CalcOperatingMode(inletState, a, b, c);
+Psychrometrics::PsychState CoilCoolingDXCurveFitPerformance::simulate(Psychrometrics::PsychState & inletState, int & mode, Real64 & PLR, int & speedNum, Real64 & speedRatio, int & fanOpMode ) {
+	auto & currentMode = this->modes[ mode ];
+	auto returnState = currentMode.CalcOperatingMode(inletState, mode, PLR, speedNum, speedRatio, fanOpMode);
     this->powerUse = currentMode.OpModePower;
-    return returnState;
+	this->RTF = currentMode.OpModeRTF;
+	return returnState;
 }
 
