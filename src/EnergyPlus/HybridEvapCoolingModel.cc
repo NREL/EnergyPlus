@@ -1073,7 +1073,7 @@ namespace EnergyPlus {//***************
 			optimal_EnvCondMet = false;
 			Tsa = 0;
 			//reset the power use to a high value, this is replaced during the calculation keeping the "best" setting. 
-			//pOptimal.ElectricalPower = IMPLAUSIBLE_POWER;
+		
 			RunningPeakCapacity_EnvCondMet = false;
 			Settings.clear();
 		}
@@ -1563,7 +1563,7 @@ namespace EnergyPlus {//***************
 			Real64 UnscaledMsa = 0;
 			Real64 ScaledMsa = 0;
 			Real64 Mvent = 0;
-			Real64 pOptimal_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
+			Real64 OptimalSetting_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
 			Real64 EIR;
 			Real64 ElectricalPower;
 			Real64 SHR;
@@ -1846,10 +1846,10 @@ namespace EnergyPlus {//***************
 				if (Conditioning_load_met && Humidification_load_met)
 				{
 					//store best performing mode
-					if (RunFractionTotalFuel < pOptimal_RunFractionTotalFuel)
+					if (RunFractionTotalFuel < OptimalSetting_RunFractionTotalFuel)
 					{
-						pOptimal_RunFractionTotalFuel = RunFractionTotalFuel;
-						pOptimal = *(*iteratorSetting);
+						OptimalSetting_RunFractionTotalFuel = RunFractionTotalFuel;
+						OptimalSetting = *(*iteratorSetting);
 						DidWeMeetLoad = true;
 						DidWeMeetHumidificaiton = true;
 					}
@@ -1896,8 +1896,8 @@ namespace EnergyPlus {//***************
 						}
 						if (store_best_attempt)
 						{
-							pOptimal_RunFractionTotalFuel = RunFractionTotalFuel;
-							pOptimal = *(*iteratorSetting);
+							OptimalSetting_RunFractionTotalFuel = RunFractionTotalFuel;
+							OptimalSetting = *(*iteratorSetting);
 							DidWePartlyMeetLoad = true;
 						}
 					}
@@ -1926,9 +1926,9 @@ namespace EnergyPlus {//***************
 				//add first setting to operating modes
 				ErrorCode = 0;
 				//save the optimal setting in the 
-				CurrentOperatingSettings[0] = pOptimal;
-				RawHR = pOptimal.RawW;
-				PrimaryModeRuntimeFraction=pOptimal.Runtime_Fraction;
+				CurrentOperatingSettings[0] = OptimalSetting;
+				RawHR = OptimalSetting.RawW;
+				PrimaryModeRuntimeFraction=OptimalSetting.Runtime_Fraction;
 				oStandBy.Runtime_Fraction = (1 - PrimaryModeRuntimeFraction );
 				if (oStandBy.Runtime_Fraction < 0)
 				{
@@ -1943,15 +1943,15 @@ namespace EnergyPlus {//***************
 				{
 					ErrorCode = 0;
 					count_DidWeNotMeetLoad++;
-					if (pOptimal.ElectricalPower == IMPLAUSIBLE_POWER)
+					if (OptimalSetting.ElectricalPower == IMPLAUSIBLE_POWER)
 					{
 						ShowWarningError("Model was not able to provide cooling for a time step, called in HybridEvapCooling:dostep");
-						pOptimal.ElectricalPower = 0;
+						OptimalSetting.ElectricalPower = 0;
 					}
-					pOptimal.Runtime_Fraction = 1;
-					RawHR = pOptimal.RawW;
-					CurrentOperatingSettings[0] = pOptimal;
-					PrimaryMode = pOptimal.Mode;
+					OptimalSetting.Runtime_Fraction = 1;
+					RawHR = OptimalSetting.RawW;
+					CurrentOperatingSettings[0] = OptimalSetting;
+					PrimaryMode = OptimalSetting.Mode;
 					PrimaryModeRuntimeFraction = 1;
 				}
 			//if we didn't even partially meet the load make sure the operational settings are just the standby mode.

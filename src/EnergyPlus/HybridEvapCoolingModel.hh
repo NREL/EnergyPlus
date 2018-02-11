@@ -358,7 +358,7 @@ namespace EnergyPlus {
 			int DebugBreak;
 			Real64 RawHR;
 
-			CSetting pOptimal;
+			CSetting OptimalSetting;
 			CSetting oStandBy;
 
 			std::list <std::shared_ptr< CSetting >> Settings;
