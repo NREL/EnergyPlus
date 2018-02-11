@@ -393,8 +393,7 @@ namespace EnergyPlus {
 			std::vector<int> SAT_OC_MetinMode_v;
 			std::vector<int> SAHR_OC_MetinMode_v;
 			bool WarnOnceFlag;
-			//holds the X and Y points of the possible sollutions within the operating conditions. Int is the mode number
-			std::list<CModeSolutionSpace*> SolutionSpaces;
+			
 			
 			Real64 ResolutionMsa;
 			Real64 ResolutionOSA;

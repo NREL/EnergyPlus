@@ -1080,14 +1080,6 @@ namespace EnergyPlus {//***************
 
 		Model::~Model()                 
 		{
-			for (auto iter = SolutionSpaces.begin(); iter != SolutionSpaces.end(); ++iter) {
-				CModeSolutionSpace* p = (*iter);
-				delete p;
-			} 
-			
-			for (auto iterSettings = Settings.begin(); iterSettings != Settings.end(); ++iterSettings) {
-				 (*iterSettings).reset();
-			}
 		}
 
 		CMode::~CMode()  
