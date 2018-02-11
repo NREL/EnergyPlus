@@ -1,14 +1,16 @@
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <Coils/PsychStruct.hh>
-#include <DataIPShortCuts.hh>
-#include <InputProcessor.hh>
 #include <CurveManager.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
+#include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataSizing.hh>
 #include <DXCoils.hh>
+#include <InputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ReportSizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -16,12 +18,13 @@ using namespace DataIPShortCuts;
 void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFitSpeedInputSpecification input_data, CoilCoolingDXCurveFitOperatingMode * _parentMode ) {
     this->original_input_specs = input_data;
     this->parentMode = _parentMode;
+//	this->mySizeFlag = true; // set up flag for sizing
     //bool errorsFound = false;
     this->name = input_data.name;
-    this->rated_total_capacity = input_data.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
-    this->evap_air_flow_rate = input_data.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
-    this->condenser_air_flow_rate = input_data.condenser_air_flow_fraction * parentMode->ratedCondAirFlowRate;
-    this->gross_shr = input_data.gross_rated_sensible_heat_ratio;
+//    this->rated_total_capacity = input_data.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
+//    this->evap_air_flow_rate = input_data.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
+//    this->condenser_air_flow_rate = input_data.condenser_air_flow_fraction * parentMode->ratedCondAirFlowRate;
+//    this->gross_shr = input_data.gross_rated_sensible_heat_ratio;
     this->active_fraction_of_face_coil_area = input_data.active_fraction_of_coil_face_area;
     this->rated_evap_fan_power_per_volume_flow_rate = input_data.rated_evaporator_fan_power_per_volume_flow_rate;
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
@@ -69,7 +72,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find,
 	CondInletTemp( 0.0 ), // condenser inlet node temp or outdoor temp if no condenser node {C}
 	ambPressure( 0.0 ), // outdoor pressure {Pa]
 	AirFF( 0.0 ), // ratio of air mass flow rate to rated air mass flow rate
-	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
+//	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
 	RatedAirMassFlowRate( 0.0 ), // rated air mass flow rate at speed {kg/s}
 	RatedSHR( 0.0 ), // rated sensible heat ratio at speed
 	RatedCBF( 0.0 ), // rated coil bypass factor at speed
@@ -90,7 +93,15 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find,
     rated_evap_fan_power_per_volume_flow_rate(0.0),
     evap_condenser_pump_power_fraction(0.0),
     evap_condenser_effectiveness(0.0),
-    rated_waste_heat_fraction_of_power_input(0.0)
+    rated_waste_heat_fraction_of_power_input(0.0),
+
+	// rating data
+    RatedInletAirTemp(26.6667), // 26.6667C or 80F
+    RatedInletWetBulbTemp(19.44), // 19.44 or 67F
+    RatedInletAirHumRat(0.01125), // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    RatedOutdoorAirTemp(35.0), // 35 C or 95F
+    DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
+
 {
     int numModes = InputProcessor::GetNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numModes <= 0) {
@@ -138,7 +149,47 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find,
     }
 }
 
-Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrometrics::PsychState & inletState, int & fanOpMode ) {
+void CoilCoolingDXCurveFitSpeed::sizeSpeedMode() {
+
+    std::string RoutineName = "sizeSpeedMode";
+
+    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
+    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
+    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * parentMode->ratedCondAirFlowRate;
+    this->gross_shr = this->original_input_specs.gross_rated_sensible_heat_ratio;
+
+    this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
+    this->RatedCondAirMassFlowRate = this->condenser_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
+
+	bool PrintFlag = true;
+	int SizingMethod = DataHVACGlobals::CoolingSHRSizing;
+	std::string CompType = this->object_name;
+	std::string CompName = this->name;
+	std::string SizingString = "Evaporator Air Flow Rate";
+	DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
+	DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
+//	DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+//	DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+	Real64 TempSize = this->gross_shr;
+	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+	this->RatedSHR = TempSize;
+	this->gross_shr = TempSize;
+	DataSizing::DataFlowUsedForSizing = 0.0;
+	DataSizing::DataCapacityUsedForSizing = 0.0;
+	DataSizing::DataEMSOverrideON = false;
+	DataSizing::DataEMSOverride = 0.0;
+
+//	this->RatedCBF = CalcCBF( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, this->rated_total_capacity, this->evap_air_flow_rate, this->RatedSHR );
+	Psychrometrics::PsychState in;
+	in.tdb = RatedInletAirTemp;
+	in.w = RatedInletAirHumRat;
+	in.h = Psychrometrics::PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
+	in.p = DataEnvironment::StdPressureSeaLevel;
+	this->RatedCBF = CalcBypassFactor( in );
+
+}
+
+Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrometrics::PsychState & inletState, Real64 & PLR, Real64 & speedRatio, int & fanOpMode ) {
 
 	// first things first, let's go get the name of our unitary object
 	//auto & compound_object_type = this->parentMode->parentPerformance->parentCoil.compound_object_type;
@@ -149,6 +200,11 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 	static std::string const RoutineName( "CalcSpeedOutput: " );
 
 	Psychrometrics::PsychState outletState;
+
+    if ( !DataGlobals::SysSizingCalc && this->mySizeFlag ) {
+        sizeSpeedMode();
+        this->mySizeFlag = false;
+    }
 
 	if ( PLR == 0.0 ) {
 		outletState.tdb = inletState.tdb;
@@ -197,7 +253,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 			TotCapFlowModFac = CurveManager::CurveValue( indexCapFFF, AirFF );
 		}
 
-		TotCap = RatedTotCap * TotCapFlowModFac * TotCapTempModFac;
+		TotCap = this->rated_total_capacity * TotCapFlowModFac * TotCapTempModFac;
 
 		SHR = 0.0;
 		if ( indexSHRFT > 0 ) {
@@ -255,18 +311,32 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
 	RTF = PLR / PLF;
 	FullLoadPower = TotCap * EIR * RTF;
 
-	outletState.h = inletState.h - ( TotCap / AirMassFlow );
-	Real64 hTinwout = inletState.h - ( ( 1.0 - SHR ) * hDelta );
-	outletState.w = Psychrometrics::PsyWFnTdbH( inletState.tdb, hTinwout );
-	outletState.tdb = Psychrometrics::PsyTdbFnHW( outletState.h, outletState.w );
+	if ( fanOpMode == DataHVACGlobals::ContFanCycCoil ) {
+
+		outletState.h = inletState.h - ( TotCap / AirMassFlow );
+		outletState.h = ( ( PLR * outletState.h ) + ( ( 1.0 - PLR ) * inletState.h ) );
+		Real64 hTinwout = inletState.h - ( ( 1.0 - SHR ) * hDelta );
+		outletState.w = Psychrometrics::PsyWFnTdbH( inletState.tdb, hTinwout );
+		outletState.w = ( ( PLR * outletState.w ) + ( ( 1.0 - PLR ) * inletState.w ) );
+		outletState.tdb = Psychrometrics::PsyTdbFnHW( outletState.h, outletState.w );
+
+	} else {
+
+		outletState.h = inletState.h - ( TotCap / AirMassFlow );
+		Real64 hTinwout = inletState.h - ( ( 1.0 - SHR ) * hDelta );
+		outletState.w = Psychrometrics::PsyWFnTdbH( inletState.tdb, hTinwout );
+		outletState.tdb = Psychrometrics::PsyTdbFnHW( outletState.h, outletState.w );
+
+	}
 
 	return outletState;
 
 }
 
-void CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState & in) {
+Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState & in) {
 
   // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
+  Real64 calcCBF = 0.0;
 
   // Outlet conditions
   Psychrometrics::PsychState out;
@@ -275,24 +345,52 @@ void CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Psychrometrics::PsychState & i
   Real64 deltaH = rated_total_capacity / airMassFlowRate;
   out.p = in.p;
   out.h = in.h - deltaH;
-  out.w = Psychrometrics::PsyWFnTdbH(in.tdb, in.h - (1.0 - gross_shr)*deltaH); // enthalpy at Tdb,in and Wout
+  out.w = Psychrometrics::PsyWFnTdbH(in.tdb, in.h - (1.0 - this->gross_shr)*deltaH); // enthalpy at Tdb,in and Wout
   out.tdb = Psychrometrics::PsyTdbFnHW(out.h, out.w);
   out.rh = Psychrometrics::PsyRhFnTdbWPb(out.tdb, out.w, out.p);
 
   // ADP conditions
   Psychrometrics::PsychState adp;
-
-  adp.tdb = Psychrometrics::PsyTdpFnWPb(out.w, out.p);
+  adp.tdb = Psychrometrics::PsyTdpFnWPb( out.w, out.p );
 
   Real64 tol = 1.0;
-
   std::size_t iter = 0;
-
   const std::size_t maxIter(50);
+  Real64 errorLast = 100.0;
+  Real64 deltaADPTemp = 5.0;
+  Real64 tolerance = 1.0; // initial conditions for iteration
+  Real64 ADPHumRat = 0.0;
+  Real64 slopeAtConds = 0.0;
+  Real64 deltaT = in.tdb - out.tdb;
+  Real64 deltaHumRat = in.w - out.w;
 
-  while( (iter <= maxIter) ) {
+  if ( deltaT > 0.0 ) slopeAtConds = deltaHumRat / deltaT;
 
+  while ( ( iter <= maxIter ) && ( tolerance > 0.001 ) ) {
+
+    // Do for IterMax iterations or until the error gets below .1%
+    if ( iter > 0 ) adp.tdb += deltaADPTemp;
+      ++iter;
+      //  Find new slope using guessed Tadp
+      ADPHumRat = min( out.w, Psychrometrics::PsyWFnTdpPb( adp.tdb, DataEnvironment::StdPressureSeaLevel ) );
+      Real64 slope = ( in.w - ADPHumRat ) / max( 0.001, ( in.tdb - adp.tdb ) );
+      //  check for convergence (slopes are equal to within error tolerance)
+      Real64 error = ( slope - slopeAtConds ) / slopeAtConds;
+      if ( ( error > 0.0 ) && ( errorLast < 0.0 ) ) {
+        deltaADPTemp = -deltaADPTemp / 2.0;
+      } else if ( ( error < 0.0 ) && ( errorLast > 0.0 ) ) {
+        deltaADPTemp = -deltaADPTemp / 2.0;
+      } else if ( abs( error ) > abs( errorLast ) ) {
+        deltaADPTemp = -deltaADPTemp / 2.0;
+      }
+      errorLast = error;
+      tolerance = std::abs( error );
   }
 
+  //   Calculate Bypass Factor from Enthalpies
+  Real64 ADPEnthalpy = Psychrometrics::PsyHFnTdbW( adp.tdb, ADPHumRat );
+  calcCBF = min( 1.0, ( out.h - ADPEnthalpy ) / ( in.h - ADPEnthalpy ) );
+
+  return calcCBF;
 
 }

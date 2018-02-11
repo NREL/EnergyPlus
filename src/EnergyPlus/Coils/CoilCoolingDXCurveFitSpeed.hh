@@ -39,7 +39,7 @@ namespace EnergyPlus {
     class CoilCoolingDXCurveFitSpeed {
         std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
     public:
-        CoilCoolingDXCurveFitSpeed() {}
+		CoilCoolingDXCurveFitSpeed() {};
 
         CoilCoolingDXCurveFitSpeed(std::string name, CoilCoolingDXCurveFitOperatingMode * parentMode);
 
@@ -51,16 +51,16 @@ namespace EnergyPlus {
         std::string name;
 
         Real64 TotalCapacity;
-        int const indexCapFT;
-        int const typeCapFT;
-        int const indexCapFFF;
-        int const indexEIRFT;
-        int const indexEIRFFF;
-        int const indexPLRFPLF;
-        int const indexWHFT;
-        int const indexWHFFF;
-        int const indexSHRFT;
-        int const indexSHRFFF;
+        int indexCapFT;
+        int typeCapFT;
+        int indexCapFFF;
+        int indexEIRFT;
+        int indexEIRFFF;
+        int indexPLRFPLF;
+        int indexWHFT;
+        int indexWHFFF;
+        int indexSHRFT;
+        int indexSHRFFF;
 
         // speed class inputs
         Real64 PLR;
@@ -71,13 +71,15 @@ namespace EnergyPlus {
         Real64 CondInletTemp; // condenser inlet node temp or outdoor temp if no condenser node {C}
         Real64 ambPressure; // outdoor pressure {Pa]
         Real64 AirFF; // ratio of air mass flow rate to rated air mass flow rate
-        Real64 RatedTotCap; // rated total capacity at speed {W}
+//        Real64 RatedTotCap; // rated total capacity at speed {W}
         Real64 RatedAirMassFlowRate; // rated air mass flow rate at speed {kg/s}
-        Real64 RatedSHR; // rated sensible heat ratio at speed
+        Real64 RatedCondAirMassFlowRate; // rated condenser air mass flow rate at speed {kg/s}
+		Real64 RatedSHR; // rated sensible heat ratio at speed
         Real64 RatedCBF; // rated coil bypass factor at speed
         Real64 RatedEIR; // rated energy input ratio at speed {W/W}
         Real64 AirMassFlow; // coil inlet air mass flow rate {kg/s}
         int FanOpMode; // fan operating mode, constant or cycling fan
+		Real64 speedRatio; // operating PLR between speeds
 
         // speed class outputs
         Real64 FullLoadPower; // full load power at speed {W}
@@ -94,9 +96,18 @@ namespace EnergyPlus {
         Real64 evap_condenser_effectiveness;
         Real64 rated_waste_heat_fraction_of_power_input;
 
-        Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState & inletState, int & fanOpMode);
+        // rating data
+		Real64 RatedInletAirTemp; // 26.6667C or 80F
+		Real64 RatedInletWetBulbTemp; // 19.44 or 67F
+		Real64 RatedInletAirHumRat; // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+		Real64 RatedOutdoorAirTemp; // 35 C or 95F
+		Real64 DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
-        void CalcBypassFactor(Psychrometrics::PsychState & in);
+        Psychrometrics::PsychState CalcSpeedOutput(Psychrometrics::PsychState & inletState, Real64 & PLR, Real64 & speedRatio, int & fanOpMode);
+        void sizeSpeedMode();
+        bool mySizeFlag;
+
+        Real64 CalcBypassFactor(Psychrometrics::PsychState & in);
     };
 }
 

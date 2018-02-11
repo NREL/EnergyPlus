@@ -8608,7 +8608,25 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( SELECT_CASE_var == CoilDX_Cooling ) { // CoilCoolingDX
-			coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex].simulate( UnitarySystem( UnitarySysNum ).DehumidificationMode, PartLoadRatio, UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).FanOpMode );
+
+			if ( CoolingLoad ) {
+				if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 ) {
+					CoilPLR = 1.0; // so where is speed ratio here? If I pass PLR = 1
+					UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = PartLoadRatio;
+				} else {
+					CoilPLR = PartLoadRatio;
+					//				UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0; // isn't this handled somewhere else?
+				}
+			} else {
+				CoilPLR = 0.0;
+			}
+			coilCoolingDXs[UnitarySystem( UnitarySysNum ).CoolingCoilIndex].simulate( UnitarySystem( UnitarySysNum ).DehumidificationMode, CoilPLR, UnitarySystem( UnitarySysNum ).CoolingSpeedNum, UnitarySystem( UnitarySysNum ).CoolingSpeedRatio, UnitarySystem( UnitarySysNum ).FanOpMode );
+			if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 ) {
+				UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = 1.0;
+			} else {
+				UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
+			}
+
 		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) { // CoilSystem:Cooling:*:HeatExchangerAssisted
 
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {

@@ -123,6 +123,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	Psychrometrics::PsychState inletState;
 
 	thisSpeed.PLR = 1.0;
+	thisSpeed.speedRatio = 1.0;
 	inletState.tdb = 20.0;
 	inletState.w = 0.008;
 	inletState.twb = 14.43;
@@ -130,7 +131,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	thisSpeed.CondInletTemp = 35.0;
 	thisSpeed.ambPressure = 101325.0;
 	thisSpeed.AirFF = 1.0;
-	thisSpeed.RatedTotCap = 3000.0;
+	thisSpeed.rated_total_capacity = 3000.0;
 	thisSpeed.RatedAirMassFlowRate = 1.0;
 	thisSpeed.RatedSHR = 0.75;
 	thisSpeed.RatedCBF = 0.09;
@@ -138,7 +139,7 @@ TEST_F( EnergyPlusFixture, CoilCoolingDXCurveFitSpeedTest )
 	thisSpeed.AirMassFlow = 1.0;
 	int fanOpMode = 0;
 
-	auto outletConditions = thisSpeed.CalcSpeedOutput(inletState, fanOpMode);
+	auto outletConditions = thisSpeed.CalcSpeedOutput(inletState, thisSpeed.PLR, thisSpeed.speedRatio, fanOpMode );
 
 	EXPECT_NEAR( outletConditions.tdb, 17.057, 0.001 );
 	EXPECT_NEAR( outletConditions.w, 0.0078, 0.0001 );

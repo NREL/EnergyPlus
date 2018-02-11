@@ -88,6 +88,7 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     this->inletStateHolder.h = evapInletNode.Enthalpy;
     this->inletStateHolder.w = evapInletNode.HumRat;
 	this->inletStateHolder.massFlowRate = evapInletNode.MassFlowRate;
+	this->inletStateHolder.p = evapInletNode.Press;
 
     // call the simulation, which returns useful data
     auto & myPerformance = this->performance;

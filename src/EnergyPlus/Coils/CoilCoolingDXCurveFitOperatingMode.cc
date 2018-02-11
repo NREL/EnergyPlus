@@ -59,7 +59,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
         }
 
         this->instantiateFromInputSpec(input_specs);
-	}
+    }
 
     if (!found_it) {
         // error
@@ -69,37 +69,37 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
 
 void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode() {
 
-	std::string RoutineName = "sizeOperatingMode";
-	std::string CompType = this->object_name;
-	std::string CompName = this->name;
-	bool PrintFlag = true;
+    std::string RoutineName = "sizeOperatingMode";
+    std::string CompType = this->object_name;
+    std::string CompName = this->name;
+    bool PrintFlag = true;
 
-	int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-	std::string SizingString = "Rated Evaporator Air Flow Rate";
-	Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
-	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-	this->ratedEvapAirFlowRate = TempSize;
+    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+    std::string SizingString = "Rated Evaporator Air Flow Rate";
+    Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
+    ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+    this->ratedEvapAirFlowRate = TempSize;
 
-	SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-	SizingString = "Rated Gross Total Cooling Capacity";
-	TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
-	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-	this->ratedGrossTotalCap = TempSize;
+    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+    SizingString = "Rated Gross Total Cooling Capacity";
+    TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
+    ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+    this->ratedGrossTotalCap = TempSize;
 
-	SizingMethod = DataHVACGlobals::AutoCalculateSizing;
-	// Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
-	DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
-	DataSizing::DataFractionUsedForSizing = 0.000114;
-	SizingString = "Rated Condenser Air Flow Rate";
-	TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
-	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-	this->ratedCondAirFlowRate = TempSize;
+    SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+    // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+    DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
+    DataSizing::DataFractionUsedForSizing = 0.000114;
+    SizingString = "Rated Condenser Air Flow Rate";
+    TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
+    ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+    this->ratedCondAirFlowRate = TempSize;
 
-	// where should this be done?
-	this->maxCyclingRate = this->original_input_specs.maximum_cycling_rate;
-	this->latentTimeConst = this->original_input_specs.latent_capacity_time_constant;
-	this->evapRateRatio = this->original_input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
-	this->timeForCondensateRemoval = this->original_input_specs.nominal_time_for_condensate_removal_to_begin;
+    // where should this be done?
+    this->maxCyclingRate = this->original_input_specs.maximum_cycling_rate;
+    this->latentTimeConst = this->original_input_specs.latent_capacity_time_constant;
+    this->evapRateRatio = this->original_input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
+    this->timeForCondensateRemoval = this->original_input_specs.nominal_time_for_condensate_removal_to_begin;
 
 }
 
@@ -110,9 +110,10 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
 	thisspeed.CondInletTemp = inletState.tdb;
 	thisspeed.ambPressure = inletState.p;
 	thisspeed.AirMassFlow = inletState.massFlowRate;
+	if ( fanOpMode == DataHVACGlobals::CycFanCycCoil ) thisspeed.AirMassFlow = inletState.massFlowRate / PLR;
 	thisspeed.AirFF = inletState.massFlowRate / thisspeed.RatedAirMassFlowRate;
 
-	auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, fanOpMode );
+	auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
 
     Psychrometrics::PsychState finalOutletConditions;
 
@@ -126,7 +127,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
 
 		auto & thisspeed( this->speeds[ speedNum ] );
 
-		auto out = thisspeed.CalcSpeedOutput(inletState, fanOpMode );
+		auto out = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
 
         finalOutletConditions.tdb = finalOutletConditions.tdb * speedRatio + ( 1.0 - speedRatio ) * out.tdb;
 		finalOutletConditions.w = finalOutletConditions.w * speedRatio + ( 1.0 - speedRatio ) * out.w;
