@@ -286,6 +286,8 @@ namespace DataZoneEquipment {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneEquipmentData1: " ); // include trailing blank space
 
+    std::cout << RoutineName << std::endl;
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 

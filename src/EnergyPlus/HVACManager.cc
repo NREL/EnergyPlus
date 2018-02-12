@@ -388,6 +388,13 @@ namespace HVACManager {
 		NumOfSysTimeSteps = 1;
 		FracTimeStepZone = TimeStepSys / TimeStepZone;
 
+		if ( ! DataZoneEquipment::ZoneEquipInputsFilled ) {
+			DataZoneEquipment::GetZoneEquipmentData();
+			DataZoneEquipment::ZoneEquipInputsFilled = true;
+		}
+
+	  ZoneTempPredictorCorrector::InitZoneAirSetPoints();
+
 		CalcAirFlowSimple();
 
 		UpdateInternalGainValues( true, true );
@@ -421,12 +428,38 @@ namespace HVACManager {
     OutputRefs[0] = EMO.scalarVariableValueReference("zone_foo_inlet_temp");
     OutputRefs[1] = EMO.scalarVariableValueReference("zone_foo_inlet_mdot");
 
-    nx = 2;
+    nx = 0;
     nz = 1;
+
+    if( nx > 0 ) {
+      x    = (double *) calloc(nx, sizeof(double));
+      xdot = (double *) calloc(nx, sizeof(double));
+    }
+
+    if( nz > 0 ) {
+      z    =  (double *) calloc(nz, sizeof(double));
+      prez =  (double *) calloc(nz, sizeof(double));
+    }
+
+    // set the start time and initialize
+    //time = t0;
+    //fmiFlag =  emo.fmiSetTime(t0);
+    //if (fmiFlag > fmiWarning) return 0;
+    bool toleranceControlled = false;
+    double t0 = 0.0;
+    fmiFlag =  EMO.fmiInitialize(toleranceControlled, t0, &eventInfo);
+    //if (fmiFlag > fmiWarning)  return 0;
+    //if (eventInfo.terminateSimulation) {
+    //    std::cout << "model requested termination at init" << std::endl;
+    //    tEnd = time;
+    //}
 
     Real64 PreTime = DataGlobals::PreSimTime;
     Real64 MaxSysStep = 60;
 		FirstTimeStepSysFlag = true;
+
+      std::cout << "PreTime: " << PreTime << std::endl;
+      std::cout << "DataGlobals::SimTime: " << DataGlobals::SimTime << std::endl;
 
     //NumOfSysTimeSteps = 0;
     while ( PreTime < DataGlobals::SimTime ) {
@@ -443,7 +476,10 @@ namespace HVACManager {
 
       // Reduce timestep if there is an upcoming event from the fmu
       timeEvent = eventInfo.upcomingTimeEvent && eventInfo.nextEventTime <= Time;
-      if (timeEvent) Time = eventInfo.nextEventTime;
+      if (timeEvent) { 
+        Time = eventInfo.nextEventTime;
+        std::cout << "timeEvent: " << Time << std::endl;
+      }
 
       // Reduce timestep down to the maximum allowed system step size
       if ( Time - PreTime > MaxSysStep ) Time = PreTime + MaxSysStep;
@@ -461,6 +497,8 @@ namespace HVACManager {
       // Set inputs
       Inputs[0] = ZoneNode.Temp;
       EMO.fmiSetReal(InputRefs,1,Inputs);
+
+      //std::cout << "ZoneNode.Temp: " << ZoneNode.Temp << std::endl;
 
       // perform one step
       for (unsigned i=0; i<nx; i++) x[i] += DTime * xdot[i]; // forward Euler method
@@ -521,6 +559,7 @@ namespace HVACManager {
       EMO.fmiGetReal(OutputRefs,2,Outputs);
       InletNode.Temp = Outputs[0];
       InletNode.MassFlowRate = Outputs[1];
+
       ReturnAirNode.Temp = ZoneNode.Temp;
       ReturnAirNode.MassFlowRate = Outputs[1];
 

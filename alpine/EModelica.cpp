@@ -169,59 +169,59 @@ void EModelica::compileFMU() {
     fmi_runtime_options_map_vrefs = (int *)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiInstantiateModel") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiInstantiateModel") ) {
     m_fmiInstantiateModel = (t_fmiInstantiateModel)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiSetTime") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiSetTime") ) {
     m_fmiSetTime = (t_fmiSetTime)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiInitialize") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiInitialize") ) {
     m_fmiInitialize = (t_fmiInitialize)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiGetContinuousStates") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiGetContinuousStates") ) {
     m_fmiGetContinuousStates = (t_fmiGetContinuousStates)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiSetContinuousStates") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiSetContinuousStates") ) {
     m_fmiSetContinuousStates = (t_fmiSetContinuousStates)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiGetReal") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiGetReal") ) {
     m_fmiGetReal = (t_fmiGetReal)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiSetReal") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiSetReal") ) {
     m_fmiSetReal = (t_fmiSetReal)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiGetDerivatives") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiGetDerivatives") ) {
     m_fmiGetDerivatives = (t_fmiGetDerivatives)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiCompletedIntegratorStep") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiCompletedIntegratorStep") ) {
     m_fmiCompletedIntegratorStep = (t_fmiCompletedIntegratorStep)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiGetEventIndicators") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiGetEventIndicators") ) {
     m_fmiGetEventIndicators = (t_fmiGetEventIndicators)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiTerminate") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiTerminate") ) {
     m_fmiTerminate = (t_fmiTerminate)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiFreeModelInstance") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiFreeModelInstance") ) {
     m_fmiFreeModelInstance = (t_fmiFreeModelInstance)symbol.getAddress();
   }
 
-  if( auto symbol = j->findSymbol("Vdp_fmiEventUpdate") ) {
+  if( auto symbol = j->findSymbol("Hvac_fmiEventUpdate") ) {
     m_fmiEventUpdate = (t_fmiEventUpdate)symbol.getAddress();
   }
 
-  fmiString instanceName("Vdp");
+  fmiString instanceName("Hvac");
   fmiString uid(C_GUID);
   fmiCallbackFunctions functions;
   fmiBoolean loggingOn(true);

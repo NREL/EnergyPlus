@@ -18,7 +18,7 @@ public class Main {
     OptionRegistry options = ModelicaCompiler.createOptions();
     //options.setOption("debug_duplicate_generated","true");
     ModelicaCompiler mc = new ModelicaCompiler(options);
-    mc.setJModelicaHome("build/alpine");
+    mc.setJModelicaHome("/Users/kbenne/Development/EnergyPLus/build/alpine");
     mc.setOutDir(new File("mo-build/"));
     //mc.setLogger("d:out.log");
     ModelicaCompiler.TargetObject to = mc.createTargetObject("me", "1.0");
@@ -28,9 +28,9 @@ public class Main {
     	System.out.println("Parse Model");
 			SourceRoot sr = mc.parseModel(files);
     	System.out.println("Instantiate Model");
-		  InstClassDecl mo = mc.instantiateModel(sr,"Vdp",to);
+		  InstClassDecl mo = mc.instantiateModel(sr,"Hvac",to);
     	System.out.println("Flatten Model");
-			FClass flatMO = mc.flattenModel(mo,to,"Vdp");
+			FClass flatMO = mc.flattenModel(mo,to,"Hvac");
     	System.out.println("Generate Code");
 			mc.generateCode(flatMO,to);
     	System.out.println("Done generating code");
@@ -38,6 +38,7 @@ public class Main {
     	System.out.println("Beaver parser Exception");
 		} catch (CompilerException e) {
     	System.out.println("Compiler Exception");
+    	System.out.println(e.getMessage());
 		} catch (FileNotFoundException e) {
     	System.out.println("File Not found Exception");
 		} catch (IOException e) {

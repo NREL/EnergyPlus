@@ -327,6 +327,13 @@ namespace SimulationManager {
 		// FLOW:
 		PostIPProcessing();
 
+    // Compile any Modelica models that may be used
+    DataHVACGlobals::EMO.compileModel("hvac.mo");
+    bool toleranceControlled = false;
+    double t0 = 0.0;
+    fmiEventInfo eventInfo;
+    auto fmiFlag =  DataHVACGlobals::EMO.fmiInitialize(toleranceControlled, t0, &eventInfo);
+
 		InitializePsychRoutines();
 
 		BeginSimFlag = true;
