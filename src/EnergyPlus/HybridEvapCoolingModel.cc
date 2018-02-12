@@ -1773,7 +1773,8 @@ namespace EnergyPlus {//***************
 				Real64 SystemCp = ReturnAirCP + OSAF*(OutsideAirCP - ReturnAirCP) + SupplyAirCp; //J/degreesK.kg 
 				Real64 SensibleSystem =  ScaledMsa*0.5* SystemCp * (Tma - Tsa)/1000;//kw  dynamic cp
 				Real64 MsaDry = ScaledMsa*(1 - Wsa);
-				Real64 LatentSystem  = 2257 * MsaDry*(Wma - Wsa); //kw
+				Real64 LambdaSa = Psychrometrics::PsyHfgAirFnWTdb(0, Tsa);
+				Real64 LatentSystem  = LambdaSa * MsaDry*(Wma - Wsa); //kw
 				// Total system cooling
 				TotalSystem = (Hma - Hsa) * ScaledMsa / 1000;
 				// Perform latent check
@@ -1783,7 +1784,7 @@ namespace EnergyPlus {//***************
 				//Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
 				//Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}
 				Real64 SensibleRoomORZone =  ScaledMsa*0.5*(SupplyAirCp + ReturnAirCP) * (StepIns.Tra - Tsa)/1000;//kw  dynamic cp
-				Real64 latentRoomORZone = 2257 * MsaDry*(Wra - Wsa);//kw
+				Real64 latentRoomORZone = LambdaSa * MsaDry*(Wra - Wsa);//kw
 				// Total room cooling
 				Real64 TotalRoomORZone = (Hra - Hsa) * ScaledMsa / 1000; //kw
 				//Perform latent check 
@@ -2135,14 +2136,14 @@ namespace EnergyPlus {//***************
 			// set requested loads to output variables
 			RequestedLoadToHeatingSetpoint = RequestedCoolingLoad;
 			RequestedLoadToCoolingSetpoint = RequestedHeatingLoad;
-
+			Real64 LambdaRa = Psychrometrics::PsyHfgAirFnWTdb(0, InletTemp);
 			RequestedHumdificationMass = OutputRequiredToHumidify;
-			RequestedHumdificationLoad = OutputRequiredToHumidify * 2257 / 1000; // [kW];
-			RequestedHumdificationEnergy = OutputRequiredToHumidify * 2257 * TimeStepSys * SecInHour; // [j]
+			RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa / 1000; // [kW];
+			RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * SecInHour; // [j]
 
 			RequestedDeHumdificationMass = OutputRequiredToDehumidify;
-			RequestedDeHumdificationLoad = OutputRequiredToDehumidify * 2257; // [kW]; 
-			RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * 2257 * TimeStepSys * SecInHour; // [j] 
+			RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa; // [kW]; 
+			RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * SecInHour; // [j] 
 
 			MinOA_Msa = DesignMinVR;// as mass flow kg/s
 
@@ -2261,7 +2262,8 @@ namespace EnergyPlus {//***************
 				//Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}		
 				QSensZoneOut = OutletMassFlowRate* 0.5* (Returncp + Outletcp)*(StepIns.Tra - OutletTemp); //Watts
 				Real64 OutletMassFlowRateDry = OutletMassFlowRate * (1 - Wsa);
-				QLatentZoneOut = 1000 * 2257 * OutletMassFlowRateDry* (InletHumRat - OutletHumRat); //Watts
+				Real64 LambdaSa = Psychrometrics::PsyHfgAirFnWTdb(0, OutletTemp);
+				QLatentZoneOut = 1000 * LambdaSa * OutletMassFlowRateDry* (InletHumRat - OutletHumRat); //Watts
 				QTotZoneOut = OutletMassFlowRateDry * (InletEnthalpy - OutletEnthalpy); //Watts
 				Real64 QLatentCheck = QTotZoneOut - QSensZoneOut;//Watts
 
@@ -2274,7 +2276,7 @@ namespace EnergyPlus {//***************
 				Real64 SystemTimeStepT = StepIns.Tra + averageOSAF * (StepIns.Tosa - StepIns.Tra) - OutletTemp;//T_RA + OSAF *(T_OSA - T_RA) - T_SA
 				QSensSystemOut =  0.5* SystemTimeStepCp *OutletMassFlowRate* SystemTimeStepT;//w
 
-				QLatentSystemOut = 1000 * 2257 * OutletMassFlowRateDry*SystemTimeStepW; //Watts
+				QLatentSystemOut = 1000 * LambdaSa * OutletMassFlowRateDry*SystemTimeStepW; //Watts
 				QTotSystemOut = OutletMassFlowRateDry * (MixedAirEnthalpy - OutletEnthalpy);//Watts
 				QLatentCheck = QTotSystemOut - QSensSystemOut;//Watts
 
