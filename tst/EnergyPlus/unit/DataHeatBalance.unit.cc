@@ -848,24 +848,23 @@ TEST_F( EnergyPlusFixture, DataHeatBalance_CheckConstructLayers )
 	EXPECT_FALSE( SurfaceWindow( 2 ).HasShadeOrBlindLayer ); // the window construction has no blind
 
 	GetEMSInput();
-
+	// check if EMS actuator is not setup because there is no blind/shade layer
 	SetupWindowShadingControlActuators();
-	
+	EXPECT_EQ( numEMSActuatorsAvailable, 0 ); // no EMS actuator because there is shade/blind layer
+
 	// add a blind layer in between glass 
 	Construct( 4 ).TotLayers = 5;
 	Construct( 4 ).TotGlassLayers = 2;
 	Construct( 4 ).TotSolidLayers = 3;
-	
-	EXPECT_EQ( Construct( 4 ).TotLayers, 5 ); // outer glass, air gap, blind, air gap, inner glass
-	EXPECT_EQ( Construct( 4 ).TotGlassLayers, 2 ); // outer glass, inner glass
-	EXPECT_EQ( Construct( 4 ).TotSolidLayers, 3 ); // glass, blind, glass
-
 	Construct( 4 ).LayerPoint( 1 ) = 4; // glass
 	Construct( 4 ).LayerPoint( 2 ) = 5; // air gap
 	Construct( 4 ).LayerPoint( 3 ) = 6; // window blind
 	Construct( 4 ).LayerPoint( 4 ) = 5; // air gap
 	Construct( 4 ).LayerPoint( 5 ) = 4; // glass
-
+	// updated contruction and material layers data
+	EXPECT_EQ( Construct( 4 ).TotLayers, 5 ); // outer glass, air gap, blind, air gap, inner glass
+	EXPECT_EQ( Construct( 4 ).TotGlassLayers, 2 ); // outer glass, inner glass
+	EXPECT_EQ( Construct( 4 ).TotSolidLayers, 3 ); // glass, blind, glass
 	// construction layer material pointers. this construction has blind
 	EXPECT_EQ( Construct( 4 ).LayerPoint( 1 ), 4 ); // glass, outer layer
 	EXPECT_EQ( Construct( 4 ).LayerPoint( 2 ), 5 ); // air gap
@@ -876,15 +875,15 @@ TEST_F( EnergyPlusFixture, DataHeatBalance_CheckConstructLayers )
 	// check if the construction has a blind material layer
 	SetFlagForWindowConstructionWithShadeOrBlindLayer();
 	EXPECT_TRUE( SurfaceWindow( 2 ).HasShadeOrBlindLayer ); // the window construction has blind
-	EXPECT_EQ( numEMSActuatorsAvailable, 0 ); // no EMS actuator because there is shade/blind layer
-
 	// set the blind to movable 
 	SurfaceWindow( 2 ).MovableSlats = true;
 	// check if EMS actuator is available when blind layer is added
 	SetupWindowShadingControlActuators();
 	EXPECT_EQ( numEMSActuatorsAvailable, 2 );
+	EXPECT_EQ( EMSActuatorAvailable( 1 ).ComponentTypeName, "Window Shading Control" );
 	EXPECT_EQ( EMSActuatorAvailable( 1 ).ControlTypeName, "Control Status" );
 	EXPECT_EQ( EMSActuatorAvailable( 1 ).Units, "[ShadeStatus]" );
+	EXPECT_EQ( EMSActuatorAvailable( 2 ).ComponentTypeName, "Window Shading Control" );
 	EXPECT_EQ( EMSActuatorAvailable( 2 ).ControlTypeName, "Slat Angle" );
 	EXPECT_EQ( EMSActuatorAvailable( 2 ).Units, "[degrees]" );
 
