@@ -117,7 +117,7 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     evapOutletNode.MassFlowRateMax = evapInletNode.MassFlowRateMax; // pass through
     evapOutletNode.MassFlowRateMin = evapInletNode.MassFlowRateMin; // pass through
     evapOutletNode.MassFlowRateMaxAvail = evapInletNode.MassFlowRateMaxAvail; // pass through
-    evapOutletNode.MassFlowRateMaxAvail = evapInletNode.MassFlowRateMinAvail; // pass through
+    evapOutletNode.MassFlowRateMinAvail = evapInletNode.MassFlowRateMinAvail; // pass through
 
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
