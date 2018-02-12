@@ -2169,7 +2169,7 @@ namespace DataHeatBalance {
 	}
 
 	void
-		SetFlagForWindowConstructionWithShadeOrBlindLayer()
+	SetFlagForWindowConstructionWithShadeOrBlindLayer()
 	{
 
 
