@@ -47,6 +47,7 @@
 
 // C++ Headers
 #include <math.h>
+#include <stdexcept>
 
 // ObjexxFCL Headers
 
@@ -210,18 +211,43 @@ namespace PVWatts {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
+		bool errorsFound = false;
 
 		GetObjectItem("Generator:PVWatts", objNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 		const std::string name(cAlphaArgs(AlphaFields::NAME));
 		const Real64 dcSystemCapacity(rNumericArgs(NumFields::DC_SYSTEM_CAPACITY));
 		const std::map<std::string, ModuleType> moduleTypeMap = { {"STANDARD", ModuleType::STANDARD}, {"PREMIUM", ModuleType::PREMIUM}, {"ThinFilm", ModuleType::THIN_FILM} };
-		const ModuleType moduleType(moduleTypeMap.at(cAlphaArgs(AlphaFields::MODULE_TYPE)));
+		ModuleType moduleType;
+		auto moduleTypeIt = moduleTypeMap.find(cAlphaArgs(AlphaFields::MODULE_TYPE));
+		if ( moduleTypeIt == moduleTypeMap.end() ) {
+			ShowSevereError("PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
+			errorsFound = true;
+		} else {
+			moduleType = moduleTypeIt->second;
+		}
+
 		const std::map<std::string, ArrayType> arrayTypeMap = { {"FIXEDOPENRACK", ArrayType::FIXED_OPEN_RACK}, {"FIXEDROOFMOUNTED", ArrayType::FIXED_ROOF_MOUNTED}, {"ONEAXIS", ArrayType::ONE_AXIS}, {"ONEAXISBACKTRACKING", ArrayType::ONE_AXIS_BACKTRACKING}, {"TWOAXIS", ArrayType::TWO_AXIS} };
-		const ArrayType arrayType(arrayTypeMap.at(cAlphaArgs(AlphaFields::ARRAY_TYPE)));
+		ArrayType arrayType;
+		auto arrayTypeIt = arrayTypeMap.find(cAlphaArgs(AlphaFields::ARRAY_TYPE));
+		if ( arrayTypeIt == arrayTypeMap.end() ) {
+			ShowSevereError("PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
+			errorsFound = true;
+		} else {
+			arrayType = arrayTypeIt->second;
+		}
+
 		const Real64 systemLosses(rNumericArgs(NumFields::SYSTEM_LOSSES));
 		const std::map<std::string, GeometryType> geometryTypeMap { {"TILTAZIMUTH", GeometryType::TILT_AZIMUTH}, {"SURFACE", GeometryType::SURFACE} };
-		const GeometryType geometryType(geometryTypeMap.at(cAlphaArgs(AlphaFields::GEOMETRY_TYPE)));
+		GeometryType geometryType;
+		auto geometryTypeIt = geometryTypeMap.find(cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
+		if ( geometryTypeIt == geometryTypeMap.end() ) {
+			ShowSevereError("PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
+			errorsFound = true;
+		} else {
+			geometryType = geometryTypeIt->second;
+		}
+
 		const Real64 tilt(rNumericArgs(NumFields::TILT_ANGLE));
 		const Real64 azimuth(rNumericArgs(NumFields::AZIMUTH_ANGLE));
 		int surfaceNum;
@@ -230,6 +256,11 @@ namespace PVWatts {
 		} else {
 			surfaceNum = FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), DataSurfaces::Surface);
 		}
+
+		if (errorsFound) {
+			ShowFatalError("Errors found in getting PVWatts input");
+		}
+
 		if ( NumNums < NumFields::GROUND_COVERAGE_RATIO ) {
 			return PVWattsGenerator(name, dcSystemCapacity, moduleType, arrayType, systemLosses, geometryType, tilt, azimuth, surfaceNum, 0.4);
 		}
