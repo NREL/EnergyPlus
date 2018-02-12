@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,7 +58,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 
-#define MINIMUM_LOAD_TO_ACTIVATE 0.5 // (kw)_ should think about if this needs to be user defined!!!!!
+#define MINIMUM_LOAD_TO_ACTIVATE 0.5 // (kw) sets a minimum load to avoid the system fluttering on and off. 
 #define IMPLAUSIBLE_POWER 10000000
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
@@ -165,15 +166,15 @@ namespace EnergyPlus {
 			Real64 TotalSystem;
 			Real64 SensibleSystem;
 			Real64 LatentSystem;
-			Real64 TotalZone;
-			Real64 SensibleZone;
-			Real64 LatentZone;
+			Real64 TotalZone;	// kW
+			Real64 SensibleZone;	 // kW
+			Real64 LatentZone;	// kW
 			Real64 ElectricalPower;
-			Real64 SupplyFanElectricPower;	   //
-			Real64 SecondaryFuelConsumptionRate;//
-			Real64 ThirdFuelConsumptionRate;   //
-			Real64 WaterConsumptionRate;	   //
-			Real64 ExternalStaticPressure;	   //
+			Real64 SupplyFanElectricPower;	   
+			Real64 SecondaryFuelConsumptionRate;	
+			Real64 ThirdFuelConsumptionRate;	
+			Real64 WaterConsumptionRate;	   
+			Real64 ExternalStaticPressure;	   
 			//Debug values
 			Real64 RawW;
 
@@ -404,8 +405,8 @@ namespace EnergyPlus {
 			int count_DidWeMeetLoad;
 			int count_DidWeNotMeetLoad;
 		
-			Real64 cp;
-			Real64 Lambna;
+			//Real64 cp;
+			//Real64 Lambda;
 			bool optimal_EnvCondMet;
 			bool RunningPeakCapacity_EnvCondMet;
 		
