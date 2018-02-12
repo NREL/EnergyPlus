@@ -39,6 +39,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         input_specs.name = cAlphaArgs(1);
         input_specs.crankcase_heater_capacity = rNumericArgs(1);
         input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation = rNumericArgs(2);
+		this->minOutdoorDrybulb = input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
         input_specs.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation = rNumericArgs(3);
         input_specs.unit_internal_itatic_air_pressure = rNumericArgs(4);
         input_specs.method_for_switching_modes = cAlphaArgs(2);

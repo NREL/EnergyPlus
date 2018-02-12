@@ -10,6 +10,7 @@
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -27,18 +28,29 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     // other construction below
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_outlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+    if ( input_data.condenser_inlet_node_name != "" ) {
+        this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.condenser_inlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+    } else {
+        this->condInletNodeIndex = 0;
+    }
+    if ( input_data.condenser_outlet_node_name != "" ) {
+        this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.condenser_outlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+    } else {
+        this->condOutletNodeIndex = 0;
+    }
+    this->availScheduleIndex = ScheduleManager::GetScheduleIndex( input_data.availability_schedule_name );
     BranchNodeConnections::TestCompSet( CoilCoolingDX::object_name, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes" );
 
     // setup output variables, should probably be done elsewhere
     SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name );
     SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, this->totalCoolingEnergy, "System", "Sum", this->name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-	SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name );
-	SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name );
-	SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name );
-	SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name );
-	SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, this->elecCoolingPower, "System", "Average", this->name );
-	SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, this->elecCoolingConsumption, "System", "Sum", this->name, _, "Electric", "COOLING", _, "System" );
-	SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name );
+    SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name );
+    SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name );
+    SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name );
+    SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name );
+    SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, this->elecCoolingPower, "System", "Average", this->name );
+    SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, this->elecCoolingConsumption, "System", "Sum", this->name, _, "Electric", "COOLING", _, "System" );
+    SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name );
 
 }
 
@@ -87,8 +99,8 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     this->inletStateHolder.tdb = evapInletNode.Temp;
     this->inletStateHolder.h = evapInletNode.Enthalpy;
     this->inletStateHolder.w = evapInletNode.HumRat;
-	this->inletStateHolder.massFlowRate = evapInletNode.MassFlowRate;
-	this->inletStateHolder.p = evapInletNode.Press;
+    this->inletStateHolder.massFlowRate = evapInletNode.MassFlowRate;
+    this->inletStateHolder.p = evapInletNode.Press;
 
     // call the simulation, which returns useful data
     auto & myPerformance = this->performance;
@@ -98,21 +110,26 @@ void CoilCoolingDX::simulate(int mode, Real64 PLR, int speedNum, Real64 speedRat
     auto & evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
     evapOutletNode.Temp = this->outletStateHolder.tdb;
     evapOutletNode.HumRat = this->outletStateHolder.w;
-	evapOutletNode.Enthalpy = this->outletStateHolder.h;
-	evapOutletNode.MassFlowRate = this->inletStateHolder.massFlowRate; // pass through
-	evapOutletNode.Press = this->inletStateHolder.p; // pass through
+    evapOutletNode.Enthalpy = this->outletStateHolder.h;
+    evapOutletNode.MassFlowRate = this->inletStateHolder.massFlowRate; // pass through
+    evapOutletNode.Press = this->inletStateHolder.p; // pass through
+    evapOutletNode.Quality = evapInletNode.Quality; // pass through
+    evapOutletNode.MassFlowRateMax = evapInletNode.MassFlowRateMax; // pass through
+    evapOutletNode.MassFlowRateMin = evapInletNode.MassFlowRateMin; // pass through
+    evapOutletNode.MassFlowRateMaxAvail = evapInletNode.MassFlowRateMaxAvail; // pass through
+    evapOutletNode.MassFlowRateMaxAvail = evapInletNode.MassFlowRateMinAvail; // pass through
 
-	// calculate energy conversion factor
-	Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-	// update report variables
-	this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * ( evapOutletNode.Enthalpy - evapInletNode.Enthalpy );
-	this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
-	Real64 minAirHumRat = min( evapInletNode.HumRat, evapOutletNode.HumRat );
-	this->sensCoolingEnergyRate = evapOutletNode.MassFlowRate * ( Psychrometrics::PsyHFnTdbW( evapInletNode.Temp, minAirHumRat ) - Psychrometrics::PsyHFnTdbW( evapOutletNode.Temp, minAirHumRat ) );
-	this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
-	this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
-	this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
-	this->coolingCoilRuntimeFraction = myPerformance.RTF;
-	this->elecCoolingPower = myPerformance.powerUse;
-	this->elecCoolingConsumption = myPerformance.powerUse * reportingConstant;
+    // calculate energy conversion factor
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    // update report variables
+    this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * ( evapInletNode.Enthalpy - evapOutletNode.Enthalpy );
+    this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
+    Real64 minAirHumRat = min( evapInletNode.HumRat, evapOutletNode.HumRat );
+    this->sensCoolingEnergyRate = evapOutletNode.MassFlowRate * ( Psychrometrics::PsyHFnTdbW( evapInletNode.Temp, minAirHumRat ) - Psychrometrics::PsyHFnTdbW( evapOutletNode.Temp, minAirHumRat ) );
+    this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
+    this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
+    this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
+    this->coolingCoilRuntimeFraction = myPerformance.RTF;
+    this->elecCoolingPower = myPerformance.powerUse;
+    this->elecCoolingConsumption = myPerformance.powerUse * reportingConstant;
 }

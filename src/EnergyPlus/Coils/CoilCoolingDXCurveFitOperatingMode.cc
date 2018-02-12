@@ -1,9 +1,11 @@
 #include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <DataIPShortCuts.hh>
+#include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataSizing.hh>
 #include <InputProcessor.hh>
+#include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 
 using namespace EnergyPlus;
@@ -40,12 +42,18 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(std::stri
 
         input_specs.name = cAlphaArgs(1);
         input_specs.gross_rated_total_cooling_capacity = rNumericArgs(1);
+        this->ratedGrossTotalCap = input_specs.gross_rated_total_cooling_capacity;
         input_specs.rated_evaporator_air_flow_rate = rNumericArgs(2);
+        this->ratedEvapAirFlowRate = input_specs.rated_evaporator_air_flow_rate;
         input_specs.rated_condenser_air_flow_rate = rNumericArgs(3);
         input_specs.maximum_cycling_rate = rNumericArgs(4);
+        this->maxCyclingRate = input_specs.maximum_cycling_rate;
         input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity = rNumericArgs(5);
+        this->evapRateRatio = input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
         input_specs.latent_capacity_time_constant = rNumericArgs(6);
+        this->latentTimeConst = input_specs.latent_capacity_time_constant;
         input_specs.nominal_time_for_condensate_removal_to_begin = rNumericArgs(7);
+        this->timeForCondensateRemoval = input_specs.nominal_time_for_condensate_removal_to_begin;
         input_specs.apply_latent_degradation_to_speeds_greater_than_1 = cAlphaArgs(2);
         input_specs.condenser_type = cAlphaArgs(3);
         input_specs.nominal_evap_condenser_pump_power = rNumericArgs(8);
@@ -95,43 +103,50 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode() {
     ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
     this->ratedCondAirFlowRate = TempSize;
 
-    // where should this be done?
-    this->maxCyclingRate = this->original_input_specs.maximum_cycling_rate;
-    this->latentTimeConst = this->original_input_specs.latent_capacity_time_constant;
-    this->evapRateRatio = this->original_input_specs.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
-    this->timeForCondensateRemoval = this->original_input_specs.nominal_time_for_condensate_removal_to_begin;
-
 }
 
 Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode( Psychrometrics::PsychState & inletState, int & mode, Real64 & PLR, int & speedNum, Real64 & speedRatio, int & fanOpMode ) {
 
-	auto & thisspeed( this->speeds[ max( speedNum - 1, 0 ) ] );
+    auto & thisspeed( this->speeds[ max( speedNum - 1, 0 ) ] );
 
-	thisspeed.CondInletTemp = inletState.tdb;
-	thisspeed.ambPressure = inletState.p;
-	thisspeed.AirMassFlow = inletState.massFlowRate;
-	if ( fanOpMode == DataHVACGlobals::CycFanCycCoil ) thisspeed.AirMassFlow = inletState.massFlowRate / PLR;
-	thisspeed.AirFF = inletState.massFlowRate / thisspeed.RatedAirMassFlowRate;
+    thisspeed.CondInletTemp = DataEnvironment::OutDryBulbTemp; // need to move this up and apply logic in DXCoils to find correct cond inlet temp
+    thisspeed.ambPressure = inletState.p;
+    thisspeed.AirMassFlow = inletState.massFlowRate;
+    if ( fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1 ) thisspeed.AirMassFlow = inletState.massFlowRate / PLR;
+    thisspeed.AirFF = inletState.massFlowRate / thisspeed.RatedAirMassFlowRate;
 
-	auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
+    auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
 
     Psychrometrics::PsychState finalOutletConditions;
 
-    finalOutletConditions.tdb = outSpeed1.tdb;
-	finalOutletConditions.w = outSpeed1.w;
-	finalOutletConditions.h = outSpeed1.h;
-	OpModePower = thisspeed.FullLoadPower; // this should be averaged also?
-	OpModeRTF = thisspeed.RTF;
+    if ( fanOpMode == DataHVACGlobals::ContFanCycCoil ) {
+        finalOutletConditions.w = outSpeed1.w * PLR + ( 1.0 - PLR ) * inletState.w;
+        finalOutletConditions.h = outSpeed1.h * PLR + ( 1.0 - PLR ) * inletState.h;
+    } else {
+        finalOutletConditions.w = outSpeed1.w;
+        finalOutletConditions.h = outSpeed1.h;
+    }
+    finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW( finalOutletConditions.h, finalOutletConditions.w );
 
-	if ( speedNum > 1 ) {
+    if ( speedNum > 1 ) {
+        OpModeRTF = thisspeed.RTF;
+        OpModePower = thisspeed.FullLoadPower;
+    } else {
+        OpModeRTF = thisspeed.RTF;
+        OpModePower = thisspeed.FullLoadPower * OpModeRTF;
+    }
 
-		auto & thisspeed( this->speeds[ speedNum ] );
+    if ( speedNum > 1 ) {
 
-		auto out = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
+        auto & thisspeed( this->speeds[ speedNum ] );
 
-        finalOutletConditions.tdb = finalOutletConditions.tdb * speedRatio + ( 1.0 - speedRatio ) * out.tdb;
-		finalOutletConditions.w = finalOutletConditions.w * speedRatio + ( 1.0 - speedRatio ) * out.w;
-		finalOutletConditions.h = finalOutletConditions.h * speedRatio + ( 1.0 - speedRatio ) * out.h;
+        auto out = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
+
+        finalOutletConditions.w = outSpeed1.w * speedRatio + ( 1.0 - speedRatio ) * out.w;
+        finalOutletConditions.h = outSpeed1.h * speedRatio + ( 1.0 - speedRatio ) * out.h;
+        finalOutletConditions.tdb = Psychrometrics::PsyTdbFnHW( finalOutletConditions.h, finalOutletConditions.w );
+        OpModeRTF = thisspeed.RTF;
+        OpModePower = OpModePower + thisspeed.FullLoadPower * OpModeRTF;
 
 	}
 

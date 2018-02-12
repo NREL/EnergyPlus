@@ -159,177 +159,159 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeedMode() {
     this->gross_shr = this->original_input_specs.gross_rated_sensible_heat_ratio;
 
     this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
-    this->RatedCondAirMassFlowRate = this->condenser_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
+	this->RatedCondAirMassFlowRate = this->condenser_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName );
 
-	bool PrintFlag = true;
-	int SizingMethod = DataHVACGlobals::CoolingSHRSizing;
-	std::string CompType = this->object_name;
-	std::string CompName = this->name;
-	std::string SizingString = "Evaporator Air Flow Rate";
-	DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
-	DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-//	DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
-//	DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-	Real64 TempSize = this->gross_shr;
-	ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-	this->RatedSHR = TempSize;
-	this->gross_shr = TempSize;
-	DataSizing::DataFlowUsedForSizing = 0.0;
-	DataSizing::DataCapacityUsedForSizing = 0.0;
-	DataSizing::DataEMSOverrideON = false;
-	DataSizing::DataEMSOverride = 0.0;
+    bool PrintFlag = true;
+    int SizingMethod = DataHVACGlobals::CoolingSHRSizing;
+    std::string CompType = this->object_name;
+    std::string CompName = this->name;
+    std::string SizingString = "Evaporator Air Flow Rate";
+    DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
+    DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
+//  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+//  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+    Real64 TempSize = this->gross_shr;
+    ReportSizingManager::RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+    this->RatedSHR = TempSize;
+    this->gross_shr = TempSize;
+    DataSizing::DataFlowUsedForSizing = 0.0;
+    DataSizing::DataCapacityUsedForSizing = 0.0;
+//  DataSizing::DataEMSOverrideON = false;
+//  DataSizing::DataEMSOverride = 0.0;
 
-//	this->RatedCBF = CalcCBF( CompType, CompName, RatedInletAirTemp, RatedInletAirHumRat, this->rated_total_capacity, this->evap_air_flow_rate, this->RatedSHR );
-	Psychrometrics::PsychState in;
-	in.tdb = RatedInletAirTemp;
-	in.w = RatedInletAirHumRat;
-	in.h = Psychrometrics::PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
-	in.p = DataEnvironment::StdPressureSeaLevel;
-	this->RatedCBF = CalcBypassFactor( in );
+    Psychrometrics::PsychState in;
+    in.tdb = RatedInletAirTemp;
+    in.w = RatedInletAirHumRat;
+    in.h = Psychrometrics::PsyHFnTdbW( RatedInletAirTemp, RatedInletAirHumRat );
+    in.p = DataEnvironment::StdPressureSeaLevel;
+
+    this->RatedCBF = CalcBypassFactor( in );
+    this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 
 }
 
 Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrometrics::PsychState & inletState, Real64 & PLR, Real64 & speedRatio, int & fanOpMode ) {
 
-	// first things first, let's go get the name of our unitary object
-	//auto & compound_object_type = this->parentMode->parentPerformance->parentCoil.compound_object_type;
-	//auto & compound_object_index = this->parentMode->parentPerformance->parentCoil.compound_object_index;
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static std::string const RoutineName( "CalcSpeedOutput: " );
 
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	static std::string const RoutineName( "CalcSpeedOutput: " );
-
-	Psychrometrics::PsychState outletState;
+    Psychrometrics::PsychState outletState;
 
     if ( !DataGlobals::SysSizingCalc && this->mySizeFlag ) {
         sizeSpeedMode();
         this->mySizeFlag = false;
     }
 
-	if ( PLR == 0.0 ) {
-		outletState.tdb = inletState.tdb;
-		outletState.w = inletState.w;
-		outletState.h = inletState.h;
-		FullLoadPower = 0.0;
-		RTF = 0.0;
-		return outletState;
-	}
+    if ( PLR == 0.0 ) {
+        outletState.tdb = inletState.tdb;
+        outletState.w = inletState.w;
+        outletState.h = inletState.h;
+		outletState.p = inletState.p;
+        FullLoadPower = 0.0;
+        RTF = 0.0;
+        return outletState;
+    }
 
-	Real64 TotCap = 0.0;
-	Real64 SHR = 0.0;
-	Real64 hDelta; // enthalpy difference across cooling coil
-	Real64 A0 = 0.0; // ratio of UA to Cp
-	Real64 CBF = 0.0; // adjusted coil bypass factor
-	if ( RatedCBF > 0.0 ) {
-		A0 = -std::log( RatedCBF ) * RatedAirMassFlowRate;
-	} else {
-		A0 = 0.0;
-	}
-	Real64 ADiff = -A0 / AirMassFlow;
-	if ( ADiff >= DataPrecisionGlobals::EXP_LowerLimit ) {
-		CBF = std::exp( ADiff );
-	} else {
-		CBF = 0.0;
-	}
+    Real64 TotCap = 0.0;
+    Real64 SHR = 0.0;
+    Real64 hDelta; // enthalpy difference across cooling coil
+    Real64 A0 = 0.0; // ratio of UA to Cp
+    Real64 CBF = 0.0; // adjusted coil bypass factor
+    if ( RatedCBF > 0.0 ) {
+        A0 = -std::log( RatedCBF ) * RatedAirMassFlowRate;
+    } else {
+        A0 = 0.0;
+    }
+    Real64 ADiff = -A0 / AirMassFlow;
+    if ( ADiff >= DataPrecisionGlobals::EXP_LowerLimit ) {
+        CBF = std::exp( ADiff );
+    } else {
+        CBF = 0.0;
+    }
 
-	Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( inletState.tdb, inletState.w, ambPressure );
+    Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( inletState.tdb, inletState.w, ambPressure );
+	Real64 inletw = inletState.w;
 
-	int Counter = 0; // iteration counter for dry coil condition
-	int const MaxIter( 30 ); // iteration limit
-	Real64 const Tolerance( 0.01 ); // iteration convergence limit
-	Real64 RF = 0.4; // relaxation factor for holding back changes in value during iteration
-	while ( true ) {
+    int Counter = 0; // iteration counter for dry coil condition
+    int const MaxIter( 30 ); // iteration limit
+    Real64 const Tolerance( 0.01 ); // iteration convergence limit
+    Real64 RF = 0.4; // relaxation factor for holding back changes in value during iteration
+    while ( true ) {
 
-		Real64 TotCapTempModFac = 1.0;
-		if ( indexCapFT > 0 ) {
-			if ( typeCapFT == CurveManager::BiQuadratic ) {
-				TotCapTempModFac = CurveManager::CurveValue( indexCapFT, inletState.twb, CondInletTemp );
-			} else {
-				TotCapTempModFac = CurveManager::CurveValue( indexCapFT, CondInletTemp );
-			}
-		}
-		Real64 TotCapFlowModFac = 1.0;
-		if ( indexCapFFF > 0 ) {
-			TotCapFlowModFac = CurveManager::CurveValue( indexCapFFF, AirFF );
-		}
+        Real64 TotCapTempModFac = 1.0;
+        if ( indexCapFT > 0 ) {
+            if ( typeCapFT == CurveManager::BiQuadratic ) {
+                TotCapTempModFac = CurveManager::CurveValue( indexCapFT, inletWetBulb, CondInletTemp );
+            } else {
+                TotCapTempModFac = CurveManager::CurveValue( indexCapFT, CondInletTemp );
+            }
+        }
+        Real64 TotCapFlowModFac = 1.0;
+        if ( indexCapFFF > 0 ) {
+            TotCapFlowModFac = CurveManager::CurveValue( indexCapFFF, AirFF );
+        }
 
-		TotCap = this->rated_total_capacity * TotCapFlowModFac * TotCapTempModFac;
+        TotCap = this->rated_total_capacity * TotCapFlowModFac * TotCapTempModFac;
 
-		SHR = 0.0;
-		if ( indexSHRFT > 0 ) {
-			SHR = DXCoils::CalcSHRUserDefinedCurves( inletState.tdb, inletState.twb, AirFF, indexSHRFT, indexSHRFFF, RatedSHR );
-			break;
-		} else {
-			// Calculate apparatus dew point conditions using TotCap and CBF
-			hDelta = TotCap / AirMassFlow;
-			Real64 hADP = inletState.h - hDelta / ( 1.0 - CBF );
-			Real64 tADP = Psychrometrics::PsyTsatFnHPb( hADP, ambPressure, RoutineName );
-			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-			//  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-			Real64 wADP = Psychrometrics::PsyWFnTdbH( tADP, hADP, RoutineName );
-			Real64 hTinwADP = Psychrometrics::PsyHFnTdbW( inletState.tdb, wADP );
-			if ( ( inletState.h - hADP ) > 1.e-10 ) {
-				SHR = min( ( hTinwADP - hADP ) / ( inletState.h - hADP ), 1.0 );
-			} else {
-				SHR = 1.0;
-			}
-			// Check for dry evaporator conditions (win < wadp)
-			if ( wADP > inletState.w || ( Counter >= 1 && Counter < MaxIter ) ) {
-				if ( inletState.w == 0.0 ) inletState.w = 0.00001;
-				Real64 werror = ( inletState.w - wADP ) / inletState.w;
-				// Increase InletAirHumRatTemp at constant InletAirTemp to find coil dry-out point. Then use the
-				// capacity at the dry-out point to determine exiting conditions from coil. This is required
-				// since the TotCapTempModFac doesn't work properly with dry-coil conditions.
-				inletState.w = RF * wADP + ( 1.0 - RF ) * inletState.w;
-				inletState.twb = Psychrometrics::PsyTwbFnTdbWPb( inletState.tdb, inletState.w, ambPressure );
-				++Counter;
-				if ( std::abs( werror ) > Tolerance ) continue; // Recalculate with modified inlet conditions
-				break;
-			} else {
-				break;
-			}
-		}
-	}
+        SHR = 0.0;
+        if ( indexSHRFT > 0 ) {
+            SHR = DXCoils::CalcSHRUserDefinedCurves( inletState.tdb, inletWetBulb, AirFF, indexSHRFT, indexSHRFFF, RatedSHR );
+            break;
+        } else {
+            // Calculate apparatus dew point conditions using TotCap and CBF
+            hDelta = TotCap / AirMassFlow;
+            Real64 hADP = inletState.h - hDelta / ( 1.0 - CBF );
+            Real64 tADP = Psychrometrics::PsyTsatFnHPb( hADP, ambPressure, RoutineName );
+            Real64 wADP = Psychrometrics::PsyWFnTdbH( tADP, hADP, RoutineName );
+            Real64 hTinwADP = Psychrometrics::PsyHFnTdbW( inletState.tdb, wADP );
+            if ( ( inletState.h - hADP ) > 1.e-10 ) {
+                SHR = min( ( hTinwADP - hADP ) / ( inletState.h - hADP ), 1.0 );
+            } else {
+                SHR = 1.0;
+            }
+            // Check for dry evaporator conditions (win < wadp)
+            if ( wADP > inletw || ( Counter >= 1 && Counter < MaxIter ) ) {
+            if ( inletw == 0.0 ) inletw = 0.00001;
+                Real64 werror = ( inletw - wADP ) / inletw;
+                // Increase InletAirHumRatTemp at constant InletAirTemp to find coil dry-out point. Then use the
+                // capacity at the dry-out point to determine exiting conditions from coil. This is required
+                // since the TotCapTempModFac doesn't work properly with dry-coil conditions.
+				inletw = RF * wADP + ( 1.0 - RF ) * inletw;
+				inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( inletState.tdb, inletw, ambPressure );
+                ++Counter;
+                if ( std::abs( werror ) > Tolerance ) continue; // Recalculate with modified inlet conditions
+                break;
+            } else {
+                break;
+            }
+        }
+    }
 
+    Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
+    if ( indexPLRFPLF > 0 ) {
+        PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
+    }
+    if ( fanOpMode == DataHVACGlobals::CycFanCycCoil ) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
 
-	Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
-	if ( indexPLRFPLF > 0 ) {
-		PLF = CurveManager::CurveValue( indexPLRFPLF, PLR ); // Calculate part-load factor
-	}
-	if ( fanOpMode == DataHVACGlobals::CycFanCycCoil ) DataHVACGlobals::OnOffFanPartLoadFraction = PLF;
+    Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
+    if ( indexEIRFT > 0 ) {
+        EIRTempModFac = CurveManager::CurveValue( indexEIRFT, inletWetBulb, CondInletTemp );
+    }
+    Real64 EIRFlowModFac = 1.0; // EIR as a function of flow fraction curve result
+    if ( indexEIRFFF > 0 ) {
+        EIRFlowModFac = CurveManager::CurveValue( indexEIRFFF, AirFF );
+    }
 
-	Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
-	if ( indexEIRFT > 0 ) {
-		EIRTempModFac = CurveManager::CurveValue( indexEIRFT, inletWetBulb, CondInletTemp );
-	}
-	Real64 EIRFlowModFac = 1.0; // EIR as a function of flow fraction curve result
-	if ( indexEIRFFF > 0 ) {
-		EIRFlowModFac = CurveManager::CurveValue( indexEIRFFF, AirFF );
-	}
+    Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
+    RTF = PLR / PLF;
+    FullLoadPower = TotCap * EIR;
 
-	Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
-	RTF = PLR / PLF;
-	FullLoadPower = TotCap * EIR * RTF;
+    outletState.h = inletState.h - ( TotCap / AirMassFlow );
+    Real64 hTinwout = inletState.h - ( ( 1.0 - SHR ) * hDelta );
+    outletState.w = Psychrometrics::PsyWFnTdbH( inletState.tdb, hTinwout );
+    outletState.tdb = Psychrometrics::PsyTdbFnHW( outletState.h, outletState.w );
 
-	if ( fanOpMode == DataHVACGlobals::ContFanCycCoil ) {
-
-		outletState.h = inletState.h - ( TotCap / AirMassFlow );
-		outletState.h = ( ( PLR * outletState.h ) + ( ( 1.0 - PLR ) * inletState.h ) );
-		Real64 hTinwout = inletState.h - ( ( 1.0 - SHR ) * hDelta );
-		outletState.w = Psychrometrics::PsyWFnTdbH( inletState.tdb, hTinwout );
-		outletState.w = ( ( PLR * outletState.w ) + ( ( 1.0 - PLR ) * inletState.w ) );
-		outletState.tdb = Psychrometrics::PsyTdbFnHW( outletState.h, outletState.w );
-
-	} else {
-
-		outletState.h = inletState.h - ( TotCap / AirMassFlow );
-		Real64 hTinwout = inletState.h - ( ( 1.0 - SHR ) * hDelta );
-		outletState.w = Psychrometrics::PsyWFnTdbH( inletState.tdb, hTinwout );
-		outletState.tdb = Psychrometrics::PsyTdbFnHW( outletState.h, outletState.w );
-
-	}
-
-	return outletState;
+    return outletState;
 
 }
 

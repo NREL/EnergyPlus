@@ -16,7 +16,7 @@ struct PsychState {
   Real64 h; // Enthalpy {J/kg}
   Real64 twb; // Wet-bulb temperature {C}
   Real64 rh; // Relative Humidity
-  Real64 massFlowRate; // Mass Flow Rate {kg/s]
+  Real64 massFlowRate; // Mass Flow Rate {kg/s}
 };
 
 }

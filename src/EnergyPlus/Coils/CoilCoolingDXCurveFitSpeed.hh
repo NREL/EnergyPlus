@@ -39,7 +39,7 @@ namespace EnergyPlus {
     class CoilCoolingDXCurveFitSpeed {
         std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
     public:
-		CoilCoolingDXCurveFitSpeed() {};
+        CoilCoolingDXCurveFitSpeed() {}
 
         CoilCoolingDXCurveFitSpeed(std::string name, CoilCoolingDXCurveFitOperatingMode * parentMode);
 
