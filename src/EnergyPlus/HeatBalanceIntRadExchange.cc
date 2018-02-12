@@ -48,6 +48,8 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#define EIGEN_USE_MKL_ALL
+#include <Eigen/Dense>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -1549,6 +1551,54 @@ namespace HeatBalanceIntRadExchange {
 				for ( int j = l; j <= u; ++j, ji += n, jk += n ) {
 					I[ ji ] -= Aik * I[ jk ];
 				}
+			}
+		}
+
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> eigenA(A.size1(), A.size2());
+		double A_arr[A.size1()][A.size2()];
+		double I_arr[A.size1()][A.size2()];
+
+		for ( auto i = 1; i <= A.size1(); i++ ) {
+			for ( auto j = 1; j <= A.size2(); j++ ) {
+				auto const val = A(i, j);
+				A_arr[i-1][j-1] = A(i, j);
+				I_arr[i-1][j-1] = I(i, j);
+				eigenA(i-1, j-1) = val;
+			}
+		}
+
+		// check to see if input / instantiated eigen matrices are the same
+		for ( auto i = 1; i <= A.size1(); i++ ) {
+			for ( auto j = 1; j <= A.size2(); j++ ) {
+				auto const Ainv = eigenA(i-1, j-1);
+				auto const ePlus = A_arr[i - 1][j-1];
+				if (std::abs(Ainv - ePlus) > 0.000001) {
+					auto rip = 0;
+				}
+			}
+		}
+
+		auto inverse = eigenA.inverse();
+
+		// check to see if inverse resultant matrices are the same
+		for ( auto i = 1; i <= A.size1(); i++ ) {
+			for ( auto j = 1; j <= A.size2(); j++ ) {
+                auto const inv = inverse(i-1, j-1);
+				auto const ePlusInv = I_arr[i - 1][j-1];
+				if (std::abs(inv - ePlusInv) > 0.0001) {
+					auto checkOrigA = A_arr[i - 1][j - 1];
+					auto checkOrigEigen = eigenA(i - 1, j - 1);
+					auto rip = 0;
+				}
+			}
+		}
+//		auto test = 0;
+
+		// test to see if replacing values actually works
+		for ( auto i = 1; i <= A.size1(); i++ ) {
+			for ( auto j = 1; j <= A.size2(); j++ ) {
+				auto const inv = inverse(i-1, j-1);
+                I(i, j) = inv;
 			}
 		}
 
