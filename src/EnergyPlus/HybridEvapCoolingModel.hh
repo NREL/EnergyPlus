@@ -368,9 +368,6 @@ namespace EnergyPlus {
 			Real64 CurrentPrimaryRuntimeFraction();
 			Real64 CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone);
 			bool ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
-			int GetID();            // accessor function
-			void SetID(int vID) { ID = vID; };    // accessor function
-			//void doStep(Real64 Tosa, Real64 Tra, Real64 RHosa, Real64 RHra, Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
 			void doStep(Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
 			void Initialize(int ZoneNumber);
 			void InitializeModelParams();
@@ -380,7 +377,7 @@ namespace EnergyPlus {
 			bool MeetsSupplyAirRHOC(Real64 Wosa);
 			Real64 CheckVal_T(Real64 T);
 			Real64 CheckVal_W(Real64 W, Real64 T, Real64 P);
-			bool SetStandByMode(CMode* pMode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
+			bool SetStandByMode(CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
 			Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
 			int SetOperatingSetting(CStepInputs StepIns);
 			void DetermineCoolingVentilationOrHumidificationNeeds(CStepInputs& StepIns);
@@ -388,14 +385,11 @@ namespace EnergyPlus {
 			Real64 Part_press(Real64 P, Real64 W);
 		
 		private:                   // begin private section
-			int ID;              // member variable
 			
-			//number of times in a day it failed to 
+			//number of times in a day it failed resulting in a warning. 
 			std::vector<int> SAT_OC_MetinMode_v;
 			std::vector<int> SAHR_OC_MetinMode_v;
 			bool WarnOnceFlag;
-			
-			
 			Real64 ResolutionMsa;
 			Real64 ResolutionOSA;
 			int count_EnvironmentConditionsNotMet;
@@ -405,8 +399,6 @@ namespace EnergyPlus {
 			int count_DidWeMeetLoad;
 			int count_DidWeNotMeetLoad;
 		
-			//Real64 cp;
-			//Real64 Lambda;
 			bool optimal_EnvCondMet;
 			bool RunningPeakCapacity_EnvCondMet;
 		

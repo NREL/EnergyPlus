@@ -1086,11 +1086,7 @@ namespace EnergyPlus {//***************
 	
 		}
 
-		int Model::GetID()
-		{
-			return ID;
-		}
-	
+
 		void Model::Initialize(int ZoneNumber)
 		{
 			// SUBROUTINE INFORMATION:
@@ -1238,8 +1234,7 @@ namespace EnergyPlus {//***************
 			}
 			return T;
 		}
-
-		bool Model::SetStandByMode(CMode* pMode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra)
+		bool Model::SetStandByMode(CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra)
 		{
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Spencer Maxwell Dutton
@@ -1261,9 +1256,9 @@ namespace EnergyPlus {//***************
 			// Using/Aliasing
 			// using the pointer to the first of the operating modes (which is always the standby mode by definition.
 			//Get a handel to the map of possible solutions (valid combinations of OSA fraction and Msa)
-			CModeSolutionSpace* solutionspace = &(pMode0->sol);
+			CModeSolutionSpace solutionspace = Mode0.sol;
 			//assess the sixe of the solution space to make sure it holds at least 1 combination
-			int solution_map_sizeX = solutionspace->PointX.size();
+			int solution_map_sizeX = solutionspace.PointX.size();
 			//Check the normalization reference is set if not set a default
 			Real64 NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same, this is explained in the IO reference
 			if (NormalizationReference == -1)
@@ -1275,21 +1270,21 @@ namespace EnergyPlus {//***************
 			// and how much power it uses etc.
 			if (solution_map_sizeX > 0)
 			{
-				Real64 MsaRatio = solutionspace->PointX[0];
+				Real64 MsaRatio = solutionspace.PointX[0];
 				Real64 UnscaledMsa = NormalizationReference * MsaRatio;
-				Real64 OSAF = solutionspace->PointY[0];
-				Real64 ElectricalPower = pMode0->CalculateCurveVal( Tosa, Wosa, Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE);
+				Real64 OSAF = solutionspace.PointY[0];
+				Real64 ElectricalPower = Mode0.CalculateCurveVal(Tosa, Wosa, Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE);
 				oStandBy.ElectricalPower = ElectricalPower;
 				oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
-				oStandBy.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio*ScaledSystemMaximumSupplyAirMassFlowRate;
-				oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio*ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+				oStandBy.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate;
+				oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
 				oStandBy.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
 				oStandBy.Outside_Air_Fraction = OSAF;
 				oStandBy.SupplyAirTemperature = Tra;
 				oStandBy.SupplyAirW = Wra;
 				oStandBy.Mode = 0;
-				oStandBy.Mixed_Air_Temperature= Tra;
-				oStandBy.Mixed_Air_W=Wra;
+				oStandBy.Mixed_Air_Temperature = Tra;
+				oStandBy.Mixed_Air_W = Wra;
 			}
 			else
 			{
@@ -1611,11 +1606,11 @@ namespace EnergyPlus {//***************
 			for (; iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
 			{
 				CMode Mode = *iterator;
-				CModeSolutionSpace* solutionspace = &(Mode.sol);
+				CModeSolutionSpace solutionspace = Mode.sol;
 				bool SAHR_OC_MetinMode = false;
 				bool SAT_OC_MetinMode = false;
-				int solution_map_sizeX = solutionspace->PointX.size() - 1;
-				int solution_map_sizeY = solutionspace->PointY.size() - 1;
+				int solution_map_sizeX = solutionspace.PointX.size() - 1;
+				int solution_map_sizeY = solutionspace.PointY.size() - 1;
 				
 				if (solution_map_sizeX != solution_map_sizeY)
 				{
@@ -1645,8 +1640,8 @@ namespace EnergyPlus {//***************
 						//Supply Air Mass Flow Rate(kg / s)
 						//Outside Air Fraction(0 - 1)
 						
-						MsaRatio = solutionspace->PointX[point_number];// fractions of rated mass flow rate, so for some modes this might be low but others hi
-						OSAF = solutionspace->PointY[point_number];
+						MsaRatio = solutionspace.PointX[point_number];// fractions of rated mass flow rate, so for some modes this might be low but others hi
+						OSAF = solutionspace.PointY[point_number];
 						UnscaledMsa = NormalizationReference * MsaRatio;
 						ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
 						Real64 Supply_Air_Ventilation_Volume = 0;
@@ -1674,7 +1669,7 @@ namespace EnergyPlus {//***************
 						if (MinVRMet)
 						{
 							//all these points meet the minimum VR requirement
-							solutionspace->PointMeta[point_number] = 1;
+							solutionspace.PointMeta[point_number] = 1;
 							// Calculate prospective supply air temperature
 							Tsa = Mode.CalculateCurveVal( StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
 							// Check it meets constraints
@@ -1753,7 +1748,7 @@ namespace EnergyPlus {//***************
 				(*iteratorSetting)->Mixed_Air_Temperature = Tma;
 				(*iteratorSetting)->Mixed_Air_W = Wma;
 			    
-				Hma = PsyHFnTdbW(Tma, Wma); 
+				Hma = PsyHFnTdbW(Tma, Wma);
 				// Calculate Enthalpy of return air
 				Real64 Hra =  PsyHFnTdbW(StepIns.Tra, Wra); 
 
@@ -2170,7 +2165,7 @@ namespace EnergyPlus {//***************
 			iterator = OperatingModes.begin();
 			CMode Mode = *iterator;
 			// 
-			if (SetStandByMode(&Mode, StepIns.Tosa, Wosa, StepIns.Tra, Wra))
+			if (SetStandByMode(Mode, StepIns.Tosa, Wosa, StepIns.Tra, Wra))
 			{
 				std::string ObjectID = Name.c_str();
 				ShowSevereError("Standby mode not defined correctly, as the mode is defined there are zero combinations of acceptible outside air fractions and supply air mass flow rate, called in object " + ObjectID);
