@@ -1721,8 +1721,13 @@ Input for the exponential-modified skew normal curve consists of the curve name,
 y = \frac{{{e^{( - 0.5*Z_1^2)}}[1 + \frac{{{Z_2}}}{{\left| {{Z_2}} \right|}}*erf\left( {\frac{{\left| {{Z_2}} \right|}}{{\sqrt 2 }}} \right)}}{{{e^{( - 0.5*Z_3^2)}}[1 + \frac{{{Z_3}}}{{\left| {{Z_3}} \right|}}*erf\left( {\frac{{\left| {{Z_3}} \right|}}{{\sqrt 2 }}} \right)}}
 \end{equation}
 
-where \emph{Z\(_{1}\) =} (\emph{x C\(_{1}\)}) \emph{/ C\(_{2}\)}; \emph{Z\(_{2}\) =} {[}(\emph{e}\(^{{(}\emph{C\(_{4}\)*x}}\(^{)}\) * \emph{C\(_{4}\)*x}) \emph{- C\(_{1}\)}{]} \emph{/ C\(_{2}\)}; \emph{Z\(_{3}\) = -C\(_{1}\) / C\(_{2}\)}
+where:
 
+\begin{align*}
+  Z_1 &= x \cdot C_1 / C_2 \\
+  Z_2 &= e^{C_4 x} \cdot C_4 \cdot x - C_1/C_2 \\
+  Z_3 &= -C_1/C_2
+\end{align*}
 
 \subsubsection{Inputs}\label{inputs-13-008}
 
@@ -2046,7 +2051,7 @@ Curve:RectangularHyperbola2,
 Input for the exponential decay curve consists of the curve name, the three coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation is:
 
 \begin{equation}
-\emph{y} = \emph{C\(_{1}\)} + \emph{C\(_{2}\)} * {e}\(^{{(}\emph{C\(_{3}\)*x}}\(^{)}\)
+  y = C_1 + C_2 \cdot e^{C_3 x}
 \end{equation}
 
 \subsubsection{Inputs}\label{inputs-17-005}
@@ -2111,7 +2116,7 @@ Curve:ExponentialDecay,
 Input for the double exponential decay curve consists of the curve name, the five coefficients, and the maximum and minimum valid independent variable values. Optional inputs for the curve include the minimum and maximum output of the performance curve. The equation is:
 
 \begin{equation}
-\emph{y} = \emph{C\(_{1}\)} + \emph{C\(_{2}\)} * {e}\(^{{(}\emph{C\(_{3}\)*x}}\(^{)}\) + \emph{C\(_{4}\)} * {e}\(^{{(}\emph{C\(_{5}\)*x}}\(^{)}\)
+  y = C_1 + C_2 \cdot e^{C_3 x} + C_4 e^{C_5 x}
 \end{equation}
 
 \subsubsection{Inputs}\label{inputs-18-005}
