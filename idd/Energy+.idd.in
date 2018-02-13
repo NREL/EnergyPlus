@@ -16134,6 +16134,29 @@ SurfaceProperty:HeatTransferAlgorithm:Construction,
        \type object-list
        \object-list ConstructionNames
 
+SurfaceProperty:HeatBalanceSourceTerm,
+       \memo Allows an additional heat source term to be added to the inside or outside surface boundary.
+       \memo A heat source can be added to either or both the inside and outside of the same surface.   
+       \min-fields 3
+  A1 , \field Surface Name
+       \required-field
+       \type object-list
+       \object-list SurfaceNames
+  A2 , \field Inside Face Heat Source Term Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note The value of this schedule is the source term value for the inside face of this surface
+       \note If this field is left blank, no inside surface source term will be applied.
+       \note The schedule values are heat rate per surface area (W/m2), when positive
+       \note schedule values indicate heat gain and negative values indicates loss.
+  A3 ; \field Outside Face Heat Source Term Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note The value of this schedule is the source term value for the outside face of this surface
+       \note If this field is left blank, no outside surface source term will be applied.
+       \note The schedule values are heat rate per surface area (W/m2), when positive
+       \note schedule values indicate heat gain and negative values indicates loss.
+
 SurfaceControl:MovableInsulation,
       \memo Exterior or Interior Insulation on opaque surfaces
   A1, \field Insulation Type
