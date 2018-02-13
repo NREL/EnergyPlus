@@ -85,11 +85,11 @@ namespace EnergyPlus {
 
 		class CMode
 		{
-			public:
-				CMode();
+		public:
+			CMode();
 			
 			//finish init above
-			~CMode();                  // destructor
+			~CMode() {};                  // destructor
 			int ModeID;
 			CModeSolutionSpace sol;
 			std::string ModeName;
@@ -150,7 +150,7 @@ namespace EnergyPlus {
 		public:
 			CSetting() :Runtime_Fraction(0), Mode(0), Outside_Air_Fraction(0), Unscaled_Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
 				SupplyAirTemperature(0), Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), 
-				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0), RawW(0){}
+				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0){}
 			Real64 Runtime_Fraction;															  
 			Real64 Mode;																		  
 			Real64 Outside_Air_Fraction;														  
@@ -174,43 +174,9 @@ namespace EnergyPlus {
 			Real64 SecondaryFuelConsumptionRate;	
 			Real64 ThirdFuelConsumptionRate;	
 			Real64 WaterConsumptionRate;	   
-			Real64 ExternalStaticPressure;	   
-			//Debug values
-			Real64 RawW;
+			Real64 ExternalStaticPressure;	  
 
-			// add other fuels, or change name to be fuel
 			CMode oMode;
-			CSetting& operator=(CSetting other)
-			{
-				using std::swap;
-				swap(Runtime_Fraction, other.Runtime_Fraction);
-				swap(Mode, other.Mode);
-				swap(Outside_Air_Fraction, other.Outside_Air_Fraction);
-				swap(Unscaled_Supply_Air_Mass_Flow_Rate, other.Unscaled_Supply_Air_Mass_Flow_Rate);
-				swap(Supply_Air_Ventilation_Volume, other.Supply_Air_Ventilation_Volume);
-				swap(Supply_Air_Mass_Flow_Rate_Ratio, other.Supply_Air_Mass_Flow_Rate_Ratio);
-				swap(ScaledSupply_Air_Mass_Flow_Rate, other.ScaledSupply_Air_Mass_Flow_Rate);
-				swap(ScaledSupply_Air_Ventilation_Volume, other.ScaledSupply_Air_Ventilation_Volume);
-				swap(SupplyAirTemperature, other.SupplyAirTemperature);
-				swap(Mixed_Air_Temperature, other.Mixed_Air_Temperature);
-				swap(SupplyAirW, other.SupplyAirW);
-				swap(Mixed_Air_W, other.Mixed_Air_W);
-				swap(TotalSystem, other.TotalSystem);
-				swap(SensibleSystem, other.SensibleSystem);
-				swap(LatentSystem, other.LatentSystem);
-				swap(TotalZone, other.TotalZone);
-				swap(SensibleZone, other.SensibleZone);
-				swap(LatentZone, other.LatentZone);
-				swap(ElectricalPower, other.ElectricalPower);
-				swap(SupplyFanElectricPower, other.SupplyFanElectricPower);
-				swap(SecondaryFuelConsumptionRate, other.SecondaryFuelConsumptionRate);
-				swap(ThirdFuelConsumptionRate, other.ThirdFuelConsumptionRate);
-				swap(WaterConsumptionRate, other.WaterConsumptionRate);
-				swap(ExternalStaticPressure, other.ExternalStaticPressure);
-				swap(oMode, other.oMode);
-				swap(RawW, other.RawW);
-				return *this;
-			}
 		};
 
 		class CStepInputs
@@ -232,7 +198,7 @@ namespace EnergyPlus {
 		{
 		public:                    // begin public section
 			Model();
-			~Model();                  // destructor
+			~Model() {};                  // destructor
 	
 			// Default Constructor
 			std::string Name; // user identifier
@@ -284,12 +250,12 @@ namespace EnergyPlus {
 
 			Real64 RequestedLoadToHeatingSetpoint;
 			Real64 RequestedLoadToCoolingSetpoint;
-			Real64  RequestedHumdificationMass;
-			Real64  RequestedHumdificationLoad;
-			Real64  RequestedHumdificationEnergy;
-			Real64  RequestedDeHumdificationMass;
-			Real64  RequestedDeHumdificationLoad;
-			Real64  RequestedDeHumdificationEnergy;
+			Real64 RequestedHumdificationMass;
+			Real64 RequestedHumdificationLoad;
+			Real64 RequestedHumdificationEnergy;
+			Real64 RequestedDeHumdificationMass;
+			Real64 RequestedDeHumdificationLoad;
+			Real64 RequestedDeHumdificationEnergy;
 			int TsaMin_schedule_pointer;
 			int TsaMax_schedule_pointer;
 			int RHsaMin_schedule_pointer;
@@ -357,12 +323,12 @@ namespace EnergyPlus {
 			std::vector<CSetting> CurrentOperatingSettings;
 			//debug values
 			int DebugBreak;
-			Real64 RawHR;
 
 			CSetting OptimalSetting;
 			CSetting oStandBy;
 
-			std::list <std::shared_ptr< CSetting >> Settings;
+			//std::list <std::shared_ptr< CSetting >> Settings;
+			std::list <CSetting> Settings;
 			//methods
 			int CurrentPrimaryMode();
 			Real64 CurrentPrimaryRuntimeFraction();
@@ -372,17 +338,14 @@ namespace EnergyPlus {
 			void Initialize(int ZoneNumber);
 			void InitializeModelParams();
 			void ResetOutputs();
-			Real64 CalcHum_ratio_W(Real64 Tdb, Real64 RH, Real64 P);
 			bool MeetsSupplyAirTOC(Real64 Tosa);
 			bool MeetsSupplyAirRHOC(Real64 Wosa);
 			Real64 CheckVal_T(Real64 T);
-			Real64 CheckVal_W(Real64 W, Real64 T, Real64 P);
+			Real64 CheckVal_W(Real64 W, Real64 T, Real64 P); // pascals
 			bool SetStandByMode(CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
 			Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
 			int SetOperatingSetting(CStepInputs StepIns);
 			void DetermineCoolingVentilationOrHumidificationNeeds(CStepInputs& StepIns);
-			Real64 Sat_press(Real64 Tdb);
-			Real64 Part_press(Real64 P, Real64 W);
 		
 		private:                   // begin private section
 			
@@ -404,10 +367,7 @@ namespace EnergyPlus {
 		
 			std::vector<Real64> PolygonXs;
 			std::vector<Real64> PolygonYs;
-
 		};
-
-	
 	}
 }
 

@@ -88,13 +88,12 @@
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
 
-//#include <HybridModelConfigFile.hh>
 
 #define  TEMP_CURVE 0 
 #define  W_CURVE 1
 #define  POWER_CURVE 2 
 
-namespace EnergyPlus {//***************
+namespace EnergyPlus {
 
 	namespace HybridUnitaryAirConditioners {
 		// Using/Aliasing
@@ -116,7 +115,7 @@ namespace EnergyPlus {//***************
 		//_______________________________________________________________________________________________________________________
 		//***************
 		void
-			SimZoneHybridUnitaryAirConditioners(
+		SimZoneHybridUnitaryAirConditioners(
 				std::string const & CompName, // name of the packaged terminal heat pump
 				int const ZoneNum, // number of zone being served
 				Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
@@ -155,7 +154,7 @@ namespace EnergyPlus {//***************
 				if (CompNum == 0) {
 					ShowFatalError("SimZoneHybridUnitaryAirConditioners: Zone evaporative cooler unit not found.");
 				}
-				CompIndex = CompNum;
+				CompIndex = CompNum; 
 			}
 			else {
 				CompNum = CompIndex;
@@ -197,14 +196,10 @@ namespace EnergyPlus {//***************
 				return;
 			}
 		}
-		// this is used excusively for unit testing to get access to the ZoneHybridUnitaryAirConditioner
-		Model* HandleToHybridUnitaryAirConditioner(int UnitNum)
-		{
-			return &(ZoneHybridUnitaryAirConditioner(UnitNum));
-		}
+
 
 		void
-			InitZoneHybridUnitaryAirConditioners(
+		InitZoneHybridUnitaryAirConditioners(
 				int const UnitNum, // unit number
 				int const ZoneNum // number of zone being served
 				)
@@ -310,7 +305,7 @@ namespace EnergyPlus {//***************
 	
 
 		void
-			CalcZoneHybridUnitaryAirConditioners(
+		CalcZoneHybridUnitaryAirConditioners(
 				int const UnitNum, // unit number
 				int const ZoneNum, // number of zone being served
 				Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
@@ -378,7 +373,7 @@ namespace EnergyPlus {//***************
 		}
 
 		void
-			ReportZoneHybridUnitaryAirConditioners(int const UnitNum)
+		ReportZoneHybridUnitaryAirConditioners(int const UnitNum)
 		{
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Spencer Maxwell Dutton
@@ -408,7 +403,7 @@ namespace EnergyPlus {//***************
 		}
 
 		void
-			GetInputZoneHybridUnitaryAirConditioners(bool & Errors)
+		GetInputZoneHybridUnitaryAirConditioners(bool & Errors)
 		{
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Spencer Maxwell Dutton
@@ -654,9 +649,6 @@ namespace EnergyPlus {//***************
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Relative Humidity", OutputProcessor::Unit::Perc, ZoneHybridUnitaryAirConditioner(UnitLoop).InletRH, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Outside Air Relative Humidity", OutputProcessor::Unit::Perc, ZoneHybridUnitaryAirConditioner(UnitLoop).SecInletRH, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
-				//debug
-				SetupOutputVariable("Zone Hybrid Unitary Optimal Setting Raw Relative Humidity", OutputProcessor::Unit::Perc, ZoneHybridUnitaryAirConditioner(UnitLoop).RawHR, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate", OutputProcessor::Unit::kg_s, ZoneHybridUnitaryAirConditioner(UnitLoop).OutletMassFlowRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneHybridUnitaryAirConditioner(UnitLoop).OutletVolumetricFlowRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyVentilationVolume, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
@@ -683,37 +675,21 @@ namespace EnergyPlus {//***************
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Secondary Fuel Consumption", OutputProcessor::Unit::J, ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumption, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption Rate", OutputProcessor::Unit::W, ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumptionRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption", OutputProcessor::Unit::J, ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumption, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-				 SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption Rate", OutputProcessor::Unit::kgWater_s, ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumptionRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption Rate", OutputProcessor::Unit::kgWater_s, ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumptionRate, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				//make sure units above are right.
-				 SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption", OutputProcessor::Unit::m3, ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumption, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption", OutputProcessor::Unit::m3, ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumption, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC External Static Pressure", OutputProcessor::Unit::Pa, ZoneHybridUnitaryAirConditioner(UnitLoop).ExternalStaticPressure, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
-				std::vector<CSetting>::iterator iterOperatingSettings;
 				int index=0;
-				int size= ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings.size();
 
-				for (int i = 0; i< size; i++)
-				{
-					CSetting *po = &ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings[i];			
-					std::ostringstream strs;
-					strs << "Zone Hybrid Unitary HVAC Runtime Fraction in Setting " << index;
-					SetupOutputVariable(strs.str(), OutputProcessor::Unit::None, po->Runtime_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Mode in Setting " << index;
-					SetupOutputVariable(strs.str(), OutputProcessor::Unit::None,po->Mode,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Outside Air Fraction in Setting " << index;
-					SetupOutputVariable(strs.str(),OutputProcessor::Unit::kg_s, po->Outside_Air_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting " << index;
-					SetupOutputVariable(strs.str(), OutputProcessor::Unit::kg_s, po->Unscaled_Supply_Air_Mass_Flow_Rate,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-					strs.str("");
-					strs << "Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting " << index;
-					SetupOutputVariable(strs.str(), OutputProcessor::Unit::None, po->Supply_Air_Mass_Flow_Rate_Ratio,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-					strs.str("");
+				for (auto & thisSetting : ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings) {
+					SetupOutputVariable("Zone Hybrid Unitary HVAC Runtime Fraction in Setting " + std::to_string(index), OutputProcessor::Unit::None, thisSetting.Runtime_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable("Zone Hybrid Unitary HVAC Mode in Setting " + std::to_string(index), OutputProcessor::Unit::None,thisSetting.Mode,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable("Zone Hybrid Unitary HVAC Outside Air Fraction in Setting " + std::to_string(index),OutputProcessor::Unit::kg_s, thisSetting.Outside_Air_Fraction,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting " + std::to_string(index), OutputProcessor::Unit::kg_s, thisSetting.Unscaled_Supply_Air_Mass_Flow_Rate,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+					SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting " + std::to_string(index), OutputProcessor::Unit::None, thisSetting.Supply_Air_Mass_Flow_Rate_Ratio,"Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 					index++; 
 				}
-			
 			}
 			Errors = ErrorsFound;
 			if (ErrorsFound) {
