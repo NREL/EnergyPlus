@@ -625,7 +625,7 @@ namespace EnergyPlus {
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Heating Energy", OutputProcessor::Unit::J, ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingEnergy, "System", "Sum", ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
 
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate", OutputProcessor::Unit::W, ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedLoadToCoolingSetpoint, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-				SetupOutputVariable("ErrorCode", OutputProcessor::Unit::None, ZoneHybridUnitaryAirConditioner(UnitLoop).ErrorCode, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+				SetupOutputVariable("Zone Hybrid Unitary HVAC Error Code", OutputProcessor::Unit::None, ZoneHybridUnitaryAirConditioner(UnitLoop).ErrorCode, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Temperature", OutputProcessor::Unit::C, ZoneHybridUnitaryAirConditioner(UnitLoop).OutletTemp, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 				SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Temperature", OutputProcessor::Unit::C, ZoneHybridUnitaryAirConditioner(UnitLoop).InletTemp, "System", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);

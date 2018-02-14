@@ -28,7 +28,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -175,6 +175,24 @@
 
   ScheduleTypeLimits,
     Any Number;              !- Name
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    Discrete;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -100,                    !- Lower Limit Value
+    100,                     !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    Humidity,                !- Name
+    0.0,                     !- Lower Limit Value
+    100.0,                   !- Upper Limit Value
+    Continuous;              !- Numeric Type
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:COMPACT ===========
 
@@ -50033,14 +50051,6 @@ ZoneHVAC:HybridUnitaryHVAC,
 
   Output:Variable,*,Zone Hybrid Unitary HVAC Zone Latent Heating Energy,timestep;
 
-  Output:Variable,*,Requested Total Load To Cooling Setpoint,timestep;
-
-  Output:Variable,*,Average Mode Number,timestep;
-
-  Output:Variable,*,ErrorCode,timestep;
-
-  Output:Variable,*,Attempted Tsa,timestep;
-
   Output:Variable,*,Zone Hybrid Unitary HVAC Supply Air Temperature,timestep;
 
   Output:Variable,*,Zone Hybrid Unitary HVAC Return Air Temperature,timestep;
@@ -50072,8 +50082,6 @@ ZoneHVAC:HybridUnitaryHVAC,
   Output:Variable,*,Zone Hybrid Unitary HVAC Electric Power,timestep;
 
   Output:Variable,*,Zone Hybrid Unitary HVAC Electric Energy,timestep;
-
-  Output:Variable,*,Zone Hybrid Unitary HVAC Minimum Outside Air Ventilation,timestep;
 
   Output:Variable,*,Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate,timestep;
 
