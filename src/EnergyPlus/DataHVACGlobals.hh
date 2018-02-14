@@ -53,7 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include "../alpine/EModelica.hpp"
+//#include "../alpine/EModelica.hpp"
 
 namespace EnergyPlus {
 
@@ -66,7 +66,7 @@ namespace DataHVACGlobals {
 	// Thus, all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS:
-  extern EModelica EMO;
+  //extern EModelica EMO;
 
 	extern Real64 const SmallTempDiff;
 	extern Real64 const SmallMassFlow;

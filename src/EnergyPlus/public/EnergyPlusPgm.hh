@@ -47,7 +47,7 @@
 #ifndef EnergyPlusPgm_hh_INCLUDED
 #define EnergyPlusPgm_hh_INCLUDED
 
-#include <EnergyPlusAPI.hh>
+#include "./EnergyPlusAPI.hh"
 
 // C++ Headers
 #include <string>

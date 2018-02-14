@@ -45,9 +45,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // FMI-Related Headers
-extern "C" {
-#include <FMI/main.h>
-}
+//extern "C" {
+//#include <FMI/main.h>
+//}
 
 // C++ Headers
 #include <cmath>
@@ -328,11 +328,11 @@ namespace SimulationManager {
 		PostIPProcessing();
 
     // Compile any Modelica models that may be used
-    DataHVACGlobals::EMO.compileModel("hvac.mo");
-    bool toleranceControlled = false;
-    double t0 = 0.0;
-    fmiEventInfo eventInfo;
-    auto fmiFlag =  DataHVACGlobals::EMO.fmiInitialize(toleranceControlled, t0, &eventInfo);
+    //DataHVACGlobals::EMO.compileModel("hvac.mo");
+    //bool toleranceControlled = false;
+    //double t0 = 0.0;
+    //fmiEventInfo eventInfo;
+    //auto fmiFlag =  DataHVACGlobals::EMO.fmiInitialize(toleranceControlled, t0, &eventInfo);
 
 		InitializePsychRoutines();
 

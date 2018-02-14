@@ -586,7 +586,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva alpine)
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )
