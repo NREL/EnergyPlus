@@ -924,8 +924,8 @@ namespace EnergyPlus {//***************
 			RequestedDeHumdificationEnergy(0.0),
 			QSensZoneOut(0),
 			QLatentZoneOut( 0),
-			RequestedLoadToHeatingSetpoint(0.0),$
-			RequestedLoadToCoolingSetpoint(0.0),$
+			RequestedLoadToHeatingSetpoint(0.0),
+			RequestedLoadToCoolingSetpoint(0.0),
 			TsaMin_schedule_pointer(0),
 			TsaMax_schedule_pointer(0),
 			RHsaMin_schedule_pointer(0),
