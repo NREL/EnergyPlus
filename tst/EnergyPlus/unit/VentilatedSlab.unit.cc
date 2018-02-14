@@ -242,21 +242,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 		"    1.0;                     !- Sky Clearness",
 
-		"  RunPeriod,",
-		"    ,                        !- Name",
-		"    7,                       !- Begin Month",
-		"    5,                       !- Begin Day of Month",
-		"    ,                        !- Begin Year",
-		"    7,                       !- End Month",
-		"    12,                      !- End Day of Month",
-		"    ,                        !- End Year",
-		"    UseWeatherFile,          !- Day of Week for Start Day",
-		"    Yes,                     !- Use Weather File Holidays and Special Days",
-		"    Yes,                     !- Use Weather File Daylight Saving Period",
-		"    No,                      !- Apply Weekend Holiday Rule",
-		"    Yes,                     !- Use Weather File Rain Indicators",
-		"    Yes;                     !- Use Weather File Snow Indicators",
-
 		"  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
 
 		"  ScheduleTypeLimits,",
