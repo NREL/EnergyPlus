@@ -4865,7 +4865,7 @@ namespace OutputProcessor {
 	)
 	{
 		// J.Glazer - August/September 2017
-		std::string unitUpper = InputProcessor::MakeUPPERCase(unitIn);
+		std::string unitUpper = UtilityRoutines::MakeUPPERCase(unitIn);
 		if ( unitUpper == "J" ) {
 			return OutputProcessor::Unit::J;
 		} else if ( unitUpper == "DELTAC" ) {

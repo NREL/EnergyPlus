@@ -3551,7 +3551,7 @@ Label100: ;
 			GetControllerInputFlag = false;
 		}
 
-		int ControllerIndex = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		int ControllerIndex = UtilityRoutines::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControllerIndex == 0 ) {
 			ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 		}

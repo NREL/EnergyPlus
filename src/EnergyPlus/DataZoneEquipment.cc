@@ -489,13 +489,13 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
 				if ( !lAlphaBlanks( 2 ) ){
-					if ( SameString( AlphArray( 2 ), "SequentialLoad" ) ) {
+					if ( UtilityRoutines::SameString( AlphArray( 2 ), "SequentialLoad" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialLoading;
-					} else if ( SameString( AlphArray( 2 ), "UniformLoad" ) ) {
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "UniformLoad" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformLoading;
-					} else if ( SameString( AlphArray( 2 ), "UniformPLR" ) ) {
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "UniformPLR" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformPLRLoading;
-					} else if ( SameString( AlphArray( 2 ), "SequentialUniformPLR" ) ) {
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "SequentialUniformPLR" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLRLoading;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\", Invalid choice." );
@@ -1242,9 +1242,6 @@ namespace DataZoneEquipment {
 		// otherwise return the index of the matching return node name.
 		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
 
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int ReturnIndex; // Return number for the given zone (not the node number)
 
@@ -1255,7 +1252,7 @@ namespace DataZoneEquipment {
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		ReturnIndex = 0; // default if not found
 		if ( ControlledZoneIndex > 0 ) {
 			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {

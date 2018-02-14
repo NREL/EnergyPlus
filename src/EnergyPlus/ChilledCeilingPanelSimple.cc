@@ -316,6 +316,7 @@ namespace CoolingPanelSimple {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
 		int CoolingPanelNum; // Cooling panel number
+		int CoolPanelNumI; // For loop index
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int SurfNum; // Surface number Do loop counter
@@ -341,9 +342,6 @@ namespace CoolingPanelSimple {
 			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames = "";
 			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames = cNumericFieldNames;
 
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
 			if ( CoolingPanelNum > 1 ) {
 				for ( CoolPanelNumI = 2; CoolPanelNumI <= NumCoolingPanels; ++CoolPanelNumI ) {
 					if ( cAlphaArgs(1) == CoolingPanel( CoolPanelNumI ).EquipID) {

@@ -700,28 +700,27 @@ namespace Photovoltaics {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   Sept 2017
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// Get the zone number for this PV array for use when zone multipliers are applied
 
 		using DataHeatBalance::Zone;
 		using DataGlobals::NumOfZones;
 		using DataSurfaces::Surface;
-		using InputProcessor::FindItemInList;
-		
+
 		int GetPVZone( 0 );
-		
+
 		if ( SurfNum > 0 ) {
 			GetPVZone = Surface( SurfNum ).Zone;
 				if ( GetPVZone == 0 ) { // might need to get the zone number from the name
-					GetPVZone = FindItemInList( Surface( SurfNum ).ZoneName, Zone, NumOfZones );
+					GetPVZone = UtilityRoutines::FindItemInList( Surface( SurfNum ).ZoneName, Zone, NumOfZones );
 				}
 		}
-		
+
 		return GetPVZone;
-		
+
 	}
-	
+
 	// **************************************
 
 	void
@@ -831,13 +830,12 @@ namespace Photovoltaics {
 		using DataSurfaces::Surface;
 		using DataHeatBalFanSys::QPVSysSource;
 		using TranspiredCollector::SetUTSCQdotSource;
-		using InputProcessor::FindItemInList;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int thisZone; // working index for zones
 
 		PVarray( PVnum ).Report.DCEnergy = PVarray( PVnum ).Report.DCPower * ( TimeStepSys * SecInHour );
-		
+
 		// add check for multiplier.  if surface is attached to a zone that is on a multiplier
 		// then PV production should be multiplied out as well
 

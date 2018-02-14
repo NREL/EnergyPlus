@@ -297,7 +297,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		Array1_string const & ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	int
@@ -313,7 +313,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		Array1S_string const ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	template < typename A >
@@ -337,7 +337,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		MArray1< A, std::string > const & ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
@@ -363,7 +363,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		Container const & ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
@@ -391,7 +391,7 @@ namespace UtilityRoutines {
 		Container const & ListOfItems,
 		std::string Container::value_type::*name_p
 	) {
-		return FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
 	}
 
 	int
@@ -544,7 +544,7 @@ namespace UtilityRoutines {
 		MArray1< A, std::string > const & ListOfItems,
 		int const NumItems
 	) {
-		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, NumItems ) );
 		if ( item_number != 0 ) return item_number;
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
 			if ( equali( String, ListOfItems( Count ) ) ) return Count;
@@ -571,7 +571,7 @@ namespace UtilityRoutines {
 		Container const & ListOfItems,
 		int const NumItems
 	) {
-		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, NumItems ) );
 		if ( item_number != 0 ) return item_number;
 		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
 			if ( equali( String, ListOfItems[ i ].Name ) ) return i + 1; // 1-based return index
@@ -600,7 +600,7 @@ namespace UtilityRoutines {
 		std::string Container::value_type::*name_p,
 		int const NumItems
 	) {
-		int const item_number( FindItemInList( String, ListOfItems, name_p, NumItems ) );
+		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, name_p, NumItems ) );
 		if ( item_number != 0 ) return item_number;
 		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
 			if ( equali( String, ListOfItems[ i ].*name_p ) ) return i + 1; // 1-based return index

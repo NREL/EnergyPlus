@@ -5653,9 +5653,9 @@ namespace SurfaceGeometry {
 						ErrorsFound = true;
 					}
 					for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-						if ( SameString(cAlphaArgs( alpF ), "YES") ) {
+						if ( UtilityRoutines::SameString(cAlphaArgs( alpF ), "YES") ) {
 							data.isExposedPerimeter.push_back(true);
-						} else if ( SameString(cAlphaArgs( alpF ), "NO") ) {
+						} else if ( UtilityRoutines::SameString(cAlphaArgs( alpF ), "NO") ) {
 							data.isExposedPerimeter.push_back(false);
 						} else if ( lAlphaFieldBlanks( alpF ) ) {
 							ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cAlphaFieldNames( alpF ) + ". Must be \"Yes\" or \"No\".");
@@ -5999,11 +5999,11 @@ namespace SurfaceGeometry {
 		static gio::Fmt Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
 
 		cCurrentModuleObject = "SurfaceProperty:HeatBalanceSourceTerm";
-		int CountAddHeatSourceSurf = GetNumObjectsFound( cCurrentModuleObject );
+		int CountAddHeatSourceSurf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( Item = 1; Item <= CountAddHeatSourceSurf; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			Found = FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
 
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );

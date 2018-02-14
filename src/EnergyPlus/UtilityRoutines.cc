@@ -274,7 +274,7 @@ namespace UtilityRoutines {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int FindItem = FindItemInList( String, ListOfItems, NumItems );
+		int FindItem = UtilityRoutines::FindItemInList( String, ListOfItems, NumItems );
 		if ( FindItem != 0 ) return FindItem;
 
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
@@ -303,7 +303,7 @@ namespace UtilityRoutines {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int FindItem = FindItemInList( String, ListOfItems, NumItems );
+		int FindItem = UtilityRoutines::FindItemInList( String, ListOfItems, NumItems );
 		if ( FindItem != 0 ) return FindItem;
 
 		for ( int Count = 1; Count <= NumItems; ++Count ) {

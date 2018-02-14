@@ -670,11 +670,11 @@ namespace ScheduleManager {
 			}
 
 			// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-			if ( SameString( Alphas( 3 ), "NO" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 3 ), "NO" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::No;
-			} else if ( SameString( Alphas( 3 ), "AVERAGE" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 3 ), "AVERAGE" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Average;
-			} else if ( SameString( Alphas( 3 ), "LINEAR" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 3 ), "LINEAR" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Linear;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
@@ -746,11 +746,11 @@ namespace ScheduleManager {
 			}
 
 			// Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-			if ( SameString( Alphas( 3 ), "NO" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 3 ), "NO" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::No;
-			} else if ( SameString( Alphas( 3 ), "AVERAGE" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 3 ), "AVERAGE" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Average;
-			} else if ( SameString( Alphas( 3 ), "LINEAR" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 3 ), "LINEAR" ) ) {
 				DaySchedule( Count ).IntervalInterpolated = ScheduleInterpolation::Linear;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "Invalid value for \"" + cAlphaFields( 3 ) + "\" field=\"" + Alphas( 3 ) + "\"" );
@@ -2972,7 +2972,7 @@ namespace ScheduleManager {
 						curValue += incrementPerMinute;
 						SetMinuteValue( Min, SHr ) = true;
 					}
-					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours
 						for ( Min = 1; Min <= 60; ++Min ) {
 							MinuteValue( Min, Hr ) = curValue;
 							curValue += incrementPerMinute;
@@ -2989,7 +2989,7 @@ namespace ScheduleManager {
 						MinuteValue( Min, SHr ) = Numbers( Count );
 						SetMinuteValue( Min, SHr ) = true;
 					}
-					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours 
+					for ( Hr = SHr + 1; Hr <= EHr - 1; ++Hr ) {    // for intermediate hours
 						MinuteValue( _, Hr ) = Numbers( Count );
 						SetMinuteValue( _, Hr ) = true;
 					}
@@ -4637,7 +4637,7 @@ namespace ScheduleManager {
 	)
 	{
 		// J. Glazer - July 2017
-		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek()
 
 		int DaysInYear;
 
@@ -4714,7 +4714,7 @@ namespace ScheduleManager {
 		)
 	{
 		// J. Glazer - July 2017
-		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek() 
+		// adapted from Linda K. Lawrie original code for ScheduleAverageHoursPerWeek()
 
 		int DaysInYear;
 

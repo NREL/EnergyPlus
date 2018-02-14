@@ -79,8 +79,9 @@ namespace DataStringGlobals {
 	extern std::string outputTblTabFileName;
 	extern std::string outputTblTxtFileName;
 	extern std::string outputTblXmlFileName;
-	extern std::string inputIdfFileName;
+	extern std::string inputFileName;
 	extern std::string inputIddFileName;
+	extern std::string inputEpJSONSchemaFileName;
 	extern std::string inputEpJSONSchemaFileName;
 	extern std::string inputWeatherFileName;
 	extern std::string outputAdsFileName;

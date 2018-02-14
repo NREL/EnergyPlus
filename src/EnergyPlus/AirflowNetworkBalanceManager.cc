@@ -1258,14 +1258,9 @@ namespace AirflowNetworkBalanceManager {
 				}
  				CurrentModuleObject = "OutdoorAir:Node";
  				for ( i = AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode + 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
- 					GetObjectItem( CurrentModuleObject, i - ( AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode ), Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
- 					IsNotOK = false;
- 					IsBlank = false;
- 					VerifyName( Alphas( 1 ), MultizoneExternalNodeData, i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
- 					if ( IsNotOK ) {
- 						ErrorsFound = true;
- 						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
- 					}
+ 					inputProcessor->getObjectItem( CurrentModuleObject, i - ( AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode ), Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+ 					UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+ 					//HACK: Need to verify name is unique between "OutdoorAir:Node" and "AirflowNetwork:MultiZone:ExternalNode"
 
 					if ( NumAlphas > 5 && !lAlphaBlanks( 6 ) ) { // Wind pressure curve
 						MultizoneExternalNodeData( i ).curve = GetCurveIndex( Alphas( 6 ) );
@@ -1277,18 +1272,18 @@ namespace AirflowNetworkBalanceManager {
 					}
 
 					if ( NumAlphas > 6 && !lAlphaBlanks( 7 ) ) { // Symmetric curve
-						if ( SameString( Alphas( 7 ), "Yes" ) ) {
+						if ( UtilityRoutines::SameString( Alphas( 7 ), "Yes" ) ) {
 							MultizoneExternalNodeData( i ).symmetricCurve = true;
-						} else if ( !SameString(Alphas( 7 ), "No" ) ) {
+						} else if ( ! UtilityRoutines::SameString(Alphas( 7 ), "No" ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
 							ShowContinueError( "The default value is assigned as No." );
 						}
 					}
 
 					if ( NumAlphas > 7 && !lAlphaBlanks( 8 ) ) { // Relative or absolute wind angle
-						if ( SameString( Alphas( 8 ), "Relative" ) ) {
+						if ( UtilityRoutines::SameString( Alphas( 8 ), "Relative" ) ) {
 							MultizoneExternalNodeData( i ).useRelativeAngle = true;
-						} else if ( !SameString(Alphas( 8 ), "Absolute" ) ) {
+						} else if ( ! UtilityRoutines::SameString(Alphas( 8 ), "Absolute" ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 8 ) + " = " + Alphas( 8 ) );
 							ShowContinueError( "The default value is assigned as Absolute." );
 						}
@@ -1318,8 +1313,8 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneSurfaceData( i ).OpeningName = Alphas( 2 ); // Name of crack or opening component,
 				// either simple or detailed large opening, or crack
 				MultizoneSurfaceData( i ).ExternalNodeName = Alphas( 3 ); // Name of external node, but not used at WPC="INPUT"
-				if ( FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) &&
-					MultizoneExternalNodeData( FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) ).curve == 0 ) {
+				if ( UtilityRoutines::FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) &&
+					MultizoneExternalNodeData( UtilityRoutines::FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) ).curve == 0 ) {
 					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + "=" + Alphas( 3 ) );
 					ShowContinueError( "A valid wind pressure coefficient curve name is required but not found when Wind Pressure Coefficient Type = Input." );
 					ErrorsFound = true;
