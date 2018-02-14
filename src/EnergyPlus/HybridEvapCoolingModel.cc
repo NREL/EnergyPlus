@@ -436,7 +436,7 @@ namespace EnergyPlus {//***************
 			}
 			return true;
 		}
-		bool CMode::ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject)
+		bool CMode::ValidateArrays(Array1D_string Alphas, Array1D_string EP_UNUSED(cAlphaFields), Array1D< Real64 > Numbers, Array1D_string EP_UNUSED(cNumericFields), std::string EP_UNUSED(cCurrentModuleObject))
 		{
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Spencer Maxwell Dutton
@@ -907,8 +907,6 @@ namespace EnergyPlus {//***************
 			SystemSensibleHeatingEnergy(0.0),
 			SystemLatentHeatingRate(0.0),
 			SystemLatentHeatingEnergy(0.0),
-			RequestedLoadToHeatingSetpoint(0.0),
-			RequestedLoadToCoolingSetpoint(0.0),
 			SupplyFanElectricPower(0.0),
 			SupplyFanElectricEnergy(0.0),
 			SecondaryFuelConsumptionRate(0.0),
@@ -924,8 +922,10 @@ namespace EnergyPlus {//***************
 			RequestedDeHumdificationMass(0.0),
 			RequestedDeHumdificationLoad(0.0),
 			RequestedDeHumdificationEnergy(0.0),
-			QLatentZoneOut( 0),
 			QSensZoneOut(0),
+			QLatentZoneOut( 0),
+			RequestedLoadToHeatingSetpoint(0.0),$
+			RequestedLoadToCoolingSetpoint(0.0),$
 			TsaMin_schedule_pointer(0),
 			TsaMax_schedule_pointer(0),
 			RHsaMin_schedule_pointer(0),
@@ -947,8 +947,8 @@ namespace EnergyPlus {//***************
 			InletEnthalpy(0.0),
 			InletPressure(0.0),
 			InletRH(0.0),
-			OutletMassFlowRate(0.0),
 			OutletVolumetricFlowRate(0.0),
+			OutletMassFlowRate(0.0),
 			OutletTemp(0.0),
 			OutletWetBulbTemp(0.0),
 			OutletHumRat(0.0),
@@ -995,7 +995,6 @@ namespace EnergyPlus {//***************
 			SAT_OC_MetinMode_v= temp;
 			SAHR_OC_MetinMode_v= temp;
 			
-			int MAXIMUM_OPERATIONAL_SETTINGS = 5;
 			ModeCounter = 0;
 			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
 			DebugBreak = 12; // remove
@@ -1745,7 +1744,7 @@ namespace EnergyPlus {//***************
 																	 // Total system cooling
 				TotalSystem = (Hma - Hsa) * ScaledMsa / 1000;
 				// Perform latent check
-				Real64 latentCheck = TotalSystem - SensibleSystem;
+				// Real64 latentCheck = TotalSystem - SensibleSystem;
 
 				//Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
 				//Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
@@ -1755,7 +1754,7 @@ namespace EnergyPlus {//***************
 																		// Total room cooling
 				Real64 TotalRoomORZone = (Hra - Hsa) * ScaledMsa / 1000; //kw
 																		 //Perform latent check 
-				Real64 latentRoomORZoneCheck = TotalRoomORZone - SensibleRoomORZone;
+				// Real64 latentRoomORZoneCheck = TotalRoomORZone - SensibleRoomORZone;
 
 				thisSetting.TotalSystem = TotalSystem;
 				thisSetting.SensibleSystem = SensibleSystem;
@@ -2092,10 +2091,10 @@ namespace EnergyPlus {//***************
 			// REFERENCES: OutletVolumetricFlowRate, SupplyVentilationVolume, MinOA_Msa, SupplyVentilationAir
 			// na
 			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
-			if ((DataGlobals::HourOfDay == DebugBreak) && !WarmupFlag)
-			{
-				int k = 1;//debug step
-			}
+			// if ((DataGlobals::HourOfDay == DebugBreak) && !WarmupFlag)
+			// {
+			// 	int k = 1;//debug step
+			// }
 			// set requested loads to output variables
 			RequestedLoadToHeatingSetpoint = RequestedCoolingLoad;
 			RequestedLoadToCoolingSetpoint = RequestedHeatingLoad;
