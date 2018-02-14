@@ -5956,13 +5956,6 @@ namespace SurfaceGeometry {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-<<<<<<< HEAD
-=======
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
->>>>>>> NREL/develop
 		using DataSurfaces::Surface;
 		using DataHeatBalance::HeatTransferAlgosUsed;
 		using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
@@ -6025,7 +6018,7 @@ namespace SurfaceGeometry {
 				if ( Surface( Found ).InsideHeatSourceTermSchedule == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", cannot find the matching Schedule: " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
 					ErrorsFound = true;
-				} 
+				}
 			}
 
 			if ( ! lAlphaFieldBlanks( 3 ) ) {
@@ -6036,14 +6029,14 @@ namespace SurfaceGeometry {
 				} else if ( Surface( Found ).OSCPtr > 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"SurfaceProperty:HeatBalanceSourceTerm\", cannot be specified for OtherSideCoefficient Surface=" + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
-				} 
-			}			
+				}
+			}
 
 			if ( Surface( Found ).OutsideHeatSourceTermSchedule == 0 && Surface( Found ).InsideHeatSourceTermSchedule == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", no schedule defined for additional heat source." );
 				ErrorsFound = true;
 			}
-		} 
+		}
 
 		// first initialize each heat transfer surface with the overall model type, array assignment
 		for ( auto & e : Surface ) e.HeatTransferAlgorithm = HeatTransferAlgosUsed( 1 );
