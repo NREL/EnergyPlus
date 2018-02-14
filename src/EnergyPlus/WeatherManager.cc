@@ -5741,41 +5741,63 @@ Label9999: ;
 				RunPeriodInput(Loop).endJulianDate = computeJulianDate(RunPeriodInput(Loop).endYear, RunPeriodInput(Loop).endMonth, RunPeriodInput(Loop).endDay);
 			}
 
-			// A3,  \field Apply Weekend Holiday Rule
-			if ( lAlphaFieldBlanks( 3) || SameString( cAlphaArgs( 3 ), "YES" ) ) {
-				RunPeriodInput( Loop ).ApplyWeekendRule = true;
+			// A3,  \field Use Weather File Holidays and Special Days
+			if ( lAlphaFieldBlanks( 3 ) || SameString( cAlphaArgs( 3 ), "YES" ) ) {
+				RunPeriodInput( Loop ).UseHolidays = true;
 			} else if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
-				RunPeriodInput( Loop ).ApplyWeekendRule = false;
+				RunPeriodInput( Loop ).UseHolidays = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 3 ) + " invalid [" + cAlphaArgs( 3 ) + ']' );
 				ErrorsFound = true;
 			}
 
-			// A4,  \field Use Weather File Rain Indicators
+			// A4,  \field Use Weather File Daylight Saving Period
 			if ( lAlphaFieldBlanks( 4 ) || SameString( cAlphaArgs( 4 ), "YES" ) ) {
-				RunPeriodInput( Loop ).UseRain = true;
+				RunPeriodInput( Loop ).UseDST = true;
 			} else if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
-				RunPeriodInput( Loop ).UseRain = false;
+				RunPeriodInput( Loop ).UseDST = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 4 ) + " invalid [" + cAlphaArgs( 4 ) + ']' );
 				ErrorsFound = true;
 			}
 
-			// A5,  \field Use Weather File Snow Indicators
+			// A5,  \field Apply Weekend Holiday Rule
 			if ( lAlphaFieldBlanks( 5 ) || SameString( cAlphaArgs( 5 ), "YES" ) ) {
-				RunPeriodInput( Loop ).UseSnow = true;
+				RunPeriodInput( Loop ).ApplyWeekendRule = true;
 			} else if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
-				RunPeriodInput( Loop ).UseSnow = false;
+				RunPeriodInput( Loop ).ApplyWeekendRule = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 5 ) + " invalid [" + cAlphaArgs( 5 ) + ']' );
 				ErrorsFound = true;
 			}
 
-			// A6,  \field Treat Weather as Actual
+			// A6,  \field Use Weather File Rain Indicators
 			if ( lAlphaFieldBlanks( 6 ) || SameString( cAlphaArgs( 6 ), "YES" ) ) {
-				RunPeriodInput( Loop ).actualWeather = true;
+				RunPeriodInput( Loop ).UseRain = true;
+			} else if ( SameString( cAlphaArgs( 6 ), "NO" ) ) {
+				RunPeriodInput( Loop ).UseRain = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 6 ) + " invalid [" + cAlphaArgs( 6 ) + ']' );
+				ErrorsFound = true;
+			}
+
+			// A7,  \field Use Weather File Snow Indicators
+			if ( lAlphaFieldBlanks( 7 ) || SameString( cAlphaArgs( 7 ), "YES" ) ) {
+				RunPeriodInput( Loop ).UseSnow = true;
+			} else if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
+				RunPeriodInput( Loop ).UseSnow = false;
+			} else {
+				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 7 ) + " invalid [" + cAlphaArgs( 7 ) + ']' );
+				ErrorsFound = true;
+			}
+
+			// A8,  \field Treat Weather as Actual
+			if ( lAlphaFieldBlanks( 8 ) || SameString( cAlphaArgs( 8 ), "YES" ) ) {
+				RunPeriodInput( Loop ).actualWeather = true;
+			} else if ( SameString( cAlphaArgs( 8 ), "NO" ) ) {
+				RunPeriodInput(Loop).actualWeather = false;
+			} else {
+				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 8 ) + " invalid [" + cAlphaArgs( 8 ) + ']' );
 				ErrorsFound = true;
 			}
 

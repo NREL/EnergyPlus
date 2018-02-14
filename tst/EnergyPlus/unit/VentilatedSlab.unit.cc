@@ -251,6 +251,8 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    12,                      !- End Day of Month",
 		"    ,                        !- End Year",
 		"    UseWeatherFile,          !- Day of Week for Start Day",
+		"    Yes,                     !- Use Weather File Holidays and Special Days",
+		"    Yes,                     !- Use Weather File Daylight Saving Period",
 		"    No,                      !- Apply Weekend Holiday Rule",
 		"    Yes,                     !- Use Weather File Rain Indicators",
 		"    Yes;                     !- Use Weather File Snow Indicators",

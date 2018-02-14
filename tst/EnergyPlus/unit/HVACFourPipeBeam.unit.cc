@@ -226,6 +226,8 @@ namespace EnergyPlus {
 		"    31,                      !- End Day of Month",
 		"    ,                        !- End Year",
 		"    Sunday,                  !- Day of Week for Start Day",
+		"    No,                      !- Use Weather File Holidays and Special Days",
+		"    No,                      !- Use Weather File Daylight Saving Period",
 		"    No,                      !- Apply Weekend Holiday Rule",
 		"    Yes,                     !- Use Weather File Rain Indicators",
 		"    Yes;                     !- Use Weather File Snow Indicators",
