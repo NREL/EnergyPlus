@@ -219,7 +219,6 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 						if ( obj_name != "RunPeriod" ) {
 							warnings.emplace_back( "Duplicate name found. name: \"" + name + "\"" );
 						} else {
-							u64toa( root[ obj_name ].size() + 1, s );
                             name = s;
 						}
 					}
