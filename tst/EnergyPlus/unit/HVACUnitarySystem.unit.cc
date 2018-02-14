@@ -2155,6 +2155,7 @@ TEST_F( EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTes
 	HVACUnitarySystem::NumUnitarySystem = 50; // trick code so that UnitarySystemNumericFields.deallocate(); does not occur within code called from unit test
 	FinalZoneSizing.allocate( 1 );
 	ZoneEqSizing.allocate( 1 );
+	SysSizPeakDDNum.allocate( 1 );
 
 	CurSysNum = 0;
 	CurOASysNum = 0;
@@ -8485,6 +8486,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_SizingWithFans ) {
 	// Need this to prevent crash in RequestSizing
 	UnitarySysEqSizing.allocate( 1 );
 	OASysEqSizing.allocate( 1 );
+	SysSizPeakDDNum.allocate( 1 );
 
 	int UnitarySysNum( 1 );
 	int AirLoopNum( 1 );

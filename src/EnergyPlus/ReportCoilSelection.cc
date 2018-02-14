@@ -465,7 +465,7 @@ ReportCoilSelection::doAirLoopSetup(
 {
 	// this routine sets up some things for central air systems, needs to follow setting of an airloop num
 	auto & c( coilSelectionDataObjs[ coilVecIndex ] );
-	if ( c->airloopNum > 0 ) {
+	if ( c->airloopNum > 0  && allocated( DataAirSystems::PrimaryAirSystem ) ) {
 		// see if there is an OA controller
 		if ( DataAirSystems::PrimaryAirSystem( c->airloopNum ).OASysExists ) {
 			//loop over OA controllers and match node num ?
@@ -477,36 +477,36 @@ ReportCoilSelection::doAirLoopSetup(
 		}
 		//fill list of zones connected to this air loop
 		// this could be reworked to use different structure which is available now since std 62.1 changes
-
-		if (  DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesCooled > 0 ) {
-			int zoneCount = DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesCooled;
-			c->zoneNum.resize( zoneCount );
-			c->zoneName.resize( zoneCount );
-			for ( int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesCooled; ++loopZone ) {
-				c->zoneNum[ loopZone - 1] = DataAirLoop::AirToZoneNodeInfo( c->airloopNum).CoolCtrlZoneNums( loopZone );
-				c->zoneName[ loopZone - 1] = DataHeatBalance::Zone( c->zoneNum[ loopZone - 1] ).Name;
+		if ( allocated( DataAirLoop::AirToZoneNodeInfo ) ) {
+			if (  DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesCooled > 0 ) {
+				int zoneCount = DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesCooled;
+				c->zoneNum.resize( zoneCount );
+				c->zoneName.resize( zoneCount );
+				for ( int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesCooled; ++loopZone ) {
+					c->zoneNum[ loopZone - 1] = DataAirLoop::AirToZoneNodeInfo( c->airloopNum).CoolCtrlZoneNums( loopZone );
+					c->zoneName[ loopZone - 1] = DataHeatBalance::Zone( c->zoneNum[ loopZone - 1] ).Name;
+				}
 			}
-		}
 
-		if ( DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated > 0 ) {
-			int zoneCount = DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated;
-			for ( int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated; ++loopZone ) {
-				int zoneIndex = DataAirLoop::AirToZoneNodeInfo( c->airloopNum).HeatCtrlZoneNums( loopZone );
-				// see if this zone is new or already in list
-				bool found = false;
-				for ( auto & z : c->zoneNum ) {
-					if ( z == zoneIndex ) {
-						found =  true;
-						break;
+			if ( DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated > 0 ) {
+				int zoneCount = DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated;
+				for ( int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated; ++loopZone ) {
+					int zoneIndex = DataAirLoop::AirToZoneNodeInfo( c->airloopNum).HeatCtrlZoneNums( loopZone );
+					// see if this zone is new or already in list
+					bool found = false;
+					for ( auto & z : c->zoneNum ) {
+						if ( z == zoneIndex ) {
+							found =  true;
+							break;
+						}
+					}
+					if ( !  found ) { // add it
+						c->zoneNum.emplace_back( zoneIndex );
+						c->zoneName.emplace_back( DataHeatBalance::Zone( zoneIndex ).Name );
 					}
 				}
-				if ( !  found ) { // add it
-					c->zoneNum.emplace_back( zoneIndex );
-					c->zoneName.emplace_back( DataHeatBalance::Zone( zoneIndex ).Name );
-				}
 			}
 		}
-
 	}
 
 
@@ -885,7 +885,7 @@ ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName (
 		bool found( false );
 		bool locIsCooling( false );
 		bool locIsHeating( false );
-		for ( int loop = 1; loop < DataHVACGlobals::NumAllCoilTypes; ++loop ) {
+		for ( int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop ) {
 			if ( InputProcessor::SameString( coilType, DataHVACGlobals::cAllCoilTypes( loop ) ) ) {
 				found = true;
 				locIsCooling = InputProcessor::SameString( coilType, DataHVACGlobals::cCoolingCoilTypes( loop ) );
@@ -904,6 +904,9 @@ ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName (
 
 	}
 
+	if ( index == -1 ) {
+		ShowFatalError( "getIndexForOrCreateDataObjFromCoilName: Developer error - not a coil: " + coilType + " = " + coilName );
+	}
 	return index;
 }
 
@@ -1129,7 +1132,7 @@ ReportCoilSelection::setCoilCoolingCapacity(
 	c->zoneEqNum = curZoneEqNum;
 //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
 	c->oASysNum = curOASysNum;
-	if ( curSysNum > 0 && c->zoneEqNum == 0 && allocated( DataSizing::FinalSysSizing ) ) {
+	if ( curSysNum > 0 && c->zoneEqNum == 0 && allocated( DataSizing::FinalSysSizing ) && allocated( DataSizing::SysSizPeakDDNum ) ) {
 
 		// These next blocks does not always work with SizingPeriod:WeatherFileDays or SizingPeriod:WeatherFileConditionType, protect against hard crash
 		if ( DataSizing::SysSizPeakDDNum( curSysNum ).SensCoolPeakDD > 0 && DataSizing::SysSizPeakDDNum( curSysNum ).SensCoolPeakDD <= DataEnvironment::TotDesDays ) {
