@@ -84,59 +84,40 @@ This optional choice field provides a temperature difference between cut-out tem
 
 If MAT is defined as zone air temperature at previous time step, and DeltaT represents the temperature difference between cutout and setpoint and greater than 0.0, following action will be taken: 
 
+\begin{lstlisting}
 0 - Uncontrolled (No specification or default)
-
 	No change
 
 1 - Single Heating Setpoint
-
 	If ( MAT < ThermostatSetpoint:SingleHeating + DeltaT)
-
 		ThermostatSetpoint:SingleHeating = ThermostatSetpoint:SingleHeating + DeltaT
-	
 	Else
-		
 		ThermostatSetpoint:SingleHeating = No change
-	
 	End If
 
 2 - Single Cooling SetPoint
 
 	If ( MAT > ThermostatSetpoint:SingleCooling - DeltaT)
-
 		ThermostatSetpoint:SingleCooling = ThermostatSetpoint:SingleCooling - DeltaT
-	
 	Else
-		
 		ThermostatSetpoint:SingleCooling = No change
-	
 	End If
-
 
 3 - Single Heating/Cooling Setpoint
-
-
 	= No change
 
-
 4 - Dual Setpoint (Heating and Cooling) with deadband
-
 	If ( MAT < HeatingSetpoint + DeltaT)
-
 		HeatingSetpoint = HeatingSetpoint + DeltaT
 		CoolingSetpoint = No change
-	
 	Else If ( MAT > CoolingSetpoint - DeltaT)
-		
 		HeatingSetpoint = No change
 		CoolingSetpoint = CoolingSetpoint - DeltaT
-		
 	Else
-	
 		HeatingSetpoint = No change
 		CoolingSetpoint = No change
-	
 	End If
+\end{lstlisting}
 
 An example of this statement in an IDF is:
 

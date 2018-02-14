@@ -32935,7 +32935,7 @@ ZoneControl:Thermostat,
   N1 ; \field Temperature Difference Between Cutout And Setpoint
        \units deltaC
        \type real
-       \minimum= 0
+       \minimum> 0
 
 ZoneControl:Thermostat:OperativeTemperature,
        \memo This object can be used with the ZoneList option on a thermostat or with one
