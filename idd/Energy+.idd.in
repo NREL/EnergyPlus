@@ -7104,25 +7104,25 @@ MaterialProperty:PhaseChangeHysteresis,
        \required-field
        \units J/kg-K
        \type real
-       \minimum >0
+       \minimum> 0
   N5 , \field High Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N6 , \field Peak Melting Temperature
        \note The temperature at which the melting curve peaks
        \required-field
        \units C
        \type real
-       \minimum >0
+       \minimum> 0
   N7 , \field Low Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N8 , \field Solid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully solid
        \required-field
@@ -7140,25 +7140,25 @@ MaterialProperty:PhaseChangeHysteresis,
        \required-field
        \units J/kg-K
        \type real
-       \minimum >0
+       \minimum> 0
   N11, \field High Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N12, \field Peak Freezing Temperature
        \note The temperature at which the freezing curve peaks
        \required-field
        \units C
        \type real
-       \minimum >0
+       \minimum> 0
   N13; \field Low Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
 
 MaterialProperty:VariableThermalConductivity,
     \memo Additional properties for temperature dependent thermal conductivity
@@ -23689,8 +23689,8 @@ AirflowNetwork:MultiZone:Surface,
   A8, \field Equivalent Rectangle Method
       \type choice
       \key PolygonHeight
-      \Key BaseSurfaceAspectRatio
-      \Key UserDefinedAspectRatio
+      \key BaseSurfaceAspectRatio
+      \key UserDefinedAspectRatio
       \default PolygonHeight
       \note This field is applied to a non-rectangular window or door. The equivalent shape has
       \note the same area as a polygonal window or door.
@@ -44366,7 +44366,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity
-  N11, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N11, \field Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44522,7 +44522,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 2.
-  N24, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N24, \field Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44675,7 +44675,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 3.
-  N37, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N37, \field Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44823,7 +44823,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 4
-  N50, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N50, \field Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -63221,12 +63221,12 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
   A1 , \field Name
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Surface Name
        \required-field
        \type object-list
        \object-list AllShadingAndHTSurfNames
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames
   A3 , \field Photovoltaic-Thermal Model Performance Name
        \type object-list
        \object-list FlatPlatePVTParameters
@@ -68977,7 +68977,7 @@ GroundHeatExchanger:Vertical:Properties,
   N1,   \field Depth of Top of Borehole
         \required-field
         \type real
-        \units m-K
+        \units m
         \minimum 0.0
   N2,   \field Borehole Length
         \required-field
@@ -68989,6 +68989,7 @@ GroundHeatExchanger:Vertical:Properties,
         \type real
         \minimum> 0.0
         \units m
+        \ip-units in
   N4,   \field Grout Thermal Conductivity
         \required-field
         \type real
@@ -84800,7 +84801,7 @@ Matrix:TwoDimension,
   N21001,N21002,N21003,N21004,N21005,N21006,N21007,N21008,N21009,N21010,N21011,N21012,N21013,N21014,N21015,N21016,N21017,N21018,N21019,N21020,  \note fields as indicated
   N21021,N21022,N21023,N21024,N21025,N21026,N21027,N21028,N21029,N21030,N21031,N21032,N21033,N21034,N21035,N21036,N21037,N21038,N21039,N21040;  \note fields as indicated
 
-\ group Hybrid Model
+\group Hybrid Model
 
 HybridModel:Zone,
        \memo Zones with measured air temperature data and a range of dates.
