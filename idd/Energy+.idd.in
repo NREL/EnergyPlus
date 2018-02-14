@@ -20461,6 +20461,9 @@ People,
        \minimum 0.0
        \maximum 1.0
        \default 0.3
+       \note This is radiant fraction of the sensible heat released by people in a zone. This value will be 
+       \note multiplied by the total sensible heat released by people yields the amount of long wavelength 
+       \note radiation gain from people in a zone. Default value is 0.30.
   N5,  \field Sensible Heat Fraction
        \note if input, overrides program calculated sensible/latent split
        \autocalculatable
@@ -21706,7 +21709,9 @@ Daylighting:Controls,
        \maximum 0.6
        \default 0.2
   N3,  \field Number of Stepped Control Steps
-       \note for Stepped Lighting Control Type, this field cannot be zero.
+       \note The number of steps, excluding off, in a stepped lighting control system.
+       \note If Lighting Control Type is Stepped, this field must be greater than zero.
+       \note The steps are assumed to be equally spaced.
        \type integer
        \minimum 1
        \default 1
