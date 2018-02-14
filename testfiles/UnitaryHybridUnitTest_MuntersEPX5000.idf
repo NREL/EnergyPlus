@@ -204,14 +204,6 @@
     UNTIL: 24:00,1;          !- Field 3
 
   Schedule:Compact,
-    Fan Availability Schedule,  !- Name
-    Any Number,              !- Schedule Type Limits Name
-    THROUGH: 12/31,          !- Field 1
-    FOR: AllDays,            !- Field 2
-    UNTIL: 12:00,1,          !- Field 3
-    UNTIL: 24:00,0;          !- Field 5
-
-  Schedule:Compact,
     ALWAYS_ON,               !- Name
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -275,21 +267,6 @@
     Until: 8:00,0.0,         !- Field 3
     Until: 21:00,1.0,        !- Field 5
     Until: 24:00,0.0;        !- Field 7
-
-  Schedule:Compact,
-    MinOA,                   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2, !- Field 2
-    Until: 8:00,0.0,         !- Field 3
-    Until: 21:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: Weekends Holiday,   !- Field 9
-    Until: 24:00,0.0,        !- Field 10
-    For: SummerDesignDay,    !- Field 12
-    Until: 24:00,1.0,        !- Field 13
-    For: WinterDesignDay,    !- Field 15
-    Until: 24:00,1.0;        !- Field 16
 
   Schedule:Compact,
     ActSchd,                 !- Name
@@ -1271,26 +1248,6 @@ ZoneHVAC:HybridUnitaryHVAC,
     Main Return Air Node Name,  !- Zone Air Exhaust Node or NodeList Name
     Main Zone Node,          !- Zone Air Node Name
     Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name
-
-!-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
-
-  Controller:OutdoorAir,
-    Outside Air Controller,  !- Name
-    Main Relief Node,        !- Relief Air Outlet Node Name
-    Main Return Air Node Name,  !- Return Air Node Name
-    Main Zone Inlet Node,    !- Mixed Air Node Name
-    Outside Air Inlet Node,  !- Actuator Node Name
-    2.0,                     !- Minimum Outdoor Air Flow Rate {m3/s}
-    2.0,                     !- Maximum Outdoor Air Flow Rate {m3/s}
-    NoEconomizer,            !- Economizer Control Type
-    ModulateFlow,            !- Economizer Control Action Type
-    19.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-    ,                        !- Electronic Enthalpy Limit Curve Name
-    4.,                      !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-    NoLockout,               !- Lockout Type
-    FixedMinimum;            !- Minimum Limit Type
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODE ===========
 
