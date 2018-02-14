@@ -778,7 +778,7 @@ algorithm will be used to find a part load ratio or mass flow rate at given equi
 
 \subsubsection{Inputs}\label{inputs-hvacystemrootfindingalgorithm}
 
-\paragraph{Field: Algorithm}\label{field-algorithm}
+\paragraph{Field: Algorithm}\label{field-algorithm-201710020807}
 
 Five choices are allowed to select which solution algorithm will be used: RegulaFalsi, Bisection,  BisectionThenRegulaFalsi, RegulaFalsiThenBisection, and Alternation. The RegulaFalsi
 selection is the default selection. Bisection selection will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.

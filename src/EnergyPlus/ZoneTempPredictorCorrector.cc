@@ -4672,8 +4672,6 @@ namespace ZoneTempPredictorCorrector {
 		Real64 C;
 		Real64 WZSat;
 		Real64 MoistureMassFlowRate;
-		Real64 ExhMassFlowRate;
-		Real64 TotExitMassFlowRate;
 		Real64 ZoneMassFlowRate;
 		Real64 SysTimeStepInSeconds;
 		Real64 H2OHtOfVap;
@@ -4686,8 +4684,6 @@ namespace ZoneTempPredictorCorrector {
 		// FLOW:
 		MoistureMassFlowRate = 0.0;
 		ZoneMassFlowRate = 0.0;
-		ExhMassFlowRate = 0.0;
-		TotExitMassFlowRate = 0.0;
 		ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 		// Check to see if this is a controlled zone
@@ -4705,17 +4701,6 @@ namespace ZoneTempPredictorCorrector {
 				MoistureMassFlowRate += ( Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate * Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).HumRat ) / ZoneMult;
 				ZoneMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
-
-			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
-				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
-			} // NodeNum
-
-			TotExitMassFlowRate = ExhMassFlowRate;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes > 0 ) {
-				for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes; ++retNode ) {
-					TotExitMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnNode( retNode ) ).MassFlowRate / ZoneMult;
-				}
-			}
 
 			// Do the calculations for the plenum zone
 		} else if ( ZoneRetPlenumAirFlag ) {
@@ -4739,17 +4724,11 @@ namespace ZoneTempPredictorCorrector {
 					ZoneMassFlowRate += AirDistUnit( ADUNum ).MassFlowRateDnStrLk / ZoneMult;
 				}
 			}
-			// Do not allow exhaust mass flow for a plenum zone
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 
 		} else if ( ZoneSupPlenumAirFlag ) {
 			ZoneSupPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			MoistureMassFlowRate += ( Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate * Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).HumRat ) / ZoneMult;
 			ZoneMassFlowRate += Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate / ZoneMult;
-			// Do not allow exhaust mass flow for a plenum zone
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 		}
 
 		// Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
@@ -4779,26 +4758,14 @@ namespace ZoneTempPredictorCorrector {
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
-		// Check for the flow and NO flow condition
-		if ( ZoneMassFlowRate > 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
-			A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
-			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-				// Multizone airflow calculated in AirflowNetwork
-				B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
-				A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
-			}
-			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
-		} else if ( ZoneMassFlowRate <= 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
-			A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum );
-			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-				// Multizone airflow calculated in AirflowNetwork
-				B = ( LatentGain / H2OHtOfVap ) + SumHmARaW( ZoneNum ) + AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW;
-				A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
-			}
-			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+		B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + (MoistureMassFlowRate)+SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
+		A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+			// Multizone airflow calculated in AirflowNetwork
+			B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
+			A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 		}
+		C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
 			B += AirflowNetworkExchangeData( ZoneNum ).TotalLat;
