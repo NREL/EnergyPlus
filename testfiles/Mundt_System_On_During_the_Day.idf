@@ -118,8 +118,10 @@
     ,                        !- Name
     6,                       !- Begin Month
     15,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     15,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period

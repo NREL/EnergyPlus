@@ -100,9 +100,11 @@
     ,                        !- Name
     6,                       !- Begin Month
     29,                      !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     1,                       !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule

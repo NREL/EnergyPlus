@@ -129,9 +129,11 @@
     ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     12,                      !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     ,                        !- Apply Weekend Holiday Rule
@@ -142,9 +144,11 @@
     ,                        !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
+    ,                        !- Begin Year
     5,                       !- End Month
     5,                       !- End Day of Month
-    UseWeatherFile,          !- Day of Week for Start Day
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     ,                        !- Apply Weekend Holiday Rule
