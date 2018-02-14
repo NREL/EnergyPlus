@@ -448,7 +448,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	DataGlobals::DoWeathSim = true;
 

@@ -441,9 +441,6 @@ namespace EnergyPlus {
 		Alphas = "";
 		Numbers = 0;
 
-		if ( is_AlphaBlank ) AlphaBlank = true;
-		if ( is_NumBlank ) NumBlank = true;
-
 		auto const & obj = epJSON_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];

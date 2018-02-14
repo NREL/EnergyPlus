@@ -369,7 +369,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp )
 		"  0.001;      !- Value Until Time 14",
 		"", } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -483,7 +483,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp )
 		"  0.001;      !- Value Until Time 14",
 		"", } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -558,7 +558,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep )
 		"  0.0;        !- Value Until Time 14",
 		"", } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;

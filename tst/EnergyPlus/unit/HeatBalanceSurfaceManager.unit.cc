@@ -1240,7 +1240,7 @@ namespace EnergyPlus {
 			"    Until: 24:00, 90;             !- Field 3"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
 
 		ScheduleManager::ProcessScheduleInput();
@@ -1824,7 +1824,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
 
 		ScheduleManager::ProcessScheduleInput();
@@ -1973,7 +1973,7 @@ namespace EnergyPlus {
 			" Output:Diagnostics, DisplayAdvancedReportVariables;",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::DisplayAdvancedReportVariables = true;
 
@@ -2396,7 +2396,7 @@ namespace EnergyPlus {
 			"    ;                           !- Outside Face Heat Source Term Schedule Name"
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
 
 		HeatBalanceManager::GetProjectControlData( ErrorsFound );

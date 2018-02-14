@@ -1175,7 +1175,7 @@ namespace EnergyPlus {
 			"    Until: 24:00, 90;             !- Field 3"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
 
 		ScheduleManager::ProcessScheduleInput();
@@ -1280,7 +1280,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 		ErrorsFound = false;
@@ -1311,7 +1311,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 		ErrorsFound = false;

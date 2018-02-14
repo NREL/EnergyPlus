@@ -502,7 +502,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2 )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -645,7 +645,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -790,7 +790,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -935,7 +935,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -1098,7 +1098,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );

@@ -1002,7 +1002,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	SolarShading::clear_state();
 

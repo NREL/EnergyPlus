@@ -433,7 +433,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 15; // must initialize this to get schedules initialized

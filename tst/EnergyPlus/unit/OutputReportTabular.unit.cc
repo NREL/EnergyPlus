@@ -3438,7 +3438,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		//"  Temperature;             !- Output Unit Type",
 	//} );
 
-	//ASSERT_FALSE( process_idf( idf_objects ) );
+	//ASSERT_TRUE( process_idf( idf_objects ) );
 
 	//OutputProcessor::TimeValue.allocate( 2 );
 	////DataGlobals::DDOnlySimulation = true;
@@ -4823,7 +4823,7 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 		//"                                                                                                   "
 	//} );
 
-	//ASSERT_FALSE( process_idf( idf_objects ) );
+	//ASSERT_TRUE( process_idf( idf_objects ) );
 
 	//OutputProcessor::TimeValue.allocate( 2 );
 	////DataGlobals::DDOnlySimulation = true;
@@ -5923,7 +5923,7 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 		//"    SimpleAndTabular;        !- Option Type                                               ",
 	//} );
 
-	//ASSERT_FALSE( process_idf( idf_objects ) );
+	//ASSERT_TRUE( process_idf( idf_objects ) );
 
 	//OutputProcessor::TimeValue.allocate( 2 );
 	////DataGlobals::DDOnlySimulation = true;

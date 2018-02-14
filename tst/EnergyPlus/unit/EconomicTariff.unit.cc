@@ -251,7 +251,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
 		"    3.3076;                  !- Cost per Unit Value or Variable Name        ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Create a water meter
 	NumEnergyMeters = 1;
@@ -294,7 +294,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 		"    10;                      !- Monthly Charge or Variable Name             ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Create a water meter
 	NumEnergyMeters = 1;
@@ -334,7 +334,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 		"    10;                      !- Monthly Charge or Variable Name             ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Create a water meter
 	NumEnergyMeters = 1;
@@ -376,7 +376,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 		"    10;                      !- Monthly Charge or Variable Name             ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Create a water meter
 	NumEnergyMeters = 1;

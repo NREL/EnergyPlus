@@ -2298,7 +2298,7 @@ namespace EnergyPlus {
 				"Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			inputProcessor->preScanReportingVariables();
 			InitializeOutput();
@@ -2356,7 +2356,7 @@ namespace EnergyPlus {
 				"Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			inputProcessor->preScanReportingVariables();
 			InitializeOutput();

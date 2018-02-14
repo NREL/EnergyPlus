@@ -107,7 +107,8 @@ extension_renaming = {
     'OutdoorAir:NodeList': 'nodes',
     'Fan:SystemModel': 'speed_fractions',
     'AirflowNetwork:Distribution:DuctViewFactors': 'surfaces',
-    'GroundHeatExchanger:Vertical': 'g_functions',
+    'GroundHeatExchanger:System': 'g_functions',
+    'GroundHeatExchanger:ResponseFactors': 'g_functions',
     'Foundation:Kiva': 'blocks',
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
 }
