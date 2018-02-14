@@ -1054,7 +1054,7 @@ namespace WeatherManager {
 								RunStJDay = DataPeriods( Loop ).DataStJDay;
 								RunEnJDay = DataPeriods( Loop ).DataEnJDay;
 								if ( ! DataPeriods( Loop ).HasYearData ) {
-									ShowSevereError( "GetNextEnvironment: Runperiod:CustomRange has been entered but weatherfile DATA PERIOD does not have year included in start/end date." );
+									ShowSevereError( "GetNextEnvironment: Runperiod has been entered but weatherfile DATA PERIOD does not have year included in start/end date." );
 									ShowContinueError( "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both." );
 								}
 								if ( ! BetweenDates( Environment( Envrn ).StartDate, RunStJDay, RunEnJDay ) ) continue;
@@ -5792,17 +5792,16 @@ Label9999: ;
 			}
 
 			// A8,  \field Treat Weather as Actual
-			if ( lAlphaFieldBlanks( 8 ) || SameString( cAlphaArgs( 8 ), "YES" ) ) {
-				RunPeriodInput( Loop ).actualWeather = true;
-			} else if ( SameString( cAlphaArgs( 8 ), "NO" ) ) {
-				RunPeriodInput(Loop).actualWeather = false;
+			if ( lAlphaFieldBlanks( 8 ) || SameString( cAlphaArgs( 8 ), "NO" ) ) {
+				RunPeriodInput( Loop ).actualWeather = false;
+			} else if ( SameString( cAlphaArgs( 8 ), "YES" ) ) {
+				RunPeriodInput(Loop).actualWeather = true;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 8 ) + " invalid [" + cAlphaArgs( 8 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			//calculate the annual start and end days from the user inputted month and day
-			//RunPeriodInput( Loop ).ActualWeather = true;
 			RunPeriodInput( Loop ).MonWeekDay = 0;
 			if ( RunPeriodInput( Loop ).DayOfWeek != 0 && ! ErrorsFound ) {
 				SetupWeekDaysByMonth( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, RunPeriodInput( Loop ).DayOfWeek, RunPeriodInput( Loop ).MonWeekDay );
@@ -9642,12 +9641,10 @@ Label9998: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int tdate; // integer*4 variable needed for double precision arithmetic
 		int tyyyy; // integer*4 variable needed for double precision arithmetic
 		int tmm; // integer*4 variable needed for double precision arithmetic
 		int tdd; // integer*4 variable needed for double precision arithmetic
 		int l; // temporary variable used in conversion.
-		int n; // temporary variable used in conversion.
 
 		tyyyy = gyyyy;
 		tmm = gmm;
