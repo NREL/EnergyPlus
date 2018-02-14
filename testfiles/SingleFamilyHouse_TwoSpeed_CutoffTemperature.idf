@@ -1207,7 +1207,7 @@
     -0.000009720,            !- Coefficient6 x*y
     12.77778,                !- Minimum Value of x
     23.88889,                !- Maximum Value of x
-    23.88889,                !- Minimum Value of y
+    18.0,                    !- Minimum Value of y
     46.11111,                !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
@@ -1225,7 +1225,7 @@
     -0.000728028,            !- Coefficient6 x*y
     12.77778,                !- Minimum Value of x
     23.88889,                !- Maximum Value of x
-    23.88889,                !- Minimum Value of y
+    18.0,                    !- Minimum Value of y
     46.11111,                !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
@@ -1531,7 +1531,7 @@
     -0.000345086,            !- Coefficient6 x*y
     13.88889,                !- Minimum Value of x
     22.22222,                !- Maximum Value of x
-    23.88889,                !- Minimum Value of y
+    18.0,                    !- Minimum Value of y
     46.11111,                !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
@@ -1549,7 +1549,7 @@
     -0.000416472,            !- Coefficient6 x*y
     13.88889,                !- Minimum Value of x
     22.22222,                !- Maximum Value of x
-    23.88889,                !- Minimum Value of y
+    18.0,                    !- Minimum Value of y
     46.11111,                !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
@@ -1583,7 +1583,7 @@
     -0.001378514,            !- Coefficient6 x*y
     13.88889,                !- Minimum Value of x
     22.22222,                !- Maximum Value of x
-    23.88889,                !- Minimum Value of y
+    18.0,                    !- Minimum Value of y
     46.11111,                !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
@@ -1601,7 +1601,7 @@
     -0.000446723,            !- Coefficient6 x*y
     13.88889,                !- Minimum Value of x
     22.22222,                !- Maximum Value of x
-    23.88889,                !- Minimum Value of y
+    18.0,                    !- Minimum Value of y
     46.11111,                !- Maximum Value of y
     ,                        !- Minimum Curve Output
     ,                        !- Maximum Curve Output
