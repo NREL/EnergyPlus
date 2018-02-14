@@ -6,9 +6,9 @@ This group of objects describes the ambient conditions for the simulation.
 
 The location class describes the parameters for the building's location. Only one location is allowed. Weather data file location, if it exists, will override any location data in the IDF. Thus, for an annual simulation, a Location does not need to be entered.
 
-\subsubsection{Inputs}\label{inputs-026}
+\subsubsection{Inputs}\label{inputs-201709281625}
 
-\paragraph{Field: Name}\label{field-name-025}
+\paragraph{Field: Name}\label{field-name-201709281626}
 
 This alpha field is used as an identifying field in output reports.
 
@@ -45,7 +45,7 @@ Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26;
 \end{lstlisting}
 
 
-\subsection{Site:VariableLocation}\label{sitelocation}
+\subsection{Site:VariableLocation}\label{sitevariablelocation}
 
 This variable location class describes the parameters for a moving and/or rotating building's location.
 The applications for this include:
@@ -64,15 +64,15 @@ The latitude, longitude, and orientation are all defined according to the same c
 
 This alpha field is used as an identifying field in output reports.
 
-\paragraph{Field: Building Location Latitude Schedule}\label{field-latitude}
+\paragraph{Field: Building Location Latitude Schedule}\label{field-building-location-latitude-schedule}
 
 This field represents the latitude (in degrees) of the facility. By convention, North Latitude is represented as positive; South Latitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
 
-\paragraph{Field: Building Location Longitude Schedule}\label{field-longitude}
+\paragraph{Field: Building Location Longitude Schedule}\label{field-building-location-longitude-schedule}
 
 This field represents the longitude (in degrees) of the facility. By convention, East Longitude is represented as positive; West Longitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
 
-\paragraph{Field: Building Location Orientation Schedule}\label{field-time-zone}
+\paragraph{Field: Building Location Orientation Schedule}\label{field-building-location-orientation-schedule}
 
 This field represents the time zone of the facility (relative to Greenwich Mean Time or the 0\(^{th}\) meridian). Time zones west of GMT (e.g. North America) are represented as negative; east of GMT as positive. Non-whole hours can be represented in decimal (e.g. 6:30 is 6.5).
 
