@@ -96,7 +96,6 @@ If MAT is defined as zone air temperature at previous time step, and DeltaT repr
 	End If
 
 2 - Single Cooling SetPoint
-
 	If ( MAT > ThermostatSetpoint:SingleCooling - DeltaT)
 		ThermostatSetpoint:SingleCooling = ThermostatSetpoint:SingleCooling - DeltaT
 	Else
@@ -104,7 +103,7 @@ If MAT is defined as zone air temperature at previous time step, and DeltaT repr
 	End If
 
 3 - Single Heating/Cooling Setpoint
-	= No change
+	No change
 
 4 - Dual Setpoint (Heating and Cooling) with deadband
 	If ( MAT < HeatingSetpoint + DeltaT)
