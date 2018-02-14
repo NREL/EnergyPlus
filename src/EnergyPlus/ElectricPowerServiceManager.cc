@@ -1960,10 +1960,10 @@ namespace EnergyPlus {
 			generatorType = GeneratorType::pV;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
 			compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
-				} else if ( InputProcessor::SameString( objectType, "Generator:PVWatts" ) ) {
-						generatorType = GeneratorType::pvWatts;
-						compGenTypeOf_Num = DataGlobalConstants::iGeneratorPVWatts;
-						compPlantTypeOf_Num = DataPlant::TypeOf_Other;
+		} else if ( InputProcessor::SameString( objectType, "Generator:PVWatts" ) ) {
+				generatorType = GeneratorType::pvWatts;
+				compGenTypeOf_Num = DataGlobalConstants::iGeneratorPVWatts;
+				compPlantTypeOf_Num = DataPlant::TypeOf_Other;
 		} else if ( InputProcessor::SameString( objectType, "Generator:FuelCell" ) ) {
 			generatorType = GeneratorType::fuelCell;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
