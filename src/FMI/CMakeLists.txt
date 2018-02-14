@@ -12,7 +12,7 @@ set(src
   ../EnergyPlus/public/EnergyPlusPgm.hh 
 )
 
-add_library( epfmu "${src}" )
+add_library( epfmu ${src} )
 
 target_link_libraries( epfmu energypluslib )
 
