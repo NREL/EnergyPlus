@@ -371,12 +371,8 @@ namespace EnergyPlus {
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		HybridModel::clear_state();
-<<<<<<< HEAD
-		EnergyPlus::inputProcessor->clear_state();
-=======
 		HysteresisPhaseChange::clear_state();
-		InputProcessor::clear_state();
->>>>>>> NREL/develop
+		EnergyPlus::inputProcessor->clear_state();
 		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();

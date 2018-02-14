@@ -964,21 +964,12 @@ namespace Furnaces {
 					//             Find the controlled zone number for the specified thermostat location
 					Furnace( FurnaceNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 					//             Determine if furnace is on air loop served by the thermostat location specified
-<<<<<<< HEAD
-					AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					if ( AirLoopNumber > 0 ) {
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Furnace( FurnaceNum ).Name ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-								AirLoopFound = true;
-								break;
-=======
 					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
 						int AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
 						if ( AirLoopNumber > 0 ) {
 							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-									if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Furnace( FurnaceNum ).Name ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+									if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Furnace( FurnaceNum ).Name ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 									AirLoopFound = true;
 									Furnace( FurnaceNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( zoneInNode );
 									break;
@@ -992,7 +983,6 @@ namespace Furnaces {
 							for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
 								if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != Furnace( FurnaceNum ).ControlZoneNum ) continue;
 								AirNodeFound = true;
->>>>>>> NREL/develop
 							}
 						}
 						if ( AirLoopFound ) break;
@@ -1483,21 +1473,12 @@ namespace Furnaces {
 					//             Find the controlled zone number for the specified thermostat location
 					Furnace( FurnaceNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 					//             Determine if system is on air loop served by the thermostat location specified
-<<<<<<< HEAD
-					AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					if ( AirLoopNumber > 0 ) {
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-								AirLoopFound = true;
-								break;
-=======
 					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
 						int AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
 						if ( AirLoopNumber > 0 ) {
 							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-									if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+									if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 									AirLoopFound = true;
 									Furnace( FurnaceNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( zoneInNode );
 									break;
@@ -1511,7 +1492,6 @@ namespace Furnaces {
 							for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
 								if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != Furnace( FurnaceNum ).ControlZoneNum ) continue;
 								AirNodeFound = true;
->>>>>>> NREL/develop
 							}
 						}
 						if ( AirLoopFound ) break;
@@ -2625,21 +2605,12 @@ namespace Furnaces {
 					//             Find the controlled zone number for the specified thermostat location
 					Furnace( FurnaceNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 					//             Determine if furnace is on air loop served by the thermostat location specified
-<<<<<<< HEAD
-					AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					if ( AirLoopNumber > 0 ) {
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-								AirLoopFound = true;
-								break;
-=======
 					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
 						int AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
 						if ( AirLoopNumber > 0 ) {
 							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-									if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+									if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 									AirLoopFound = true;
 									Furnace( FurnaceNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( zoneInNode );
 									break;
@@ -2653,7 +2624,6 @@ namespace Furnaces {
 							for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
 								if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != Furnace( FurnaceNum ).ControlZoneNum ) continue;
 								AirNodeFound = true;
->>>>>>> NREL/develop
 							}
 						}
 						if ( AirLoopFound ) break;
@@ -3513,21 +3483,12 @@ namespace Furnaces {
 					//             Find the controlled zone number for the specified thermostat location
 					Furnace( FurnaceNum ).NodeNumOfControlledZone = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 					//             Determine if furnace is on air loop served by the thermostat location specified
-<<<<<<< HEAD
-					AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					if ( AirLoopNumber > 0 ) {
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
-								AirLoopFound = true;
-								break;
-=======
 					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
 						int AirLoopNumber = ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode );
 						if ( AirLoopNumber > 0 ) {
 							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNumber ).NumBranches; ++BranchNum ) {
 								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-									if ( !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || !SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
+									if ( ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, Alphas( 1 ) ) || ! UtilityRoutines::SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).TypeOf, CurrentModuleObject ) ) continue;
 									AirLoopFound = true;
 									Furnace( FurnaceNum ).ZoneInletNode = ZoneEquipConfig( ControlledZoneNum ).InletNode( zoneInNode );
 									break;
@@ -3541,7 +3502,6 @@ namespace Furnaces {
 							for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
 								if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != Furnace( FurnaceNum ).ControlZoneNum ) continue;
 								AirNodeFound = true;
->>>>>>> NREL/develop
 							}
 						}
 						if ( AirLoopFound ) break;

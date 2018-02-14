@@ -1097,27 +1097,6 @@ namespace SimAirServingZones {
 						PrimaryAirSystem( AirSysNum ).ControlConverged( OASysControllerNum ) = false;
 						PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = true;
 						GetControllerActuatorNodeNum( ControllerName, ActuatorNodeNum, errFlag );
-<<<<<<< HEAD
-						for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( UtilityRoutines::SameString( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirloopHVAC:OutdoorAirSystem" ) ) continue;
-								CompType = PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-								WaterCoilNodeNum = -1;
-								if ( UtilityRoutines::SameString( CompType, "Coil:Cooling:Water:DetailedGeometry" ) || UtilityRoutines::SameString( CompType, "Coil:Heating:Water" ) || UtilityRoutines::SameString( CompType, "Coil:Cooling:Water" ) ) {
-									WaterCoilNodeNum = GetCoilWaterInletNode( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name, ErrorsFound );
-								}
-								if ( WaterCoilNodeNum == ActuatorNodeNum ) {
-									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
-								}
-							}
-						}
-						// added to fix bug issue #5695, if HW coil on outdoor air system, don't lock out during economizing
-						for (OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum) {
-							for (OACompNum = 1; OACompNum <= OutsideAirSys( OASysNum ).NumComponents; ++OACompNum) {
-								CompType = OutsideAirSys( AirSysNum ).ComponentType( OACompNum );
-								if (UtilityRoutines::SameString( CompType, "Coil:Heating:Water" )) {
-									PrimaryAirSystem( AirSysNum ).CanBeLockedOutByEcono( OASysControllerNum ) = false;
-=======
 
 						bool nonLockoutCoilFound = false;
 						WaterCoilNodeNum = -1;
@@ -1125,7 +1104,7 @@ namespace SimAirServingZones {
 						if ( OANum > 0 ) {
 							for ( int OACompNum = 1; OACompNum <= OutsideAirSys( OANum ).NumComponents; ++OACompNum ) {
 								CompType = OutsideAirSys( OANum ).ComponentType( OACompNum );
-								if ( SameString( CompType, "Coil:Heating:Water" ) ) {
+								if ( UtilityRoutines::SameString( CompType, "Coil:Heating:Water" ) ) {
 									WaterCoilNodeNum = GetCoilWaterInletNode( CompType, OutsideAirSys( OANum ).ComponentName( OACompNum ), ErrorsFound );
 									if ( WaterCoilNodeNum == ActuatorNodeNum ) nonLockoutCoilFound = true;
 									break;
@@ -1139,16 +1118,15 @@ namespace SimAirServingZones {
 							//         If these node numbers match, the coil is in the main air loop and the lockout flag should be reset to FALSE
 							for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
 								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-									if ( SameString( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirloopHVAC:OutdoorAirSystem" ) ) continue;
+									if ( UtilityRoutines::SameString( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "AirloopHVAC:OutdoorAirSystem" ) ) continue;
 									CompType = PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
-									if ( SameString( CompType, "Coil:Cooling:Water:DetailedGeometry" ) || SameString( CompType, "Coil:Heating:Water" ) || SameString( CompType, "Coil:Cooling:Water" ) ) {
+									if ( UtilityRoutines::SameString( CompType, "Coil:Cooling:Water:DetailedGeometry" ) || UtilityRoutines::SameString( CompType, "Coil:Heating:Water" ) || UtilityRoutines::SameString( CompType, "Coil:Cooling:Water" ) ) {
 										WaterCoilNodeNum = GetCoilWaterInletNode( CompType, PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name, ErrorsFound );
 										if (WaterCoilNodeNum == ActuatorNodeNum) {
 											nonLockoutCoilFound = true;
 											break;
 										}
 									}
->>>>>>> NREL/develop
 								}
 							}
 						}
@@ -2698,7 +2676,7 @@ namespace SimAirServingZones {
 		AirLoopControlInfo( AirLoopNum ).AllowWarmRestartFlag = true;
 
 		if ( PrimaryAirSystem( AirLoopNum ).SizeAirloopCoil ) { // one time flag to initialize controller index and size coils if needed
-			// Loop through the controllers first to set the controller index in the PrimaryAirSystem array. 
+			// Loop through the controllers first to set the controller index in the PrimaryAirSystem array.
 			// Need to actaully simulate controller to get controller index.
 			for ( int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem( AirLoopNum ).NumControllers; ++AirLoopControlNum ) {
 				PrimaryAirSystem( AirLoopNum ).ControllerIndex( AirLoopControlNum ) = HVACControllers::GetControllerIndex( PrimaryAirSystem( AirLoopNum ).ControllerName( AirLoopControlNum ) );
@@ -3053,7 +3031,7 @@ namespace SimAirServingZones {
 		// TRUE when air loop needs to be refreshed.
 		// Note that it is not used by ManageControllers() in the WARM_RESTART mode.
 		bool IsUpToDateFlag;
-		static bool BypassOAController; // logical to bypass HVAC controller calcs 
+		static bool BypassOAController; // logical to bypass HVAC controller calcs
 
 		// FLOW:
 
@@ -3974,7 +3952,7 @@ namespace SimAirServingZones {
 					if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = AllOA;
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = AllOA;
-					} else { 
+					} else {
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
 					}
@@ -4007,7 +3985,7 @@ namespace SimAirServingZones {
 					if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = AllOA;
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = AllOA;
-					} else { 
+					} else {
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).CoolOAOption = SysSizInput( 1 ).CoolOAOption;
 						SysSizing( DesDayEnvrnNum, AirLoopNum ).HeatOAOption = SysSizInput( 1 ).HeatOAOption;
 					}
@@ -4068,7 +4046,7 @@ namespace SimAirServingZones {
 				if ( PrimaryAirSystem( AirLoopNum ).isAllOA ) {
 					FinalSysSizing( AirLoopNum ).CoolOAOption = AllOA;
 					FinalSysSizing( AirLoopNum ).HeatOAOption = AllOA;
-				} else { 
+				} else {
 					FinalSysSizing( AirLoopNum ).CoolOAOption = SysSizInput( SysSizNum ).CoolOAOption;
 					FinalSysSizing( AirLoopNum ).HeatOAOption = SysSizInput( SysSizNum ).HeatOAOption;
 				}

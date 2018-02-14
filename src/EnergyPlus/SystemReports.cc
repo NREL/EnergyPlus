@@ -332,12 +332,7 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-<<<<<<< HEAD
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
 				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
-=======
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
->>>>>>> NREL/develop
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
 					AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
@@ -451,12 +446,7 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-<<<<<<< HEAD
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
 				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
-=======
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
->>>>>>> NREL/develop
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				//loop over the zone supply air path inlet nodes
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {

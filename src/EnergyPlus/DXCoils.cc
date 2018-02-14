@@ -14662,10 +14662,7 @@ Label50: ;
 
 		if ( OperationMode == FlagCoolMode ) {
 		//Cooling: OperationMode 0
-<<<<<<< HEAD
-=======
 
->>>>>>> NREL/develop
 			if ( present( BF ) ) {
 				BF_real = BF;
 			} else {

@@ -968,21 +968,12 @@ namespace PlantManager {
 							this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
 							this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory( CompNames( CompNum ) );
-<<<<<<< HEAD
-						} else if ( UtilityRoutines::SameString( this_comp_type, "GroundHeatExchanger:Vertical" ) ) {
-							this_comp.TypeOf_Num = TypeOf_GrndHtExchgVertical;
-							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-							this_comp.compPtr = inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( CompNames( CompNum ) );
-						} else if ( UtilityRoutines::SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
-=======
-						} else if ( SameString( this_comp_type, "GroundHeatExchanger:System" ) ) {
+						} else if ( UtilityRoutines::SameString( this_comp_type, "GroundHeatExchanger:System" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSystem;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-							this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory( TypeOf_GrndHtExchgSystem, CompNames( CompNum ) );
-						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
->>>>>>> NREL/develop
+							this_comp.compPtr = inputProcessor->objectFactory< GroundHeatExchangers::GLHESystem >( CompNames( CompNum ) );
+						} else if ( UtilityRoutines::SameString( this_comp_type, "GroundHeatExchanger:Surface" ) ) {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
@@ -1660,11 +1651,7 @@ namespace PlantManager {
 							GeneralEquipType = GenEquipTypes_Chiller;
 						} else if ( has_prefixi( this_comp.TypeOf, "District" ) ) {
 							GeneralEquipType = GenEquipTypes_Purchased;
-<<<<<<< HEAD
-						} else if ( UtilityRoutines::SameString( this_comp.TypeOf, "GroundHeatExchanger:Vertical" ) ) {
-=======
-						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:System" ) ) {
->>>>>>> NREL/develop
+						} else if ( UtilityRoutines::SameString( this_comp.TypeOf, "GroundHeatExchanger:System" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 						} else if ( UtilityRoutines::SameString( this_comp.TypeOf, "GroundHeatExchanger:Surface" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;

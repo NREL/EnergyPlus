@@ -656,9 +656,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( ElectricBaseboardRadiator::ElecBaseboard( BaseboardNum ).NominalCapacity, 3000.0 );
 
 	}
-<<<<<<< HEAD
-=======
-	
+
 	TEST_F( EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOff ) {
 		// this unit test is related to issue #6276, unit was producing negative heating, new routines turning things off or calculating things when on were added
 		Real64 LoadMet;
@@ -668,7 +666,7 @@ namespace EnergyPlus {
 		Real64 ElecUseRate;
 		Real64 AirOutletTemp;
 		Real64 AirInletTemp;
-		
+
 		// Set conditions
 		LoadMet = -1000.0;
 		QBBCap = 500.0;
@@ -688,7 +686,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( QBBElecRadSrc, 0.0 );
 		EXPECT_EQ( ElecUseRate, 0.0 );
 		EXPECT_EQ( AirOutletTemp, AirInletTemp );
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOn ) {
@@ -707,7 +705,7 @@ namespace EnergyPlus {
 		QBBCap = 1200.0;
 		CapacitanceAir = 1000.0;
 		Effic = 0.5;
-		
+
 		// Call the On routine
 		ElectricBaseboardRadiator::UpdateElectricBaseboardOn( AirOutletTemp, ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
 
@@ -716,8 +714,7 @@ namespace EnergyPlus {
 		// ElecUseRate = QBBCap / Effic;
 		EXPECT_NEAR( AirOutletTemp, 21.2, 0.0001 );
 		EXPECT_NEAR( ElecUseRate, 2400.0, 0.0001 );
-		
+
 	}
-	
->>>>>>> NREL/develop
+
 }

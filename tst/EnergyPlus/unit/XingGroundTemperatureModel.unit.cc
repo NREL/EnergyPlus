@@ -74,13 +74,8 @@ TEST_F( EnergyPlusFixture, XingGroundTempsModelTest )
 		"	30;			!- Phase Shift of Temperature Amplitude 2 {days}",
 	});
 
-<<<<<<< HEAD
 	ASSERT_TRUE( process_idf( idf_objects ) );
-	
-=======
-	ASSERT_FALSE( process_idf( idf_objects ) );
 
->>>>>>> NREL/develop
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

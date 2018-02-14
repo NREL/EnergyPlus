@@ -554,7 +554,7 @@ namespace ZoneEquipmentManager {
 				}
 			}
 		}
-		
+
 		for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
 			AirLoopFlow( airLoop ).SupFlow = 0.0;
 			AirLoopFlow( airLoop ).ZoneRetFlow = 0.0;
@@ -655,7 +655,7 @@ namespace ZoneEquipmentManager {
 			ActualZoneNum = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ActualZoneNum;
 			NonAirSystemResponse( ActualZoneNum ) = 0.0;
 			SysDepZoneLoads( ActualZoneNum ) = 0.0;
-			SysOutputProvided = 0.0; 
+			SysOutputProvided = 0.0;
 			LatOutputProvided = 0.0;
 			InitSystemOutputRequired( ActualZoneNum, true );
 			ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
@@ -3568,21 +3568,21 @@ namespace ZoneEquipmentManager {
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
 		} else if ( FirstHVACIteration && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading ) && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading ) ) {
 			//init each sequenced demand to the zone design load in order to get available capacities from equipment
-			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) { 
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) {
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = DataSizing::FinalZoneSizing( ZoneNum ).DesHeatLoad; // array assignment
 				} else {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = -DataSizing::FinalZoneSizing( ZoneNum ).DesCoolLoad; // array assignment
 				}
 			}
-			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) { 
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) {
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = DataSizing::FinalZoneSizing( ZoneNum ).DesHeatLoad; // array assignment
 				} else {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = -DataSizing::FinalZoneSizing( ZoneNum ).DesCoolLoad; // array assignment
 				}
 			}
-			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) { 
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) {
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = DataSizing::FinalZoneSizing( ZoneNum ).DesHeatLoad; // array assignment
 				} else {
@@ -4005,9 +4005,9 @@ namespace ZoneEquipmentManager {
 				}
 				break;
 			case DataZoneEquipment::LoadDist::UniformLoading:
-			case DataZoneEquipment::LoadDist::UniformPLRLoading: 
+			case DataZoneEquipment::LoadDist::UniformPLRLoading:
 			case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
-				// For every load distribution scheme except SequentialLoad, do not touch the sequenced loads, 
+				// For every load distribution scheme except SequentialLoad, do not touch the sequenced loads,
 				// but set the remaining loads to the next equipment type's load to support equipment types that don't use the sequenced loads
 				if ( present( EquipPriorityNum ) ) {
 					if ( EquipPriorityNum + 1 <= energy.NumZoneEquipment ) {
@@ -4045,10 +4045,6 @@ namespace ZoneEquipmentManager {
 		// METHODOLOGY EMPLOYED:
 		// Mass continuity equation.
 
-<<<<<<< HEAD
-		// Using/Aliasing
-=======
->>>>>>> NREL/develop
 		using DataLoopNode::Node;
 		using DataAirLoop::AirLoopFlow;
 		using namespace DataRoomAirModel; // UCSD
@@ -4057,11 +4053,6 @@ namespace ZoneEquipmentManager {
 		using DataAirSystems::PrimaryAirSystem;
 		using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 		using DataGlobals::isPulseZoneSizing;
-<<<<<<< HEAD
-		using DataGlobals::DoingSizing;
-=======
-
->>>>>>> NREL/develop
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::MassConservation;
 		using DataHeatBalance::Infiltration;
@@ -4078,18 +4069,9 @@ namespace ZoneEquipmentManager {
 		using DataHVACGlobals::SmallMassFlow;
 		using ScheduleManager::GetCurrentScheduleValue;
 
-<<<<<<< HEAD
-		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const IterMax( 25 );
 		Real64 const ConvergenceTolerance( 0.000010 );
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ZoneNum;
-=======
-		int const IterMax( 25 );
-		Real64 const ConvergenceTolerance( 0.000010 );
-
->>>>>>> NREL/develop
 		int NodeNum;
 		int ZoneNode; // zone air node number
 		Real64 TotInletAirMassFlowRate;
@@ -4132,7 +4114,7 @@ namespace ZoneEquipmentManager {
 			if  ( airLoop > 0 ) {
 				AirLoopFlow( airLoop ).SupFlow += Node( DirectAirManager::DirectAir( directAirUnit ).ZoneSupplyAirNode ).MassFlowRate ;
 			}
-		}	
+		}
 
 		do {
 			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
@@ -4445,7 +4427,7 @@ namespace ZoneEquipmentManager {
 				}
 
 				// Return node 1 is special
-				if( returnNum == 1 ){ 
+				if( returnNum == 1 ){
 					// Make no return air flow adjustments during sizing
 					if ( ( DataGlobals::DoingSizing || DataGlobals::isPulseZoneSizing ) && numRetNodes == 1 ) {
 						returnNodeMassFlow = ExpTotalReturnMassFlow;
@@ -5021,7 +5003,7 @@ namespace ZoneEquipmentManager {
 			}
 			else {
 				HumRatExt = OutHumRat;
-				EnthalpyExt = OutEnthalpy;					
+				EnthalpyExt = OutEnthalpy;
 			}
 			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, HumRatExt );
 			CpAir = PsyCpAirFnWTdb( HumRatExt, TempExt );
@@ -5596,7 +5578,7 @@ namespace ZoneEquipmentManager {
 			WindSpeedExt = Zone( NZ ).WindSpeed;
 
 			// Use air node information linked to the zone if defined
-			
+
 			if ( Zone( NZ ).HasLinkedOutAirNode ) {
 				HumRatExt = Node( Zone( NZ ).LinkedOutAirNode ).HumRat;
 				}

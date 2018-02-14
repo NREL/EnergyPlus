@@ -65,12 +65,9 @@
 #include <DataAirSystems.hh>
 #include <DataHVACGlobals.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-<<<<<<< HEAD
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-=======
 #include <OutAirNodeManager.hh>
 #include <DataEnvironment.hh>
->>>>>>> NREL/develop
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -684,7 +681,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
 
 	}
-	
+
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest )
 	{
 
@@ -709,7 +706,7 @@ namespace EnergyPlus {
 		MaxCoolLoadZone.allocate( NumOfZones );
 		MaxCoolLoadPrevDay.allocate( NumOfZones );
 		WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue = 0.0;
-		
+
 		// Test 1: All Maxs both less than MinLoad (100.0)
 		MaxHeatLoadZone( 1 ) = 50.0;
 		MaxHeatLoadPrevDay( 1 ) = 90.0;
@@ -720,7 +717,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.0, 0.0001 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.0, 0.0001 );
-		
+
 		// Test 2: Max Previous Day both less than MinLoad
 		MaxHeatLoadZone( 1 ) = 100.5;
 		MaxHeatLoadPrevDay( 1 ) = 90.0;
@@ -731,7 +728,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
-		
+
 		// Test 3: Max Current Day both less than MinLoad
 		MaxHeatLoadZone( 1 ) = 90.0;
 		MaxHeatLoadPrevDay( 1 ) = 100.5;
@@ -742,7 +739,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
-		
+
 		// Test 4: Everything greater than MinLoad (pass convergence test)
 		MaxHeatLoadZone( 1 ) = 201.0;
 		MaxHeatLoadPrevDay( 1 ) = 200.0;
@@ -753,7 +750,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 2 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.005, 0.0001 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.005, 0.0001 );
-		
+
 		// Test 5: Everything greater than MinLoad (fail convergence test)
 		MaxHeatLoadZone( 1 ) = 210.0;
 		MaxHeatLoadPrevDay( 1 ) = 200.0;
@@ -1211,7 +1208,7 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).NumReturnNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
-		
+
 		DataHeatBalance::TempEffBulkAir.allocate(6);
 
 

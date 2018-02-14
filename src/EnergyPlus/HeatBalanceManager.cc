@@ -1419,12 +1419,8 @@ namespace HeatBalanceManager {
 
 		TotMaterials = RegMat + RegRMat + AirMat + W5GlsMat + W5GlsMatAlt + W5GasMat + W5GasMatMixture + TotShades + TotScreens + TotBlinds + EcoRoofMat + IRTMat + TotSimpleWindow + TotComplexShades + TotComplexGaps + W5GlsMatEQL + TotShadesEQL + TotDrapesEQL + TotBlindsEQL + TotScreensEQL + W5GapMatEQL;
 
-<<<<<<< HEAD
 		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
-=======
-		TotFfactorConstructs = GetNumObjectsFound( "Construction:FfactorGroundFloor" );
-		TotCfactorConstructs = GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
 
 		if ( TotFfactorConstructs > 0 ) {
 			NoFfactorConstructionsUsed = false;
@@ -1434,7 +1430,6 @@ namespace HeatBalanceManager {
 			NoCfactorConstructionsUsed = false;
 		}
 
->>>>>>> NREL/develop
 		if ( TotFfactorConstructs + TotCfactorConstructs >= 1 ) {
 			// Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
 			TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
@@ -3743,15 +3738,8 @@ namespace HeatBalanceManager {
 		TotRegConstructs = inputProcessor->getNumObjectsFound( "Construction" );
 		TotSourceConstructs = inputProcessor->getNumObjectsFound( "Construction:InternalSource" );
 
-<<<<<<< HEAD
 		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
-		TotComplexFenStates = inputProcessor->getNumObjectsFound( "Construction:ComplexFenestrationState" );
-		TotWindow5Constructs = inputProcessor->getNumObjectsFound( "Construction:WindowDataFile" );
-		TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound( "Construction:WindowEquivalentLayer" );
-=======
-		TotFfactorConstructs = GetNumObjectsFound( "Construction:FfactorGroundFloor" );
-		TotCfactorConstructs = GetNumObjectsFound( "Construction:CfactorUndergroundWall" );
 
 		if ( TotFfactorConstructs > 0 ) {
 			NoFfactorConstructionsUsed = false;
@@ -3761,10 +3749,9 @@ namespace HeatBalanceManager {
 			NoCfactorConstructionsUsed = false;
 		}
 
-		TotComplexFenStates = GetNumObjectsFound( "Construction:ComplexFenestrationState" );
-		TotWindow5Constructs = GetNumObjectsFound( "Construction:WindowDataFile" );
-		TotWinEquivLayerConstructs = GetNumObjectsFound( "Construction:WindowEquivalentLayer" );
->>>>>>> NREL/develop
+		TotComplexFenStates = inputProcessor->getNumObjectsFound( "Construction:ComplexFenestrationState" );
+		TotWindow5Constructs = inputProcessor->getNumObjectsFound( "Construction:WindowDataFile" );
+		TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound( "Construction:WindowEquivalentLayer" );
 
 		WConstructNames.allocate( TotWindow5Constructs );
 
@@ -4379,11 +4366,7 @@ namespace HeatBalanceManager {
 		//-----------------------------------------------------------------------
 
 		cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
-<<<<<<< HEAD
 		TotZoneEnv = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
-=======
-		TotZoneEnv = GetNumObjectsFound( cCurrentModuleObject );
->>>>>>> NREL/develop
 
 		if ( TotZoneEnv > 0 ) {
 			// Check if IDD definition is correct

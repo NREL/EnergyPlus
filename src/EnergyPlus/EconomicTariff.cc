@@ -463,47 +463,6 @@ namespace EconomicTariff {
 				NamesOfKeys.deallocate();
 				IndexesForKeyVar.deallocate();
 			}
-<<<<<<< HEAD
-			//conversion factor
-			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
-				tariff( iInObj ).convChoice = conversionUSERDEF;
-				tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
-				tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KWH" ) ) {
-				tariff( iInObj ).convChoice = conversionKWH;
-				tariff( iInObj ).energyConv = 0.0000002778;
-				tariff( iInObj ).demandConv = 0.001;
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "THERM" ) ) {
-				tariff( iInObj ).convChoice = conversionTHERM;
-				tariff( iInObj ).energyConv = 9.4781712e-9;
-				tariff( iInObj ).demandConv = 0.00003412;
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
-				tariff( iInObj ).convChoice = conversionMMBTU;
-				tariff( iInObj ).energyConv = 9.4781712e-10;
-				tariff( iInObj ).demandConv = 0.000003412;
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MJ" ) ) {
-				tariff( iInObj ).convChoice = conversionMJ;
-				tariff( iInObj ).energyConv = 0.000001;
-				tariff( iInObj ).demandConv = 0.0036;
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
-				tariff( iInObj ).convChoice = conversionKBTU;
-				tariff( iInObj ).energyConv = 9.4781712e-7;
-				tariff( iInObj ).demandConv = 0.003412;
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MCF" ) ) {
-				tariff( iInObj ).convChoice = conversionMCF;
-				tariff( iInObj ).energyConv = 9.4781712e-10;
-				tariff( iInObj ).demandConv = 0.000003412;
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "CCF" ) ) {
-				tariff( iInObj ).convChoice = conversionCCF;
-				tariff( iInObj ).energyConv = 9.4781712e-9;
-				tariff( iInObj ).demandConv = 0.00003412;
-			} else {
-				tariff( iInObj ).convChoice = conversionKWH;
-				tariff( iInObj ).energyConv = 0.0000002778;
-				tariff( iInObj ).demandConv = 0.001;
-				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
-				ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", Defaulting to KWH." );
-=======
 
 			// Start by checking what type of meter we do have, some units can be used for several resources with different conversion factors
 			// Explicitly assume it's not a water meter nor an electric meter nor a gas meter (was already done in constructor though)
@@ -514,7 +473,7 @@ namespace EconomicTariff {
 			// Determine whether this meter is related to electricity, or water, or gas
 			if ( tariff( iInObj ).reportMeterIndx != 0 ) {
 
-				auto const SELECT_CASE_var( MakeUPPERCase( EnergyMeters( tariff( iInObj ).reportMeterIndx ).ResourceType ) );
+				auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( EnergyMeters( tariff( iInObj ).reportMeterIndx ).ResourceType ) );
 
 				// Various types of electricity meters
 				if ( SELECT_CASE_var == "ELECTRICITY" ) {
@@ -538,7 +497,6 @@ namespace EconomicTariff {
 				} else if (SELECT_CASE_var == "GAS" || SELECT_CASE_var == "NATURALGAS" || SELECT_CASE_var == "NATURAL GAS" )  {
 					tariff( iInObj ).kindGasMtr = kindMeterGas;
 				}
->>>>>>> NREL/develop
 			}
 
 			// Assign the right conversion factors based on the resource type
@@ -547,23 +505,23 @@ namespace EconomicTariff {
 			// We set demandConv to something analogous to m3/h
 			if ( tariff( iInObj ).kindWaterMtr == kindMeterWater ) {
 				//conversion factor
-				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
 					tariff( iInObj ).convChoice = conversionUSERDEF;
 					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
 					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
-				} else if ( SameString( cAlphaArgs( 3 ), "M3" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "M3" ) ) {
 					tariff( iInObj ).convChoice = conversionM3;
 					tariff( iInObj ).energyConv = 1.0;
 					tariff( iInObj ).demandConv = 3600.0;
-				} else if ( SameString( cAlphaArgs( 3 ), "CCF" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "CCF" ) ) {
 					tariff( iInObj ).convChoice = conversionCCF;
 					tariff( iInObj ).energyConv = 0.35314666721488586;
 					tariff( iInObj ).demandConv = 0.35314666721488586 * 3600;
-				} else if ( SameString( cAlphaArgs( 3 ), "GAL" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "GAL" ) ) {
 					tariff( iInObj ).convChoice = conversionGAL;
 					tariff( iInObj ).energyConv = 264.1720523602524;
 					tariff( iInObj ).demandConv = 264.1720523602524 * 3600;
-				} else if ( SameString( cAlphaArgs( 3 ), "KGAL" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KGAL" ) ) {
 					tariff( iInObj ).convChoice = conversionKGAL;
 					tariff( iInObj ).energyConv = 0.2641720523602524;
 					tariff( iInObj ).demandConv = 0.2641720523602524 * 3600;
@@ -580,29 +538,29 @@ namespace EconomicTariff {
 			// Volumetric units such as MCF or CCF doesn't make sense IMHO (JM)
 			// THERM is strange for an electric meter but currently I accept but issue a warning
 			} else if ( tariff( iInObj ).kindElectricMtr != kindMeterNotElectric ) {
-				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
 					tariff( iInObj ).convChoice = conversionUSERDEF;
 					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
 					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
-				} else if ( SameString( cAlphaArgs( 3 ), "KWH" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KWH" ) ) {
 					tariff( iInObj ).convChoice = conversionKWH;
 					tariff( iInObj ).energyConv = 0.0000002778;
 					tariff( iInObj ).demandConv = 0.001;
-				} else if ( SameString( cAlphaArgs( 3 ), "MJ" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MJ" ) ) {
 					tariff( iInObj ).convChoice = conversionMJ;
 					tariff( iInObj ).energyConv = 0.000001;
 					tariff( iInObj ).demandConv = 0.0036;
-				} else if ( SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
 					tariff( iInObj ).convChoice = conversionMMBTU;
 					tariff( iInObj ).energyConv = 9.4781712e-10;
 					tariff( iInObj ).demandConv = 0.000003412;
-				} else if ( SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
 					tariff( iInObj ).convChoice = conversionKBTU;
 					tariff( iInObj ).energyConv = 9.4781712e-7;
 					tariff( iInObj ).demandConv = 0.003412;
 
 				// We accept the following choices, but issue a warning
-				} else if ( SameString( cAlphaArgs( 3 ), "THERM" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "THERM" ) ) {
 					tariff( iInObj ).convChoice = conversionTHERM;
 					tariff( iInObj ).energyConv = 9.4781712e-9;
 					tariff( iInObj ).demandConv = 0.00003412;
@@ -620,42 +578,42 @@ namespace EconomicTariff {
 
 			// If it's a gas meter
 			} else if ( tariff( iInObj ).kindGasMtr == kindMeterGas ) {
-				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
 					tariff( iInObj ).convChoice = conversionUSERDEF;
 					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
 					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
-				} else if ( SameString( cAlphaArgs( 3 ), "KWH" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KWH" ) ) {
 					tariff( iInObj ).convChoice = conversionKWH;
 					tariff( iInObj ).energyConv = 0.0000002778;
 					tariff( iInObj ).demandConv = 0.001;
-				} else if ( SameString( cAlphaArgs( 3 ), "THERM" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "THERM" ) ) {
 					tariff( iInObj ).convChoice = conversionTHERM;
 					tariff( iInObj ).energyConv = 9.4781712e-9;
 					tariff( iInObj ).demandConv = 0.00003412;
-				} else if ( SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
 					tariff( iInObj ).convChoice = conversionMMBTU;
 					tariff( iInObj ).energyConv = 9.4781712e-10;
 					tariff( iInObj ).demandConv = 0.000003412;
-				} else if ( SameString( cAlphaArgs( 3 ), "MJ" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MJ" ) ) {
 					tariff( iInObj ).convChoice = conversionMJ;
 					tariff( iInObj ).energyConv = 0.000001;
 					tariff( iInObj ).demandConv = 0.0036;
-				} else if ( SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
 					tariff( iInObj ).convChoice = conversionKBTU;
 					tariff( iInObj ).energyConv = 9.4781712e-7;
 					tariff( iInObj ).demandConv = 0.003412;
 
 				// Volumetric units for natural gas
 				// Actually assuming 1 therm = 1 CCF (= 100 ft^3)
-				} else if ( SameString( cAlphaArgs( 3 ), "MCF" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MCF" ) ) {
 					tariff( iInObj ).convChoice = conversionMCF;
 					tariff( iInObj ).energyConv = 9.4781712e-10;
 					tariff( iInObj ).demandConv = 0.000003412;
-				} else if ( SameString( cAlphaArgs( 3 ), "CCF" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "CCF" ) ) {
 					tariff( iInObj ).convChoice = conversionCCF;
 					tariff( iInObj ).energyConv = 9.4781712e-9;
 					tariff( iInObj ).demandConv = 0.00003412;
-				} else if ( SameString( cAlphaArgs( 3 ), "M3" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "M3" ) ) {
 					// Obtained from converting CCF above to m^3 so the same heat content of natural gas is used (1 therm = 1 CCF)
 					tariff( iInObj ).convChoice = conversionM3;
 					tariff( iInObj ).energyConv = 2.6839192e-10;
@@ -673,27 +631,27 @@ namespace EconomicTariff {
 			// It it's neither an electric, water or gas meter, we cannot accept volumetric units
 			// because we cannot infer the heat content
 			} else {
-				if ( SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
 					tariff( iInObj ).convChoice = conversionUSERDEF;
 					tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
 					tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
-				} else if ( SameString( cAlphaArgs( 3 ), "KWH" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KWH" ) ) {
 					tariff( iInObj ).convChoice = conversionKWH;
 					tariff( iInObj ).energyConv = 0.0000002778;
 					tariff( iInObj ).demandConv = 0.001;
-				} else if ( SameString( cAlphaArgs( 3 ), "THERM" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "THERM" ) ) {
 					tariff( iInObj ).convChoice = conversionTHERM;
 					tariff( iInObj ).energyConv = 9.4781712e-9;
 					tariff( iInObj ).demandConv = 0.00003412;
-				} else if ( SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
 					tariff( iInObj ).convChoice = conversionMMBTU;
 					tariff( iInObj ).energyConv = 9.4781712e-10;
 					tariff( iInObj ).demandConv = 0.000003412;
-				} else if ( SameString( cAlphaArgs( 3 ), "MJ" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MJ" ) ) {
 					tariff( iInObj ).convChoice = conversionMJ;
 					tariff( iInObj ).energyConv = 0.000001;
 					tariff( iInObj ).demandConv = 0.0036;
-				} else if ( SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
 					tariff( iInObj ).convChoice = conversionKBTU;
 					tariff( iInObj ).energyConv = 9.4781712e-7;
 					tariff( iInObj ).demandConv = 0.003412;
@@ -1023,13 +981,8 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Charge:Block";
-<<<<<<< HEAD
-		hugeNumber = huge( hugeNumber );
-		numChargeBlock = inputProcessor->getNumObjectsFound( CurrentModuleObject );
-=======
 		hugeNumber = HUGE_( hugeNumber );
-		numChargeBlock = GetNumObjectsFound( CurrentModuleObject );
->>>>>>> NREL/develop
+		numChargeBlock = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		chargeBlock.allocate( numChargeBlock );
 		for ( iInObj = 1; iInObj <= numChargeBlock; ++iInObj ) {
 			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -4806,28 +4759,6 @@ namespace EconomicTariff {
 		numMins = 0;
 		MinTariffIndex.dimension( numTariff, 0 );
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-<<<<<<< HEAD
-			//determine if this is meter related to electricity
-			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
-				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) );
-				if ( SELECT_CASE_var == "ELECTRICITY" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecSimple;
-				} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecProduced;
-				} else if ( SELECT_CASE_var == "ELECTRICITYPURCHASED" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecPurchased;
-				} else if ( SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecSurplusSold;
-				} else if ( SELECT_CASE_var == "ELECTRICITYNET" ) {
-					tariff( iTariff ).kindElectricMtr = kindMeterElecNet;
-				} else {
-					tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
-				}}
-			} else {
-				tariff( iTariff ).kindElectricMtr = kindMeterNotElectric;
-			}
-=======
->>>>>>> NREL/develop
 			// compute the total annual cost of each tariff
 			totalVarPt = tariff( iTariff ).ptTotal;
 			totEneVarPt = tariff( iTariff ).nativeTotalEnergy;

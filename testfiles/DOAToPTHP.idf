@@ -3365,13 +3365,6 @@
   Output:Variable,SPACE4-1 Supply Inlet,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 Supply Inlet,System Node Mass Flow Rate,hourly;
-<<<<<<< HEAD
-
-  Output:Variable, *,Zone Air CO2 Concentration,hourly;
-
-
-=======
->>>>>>> NREL/develop
 
   Output:Variable,*,Zone Air CO2 Concentration,hourly;
 

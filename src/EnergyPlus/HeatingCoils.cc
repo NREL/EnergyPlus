@@ -601,18 +601,6 @@ namespace HeatingCoils {
 			// Setup Report variables for the Fuel Coils
 			// CurrentModuleObject = "Coil:Heating:OtherFuel"
 
-<<<<<<< HEAD
-			SetupOutputVariable( "Heating Coil Air Heating Energy [J]", coil.HeatingCoilLoad, "System", "Sum", coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Heating Coil Air Heating Rate [W]", coil.HeatingCoilRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil " + FuelType + " Energy [J]", coil.FuelUseLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil " + FuelType + " Rate [W]", coil.FuelUseRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Electric Energy [J]", coil.ElecUseLoad, "System", "Sum", coil.Name, _, "Electricity", "Heating", _, "System" );
-			SetupOutputVariable( "Heating Coil Electric Power [W]", coil.ElecUseRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Runtime Fraction []", coil.RTF, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Rate [W]", coil.ParasiticFuelRate, "System", "Average", coil.Name );
-			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Energy [J]", coil.ParasiticFuelLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
-
-=======
 			SetupOutputVariable( "Heating Coil Air Heating Energy", OutputProcessor::Unit::J, coil.HeatingCoilLoad, "System", "Sum", coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Heating Coil Air Heating Rate", OutputProcessor::Unit::W, coil.HeatingCoilRate, "System", "Average", coil.Name );
 			SetupOutputVariable( "Heating Coil " + FuelType + " Energy", OutputProcessor::Unit::J, coil.FuelUseLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
@@ -622,8 +610,7 @@ namespace HeatingCoils {
 			SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name );
 			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Rate", OutputProcessor::Unit::W, coil.ParasiticFuelRate, "System", "Average", coil.Name );
 			SetupOutputVariable( "Heating Coil Ancillary " + FuelType + " Energy", OutputProcessor::Unit::J, coil.ParasiticFuelLoad, "System", "Sum", coil.Name, _, FuelType, "Heating", _, "System" );
-			
->>>>>>> NREL/develop
+
 		}
 
 		// Get the data for for gas multistage heating coils

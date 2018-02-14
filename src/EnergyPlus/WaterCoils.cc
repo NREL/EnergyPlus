@@ -73,12 +73,8 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-<<<<<<< HEAD
-#include <InputProcessing/InputProcessor.hh>
-=======
 #include <HVACControllers.hh>
-#include <InputProcessor.hh>
->>>>>>> NREL/develop
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>

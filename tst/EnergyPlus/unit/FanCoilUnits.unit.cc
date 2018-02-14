@@ -1783,20 +1783,8 @@ namespace EnergyPlus {
 		PlantLoop( 2 ).LoopSide( 1 ).FlowLock = 0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( -4420.0, QUnitOut, 5.0 );
-<<<<<<< HEAD
-		DataGlobals::DoingSizing = false;
-		PlantLoop.deallocate();
-		ZoneSysEnergyDemand.deallocate();
-		FanCoil.deallocate();
-		Node.deallocate();
-		WaterCoil.deallocate();
-		ZoneEquipConfig.deallocate();
-		Zone.deallocate();
-		CoilNames.clear();
-=======
 		// expect inlet and outlet node air mass flow rates are equal
 		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
->>>>>>> NREL/develop
 
 	}
 	TEST_F( EnergyPlusFixture, FanCoil_ASHRAE90VariableFan ) {
@@ -2434,8 +2422,6 @@ namespace EnergyPlus {
 
 	}
 
-<<<<<<< HEAD
-=======
 	TEST_F( EnergyPlusFixture, FanCoil_CyclingFanMode ) {
 
 		int FanCoilNum( 1 );
@@ -2593,7 +2579,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -2839,5 +2825,4 @@ namespace EnergyPlus {
 
 	}
 
->>>>>>> NREL/develop
 }

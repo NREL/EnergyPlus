@@ -415,17 +415,7 @@ namespace RoomAirModelAirflowNetwork {
 								}
 							}
 
-<<<<<<< HEAD
 							if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum > 0 && UtilityRoutines::SameString( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName, "" ) ) {
-								RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName = NodeID( ZoneEquipConfig( LoopZone ).ReturnAirNode ); // Zone return node
-							}
-
-							for ( IdNode = 1; IdNode <= NumOfNodes; ++IdNode ) { //loop over all nodes to find return node ID
-								if ( UtilityRoutines::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName ) ) {
-									RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).RetNodeNum = IdNode;
-									break;
-=======
-							if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum > 0 && SameString( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName, "" ) ) {
 								// Find matching return node
 								for ( int retNode = 1; retNode <= ZoneEquipConfig( LoopZone ).NumReturnNodes; ++retNode ) {
 									if ( ( ZoneEquipConfig( LoopZone ).ReturnNodeInletNum( retNode ) == inletNodeIndex ) && ( ZoneEquipConfig( LoopZone ).ReturnNode( retNode ) > 0 ) ) {
@@ -437,11 +427,10 @@ namespace RoomAirModelAirflowNetwork {
 
 							if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).RetNodeNum == 0 ) {
 								for ( IdNode = 1; IdNode <= NumOfNodes; ++IdNode ) { //loop over all nodes to find return node ID
-									if ( SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName ) ) {
+									if ( UtilityRoutines::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName ) ) {
 										RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).RetNodeNum = IdNode;
 										break;
 									}
->>>>>>> NREL/develop
 								}
 							}
 							SetupOutputVariable( "RoomAirflowNetwork Node HVAC Supply Fraction", OutputProcessor::Unit::None, RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupplyFraction, "HVAC", "Average", RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name);

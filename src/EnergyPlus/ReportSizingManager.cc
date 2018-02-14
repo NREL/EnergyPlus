@@ -1220,10 +1220,7 @@ namespace ReportSizingManager {
 						ShowContinueError( "...Rated Total Heating Capacity = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesMassFlow / StdRhoAir, 5 ) + " [m3/s]" );
 						if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
-<<<<<<< HEAD
-=======
 							ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesMassFlow / StdRhoAir, 5 ) + " [m3/s]" );
->>>>>>> NREL/develop
 							ShowContinueError( "...Plant loop temperature difference = " + TrimSigDigits( DataWaterCoilSizHeatDeltaT, 2 ) + " [C]" );
 						} else {
 							ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );

@@ -205,11 +205,7 @@ namespace EnergyPlus {
 				"    Chilled Water Loop Supply inlet;  !- Setpoint Node or NodeList Name",
 			} );
 
-<<<<<<< HEAD
 			ASSERT_TRUE( process_idf( idf_objects ) );
-=======
-			ASSERT_FALSE( process_idf( idf_objects ) );
->>>>>>> NREL/develop
 
 			// get input and checks if there are two setpointmanagers
 			// for a TwoWayCommonPipe and one of them setpoints can be

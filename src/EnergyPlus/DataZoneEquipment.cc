@@ -564,15 +564,11 @@ namespace DataZoneEquipment {
 						GetZoneEquipmentDataErrorsFound = true;
 					}
 
-<<<<<<< HEAD
-					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
-=======
 					// do this here for initial prototype, but later will call all the equipment in a separate function to see who is on - maybe
 					if ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailHeatEquip;
 					if ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailCoolEquip;
 
-					{ auto const SELECT_CASE_var( MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
->>>>>>> NREL/develop
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
 
 					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
@@ -1181,12 +1177,8 @@ namespace DataZoneEquipment {
 	int
 	GetReturnAirNodeForZone(
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
-<<<<<<< HEAD
-		std::string const & NodeName  // Return air node name to match (may be blank)
-=======
 		std::string const & NodeName,  // Return air node name to match (may be blank)
 		std::string const & calledFromDescription  // String identifying the calling function and object
->>>>>>> NREL/develop
 	)
 	{
 
@@ -1218,7 +1210,7 @@ namespace DataZoneEquipment {
 				if ( NodeName == "" ) {
 					// If NodeName is blank, return first return node number, but warn if there are multiple return nodes for this zone
 					ReturnAirNodeNumber = thisZoneEquip.ReturnNode( 1 );
-					if ( thisZoneEquip.NumReturnNodes > 1 ){ 
+					if ( thisZoneEquip.NumReturnNodes > 1 ){
 						ShowWarningError( "GetReturnAirNodeForZone: " + calledFromDescription + ", request for zone return node is ambiguous." );
 						ShowContinueError( "Zone=" + thisZoneEquip.ZoneName + " has "+ General::RoundSigDigits(thisZoneEquip.NumReturnNodes ) + " return nodes. First return node will be used." );
 					}
@@ -1241,13 +1233,13 @@ namespace DataZoneEquipment {
 	GetReturnNumForZone(
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
 		std::string const & NodeName  // Return air node name to match (may be blank)
-	) 
+	)
 	{
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the zone return number (not the node number) for the indicated
 		// zone and node name.  If NodeName is blank, return 1 (the first return node)
-		// otherwise return the index of the matching return node name.  
+		// otherwise return the index of the matching return node name.
 		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
 
 		// Using/Aliasing

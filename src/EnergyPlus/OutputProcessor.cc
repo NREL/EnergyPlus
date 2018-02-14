@@ -647,13 +647,8 @@ namespace OutputProcessor {
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ReqRepVars( Loop ).Key.empty() ) continue;
-<<<<<<< HEAD
 			if ( ! UtilityRoutines::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
-=======
-			if ( ! SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
-			if ( !RE2::FullMatch( KeyedValue, "(?i)" + ReqRepVars( Loop ).Key ) ) continue;
->>>>>>> NREL/develop
+			if ( ! RE2::FullMatch( KeyedValue, "(?i)" + ReqRepVars( Loop ).Key ) ) continue;
 
 			//   A match.  Make sure doesn't duplicate
 
@@ -2555,17 +2550,6 @@ namespace OutputProcessor {
 		} else if ( has( UC_ResourceType, "COOL" ) ) {
 			CodeForIPUnits = RT_IPUnits_Cooling;
 		}
-<<<<<<< HEAD
-		if ( UtilityRoutines::SameString( MtrUnits, "m3" ) && has( UC_ResourceType, "WATER" ) ) {
-			CodeForIPUnits = RT_IPUnits_Water;
-		} else if ( UtilityRoutines::SameString( MtrUnits, "m3" ) ) {
-			CodeForIPUnits = RT_IPUnits_OtherM3;
-		}
-		if ( UtilityRoutines::SameString( MtrUnits, "kg" ) ) {
-			CodeForIPUnits = RT_IPUnits_OtherKG;
-		}
-		if ( UtilityRoutines::SameString( MtrUnits, "L" ) ) {
-=======
 		if ( MtrUnits == OutputProcessor::Unit::m3 && has( UC_ResourceType, "WATER" ) ) {
 			CodeForIPUnits = RT_IPUnits_Water;
 		} else if ( MtrUnits == OutputProcessor::Unit::m3 ) {
@@ -2575,18 +2559,12 @@ namespace OutputProcessor {
 			CodeForIPUnits = RT_IPUnits_OtherKG;
 		}
 		if ( MtrUnits == OutputProcessor::Unit::L ) {
->>>>>>> NREL/develop
 			CodeForIPUnits = RT_IPUnits_OtherL;
 		}
 		//  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
 		//  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
-<<<<<<< HEAD
-		if ( ! UtilityRoutines::SameString( MtrUnits, "kg" ) && ! UtilityRoutines::SameString( MtrUnits, "J" ) && ! UtilityRoutines::SameString( MtrUnits, "m3" ) && ! UtilityRoutines::SameString( MtrUnits, "L" ) ) {
-			ShowWarningError( "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[" + MtrUnits + "]." );
-=======
 		if ( ! (MtrUnits == OutputProcessor::Unit::kg) && ! ( MtrUnits == OutputProcessor::Unit::J ) && ! ( MtrUnits == OutputProcessor::Unit::m3 )  && ! (MtrUnits == OutputProcessor::Unit::L )  ) {
 			ShowWarningError( "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[" + unitEnumToString( MtrUnits ) + "]." );
->>>>>>> NREL/develop
 			ErrorsFound = true;
 		}
 
@@ -3754,7 +3732,7 @@ namespace OutputProcessor {
 		std::string const & variableName, // The variable's actual name
 		int const indexType,
 		OutputProcessor::Unit const & unitsForVar, // The variables units
-		Optional_string_const customUnitName, 
+		Optional_string_const customUnitName,
 		Optional_string_const ScheduleName
 	)
 	{
@@ -4952,7 +4930,7 @@ namespace OutputProcessor {
 			return OutputProcessor::Unit::kg_kg;
 		} else if ( unitUpper == "%" ) {
 			return OutputProcessor::Unit::Perc;
-		} else if ( unitUpper == "DEG" ) { 
+		} else if ( unitUpper == "DEG" ) {
 			return OutputProcessor::Unit::deg;
 		} else if ( unitUpper == "S" ) {
 			return OutputProcessor::Unit::s;
@@ -5058,42 +5036,7 @@ SetupOutputVariable(
 
 	if ( ! OutputInitialized ) InitializeOutput();
 
-<<<<<<< HEAD
-	//! Errors are severe and fatal because should only be encountered during development.
-	Item = index( VariableName, '[' );
-	if ( Item != std::string::npos ) {
-		UnitsString = GetVariableUnitsString( VariableName );
-		strip( UnitsString );
-		VarName = stripped( VariableName.substr( 0, Item ) );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		// Check name length for variable name
-		invalidUnits = false;
-		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-		if ( UtilityRoutines::SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name length (including units) [" + TrimSigDigits( len( stripped( VariableName ) ) ) + "] exceeds maximum=" + VariableName );
-			if ( invalidUnits ) ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-		if ( invalidUnits ) {
-			ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-	} else { // no units
-		UnitsString = BlankString;
-		VarName = stripped( VariableName );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name has no units in call=" + VariableName );
-			ShowSevereError( "Variable Name length exceeds maximum=" + VariableName );
-			ShowFatalError( "Program terminates." );
-		}
-		ShowSevereError( "Variable Name has no units in call=" + VariableName );
-		ShowFatalError( "Program terminates." );
-	}
-=======
 	VarName = VariableName;
->>>>>>> NREL/develop
 
 	// Determine whether to Report or not
 	CheckReportVariable( KeyedValue, VarName );
@@ -5178,20 +5121,13 @@ SetupOutputVariable(
 		RVariableTypes( CV ).StoreType = VariableType;
 		RVariableTypes( CV ).VarName = KeyedValue + ':' + VarName;
 		RVariableTypes( CV ).VarNameOnly = VarName;
-<<<<<<< HEAD
 		RVariableTypes( CV ).VarNameOnlyUC = UtilityRoutines::MakeUPPERCase( VarName );
 		RVariableTypes( CV ).VarNameUC = UtilityRoutines::MakeUPPERCase( RVariableTypes( CV ).VarName );
 		RVariableTypes( CV ).KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase( KeyedValue );
-		RVariableTypes( CV ).UnitsString = UnitsString;
-=======
-		RVariableTypes( CV ).VarNameOnlyUC = MakeUPPERCase( VarName );
-		RVariableTypes( CV ).VarNameUC = MakeUPPERCase( RVariableTypes( CV ).VarName );
-		RVariableTypes( CV ).KeyNameOnlyUC = MakeUPPERCase( KeyedValue );
 		RVariableTypes( CV ).units = VariableUnit;
 		if ( VariableUnit == OutputProcessor::Unit::customEMS ) {
 			RVariableTypes( CV ).unitNameCustomEMS = customUnitName;
 		}
->>>>>>> NREL/develop
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
@@ -5317,42 +5253,7 @@ SetupOutputVariable(
 
 	if ( ! OutputInitialized ) InitializeOutput();
 
-<<<<<<< HEAD
-	//! Errors are severe and fatal because should only be encountered during development.
-	Item = index( VariableName, '[' );
-	if ( Item != std::string::npos ) {
-		UnitsString = GetVariableUnitsString( VariableName );
-		strip( UnitsString );
-		invalidUnits = false;
-		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-		if ( UtilityRoutines::SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
-		VarName = stripped( VariableName.substr( 0, Item ) );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		// Check name length for variable name
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name length (including units) [" + TrimSigDigits( len( stripped( VariableName ) ) ) + "] exceeds maximum=" + VariableName );
-			if ( invalidUnits ) ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-		if ( invalidUnits ) {
-			ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
-			ShowFatalError( "Program terminates." );
-		}
-	} else {
-		UnitsString = BlankString;
-		VarName = stripped( VariableName );
-		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
-		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
-			ShowSevereError( "Variable Name has no units in call=" + VariableName );
-			ShowSevereError( "Variable Name length exceeds maximum=" + VariableName );
-			ShowFatalError( "Program terminates." );
-		}
-		ShowSevereError( "Variable Name has no units in call=" + VariableName );
-		ShowFatalError( "Program terminates." );
-	}
-=======
 	VarName = VariableName;
->>>>>>> NREL/develop
 
 	// Determine whether to Report or not
 	CheckReportVariable( KeyedValue, VarName );
@@ -5396,13 +5297,8 @@ SetupOutputVariable(
 		IVariableTypes( CV ).StoreType = VariableType;
 		IVariableTypes( CV ).VarName = KeyedValue + ':' + VarName;
 		IVariableTypes( CV ).VarNameOnly = VarName;
-<<<<<<< HEAD
 		IVariableTypes( CV ).VarNameUC = UtilityRoutines::MakeUPPERCase( IVariableTypes( CV ).VarName );
-		IVariableTypes( CV ).UnitsString = UnitsString;
-=======
-		IVariableTypes( CV ).VarNameUC = MakeUPPERCase( IVariableTypes( CV ).VarName );
 		IVariableTypes( CV ).units = VariableUnit;
->>>>>>> NREL/develop
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );

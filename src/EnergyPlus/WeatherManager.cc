@@ -6477,21 +6477,13 @@ Label9999: ;
 				cAlphaArgs( 3 ) = "MultiplierSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Multiplier;
 				units = "[]";
-<<<<<<< HEAD
+				unitType = OutputProcessor::Unit::None;
 			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Difference" ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "Delta" ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "DifferenceSchedule" ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "DeltaSchedule" ) ) {
 				cAlphaArgs( 3 ) = "DifferenceSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Difference;
 				units = "[deltaC]";
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DefaultMultipliers" ) ) {
-=======
-				unitType = OutputProcessor::Unit::None;
-			} else if ( SameString( cAlphaArgs( 3 ), "Difference" ) || SameString( cAlphaArgs( 3 ), "Delta" ) || SameString( cAlphaArgs( 3 ), "DifferenceSchedule" ) || SameString( cAlphaArgs( 3 ), "DeltaSchedule" ) ) {
-				cAlphaArgs( 3 ) = "DifferenceSchedule";
-				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Difference;
-				units = "[deltaC]";
 				unitType = OutputProcessor::Unit::deltaC;
-			} else if ( SameString( cAlphaArgs( 3 ), "DefaultMultipliers" ) ) {
->>>>>>> NREL/develop
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DefaultMultipliers" ) ) {
 				cAlphaArgs( 3 ) = "DefaultMultipliers";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Default;
 				// Validate Temperature - Daily range
@@ -6672,12 +6664,8 @@ Label9999: ;
 				cAlphaArgs( 5 ) = "RelativeHumiditySchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_RelHumSch;
 				units = "[%]";
-<<<<<<< HEAD
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "WetBulbProfileMultiplierSchedule" ) ) {
-=======
 				unitType = OutputProcessor::Unit::Perc;
-			} else if ( SameString( cAlphaArgs( 5 ), "WetBulbProfileMultiplierSchedule" ) ) {
->>>>>>> NREL/develop
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "WetBulbProfileMultiplierSchedule" ) ) {
 				cAlphaArgs( 5 ) = "WetBulbProfileMultiplierSchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfMul;
 				units = "[]";
@@ -7165,21 +7153,13 @@ Label9999: ;
 				WPSkyTemperature( Item ).CalculationType = WP_ScheduleValue;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[C]";
-<<<<<<< HEAD
+				unitType = OutputProcessor::Unit::C;
 			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "DifferenceScheduleDryBulbValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DryBulbDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";
-			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "DifferenceScheduleDewPointValue" ) ) {
-=======
-				unitType = OutputProcessor::Unit::C;
-			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDryBulbValue" ) ) {
-				WPSkyTemperature( Item ).CalculationType = WP_DryBulbDelta;
-				WPSkyTemperature( Item ).IsSchedule = true;
-				units = "[deltaC]";
 				unitType = OutputProcessor::Unit::deltaC;
-			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDewPointValue" ) ) {
->>>>>>> NREL/develop
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "DifferenceScheduleDewPointValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DewPointDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";

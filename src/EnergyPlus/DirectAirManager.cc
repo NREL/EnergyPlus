@@ -323,11 +323,7 @@ namespace DirectAirManager {
 				// DesignSpecification:AirTerminal:Sizing name
 				DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaFieldBlanks( 6 )) {
-<<<<<<< HEAD
-					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), DataSizing::AirTerminalSizingSpec );
-=======
-					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( cAlphaArgs( 6 ), DataSizing::AirTerminalSizingSpec );
->>>>>>> NREL/develop
+					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), DataSizing::AirTerminalSizingSpec );
 					if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex == 0 ) {
 						ShowSevereError(cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + DirectAir( DirectAirNum ).cObjectName );
@@ -467,17 +463,7 @@ namespace DirectAirManager {
 
 			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
 			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-<<<<<<< HEAD
-			if ( ControlledZoneNum > 0 ) {
-				if ( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum > 0  ) {
-					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum;
-					DirectAir( DirectAirNum ).CtrlZoneNum = ControlledZoneNum;
-					MySizeFlag( DirectAirNum ) = false;
-				}
-			}
-=======
 			MySizeFlag( DirectAirNum ) = false;
->>>>>>> NREL/develop
 		}
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( DirectAirNum ) ) {

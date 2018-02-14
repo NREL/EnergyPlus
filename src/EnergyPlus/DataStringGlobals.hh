@@ -79,14 +79,9 @@ namespace DataStringGlobals {
 	extern std::string outputTblTabFileName;
 	extern std::string outputTblTxtFileName;
 	extern std::string outputTblXmlFileName;
-<<<<<<< HEAD
-	extern std::string inputFileName;
-	extern std::string inputIddFileName;
-	extern std::string inputEpJSONSchemaFileName;
-=======
 	extern std::string inputIdfFileName;
 	extern std::string inputIddFileName;
->>>>>>> NREL/develop
+	extern std::string inputEpJSONSchemaFileName;
 	extern std::string inputWeatherFileName;
 	extern std::string outputAdsFileName;
 	extern std::string outputDfsFileName;

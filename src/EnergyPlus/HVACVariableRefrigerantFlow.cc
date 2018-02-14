@@ -3860,22 +3860,6 @@ namespace HVACVariableRefrigerantFlow {
 
 			if( VRF( NumCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ){
 			// For VRF_FluidTCtrl Model
-<<<<<<< HEAD
-				SetupOutputVariable( "VRF Heat Pump Compressor Electric Power [W]", VRF( NumCond ).Ncomp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Fan Power [W]", VRF( NumCond ).OUFanPower, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Compressor Rotating Speed [rev/min]", VRF( NumCond ).CompActSpeed, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Indoor Unit Evaporating Temperature [C]", VRF( NumCond ).IUEvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Condensing Temperature [C]", VRF( NumCond ).CondensingTemp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Indoor Unit Condensing Temperature [C]", VRF( NumCond ).IUCondensingTemp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Evaporating Temperature [C]", VRF( NumCond ).EvaporatingTemp, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Cooling Capacity at Max Compressor Speed [W]", VRF( NumCond ).CoolingCapacity, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Heating Capacity at Max Compressor Speed [W]", VRF( NumCond ).HeatingCapacity, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Indoor Unit Piping Correction for Cooling []", VRF( NumCond ).PipingCorrectionCooling, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Indoor Unit Piping Correction for Heating []", VRF( NumCond ).PipingCorrectionHeating, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate [W]", VRF( NumCond ).OUEvapHeatRate, "System", "Average", VRF( NumCond ).Name );
-				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Condenser Heat Release Rate [W]", VRF( NumCond ).OUCondHeatRate, "System", "Average", VRF( NumCond ).Name );
-
-=======
 				SetupOutputVariable( "VRF Heat Pump Compressor Electric Power", OutputProcessor::Unit::W, VRF( NumCond ).Ncomp, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Fan Power", OutputProcessor::Unit::W, VRF( NumCond ).OUFanPower, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Compressor Rotating Speed", OutputProcessor::Unit::rev_min, VRF( NumCond ).CompActSpeed, "System", "Average", VRF( NumCond ).Name );
@@ -3889,8 +3873,7 @@ namespace HVACVariableRefrigerantFlow {
 				SetupOutputVariable( "VRF Heat Pump Indoor Unit Piping Correction for Heating", OutputProcessor::Unit::None, VRF( NumCond ).PipingCorrectionHeating, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate", OutputProcessor::Unit::W, VRF( NumCond ).OUEvapHeatRate, "System", "Average", VRF( NumCond ).Name );
 				SetupOutputVariable( "VRF Heat Pump Outdoor Unit Condenser Heat Release Rate", OutputProcessor::Unit::W, VRF( NumCond ).OUCondHeatRate, "System", "Average", VRF( NumCond ).Name );
-				
->>>>>>> NREL/develop
+
 			} else {
 			// For VRF_SysCurve Model
 				SetupOutputVariable( "VRF Heat Pump Maximum Capacity Cooling Rate", OutputProcessor::Unit::W, MaxCoolingCapacity( NumCond ), "System", "Average", VRF( NumCond ).Name );

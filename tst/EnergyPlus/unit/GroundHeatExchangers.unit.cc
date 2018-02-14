@@ -61,12 +61,8 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-<<<<<<< HEAD
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-=======
 
 // Testing Headers
->>>>>>> NREL/develop
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -102,14 +98,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Interpolate )
 	thisGLHE.myRespFactors->GFNC( 1 ) = 0.0;
 	thisGLHE.myRespFactors->GFNC( 2 ) = 5.0;
 
-<<<<<<< HEAD
-	thisGLHE.LNTTS( 1 ) = 0.0;
-	thisGLHE.LNTTS( 2 ) = 5.0;
-	thisGLHE.GFNC( 1 ) = 0.0;
-	thisGLHE.GFNC( 2 ) = 5.0;
-
-=======
->>>>>>> NREL/develop
 	// Case when extrapolating beyond lower bound
 	thisLNTTS = -1.0;
 	thisGFunc = thisGLHE.interpGFunc( thisLNTTS );
@@ -133,11 +121,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Slinky_GetGFunc )
 	GLHESlinky thisGLHE;
 	Real64 thisGFunc;
 	Real64 time;
-<<<<<<< HEAD
-
-	thisGLHE.NPairs = 2;
-=======
->>>>>>> NREL/develop
 
 	int NPairs = 2;
 
@@ -166,11 +149,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc )
 	GLHEVert thisGLHE;
 	Real64 thisGFunc;
 	Real64 time;
-<<<<<<< HEAD
-
-	thisGLHE.NPairs = 2;
-=======
->>>>>>> NREL/develop
 
 	int NPairs = 2;
 
@@ -233,64 +211,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance )
 
 	// Zero mass flow rate
 	thisGLHE.massFlowRate = 0.0;
-<<<<<<< HEAD
-	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.07094, thisGLHE.HXResistance, 0.0001 );
-}
-
-TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_CalcHXResistance )
-{
-
-	// Initializations
-	GLHEVert thisGLHE;
-
-	PlantLoop.allocate( 1 );
-	thisGLHE.loopNum = 1;
-
-	PlantLoop( thisGLHE.loopNum ).FluidName = "WATER";
-	PlantLoop( thisGLHE.loopNum ).FluidIndex = 1;
-
-	thisGLHE.inletTemp = 5.0;
-	thisGLHE.massFlowRate = 0.01;
-	thisGLHE.numBoreholes = 1;
-	thisGLHE.pipeOutDia = 0.02667;
-	thisGLHE.pipeThick = 0.004;
-	thisGLHE.kPipe = 0.4;
-	thisGLHE.boreholeRadius = 0.1;
-	thisGLHE.kGrout = 1.0;
-
-	// Re < 2300 mass flow rate; 0.0 <= distanceRatio <= 2.5 correction factor
-	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.49421, thisGLHE.HXResistance, 0.0001 );
-
-	// Re < 2300 mass flow rate; 0.25 < distanceRatio < 0.5 correction factor
-	thisGLHE.UtubeDist = 0.05;
-	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.46859, thisGLHE.HXResistance, 0.0001 );
-
-	// Re < 2300 mass flow rate; 0.5 <= distanceRatio < 0.75 correction factor
-	thisGLHE.UtubeDist = 0.087;
-	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.32891, thisGLHE.HXResistance, 0.0001 );
-
-	// 4000 > Re > 2300 mass flow rate; all other distance ratios correction factor
-	thisGLHE.UtubeDist = 0.12;
-	thisGLHE.massFlowRate = 0.07;
-	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.18391, thisGLHE.HXResistance, 0.0001 );
-
-	// Re > 4000 mass flow rate; all other distance ratios correction factor
-	thisGLHE.massFlowRate = 0.1;
-	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.17526, thisGLHE.HXResistance, 0.0001 );
-
-	// Zero mass flow rate; distance ratio > 0.75 correction factor
-	thisGLHE.massFlowRate = 0.0;
-	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.16903, thisGLHE.HXResistance, 0.0001 );
-=======
 	EXPECT_NEAR( 0.07094, thisGLHE.calcHXResistance(), 0.0001 );
->>>>>>> NREL/develop
 }
 
 TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger )
@@ -558,11 +479,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check
 	EXPECT_EQ( 12.778359, thisRF->GFNC( 76 ) );
 }
 
-<<<<<<< HEAD
-TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 )
-=======
 TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Check )
->>>>>>> NREL/develop
 {
 	std::string const idf_objects = delimited_string( {
 		"GroundHeatExchanger:Vertical:Properties,",
@@ -592,12 +509,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Che
 
 	EXPECT_EQ( 1u, vertArraysVector.size() );
 
-<<<<<<< HEAD
-	// This should not throw since number of data pairs will now automatically be set to the actual number of gfunctions if they don't match.
-	EXPECT_NO_THROW( ( EnergyPlus::inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( "Vertical GHE JL2015" ) ) );
-=======
 	auto & thisArray( vertArraysVector[0] );
->>>>>>> NREL/develop
 
 	EXPECT_EQ( "GHE-ARRAY", thisArray->name );
 	EXPECT_EQ( "GHE-1 PROPS", thisArray->props->name );
@@ -800,11 +712,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors
 		"	GHE-1 g-functions;  !- Response Factors Object Name",
 	});
 
-<<<<<<< HEAD
-	EXPECT_TRUE( process_idf( idf_objects, false ) );
-
-	EXPECT_ANY_THROW( ( EnergyPlus::inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( "Vertical GHE JL2015" ) ) );
-=======
 	ASSERT_FALSE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
@@ -3884,7 +3791,6 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalRes
 	thisGLHE.massFlowRate = 1;
 
 	Real64 const tolerance = 0.00001;
->>>>>>> NREL/develop
 
 	// Flow rate and pipe thickness picked to fix pipe resistance at 0.05
 	EXPECT_NEAR( thisGLHE.theta_1, 0.37037, tolerance );

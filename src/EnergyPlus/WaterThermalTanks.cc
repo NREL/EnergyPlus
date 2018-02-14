@@ -4478,37 +4478,20 @@ namespace WaterThermalTanks {
 						SetupOutputVariable( "Water Heater Runtime Fraction", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).RuntimeFraction, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						SetupOutputVariable( "Water Heater Part Load Ratio", OutputProcessor::Unit::None, WaterThermalTank( WaterThermalTankNum ).PartLoadRatio, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 
-<<<<<<< HEAD
 						if ( UtilityRoutines::SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							SetupOutputVariable( "Water Heater Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-=======
-						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
 							SetupOutputVariable( "Water Heater Electric Power", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
->>>>>>> NREL/develop
 						} else {
 							SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).FuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
-<<<<<<< HEAD
-						SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).FuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).FuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
-						if ( UtilityRoutines::SameString( WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "Electric" ) ) {
-							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-=======
 						SetupOutputVariable( "Water Heater " + WaterThermalTank( WaterThermalTankNum ).FuelType + " Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).FuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).FuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
-						if ( SameString( WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "Electric" ) ) {
+						if ( UtilityRoutines::SameString( WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "Electric" ) ) {
 							SetupOutputVariable( "Water Heater Off Cycle Parasitic Electric Power", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
->>>>>>> NREL/develop
 						} else {
 							SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}
-<<<<<<< HEAD
-						SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Energy [J]", WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
-						if ( UtilityRoutines::SameString( WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "Electric" ) ) {
-							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Power [W]", WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
-=======
 						SetupOutputVariable( "Water Heater Off Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType + " Energy", OutputProcessor::Unit::J, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelEnergy, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelType, "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
-						if ( SameString( WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "Electric" ) ) {
+						if ( UtilityRoutines::SameString( WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType, "Electric" ) ) {
 							SetupOutputVariable( "Water Heater On Cycle Parasitic Electric Power", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
->>>>>>> NREL/develop
 						} else {
 							SetupOutputVariable( "Water Heater On Cycle Parasitic " + WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelType + " Rate", OutputProcessor::Unit::W, WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate, "System", "Average", WaterThermalTank( WaterThermalTankNum ).Name );
 						}

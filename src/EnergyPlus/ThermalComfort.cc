@@ -1211,7 +1211,7 @@ namespace ThermalComfort {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates TSV using the KSU 2 Node model.
-		
+
 		// METHODOLOGY EMPLOYED:
 		// This subroutine is based heavily upon the work performed by Dan Maloney for
 		// the BLAST program.  Many of the equations are based on the original Pierce
@@ -1667,13 +1667,6 @@ namespace ThermalComfort {
 		// SUBROUTINE INFORMATION:
 		//     AUTHOR         Jaewook Lee
 		//     DATE WRITTEN   July 2001
-<<<<<<< HEAD
-		//     MODIFIED       na
-		//     RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-=======
->>>>>>> NREL/develop
 
 		// Using/Aliasing
 		using namespace DataGlobals;
@@ -1713,17 +1706,10 @@ namespace ThermalComfort {
 
 			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-<<<<<<< HEAD
-			AngleFactorList( Item ).Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
-			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );
-			AngleFactorList( Item ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
-			if ( AngleFactorList( Item ).ZonePtr == 0 ) {
-=======
 			thisAngFacList.Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
 			thisAngFacList.ZoneName = cAlphaArgs( 2 );
-			thisAngFacList.ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			thisAngFacList.ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( thisAngFacList.ZonePtr == 0 ) {
->>>>>>> NREL/develop
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - not found" );
 				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1739,17 +1725,10 @@ namespace ThermalComfort {
 			thisAngFacList.SurfacePtr.allocate( thisAngFacList.TotAngleFacSurfaces );
 			thisAngFacList.AngleFactor.allocate( thisAngFacList.TotAngleFacSurfaces );
 
-<<<<<<< HEAD
-			for ( SurfNum = 1; SurfNum <= AngleFactorList( Item ).TotAngleFacSurfaces; ++SurfNum ) {
-				AngleFactorList( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				AngleFactorList( Item ).SurfacePtr( SurfNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
-				AngleFactorList( Item ).AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
-=======
 			for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
 				thisAngFacList.SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				thisAngFacList.SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
+				thisAngFacList.SurfacePtr( SurfNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
 				thisAngFacList.AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
->>>>>>> NREL/develop
 				// Error trap for surfaces that do not exist or surfaces not in the zone
 				if ( thisAngFacList.SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( SurfNum + 2 ) + ", entered value=" + cAlphaArgs( SurfNum + 2 ) );
@@ -1835,7 +1814,7 @@ namespace ThermalComfort {
 		SurfEAF = 0.0;
 
 		auto & thisAngFacList( AngleFactorList( AngleFacNum ) );
-		
+
 		for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
 			SurfaceTemp = TH( 2, 1, thisAngFacList.SurfacePtr( SurfNum ) ) + KelvinConv;
 			SurfEAF = Construct( Surface( thisAngFacList.SurfacePtr( SurfNum ) ).Construction ).InsideAbsorpThermal * thisAngFacList.AngleFactor( SurfNum );
@@ -1855,7 +1834,7 @@ namespace ThermalComfort {
 		int const SurfNum
 	)
 	{
-		
+
 		// Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
 		//          This is necessary for the surface weighted option to not in essence
 		//          double count SurfNum in the MRT calculation.  Other than that, the
@@ -1864,7 +1843,7 @@ namespace ThermalComfort {
 		//          RadTemp (radiant temperature) for use by the thermal comfort routines
 		//          that is the average of the surface temperature to be weighted and
 		//          the modified zone MRT.
-		
+
 		// Using/Aliasing
 		using DataHeatBalSurface::TH;
 		using DataSurfaces::Surface;
@@ -1873,7 +1852,7 @@ namespace ThermalComfort {
 
 		// Return value
 		Real64 CalcSurfaceWeightedMRT = 0.0;
-		
+
 		// Local variables
 		int SurfNum2; // surface number used in "for" loop
 		int ZoneNum2; // zone number index
@@ -1899,7 +1878,7 @@ namespace ThermalComfort {
 				}
 			}
 		}
-		
+
 		// Calculate the sum of area*emissivity and area*emissivity*temperature for all surfaces in the zone EXCEPT the surface being weighted
 		// Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
 		SumAET = 0.0;
@@ -1911,7 +1890,7 @@ namespace ThermalComfort {
 				ZoneAESum( ZoneNum ) += SurfaceAE( SurfNum2 );
 			}
 		}
-		
+
 		// Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
 		if ( ZoneAESum( ZoneNum ) > 0.01 ) {
 			CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + ( SumAET / ZoneAESum( ZoneNum ) ) );
@@ -1927,7 +1906,7 @@ namespace ThermalComfort {
 		return CalcSurfaceWeightedMRT;
 
 	}
-	
+
 	Real64
 	CalcSatVapPressFromTemp( Real64 const Temp )
 	{

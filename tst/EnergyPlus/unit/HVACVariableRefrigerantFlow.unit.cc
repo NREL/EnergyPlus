@@ -1731,23 +1731,14 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 1;
 
 		GetVRFInputData( ErrorsFound ); // read VRF
-<<<<<<< HEAD
-		// EXPECT_FALSE( ErrorsFound );
-
-		// Allocate
-		TerminalUnitList.allocate( NumTUList );
-		VRF( VRFCond ).ZoneTUListPtr = TUListNum;
-		TerminalUnitList( TUListNum ).NumTUInList = NumTUList;
-=======
 		EXPECT_FALSE( ErrorsFound );
-		
+
 		// Check expected result from GetInput
 
 		// #6218 Fan:SystemModel is used and DX coil RatedVolAirFlowRate was not set equal to system fan designAirVolFlowRate
 		EXPECT_EQ( DXCoil( 1 ).RatedAirVolFlowRate( 1 ), 1.0 );
 		EXPECT_EQ( DXCoil( 2 ).RatedAirVolFlowRate( 1 ), 1.0 );
 		EXPECT_EQ( HVACFan::fanObjs[ VRFTU( 1 ).FanIndex ]->designAirVolFlowRate, 1.0 );
->>>>>>> NREL/develop
 
 		// Run and Check: GetSupHeatTempRefrig
 		{

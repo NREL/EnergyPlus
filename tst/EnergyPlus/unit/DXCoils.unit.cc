@@ -1851,13 +1851,8 @@ namespace EnergyPlus {
 		// tests minimum limits of Minimum Outdoor Drybulb Temperature for Compressor Operation
 
 		std::string const idf_objects = delimited_string( {
-<<<<<<< HEAD
 
-			"  Version,8.7;",
-=======
-			
 			"  Version,8.9;",
->>>>>>> NREL/develop
 
 			"  Schedule:Compact,",
 			"    FanAvailSched,           !- Name",

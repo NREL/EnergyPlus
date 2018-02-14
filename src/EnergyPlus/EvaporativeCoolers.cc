@@ -4021,11 +4021,7 @@ namespace EvaporativeCoolers {
 					Node( ZoneEvapUnit( UnitNum ).FanOutletNodeNum ).MassFlowRate = Node( ZoneEvapUnit( UnitNum ).OAInletNodeNum ).MassFlowRate;
 					Node( ZoneEvapUnit( UnitNum ).FanOutletNodeNum ).MassFlowRateMaxAvail = Node( ZoneEvapUnit( UnitNum ).OAInletNodeNum ).MassFlowRate;
 					if ( ZoneEvapUnit( UnitNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-<<<<<<< HEAD
-						Fans::SimulateFanComponents( ZoneEvapUnit( UnitNum ).FanName, false, ZoneEvapUnit( UnitNum ).FanIndex, ZoneEvapUnit( UnitNum ).DesignFanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-=======
 						Fans::SimulateFanComponents( ZoneEvapUnit( UnitNum ).FanName, false, ZoneEvapUnit( UnitNum ).FanIndex, ZoneEvapUnit( UnitNum ).DesignFanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ); // DesignFanSpeedRatio used by OnOff fan for power calc
->>>>>>> NREL/develop
 					} else {
 						HVACFan::fanObjs[ ZoneEvapUnit( UnitNum ).FanIndex ]->simulate( _ , ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
 					}

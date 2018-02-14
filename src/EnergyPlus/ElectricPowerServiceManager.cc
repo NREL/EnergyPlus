@@ -2216,27 +2216,12 @@ namespace EnergyPlus {
 			}
 
 			} // end switch modelType
-<<<<<<< HEAD
 
-			SetupOutputVariable( "Inverter DC to AC Efficiency []", efficiency_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter DC Input Electric Power [W]", dCPowerIn_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter DC Input Electric Energy [J]", dCEnergyIn_, "System", "Sum", name_ );
-			SetupOutputVariable( "Inverter AC Output Electric Power [W]", aCPowerOut_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter AC Output Electric Energy [J]", aCEnergyOut_, "System", "Sum", name_ );
-			SetupOutputVariable( "Inverter Conversion Loss Power [W]", conversionLossPower_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter Conversion Loss Energy [J]", conversionLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Inverter Conversion Loss Decrement Energy [J]", conversionLossEnergyDecrement_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
-			SetupOutputVariable( "Inverter Thermal Loss Rate [W]", thermLossRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter Thermal Loss Energy [J]", thermLossEnergy_, "System", "Sum", name_ );
-			SetupOutputVariable( "Inverter Ancillary AC Electric Power [W]", ancillACuseRate_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter Ancillary AC Electric Energy [J]", ancillACuseEnergy_, "System", "Sum", name_, _, "Electricity", "Cogeneration", "DCtoACInverter Ancillary", "Plant" ); // called cogeneration for end use table
-=======
-		
 			SetupOutputVariable( "Inverter DC to AC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_ );
 			SetupOutputVariable( "Inverter DC Input Electric Power", OutputProcessor::Unit::W, dCPowerIn_, "System", "Average", name_ );
 			SetupOutputVariable( "Inverter DC Input Electric Energy", OutputProcessor::Unit::J, dCEnergyIn_, "System", "Sum", name_ );
 			SetupOutputVariable( "Inverter AC Output Electric Power", OutputProcessor::Unit::W, aCPowerOut_, "System", "Average", name_ );
-			SetupOutputVariable( "Inverter AC Output Electric Energy", OutputProcessor::Unit::J, aCEnergyOut_, "System", "Sum", name_ ); 
+			SetupOutputVariable( "Inverter AC Output Electric Energy", OutputProcessor::Unit::J, aCEnergyOut_, "System", "Sum", name_ );
 			SetupOutputVariable( "Inverter Conversion Loss Power", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_ );
 			SetupOutputVariable( "Inverter Conversion Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_ );
 			SetupOutputVariable( "Inverter Conversion Loss Decrement Energy", OutputProcessor::Unit::J, conversionLossEnergyDecrement_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "Plant" );
@@ -2244,7 +2229,6 @@ namespace EnergyPlus {
 			SetupOutputVariable( "Inverter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_ );
 			SetupOutputVariable( "Inverter Ancillary AC Electric Power", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_ );
 			SetupOutputVariable( "Inverter Ancillary AC Electric Energy", OutputProcessor::Unit::J, ancillACuseEnergy_, "System", "Sum", name_, _, "Electricity", "Cogeneration", "DCtoACInverter Ancillary", "Plant" ); // called cogeneration for end use table
->>>>>>> NREL/develop
 			if ( zoneNum_ > 0 ) {
 				switch (modelType_ )
 				{
@@ -3849,13 +3833,8 @@ namespace EnergyPlus {
 			if ( usageMode_ == TransformerUse::powerInFromGrid ) { // power losses metered as an end use exterior equipment
 				SetupOutputVariable( "Transformer Distribution Electric Loss Energy", OutputProcessor::Unit::J, elecUseMeteredUtilityLosses_, "System", "Sum", name_, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
 			}
-<<<<<<< HEAD
 			if ( usageMode_ == TransformerUse::powerOutFromBldgToGrid ) {
-				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
-=======
-			if ( usageMode_ == TransformerUse::powerOutFromBldgToGrid ) { 
 				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy", OutputProcessor::Unit::J, powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );
->>>>>>> NREL/develop
 			}
 			if ( usageMode_ == TransformerUse::powerBetweenLoadCenterAndBldg ) {
 				SetupOutputVariable( "Transformer Conversion Electric Loss Energy", OutputProcessor::Unit::J, powerConversionMeteredLosses_, "System", "Sum", name_, _, "ElectricityProduced", "POWERCONVERSION", _, "System" );

@@ -57,11 +57,8 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
-<<<<<<< HEAD
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-=======
 #include <EnergyPlus/OutputReportTabular.hh>
->>>>>>> NREL/develop
 
 #include <map>
 
@@ -1210,115 +1207,6 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 
-<<<<<<< HEAD
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [meterUnits] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,meterName [meterUnits] !TimeStep" } ) ) );
-
-			WriteMeterDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "2,1,meterName [meterUnits] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,meterName [meterUnits] !TimeStep" } ) ) );
-
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "meterName", "meterUnits", true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,Cumulative meterName [meterUnits] !TimeStep" } ) ) );
-
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "meterName", "meterUnits", false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "4,1,meterName [meterUnits] !TimeStep" } ) ) );
-
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "meterName", "meterUnits", true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "5,1,Cumulative meterName [meterUnits] !TimeStep" } ) ) );
-
-			WriteMeterDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "6,1,meterName [meterUnits] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,meterName [meterUnits] !Each Call" } ) ) );
-
-			WriteMeterDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "7,1,meterName [meterUnits] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,meterName [meterUnits] !Each Call" } ) ) );
-
-			WriteMeterDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "meterName", "meterUnits", true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,Cumulative meterName [meterUnits] !Each Call" } ) ) );
-
-			WriteMeterDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "meterName", "meterUnits", false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "9,1,meterName [meterUnits] !Each Call" } ) ) );
-
-			WriteMeterDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "meterName", "meterUnits", true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "10,1,Cumulative meterName [meterUnits] !Each Call" } ) ) );
-
-			WriteMeterDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "11,1,meterName [meterUnits] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,meterName [meterUnits] !Hourly" } ) ) );
-
-			WriteMeterDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "12,1,meterName [meterUnits] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,meterName [meterUnits] !Hourly" } ) ) );
-
-			WriteMeterDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "meterName", "meterUnits", true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,Cumulative meterName [meterUnits] !Hourly" } ) ) );
-
-			WriteMeterDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "meterName", "meterUnits", false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "14,1,meterName [meterUnits] !Hourly" } ) ) );
-
-			WriteMeterDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "meterName", "meterUnits", true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "15,1,Cumulative meterName [meterUnits] !Hourly" } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,meterName [meterUnits] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "meterName", "meterUnits", true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "18,1,Cumulative meterName [meterUnits] !Daily " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,1,Cumulative meterName [meterUnits] !Daily " } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "meterName", "meterUnits", false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "19,7,meterName [meterUnits] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "meterName", "meterUnits", true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "20,1,Cumulative meterName [meterUnits] !Daily " } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,meterName [meterUnits] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "meterName", "meterUnits", true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,1,Cumulative meterName [meterUnits] !Monthly " } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "meterName", "meterUnits", false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "24,9,meterName [meterUnits] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "meterName", "meterUnits", true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "25,1,Cumulative meterName [meterUnits] !Monthly " } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "meterName", "meterUnits", false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "meterName", "meterUnits", true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,1,Cumulative meterName [meterUnits] !RunPeriod " } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "meterName", "meterUnits", false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "29,11,meterName [meterUnits] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", "meterUnits", true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "30,1,Cumulative meterName [meterUnits] !RunPeriod " } ) ) );
-=======
 			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
@@ -1426,7 +1314,6 @@ namespace EnergyPlus {
 
 			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "30,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
->>>>>>> NREL/develop
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -1473,39 +1360,6 @@ namespace EnergyPlus {
 
 			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,keyedValue,variableName [variableUnits] !TimeStep,scheduleName" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "4,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "5,1,keyedValue,variableName [variableUnits] !TimeStep" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,keyedValue,variableName [variableUnits] !Each Call,scheduleName" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "9,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, "variableUnits", _ );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "10,1,keyedValue,variableName [variableUnits] !Each Call" } ) ) );
-
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
@@ -1537,178 +1391,101 @@ namespace EnergyPlus {
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "10,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "14,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "15,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,keyedValue,variableName [m3/s] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,keyedValue,variableName [m3/s] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, "variableUnits", "scheduleName" );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, "variableUnits", _ );
-=======
 			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
@@ -2774,12 +2551,8 @@ namespace EnergyPlus {
 			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			GetReportVariableInput();
-<<<<<<< HEAD
-			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature [C]", DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
-=======
 			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
->>>>>>> NREL/develop
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2817,16 +2590,10 @@ namespace EnergyPlus {
 
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-<<<<<<< HEAD
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
-=======
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
->>>>>>> NREL/develop
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2861,16 +2628,10 @@ namespace EnergyPlus {
 
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-<<<<<<< HEAD
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
-=======
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
->>>>>>> NREL/develop
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2903,16 +2664,10 @@ namespace EnergyPlus {
 
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
-<<<<<<< HEAD
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler1" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler2" );
-			SetupOutputVariable( "Boiler Gas Rate [W]", fuel_used, "System", "Average", "Boiler3" );
-=======
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
->>>>>>> NREL/develop
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2946,18 +2701,11 @@ namespace EnergyPlus {
 
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
-<<<<<<< HEAD
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall002" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "Zn003:Wall003" );
-=======
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall003" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
->>>>>>> NREL/develop
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
 
@@ -2993,18 +2741,11 @@ namespace EnergyPlus {
 
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
-<<<<<<< HEAD
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL002" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
-			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", vol_flow, "System", "Average", "ZN003:WALL003" );
-=======
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL003" );
 			sqlite_test = std::move( EnergyPlus::sqlite );
->>>>>>> NREL/develop
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
 

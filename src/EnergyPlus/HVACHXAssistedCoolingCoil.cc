@@ -62,12 +62,8 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HeatRecovery.hh>
-<<<<<<< HEAD
-#include <InputProcessing/InputProcessor.hh>
-=======
 #include <HVACControllers.hh>
-#include <InputProcessor.hh>
->>>>>>> NREL/develop
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -292,8 +288,6 @@ namespace HVACHXAssistedCoolingCoil {
 		//  Uses "Get" routines to read in data.
 
 		// Using/Aliasing
-<<<<<<< HEAD
-=======
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using DXCoils::GetDXCoilIndex;
@@ -302,12 +296,6 @@ namespace HVACHXAssistedCoolingCoil {
 		using HeatRecovery::GetSecondaryInletNode;
 		using HeatRecovery::GetSecondaryOutletNode;
 		using HVACControllers::GetControllerNameAndIndex;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
->>>>>>> NREL/develop
 		using NodeInputManager::GetOnlySingleNode;
 		using WaterCoils::GetCoilWaterInletNode;
 		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );

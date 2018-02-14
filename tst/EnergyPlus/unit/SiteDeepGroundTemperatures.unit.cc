@@ -77,13 +77,8 @@ TEST_F( EnergyPlusFixture, SiteDeepGroundTempTest )
 		"	32.00;	!- December",
 	});
 
-<<<<<<< HEAD
 	ASSERT_TRUE( process_idf( idf_objects ) );
-	
-=======
-	ASSERT_FALSE( process_idf( idf_objects ) );
 
->>>>>>> NREL/develop
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_SiteDeepGroundTemp );
 
 	auto thisModel = GetGroundTempModelAndInit( CurrentModuleObject, "TEST" );

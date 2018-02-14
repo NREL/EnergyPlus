@@ -90,12 +90,8 @@
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
 #include <HybridModel.hh>
-<<<<<<< HEAD
 #include <InputProcessing/InputProcessor.hh>
-=======
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
->>>>>>> NREL/develop
 #include <LowTempRadiantSystem.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>
@@ -6562,11 +6558,7 @@ namespace OutputReportTabular {
 						GetUnitConversion( indexUnitConv, curConversionFactor, curConversionOffset, curUnits );
 					} else { //just do the Joule conversion
 						//if units is in Joules, convert if specified
-<<<<<<< HEAD
-						if ( UtilityRoutines::SameString( MonthlyColumns( curCol ).units, "J" ) ) {
-=======
-						if ( SameString( unitEnumToString( MonthlyColumns( curCol ).units) , "J" ) ) {
->>>>>>> NREL/develop
+						if ( UtilityRoutines::SameString( unitEnumToString( MonthlyColumns( curCol ).units) , "J" ) ) {
 							curUnits = energyUnitsString;
 							curConversionFactor = energyUnitsConversionFactor;
 							curConversionOffset = 0.0;
@@ -11840,35 +11832,11 @@ namespace OutputReportTabular {
 						CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
 						AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables( iZone ) );
 					}
-<<<<<<< HEAD
-				}
-			}
-			// now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute them for specific design day and time of max
-			for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				if ( !ZoneEquipConfig( iZone ).IsControlled ) continue;
-				if  ( displayZoneComponentLoadSummary && (AirLoopZonesCoolCompLoadTables( iZone ).desDayNum == ZoneCoolCompLoadTables( iZone ).desDayNum) && (AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax == ZoneCoolCompLoadTables( iZone ).timeStepMax) ){
-					AirLoopZonesCoolCompLoadTables( iZone ) = ZoneCoolCompLoadTables( iZone );
-				} else {
-					coolDesSelected = AirLoopZonesCoolCompLoadTables( iZone ).desDayNum;
-					timeCoolMax = AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax;
-
-					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					ComputeTableBodyUsingMovingAvg( AirLoopZonesCoolCompLoadTables( iZone ).cells, AirLoopZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
-					AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables( iZone ) );
-				}
-				if ( displayZoneComponentLoadSummary && ( AirLoopZonesHeatCompLoadTables( iZone ).desDayNum == ZoneHeatCompLoadTables( iZone ).desDayNum ) && ( AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax == ZoneHeatCompLoadTables( iZone ).timeStepMax ) ) {
-					AirLoopZonesHeatCompLoadTables( iZone ) = ZoneHeatCompLoadTables( iZone );
-				} else {
-					heatDesSelected = AirLoopZonesHeatCompLoadTables( iZone ).desDayNum;
-					timeHeatMax = AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax;
-=======
 					if ( displayZoneComponentLoadSummary && ( AirLoopZonesHeatCompLoadTables( iZone ).desDayNum == ZoneHeatCompLoadTables( iZone ).desDayNum ) && ( AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax == ZoneHeatCompLoadTables( iZone ).timeStepMax ) ) {
 						AirLoopZonesHeatCompLoadTables( iZone ) = ZoneHeatCompLoadTables( iZone );
 					} else {
 						heatDesSelected = AirLoopZonesHeatCompLoadTables( iZone ).desDayNum;
 						timeHeatMax = AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax;
->>>>>>> NREL/develop
 
 						GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 						ComputeTableBodyUsingMovingAvg( AirLoopZonesHeatCompLoadTables( iZone ).cells, AirLoopZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );

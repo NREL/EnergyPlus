@@ -59,13 +59,10 @@
 #include <DataGlobals.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <PlantComponent.hh>
-#include <nlohmann/json.hpp>
 
 namespace EnergyPlus {
 
 namespace GroundHeatExchangers {
-
-	using json = nlohmann::json;
 
 	// Using/Aliasing
 	using namespace GroundTemperatureManager;
@@ -240,59 +237,6 @@ namespace GroundHeatExchangers {
 		{}
 
 		// Members
-<<<<<<< HEAD
-		bool available = false; // need an array of logicals--load identifiers of available equipment
-		bool on = false; // simulate the machine at it's operating part load ratio
-		std::string Name; // user identifier
-		int loopNum = 0;
-		int loopSideNum = 0;
-		int branchNum = 0;
-		int compNum = 0;
-		int inletNodeNum = 0; // Node number on the inlet side of the plant
-		int outletNodeNum = 0; // Node number on the outlet side of the plant
-		Real64 kGround = 0.0; // Thermal conductivity of the ground		[W/(mK)]
-		Real64 cpRhoGround = 0.0; // Specific heat capacity of ground		[J/Kg/K]
-		Real64 diffusivityGround = 0.0; // Thermal diffisivity of the ground [m2/s]
-		Real64 kPipe = 0.0; // Thermal Conductivity of the U tube			[W/(mK)]
-		Real64 cpPipe = 0.0; // Specific heat of the U tube				[J/kg-K]
-		Real64 rhoPipe = 0.0; // Density of the U tube					[kg/m3]
-		Real64 pipeOutDia = 0.0; // Outer diameter of the Pipe			[m]
-		Real64 pipeThick = 0.0; // Thickness of the pipe wall				[m]
-		Real64 designFlow = 0.0; // Design volumetric flow rate			[m3/s]
-		Real64 designMassFlow = 0.0; // Design mass flow rate				[kg/s]
-		Real64 tempGround = 0.0; // The far feild temperature of the ground   [°C]
-		Array1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
-		Array1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
-		Array1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalized
-		// by the total active length of bore holes  [W/m]
-		int prevHour = 1;
-		Real64 gReferenceRatio = 0.0; // Reference ratio for developing g-functions [-]
-		int NPairs = 0; // Number of pairs of Lntts and Gfunc
-		Array1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
-		Array1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
-		int AGG = 0; // Minimum Hourly History required
-		int SubAGG = 0; // Minimum subhourly History
-		Array1D_int LastHourN; // Stores the Previous hour's N for past hours
-		// until the minimum subhourly history
-		//loop topology variables
-		Real64 boreholeTemp = 0.0; // [°C]
-		Real64 massFlowRate = 0.0; // [kg/s]
-		Real64 outletTemp = 0.0; // [°C]
-		Real64 inletTemp = 0.0; // [°C]
-		Real64 aveFluidTemp = 0.0; // [°C]
-		Real64 QGLHE = 0.0; // [W] heat transfer rate
-		bool myFlag = true;
-		bool myEnvrnFlag = true;
-		Real64 lastQnSubHr = 0.0;
-		Real64 HXResistance = 0.0; // The thermal resistance of the GHX, (K per W/m)
-		Real64 totalTubeLength = 0.0; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
-		Real64 timeSS = 0.0; // Steady state time
-		Real64 timeSSFactor = 0.0; // Steady state time factor for calculation
-		std::shared_ptr< BaseGroundTempsModel > groundTempModel;
-
-		// Default Constructor
-		GLHEBase() = default;
-=======
 		bool available; // need an array of logicals--load identifiers of available equipment
 		bool on; // simulate the machine at it's operating part load ratio
 		std::string name; // user identifier
@@ -308,7 +252,7 @@ namespace GroundHeatExchangers {
 		std::shared_ptr < GLHEResponseFactorsStruct > myRespFactors;
 		Real64 designFlow; // Design volumetric flow rate			[m3/s]
 		Real64 designMassFlow; // Design mass flow rate				[kg/s]
-		Real64 tempGround; // The far field temperature of the ground   [°C]
+		Real64 tempGround; // The far field temperature of the ground   [ï¿½C]
 		Array1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
 		Array1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
 		Array1D< Real64 > QnSubHr; // Contains the sub-hourly heat extraction/rejection rate normalized by the total active length of bore holes  [W/m]
@@ -316,11 +260,11 @@ namespace GroundHeatExchangers {
 		int AGG; // Minimum Hourly History required
 		int SubAGG; // Minimum sub-hourly History
 		Array1D_int LastHourN; // Stores the Previous hour's N for past hours until the minimum sub-hourly history
-		Real64 bhTemp; // [°C]
+		Real64 bhTemp; // [ï¿½C]
 		Real64 massFlowRate; // [kg/s]
-		Real64 outletTemp; // [°C]
-		Real64 inletTemp; // [°C]
-		Real64 aveFluidTemp; // [°C]
+		Real64 outletTemp; // [ï¿½C]
+		Real64 inletTemp; // [ï¿½C]
+		Real64 aveFluidTemp; // [ï¿½C]
 		Real64 QGLHE; // [W] heat transfer rate
 		bool myFlag;
 		bool myEnvrnFlag;
@@ -361,10 +305,9 @@ namespace GroundHeatExchangers {
 			timeSS( 0.0 ),
 			timeSSFactor( 0.0 )
 		{}
->>>>>>> NREL/develop
 
 		virtual void
-		calcGFunctions() = 0;
+		calcGFunctions()=0;
 
 		void
 		calcAggregateLoad();
@@ -375,27 +318,12 @@ namespace GroundHeatExchangers {
 		void
 		calcGroundHeatExchanger();
 
-<<<<<<< HEAD
-		virtual void
-		initGLHESimVars() = 0;
-
-		virtual void
-		calcHXResistance() = 0;
-=======
 		inline bool
 		isEven( int const val );
->>>>>>> NREL/develop
 
 		Real64
 		interpGFunc( Real64 );
 
-<<<<<<< HEAD
-		virtual Real64
-		getGFunc( Real64 ) = 0;
-
-		virtual void
-		getAnnualTimeConstant() = 0;
-=======
 		void
 		makeThisGLHECacheAndCompareWithFileCache();
 
@@ -404,13 +332,12 @@ namespace GroundHeatExchangers {
 
 		virtual void
 		readCacheFileAndCompareWithThisGLHECache()=0;
->>>>>>> NREL/develop
 
 		void onInitLoopEquip( const PlantLocation & calledFromLocation ) override;
 
 		void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
-		// static PlantComponent * factory( int const objectType, std::string objectName );
+		static PlantComponent * factory( int const objectType, std::string objectName );
 
 		virtual Real64
 		getGFunc( Real64 )=0;
@@ -432,21 +359,6 @@ namespace GroundHeatExchangers {
 		~GLHEVert(){}
 
 		// Members
-<<<<<<< HEAD
-		Real64 maxFlowRate = 0.0; // design nominal capacity of Pump
-		int maxSimYears = 0; // maximum length of simulation (years)
-		int numBoreholes = 0;
-		Real64 boreholeLength = 0.0;
-		Real64 boreholeRadius = 0.0;
-		Real64 kGrout = 0.0; // Grout thermal conductivity                [W/(mK)]
-		Real64 UtubeDist = 0.0; // Distance between the legs of the Utube    [m]
-		bool runFlag = false;
-
-		// Default Constructor
-		GLHEVert() = default;
-
-		GLHEVert( std::string const & name, json const & fields );
-=======
 		Real64 bhDiameter; // Diameter of borehole {m}
 		Real64 bhRadius; // Radius of borehole {m}
 		Real64 bhLength; // Length of borehole {m}
@@ -473,7 +385,6 @@ namespace GroundHeatExchangers {
 			theta_3( 0.0 ),
 			sigma( 0.0 )
 		{}
->>>>>>> NREL/develop
 
 		std::vector< Real64 >
 		distances(
@@ -524,15 +435,6 @@ namespace GroundHeatExchangers {
 			Real64 const time
 		);
 
-<<<<<<< HEAD
-		static
-		std::string const &
-		canonicalObjectType();
-
-		static
-		std::size_t
-		objectTypeHash();
-=======
 		void
 		makeThisGLHECacheStruct();
 
@@ -567,7 +469,6 @@ namespace GroundHeatExchangers {
 
 		void
 		combineShortAndLongTimestepGFunctions();
->>>>>>> NREL/develop
 
 	};
 
@@ -578,28 +479,22 @@ namespace GroundHeatExchangers {
 		~GLHESlinky(){}
 
 		// Members
-		bool verticalConfig = false;	// HX Configuration Flag
-		Real64 coilDiameter = 0.0;	// Diameter of the slinky coils [m]
-		Real64 coilPitch = 0.0;		// Center-to-center slinky coil spacing [m]
-		Real64 coilDepth = 0.0;		// Average depth of the coil [m]
-		Real64 trenchDepth = 0.0;		// Trench depth from ground surface to trench bottom [m]
-		Real64 trenchLength = 0.0;	// Length of single trench [m]
-		int numTrenches = 0;		// Number of parallel trenches [m]
-		Real64 trenchSpacing = 0.0;	// Spacing between parallel trenches [m]
-		int numCoils = 0;			// Number of coils
-		int monthOfMinSurfTemp = 0;
-		Real64 maxSimYears = 0.0;
-		Real64 minSurfTemp = 0.0;
+		bool verticalConfig;	// HX Configuration Flag
+		Real64 coilDiameter;	// Diameter of the slinky coils [m]
+		Real64 coilPitch;		// Center-to-center slinky coil spacing [m]
+		Real64 coilDepth;		// Average depth of the coil [m]
+		Real64 trenchDepth;		// Trench depth from ground surface to trench bottom [m]
+		Real64 trenchLength;	// Length of single trench [m]
+		int numTrenches;		// Number of parallel trenches [m]
+		Real64 trenchSpacing;	// Spacing between parallel trenches [m]
+		int numCoils;			// Number of coils
+		int monthOfMinSurfTemp;
+		Real64 maxSimYears;
+		Real64 minSurfTemp;
 		Array1D< Real64 > X0;
 		Array1D< Real64 > Y0;
-		Real64 Z0 = 0.0;
+		Real64 Z0;
 
-<<<<<<< HEAD
-		// Default Constructor
-		GLHESlinky() = default;
-
-		GLHESlinky( std::string const & name, json const & fields );
-=======
 		GLHESlinky() :
 			verticalConfig( false ),
 			coilDiameter( 0.0 ),
@@ -614,7 +509,6 @@ namespace GroundHeatExchangers {
 			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )
 		{}
->>>>>>> NREL/develop
 
 		Real64
 		calcHXResistance();
@@ -703,21 +597,6 @@ namespace GroundHeatExchangers {
 			Real64 const time
 		);
 
-<<<<<<< HEAD
-		static
-		std::string const &
-		canonicalObjectType();
-
-		static
-		std::size_t
-		objectTypeHash();
-
-	};
-
-	// Object Data
-	// extern Array1D< GLHEVert > verticalGLHE; // Vertical GLHEs
-	// extern Array1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
-=======
 		void
 		makeThisGLHECacheStruct();
 
@@ -725,13 +604,12 @@ namespace GroundHeatExchangers {
 		readCacheFileAndCompareWithThisGLHECache();
 
 	};
->>>>>>> NREL/develop
 
 	void
 	clear_state();
 
-	// void
-	// GetGroundHeatExchangerInput();
+	void
+	GetGroundHeatExchangerInput();
 
 	std::shared_ptr < GLHEResponseFactorsStruct >
 	BuildAndGetResponseFactorObjectFromArray(

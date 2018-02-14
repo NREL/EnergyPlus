@@ -5642,15 +5642,6 @@ namespace SurfaceGeometry {
 					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cNumericFieldNames( numF ));
 					ErrorsFound = true;
 				}
-<<<<<<< HEAD
-				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-					if ( lAlphaFieldBlanks( alpF ) || UtilityRoutines::SameString(cAlphaArgs( alpF ), "YES") ) {
-						data.isExposedPerimeter.push_back(true);
-					} else if ( UtilityRoutines::SameString(cAlphaArgs( alpF ), "NO") ) {
-						data.isExposedPerimeter.push_back(false);
-					} else {
-						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
-=======
 			}  numF++;
 
 			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
@@ -5659,7 +5650,6 @@ namespace SurfaceGeometry {
 					if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
 						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
 						ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
->>>>>>> NREL/develop
 						ErrorsFound = true;
 					}
 					for (int segNum = 0; segNum < numRemainingFields; segNum++) {
@@ -7665,11 +7655,7 @@ namespace SurfaceGeometry {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
 				} else if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
-<<<<<<< HEAD
-				} else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
-=======
-				} else if (SameString(cAlphaArgs( alpF ), "Autoselect")) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( alpF ), "Autoselect") ) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
 				} else {
 					ErrorsFound = true;

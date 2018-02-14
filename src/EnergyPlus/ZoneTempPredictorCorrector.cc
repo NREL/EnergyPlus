@@ -389,11 +389,6 @@ namespace ZoneTempPredictorCorrector {
 		using General::CheckCreatedZoneItemName;
 		using WeatherManager::NumDaysInYear;
 
-<<<<<<< HEAD
-=======
-		// Locals
-
->>>>>>> NREL/develop
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneAirSetpoints: " );
 

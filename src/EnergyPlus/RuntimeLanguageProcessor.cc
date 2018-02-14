@@ -212,12 +212,8 @@ namespace RuntimeLanguageProcessor {
 		ActualDateAndTimeNum = 0;
 		ActualTimeNum = 0;
 		WarmUpFlagNum = 0;
-<<<<<<< HEAD
 		ErlStackUniqueNames.clear();
 		RuntimeReportVarUniqueNames.clear();
-=======
-
->>>>>>> NREL/develop
 	}
 
 	void
@@ -2795,31 +2791,19 @@ namespace RuntimeLanguageProcessor {
 					// name of the module object, and add an offset for the variable number
 					// This is done in the following IF/THEN section.
 					if ( GlobalNum <= NumUserGlobalVariables ) {
-<<<<<<< HEAD
 						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
-=======
-						GetObjectItem( cCurrentModuleObject, GlobalNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums,
->>>>>>> NREL/develop
 							IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
 						cCurrentModuleObject = "ExternalInterface:Variable";
-<<<<<<< HEAD
 						inputProcessor->getObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
-=======
-						GetObjectItem( cCurrentModuleObject, GlobalNum - NumUserGlobalVariables, cAlphaArgs, NumAlphas,
->>>>>>> NREL/develop
 							rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					}
 					else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						&& GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-<<<<<<< HEAD
 						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
-=======
-						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
->>>>>>> NREL/develop
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 					}
@@ -2829,11 +2813,7 @@ namespace RuntimeLanguageProcessor {
 						+ NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables
 						+ NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables){
 						cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-<<<<<<< HEAD
 						inputProcessor->getObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
-=======
-						GetObjectItem(cCurrentModuleObject, GlobalNum - NumUserGlobalVariables
->>>>>>> NREL/develop
 							- NumExternalInterfaceGlobalVariables - NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
 							cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 					}
