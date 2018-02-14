@@ -110,10 +110,10 @@
 #include <HVACSizingSimulationManager.hh>
 #include <ElectricPowerServiceManager.hh>
 
-#include <fmiModelTypes.h>
-#include <fmi1_types.h>
-#include <fmi1_functions.h>
-#include <jmi_types.h>
+//#include <fmiModelTypes.h>
+//#include <fmi1_types.h>
+//#include <fmi1_functions.h>
+//#include <jmi_types.h>
 
 namespace EnergyPlus {
 
