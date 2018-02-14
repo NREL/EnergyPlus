@@ -606,6 +606,8 @@ namespace DataSurfaces {
 		Real64 Width; // Width of the surface (m)
 		// Boundary conditions and interconnections
 		bool HeatTransSurf; // True if surface is a heat transfer surface,
+		int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+		int InsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
 		// False if a (detached) shadowing (sub)surface
 		int HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
 		std::string BaseSurfName; // Name of BaseSurf
@@ -786,6 +788,8 @@ namespace DataSurfaces {
 			Tilt( 0.0 ),
 			Width( 0.0 ),
 			HeatTransSurf( false ),
+			OutsideHeatSourceTermSchedule( 0 ),
+			InsideHeatSourceTermSchedule( 0 ),
 			HeatTransferAlgorithm( HeatTransferModel_NotSet ),
 			BaseSurf( 0 ),
 			NumSubSurfaces( 0 ),
