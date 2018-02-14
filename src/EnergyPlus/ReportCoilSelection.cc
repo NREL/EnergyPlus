@@ -1577,6 +1577,9 @@ ReportCoilSelection::setCoilSupplyFanInfo(
 	int const & fanIndex
 )
 {
+	if ( fanName == "" ) {
+		return;
+	}
 	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
 	auto & c( coilSelectionDataObjs[ index ] );
 	c->fanAssociatedWithCoilName = fanName;
