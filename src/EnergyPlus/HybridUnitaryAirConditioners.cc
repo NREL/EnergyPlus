@@ -222,14 +222,6 @@ namespace EnergyPlus {
 			// Using/Aliasing			
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
-			using DataGlobals::TimeStep;
-			using DataGlobals::TimeStepZone;
-			using DataGlobals::WarmupFlag;
-			using DataGlobals::HourOfDay;
-			using DataHVACGlobals::ZoneComp;
-			using DataHVACGlobals::SysTimeElapsed;
-			using DataSizing::AutoSize;
-			using DataEnvironment::StdRhoAir;
 			using Fans::GetFanVolFlow;
 
 			// Locals
@@ -330,8 +322,6 @@ namespace EnergyPlus {
 			// Using/Aliasing
 			using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 			using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-			using DataHVACGlobals::TimeStepSys;
-			using DataGlobals::SecInHour;
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
 			using DataEnvironment::StdRhoAir;

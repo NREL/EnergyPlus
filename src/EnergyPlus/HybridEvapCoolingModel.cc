@@ -915,6 +915,8 @@ namespace EnergyPlus {//***************
 			ThirdFuelConsumption(0.0),
 			WaterConsumptionRate(0.0),
 			WaterConsumption(0.0),
+			QSensZoneOut(0),
+			QLatentZoneOut( 0),
 			ExternalStaticPressure(0.0),
 			RequestedHumdificationMass(0.0),
 			RequestedHumdificationLoad(0.0),
@@ -922,8 +924,6 @@ namespace EnergyPlus {//***************
 			RequestedDeHumdificationMass(0.0),
 			RequestedDeHumdificationLoad(0.0),
 			RequestedDeHumdificationEnergy(0.0),
-			QSensZoneOut(0),
-			QLatentZoneOut( 0),
 			RequestedLoadToHeatingSetpoint(0.0),
 			RequestedLoadToCoolingSetpoint(0.0),
 			TsaMin_schedule_pointer(0),
@@ -1360,31 +1360,51 @@ namespace EnergyPlus {//***************
 					{
 						averagedVal = StandbyMode.SupplyAirTemperature;
 					}
-					else averagedVal = averagedVal/ MassFlowDependentDenominator; break;
+					else
+					{
+						averagedVal = averagedVal/ MassFlowDependentDenominator;
+					}
+					break;
 				case SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE:
 					if (MassFlowDependentDenominator == 0)
 					{
 						averagedVal = StandbyMode.ExternalStaticPressure;
 					}
-					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
+					else
+					{
+						averagedVal = averagedVal / MassFlowDependentDenominator;
+					}
+					break;
 				case SYSTEMOUTPUTS::SUPPLY_AIR_HR:  
 					if (MassFlowDependentDenominator == 0)
 					{
 						averagedVal = StandbyMode.SupplyAirW;
 					}
-					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
+					else
+					{
+						averagedVal = averagedVal / MassFlowDependentDenominator;
+					}
+					break;
 				case SYSTEMOUTPUTS::MIXED_AIR_TEMP:  
 					if (MassFlowDependentDenominator == 0)
 					{
 						averagedVal = StandbyMode.Mixed_Air_Temperature;
 					}
-					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
+					else
+					{
+						averagedVal = averagedVal / MassFlowDependentDenominator;
+					}
+					break;
 				case SYSTEMOUTPUTS::MIXED_AIR_HR: 
 					if (MassFlowDependentDenominator == 0)
 					{
 						averagedVal = StandbyMode.Mixed_Air_W;
 					}
-					else averagedVal = averagedVal / MassFlowDependentDenominator; break;
+					else
+					{
+						averagedVal = averagedVal / MassFlowDependentDenominator;
+					}
+					break;
 				default:
 					break;
 			}

@@ -244,18 +244,17 @@ namespace EnergyPlus {
 			Real64 ThirdFuelConsumption;	   //
 			Real64 WaterConsumptionRate;	   //
 			Real64 WaterConsumption;		   //
+			Real64 QSensZoneOut;
+			Real64 QLatentZoneOut;
 			Real64 ExternalStaticPressure;	   //
-			Real64 QSensZoneOut ;
-			Real64 QLatentZoneOut ;
-
-			Real64 RequestedLoadToHeatingSetpoint;
-			Real64 RequestedLoadToCoolingSetpoint;
 			Real64 RequestedHumdificationMass;
 			Real64 RequestedHumdificationLoad;
 			Real64 RequestedHumdificationEnergy;
 			Real64 RequestedDeHumdificationMass;
 			Real64 RequestedDeHumdificationLoad;
 			Real64 RequestedDeHumdificationEnergy;
+			Real64 RequestedLoadToHeatingSetpoint;
+			Real64 RequestedLoadToCoolingSetpoint;
 			int TsaMin_schedule_pointer;
 			int TsaMax_schedule_pointer;
 			int RHsaMin_schedule_pointer;
