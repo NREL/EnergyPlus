@@ -633,8 +633,8 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ErrorsFound );
 
 		// first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
-		EXPECT_EQ( "WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
-		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 1 ).VarName );
+		EXPECT_EQ( "WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 1 ).VarName );
+		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
 		EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
 		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
 

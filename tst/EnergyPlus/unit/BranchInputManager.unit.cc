@@ -389,7 +389,7 @@ namespace EnergyPlus {
 		FindAirLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop );
 
 		EXPECT_EQ( "AIR LOOP 1", FoundLoopName );
-		EXPECT_EQ( 1 , FoundLoopNum );
+		EXPECT_EQ( 2 , FoundLoopNum );
 		EXPECT_EQ( "Air", LoopType );
 		EXPECT_EQ( 50.0, FoundLoopVolFlowRate );
 		EXPECT_TRUE( MatchedLoop );
@@ -406,7 +406,7 @@ namespace EnergyPlus {
 		FindAirLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop );
 
 		EXPECT_EQ( "DOAS", FoundLoopName );
-		EXPECT_EQ( 2 , FoundLoopNum );
+		EXPECT_EQ( 1 , FoundLoopNum );
 		EXPECT_EQ( "Air", LoopType );
 		EXPECT_EQ( DataSizing::AutoSize, FoundLoopVolFlowRate );
 		EXPECT_TRUE( MatchedLoop );

@@ -111,6 +111,7 @@ extension_renaming = {
     'GroundHeatExchanger:ResponseFactors': 'g_functions',
     'Foundation:Kiva': 'blocks',
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
+    'SurfaceProperty:SurroundingSurfaces': 'surfaces'
 }
 remaining_objects = [
     'Site:SpectrumData',
