@@ -212,7 +212,8 @@ namespace EnergyPlus {
 		Requestedheating = RequestedCooling = Requested_Humidification = Requested_Dehumidification = 0;
 		Real64 NormalizationReference = 3.0176;
 
-// Scenario 1: Hi Cooling
+		// Scenario 1: Hi Cooling
+
 		bool Fail = false;
 		DesignMinVR = 1.622720855;  // Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate
 		Tra= 22.93929413; //Zone Hybrid Unitary HVAC Return Air Temperature
@@ -265,12 +266,25 @@ namespace EnergyPlus {
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
 		// checks 
 		
-		if ((roundf(returnOSAF * 100) / 100) != 1) Fail = true;
-		if (deliveredSC<=0) Fail = true;
-		if ((roundf(deliveredSH * 100) / 100) != 0) Fail = true;
-		if (Tsa>Tra) Fail = true;
+		if ((roundf(returnOSAF * 100) / 100) != 1)
+		{
+			Fail = true;
+		}
+		if (deliveredSC <= 0)
+		{
+			Fail = true;
+		}
+		if ((roundf(deliveredSH * 100) / 100) != 0)
+		{
+			Fail = true;
+		}
+		if (Tsa > Tra)
+		{
+			Fail = true;
+		}
+		ASSERT_TRUE(Fail);
+		// Scenario 2: high cooling larger system
 
-// Scenario 2: high cooling larger system
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
 		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
 		pZoneHybridUnitaryAirConditioner->ScalingFactor = pZoneHybridUnitaryAirConditioner->ScalingFactor * 2;
@@ -279,35 +293,48 @@ namespace EnergyPlus {
 
 		// output results
 		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
-		 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
-		 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
-		 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
-		 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-		 //double Msa_setting0= (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Supply_Air_Mass_Flow_Rate);
-		 double RTF_0 = (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Runtime_Fraction);
-		 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
-		 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
-		 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
-		 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
-		 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
-		 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
-		 SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;	   //
-		 SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;    //
-		 SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate;///
-		 SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;   //
-		 ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;   //
-		 ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;	   //
-		 WaterConsumptionRate = pZoneHybridUnitaryAirConditioner->WaterConsumptionRate;	   //
-		 WaterConsumption = pZoneHybridUnitaryAirConditioner->WaterConsumption;		   //
-		 ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;	   //
+		primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
+		Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
+		Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
+		Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
+		//double Msa_setting0= (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Supply_Air_Mass_Flow_Rate);
+		double RTF_0 = (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Runtime_Fraction);
+		Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+		ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
+		deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
+		deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
+		Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
+		returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
+		SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;	   //
+		SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;    //
+		SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate;///
+		SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;   //
+		ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;   //
+		ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;	   //
+		WaterConsumptionRate = pZoneHybridUnitaryAirConditioner->WaterConsumptionRate;	   //
+		WaterConsumption = pZoneHybridUnitaryAirConditioner->WaterConsumption;		   //
+		ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;	   //
 		// checks 
 		
-		if ((roundf(returnOSAF * 100) / 100)  != 1) Fail = true;
-		if (deliveredSC <= 0) Fail = true;
-		if ((roundf(deliveredSH * 100) / 100) != 0) Fail = true;
-		if (Tsa>Tra) Fail = true;
-		
-// Scenario 3: Outside of env conditions. should go to standby and have standby energy
+		if ((roundf(returnOSAF * 100) / 100) != 1)
+		{
+			Fail = true;
+		}
+		if (deliveredSC <= 0)
+		{
+			Fail = true;
+		}
+		if ((roundf(deliveredSH * 100) / 100) != 0)
+		{
+			Fail = true;
+		}
+		if (Tsa > Tra)
+		{
+			Fail = true;
+		}
+		ASSERT_TRUE(Fail);
+
+		// Scenario 3: Outside of env conditions. should go to standby and have standby energy
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
 		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
 		pZoneHybridUnitaryAirConditioner->SecInletTemp = 150;
@@ -319,7 +346,7 @@ namespace EnergyPlus {
 		// checks 
 		if (modenumber != 0) Fail = true;
 		
-// Scenario 4: Low Cooling
+		// Scenario 4: Low Cooling
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
 		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
 		Fail = false;
@@ -350,11 +377,23 @@ namespace EnergyPlus {
 		returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
 		// checks 
 		
-		if ((roundf(returnOSAF * 100) / 100)  != 1) Fail = true;
-		if (deliveredSC <= 0) Fail = true;
-		if ((roundf(deliveredSH * 100) / 100)  != 0) Fail = true;
-		if (Tsa>Tra) Fail = true;
-
+		if ((roundf(returnOSAF * 100) / 100) != 1)
+		{
+			Fail = true;
+		}
+		if (deliveredSC <= 0)
+		{
+			Fail = true;
+		}
+		if ((roundf(deliveredSH * 100) / 100) != 0)
+		{
+			Fail = true;
+		}
+		if (Tsa > Tra)
+		{
+			Fail = true;
+		}
+		ASSERT_TRUE(Fail);
 // Scenario 5: No Conditioning
 		DesignMinVR = 1.622720855;
 		Tra = 21.83325675; 
@@ -379,9 +418,15 @@ namespace EnergyPlus {
 		Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
 		returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
 		// checks 
-		if ((roundf(returnOSAF * 100) / 100) != 1) Fail = true;
-		if (Tsa<Tra) Fail = true;
-
+		if ((roundf(returnOSAF * 100) / 100) != 1)
+		{
+			Fail = true;
+		}
+		if (Tsa < Tra)
+		{
+			Fail = true;
+		}
+		ASSERT_TRUE(Fail);
 
 	}
 
