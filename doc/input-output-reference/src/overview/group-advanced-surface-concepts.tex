@@ -2635,6 +2635,29 @@ ZoneProperty:LocalEnvironment,
     OutdoorAirNode:0001;          !- Outdoor Air Node Name    
 \end{lstlisting}
 
+\subsection{SurfaceProperty:HeatBalanceSourceTerm}\label{surfacePropertyHeatBalanceSourceTerm}
+
+The object allows additional heat source term of the surface boundary condition in the surface heat balance calculation. The object specifies a surface with the additional heat source term described by a schedule of heat rates (can be positive or negative values) in W/m^2. A heat source can be added	to either or both the inside and outside of the same surface. The heat rates are pre-calculated outside EnergyPlus.
+
+\subsubsection{Field: Surface Name}\label{field-surface-name}
+
+This is the name of the surface that will be assigned to use the additional heat source term in heat balance calculation
+
+\subsubsection{Field: Inside Face Heat Source Term Schedule Name}\label{field-inside-heat-source-term-schedule-name}
+
+The value of this schedule is the source term value for the inside face of this surface. If this field is left blank, no inside surface source term will be applied. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
+
+\subsubsection{Field: Outside Face Heat Source Term Schedule Name}\label{field-outside-heat-source-term-schedule-name}
+
+The value of this schedule is the source term value for the outside face of this surface. If this field is left blank, no outside surface source term will be applied. The schedule values are heat rate per surface area (W/m2), when positive schedule values indicate heat gain and negative values indicates loss.
+
+\begin{lstlisting}
+SurfaceProperty:HeatBalanceSourceTerm,
+    Zn001:Wall001,                !- Surface Name
+    ,                                      !- Inside Face Heat Source Term Schedule Name
+    HeatSourceSch:001;          !- Outside Face Heat Source Term Schedule Name
+\end{lstlisting}
+
 \subsection{Zone Property View Factors}\label{zone-property-view-factors}
 
 EnergyPlus has two options for specifying the thermal radiation exchange view factors between surfaces in a zone: the approximate option and the user input option. Because the actual geometric arrangement within a zone is very complex, the approximate method of including thermal mass and other forced exchanges is more realistic than trying to come up with ``exact'' view factors. However, in some research situations it might be desirable to have control of the view factors used. For this reason, a user input mode has been included in EnergyPlus. The two modes are described in the next sections.
