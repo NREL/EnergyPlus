@@ -2896,8 +2896,8 @@ namespace EnergyPlus {
 				{ 12, std::make_tuple( 0, "InteriorLights:Electricity:Zone:SPACE4-1", "Electricity", "InteriorLights", "", "Zone", "J" ) },
 				{ 13, std::make_tuple( 0, "Electricity:Zone:SPACE5-1", "Electricity", "", "", "Zone", "J" ) },
 				{ 14, std::make_tuple( 0, "InteriorLights:Electricity:Zone:SPACE5-1", "Electricity", "InteriorLights", "", "Zone", "J" ) },
-				{ 16, std::make_tuple( 1, "MYGENERALLIGHTS", "Electricity", "", "", "", "J" ) },
-				{ 15, std::make_tuple( 1, "BUILDING INFILTRATION HEAT LOSS", "Generic", "", "", "", "J" ) },
+				{ 15, std::make_tuple( 1, "MYGENERALLIGHTS", "Electricity", "", "", "", "J" ) },
+				{ 16, std::make_tuple( 1, "BUILDING INFILTRATION HEAT LOSS", "Generic", "", "", "", "J" ) },
 				{ 17, std::make_tuple( 2, "MYBUILDINGOTHER", "Electricity", "", "", "", "J" ) },
 			});
 
