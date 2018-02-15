@@ -1095,7 +1095,7 @@ namespace WeatherManager {
 								EnDate += "/<noyear>";
 							}
 							if ( NumDataPeriods == 1 ) {
-								ShowContinueError( "Weather Data Period (Start=" + StDate + ",End=" + EnDate );
+								ShowContinueError( "Weather Data Period (Start=" + StDate + ",End=" + EnDate + ')' );
 							} else {
 								ShowContinueError( "Multiple Weather Data Periods 1st (Start=" + StDate + ",End=" + EnDate + ')' );
 							}
@@ -5393,8 +5393,6 @@ Label9999: ;
 		static bool ErrorsFound( false );
 		int RPD1;
 		int RPD2;
-		int RP; // number of run periods
-		int RPAW; // number of run periods, actual weather
 
 		// FLOW:
 
@@ -5402,9 +5400,7 @@ Label9999: ;
 		TotDesDays = GetNumObjectsFound( "SizingPeriod:DesignDay" );
 		RPD1 = GetNumObjectsFound( "SizingPeriod:WeatherFileDays" );
 		RPD2 = GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
-		RP = GetNumObjectsFound( "RunPeriod" );
-		RPAW = GetNumObjectsFound( "RunPeriod:CustomRange" );
-		TotRunPers = RP + RPAW;
+		TotRunPers = GetNumObjectsFound("RunPeriod");
 		NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
 		if ( TotRunPers > 0 ) {
 			WeathSimReq = true;
@@ -7419,25 +7415,25 @@ Label9999: ;
 		// Initialize Site:GroundTemperature:BuildingSurface object
 		siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "" );
 		if ( siteBuildingSurfaceGroundTempsPtr ){
-			ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound;
+			ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound ? true : ErrorsFound;
 		}
 
 		// Initialize Site:GroundTemperature:FCFactorMethod object
 		siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "" );
 		if ( siteFCFactorMethodGroundTempsPtr ) {
-			ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound;
+			ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound ? true : ErrorsFound;
 		}
 
 		// Initialize Site:GroundTemperature:Shallow object
 		siteShallowGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:SHALLOW", "" );
 		if ( siteShallowGroundTempsPtr ) {
-			ErrorsFound = siteShallowGroundTempsPtr->errorsFound;
+			ErrorsFound = siteShallowGroundTempsPtr->errorsFound ? true : ErrorsFound;
 		}
 
 		// Initialize Site:GroundTemperature:Deep object
 		siteDeepGroundTempsPtr = GetGroundTempModelAndInit( "SITE:GROUNDTEMPERATURE:DEEP", "" );
 		if ( siteDeepGroundTempsPtr ) {
-			ErrorsFound = siteDeepGroundTempsPtr->errorsFound;
+			ErrorsFound = siteDeepGroundTempsPtr->errorsFound ? true : ErrorsFound;
 		}
 	}
 
