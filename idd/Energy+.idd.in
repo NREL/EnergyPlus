@@ -101888,7 +101888,7 @@ Output:Variable,
        \note Detailed lists every instance (i.e. HVAC variable timesteps)
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
-       \note RunPeriod, Environment, and Annual are the same
+       \note RunPeriod and Environment are the same
        \key Hourly
        \key Daily
        \key Monthly
@@ -101918,7 +101918,7 @@ Output:Meter,
        \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
-       \note RunPeriod, Environment, and Annual are the same
+       \note RunPeriod and Environment are the same
        \key Hourly
        \key Daily
        \key Detailed
@@ -101946,7 +101946,7 @@ Output:Meter:MeterFileOnly,
        \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
-       \note RunPeriod, Environment, and Annual are the same
+       \note RunPeriod and Environment are the same
        \key Hourly
        \key Daily
        \key Monthly
@@ -101974,7 +101974,7 @@ Output:Meter:Cumulative,
        \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
-       \note RunPeriod, Environment, and Annual are the same
+       \note RunPeriod and Environment are the same
        \key Hourly
        \key Daily
        \key Monthly
@@ -102002,7 +102002,7 @@ Output:Meter:Cumulative:MeterFileOnly,
        \key Detailed
        \key Timestep
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
-       \note RunPeriod, Environment, and Annual are the same
+       \note RunPeriod and Environment are the same
        \key Hourly
        \key Daily
        \key Monthly
@@ -102162,12 +102162,11 @@ Output:EnvironmentalImpactFactors,
   A1 ; \field Reporting Frequency
        \type choice
        \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
-       \note RunPeriod, Environment, and Annual are the same. Detailed is not a valid choice.
+       \note RunPeriod and Environment are the same. Detailed is not a valid choice.
        \key Timestep
        \key Hourly
        \key Daily
        \key Monthly
-       \key Annual
        \key RunPeriod
        \key Environment
        \key Annual
