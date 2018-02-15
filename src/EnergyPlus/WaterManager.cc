@@ -1736,8 +1736,8 @@ namespace WaterManager {
 				if ( NumWaterStorageTanks > 0 ) {
 					for ( TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum ) {
 						if ( WaterStorage( TankNum ).NumWaterDemands == 0 ) {
-							ShowWarningError( "Found WaterUse:Tank that has nothing connected to draw water from it." );
-							ShowContinueError( "Occurs for WaterUse:Tank = " + WaterStorage( TankNum ).Name );
+							ShowWarningError( "Found WaterUse:Storage that has nothing connected to draw water from it." );
+							ShowContinueError( "Occurs for WaterUse:Storage = " + WaterStorage( TankNum ).Name );
 							ShowContinueError( "Check that input for water consuming components specifies a water supply tank." );
 						}
 					}
