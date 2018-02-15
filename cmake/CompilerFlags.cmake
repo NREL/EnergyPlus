@@ -21,6 +21,7 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK
 
     # COMPILER FLAGS
+    ADD_CXX_DEFINITIONS("/std:c++latest")
     ADD_CXX_DEFINITIONS("/nologo")
     ADD_CXX_DEFINITIONS("/EHsc")
     ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
