@@ -4966,9 +4966,6 @@ namespace SimAirServingZones {
 		int TimeStepIndex; // zone time step index
 		int NumZonesHeated; // number of zones heated by a system
 		int NumZonesCooled; // numberof zones cooled by a system
-		int ZonesHeatedNum; // loop index of zones heated in a system
-		int ZonesCooledNum; // loop index of zones cooled in a system
-		int CtrlZoneNum; // controlled zone number of a zone
 		int I; // write statement index
 		int J; // write statement index
 		//  REAL(r64)    :: HourFrac           ! fractional hour
@@ -5096,7 +5093,7 @@ namespace SimAirServingZones {
 
 			// Correct the zone return temperature in ZoneSizing for the case of induction units. The calc in
 			// ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
-			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+			for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				// Use first non-zero airdistunit for now
 				int TermUnitSizingIndex = 0;
@@ -5135,23 +5132,23 @@ namespace SimAirServingZones {
 				SensCoolCapTemp( AirLoopNum ) = 0.0;
 				TotCoolCapTemp( AirLoopNum ) = 0.0;
 
-				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
-					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
+					int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					Real64 adjCoolMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlow, ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesCoolMassFlowNoOA );
 					SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinCoolMassFlow += adjCoolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 				} // end of loop over cooled zones
 
 				if ( NumZonesHeated > 0 ) { // if there are zones supplied with central hot air
-					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over heated zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+					for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over heated zones
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						Real64 adjHeatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow, ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlowNoOA );
 						SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow += adjHeatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					} // end of loop over heated zones
 				} else { // otherwise use cool supply zones
-					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { //loop over cooled zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+					for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { //loop over cooled zones
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						Real64 adjHeatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlow, ZoneSizing( CurOverallSimDay, CtrlZoneNum ).DesHeatMassFlowNoOA );
 						SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow += adjHeatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -5166,7 +5163,7 @@ namespace SimAirServingZones {
 
 			// Correct the zone return temperature in ZoneSizing for the case of induction units. The calc in
 			// ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
-			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+			for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				// Use first non-zero airdistunit for now, if there is one
 				termunitsizingtempfrac = 1.0;
@@ -5210,8 +5207,8 @@ namespace SimAirServingZones {
 				SysDOASHeatAdd = 0.0;
 				SysDOASLatAdd = 0.0;
 
-				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over zones cooled by central system
-					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over zones cooled by central system
+					int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					// sum up the system mass flow rate for this time step
 					Real64 adjCoolFlowSeq = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeq( TimeStepInDay ), ZoneSizing( CurOverallSimDay, CtrlZoneNum ).CoolFlowSeqNoOA( TimeStepInDay ) );
@@ -5310,8 +5307,8 @@ namespace SimAirServingZones {
 
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
 
-					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+					for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						// sum up the heating mass flow rate for this time step
 						Real64 adjHeatFlowSeq = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ), ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeqNoOA( TimeStepInDay ) );
@@ -5368,8 +5365,8 @@ namespace SimAirServingZones {
 
 				} else { // No centrally heated zones: use cooled zones
 
-					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over the cooled zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+					for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over the cooled zones
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						// sum up the heating mass flow rate for this time step
 						Real64 adjHeatFlowSeq = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeq( TimeStepInDay ), ZoneSizing( CurOverallSimDay, CtrlZoneNum ).HeatFlowSeqNoOA( TimeStepInDay ) );
@@ -5438,12 +5435,12 @@ namespace SimAirServingZones {
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow / StdRhoAir;
 						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
-						for( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+						for( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
-						for( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+						for( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
@@ -5476,7 +5473,7 @@ namespace SimAirServingZones {
 							NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 							MinCoolingEvz = 1.0;
 							VozSumClgBySys( AirLoopNum ) = 0.0;
-							for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+							for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 								int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 								int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 
@@ -5527,7 +5524,7 @@ namespace SimAirServingZones {
 									EvzMinBySysCool( AirLoopNum ) = MinCoolingEvz;
 								} else {
 									//Restore EvzByZoneCool() since it was reset by the current (but not highest Vot) design day
-									for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+									for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 										int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 										EvzByZoneCool( CtrlZoneNum ) = EvzByZoneCoolPrev( CtrlZoneNum );
 									}
@@ -5550,12 +5547,12 @@ namespace SimAirServingZones {
 						if ( FinalSysSizing( AirLoopNum ).MaxZoneOAFraction > 0 && FinalSysSizing( AirLoopNum ).HeatAirDesMethod == FromDDCalc ) {
 							SysHtgPeakAirflow = 0.0;
 							if ( NumZonesHeated > 0 ) {
-								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+								for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 									SysHtgPeakAirflow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 								}
 							} else {
-								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
+								for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
 									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 									SysHtgPeakAirflow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow;
 								}
@@ -5576,7 +5573,7 @@ namespace SimAirServingZones {
 							MinHeatingEvz = 1.0;
 							VozSumHtgBySys( AirLoopNum ) = 0.0;
 							if ( NumZonesHeated > 0 ) {
-								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+								for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 									MatchingCooledZoneNum = FindNumberInList( CtrlZoneNum, AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums, NumZonesCooled );
@@ -5613,7 +5610,7 @@ namespace SimAirServingZones {
 									}
 								}
 							} else {
-								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
+								for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
 									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 									// Zone air secondary recirculation fraction
@@ -5662,12 +5659,12 @@ namespace SimAirServingZones {
 								} else {
 									//Restore EvzByZoneHeat() since it was reset by the current (but not highest Vot) design day
 									if ( NumZonesHeated > 0 ) {
-										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+										for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
 									} else {
-										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
+										for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
 											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
@@ -5684,12 +5681,12 @@ namespace SimAirServingZones {
 						SysSizing( CurOverallSimDay, AirLoopNum ).DesHeatVolFlow = SysSizing( CurOverallSimDay, AirLoopNum ).NonCoinHeatMassFlow / StdRhoAir;
 						VotClgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
 						VotHtgBySys( AirLoopNum ) = FinalSysSizing( AirLoopNum ).SysUncOA;
-						for( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+						for( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
 						}
-						for( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+						for( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling < EvzMinBySysCool( AirLoopNum ) ) EvzMinBySysCool( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffCooling;
 							if( TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating < EvzMinBySysHeat( AirLoopNum ) ) EvzMinBySysHeat( AirLoopNum ) = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneADEffHeating;
@@ -5723,8 +5720,8 @@ namespace SimAirServingZones {
 							NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 							MinCoolingEvz = 1.0;
 							VozSumClgBySys( AirLoopNum ) = 0.0;
-							for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-								CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+							for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+								int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 								int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 
 								// Zone air secondary recirculation fraction
@@ -5774,8 +5771,8 @@ namespace SimAirServingZones {
 									EvzMinBySysCool( AirLoopNum ) = MinCoolingEvz;
 								} else {
 									//Restore EvzByZoneCool() since it was reset by the current (but not highest Vot) design day
-									for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-										CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+									for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+										int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 										EvzByZoneCool( CtrlZoneNum ) = EvzByZoneCoolPrev( CtrlZoneNum );
 									}
 								}
@@ -5801,7 +5798,7 @@ namespace SimAirServingZones {
 							MinHeatingEvz = 1.0;
 							VozSumHtgBySys( AirLoopNum ) = 0.0;
 							if ( NumZonesHeated > 0 ) {
-								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+								for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 									MatchingCooledZoneNum = FindNumberInList( CtrlZoneNum, AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums, NumZonesCooled );
@@ -5835,7 +5832,7 @@ namespace SimAirServingZones {
 								}
 							} else {
 								NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
-								for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
+								for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
 									int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 									int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 									// Zone air secondary recirculation fraction
@@ -5880,12 +5877,12 @@ namespace SimAirServingZones {
 								} else {
 									//Restore EvzByZoneHeat() since it was just reset by the current (but not highest Vot) design day
 									if ( NumZonesHeated > 0 ) {
-										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+										for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
 									} else {
-										for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
+										for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) {
 											int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 											EvzByZoneHeat( CtrlZoneNum ) = EvzByZoneHeatPrev( CtrlZoneNum );
 										}
@@ -5914,7 +5911,7 @@ namespace SimAirServingZones {
 						// and so the zone-level Voz must be prorated so their sum equals the system level Vot
 						Ratio = 1.0;
 						if ( VozSumClgBySys( AirLoopNum ) > 0 ) Ratio = VotClgBySys( AirLoopNum ) / VozSumClgBySys( AirLoopNum );
-						for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+						for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 							TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = Ratio * TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
 							//int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
@@ -5930,13 +5927,13 @@ namespace SimAirServingZones {
 						// and so the zone-level Voz must be prorated so their sum equals the system level Vot
 						Ratio = 1.0;
 						if ( VozSumHtgBySys( AirLoopNum ) > 0 ) Ratio = VotHtgBySys( AirLoopNum ) / VozSumHtgBySys( AirLoopNum );
-						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesForHtg; ++ZonesHeatedNum ) {
+						for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesForHtg; ++ZonesHeatedNum ) {
 							int TermUnitSizingIndex = 1;
 							if ( NumZonesHeated == 0 ) {
 								TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 							} else {
 								TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
-								CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+								int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 							}
 							TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = Ratio * TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
 						}
@@ -6125,8 +6122,8 @@ namespace SimAirServingZones {
 				SysCoolOutTemp = 0.0;
 				SysCoolOutHumRat = 0.0;
 
-				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
-					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
+					int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					// save the system cooling supply air temp
 					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInTempTU = CalcSysSizing( AirLoopNum ).CoolSupTemp;
@@ -6181,12 +6178,11 @@ namespace SimAirServingZones {
 
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
 
-					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+					for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 						// save the system heating supply air temp
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU;
 						// save the system heating supply air hum rat
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU;
@@ -6222,15 +6218,13 @@ namespace SimAirServingZones {
 
 				} else { // No centrally heated zones: use cooled zones
 
-					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over the cooled zones
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+					for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over the cooled zones
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						// save the system heating supply air temp
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = CalcSysSizing( AirLoopNum ).HeatSupTemp;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU;
 						// save the system heating supply air hum rat
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU;
 						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow <= 0.0 ) continue;
 						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlowNoOA );
 						CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow += heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -6443,8 +6437,8 @@ namespace SimAirServingZones {
 					}
 
 					// take account of the user input system flow rates and alter the zone flow rates to match
-					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+					for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						if ( ( SysCoolSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) ) {
 							// size on ventilation load
@@ -6506,8 +6500,8 @@ namespace SimAirServingZones {
 					}
 					// take account of the user input system flow rates and alter the zone flow rates to match (for terminal unit sizing)
 					if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
-						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
-							CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+						for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
+							int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA > 0.0 ) ) {
 								// size on ventilation load
@@ -6524,8 +6518,8 @@ namespace SimAirServingZones {
 							}
 						}
 					} else { // No centrally heated zones: use cooled zones
-						for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over the cooled zones
-							CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+						for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over the cooled zones
+							int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 							if ( ( SysHeatSizingRat != 1.0 ) && ( FinalSysSizing( AirLoopNum ).LoadSizeType == Ventilation ) && ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA <= 0.0 ) ) {
 								ShowWarningError( "FinalSystemSizing: AirLoop=\"" + AirToZoneNodeInfo( AirLoopNum ).AirLoopName + "\", Requested sizing on Ventilation," );
@@ -6553,7 +6547,7 @@ namespace SimAirServingZones {
 
 				// loop over the zones cooled by this system and sum up the min cooling flow rates to get the
 				// min system cooling flow rate
-				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+				for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
 					int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 					FinalSysSizing( AirLoopNum ).DesCoolVolFlowMin += TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolVolFlowMin;
 				}
@@ -6569,14 +6563,18 @@ namespace SimAirServingZones {
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
-					for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
+					for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
+					}
+				} else if ( NumZonesCooled > 0 ) { // if no centrally heated zones use cooled zones
+					for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
+						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU;
-						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU;
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInTempTU = GetHeatingSATempForSizing( AirLoopNum );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing( AirLoopNum );
 					}
 				}
 			}
@@ -6682,7 +6680,7 @@ namespace SimAirServingZones {
 					PreDefTableEntry( pdchS62shdEvz, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysHeat( AirLoopNum ), 3 ); //Evz-min
 					//zone cooling design table
 					NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
-					for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
+					for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
 						int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
 						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
 						PreDefTableEntry( pdchS62zcdAlN, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
@@ -6696,7 +6694,7 @@ namespace SimAirServingZones {
 					//zone heating design table
 					NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 					if ( NumZonesHeated > 0 ) {
-						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
+						for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) { // loop over the heated zones
 							int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
 							PreDefTableEntry( pdchS62zhdAlN, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
@@ -6708,7 +6706,7 @@ namespace SimAirServingZones {
 							PreDefTableEntry( pdchS62zhdEp, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg, 3 ); //Ep
 						}
 					} else {
-						for ( ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) { // if no heated zone loop over the cooled zones
+						for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum ) { // if no heated zone loop over the cooled zones
 							int CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
 							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
 							PreDefTableEntry( pdchS62zhdAlN, TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneName, AirToZoneNodeInfo( AirLoopNum ).AirLoopName ); //Air loop name
