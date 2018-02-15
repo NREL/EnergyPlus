@@ -243,6 +243,7 @@ namespace DataGlobalConstants {
 	extern int const iGeneratorMicroCHP;
 	extern int const iGeneratorMicroturbine;
 	extern int const iGeneratorWindTurbine;
+	extern int const iGeneratorPVWatts;
 
 	extern int const iEvapCoolerDirectCELDEKPAD;
 	extern int const iEvapCoolerInDirectCELDEKPAD;
