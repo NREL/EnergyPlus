@@ -81,6 +81,14 @@ class DCtoACInverter
 
 public: // Methods
 
+	enum class InverterModelType : int {
+		notYetSet,
+		cECLookUpTableModel,
+		curveFuncOfPower,
+		simpleConstantEff,
+		pvWatts,
+	};
+
 	// Constructor
 	DCtoACInverter( std::string const & objectName );
 
@@ -92,6 +100,12 @@ public: // Methods
 
 	void
 	reinitZoneGainsAtBeginEnvironment();
+
+	void
+	setPVWattsDCCapacity( Real64 const dcCapacity );
+
+	Real64
+	pvWattsDCCapacity();
 
 	Real64
 	thermLossRate() const;
@@ -105,6 +119,8 @@ public: // Methods
 	Real64
 	aCEnergyOut() const;
 
+	InverterModelType modelType() const;
+
 	std::string const &
 	name() const;
 
@@ -114,13 +130,6 @@ private: //Methods
 	calcEfficiency();
 
 private: // data
-
-	enum class InverterModelType : int {
-		notYetSet,
-		cECLookUpTableModel,
-		curveFuncOfPower,
-		simpleConstantEff
-	};
 
 	std::string name_; // user identifier
 	Real64 aCPowerOut_;
@@ -151,6 +160,8 @@ private: // data
 	Real64 minEfficiency_;
 	Real64 maxEfficiency_;
 	Real64 standbyPower_;
+	Real64 pvWattsDCtoACSizeRatio_;
+	Real64 pvWattsInverterEfficiency_;
 
 }; //DCtoACInverter
 
@@ -558,7 +569,8 @@ public: // data // might make this class a friend of ElectPowerLoadCenter?
 		fuelCell,
 		microCHP,
 		microturbine,
-		windTurbine
+		windTurbine,
+		pvWatts,
 	};
 
 	std::string name; // user identifier
