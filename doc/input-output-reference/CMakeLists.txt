@@ -126,6 +126,8 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/ZoneComponentMatrix.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/calculation-of-dtop-for-a-shading-device-collage.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/three-cases-for-the-dtop-calculation-for-an-indoor-outdoor-shade-collage.png
+  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/hybrid001.jpg
+  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/hybrid002.jpg
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image001.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image002.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image003.png
