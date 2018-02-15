@@ -242,6 +242,8 @@ namespace ThermalComfort {
 	Real64 TotalAnyZoneNotMetCoolingOccupied( 0.0 );
 	Real64 TotalAnyZoneNotMetOccupied( 0.0 );
 	Array1D< Real64 > ZoneOccHrs;
+	bool useEpwData( false );
+	Array1D< Real64 > DailyAveOutTemp( 30, 0.0 );
 
 	// Subroutine Specifications for the Thermal Comfort module
 
@@ -2437,7 +2439,6 @@ namespace ThermalComfort {
 		bool statFileExists;
 		bool epwFileExists;
 		static bool useStatData( false );
-		static bool useEpwData( false );
 		int readStat;
 		int jStartDay;
 		int calcStartDay;
@@ -2488,6 +2489,7 @@ namespace ThermalComfort {
 				}
 				useStatData = true;
 			} else if ( epwFileExists ) {
+				DailyAveOutTemp = 0.0;
 				epwFile = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, DataStringGlobals::inputWeatherFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
@@ -2498,7 +2500,7 @@ namespace ThermalComfort {
 				}
 				jStartDay = DayOfYear - 1;
 				calcStartDay = jStartDay - 30;
-				if ( calcStartDay > 0 ) {
+				if ( calcStartDay >= 0 ) {
 					calcStartHr = 24 * calcStartDay + 1;
 					for ( i = 1; i <= calcStartHr - 1; ++i ) {
 						{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
@@ -2515,7 +2517,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
-						if ( i < 30 ) runningAverageASH = runningAverageASH + avgDryBulbASH / 29.0;
+						DailyAveOutTemp( i ) = avgDryBulbASH;
 					}
 				} else { // Do special things for wrapping the epw
 					calcEndDay = jStartDay;
@@ -2534,7 +2536,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
-						if ( calcEndDay > 1 ) runningAverageASH = runningAverageASH + avgDryBulbASH / ( calcEndDay - 1 );
+						DailyAveOutTemp( i + 30 - calcEndDay ) = avgDryBulbASH;
 					}
 					for ( i = calcEndHr + 1; i <= calcStartHr - 1; ++i ) {
 						{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
@@ -2551,11 +2553,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
-						if ( calcEndDay == 0 ) {
-							if (i < 30 ) runningAverageASH = runningAverageASH + avgDryBulbASH / ( 30 - calcEndDay - 1 );
-						} else {
-							runningAverageASH = runningAverageASH + avgDryBulbASH / ( 30 - calcEndDay );
-						}
+						DailyAveOutTemp( i ) = avgDryBulbASH;
 					}
 				}
 				gio::close( epwFile );
@@ -2571,7 +2569,15 @@ namespace ThermalComfort {
 
 		if ( BeginDayFlag && useEpwData ) {
 			// Update the running average, reset the daily avg
-			runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
+			DailyAveOutTemp( 30 ) = avgDryBulbASH;
+			Real64 sum = 0.0;
+			for ( i = 1; i <= 29; i++ ) {
+				sum += DailyAveOutTemp( i );
+			}
+			runningAverageASH = ( sum + avgDryBulbASH ) / 30.0;
+			for ( i = 1; i <= 29; i++ ) {
+				DailyAveOutTemp( i ) = DailyAveOutTemp( i + 1 );
+			}
 			avgDryBulbASH = 0.0;
 		}
 
