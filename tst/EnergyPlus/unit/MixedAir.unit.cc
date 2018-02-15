@@ -4983,12 +4983,12 @@ namespace EnergyPlus {
 			EXPECT_EQ( 18, GetOAMixerReliefNodeNumber( 1 ) );
 
 			//indexes can be found in  OAMixer array for these feild names
-			EXPECT_EQ( 2, GetOAMixerIndex( "SPACE1-1 OA Mixing Box" ) );
-			EXPECT_EQ( 3, GetOAMixerIndex( "SPACE2-1 OA Mixing Box" ) );
-			EXPECT_EQ( 4, GetOAMixerIndex( "SPACE3-1 OA Mixing Box" ) );
-			EXPECT_EQ( 5, GetOAMixerIndex( "SPACE4-1 OA Mixing Box" ) );
-			EXPECT_EQ( 6, GetOAMixerIndex( "SPACE5-1 OA Mixing Box" ) );
-			EXPECT_EQ( 1, GetOAMixerIndex( "DOAS OA Mixing Box" ) );
+			EXPECT_EQ( 1, GetOAMixerIndex( "SPACE1-1 OA Mixing Box" ) );
+			EXPECT_EQ( 2, GetOAMixerIndex( "SPACE2-1 OA Mixing Box" ) );
+			EXPECT_EQ( 3, GetOAMixerIndex( "SPACE3-1 OA Mixing Box" ) );
+			EXPECT_EQ( 4, GetOAMixerIndex( "SPACE4-1 OA Mixing Box" ) );
+			EXPECT_EQ( 5, GetOAMixerIndex( "SPACE5-1 OA Mixing Box" ) );
+			EXPECT_EQ( 6, GetOAMixerIndex( "DOAS OA Mixing Box" ) );
 
 	}
 

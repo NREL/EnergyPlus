@@ -1460,18 +1460,18 @@ TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
 
 	GetLowTempRadiantSystem();
 	EXPECT_EQ( 2, LowTempRadiantSystem::NumOfElecLowTempRadSys );
-	EXPECT_EQ( "EAST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum ).Name );
-	EXPECT_EQ( "WEST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum + 1 ).Name );
+	EXPECT_EQ( "WEST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum ).Name );
+	EXPECT_EQ( "EAST ZONE RADIANT FLOOR", RadSysTypes( RadSysNum + 1 ).Name );
 	EXPECT_EQ( LowTempRadiantSystem::ElectricSystem, RadSysTypes( RadSysNum ).SystemType );
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).ZoneName, "EAST ZONE" );
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfListName, "EAST ZONE SURFACE GROUP" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).ZoneName, "WEST ZONE" );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfListName, "WEST ZONE SURFACE GROUP" );
 	// the 2nd surface list group holds data for 1st elec rad sys (#5958)
 	EXPECT_EQ( DataSurfaceLists::SurfList( 2 ).Name, "WEST ZONE SURFACE GROUP" );
 	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).NumOfSurfaces, 2 );
 	// surface ptr's are not set correctly when elec rad sys "index" (e.g., ElecRadSys(N)) is not the same as surface group "index"
 	// #5958 fixes this issue
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 1 ), 3 );
-	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 2 ), 4 );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 1 ), 1 );
+	EXPECT_EQ( LowTempRadiantSystem::ElecRadSys( 1 ).SurfacePtr( 2 ), 2 );
 
 }
 

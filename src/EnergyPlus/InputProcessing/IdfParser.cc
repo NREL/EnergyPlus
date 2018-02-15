@@ -216,10 +216,10 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 					obj.erase( name_iter );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
 						// hacky but needed to warn if there are duplicate names in parsed IDF
-						if ( obj_name != "RunPeriod" ) {
-							warnings.emplace_back( "Duplicate name found. name: \"" + name + "\"" );
+						if ( obj_name == "RunPeriod" ) {
+							name = obj_name + " " + s;
 						} else {
-                            name = s;
+							warnings.emplace_back( "Duplicate name found. name: \"" + name + "\"" );
 						}
 					}
 				}
