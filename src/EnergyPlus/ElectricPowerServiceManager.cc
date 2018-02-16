@@ -1960,15 +1960,11 @@ namespace EnergyPlus {
 			generatorType = GeneratorType::pV;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
 			compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
-<<<<<<< HEAD
-		} else if ( UtilityRoutines::SameString( objectType, "Generator:FuelCell" ) ) {
-=======
-		} else if ( InputProcessor::SameString( objectType, "Generator:PVWatts" ) ) {
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:PVWatts" ) ) {
 				generatorType = GeneratorType::pvWatts;
 				compGenTypeOf_Num = DataGlobalConstants::iGeneratorPVWatts;
 				compPlantTypeOf_Num = DataPlant::TypeOf_Other;
-		} else if ( InputProcessor::SameString( objectType, "Generator:FuelCell" ) ) {
->>>>>>> NREL/develop
+		} else if ( UtilityRoutines::SameString( objectType, "Generator:FuelCell" ) ) {
 			generatorType = GeneratorType::fuelCell;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCStackCooler;
@@ -2208,20 +2204,7 @@ namespace EnergyPlus {
 					}
 				}
 
-<<<<<<< HEAD
-			zoneNum_ = UtilityRoutines::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
-			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
-			if ( zoneNum_ == 0 ) {
-				if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
-					heatLossesDestination_ = ThermalLossDestination::lostToOutside;
-				} else {
-					heatLossesDestination_ = ThermalLossDestination::lostToOutside;
-					ShowWarningError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " = " + DataIPShortCuts::cAlphaArgs( 3 ) );
-					ShowContinueError( "Zone name not found. Inverter heat losses will not be added to a zone" );
-					// continue with simulation but inverter losses not sent to a zone.
-=======
-				zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
+				zoneNum_ = UtilityRoutines::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
 				if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 				if ( zoneNum_ == 0 ) {
 					if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
@@ -2233,7 +2216,6 @@ namespace EnergyPlus {
 						ShowContinueError( "Zone name not found. Inverter heat losses will not be added to a zone" );
 						// continue with simulation but inverter losses not sent to a zone.
 					}
->>>>>>> NREL/develop
 				}
 				zoneRadFract_ = DataIPShortCuts::rNumericArgs( 1 );
 			}
@@ -2467,8 +2449,6 @@ namespace EnergyPlus {
 
 				break;
 			}
-<<<<<<< HEAD
-=======
 			case InverterModelType::pvWatts: {
 				Real64 const etaref = 0.9637;
 				Real64 const A = -0.0162;
@@ -2492,7 +2472,6 @@ namespace EnergyPlus {
 				}
 				break;
 			}
->>>>>>> NREL/develop
 			case InverterModelType::simpleConstantEff:
 			case InverterModelType::notYetSet: {
 				// do nothing
