@@ -132,6 +132,8 @@ namespace DataZoneControls {
 		std::string DehumidifyingSched; // Name of the schedule to determine the zone dehumidifying setpoint
 		int DehumidifyingSchedIndex; // Index for dehumidifying schedule
 		Real64 DeltaTCutSet; // Temperature difference between cutout and setpoint
+		bool CoolOffFlag; // For cooling system off with DeltaTCutSet > 0
+		bool HeatOffFlag; // For heating system off with DeltaTCutSet > 0
 
 		// Default Constructor
 		ZoneTempControls() :
@@ -162,7 +164,9 @@ namespace DataZoneControls {
 			ZoneOvercoolRangeSchedIndex( 0 ),
 			ZoneOvercoolControlRatio( 0.0 ),
 			DehumidifyingSchedIndex( 0 ),
-			DeltaTCutSet( 0 )
+			DeltaTCutSet( 0 ),
+			CoolOffFlag( false ),
+			HeatOffFlag( false )
 		{}
 
 	};

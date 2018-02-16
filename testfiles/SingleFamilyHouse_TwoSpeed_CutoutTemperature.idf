@@ -2,12 +2,12 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! SingleFamilyHouse_TwoSpeed_CutoffTemperature.idf
+! SingleFamilyHouse_TwoSpeed_CutoutTemperature.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
 ! Highlights:             This file does the basic test of an air distribution system in a residetial home.
 !                         A two speed heat pump with a supplmental gas heater provides space heating and cooling.
-!                         It provides temperature difference between cutoff and setpoint.
+!                         It provides temperature difference between cutout and setpoint.
 !
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,

@@ -1287,6 +1287,12 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 
 	CalcZoneAirTempSetPoints( );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).HeatOffFlag );
+
+	MAT( 1 ) = 23.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
 
 	// SingleCoolingSetPoint
 	Schedule( 1 ).CurrentValue = 2;
@@ -1298,7 +1304,13 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 	MAT( 1 ) = 25.0;
 
 	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	MAT( 1 ) = 27.0;
+	CalcZoneAirTempSetPoints( );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).CoolOffFlag );
 
 	// SingleHeatCoolSetPoint
 	Schedule( 1 ).CurrentValue = 3;
@@ -1326,13 +1338,25 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 
 	CalcZoneAirTempSetPoints( );
 	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
-	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
 
 	// DualSetPointWithDeadBand : Adjust heating setpoint
-	MAT( 1 ) = 22.0;
+	MAT( 1 ) = 21.0;
 	CalcZoneAirTempSetPoints( );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
 	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	// DualSetPointWithDeadBand : Adjust cooling setpoint
+	MAT( 1 ) = 27.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_FALSE( TempControlledZone( 1 ).CoolOffFlag );
 
 	TempControlledZone( 1 ).DeltaTCutSet = 0.0;
 	MAT.deallocate( );
