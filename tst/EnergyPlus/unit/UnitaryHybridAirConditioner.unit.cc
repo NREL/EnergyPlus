@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -148,7 +149,7 @@ namespace EnergyPlus {
 
 	TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest) {
 		using namespace InputProcessor;
-		std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/datasets/UnitaryHybridUnitTest_MuntersEPX5000.idf");
+		std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "tst/EnergyPlus/unit/UnitaryHybridUnitTest_MuntersEPX5000.idf");
 		std::string string = delimited_string(snippet);
 		ASSERT_FALSE(process_idf(string));
 		// setup environment
@@ -338,7 +339,7 @@ namespace EnergyPlus {
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
 		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
 		pZoneHybridUnitaryAirConditioner->SecInletTemp = 150;
-		pZoneHybridUnitaryAirConditioner->SecInletHumRat = 0;
+		pZoneHybridUnitaryAirConditioner->SecInletHumRat = 0; 
 		
 		pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
