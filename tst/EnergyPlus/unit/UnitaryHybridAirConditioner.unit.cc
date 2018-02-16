@@ -170,8 +170,6 @@ namespace EnergyPlus {
 		DataGlobals::WarmupFlag = false;
 		DataEnvironment::DayOfYear_Schedule = JulianDay(Month, DayOfMonth, 1);
 		ScheduleManager::UpdateScheduleValues();
-		Real64 SysMassFlow(0.0); // System supply mass flow rate [kg/s]
-		Real64 OAMassFlow(0.0); // OA mass flow rate [kg/s]
 								// Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
 		DataHeatBalance::Zone(1).FloorArea = 232.26;
 		DataEnvironment::StdRhoAir = 1.225;
@@ -180,9 +178,6 @@ namespace EnergyPlus {
 		SizingManager::GetOARequirements();
 		GetOAControllerInputs();
 		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-		bool UseOccSchFlag = true;
-		bool UseMinOASchFlag = true;
-		int OARequirementsPtr = 1;
 
 		//Setup performnace tables
 		CurveManager::GetCurveInputData(ErrorsFound);
@@ -201,16 +196,14 @@ namespace EnergyPlus {
 		InitZoneHybridUnitaryAirConditioners(1, 1);
 		Model * pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
 		// setup local variables for model inputs
-		Real64  Tosa, Tra, Wra, Wosa, RHosa, RHra, RequestedLoad, DesignMinVR, Requestedheating, RequestedCooling, Requested_Humidification, Requested_Dehumidification;
+		Real64  Tosa, Tra, Wra, Wosa, RHosa, RHra, DesignMinVR, Requestedheating, RequestedCooling, Requested_Humidification, Requested_Dehumidification;
 		RHosa = 0;
 		std::string TimeDate;
 		int modenumber = 0;
 		Real64 MsaRatio, OSAF;
 		MsaRatio = OSAF = 1;
-		int lineN = 0;
 
 		Requestedheating = RequestedCooling = Requested_Humidification = Requested_Dehumidification = 0;
-		Real64 NormalizationReference = 3.0176;
 
 		// Scenario 1: Hi Cooling
 
@@ -298,7 +291,6 @@ namespace EnergyPlus {
 		Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
 		Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
 		//double Msa_setting0= (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Supply_Air_Mass_Flow_Rate);
-		double RTF_0 = (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Runtime_Fraction);
 		Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
 		ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
 		deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
