@@ -3714,10 +3714,15 @@ namespace SizingManager {
 
 			// Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
 			thisTUFZSizing = thisFZSizing;
+			thisTUFZSizing.ADUName = thisTUSizing.ADUName;
 
 			if( DataSizing::NumAirTerminalSizingSpec > 0 ) {
 				// Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
 				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
+				// Outdoor air
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+				Real64 minOACoolMassFlow = thisTUFZSizing.MinOA * thisFZSizing.DesCoolDens;
+				Real64 minOAHeatMassFlow = thisTUFZSizing.MinOA * thisFZSizing.DesHeatDens;
 				// Cooling
 				Real64 coolFlowRatio = 1.0;
 				if ( thisTUSizing.SpecDesCoolSATRatio > 0.0 ) {
@@ -3733,11 +3738,16 @@ namespace SizingManager {
 				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
 				// Adjust DesCoolVolFlow, DesCoolMassFlow, and CoolFlowSeq with cooling frac, SAT ratio, and minOA frac adjustments
 				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlowNoOA * coolFlowRatio + ( thisFZSizing.DesCoolVolFlow - thisFZSizing.DesCoolVolFlowNoOA ) * minOAFrac;
+				thisTUFZSizing.DesCoolVolFlow = max( thisTUFZSizing.DesCoolVolFlow, thisTUFZSizing.MinOA );
 				thisTUFZSizing.DesCoolVolFlowNoOA = thisFZSizing.DesCoolVolFlowNoOA * coolFlowRatio;
-				thisTUFZSizing.DesCoolMassFlow = thisFZSizing.DesCoolMassFlowNoOA * coolFlowRatio + ( thisFZSizing.DesCoolMassFlow - thisFZSizing.DesCoolMassFlowNoOA ) * minOAFrac;
-				thisTUFZSizing.DesCoolMassFlowNoOA = thisFZSizing.DesCoolMassFlowNoOA * coolFlowRatio;
-				thisTUFZSizing.CoolFlowSeq = thisFZSizing.CoolFlowSeqNoOA * coolFlowRatio + ( thisFZSizing.CoolFlowSeq - thisFZSizing.CoolFlowSeqNoOA ) * minOAFrac;
-				thisTUFZSizing.CoolFlowSeqNoOA = thisFZSizing.CoolFlowSeqNoOA * coolFlowRatio;
+				thisTUFZSizing.DesCoolMassFlow = thisTUFZSizing.DesCoolVolFlow * thisFZSizing.DesCoolDens;
+				thisTUFZSizing.DesCoolMassFlow = max( thisTUFZSizing.DesCoolMassFlow, minOACoolMassFlow );
+				thisTUFZSizing.DesCoolMassFlowNoOA = thisTUFZSizing.DesCoolVolFlowNoOA * thisFZSizing.DesCoolDens;
+				for ( int timeIndex = 1; timeIndex <= ( DataGlobals::NumOfTimeStepInHour * 24 ); ++timeIndex) {
+					thisTUFZSizing.CoolFlowSeq( timeIndex ) = thisFZSizing.CoolFlowSeqNoOA( timeIndex ) * coolFlowRatio + ( thisFZSizing.CoolFlowSeq( timeIndex ) - thisFZSizing.CoolFlowSeqNoOA( timeIndex ) ) * minOAFrac;
+					thisTUFZSizing.CoolFlowSeq( timeIndex ) = max( thisTUFZSizing.CoolFlowSeq( timeIndex ), minOACoolMassFlow );
+					thisTUFZSizing.CoolFlowSeqNoOA( timeIndex ) = thisFZSizing.CoolFlowSeqNoOA( timeIndex ) * coolFlowRatio;
+				}
 				// Adjust for possible MinOA impact on DesCoolVolFlowMin, with cooling frac adjustment but no SAT adjustment
 				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * thisTUSizing.SpecDesSensCoolingFrac; // no SAT adjustment, this is a straight flow rate input
 				thisTUFZSizing.DesCoolMinAirFlow2 = thisFZSizing.DesCoolMinAirFlow2 * thisTUSizing.SpecDesSensCoolingFrac; // no SAT adjustment, this is based on area
@@ -3758,28 +3768,31 @@ namespace SizingManager {
 				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
 				// Adjust DesHeatVolFlow, DesHeatMassFlow, and HeatFlowSeq with Heating frac, SAT ratio, and minOA frac adjustments
 				thisTUFZSizing.DesHeatVolFlow = thisFZSizing.DesHeatVolFlowNoOA * heatFlowRatio + ( thisFZSizing.DesHeatVolFlow - thisFZSizing.DesHeatVolFlowNoOA ) * minOAFrac;
+				thisTUFZSizing.DesHeatVolFlow = max( thisTUFZSizing.DesHeatVolFlow, thisTUFZSizing.MinOA );
 				thisTUFZSizing.DesHeatVolFlowNoOA = thisFZSizing.DesHeatVolFlowNoOA * heatFlowRatio;
-				thisTUFZSizing.DesHeatMassFlow = thisFZSizing.DesHeatMassFlowNoOA * heatFlowRatio + ( thisFZSizing.DesHeatMassFlow - thisFZSizing.DesHeatMassFlowNoOA ) * minOAFrac;
-				thisTUFZSizing.DesHeatMassFlowNoOA = thisFZSizing.DesHeatMassFlowNoOA * heatFlowRatio;
-				thisTUFZSizing.HeatFlowSeq = thisFZSizing.HeatFlowSeqNoOA * heatFlowRatio + ( thisFZSizing.HeatFlowSeq - thisFZSizing.HeatFlowSeqNoOA ) * minOAFrac;
-				thisTUFZSizing.HeatFlowSeqNoOA = thisFZSizing.HeatFlowSeqNoOA * heatFlowRatio;
+				thisTUFZSizing.DesHeatMassFlow = thisTUFZSizing.DesHeatVolFlow * thisFZSizing.DesHeatDens;
+				thisTUFZSizing.DesHeatMassFlow = max( thisTUFZSizing.DesHeatMassFlow, minOAHeatMassFlow );
+				thisTUFZSizing.DesHeatMassFlowNoOA = thisTUFZSizing.DesHeatVolFlowNoOA * thisFZSizing.DesHeatDens;
+				for ( int timeIndex = 1; timeIndex <= ( DataGlobals::NumOfTimeStepInHour * 24 ); ++timeIndex) {
+					thisTUFZSizing.HeatFlowSeq( timeIndex ) = thisFZSizing.HeatFlowSeqNoOA( timeIndex ) * heatFlowRatio + ( thisFZSizing.HeatFlowSeq( timeIndex ) - thisFZSizing.HeatFlowSeqNoOA( timeIndex ) ) * minOAFrac;
+					thisTUFZSizing.HeatFlowSeq( timeIndex ) = max( thisTUFZSizing.HeatFlowSeq( timeIndex ), minOAHeatMassFlow );
+					thisTUFZSizing.HeatFlowSeqNoOA( timeIndex ) = thisFZSizing.HeatFlowSeqNoOA( timeIndex ) * heatFlowRatio;
+				}
 				// DesHeatVolFlowMax is a mixed bag, so just repeat the original comparison from UpdateZoneSizing using the new flows
 				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * thisTUSizing.SpecDesSensHeatingFrac; // no SAT adjustment, this is a straight flow rate input
 				thisTUFZSizing.DesHeatMaxAirFlow2 = thisFZSizing.DesHeatMaxAirFlow2 * thisTUSizing.SpecDesSensHeatingFrac; // no SAT adjustment, this is based on area
 				thisTUFZSizing.DesHeatVolFlowMax = max( thisTUFZSizing.DesHeatMaxAirFlow, thisTUFZSizing.DesHeatMaxAirFlow2, max( thisTUFZSizing.DesCoolVolFlow, thisTUFZSizing.DesHeatVolFlow ) * thisTUFZSizing.DesHeatMaxAirFlowFrac );
-				// Outdoor air
-				if ( coolFlowRatio > 0.0 ) {
-					thisTUFZSizing.DesCoolOAFlowFrac = min( thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0 );
+				// Outdoor air fractions
+				if (thisTUFZSizing.DesCoolVolFlow > 0.0 ) {
+					thisTUFZSizing.DesCoolOAFlowFrac = min( thisFZSizing.MinOA / thisTUFZSizing.DesCoolVolFlow, 1.0 );
 				} else {
 					thisTUFZSizing.DesCoolOAFlowFrac = 0.0;
 				}
-				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
-				if ( heatFlowRatio > 0.0 ) {
-					thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				if ( thisTUFZSizing.DesHeatVolFlow > 0.0 ) {
+					thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.MinOA / thisTUFZSizing.DesHeatVolFlow, 1.0 );
 				} else {
 					thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
 				}
-				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
 			}
 		}
 	}

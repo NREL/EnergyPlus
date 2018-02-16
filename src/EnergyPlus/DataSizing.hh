@@ -405,6 +405,7 @@ namespace DataSizing {
 	{
 		// Members
 		std::string ZoneName; // name of a zone
+		std::string ADUName; // Terminal Unit Name (air distribution unit or direct air unit) - only assigned for TermUnitFinalZoneSizing
 		std::string CoolDesDay; // name of a cooling design day
 		std::string HeatDesDay; // name of a heating design day
 		int ZnCoolDgnSAMethod; // choice of how to get zone cooling design air temperature;
@@ -735,6 +736,7 @@ namespace DataSizing {
 	{
 		// Members
 		int CtrlZoneNum; // Controlled zone number (index to FinalZoneSizing, etc.)
+		std::string ADUName; // Terminal Unit Name (air distribution unit or direct air unit)
 		Real64 AirVolFlow; // design air vol flow rate for single duct terminal unit [m3/s]
 		Real64 MaxHWVolFlow; // design Hot Water vol flow for single duct terminal unit [m3/s]
 		Real64 MaxSTVolFlow; // design Steam vol flow rate for single duct terminal unit [m3/s]

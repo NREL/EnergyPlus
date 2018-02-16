@@ -221,9 +221,12 @@ namespace ZoneAirLoopEquipmentManager {
 			}
 		}
 		DataSizing::CurTermUnitSizingNum = AirDistUnit( AirDistUnitNum ).TermUnitSizingNum;
-		InitZoneAirLoopEquipment( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
+		InitZoneAirLoopEquipmentTimeStep( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
+
+		// Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been matched to zone euqip config nodes
+		InitZoneAirLoopEquipment( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
 
 		//  CALL RecordZoneAirLoopEquipment
 
@@ -534,9 +537,10 @@ namespace ZoneAirLoopEquipmentManager {
 			}}
 
 			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
+			{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisADU.TermUnitSizingNum ) );
+			thisTermUnitSizingData.ADUName = thisADU.Name;
 			if ( thisADU.AirTerminalSizingSpecIndex > 0 ) {
 				{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( thisADU.AirTerminalSizingSpecIndex ) );
-				{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisADU.TermUnitSizingNum ) );
 				thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 				thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
 				thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
@@ -545,7 +549,15 @@ namespace ZoneAirLoopEquipmentManager {
 			}}}}
 			EachOnceFlag( AirDistUnitNum ) = false;
 		}
+	}
 
+	void
+	InitZoneAirLoopEquipmentTimeStep(
+		int const AirDistUnitNum,
+		int const ControlledZoneNum,
+		int const ActualZoneNum
+	)
+	{
 		// every time step
 		AirDistUnit( AirDistUnitNum ).MassFlowRateDnStrLk = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateUpStrLk = 0.0;
