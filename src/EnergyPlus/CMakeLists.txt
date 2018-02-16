@@ -430,6 +430,10 @@ SET( SRC
   Pumps.hh
   PurchasedAirManager.cc
   PurchasedAirManager.hh
+  PVWatts.cc
+  PVWatts.hh
+  PVWattsSSC.cc
+  PVWattsSSC.hh
   RefrigeratedCase.cc
   RefrigeratedCase.hh
   ReportCoilSelection.cc
