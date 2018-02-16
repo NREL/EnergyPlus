@@ -5977,8 +5977,9 @@ Label999: ;
 	double GetNormalPoint(int const CurveIndex)
 	{
 
-		if (CurveIndex > 0 && CurveIndex <= NumCurves) {
-			return TableData(CurveIndex).NormalPoint;
+		if ( CurveIndex > 0 && CurveIndex <= NumCurves && PerfCurve( CurveIndex ).TableIndex > 0 ) {
+			const int tableIndex = PerfCurve( CurveIndex ).TableIndex;
+			return TableData(tableIndex).NormalPoint;
 		}
 		else {
 			std::string s = std::to_string(CurveIndex);
