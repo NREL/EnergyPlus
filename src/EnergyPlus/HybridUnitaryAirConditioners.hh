@@ -66,7 +66,7 @@ namespace EnergyPlus {
 		 
 		// MODULE PARAMETER DEFINITIONS
 		void SimZoneHybridUnitaryAirConditioners(
-				std::string const & CompName, // name of the packaged terminal heat pump
+				std::string const & CompName, // name of the packaged terminal heat pump 
 				int const ZoneNum, // number of zone being served
 				Real64 & SensibleOutputProvided, // sensible capacity delivered to zone
 				Real64 & LatentOutputProvided, // Latent add/removal  (kg/s), dehumid = negative
@@ -88,8 +88,6 @@ namespace EnergyPlus {
 				);
 
 		void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
-		double Sat_press(double Tdb);
-		double Part_press(double P, double W); 
 
 	}
 }

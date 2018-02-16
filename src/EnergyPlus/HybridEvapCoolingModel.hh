@@ -89,7 +89,6 @@ namespace EnergyPlus {
 			CMode();
 			
 			//finish init above
-			~CMode() {};                  // destructor
 			int ModeID;
 			CModeSolutionSpace sol;
 			std::string ModeName;
@@ -125,7 +124,6 @@ namespace EnergyPlus {
 			int MODE1_BLOCK_OFFSET_Number;
 			int MODE_BLOCK_OFFSET_Number;
 			int BLOCK_HEADER_OFFSET_Number;
-
 			bool ValidPointer(int curve_pointer);
 			bool ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
 			bool ParseMode(int ModeCounter, std::vector<CMode>* OperatingModes, Real64 correction, Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
@@ -141,6 +139,7 @@ namespace EnergyPlus {
 			bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max); 
 			bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
 			bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
+			bool CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject); 
 		private:
 		
 		};
@@ -198,7 +197,6 @@ namespace EnergyPlus {
 		{
 		public:                    // begin public section
 			Model();
-			~Model() {};                  // destructor
 	
 			// Default Constructor
 			std::string Name; // user identifier
@@ -302,6 +300,7 @@ namespace EnergyPlus {
 			Real64 Wsa;
 			Real64 SupplyVentilationAir;
 			Real64 SupplyVentilationVolume;
+			Real64 ModelNormalizationReference;
 		
 			bool OutdoorAir;
 			Real64 MinOA_Msa;
@@ -326,8 +325,7 @@ namespace EnergyPlus {
 			CSetting OptimalSetting;
 			CSetting oStandBy;
 
-			//std::list <std::shared_ptr< CSetting >> Settings;
-			std::list <CSetting> Settings;
+			std::vector<CSetting> Settings;
 			//methods
 			int CurrentPrimaryMode();
 			Real64 CurrentPrimaryRuntimeFraction();

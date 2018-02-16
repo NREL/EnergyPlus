@@ -356,7 +356,6 @@ namespace EnergyPlus {
 			{
 				DesignMinVRMassFlow = DesignMinVR *  1.225;
 			}
-			//ZoneHybridUnitaryAirConditioner(UnitNum).doStep(EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
 			ZoneHybridUnitaryAirConditioner(UnitNum).doStep( ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
 			SensibleOutputProvided = ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut;
 			LatentOutputProvided = ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOut;
@@ -378,9 +377,9 @@ namespace EnergyPlus {
 			// 
 
 			// REFERENCES:
-			// na
+			// na 
 
-			// Using/Aliasing
+			// Using/Aliasing 
 			using namespace DataLoopNode;
 			using namespace Psychrometrics;
 			ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode = ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode;
@@ -471,9 +470,9 @@ namespace EnergyPlus {
 					IsBlank = false;
 					VerifyName(Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
 
-						//A1, \field Name
+					//A1, \field Name
 					ZoneHybridUnitaryAirConditioner(UnitLoop).Name = Alphas(1);
-						//A2, \field Availability Schedule Name
+					//A2, \field Availability Schedule Name
 					ZoneHybridUnitaryAirConditioner(UnitLoop).Schedule = Alphas(2);
 					if (lAlphaFieldBlanks(2)) {
 						ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = ScheduleAlwaysOn;
@@ -486,16 +485,16 @@ namespace EnergyPlus {
 							ErrorsFound = true;
 						}
 					}
-						//A3, \field Availability Manager List Name
+					//A3, \field Availability Manager List Name
 		
-						//A4, \field Minimum Supply Air Temperature Schedule Named
+					//A4, \field Minimum Supply Air Temperature Schedule Named
 					ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(Alphas(4));
 					if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer == 0) {
 						ShowSevereError("Invalid " + cAlphaFields(4) + '=' + Alphas(4));
 						ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
 						ErrorsFound = true;
 					}
-						//A5, \field Maximum Supply Air Temperature Schedule Name
+					//A5, \field Maximum Supply Air Temperature Schedule Name
 					ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer = GetScheduleIndex(Alphas(5));
 					if (ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMax_schedule_pointer == 0) {
 						ShowSevereError("Invalid " + cAlphaFields(5) + '=' + Alphas(5));
