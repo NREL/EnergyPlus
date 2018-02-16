@@ -72,6 +72,7 @@
 #include <ICEngineElectricGenerator.hh>
 #include <CTElectricGenerator.hh>
 #include <Photovoltaics.hh>
+#include <PVWatts.hh>
 #include <FuelCellElectricGenerator.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <MicroturbineElectricGenerator.hh>
@@ -882,6 +883,26 @@ namespace EnergyPlus {
 		if ( ! errorsFound && inverterPresent ) {
 			// call inverter constructor
 			inverterObj = std::unique_ptr< DCtoACInverter >  ( new DCtoACInverter( inverterName ) ) ;
+
+			// Make sure only Generator::PVWatts are used with Inverter:PVWatts
+			// Add up the total DC capacity and pass it to the inverter.
+			if ( inverterObj->modelType() == DCtoACInverter::InverterModelType::pvWatts ) {
+				Real64 totalDCCapacity = 0.0;
+				for ( const auto &generatorController : elecGenCntrlObj ) {
+					if ( generatorController->generatorType != GeneratorController::GeneratorType::pvWatts ) {
+						errorsFound = true;
+						ShowSevereError(routineName + "ElectricLoadCenter:Distribution=\"" + name_ + "\",");
+						ShowContinueError("ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
+						ShowContinueError("\"" + generatorController->name + "\" is of type " + generatorController->typeOfName);
+					} else {
+						PVWatts::PVWattsGenerator& pvwGen = PVWatts::GetOrCreatePVWattsGenerator(generatorController->name);
+						totalDCCapacity += pvwGen.getDCSystemCapacity();
+					}
+				}
+				if ( !errorsFound ) {
+					inverterObj->setPVWattsDCCapacity(totalDCCapacity);
+				}
+			}
 		}
 
 		if ( ! errorsFound && storagePresent_ ) {
@@ -1939,7 +1960,15 @@ namespace EnergyPlus {
 			generatorType = GeneratorType::pV;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
 			compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
+<<<<<<< HEAD
 		} else if ( UtilityRoutines::SameString( objectType, "Generator:FuelCell" ) ) {
+=======
+		} else if ( InputProcessor::SameString( objectType, "Generator:PVWatts" ) ) {
+				generatorType = GeneratorType::pvWatts;
+				compGenTypeOf_Num = DataGlobalConstants::iGeneratorPVWatts;
+				compPlantTypeOf_Num = DataPlant::TypeOf_Other;
+		} else if ( InputProcessor::SameString( objectType, "Generator:FuelCell" ) ) {
+>>>>>>> NREL/develop
 			generatorType = GeneratorType::fuelCell;
 			compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
 			compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCStackCooler;
@@ -2022,6 +2051,14 @@ namespace EnergyPlus {
 		case GeneratorType::pV: {
 			Photovoltaics::SimPVGenerator( DataGlobalConstants::iGeneratorPV, name, generatorIndex, runFlag, myElecLoadRequest );
 			Photovoltaics::GetPVGeneratorResults( DataGlobalConstants::iGeneratorPV, generatorIndex, dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd );
+			electricPowerOutput = dCElectProdRate;
+			thermalPowerOutput = thermProdRate;
+			break;
+		}
+		case GeneratorType::pvWatts: {
+			PVWatts::PVWattsGenerator &pvwattsGenerator(PVWatts::GetOrCreatePVWattsGenerator(name));
+			pvwattsGenerator.calc();
+			pvwattsGenerator.getResults( dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd );
 			electricPowerOutput = dCElectProdRate;
 			thermalPowerOutput = thermProdRate;
 			break;
@@ -2139,25 +2176,39 @@ namespace EnergyPlus {
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:Simple";
 			modelType_ = InverterModelType::simpleConstantEff;
 		}
+		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:PVWatts", objectName );
+		if ( testInvertIndex > 0 ) {
+			foundInverter = true;
+			invertIDFObjectNum = testInvertIndex;
+			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:PVWatts";
+			modelType_ = InverterModelType::pvWatts;
+		}
 
 		if ( foundInverter ){
 
 			inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, invertIDFObjectNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames  );
 
-			name_          = DataIPShortCuts::cAlphaArgs( 1 );
+			name_ = DataIPShortCuts::cAlphaArgs( 1 );
 			// how to verify names are unique across objects? add to GlobalNames?
 
-			if ( DataIPShortCuts::lAlphaFieldBlanks( 2 ) ) {
+			if ( modelType_ == InverterModelType::pvWatts ) {
 				availSchedPtr_ = DataGlobals::ScheduleAlwaysOn;
+				zoneNum_ = 0;
+				heatLossesDestination_ = ThermalLossDestination::lostToOutside;
+				zoneRadFract_ = 0;
 			} else {
-				availSchedPtr_ = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
-				if ( availSchedPtr_ == 0 ) {
-					ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
-					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 2 ) + " = " + DataIPShortCuts::cAlphaArgs( 2 ) );
-					errorsFound = true;
+				if ( DataIPShortCuts::lAlphaFieldBlanks( 2 ) ) {
+					availSchedPtr_ = DataGlobals::ScheduleAlwaysOn;
+				} else {
+					availSchedPtr_ = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 2 ) );
+					if ( availSchedPtr_ == 0 ) {
+						ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 2 ) + " = " + DataIPShortCuts::cAlphaArgs( 2 ) );
+						errorsFound = true;
+					}
 				}
-			}
 
+<<<<<<< HEAD
 			zoneNum_ = UtilityRoutines::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
 			if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 			if ( zoneNum_ == 0 ) {
@@ -2169,9 +2220,23 @@ namespace EnergyPlus {
 					ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " = " + DataIPShortCuts::cAlphaArgs( 3 ) );
 					ShowContinueError( "Zone name not found. Inverter heat losses will not be added to a zone" );
 					// continue with simulation but inverter losses not sent to a zone.
+=======
+				zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 3 ), DataHeatBalance::Zone );
+				if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
+				if ( zoneNum_ == 0 ) {
+					if ( DataIPShortCuts::lAlphaFieldBlanks( 3 ) ) {
+						heatLossesDestination_ = ThermalLossDestination::lostToOutside;
+					} else {
+						heatLossesDestination_ = ThermalLossDestination::lostToOutside;
+						ShowWarningError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+						ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 3 ) + " = " + DataIPShortCuts::cAlphaArgs( 3 ) );
+						ShowContinueError( "Zone name not found. Inverter heat losses will not be added to a zone" );
+						// continue with simulation but inverter losses not sent to a zone.
+					}
+>>>>>>> NREL/develop
 				}
+				zoneRadFract_ = DataIPShortCuts::rNumericArgs( 1 );
 			}
-			zoneRadFract_ = DataIPShortCuts::rNumericArgs( 1 );
 
 			// now the input objects differ depending on class type
 			switch ( modelType_ )
@@ -2214,6 +2279,11 @@ namespace EnergyPlus {
 				// do nothing
 				break;
 			}
+			case InverterModelType::pvWatts: {
+				pvWattsDCtoACSizeRatio_ = DataIPShortCuts::rNumericArgs( 1 );
+				pvWattsInverterEfficiency_ = DataIPShortCuts::rNumericArgs( 2 );
+				break;
+			}
 
 			} // end switch modelType
 
@@ -2248,6 +2318,9 @@ namespace EnergyPlus {
 					// do nothing
 					break;
 				}
+				case InverterModelType::pvWatts: {
+					break;
+				}
 				} // end switch modelType
 			}
 		} else {
@@ -2276,6 +2349,21 @@ namespace EnergyPlus {
 		qdotRadZone_             = 0.0;
 	}
 
+	void
+	DCtoACInverter::setPVWattsDCCapacity(const Real64 dcCapacity)
+	{
+		if ( modelType_ != InverterModelType::pvWatts ) {
+			ShowFatalError("Setting the DC Capacity for the inverter only works with PVWatts Inverters.");
+		}
+		ratedPower_ = dcCapacity / pvWattsDCtoACSizeRatio_;
+	}
+
+	Real64
+	DCtoACInverter::pvWattsDCCapacity()
+	{
+		return ratedPower_ * pvWattsDCtoACSizeRatio_;
+	}
+
 	Real64
 	DCtoACInverter::thermLossRate() const
 	{
@@ -2292,6 +2380,12 @@ namespace EnergyPlus {
 	DCtoACInverter::aCEnergyOut() const
 	{
 		return aCEnergyOut_;
+	}
+
+	DCtoACInverter::InverterModelType
+	DCtoACInverter::modelType() const
+	{
+		return modelType_;
 	}
 
 	std::string const &
@@ -2373,6 +2467,32 @@ namespace EnergyPlus {
 
 				break;
 			}
+<<<<<<< HEAD
+=======
+			case InverterModelType::pvWatts: {
+				Real64 const etaref = 0.9637;
+				Real64 const A = -0.0162;
+				Real64 const B = -0.0059;
+				Real64 const C = 0.9858;
+				Real64 const pdc0 = ratedPower_ / pvWattsInverterEfficiency_;
+				Real64 const plr = dCPowerIn_ / pdc0;
+				Real64 ac = 0;
+
+				if ( plr > 0 ) {
+					// normal operation
+					Real64 eta = (A * plr + B / plr + C) * pvWattsInverterEfficiency_ / etaref;
+					ac = dCPowerIn_ * eta;
+					if ( ac > ratedPower_ ) {
+						// clipping
+						ac = ratedPower_;
+					}
+					efficiency_ = ac / dCPowerIn_;
+				} else {
+					efficiency_ = 0.0;
+				}
+				break;
+			}
+>>>>>>> NREL/develop
 			case InverterModelType::simpleConstantEff:
 			case InverterModelType::notYetSet: {
 				// do nothing

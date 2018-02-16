@@ -182,6 +182,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -404,6 +405,7 @@ namespace EnergyPlus {
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
+		PVWatts::clear_state();
 		ReturnAirPathManager::clear_state();
 		RoomAirModelAirflowNetwork::clear_state();
 		RoomAirModelManager::clear_state();

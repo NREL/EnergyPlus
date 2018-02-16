@@ -109,7 +109,7 @@ namespace ExternalInterface {
 	std::string FMURootWorkingFolder; // FMU root working folder
 
 	// MODULE PARAMETER DEFINITIONS:
-	int const maxVar( 10240000 ); // Maximum number of variables to be exchanged
+	int const maxVar( 100000 ); // Maximum number of variables to be exchanged
 	int const maxErrMsgLength( 10000 ); // Maximum error message length from xml schema validation
 	int const indexSchedule( 1 ); // Index for schedule in inpVarTypes
 	int const indexVariable( 2 ); // Index for variable in inpVarTypes

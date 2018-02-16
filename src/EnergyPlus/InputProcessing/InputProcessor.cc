@@ -394,7 +394,7 @@ namespace EnergyPlus {
 		int adjustedNumber = getJSONObjNum( Object, Number ); // if incoming input is idf, then use idf object order
 
 		auto find_iterators = objectCacheMap.find( Object );
-		auto sorted_iterators = find_iterators;
+		// auto sorted_iterators = find_iterators;
 
 
 		if ( find_iterators == objectCacheMap.end() ) {
@@ -444,7 +444,7 @@ namespace EnergyPlus {
 		auto const & obj = epJSON_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
-		int idfObjCount = obj_val[ "idfOrder"];
+		// int idfObjCount = obj_val[ "idfOrder"];
 		for ( size_t i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_alphas_fields[ i ];
 			if ( field == "name" && schema_name_field != epJSON_schema_it_val.end() ) {
@@ -682,7 +682,7 @@ namespace EnergyPlus {
 	InputProcessor::getIDFObjNum(
 		std::string const & Object,
 		int const Number
-	) 
+	)
 	{
 		// Given the number (index) of an object in JSON order, return it's number in original idf order
 
@@ -716,7 +716,7 @@ namespace EnergyPlus {
 
 		// find matching object number in unsorted list
 		int targetIdfObjNum = idfObjNums[ Number - 1 ];
-		for ( int i = 1; i <= idfObjNums.size(); ++i ) {
+		for ( size_t i = 1; i <= idfObjNums.size(); ++i ) {
 			if (idfObjNumsSorted[ i - 1 ] == targetIdfObjNum ) {
 				idfOrderNumber = i;
 				break;
@@ -729,7 +729,7 @@ namespace EnergyPlus {
 	InputProcessor::getJSONObjNum(
 		std::string const & Object,
 		int const Number
-	) 
+	)
 	{
 		// Given the number (index) of an object in original idf order, return it's number in JSON order
 
@@ -763,7 +763,7 @@ namespace EnergyPlus {
 
 		// find matching object number in unsorted list
 		int targetIdfObjNum = idfObjNumsSorted[ Number - 1 ];
-		for ( int i = 1; i <= idfObjNums.size(); ++i ) {
+		for ( size_t i = 1; i <= idfObjNums.size(); ++i ) {
 			if (idfObjNums[ i - 1 ] == targetIdfObjNum ) {
 				jSONOrderNumber = i;
 				break;

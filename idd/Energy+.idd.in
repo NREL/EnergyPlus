@@ -7104,25 +7104,25 @@ MaterialProperty:PhaseChangeHysteresis,
        \required-field
        \units J/kg-K
        \type real
-       \minimum >0
+       \minimum> 0
   N5 , \field High Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N6 , \field Peak Melting Temperature
        \note The temperature at which the melting curve peaks
        \required-field
        \units C
        \type real
-       \minimum >0
+       \minimum> 0
   N7 , \field Low Temperature Difference of Melting Curve
        \note The total melting range of the material is the sum of low and high temperature difference of melting curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N8 , \field Solid State Thermal Conductivity
        \note The thermal conductivity used by this material when the material is fully solid
        \required-field
@@ -7140,25 +7140,25 @@ MaterialProperty:PhaseChangeHysteresis,
        \required-field
        \units J/kg-K
        \type real
-       \minimum >0
+       \minimum> 0
   N11, \field High Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
   N12, \field Peak Freezing Temperature
        \note The temperature at which the freezing curve peaks
        \required-field
        \units C
        \type real
-       \minimum >0
+       \minimum> 0
   N13; \field Low Temperature Difference of Freezing Curve
        \note The total freezing range of the material is the sum of low and high temperature difference of freezing curve.
        \required-field
        \units deltaC
        \type real
-       \minimum >0
+       \minimum> 0
 
 MaterialProperty:VariableThermalConductivity,
     \memo Additional properties for temperature dependent thermal conductivity
@@ -20461,6 +20461,9 @@ People,
        \minimum 0.0
        \maximum 1.0
        \default 0.3
+       \note This is radiant fraction of the sensible heat released by people in a zone. This value will be 
+       \note multiplied by the total sensible heat released by people yields the amount of long wavelength 
+       \note radiation gain from people in a zone. Default value is 0.30.
   N5,  \field Sensible Heat Fraction
        \note if input, overrides program calculated sensible/latent split
        \autocalculatable
@@ -21706,7 +21709,9 @@ Daylighting:Controls,
        \maximum 0.6
        \default 0.2
   N3,  \field Number of Stepped Control Steps
-       \note for Stepped Lighting Control Type, this field cannot be zero.
+       \note The number of steps, excluding off, in a stepped lighting control system.
+       \note If Lighting Control Type is Stepped, this field must be greater than zero.
+       \note The steps are assumed to be equally spaced.
        \type integer
        \minimum 1
        \default 1
@@ -23689,8 +23694,8 @@ AirflowNetwork:MultiZone:Surface,
   A8, \field Equivalent Rectangle Method
       \type choice
       \key PolygonHeight
-      \Key BaseSurfaceAspectRatio
-      \Key UserDefinedAspectRatio
+      \key BaseSurfaceAspectRatio
+      \key UserDefinedAspectRatio
       \default PolygonHeight
       \note This field is applied to a non-rectangular window or door. The equivalent shape has
       \note the same area as a polygonal window or door.
@@ -44366,7 +44371,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity
-  N11, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N11, \field Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44522,7 +44527,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 2.
-  N24, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N24, \field Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44675,7 +44680,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 3.
-  N37, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N37, \field Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -44823,7 +44828,7 @@ Coil:Cooling:DX:MultiSpeed,
        \note Flow rate corresponding to rated total cooling capacity, rated SHR and rated
        \note COP should be between 0.00004027 m3/s and .00006041 m3/s per watt of rated total
        \note cooling capacity for Speed 4
-  N50, \field Rated Evaporator Fan Power Per Volume Flow Rate
+  N50, \field Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate
        \note Enter the evaporator fan power per air volume flow rate at the rated test conditions.
        \note The test conditions vary external static pressure based on total cooling capacity.
        \note This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the
@@ -63221,12 +63226,12 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
   A1 , \field Name
        \reference-class-name validOASysEquipmentTypes
        \reference validOASysEquipmentNames
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
   A2 , \field Surface Name
        \required-field
        \type object-list
        \object-list AllShadingAndHTSurfNames
-       \reference-class-name validBranchEquipmentTypes
-       \reference validBranchEquipmentNames
   A3 , \field Photovoltaic-Thermal Model Performance Name
        \type object-list
        \object-list FlatPlatePVTParameters
@@ -68977,7 +68982,7 @@ GroundHeatExchanger:Vertical:Properties,
   N1,   \field Depth of Top of Borehole
         \required-field
         \type real
-        \units m-K
+        \units m
         \minimum 0.0
   N2,   \field Borehole Length
         \required-field
@@ -68989,6 +68994,7 @@ GroundHeatExchanger:Vertical:Properties,
         \type real
         \minimum> 0.0
         \units m
+        \ip-units in
   N4,   \field Grout Thermal Conductivity
         \required-field
         \type real
@@ -80534,6 +80540,99 @@ PhotovoltaicPerformance:Sandia,
          \type real
          \units dimensionless
 
+Generator:PVWatts,
+      \min-fields 9
+      \memo Describes a simple set of inputs for an array of photovoltaic (PV) modules as described
+      \memo in the PVWatts software. A series of different PVWatts arrays can be connected to a
+      \memo single electric load center (preferably through an
+      \memo ElectricLoadCenter:Inverter:PVWatts). Array tilt and azimuth can be either specified
+      \memo on this object or taken from a referenced building surface or shading surface. If
+      \memo a surface is specified, the array participates normally in all shading calculations.
+  A1, \field Name
+      \type alpha
+      \required-field
+      \reference GeneratorNames
+  A2, \field PVWatts Version
+      \type choice
+      \key 5
+  N1, \field DC System Capacity
+      \note Nameplate rated DC system capacity in watts
+      \type real
+      \required-field
+      \units W
+      \minimum> 0
+  A3, \field Module Type
+      \type choice
+      \required-field
+      \key Standard
+      \key Premium
+      \key ThinFilm
+  A4, \field Array Type
+      \type choice
+      \required-field
+      \key FixedOpenRack
+      \key FixedRoofMounted
+      \key OneAxis
+      \key OneAxisBacktracking
+      \key TwoAxis
+  N2, \field System Losses
+      \type real
+      \default 0.14
+      \minimum 0
+      \maximum 1
+  A5, \field Array Geometry Type
+      \note TiltAzimuth - The tilt and azimuth angles are specified in the next two fields.
+      \note An unshaded array is assumed.
+      \note Surface - The array geometry (tilt and azimuth) as well as shading is determined from
+      \note surface referenced.
+      \type choice
+      \default TiltAzimuth
+      \key TiltAzimuth
+      \key Surface
+  N3, \field Tilt Angle
+      \note The tilt angle is the angle from horizontal of the photovoltaic modules in the array.
+      \type real
+      \units deg
+      \default 20
+      \minimum 0
+      \maximum 90
+  N4, \field Azimuth Angle
+      \note For a fixed array, the azimuth angle is the angle clockwise from true north describing
+      \note the direction that the array faces. For an array with one-axis tracking, the azimuth
+      \note angle is the angle clockwise from true north of the axis of rotation.
+      \type real
+      \units deg
+      \default 180
+      \minimum 0
+      \maximum< 360
+  A6, \field Surface Name
+      \type object-list
+      \object-list AllShadingAndHTSurfNames
+  N5; \field Ground Coverage Ratio
+      \note Applies only to arrays with one-axis tracking and is the ratio of module surface area
+      \note to area of the ground or roof occupied by the array.
+      \type real
+      \default 0.4
+      \minimum 0
+      \maximum 1
+
+ElectricLoadCenter:Inverter:PVWatts,
+      \min-fields 1
+      \memo Electric power inverter to convert from direct current (DC) to alternating current
+      \memo (AC) in an electric load center that contains Generator:PVWatts objects.
+      \memo It implements the PVWatts inverter performance curves.
+  A1, \field Name
+      \reference InverterList
+  N1, \field DC to AC Size Ratio
+      \type real
+      \minimum> 0
+      \default 1.10
+  N2; \field Inverter Efficiency
+      \type real
+      \minimum> 0
+      \maximum 1
+      \default 0.96
+
 Generator:FuelCell,
        \memo This generator model is the FC model from IEA Annex 42
   A1, \field Name
@@ -81502,6 +81601,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81525,6 +81625,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81548,6 +81649,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81571,6 +81673,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81594,6 +81697,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81617,6 +81721,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81640,6 +81745,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81663,6 +81769,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81686,6 +81793,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81709,6 +81817,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81732,6 +81841,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81755,6 +81865,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81778,6 +81889,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81801,6 +81913,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81824,6 +81937,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81847,6 +81961,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81870,6 +81985,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81893,6 +82009,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81916,6 +82033,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81939,6 +82057,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81962,6 +82081,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -81985,6 +82105,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82008,6 +82129,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82031,6 +82153,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82054,6 +82177,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82077,6 +82201,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82100,6 +82225,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82123,6 +82249,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82146,6 +82273,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -82169,6 +82297,7 @@ ElectricLoadCenter:Generators,
        \key Generator:InternalCombustionEngine
        \key Generator:CombustionTurbine
        \key Generator:Photovoltaic
+       \key Generator:PVWatts
        \key Generator:FuelCell
        \key Generator:MicroCHP
        \key Generator:MicroTurbine
@@ -84800,7 +84929,7 @@ Matrix:TwoDimension,
   N21001,N21002,N21003,N21004,N21005,N21006,N21007,N21008,N21009,N21010,N21011,N21012,N21013,N21014,N21015,N21016,N21017,N21018,N21019,N21020,  \note fields as indicated
   N21021,N21022,N21023,N21024,N21025,N21026,N21027,N21028,N21029,N21030,N21031,N21032,N21033,N21034,N21035,N21036,N21037,N21038,N21039,N21040;  \note fields as indicated
 
-\ group Hybrid Model
+\group Hybrid Model
 
 HybridModel:Zone,
        \memo Zones with measured air temperature data and a range of dates.
