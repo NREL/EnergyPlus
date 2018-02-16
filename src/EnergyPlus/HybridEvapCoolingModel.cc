@@ -486,7 +486,7 @@ namespace EnergyPlus {//***************
 		bool CMode::CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject)
 		{
 
-			Real64 CheckNormalizationReference = GetNormalPoint(1);//CurveID);  Edwin this is strange if I use the curveID it trys to access a list thats too small.
+			Real64 CheckNormalizationReference = GetNormalPoint(CurveID);
 			if (NormalizationReference == -1)
 			{
 				//should never happen, because to get to this function we need a valid curve but check anyway.
@@ -1615,7 +1615,7 @@ namespace EnergyPlus {//***************
 					ShowWarningError("Error in solution space mapping, suggest adjusting operating constraints.");
 					return -2;
 				}
-				// Check that in this mode the //Outside Air Relative Humidity(0 - 100 % )	//Outside Air Humidity Ratio(g / g)//Outside Air Temperature(°C)
+				// Check that in this mode the //Outside Air Relative Humidity(0 - 100 % )	//Outside Air Humidity Ratio(g / g)//Outside Air Temperature(ï¿½C)
 				if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) 
 				{
 					EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;

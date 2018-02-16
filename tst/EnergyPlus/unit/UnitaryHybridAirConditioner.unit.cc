@@ -208,7 +208,6 @@ namespace EnergyPlus {
 
 		// Scenario 1: Hi Cooling
 
-		bool Fail = false;
 		DesignMinVR = 1.622720855;  // Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate
 		Tra= 22.93929413; //Zone Hybrid Unitary HVAC Return Air Temperature
 		Tosa = 26.67733333; //Zone Hybrid Unitary HVAC Outside Air Temperature 
@@ -259,24 +258,11 @@ namespace EnergyPlus {
 		Real64 ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;	   //
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
 		// checks 
-		
-		if ((roundf(returnOSAF * 100) / 100) != 1)
-		{
-			Fail = true;
-		}
-		if (deliveredSC <= 0)
-		{
-			Fail = true;
-		}
-		if ((roundf(deliveredSH * 100) / 100) != 0)
-		{
-			Fail = true;
-		}
-		if (Tsa > Tra)
-		{
-			Fail = true;
-		}
-		ASSERT_TRUE(Fail);
+		EXPECT_NEAR(1.0, returnOSAF, 0.001);
+		EXPECT_GT(deliveredSC, 0);
+		EXPECT_NEAR(0.0, deliveredSH, 0.001);
+		EXPECT_LT(Tsa, Tra);
+
 		// Scenario 2: high cooling larger system
 
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
@@ -308,24 +294,10 @@ namespace EnergyPlus {
 		WaterConsumption = pZoneHybridUnitaryAirConditioner->WaterConsumption;		   //
 		ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;	   //
 		// checks 
-		
-		if ((roundf(returnOSAF * 100) / 100) != 1)
-		{
-			Fail = true;
-		}
-		if (deliveredSC <= 0)
-		{
-			Fail = true;
-		}
-		if ((roundf(deliveredSH * 100) / 100) != 0)
-		{
-			Fail = true;
-		}
-		if (Tsa > Tra)
-		{
-			Fail = true;
-		}
-		ASSERT_TRUE(Fail);
+		EXPECT_NEAR(1.0, returnOSAF, 0.001);
+		EXPECT_GT(deliveredSC, 0);
+		EXPECT_NEAR(0.0, deliveredSH, 0.001);
+		EXPECT_LT(Tsa, Tra);
 
 		// Scenario 3: Outside of env conditions. should go to standby and have standby energy
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
@@ -336,14 +308,13 @@ namespace EnergyPlus {
 		pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 		modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
 		ElectricPower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
-		// checks 
-		if (modenumber != 0) Fail = true;
-		
+		// checks
+		EXPECT_EQ(0, modenumber);
+
 		// Scenario 4: Low Cooling
 		pZoneHybridUnitaryAirConditioner->Initialize(1);
 		pZoneHybridUnitaryAirConditioner->InitializeModelParams();
-		Fail = false;
-		DesignMinVR = 1.622720855; 
+		DesignMinVR = 1.622720855;
 		Tra = 23.00655455; //
 		Tosa = 26.67733333;
 		RHra = 17.3791073; 
@@ -369,25 +340,12 @@ namespace EnergyPlus {
 		Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
 		returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
 		// checks 
-		
-		if ((roundf(returnOSAF * 100) / 100) != 1)
-		{
-			Fail = true;
-		}
-		if (deliveredSC <= 0)
-		{
-			Fail = true;
-		}
-		if ((roundf(deliveredSH * 100) / 100) != 0)
-		{
-			Fail = true;
-		}
-		if (Tsa > Tra)
-		{
-			Fail = true;
-		}
-		ASSERT_TRUE(Fail);
-// Scenario 5: No Conditioning
+		EXPECT_NEAR(1.0, returnOSAF, 0.001);
+		EXPECT_GT(deliveredSC, 0);
+		EXPECT_NEAR(0.0, deliveredSH, 0.001);
+		EXPECT_LT(Tsa, Tra);
+
+		// Scenario 5: No Conditioning
 		DesignMinVR = 1.622720855;
 		Tra = 21.83325675; 
 		Tosa = 26.67733333;
@@ -410,16 +368,9 @@ namespace EnergyPlus {
 		deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
 		Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
 		returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
-		// checks 
-		if ((roundf(returnOSAF * 100) / 100) != 1)
-		{
-			Fail = true;
-		}
-		if (Tsa < Tra)
-		{
-			Fail = true;
-		}
-		ASSERT_TRUE(Fail);
+		// checks
+		EXPECT_NEAR(1.0, returnOSAF, 0.001);
+		EXPECT_GT(Tsa, Tra);
 
 	}
 
