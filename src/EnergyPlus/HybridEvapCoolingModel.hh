@@ -105,12 +105,12 @@ namespace EnergyPlus {
 			Real64 Min_Msa;
 			Real64 Min_OAF;
 			Real64 Max_OAF;
-			Real64 Minimum_Outside_Air_Temperature;
-			Real64 Maximum_Outside_Air_Temperature;
-			Real64 Minimum_Outside_Air_Humidity_Ratio;
-			Real64 Maximum_Outside_Air_Humidity_Ratio;
-			Real64 Minimum_Outside_Air_Relative_Humidity;
-			Real64 Maximum_Outside_Air_Relative_Humidity;
+			Real64 Minimum_Outdoor_Air_Temperature;
+			Real64 Maximum_Outdoor_Air_Temperature;
+			Real64 Minimum_Outdoor_Air_Humidity_Ratio;
+			Real64 Maximum_Outdoor_Air_Humidity_Ratio;
+			Real64 Minimum_Outdoor_Air_Relative_Humidity;
+			Real64 Maximum_Outdoor_Air_Relative_Humidity;
 			Real64 Minimum_Return_Air_Temperature;
 			Real64 Maximum_Return_Air_Temperature;
 			Real64 Minimum_Return_Air_Humidity_Ratio;
@@ -131,9 +131,9 @@ namespace EnergyPlus {
 			Real64 CalculateCurveVal( Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
 			bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
 			bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
-			bool InitializeOutsideAirTemperatureConstraints(Real64 min, Real64 max);
-			bool InitializeOutsideAirHumidityRatioConstraints(Real64 min, Real64 max);
-			bool InitializeOutsideAirRelativeHumidityConstraints(Real64 min, Real64 max);
+			bool InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max);
+			bool InitializeOutdoorAirHumidityRatioConstraints(Real64 min, Real64 max);
+			bool InitializeOutdoorAirRelativeHumidityConstraints(Real64 min, Real64 max);
 			bool InitializeReturnAirTemperatureConstraints(Real64 min, Real64 max);
 			bool InitializeReturnAirHumidityRatioConstraints(Real64 min, Real64 max);
 			bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max); 
@@ -147,12 +147,12 @@ namespace EnergyPlus {
 		class CSetting
 		{
 		public:
-			CSetting() :Runtime_Fraction(0), Mode(0), Outside_Air_Fraction(0), Unscaled_Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
+			CSetting() :Runtime_Fraction(0), Mode(0), Outdoor_Air_Fraction(0), Unscaled_Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
 				SupplyAirTemperature(0), Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), 
 				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0){}
 			Real64 Runtime_Fraction;															  
 			Real64 Mode;																		  
-			Real64 Outside_Air_Fraction;														  
+			Real64 Outdoor_Air_Fraction;														  
 			Real64 Unscaled_Supply_Air_Mass_Flow_Rate;													  
 			Real64 ScaledSupply_Air_Mass_Flow_Rate;
 			Real64 Supply_Air_Ventilation_Volume;

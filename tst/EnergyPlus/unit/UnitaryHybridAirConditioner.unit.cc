@@ -149,7 +149,7 @@ namespace EnergyPlus {
 
 	TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest) {
 		using namespace InputProcessor;
-		std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_MuntersEPX5000.idf");
+		std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
 		std::string string = delimited_string(snippet);
 		ASSERT_FALSE(process_idf(string));
 		// setup environment

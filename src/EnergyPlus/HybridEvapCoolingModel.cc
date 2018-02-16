@@ -131,10 +131,10 @@ namespace EnergyPlus {//***************
 			Min_Msa(0.0),
 			Min_OAF(0.0),
 			Max_OAF(0.0),
-			Minimum_Outside_Air_Temperature(0.0),
-			Maximum_Outside_Air_Temperature(0.0),
-			Minimum_Outside_Air_Humidity_Ratio(0.0),
-			Maximum_Outside_Air_Humidity_Ratio(0.0),
+			Minimum_Outdoor_Air_Temperature(0.0),
+			Maximum_Outdoor_Air_Temperature(0.0),
+			Minimum_Outdoor_Air_Humidity_Ratio(0.0),
+			Maximum_Outdoor_Air_Humidity_Ratio(0.0),
 			NormalizationReference(0.0),
 			Correction(0.0) 
 		{
@@ -145,29 +145,29 @@ namespace EnergyPlus {//***************
 			BLOCK_HEADER_OFFSET_Number = 6;
 		}
 
-		bool CMode::InitializeOutsideAirTemperatureConstraints(Real64 min, Real64 max)
+		bool CMode::InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max)
 		{
 			//note If this field is blank, there should be no lower constraint on outside air temperature
-			Minimum_Outside_Air_Temperature = min;
-			Maximum_Outside_Air_Temperature = max;
+			Minimum_Outdoor_Air_Temperature = min;
+			Maximum_Outdoor_Air_Temperature = max;
 			return true;
 		}
-		bool CMode::InitializeOutsideAirHumidityRatioConstraints(Real64 min, Real64 max)
+		bool CMode::InitializeOutdoorAirHumidityRatioConstraints(Real64 min, Real64 max)
 		{
 			//minimum 0.00 maximum 0.10, units kgWater / kgDryAir
 			//note Mode0 will not be considerd when outside air absolute humidity is below the value in this field.
 			//note If this field is blank, the lower constraint on outside air humidity ratio will be 0.00 kgWater / kgDryAir., default 0.00
 			//the upper constraint on outside air humidity ratio will be 0.10 kgWater / kgDryAir, default 0.10
-			Minimum_Outside_Air_Humidity_Ratio = min;
-			Maximum_Outside_Air_Humidity_Ratio = max;
+			Minimum_Outdoor_Air_Humidity_Ratio = min;
+			Maximum_Outdoor_Air_Humidity_Ratio = max;
 			return true;
 		}
-		bool CMode::InitializeOutsideAirRelativeHumidityConstraints(Real64 min, Real64 max)
+		bool CMode::InitializeOutdoorAirRelativeHumidityConstraints(Real64 min, Real64 max)
 		{
 			//minimum 0.00,maximum 100.00, units percent, Mode0 will not be considered when the outside air relative humidity is below the value in this field.
 			// note If this field is blank, the lower constraint on outside air relative humidity will be 0.00% (default 0.00), the upper constraint on outside air relative humidity will be 100.00%, (default 100.00)
-			Minimum_Outside_Air_Relative_Humidity = min;
-			Maximum_Outside_Air_Relative_Humidity = max;
+			Minimum_Outdoor_Air_Relative_Humidity = min;
+			Maximum_Outdoor_Air_Relative_Humidity = max;
 			return true;
 		}
 		bool CMode::InitializeReturnAirTemperatureConstraints(Real64 min, Real64 max)
@@ -200,7 +200,7 @@ namespace EnergyPlus {//***************
 
 		bool CMode::InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF)
 		{
-			//minimum 0.00, maximum 1.00, Outside air fractions below this value will not be considered.
+			//minimum 0.00, maximum 1.00, Outdoor air fractions below this value will not be considered.
 			//If this field is blank, the lower constraint on outside air fraction will be 0.00,default 0.10
 			Min_OAF = minOSAF;
 			Max_OAF = maxOSAF;
@@ -770,27 +770,27 @@ namespace EnergyPlus {//***************
 				(*OperatingModes).push_back(*this);
 				return ErrorsFound;
 			}
-			//N6, \field Mode0  Minimum Outside Air Temperature
-			//N7, \field Mode0  Maximum Outside Air Temperature
-			bool ok = InitializeOutsideAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
+			//N6, \field Mode0  Minimum Outdoor Air Temperature
+			//N7, \field Mode0  Maximum Outdoor Air Temperature
+			bool ok = InitializeOutdoorAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
 			if (!ok) {
 				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
 				ShowContinueError("Entered in " + cCurrentModuleObject);
 				ErrorsFound = true;
 			}
 			inter_Number = inter_Number + 2;
-			//N8, \field Mode0  Minimum Outside Air Humidity Ratio
-			//N9, \field Mode0  Maximum Outside Air Humidity Ratio
-			ok = InitializeOutsideAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
+			//N8, \field Mode0  Minimum Outdoor Air Humidity Ratio
+			//N9, \field Mode0  Maximum Outdoor Air Humidity Ratio
+			ok = InitializeOutdoorAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
 			if (!ok) {
 				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
 				ShowContinueError("Entered in " + cCurrentModuleObject);
 				ErrorsFound = true;
 			}
 			inter_Number = inter_Number + 2;
-			//N10, \field Mode0 Minimum Outside Air Relative Humidity
-			//N11, \field Mode0 Maximum Outside Air Relative Humidity
-			ok = InitializeOutsideAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
+			//N10, \field Mode0 Minimum Outdoor Air Relative Humidity
+			//N11, \field Mode0 Maximum Outdoor Air Relative Humidity
+			ok = InitializeOutdoorAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
 			if (!ok) {
 				ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
 				ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -824,8 +824,8 @@ namespace EnergyPlus {//***************
 				ErrorsFound = true;
 			}
 			inter_Number = inter_Number + 2;
-			//N18, \field Mode0 Minimum Outside Air Fraction
-			//N19, \field Mode0 Maximum Outside Air Fraction
+			//N18, \field Mode0 Minimum Outdoor Air Fraction
+			//N19, \field Mode0 Maximum Outdoor Air Fraction
 
 			ok = InitializeOSAFConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
 			if (!ok) {
@@ -871,17 +871,17 @@ namespace EnergyPlus {//***************
 			bool OAHRConstraintmet = false;
 			bool OARHConstraintmet = false;
 
-			if (Tosa >= Minimum_Outside_Air_Temperature && Tosa <= Maximum_Outside_Air_Temperature)
+			if (Tosa >= Minimum_Outdoor_Air_Temperature && Tosa <= Maximum_Outdoor_Air_Temperature)
 			{
 				OATempConstraintmet = true;
 			}
 
-			if (Wosa >= Minimum_Outside_Air_Humidity_Ratio && Wosa <= Maximum_Outside_Air_Humidity_Ratio)
+			if (Wosa >= Minimum_Outdoor_Air_Humidity_Ratio && Wosa <= Maximum_Outdoor_Air_Humidity_Ratio)
 			{
 				OAHRConstraintmet = true;
 			}
 
-			if (RHosa >= Minimum_Outside_Air_Relative_Humidity  && RHosa <= Maximum_Outside_Air_Relative_Humidity)
+			if (RHosa >= Minimum_Outdoor_Air_Relative_Humidity  && RHosa <= Maximum_Outdoor_Air_Relative_Humidity)
 			{
 				OARHConstraintmet = true;
 			}
@@ -1258,7 +1258,7 @@ namespace EnergyPlus {//***************
 				oStandBy.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate;
 				oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
 				oStandBy.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
-				oStandBy.Outside_Air_Fraction = OSAF;
+				oStandBy.Outdoor_Air_Fraction = OSAF;
 				oStandBy.SupplyAirTemperature = Tra;
 				oStandBy.SupplyAirW = Wra;
 				oStandBy.Mode = 0;
@@ -1615,7 +1615,7 @@ namespace EnergyPlus {//***************
 					ShowWarningError("Error in solution space mapping, suggest adjusting operating constraints.");
 					return -2;
 				}
-				// Check that in this mode the //Outside Air Relative Humidity(0 - 100 % )	//Outside Air Humidity Ratio(g / g)//Outside Air Temperature(�C)
+				// Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air Temperature(�C)
 				if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) 
 				{
 					EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
@@ -1635,7 +1635,7 @@ namespace EnergyPlus {//***************
 					for (point_number = 0; point_number != solution_map_sizeX; point_number++) // within each mode go though all the combinations of solution spaces.
 					{
 						//Supply Air Mass Flow Rate(kg / s)
-						//Outside Air Fraction(0 - 1)
+						//Outdoor Air Fraction(0 - 1)
 						
 						MsaRatio = solutionspace.PointX[point_number];// fractions of rated mass flow rate, so for some modes this might be low but others hi
 						OSAF = solutionspace.PointY[point_number];
@@ -1695,7 +1695,7 @@ namespace EnergyPlus {//***************
 								CSetting CandidateSetting;
 								CandidateSetting.Supply_Air_Ventilation_Volume = Supply_Air_Ventilation_Volume;
 								CandidateSetting.Mode = Mode.ModeID;
-								CandidateSetting.Outside_Air_Fraction = OSAF;
+								CandidateSetting.Outdoor_Air_Fraction = OSAF;
 								CandidateSetting.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
 								CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
 								CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate; // spencer is this the same as Correction if so make them the same.
@@ -1726,7 +1726,7 @@ namespace EnergyPlus {//***************
 	
 			for (auto & thisSetting : Settings) {
 				//Calculate the delta H 
-				OSAF = thisSetting.Outside_Air_Fraction;
+				OSAF = thisSetting.Outdoor_Air_Fraction;
 				UnscaledMsa = thisSetting.Unscaled_Supply_Air_Mass_Flow_Rate;
 				Real64 ScaledMsa = thisSetting.ScaledSupply_Air_Mass_Flow_Rate;
 
@@ -1748,7 +1748,7 @@ namespace EnergyPlus {//***************
 
 				Real64 SupplyAirCp = PsyCpAirFnWTdb(Wsa, Tsa); //J/degreesK.kg 
 				Real64 ReturnAirCP = PsyCpAirFnWTdb(Wra, StepIns.Tra); //J/degreesK.kg 
-				Real64 OutsideAirCP = PsyCpAirFnWTdb(Wosa, StepIns.Tosa); //J/degreesK.kg 
+				Real64 OutdoorAirCP = PsyCpAirFnWTdb(Wosa, StepIns.Tosa); //J/degreesK.kg 
 
 				// Calculations below of system cooling and heating capacity are ultimately reassessed when the resultant part runtime fraction is assessed.
 				// However its valuable that they are calculated here to at least provide a check. 
@@ -1756,7 +1756,7 @@ namespace EnergyPlus {//***************
 				//System Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA + OSAF*(cpOSA-cpRA) + cpSA) {kJ/kg-C} * (T_RA + OSAF*(T_OSA - T_RA)  - T_SA) 
 				//System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
 				//System Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA + OSAF*(h_OSA - h_RA) - h_SA) {kJ/kgDryAir}
-				Real64 SystemCp = ReturnAirCP + OSAF * (OutsideAirCP - ReturnAirCP) + SupplyAirCp; //J/degreesK.kg 
+				Real64 SystemCp = ReturnAirCP + OSAF * (OutdoorAirCP - ReturnAirCP) + SupplyAirCp; //J/degreesK.kg 
 				Real64 SensibleSystem = ScaledMsa * 0.5* SystemCp * (Tma - Tsa) / 1000;//kw  dynamic cp
 				Real64 MsaDry = ScaledMsa * (1 - Wsa);
 				Real64 LambdaSa = Psychrometrics::PsyHfgAirFnWTdb(0, Tsa);
