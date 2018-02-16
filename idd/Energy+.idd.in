@@ -40588,6 +40588,7 @@ AirTerminal:SingleDuct:Uncontrolled,
        \memo Central air system terminal unit, single duct, constant volume, no controls other than
        \memo on/off schedule.
        \min-fields 4
+       \obsolete New=>AirTerminal:SingleDuct:ConstantVolume:NoReheat
    A1, \field Name
        \required-field
        \reference ZoneEquipmentNames
@@ -40685,6 +40686,7 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
 
 AirTerminal:SingleDuct:ConstantVolume:NoReheat,
        \memo Central air system terminal unit, single duct, constant volume, without reheat coil
+       \min-fields 5
   A1 , \field Name
        \required-field
        \reference AirTerminalUnitNames
