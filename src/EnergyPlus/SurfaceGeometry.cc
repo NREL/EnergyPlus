@@ -7710,12 +7710,8 @@ namespace SurfaceGeometry {
 			if ( !lAlphaFieldBlanks( alpF ) ) {
 				if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Hourly")) {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
-<<<<<<< HEAD
-				} else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Timestep")) */ {
-=======
 					kivaManager.timestep = 3600.; // seconds
-				} else /* if (SameString(cAlphaArgs( alpF ), "Timestep")) */ {
->>>>>>> NREL/develop
+				} else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Timestep")) */ {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
 					kivaManager.timestep = DataGlobals::MinutesPerTimeStep*60.;
 				}
