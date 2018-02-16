@@ -68,7 +68,7 @@ namespace SingleDuct {
 	extern int const ReverseAction;
 	extern int const ReverseActionWithLimits;
 	extern int const HeatingActionNotUsed;
-	extern int const NormalEnforceVavMinForHtg; //TRANE, special version of Normal where (re)heating flow rates are enforced.
+
 	// SysTypes represented here
 	extern int const SingleDuctVAVReheat;
 	extern int const SingleDuctConstVolReheat;

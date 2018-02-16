@@ -189,6 +189,8 @@ namespace HVACDXSystem {
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 
+		bool VSCoilFanInfoSet; // flag to indicate if Coil System has set fan info in VS DX coil model
+
 		// Default Constructor
 		DXCoolingConditions() :
 			SchedPtr( 0 ),
@@ -253,7 +255,9 @@ namespace HVACDXSystem {
 			TESOpMode( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+			VSCoilFanInfoSet( false )
+
 		{}
 
 	};

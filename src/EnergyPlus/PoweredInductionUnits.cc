@@ -1291,6 +1291,7 @@ namespace PoweredInductionUnits {
 			TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac = PIU( PIUNum ).MinPriAirFlowFrac;
 			TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = PIU( PIUNum ).MaxVolHotWaterFlow;
 			TermUnitSizing( CurTermUnitSizingNum ).MaxSTVolFlow = PIU( PIUNum ).MaxVolHotSteamFlow;
+			TermUnitSizing( CurZoneEqNum ).DesHeatingLoad = DesCoilLoad; //coil report
 			TermUnitSizing( CurTermUnitSizingNum ).InducesPlenumAir = PIU( PIUNum ).InducesPlenumAir;
 			if ( PIU( PIUNum ).HCoilType_Num == HCoilType_SimpleHeating ) {
 				SetCoilDesFlow( PIU( PIUNum ).HCoilType, PIU( PIUNum ).HCoil, TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow, ErrorsFound );

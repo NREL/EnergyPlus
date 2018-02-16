@@ -305,6 +305,7 @@ namespace EnergyPlus {
 		FinalZoneSizing.allocate( 1 );
 		FinalZoneSizing( CurZoneEqNum ).MinOA = 0.5;
 		FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak = 26.66667;
+		FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak = 26.66667;
 		FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
 		FinalZoneSizing( CurZoneEqNum ).CoolDDNum = 1;
 		FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax = 1;

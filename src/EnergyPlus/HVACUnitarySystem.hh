@@ -243,6 +243,7 @@ namespace HVACUnitarySystem {
 		Real64 CoolCompPartLoadRatio; // Unitary system compressor part load ratio in cooling
 		// Heating coil specific data
 		std::string HeatingCoilName; // coil name (eliminate after blank is accepted in CALL)
+		std::string HeatingCoilTypeName; // coil type class name 
 		int HeatingCoilType_Num; // numeric coil type
 		int HeatingCoilIndex; // index to specific heating coil
 		Real64 DesignHeatingCapacity; // heating coil capacity (W)
@@ -265,6 +266,7 @@ namespace HVACUnitarySystem {
 		Real64 HeatCompPartLoadRatio; // Unitary system compressor part load ratio in heating
 		// Supplemental heating coil specific data
 		std::string SuppHeatCoilName; // coil name (eliminate after blank is accepted in CALL)
+		std::string SuppHeatCoilTypeName; // coil type class name
 		int SuppHeatCoilType_Num; // numeric coil type
 		int SuppHeatCoilIndex; // index to specific supplemental heating coil
 		Real64 DesignSuppHeatingCapacity; // supplemental heating coil capacity (W)
@@ -281,7 +283,7 @@ namespace HVACUnitarySystem {
 		int SuppCoilBranchNum; // Branch of number of the supplemental coil in the plant loop
 		int SuppCoilCompNum; // Comp num of the supplemental coil in the plant loop
 		// fan specific data
-		std::string fanName; // TRANE
+		std::string fanName;
 		int FanType_Num; // Fan type num i.e. OnOff, ConstVol, VAV
 		int FanIndex; // index of fan of a particular type
 		Real64 ActualFanVolFlowRate; // Actual or design fan volume flow rate

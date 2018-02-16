@@ -6296,6 +6296,7 @@ namespace SurfaceGeometry {
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
 		using DataSurfaces::Surface;
 		using DataHeatBalance::HeatTransferAlgosUsed;
 		using DataHeatBalance::NumberOfHeatTransferAlgosUsed;
@@ -6349,6 +6350,46 @@ namespace SurfaceGeometry {
 
 		// Formats
 		static gio::Fmt Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
+
+		cCurrentModuleObject = "SurfaceProperty:HeatBalanceSourceTerm";
+		int CountAddHeatSourceSurf = GetNumObjectsFound( cCurrentModuleObject );
+
+		for ( Item = 1; Item <= CountAddHeatSourceSurf; ++Item ) {
+			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			Found = FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
+
+			if ( Found == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
+				ErrorsFound = true;
+			} else if ( Surface( Found ).InsideHeatSourceTermSchedule || Surface( Found ).OutsideHeatSourceTermSchedule ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", multiple SurfaceProperty:HeatBalanceSourceTerm objects applied to the same surface." );
+				ErrorsFound = true;
+			}
+
+			if ( ! lAlphaFieldBlanks( 2 ) ) {
+				Surface( Found ).InsideHeatSourceTermSchedule = EnergyPlus::ScheduleManager::GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( Surface( Found ).InsideHeatSourceTermSchedule == 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", cannot find the matching Schedule: " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
+					ErrorsFound = true;
+				} 
+			}
+
+			if ( ! lAlphaFieldBlanks( 3 ) ) {
+				Surface( Found ).OutsideHeatSourceTermSchedule = EnergyPlus::ScheduleManager::GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( Surface( Found ).OutsideHeatSourceTermSchedule == 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", cannot find the matching Schedule: " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
+					ErrorsFound = true;
+				} else if ( Surface( Found ).OSCPtr > 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"SurfaceProperty:HeatBalanceSourceTerm\", cannot be specified for OtherSideCoefficient Surface=" + cAlphaArgs( 1 ) );
+					ErrorsFound = true;
+				} 
+			}			
+
+			if ( Surface( Found ).OutsideHeatSourceTermSchedule == 0 && Surface( Found ).InsideHeatSourceTermSchedule == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", no schedule defined for additional heat source." );
+				ErrorsFound = true;
+			}
+		} 
 
 		// first initialize each heat transfer surface with the overall model type, array assignment
 		for ( auto & e : Surface ) e.HeatTransferAlgorithm = HeatTransferAlgosUsed( 1 );

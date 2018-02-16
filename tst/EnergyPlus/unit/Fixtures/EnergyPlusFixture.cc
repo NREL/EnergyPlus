@@ -173,6 +173,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -244,6 +245,7 @@ namespace EnergyPlus {
 		UtilityRoutines::outputErrorHeader = false;
 
 		Psychrometrics::InitializePsychRoutines();
+		createCoilSelectionReportObj();
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -562,7 +564,9 @@ namespace EnergyPlus {
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions, bool use_idd_cache ) {
 		if ( idf_snippet.empty() ) {
-			if ( use_assertions ) EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
+			if ( use_assertions ) {
+				EXPECT_FALSE( idf_snippet.empty() ) << "IDF snippet is empty.";
+			}
 			return true;
 		}
 		using namespace InputProcessor;
@@ -573,7 +577,9 @@ namespace EnergyPlus {
 		IdfParser parser;
 		bool success = false;
 		auto const parsed_idf = parser.decode( idf_snippet, success );
-		if ( use_assertions ) EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
+		if ( use_assertions ) {
+			EXPECT_TRUE( success ) << "IDF snippet didn't parse properly. Assuming Building and GlobalGeometryRules are not in snippet.";
+		}
 		bool found_building = false;
 		bool found_global_geo = false;
 		if ( success ) {
@@ -669,10 +675,14 @@ namespace EnergyPlus {
 								"], No prior Objects." + DataStringGlobals::NL;
 			}
 		}
-		if ( use_assertions ) EXPECT_EQ( 0, count_err ) << error_string;
+		if ( use_assertions ) {
+			EXPECT_EQ( 0, count_err ) << error_string;
+		}
 
 		if ( NumIDFRecords == 0 ) {
-			if ( use_assertions ) EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
+			if ( use_assertions ) {
+				EXPECT_GT( NumIDFRecords, 0 ) << "The IDF file has no records.";
+			}
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
@@ -680,28 +690,38 @@ namespace EnergyPlus {
 		for ( auto const obj_def : ObjectDef ) {
 			if ( ! obj_def.RequiredObject ) continue;
 			if ( obj_def.NumFound > 0 ) continue;
-			if ( use_assertions ) EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
+			if ( use_assertions ) {
+				EXPECT_GT( obj_def.NumFound, 0 ) << "Required Object=\"" + obj_def.Name + "\" not found in IDF.";
+			}
 			++NumMiscErrorsFound;
 			errors_found = true;
 		}
 
 		if ( TotalAuditErrors > 0 ) {
-			if ( use_assertions ) EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
+			if ( use_assertions ) {
+				EXPECT_EQ( 0, TotalAuditErrors ) << "Note -- Some missing fields have been filled with defaults.";
+			}
 			errors_found = true;
 		}
 
 		if ( NumOutOfRangeErrorsFound > 0 ) {
-			if ( use_assertions ) EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
+			if ( use_assertions ) {
+				EXPECT_EQ( 0, NumOutOfRangeErrorsFound ) << "Out of \"range\" values found in input";
+			}
 			errors_found = true;
 		}
 
 		if ( NumBlankReqFieldFound > 0 ) {
-			if ( use_assertions ) EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
+			if ( use_assertions ) {
+				EXPECT_EQ( 0, NumBlankReqFieldFound ) << "Blank \"required\" fields found in input";
+			}
 			errors_found = true;
 		}
 
 		if ( NumMiscErrorsFound > 0 ) {
-			if ( use_assertions ) EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
+			if ( use_assertions ) {
+				EXPECT_EQ( 0, NumMiscErrorsFound ) << "Other miscellaneous errors found in input";
+			}
 			errors_found = true;
 		}
 		if (DataStringGlobals::IDDVerString.find(DataStringGlobals::MatchVersion) == std::string::npos) {
@@ -709,7 +729,9 @@ namespace EnergyPlus {
 			ShowContinueError(DataStringGlobals::IDDVerString + " not the same as expected =\"" + DataStringGlobals::MatchVersion + "\"");
 		}
 		if ( OverallErrorFlag ) {
-			if ( use_assertions ) EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
+			if ( use_assertions ) {
+				EXPECT_FALSE( OverallErrorFlag ) << "Error processing IDF snippet.";
+			}
 
 			// check if IDF version matches IDD version
 			// this really shouldn't be an issue but i'm keeping it just in case a unit test is written against a specific IDF version
@@ -726,11 +748,15 @@ namespace EnergyPlus {
 						bad_version = ( DataStringGlobals::MatchVersion == idf_record.Alphas( 1 ) );
 					}
 					found_version = true;
-					if ( use_assertions ) EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
+					if ( use_assertions ) {
+						EXPECT_FALSE( bad_version ) << "Version in IDF=\"" + idf_record.Alphas( 1 ) + "\" not the same as expected=\"" + DataStringGlobals::MatchVersion + "\"";
+					}
 					break;
 				}
 			}
-			if ( use_assertions ) EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
+			if ( use_assertions ) {
+				EXPECT_TRUE( found_version ) << "Unknown IDF Version, expected version is \"" + DataStringGlobals::MatchVersion + "\"";
+			}
 			errors_found = true;
 		}
 
