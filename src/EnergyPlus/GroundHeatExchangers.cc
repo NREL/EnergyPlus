@@ -2606,7 +2606,7 @@ namespace GroundHeatExchangers {
 					// Calculate response factors from individual boreholes
 					std::vector < std::shared_ptr < GLHEVertSingleStruct > > tempVectOfBHObjects;
 
-					for ( int index = 8; index < DataIPShortCuts::cAlphaArgs.u1(); ++index ) {
+					for ( int index = 8; index <= DataIPShortCuts::cAlphaArgs.u1(); ++index ) {
 						if ( !DataIPShortCuts::lAlphaFieldBlanks( index ) ) {
 							std::shared_ptr < GLHEVertSingleStruct > tempBHptr = GetSingleBH( DataIPShortCuts::cAlphaArgs( index ) );
 							if ( tempBHptr ) {
