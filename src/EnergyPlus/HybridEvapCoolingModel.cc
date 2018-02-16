@@ -51,7 +51,6 @@
 #include <UtilityRoutines.hh>
 
 #include <string>
-#include <list>
 #include <cmath>
 //#include <windows.h>
 #include <ScheduleManager.hh>
@@ -275,7 +274,8 @@ namespace EnergyPlus {//***************
 			case POWER_CURVE:
 
 				if (ValidPointer(Psa_curve_pointer))
-				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+				{ 
+					// Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
 					Y_val = Correction*CurveValue(Psa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
@@ -285,7 +285,8 @@ namespace EnergyPlus {//***************
 			case SUPPLY_FAN_POWER:
 				 
 				if (ValidPointer(SFPsa_curve_pointer))
-				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+				{ 
+					// Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
 					Y_val = Correction*CurveValue(SFPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
@@ -295,7 +296,8 @@ namespace EnergyPlus {//***************
 			case EXTERNAL_STATIC_PRESSURE:
 
 				if (ValidPointer(ESPsa_curve_pointer))
-				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+				{ 
+					// Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
 					Y_val = NormalizationReference*CurveValue(ESPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
@@ -305,7 +307,8 @@ namespace EnergyPlus {//***************
 			case SECOND_FUEL_USE:
 				
 				if (ValidPointer(SFUsa_curve_pointer))
-				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+				{ 
+					// Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
 					Y_val = Correction*CurveValue(SFUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
@@ -315,7 +318,8 @@ namespace EnergyPlus {//***************
 			case THIRD_FUEL_USE:
 
 				if (ValidPointer(TFUsa_curve_pointer))
-				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+				{ 
+					// Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
 					Y_val = Correction*CurveValue(TFUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
@@ -325,7 +329,8 @@ namespace EnergyPlus {//***************
 			case WATER_USE:
 
 				if (ValidPointer(WUsa_curve_pointer))
-				{ // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
+				{ 
+					// Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
 					Y_val = Correction*CurveValue(WUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
 				}
 				else {
@@ -478,6 +483,40 @@ namespace EnergyPlus {//***************
 			ModeCounter++;
 			return error;
 		}
+		bool CMode::CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject)
+		{
+
+			Real64 CheckNormalizationReference = GetNormalPoint(1);//CurveID);  Edwin this is strange if I use the curveID it trys to access a list thats too small.
+			if (NormalizationReference == -1)
+			{
+				//should never happen, because to get to this function we need a valid curve but check anyway.
+				ShowSevereError("Check specification of normalization references in UnitaryHybridUnits, all values should be identical in specified performance curves, in "+ cCurrentModuleObject);
+				return true;
+			}
+			if (CheckNormalizationReference == 0)
+			{
+				ShowWarningError("Check specification of normalization references in UnitaryHybridUnits, all specified values should be non zero and identicals, in " + cCurrentModuleObject);
+				//warn normalization reference isn't set up right in idf
+			}
+
+			if (NormalizationReference==0) // then not set yet
+			{ 
+				//set value from curve to Mode level NormalizationReference
+				NormalizationReference = CheckNormalizationReference;
+			}
+			else // must have been set, so make sure the NormalizationReferences in this mode are all the same, or else give a warning.
+				 // by definition all curves for the unit should have the same normalizaiton reference as specified in the I/O reference
+			{
+				if (NormalizationReference != CheckNormalizationReference)
+				{
+					//error there should not be different Normalization References defined for the model
+					ShowSevereError("Check specification of normalization references in UnitaryHybridUnits, all values should be identical in specified performance curves, in " + cCurrentModuleObject);
+					return true;
+				}
+			}
+			return false;
+		}
+		
 
 		bool CMode::ParseMode(int ModeCounter, std::vector<CMode>* OperatingModes, Real64 scaledCorrection, Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject)
 		{
@@ -501,15 +540,10 @@ namespace EnergyPlus {//***************
 			// Using/Aliasing
 			ModeID = ModeCounter;
 			Correction = scaledCorrection;
-			NormalizationReference = GetNormalPoint(1);
-			if (NormalizationReference == -1)
-			{
-				NormalizationReference = 1;
-			}
 			
 			if (!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject))
 			{
-				ShowSevereError("There was a misalignment between the number of modes spcified in the idf and the number of mode objects generated, in" + cCurrentModuleObject);
+				ShowSevereError("There was a misalignment between the number of modes specified in the idf, and the number of mode objects generated, in" + cCurrentModuleObject);
 				return false;
 			}
 			int inter_Number; 
@@ -548,7 +582,14 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(TEMP_CURVE, -1);
 				}
-				else { InitializeCurve(TEMP_CURVE, curveID); }
+				else 
+				{ 
+					InitializeCurve(TEMP_CURVE, curveID); 
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject))
+					{
+						ErrorsFound = true;
+					}
+				}
 
 			}
 
@@ -568,14 +609,21 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(W_CURVE, -1);
 				}
-				else { InitializeCurve(W_CURVE, curveID); }
+				else
+				{
+					InitializeCurve(W_CURVE, curveID); 
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject))
+					{
+						ErrorsFound = true;
+					}
+				}
 
 			}
 			inter_Alpha = inter_Alpha + 1;
 			//A21, \field Mode0 System Electric Power Lookup Table Name
 			curveID = -1;
 			if (lAlphaBlanks(inter_Alpha)) {
-				InitializeCurve(POWER_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default 
+				InitializeCurve(POWER_CURVE, curveID);//as this is invalid curve id CalculateCurveVal will return a default  
 			}
 			else
 			{
@@ -586,7 +634,14 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(POWER_CURVE, -1);
 				}
-				else { InitializeCurve(POWER_CURVE, curveID); }
+				else 
+				{ 
+					InitializeCurve(POWER_CURVE, curveID);
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject)) //Edwin it bums out here.
+					{
+						ErrorsFound = true;
+					}
+				}
 
 			}
 			//A22, \field Mode0 Supply Fan Electric Power Lookup Table Name
@@ -604,7 +659,14 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(SUPPLY_FAN_POWER, -1);
 				}
-				else { InitializeCurve(SUPPLY_FAN_POWER, curveID); }
+				else 
+				{ 
+					InitializeCurve(SUPPLY_FAN_POWER, curveID);
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject))
+					{
+						ErrorsFound = true;
+					}
+				}
 
 			}
 			//A23, \field Mode0 External Static Pressure Lookup Table Name
@@ -622,8 +684,14 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(EXTERNAL_STATIC_PRESSURE, -1);
 				}
-				else { InitializeCurve(EXTERNAL_STATIC_PRESSURE, curveID); }
-
+				else 
+				{ 
+					InitializeCurve(EXTERNAL_STATIC_PRESSURE, curveID);
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject))
+					{
+						ErrorsFound = true;
+					}
+				}
 			}
 			//  
 			//A24, \field Mode0 System Second Fuel Consumption Lookup Table Nam
@@ -641,8 +709,13 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(SECOND_FUEL_USE, -1);
 				}
-				else { InitializeCurve(SECOND_FUEL_USE, curveID); }
-
+				else { 
+					InitializeCurve(SECOND_FUEL_USE, curveID);
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject))
+					{
+						ErrorsFound = true;
+					}
+				}
 			}
 			//A25, \field Mode0 System Third Fuel Consumption Lookup Table Name
 			inter_Alpha = inter_Alpha + 1;
@@ -659,7 +732,13 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(THIRD_FUEL_USE, -1);
 				}
-				else { InitializeCurve(THIRD_FUEL_USE, curveID); }
+				else { 
+					InitializeCurve(THIRD_FUEL_USE, curveID);
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject))
+					{
+						ErrorsFound = true;
+					}
+				}
 
 			}
 			//A26, \field Mode0 System Water Use Lookup Table Name
@@ -677,7 +756,13 @@ namespace EnergyPlus {//***************
 					ErrorsFound = true;
 					InitializeCurve(WATER_USE, -1);
 				}
-				else { InitializeCurve(WATER_USE, curveID); }
+				else { 
+					InitializeCurve(WATER_USE, curveID);
+					if (CheckNormalizationReference(curveID, cCurrentModuleObject))
+					{
+						ErrorsFound = true;
+					}
+				}
 
 			}
 			if (ModeID == 0)
@@ -972,6 +1057,7 @@ namespace EnergyPlus {//***************
 			Wsa(0.0),
 			SupplyVentilationAir(0.0),
 			SupplyVentilationVolume(0.0),
+			ModelNormalizationReference(0.0),
 			OutdoorAir(false),
 			MinOA_Msa(0.0),
 			OARequirementsPtr(0),
@@ -996,8 +1082,6 @@ namespace EnergyPlus {//***************
 			SAHR_OC_MetinMode_v= temp;
 			
 			ModeCounter = 0;
-			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
-			DebugBreak = 12; // remove
 	
 			CurrentOperatingSettings.resize(5);
 
@@ -1109,94 +1193,6 @@ namespace EnergyPlus {//***************
 			Initialized = true;
 		}
 
-		/*
-		Real64 Model::Part_press(Real64 P, Real64 W)
-		{
-			// Function to compute partial vapor pressure in [kPa]
-			// From page 6.9 equation 38 in ASHRAE Fundamentals handbook (2005)
-			//   P = ambient pressure [kPa]
-			//   W = humidity ratio [kg/kg dry air]
-
-			return (P * W / (0.62198 + W));
-		}
-		
-		Real64 Model::Sat_press(Real64 Tdb)
-		{
-			// SUBROUTINE INFORMATION:
-			//       AUTHOR         Spencer Maxwell Dutton
-			//       DATE WRITTEN   October 2017 
-			//       MODIFIED       
-			//       RE-ENGINEERED  na
-
-			// PURPOSE OF THIS SUBROUTINE:
-			// Function to compute saturation vapor pressure in [kPa]
-
-			// METHODOLOGY EMPLOYED:
-			//ASHRAE Fundamentals handbood (2005) p 6.2, equation 5 and 6
-			//   Tdb = Dry bulb temperature [degC]
-			// Valid from -100C to 200 C
-
-			// REFERENCES:
-			// na
-
-			Real64  C1 = -5674.5359;
-			Real64  C2 = 6.3925247;
-			Real64  C3 = -0.009677843;
-			Real64  C4 = 0.00000062215701;
-			Real64  C5 = 2.0747825E-09;
-			Real64  C6 = -9.484024E-13;
-			Real64  C7 = 4.1635019;
-			Real64  C8 = -5800.2206;
-			Real64  C9 = 1.3914993;
-			Real64  C10 = -0.048640239;
-			Real64  C11 = 0.000041764768;
-			Real64  C12 = -0.000000014452093;
-			Real64  C13 = 6.5459673;
-			Real64  Sat_press_val = 0;
-
-			Real64   TK = Tdb + 273.15;         //Converts from degC to degK
-
-			if (TK <= 273.15)
-			{
-				Sat_press_val = exp(C1 / TK + C2 + C3 * TK + C4 * pow(TK, 2) + C5 * pow(TK, 3) + C6 * pow(TK, 4) + C7 * log(TK)) / 1000;
-			}
-			else
-			{
-				Sat_press_val = exp(C8 / TK + C9 + C10 * TK + C11 * pow(TK, 2) + C12 * pow(TK, 3) + C13 * log(TK)) / 1000;
-			}
-			return Sat_press_val;
-
-		}*/
-		/*		Real64 Model::CalcHum_ratio_W(Real64 Tdb, Real64 RH, Real64 P)
-		{
-			// SUBROUTINE INFORMATION:
-			//       AUTHOR         Spencer Maxwell Dutton
-			//       DATE WRITTEN   October 2017 
-			//       MODIFIED       
-			//       RE-ENGINEERED  na
-
-			// PURPOSE OF THIS SUBROUTINE:
-			// Function to calculate humidity ratio [kg H2O/kg air]
-			// Given dry bulb and wet bulb temperature inputs [degC]
-
-			// METHODOLOGY EMPLOYED:
-			// ASHRAE Fundamentals handbood (2005)
-			// Tdb = Dry bulb temperature [degC]
-			// RH = Relative Humidity [Fraction or %]
-			// P = Ambient Pressure [kPa] 
-
-			// REFERENCES:
-			// na
-
-			// Using/Aliasing
-
-			Real64 Pws = Sat_press(Tdb);
-			Real64 Hum_rat = 0.62198 * RH * Pws / (P - RH * Pws);   // Equation 22, 24, p6.8
-			return Hum_rat;
-		}*/
-
-
-
 		Real64 Model::CheckVal_W(Real64 W, Real64 T, Real64 P)
 		{
 			//P must be in pascals NOT kPa
@@ -1238,18 +1234,23 @@ namespace EnergyPlus {//***************
 			//assess the sixe of the solution space to make sure it holds at least 1 combination
 			int solution_map_sizeX = solutionspace.PointX.size();
 			//Check the normalization reference is set if not set a default
-			Real64 NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same, this is explained in the IO reference
-			if (NormalizationReference == -1)
+			Real64 StandbyNormalizationReference = Mode0.NormalizationReference;
+			if (StandbyNormalizationReference == -1)
 			{
-				NormalizationReference = 1;
-				return true;
+				ModelNormalizationReference = 1; 
+				// if for some reason its not set in standby give warning
 			}
+			else
+			{
+				ModelNormalizationReference = StandbyNormalizationReference;
+			}
+
 			// if the map of the solution space looks valid then populate the class member oStandBy (CSetting) with the settings data (what OSAF it runs at, 
 			// and how much power it uses etc.
 			if (solution_map_sizeX > 0)
 			{
 				Real64 MsaRatio = solutionspace.PointX[0];
-				Real64 UnscaledMsa = NormalizationReference * MsaRatio;
+				Real64 UnscaledMsa = ModelNormalizationReference * MsaRatio;
 				Real64 OSAF = solutionspace.PointY[0];
 				Real64 ElectricalPower = Mode0.CalculateCurveVal(Tosa, Wosa, Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE);
 				oStandBy.ElectricalPower = ElectricalPower;
@@ -1626,11 +1627,10 @@ namespace EnergyPlus {//***************
 
 				if (EnvironmentConditionsMet)
 				{
-					Real64 NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same.
-					if (NormalizationReference == -1)
+					//Real64 NormalizationReference = GetNormalPoint(1);// assumes the model has at least 1 curve and that all are set the same.
+					if (ModelNormalizationReference == 0)
 					{
-						NormalizationReference = 1;
-						return true;
+						ModelNormalizationReference = 1; //this should never happen because it calls the SetStandBy mode first.
 					}
 					for (point_number = 0; point_number != solution_map_sizeX; point_number++) // within each mode go though all the combinations of solution spaces.
 					{
@@ -1639,7 +1639,7 @@ namespace EnergyPlus {//***************
 						
 						MsaRatio = solutionspace.PointX[point_number];// fractions of rated mass flow rate, so for some modes this might be low but others hi
 						OSAF = solutionspace.PointY[point_number];
-						UnscaledMsa = NormalizationReference * MsaRatio;
+						UnscaledMsa = ModelNormalizationReference * MsaRatio;
 						ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
 						Real64 Supply_Air_Ventilation_Volume = 0;
 						//Calculate the ventilation mass flow rate
@@ -1750,12 +1750,12 @@ namespace EnergyPlus {//***************
 				Real64 ReturnAirCP = PsyCpAirFnWTdb(Wra, StepIns.Tra); //J/degreesK.kg 
 				Real64 OutsideAirCP = PsyCpAirFnWTdb(Wosa, StepIns.Tosa); //J/degreesK.kg 
 
-																		  // Calculations below of system cooling and heating capacity are ultimately reassessed when the resultant part runtime fraction is assessed.
-																		  // However its valuable that they are calculated here to at least provide a check. 
+				// Calculations below of system cooling and heating capacity are ultimately reassessed when the resultant part runtime fraction is assessed.
+				// However its valuable that they are calculated here to at least provide a check. 
 
-																		  //System Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA + OSAF*(cpOSA-cpRA) + cpSA) {kJ/kg-C} * (T_RA + OSAF*(T_OSA - T_RA)  - T_SA) 
-																		  //System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
-																		  //System Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA + OSAF*(h_OSA - h_RA) - h_SA) {kJ/kgDryAir}
+				//System Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA + OSAF*(cpOSA-cpRA) + cpSA) {kJ/kg-C} * (T_RA + OSAF*(T_OSA - T_RA)  - T_SA) 
+				//System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
+				//System Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA + OSAF*(h_OSA - h_RA) - h_SA) {kJ/kgDryAir}
 				Real64 SystemCp = ReturnAirCP + OSAF * (OutsideAirCP - ReturnAirCP) + SupplyAirCp; //J/degreesK.kg 
 				Real64 SensibleSystem = ScaledMsa * 0.5* SystemCp * (Tma - Tsa) / 1000;//kw  dynamic cp
 				Real64 MsaDry = ScaledMsa * (1 - Wsa);
@@ -2110,11 +2110,7 @@ namespace EnergyPlus {//***************
 
 			// REFERENCES: OutletVolumetricFlowRate, SupplyVentilationVolume, MinOA_Msa, SupplyVentilationAir
 			// na
-			//!!!!!!!!!!!!!!!!!!!!!!!!! this debug code will be removed nearer the code freeze, please don't comment on it, it will be gone.
-			// if ((DataGlobals::HourOfDay == DebugBreak) && !WarmupFlag)
-			// {
-			// 	int k = 1;//debug step
-			// }
+
 			// set requested loads to output variables
 			RequestedLoadToHeatingSetpoint = RequestedCoolingLoad;
 			RequestedLoadToCoolingSetpoint = RequestedHeatingLoad;
@@ -2340,8 +2336,6 @@ namespace EnergyPlus {//***************
 				QLatentSystemOut = 0;
 				// reset outputs
 				ResetOutputs();
-				
-	
 			}
 
 			// set timestep outputs calculated considering different runtime fractions.
@@ -2353,14 +2347,11 @@ namespace EnergyPlus {//***************
 			ThirdFuelConsumption = ThirdFuelConsumptionRate*TimeStepSys * SecInHour;
 			WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
 			WaterConsumption = WaterConsumptionRate*TimeStepSys * SecInHour;
-			ExternalStaticPressure=CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
-					
+			ExternalStaticPressure=CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);		
 					
 			// fuel use in calculation is in Kw, powers are typically output in EP in Watts, so do conversion here. 
 			FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
 			FinalElectricalEnergy = FinalElectricalPower*TimeStepSys * SecInHour;
-			
-		
 	
 		}
 
