@@ -2172,7 +2172,7 @@ namespace EnergyPlus {
 			DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Inverter:Simple";
 			modelType_ = InverterModelType::simpleConstantEff;
 		}
-		testInvertIndex = InputProcessor::GetObjectItemNum( "ElectricLoadCenter:Inverter:PVWatts", objectName );
+		testInvertIndex = inputProcessor->getObjectItemNum( "ElectricLoadCenter:Inverter:PVWatts", objectName );
 		if ( testInvertIndex > 0 ) {
 			foundInverter = true;
 			invertIDFObjectNum = testInvertIndex;
