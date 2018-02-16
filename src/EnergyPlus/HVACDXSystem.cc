@@ -801,6 +801,10 @@ namespace HVACDXSystem {
 					}
 					break;
 				}
+				case DataAirSystems::fanModelTypeNotYetSet: {
+					// do nothing
+					break;
+				}
 				}
 				DXCoolingSystem( DXSystemNum ).VSCoilFanInfoSet = true;
 			}

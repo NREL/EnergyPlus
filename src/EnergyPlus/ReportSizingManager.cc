@@ -780,11 +780,11 @@ namespace ReportSizingManager {
 								}
 							} else {
 								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-								if ( AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+								if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
 									if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
 										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
 									}
-								} else if ( AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+								} else if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
 									if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
 										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
 									}

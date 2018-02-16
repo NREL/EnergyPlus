@@ -490,7 +490,7 @@ ReportCoilSelection::doAirLoopSetup(
 
 			if ( DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated > 0 ) {
 				int zoneCount = DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated;
-				for ( int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo( c->airloopNum ).NumZonesHeated; ++loopZone ) {
+				for ( int loopZone = 1; loopZone <= zoneCount; ++loopZone ) {
 					int zoneIndex = DataAirLoop::AirToZoneNodeInfo( c->airloopNum).HeatCtrlZoneNums( loopZone );
 					// see if this zone is new or already in list
 					bool found = false;
@@ -802,7 +802,7 @@ ReportCoilSelection::doFinalProcessingOfCoilData()
 				// find boiler on this plant loop and get capacity from it
 				if ( allocated( BoilerSteam::Boiler )) {
 					for ( int boilerIndex = 1; boilerIndex <= BoilerSteam::NumBoilers; ++boilerIndex ) {
-						if ( BoilerSteam::Boiler( boilerIndex ).LoopNum = c->waterLoopNum ) { // steam boiler on this loop
+						if ( BoilerSteam::Boiler( boilerIndex ).LoopNum == c->waterLoopNum ) { // steam boiler on this loop
 							c->plantDesSupTemp = BoilerSteam::Boiler( boilerIndex ).TempUpLimitBoilerOut;
 							c->plantDesRetTemp = BoilerSteam::Boiler( boilerIndex ).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
 							c->plantDesCapacity = BoilerSteam::Boiler( boilerIndex ).NomCap;
@@ -880,7 +880,7 @@ ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName (
 		}
 	}
 
-	if ( index = -1 ) { // then did not find it
+	if ( index == -1 ) { // then did not find it
 		//check if really a coil type
 		bool found( false );
 		bool locIsCooling( false );

@@ -839,6 +839,10 @@ namespace SteamCoils {
 					}
 					break;
 				}
+				case DataAirSystems::fanModelTypeNotYetSet: {
+					// do nothing
+					break;
+				}
 				}
 
 				// if this is a zone coil
