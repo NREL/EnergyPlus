@@ -5,6 +5,8 @@ Allow Multiple Air Primary Loops in the Airflow Network Model
 
 **Florida Solar Energy Center**
 
+ - 1st Edition 2/13/18
+ - Add comments and submit design document
  - Original: 1/26/18
  - 
  
@@ -23,6 +25,19 @@ A new filed of AirLoop Name in AirflowNetwork:Distribution:Linkage was proposed 
 
 Jason also mentioned to allow an OA mixer for each AirLoop. Since multiple AirLoops are allowed, multiple OA mixers will be allowed too. A new field of OA mixer name will be inserted to accommodate multiple OA mixers in AirflowNetwork:Distribution:Component:OutdoorAirFlow and AirflowNetwork:Distribution:Component:ReliefAirFlow. 
 
+### Review comments based on the original NFP
+
+Edwin Lee's Email on 1/29/18
+
+Gu,
+
+I'm happy to review along with others.  I am sure this will be a great addition to those who would like to further leverage the airflow network capabilities.
+
+For the NFP, I support the input choices, but it seems like there are going to be a lot of "gotcha" cases to consider.  Your proposed changes are fairly brief, but I understand this is just the NFP stage, so I won't dwell much on it right now.
+
+Looks good.
+
+
 ## Overview ##
 
 The Airflow Network model will be modified to permit the use of a configurable number of air distribution systems. The proposed upgrade will simulate energy losses for air distribution systems and associated interactions among HVAC systems, envelope, and outdoors caused by unbalanced return and supply leaks in the multiple air distribution systems in a building.
@@ -31,10 +46,6 @@ The Airflow Network model will be modified to permit the use of a configurable n
 
 The following revisions will be performed:
 
-### Revise a filed name in AirflowNetwork:Distribution:Component:OutdoorAirFlow
-
-The
- 
 ### GetAirflowNetworkInput
 
 A few sections in this function will be modified to accommodate the changes. 
@@ -248,5 +259,89 @@ https://energyplus.uservoice.com/forums/258860-energyplus/suggestions/20318116-a
 
 HVAC_AirLoop_2009_06.doc: Allow Multiple Air Primary Loops in the AirflowNetwork Model
 
+## Design Document
 
+The design document addresses changes of two modules mainly: DataAirflowNetwork and AirflowNetworkBalanceManager.
+
+### DataAirflowNetwork
+
+The main changes are to add new variables in existing structs to store OA mixer number and AirLoopNum, so that multiple airloops information will be kept.
+
+#### Add a new variable in DisSysCompAirflowProp to provide OA mixer number
+
+A new variable of OAMixerNum will be added in the DisSysCompAirflowProp struct to store the OA mixer number. The number will be used to get the outdoor air inlet node number of an OA mixer.
+
+#### Add a new variable of AirLoopNum in DisSysNodeData struct
+
+In order to ensure integrity of air distribution system for each AirLoop, a new variable of AirLoopNum is added, so that each EnergyPlus node listed in DisSysNodeData objects will be assigned to an AirLoopNum. Nodes with different AirLoop numbers are not allowed to be linked together in a single air distribution system. In other words, all the nodes listed in each linkage should have the same AirLoop number.      
+
+#### Add a new variable of AirLoopNum in AirflowNetworkLinkageData struct
+
+In order to ensure integrity of air distribution system for each AirLoop, a new variable of AirLoopNum is added, so that each AirflowNetwork:Distribution:Linkage will be assigned to an AirLoopNum. All linkages for an air distribution system should have the same AirLoop number.      
+
+### AirflowNetworkBalanceManager
+
+The main changes are to revise two functions of GetAirflowNetworkInput and ValidateDistributionSystem, and create two new functions: GetAirLoopNumber and CheckAirLoopIntegrity. The GetAirLoopNumber will get an AirLoopNum and assign it to both associated distribution nodes and linkages. The CheckAirLoopIntegrity will ensure all nodes and linkages have no conflict. 
+
+#### GetAirflowNetworkInput
+
+The revisions will include 3 sections: 1) remove a section to check the number of primary air loops; 2) revise a section of AirflowNetwork:Distribution:Component:OutdoorAirFlow to read a new field of OA mixer; and 3) revise a section of AirflowNetwork:Distribution:Component:ReliefAirFlow to read a new field of OA mixer. 
+
+##### Remove a section to check the number of primary air loops
+
+The section shown below will be removed, so that no restriction of the number of airloops will be forced.
+
+		// Check the number of primary air loops
+		if ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS || SimulateAirflowNetwork == AirflowNetworkControlMultiADS ) {
+			NumAPL = GetNumObjectsFound( "AirLoopHVAC" );
+			if ( NumAPL != 1 ) {
+				if ( NumAPL == 0 ) {
+					ShowSevereError( RoutineName + "No AirLoopHVAC is found when " + cAlphaFields( 2 ) + " = " + SimAirNetworkKey );
+					ShowContinueError( "Please select a choice of MultizoneWithoutDistribution for " + cAlphaFields( 2 ) );
+				} else {
+					ShowSevereError( RoutineName + "More AirLoopHVACs are found. Currently only one (\"1\") AirLoopHVAC object per simulation is allowed when using AirflowNetwork Distribution Systems" );
+				}
+				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+			}
+		}
+		......
+
+
+##### Revise a section to read AirflowNetwork:Distribution:Component:OutdoorAirFlow
+
+A new field will be read. The OA mixer name will be checked to ensure the name is valid. The OA mixer number will be assigned to a new variable of OAMixerNum. In addition, the restriction of a single object will be removed to allow multiple objects.
+
+##### Revise a section to read AirflowNetwork:Distribution:Component:ReliefAirFlow
+
+A new field will be read. The OA mixer name will be checked to ensure the name is valid. The OA mixer number will be assigned to a new variable of OAMixerNum. In addition, the restriction of a single object will be removed to allow multiple objects.
+
+#### ValidateDistributionSystem
+
+The new function of GetAirLoopNumber will be called inside the section of node name validation.
+
+#### A new function of GetAirLoopNumber
+
+A new function will be created to check which AirLoopNum an EnergyPlus node belongs to. The AirLoopNum will be assign to each DisSysNodeData. The following checks will be performed:
+
+1. Branch
+   It contains all nodes for coils, fans and OA mixers
+2. Connection between supply and demand
+   It contains inlet and outlet nodes for each supply and demand branches 
+3. Supply Air path
+   It contains a single inlet and multiple outlet nodes based on a zone splitter.
+4. Return air path
+   It contains a single outlet and multiple inlet nodes based on a zone mixer.
+5. Zone Equipment configuration
+   It contains information on zone inlet and return nodes and terminal units.
+6. Terminal units
+   Some terminal units may have an damper and reheat coils. In addition to inlet and outlet nodes, any nodes between them will be obtained.
+7. Outdoor air nodes
+
+#### A new function of CheckAirLoopIntegrity
+
+There are two types of AirflowNetwork:Distribution:Node. The first type is the node defined in NodeID globally. The second type is the AirflowNetwork distribution system node. The GetAirLoopNumber function assigns the the first type nodes with AirLoopNum. The rest of nodes will be assigned to AirLoopNum based on AirflowNetwork:Distribution:Linkage check in this function.
+
+The CheckAirLoopIntegrity function will check each linkage first. If the second type node is connected to the first type node in a linkage, the same AirLoopNum will be assigned to the second type node. If both nods are the second type in a link, an AirLoopNum from one of the nodes will be assigned to the other. If both nodes are the second type and no AirLoopNum is assigned in either one, a severe warning will be issued. Then each linkage will be assigned AirLoopNum based node assignments. If both nodes have different AirLoopNums, a severe warning will be issued. 
+
+The check will ensure integrity of AirLoopNum assignment, so that each air distribution system will be under the same AirLoopNum .
 
