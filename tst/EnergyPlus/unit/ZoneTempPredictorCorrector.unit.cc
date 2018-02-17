@@ -280,6 +280,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
+	// Issue 6233
+	Zone( 1 ).IsControlled = true;
+	CorrectZoneHumRat( 1 );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
+
 	// Deallocate everything
 	ZoneEquipConfig( 1 ).InletNode.deallocate();
 	ZoneEquipConfig( 1 ).ExhaustNode.deallocate();

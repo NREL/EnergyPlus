@@ -611,7 +611,7 @@ DO WHILE (read_stat == 0) ! not end of file
   END IF
   IF (doOutputLine) THEN
     lineCount = lineCount + 1
-    WRITE(tFH,'(A)'), TRIM(LineOut)
+    WRITE(tFH,'(A)')  TRIM(LineOut)
   END IF
 END DO
 END SUBROUTINE InitialRead
@@ -1215,7 +1215,7 @@ DO WHILE (read_stat == 0)  ! not end of file
   END IF
   ! if object is disabled, then don't write the line
   IF (writeLine) THEN
-    WRITE(oFH,'(A)'), TRIM(LineOut)
+    WRITE(oFH,'(A)')  TRIM(LineOut)
   END IF
 END DO
 IF (verboseDebug) PRINT '(A,I6,2X,I6,2X,I6)',' In SubstituteValues, done copying the intermediate file. tFH/oFH/Line: ', tFH,oFH,lineCount
@@ -1244,14 +1244,14 @@ DO iError = 1,numErrMsgs
   IF (ErrMsgs(numErrMsgs)%msgKind .EQ. msgError) THEN
     IF (.NOT. wroteErrorHeader) THEN
       wroteErrorHeader = .TRUE.
-      WRITE(ErrFH, '(A)'),'==================='
-      WRITE(ErrFH, '(A)'),'   ERRORS          '
-      WRITE(ErrFH, '(A)'),'==================='
+      WRITE(ErrFH, '(A)') '==================='
+      WRITE(ErrFH, '(A)') '   ERRORS          '
+      WRITE(ErrFH, '(A)') '==================='
     END IF
-    WRITE(ErrFH, '(A)'),'-------------------------------------------------------------------------'
-    WRITE(ErrFH, '(A,A)'),'      ', TRIM(ErrMsgs(numErrMsgs)%msgText)
-    WRITE(ErrFH, '(A,I4)'),'      Number ',ErrMsgs(numErrMsgs)%msgErrNum
-    WRITE(ErrFH, '(A,A)'),'      Context ', TRIM(ErrMsgs(numErrMsgs)%msgContext)
+    WRITE(ErrFH, '(A)') '-------------------------------------------------------------------------'
+    WRITE(ErrFH, '(A,A)') '      ', TRIM(ErrMsgs(numErrMsgs)%msgText)
+    WRITE(ErrFH, '(A,I4)') '      Number ',ErrMsgs(numErrMsgs)%msgErrNum
+    WRITE(ErrFH, '(A,A)') '      Context ', TRIM(ErrMsgs(numErrMsgs)%msgContext)
   END IF
 END DO
 ! now write warnings
@@ -1259,14 +1259,14 @@ DO iError = 1,numErrMsgs
   IF (ErrMsgs(numErrMsgs)%msgKind .EQ. msgWarning) THEN
     IF (.NOT. wroteWarningHeader) THEN
       wroteWarningHeader = .TRUE.
-      WRITE(ErrFH, '(A)'),'==================='
-      WRITE(ErrFH, '(A)'),'   WARNINGS        '
-      WRITE(ErrFH, '(A)'),'==================='
+      WRITE(ErrFH, '(A)') '==================='
+      WRITE(ErrFH, '(A)') '   WARNINGS        '
+      WRITE(ErrFH, '(A)') '==================='
     END IF
-    WRITE(ErrFH, '(A)'),'-------------------------------------------------------------------------'
-    WRITE(ErrFH, '(A,A)'),'      ', TRIM(ErrMsgs(numErrMsgs)%msgText)
-    WRITE(ErrFH, '(A,I4)'),'      Number ',ErrMsgs(numErrMsgs)%msgErrNum
-    WRITE(ErrFH, '(A,A)'),'      Context ', TRIM(ErrMsgs(numErrMsgs)%msgContext)
+    WRITE(ErrFH, '(A)') '-------------------------------------------------------------------------'
+    WRITE(ErrFH, '(A,A)') '      ', TRIM(ErrMsgs(numErrMsgs)%msgText)
+    WRITE(ErrFH, '(A,I4)') '      Number ',ErrMsgs(numErrMsgs)%msgErrNum
+    WRITE(ErrFH, '(A,A)') '      Context ', TRIM(ErrMsgs(numErrMsgs)%msgContext)
   END IF
 END DO
 IF (numErrMsgs .GT. 0) THEN
