@@ -3356,6 +3356,11 @@ namespace ZoneTempPredictorCorrector {
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+
+			//
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
+			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToHeatingSetPoint = LoadToCoolingSetPoint;
@@ -3387,6 +3392,10 @@ namespace ZoneTempPredictorCorrector {
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
+			}
 
 			//PH 3/2/04      ZoneSysEnergyDemand(ZoneNum)%TotalOutputRequired = LoadToHeatingSetPoint ! = LoadToCoolingSetPoint
 			// Note that LoadToHeatingSetPoint is generally not equal to LoadToCoolingSetPoint
@@ -3453,6 +3462,10 @@ namespace ZoneTempPredictorCorrector {
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
+			}
 
 			// Possible combinations:
 			// 1/  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required

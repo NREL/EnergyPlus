@@ -21176,7 +21176,7 @@ OtherEquipment,
 ElectricEquipment:ITE:AirCooled,
    \memo This object describes air-cooled electric information technology equipment (ITE) which has
    \memo variable power consumption as a function of loading and temperature.
-       \min-fields 27
+       \min-fields 28
   A1 , \field Name
        \required-field
        \type alpha
@@ -21184,7 +21184,21 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list ZoneNames
-  A3 , \field Design Power Input Calculation Method
+  A3 , \field Air Flow Calculation Method
+       \note The specified method is used to calculate the IT inlet temperature and zone return 
+       \note air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. 
+       \note If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature 
+       \note should be defined to indicate the temperature difference due to the air distribution. When
+       \note FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction
+       \note and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple
+       \note ITE objects defined for one zone, the same calculation method should apply.
+       \note The FlowControlWithApproachTemperatures only applies to ITE zones with single duct VAV terminal unit. 
+       \note Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
+       \type choice
+       \key FlowFromSystem
+       \key FlowControlWithApproachTemperatures
+       \default FlowFromSystem
+  A4 , \field Design Power Input Calculation Method
        \note The entered calculation method is used to specify the design power input
        \note Watts/Unit => Watts per Unit -- Design Power = Watts per Unit * Number of Units
        \note Watts/Area => Watts per Zone Floor Area -- Design Power = Watts per Zone Floor Area * Floor Area
@@ -21206,18 +21220,18 @@ ElectricEquipment:ITE:AirCooled,
        \minimum 0
        \units W/m2
        \ip-units W/ft2
-  A4 , \field Design Power Input Schedule Name
+  A5 , \field Design Power Input Schedule Name
        \note Operating schedule for this equipment, fraction applied to the design power input,
        \note generally (0.0 - 1.0)
        \note If this field is blank, the schedule is assumed to always be 1.0.
        \type object-list
        \object-list ScheduleNames
-  A5 , \field CPU Loading  Schedule Name
+  A6 , \field CPU Loading  Schedule Name
        \note CPU loading schedule for this equipment as a fraction from 0.0 (idle) to 1.0 (full load).
        \note If this field is blank, the schedule is assumed to always be 1.0.
        \type object-list
        \object-list ScheduleNames
-  A6 , \field CPU Power Input Function of Loading and Air Temperature Curve Name
+  A7 , \field CPU Power Input Function of Loading and Air Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiVariateCurves
@@ -21238,7 +21252,7 @@ ElectricEquipment:ITE:AirCooled,
        \type real
        \units m3/s-W
        \minimum 0.0
-  A7 , \field Air Flow Function of Loading and Air Temperature Curve Name
+  A8 , \field Air Flow Function of Loading and Air Temperature Curve Name
        \required-field
        \type object-list
        \object-list BiVariateCurves
@@ -21247,7 +21261,7 @@ ElectricEquipment:ITE:AirCooled,
        \note air flow rate as a function of CPU loading (x) and air inlet node temperature (y).
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and
        \note Design Entering Air Temperature).
-  A8 , \field Fan Power Input Function of Flow Curve Name
+  A9 , \field Fan Power Input Function of Flow Curve Name
        \required-field
        \type object-list
        \object-list UniVariateCurves
@@ -21260,7 +21274,7 @@ ElectricEquipment:ITE:AirCooled,
        \type real
        \units C
        \default 15.0
-  A9,  \field Environmental Class
+  A10, \field Environmental Class
        \note Specifies the allowable operating conditions for the air inlet conditions.
        \note Used for reporting time outside allowable conditions.
        \type choice
@@ -21272,7 +21286,7 @@ ElectricEquipment:ITE:AirCooled,
        \key B
        \key C
        \default None
-  A10, \field Air Inlet Connection Type
+  A11, \field Air Inlet Connection Type
        \note Specifies the type of connection between the zone and the ITE air inlet node.
        \note AdjustedSupply = ITE inlet temperature will be the current Supply Air Node temperature
        \note adjusted by the current recirculation fraction.
@@ -21280,32 +21294,35 @@ ElectricEquipment:ITE:AirCooled,
        \note ZoneAirNode = ITE air inlet condition is  the average zone condition.
        \note All heat output is added to the zone air heat balance as a convective gain.
        \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes.
+       \note This field is only used when Air Flow Calculation Method is FlowFromSystem.
        \type choice
        \key AdjustedSupply
        \key ZoneAirNode
        \key RoomAirModel
        \default AdjustedSupply
-  A11, \field Air Inlet Room Air Model Node Name
+  A12, \field Air Inlet Room Air Model Node Name
        \note Name of a RoomAir:Node object which is connected to the ITE air inlet.
        \type object-list
        \object-list RoomAirNodes
-  A12, \field Air Outlet Room Air Model Node Name
+  A13, \field Air Outlet Room Air Model Node Name
        \note Name of a RoomAir:Node object which is connected to the ITE air outlet.
        \type object-list
        \object-list RoomAirNodes
-  A13, \field Supply Air Node Name
+  A14, \field Supply Air Node Name
        \note Name of the supply air inlet node serving this ITE. Required if the
-       \note Air Node Connection Type = AdjustedSupply. Also required if reporting of
+       \note Air Node Connection Type = AdjustedSupply. Also required if 
+       \note Calculation Method = FlowControlWithApproachTemperatures. Also required if reporting of
        \note Supply Heat Index is desired.
        \type node
   N7,  \field Design Recirculation Fraction
        \note The recirculation fraction for this equipment at design conditions. This field is used only
        \note if the Air Node Connection Type = AdjustedSupply. The default is 0.0 (no recirculation).
+       \note This field is only used when Air Flow Calculation Method is FlowFromSystem.
        \type real
        \minimum 0.0
        \maximum 0.5
        \default 0.0
-  A14, \field Recirculation Function of Loading and Supply Temperature Curve Name
+  A15, \field Recirculation Function of Loading and Supply Temperature Curve Name
        \type object-list
        \object-list BiVariateCurves
        \object-list BiVariateTables
@@ -21315,13 +21332,14 @@ ElectricEquipment:ITE:AirCooled,
        \note Design Entering Air Temperature).This field is used only if the
        \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve
        \note is assumed to always equal 1.0.
+       \note This field is only used when Air Flow Calculation Method is FlowFromSystem.
   N8 , \field Design Electric Power Supply Efficiency
        \note The efficiency of the power supply system serving this ITE
        \type real
        \minimum> 0.0
        \maximum 1.0
        \default 1.0
-  A15, \field Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+  A16, \field Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
        \type object-list
        \object-list UniVariateCurves
        \object-list UniVariateTables
@@ -21336,22 +21354,46 @@ ElectricEquipment:ITE:AirCooled,
        \minimum 0.0
        \maximum 1.0
        \default 1.0
-  A16, \field CPU End-Use Subcategory
+  A17, \field CPU End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-CPU
-  A17, \field Fan End-Use Subcategory
+  A18, \field Fan End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-Fans
-  A18; \field Electric Power Supply End-Use Subcategory
+  A19, \field Electric Power Supply End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
        \default ITE-UPS
-
+  N10, \field Supply Temperature Difference
+       \note The difference of the IT inlet temperature from the AHU supply air temperature.
+       \note Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. 
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+       \type real
+       \units deltaC
+  A20, \field Supply Temperature Difference Schedule
+       \note The difference schedule of the IT inlet temperature from the AHU supply air temperature.   
+       \note Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. 
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+       \type object-list
+       \object-list ScheduleNames
+  N11, \field Return Temperature Difference
+       \note The difference of the return outlet temperature from the well mixed zone temperature.
+       \note Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures.
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+       \type real
+       \units deltaC
+  A21; \field Return Temperature Difference Schedule
+       \note The difference schedule of the return outlet temperature from the well mixed zone temperature.
+       \note Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. 
+       \note This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+       \type object-list
+       \object-list ScheduleNames
+	   
 ZoneBaseboard:OutdoorTemperatureControlled,
        \memo Specifies outside temperature-controlled electric baseboard heating.
        \min-fields 8

@@ -7974,7 +7974,11 @@ namespace SurfaceGeometry {
 				} else if ( SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
 					int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex( Surface( SurfNum ).ZoneName );
-					if( controlledZoneNum > 0 ) DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+					if( controlledZoneNum > 0 ) {
+						DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+						DataHeatBalance::Zone( Surface( SurfNum ).Zone ).HasAirFlowWindowReturn = true;
+					}
+					
 					// Set return air node number
 					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = 0;
 					std::string retNodeName = "";
