@@ -910,7 +910,6 @@ namespace EnergyPlus {
 		bool ErrorsFound( false );
 		bool FirstHVACIteration( false );
 		Real64 HVACInletMassFlowRate( 0.0 );
-		Real64 PrimaryAirMassFlowRate( 0.0 );
 		Real64 OnOffAirFlowRatio( 1.0 );
 		Real64 LatOutputProvided( 0.0 );
 		Real64 QUnitOut( 0.0 );

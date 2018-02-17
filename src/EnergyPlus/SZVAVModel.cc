@@ -223,7 +223,6 @@ namespace SZVAVModel {
 		Real64 ZoneHumRat = DataLoopNode::Node( SZVAVModel.NodeNumOfControlledZone ).HumRat;
 		// initialize flow variables to 0
 		Real64 lowWaterMdot = 0.0;
-		Real64 SupHeaterLoad = 0.0;
 
 		// model attempts to control air flow rate and coil capacity in specific operating regions:
 		// Region 1 (R1) - minimum air flow rate at modulated coil capacity (up to min/max temperature limits)
