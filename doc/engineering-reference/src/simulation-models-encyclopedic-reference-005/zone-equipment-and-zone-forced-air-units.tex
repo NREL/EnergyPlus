@@ -566,6 +566,37 @@ where:
 
 Iterative calculations (successive modeling of the individual PTAC component models) are used to determine the final heating part-load ratio to account for the non-linear performance of the heating coil at part-load conditions and the variation in supply air fan heat for the case of cycling fan/cycling coil (AUTO fan). If heating coil operation at full load is unable to meet the entire zone heating load (e.g., the heating coil capacity is insufficient or the coil is scheduled OFF), the air conditioner's part-load ratio is set to 1 to meet the zone heating load to the extent possible.
 
+\subsubsection{Single Zone VAV load based control:}\label{single-zone-vav-load-based-control}
+
+The packaged terminal air conditioner can also be used to simulate a system capable of maintaining a low fan speed through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the fan speed is maintained at a minimum level and the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. As the outlet air temperature limit is reached and loads increase, the fan speed increases to maintain thermostat control. When the fan speed reaches the maximum flow limit, the system outlet air temperature may exceed the user specified limit, if the coil is capable of providing more capacity, to meet increased load. This model is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for cooling or heating operation. Additionally, only specific coil types are allowed for the Single Zone VAV capacity control method. 
+
+Allowed coil types are:
+
+\textbf{Cooling coils:}
+\begin{itemize}
+\item Coil:Cooling:DX:SingleSpeed
+\end{itemize}
+
+\textbf{Heating coils:}
+\begin{itemize}
+\item Coil:Heating:Water
+\item Coil:Heating:Fuel
+\item Coil:Heating:Electric
+\item Coil:Heating:DX:SingleSpeed (Packaged Terminal Heat Pump only)
+\end{itemize}
+
+Other coil types may be used when selecting the Single Zone VAV control method, however, these coils will not be modeled using the Single Zone VAV load based control method and instead will be modeled using the Load Based control method described in a previous section.
+
+The example below shows two implementations of the Single Zone VAV model using the ZoneHVAC:PackagedTerminalAirConditioner and ZoneHVAC:PackagedTerminalHeatPump objects serving a single zone. The supply air temperature limits are autosized. The supply air temperature limits are intended to reflect the model requirement to allow low speed fan operation at zone loads less than or equal to 50\% of the design load. The zone cooling and heating loads identified in the figure are actual simulation data taken from the zone sizing information representative of the control zones used for each system. If the load on the unit is zero the air flow rate remains at the minimum. If the zone load is greater than 50\% of the design load, the air flow rate increases to allow more capacity up to the point where the maximum supply air flow rate is achieved. When supplemental heaters are active, the air flow rate will be at the maximum. The figure on the left has a 24 C cooling and 18 C heating set point temperature. The figure on the right, 23.5 and 22.5, respectively.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/PTUnit_SZVAV_FanControl.png}
+\caption{Example of the EnergyPlus Packaged Terminal Unit Single Zone VAV Model \protect \label{fig:example-of-the-energyplus-packaged-terminal-unit-single-zone-vav-model}}
+\end{figure}
+
+Supply air temperature limits are autosizable and calculated with respect to the zone temperatures at the design cooling and heating peak load conditions. Once the temperature limits are reached and the zone load continues to increase, the fan speed is increased while limiting the maximum outlet air temperature up to the maximum fan speed. At this point, the maximum temperature limits are ignored and the coils are allowed to provide excess temperatures when needed to meet increasing loads. When a supplemental heating coil is used, this coil should be active only when maximum fan speed is reached and will supplement any additional heating required to meet the zone load. The supplemental heating coil also has no maximum temperature limit while attempting to meet high heating loads.
+
 \subsubsection{Average Air Flow Calculations}\label{average-air-flow-calculations-000}
 
 The packaged terminal air conditioner operates based on user-specified (or autosized) air flow rates. The PTAC's supply air flow rate during cooling operation may be different than the supply air flow rate during heating operation. In addition, the supply air flow rate when no cooling or heating is required but the supply air fan remains ON can be different than the air flow rates when cooling or heating is required. The outdoor air flow rates can likewise be different in these various operating modes. The model takes these different flow rates into account when modeling the air conditioner, and the average air flow rate for each simulation time step is reported on the inlet/outlet air nodes of the various PTAC components in proportion to the calculated part-load ratio of the coil.
@@ -769,6 +800,11 @@ where:
 \(\dot{Q}_{zone,heating}\) = required zone sensible heating rate to meet setpoint, W
 
 Iterative calculations (successive modeling of the individual PTHP component models) are used to determine the final heating part-load ratio to account for the non-linear performance of the DX heating coil at part-load conditions and the variation in supply air fan heat for the case of cycling fan/cycling coil (AUTO fan). If DX heating coil operating at full load is unable to meet the entire zone heating load (e.g., the DX heating coil capacity is insufficient or the coil is scheduled OFF, or the outdoor temperature is below the PTHP's minimum outdoor dry-bulb temperature for compressor operation), the supplemental heating coil is activated to meet the remaining zone heating load to the extent possible.
+
+\subsubsection{Single Zone VAV load based control:}\label{single-zone-vav-load-based-control-2}
+
+The packaged terminal heat pump can also be used to simulate a system capable of maintaining a low fan speed 
+through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the fan speed is maintained at a minimum level and the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. This model is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for cooling or heating operation. See the description for Packaged Terminal Air Conditioner.
 
 \subsubsection{Average Air Flow Calculations}\label{average-air-flow-calculations-1}
 

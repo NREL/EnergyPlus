@@ -526,7 +526,7 @@ A unique user assigned name for an instance of a Fan Coil unit. Any reference to
 
 The name of the schedule (ref: Schedule) that denotes whether the fan coil unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-\textbf{\emph{Field: Capacity Control~Method}}
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
 
 This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{ConstantFanVariableFlow}}, \textbf{\emph{CyclingFan}}, \textbf{\emph{VariableFanVariableFlow}}, \textbf{\emph{VariableFanConstantFlow}}, \textbf{\emph{MultiSpeedFan}}, or \textbf{\emph{ASHRAE90VariableFan}}. For \emph{ConstantFanVariableFlow}, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For \emph{CyclingFan}, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For \emph{VariableFanVariableFlow} ~both air and water flow rates are varied to match the load. For \emph{VariableFanConstantFlow,} the water flow rate is at full flow and the fan speed varies to meet the load. For \emph{MultiSpeedFan} the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For \emph{ASHRAE90VariableFan}, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
 
@@ -2242,6 +2242,19 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner~ zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-2}
+
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel and Coil:Heating:Electric. If alternate coil types are used they are modeled using the load based control method. 
+
+\paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-2}
+
+When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
+\paragraph{Field: Maximum Supply Air Temperature in Heating Mode}\label{field-maximum-supply-air-temperature-in-heating-mode-2}
+
+When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
+
 As shown in the example below, correct specification of the packaged terminal air conditioner requires the following objects in addition to the compound object itself:
 
 \begin{enumerate}
@@ -2614,6 +2627,19 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-7}
 
 This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-3}
+
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is Coil:Cooling:DX:SingleSpeed while the heating coil type is Coil:Heating:DX:SingleSpeed.
+
+\paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-3}
+
+When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
+\paragraph{Field: Maximum Supply Air Temperature in Heating Mode}\label{field-maximum-supply-air-temperature-in-heating-mode-3}
+
+When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
 
 As shown in the example below, correct specification of the packaged terminal heat pump requires the following objects in addition to the compound object itself:
 

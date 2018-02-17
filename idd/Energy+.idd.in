@@ -818,6 +818,7 @@ HVACSystemRootFindingAlgorithm,
        \key Bisection
        \key BisectionThenRegulaFalsi
        \key RegulaFalsiThenBisection
+       \key Alternation
        \default RegulaFalsi
   N1 ; \field Number of Iterations Before Algorithm Switch
        \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is
@@ -34034,10 +34035,27 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-   A16; \field Design Specification ZoneHVAC Sizing Object Name
+   A16, \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
+   A17, \field Capacity Control Method
+        \type choice
+        \key None
+        \key SingleZoneVAV
+        \default None
+   N7 , \field Minimum Supply Air Temperature in Cooling Mode
+        \note For Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
+   N8 ; \field Maximum Supply Air Temperature in Heating Mode
+        \note For Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
 
 ZoneHVAC:PackagedTerminalHeatPump,
         \memo Packaged terminal heat pump (PTHP). Forced-convection heating-cooling unit with
@@ -34226,10 +34244,27 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-   A18; \field Design Specification ZoneHVAC Sizing Object Name
+   A18, \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
+   A19, \field Capacity Control Method
+        \type choice
+        \key None
+        \key SingleZoneVAV
+        \default None
+   N11, \field Minimum Supply Air Temperature in Cooling Mode
+        \note For Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
+   N12; \field Maximum Supply Air Temperature in Heating Mode
+        \note For Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed.
+        \type real
+        \minimum 0.0
+        \autosizable
+        \default autosize
 
 ZoneHVAC:WaterToAirHeatPump,
         \memo Water-to-air heat pump. Forced-convection heating-cooling unit with supply fan,

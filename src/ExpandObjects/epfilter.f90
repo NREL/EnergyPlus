@@ -23381,6 +23381,8 @@ INTEGER, PARAMETER :: capctrlConstFanVarFlow  = 1
 INTEGER, PARAMETER :: capctrlCyclFan          = 2
 INTEGER, PARAMETER :: capctrlVarFanVarFlow    = 3
 INTEGER, PARAMETER :: capctrlVarFanConstFlow  = 4
+INTEGER, PARAMETER :: capctrlMultiSpeedFan    = 5
+INTEGER, PARAMETER :: capctrlASHRAE90VariableFan = 6
 
           ! INTERFACE BLOCK SPECIFICATIONS
           !    na
@@ -23467,6 +23469,10 @@ DO iZone = 1, numCompactFanCoil
     capacityControlKind = capctrlVarFanVarFlow
   ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'VariableFanConstantFlow')) THEN
     capacityControlKind = capctrlVarFanConstFlow
+!  ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'MultiSpeedFan')) THEN
+!    capacityControlKind = capctrlMultiSpeedFan
+  ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'ASHRAE90VariableFan')) THEN
+    capacityControlKind = capctrlASHRAE90VariableFan
   ELSE
     CALL WriteError('Invalid choice in HVACTemplate:Zone:FanCoil "'//TRIM(FldVal(base + fczNameOff))//'"'// &
                     ' in the Capacity Control Method field: '//TRIM(FldVal(base + fczCapCtrlTypeOff)))
@@ -23655,7 +23661,7 @@ DO iZone = 1, numCompactFanCoil
 !  CALL AddToObjFld('Relief Air Node Name', base + fczNameOff,' Relief Air Outlet')
   CALL AddToObjStr('Outdoor Air Mixer Object Type', 'OutdoorAir:Mixer')
   CALL AddToObjFld('Outdoor Air Mixer Name', base + fczNameOff,' OA Mixing Box')
-  IF (capacityControlKind == capctrlConstFanVarFlow) THEN
+  IF (capacityControlKind == capctrlConstFanVarFlow .OR. capacityControlKind==capctrlASHRAE90VariableFan) THEN
     CALL AddToObjStr('Supply Air Fan Object Type', 'Fan:ConstantVolume')
   ELSEIF (capacityControlKind == capctrlCyclFan) THEN
     CALL AddToObjStr('Supply Air Fan Object Type', 'Fan:OnOff')
@@ -23680,7 +23686,7 @@ DO iZone = 1, numCompactFanCoil
 
   ! Supply fan
   SELECT CASE (capacityControlKind)
-  CASE (capctrlConstFanVarFlow)
+  CASE (capctrlConstFanVarFlow,capctrlASHRAE90VariableFan)
     CALL CreateNewObj('Fan:ConstantVolume')
     CALL AddToObjFld('Name', base + fczNameOff,' Supply Fan')
     IF (.NOT. isSysAvailSchedBlank) THEN
@@ -23691,6 +23697,7 @@ DO iZone = 1, numCompactFanCoil
     CALL AddToObjFld('Fan Efficiency', base + fczSupplyEfficiencyOff,'')
     CALL AddToObjFld('Pressure Rise {Pa}', base + fczSupplyPressureOff,'')
     CALL AddToObjStr('Maximum Flow Rate {m3/s}','autosize')
+	if ( capacityControlKind .EQ. capctrlASHRAE90VariableFan ) CALL AddToObjStr('Low Speed Supply Air Flow Ratio','autosize')
     CALL AddToObjFld('Motor Efficiency', base + fczSupplyFanMotorEffOff,'')
     CALL AddToObjFld('Motor in Airstream Fraction', base + fczSupplyFanMotorFracOff,'')
     CALL AddToObjFld('Air Inlet Node Name', base + fczNameOff,' Mixed Air Outlet')
