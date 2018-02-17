@@ -23661,7 +23661,7 @@ DO iZone = 1, numCompactFanCoil
 !  CALL AddToObjFld('Relief Air Node Name', base + fczNameOff,' Relief Air Outlet')
   CALL AddToObjStr('Outdoor Air Mixer Object Type', 'OutdoorAir:Mixer')
   CALL AddToObjFld('Outdoor Air Mixer Name', base + fczNameOff,' OA Mixing Box')
-  IF (capacityControlKind == capctrlConstFanVarFlow,capctrlASHRAE90VariableFan) THEN
+  IF (capacityControlKind == capctrlConstFanVarFlow .OR. capacityControlKind==capctrlASHRAE90VariableFan) THEN
     CALL AddToObjStr('Supply Air Fan Object Type', 'Fan:ConstantVolume')
   ELSEIF (capacityControlKind == capctrlCyclFan) THEN
     CALL AddToObjStr('Supply Air Fan Object Type', 'Fan:OnOff')
