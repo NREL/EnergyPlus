@@ -16136,7 +16136,7 @@ SurfaceProperty:HeatTransferAlgorithm:Construction,
 
 SurfaceProperty:HeatBalanceSourceTerm,
        \memo Allows an additional heat source term to be added to the inside or outside surface boundary.
-       \memo A heat source can be added to either or both the inside and outside of the same surface.   
+       \memo A heat source can be added to either or both the inside and outside of the same surface.
        \min-fields 3
   A1 , \field Surface Name
        \required-field
@@ -20461,8 +20461,8 @@ People,
        \minimum 0.0
        \maximum 1.0
        \default 0.3
-       \note This is radiant fraction of the sensible heat released by people in a zone. This value will be 
-       \note multiplied by the total sensible heat released by people yields the amount of long wavelength 
+       \note This is radiant fraction of the sensible heat released by people in a zone. This value will be
+       \note multiplied by the total sensible heat released by people yields the amount of long wavelength
        \note radiation gain from people in a zone. Default value is 0.30.
   N5,  \field Sensible Heat Fraction
        \note if input, overrides program calculated sensible/latent split
@@ -90298,7 +90298,7 @@ UtilityCost:Tariff,
         \key gal
         \key kgal
         \note A choice that allows several different predefined conversion factors to be used; otherwise user
-        \note defined conversion factors are used as defined in the next two fields. If left blank m3 is used for water meters 
+        \note defined conversion factors are used as defined in the next two fields. If left blank m3 is used for water meters
         \note and kWh are used for all other meters.
    N1,  \field Energy Conversion Factor
         \type real

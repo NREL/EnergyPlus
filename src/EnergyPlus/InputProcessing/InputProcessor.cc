@@ -441,6 +441,18 @@ namespace EnergyPlus {
 
 		Alphas = "";
 		Numbers = 0;
+		if ( is_NumBlank ) {
+			NumBlank() = true;
+		}
+		if ( is_AlphaBlank ) {
+			AlphaBlank() = true;
+		}
+		if ( is_AlphaFieldNames ) {
+			AlphaFieldNames() = "";
+		}
+		if ( is_NumericFieldNames ) {
+			NumericFieldNames() = "";
+		}
 
 		auto const & obj = epJSON_it;
 		auto const & obj_val = obj.value();
