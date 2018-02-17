@@ -2892,14 +2892,14 @@ TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test )
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
 }
 
-TEST( SurfaceGeometryUnitTests, MakeRectangularVertices )
+TEST_F( EnergyPlusFixture, MakeRectangularVertices )
 {
 	int surfNum = 1;
 	int zoneNum = 1;
 	SurfaceTmp.allocate( surfNum );
 	SurfaceTmp( surfNum ).Class = SurfaceClass_Wall;
 	SurfaceTmp( surfNum ).Zone = zoneNum;
-	SurfaceTmp( surfNum ).Azimuth = 0.; 
+	SurfaceTmp( surfNum ).Azimuth = 0.;
 	SurfaceTmp( surfNum ).Tilt = 90.;
 	SurfaceTmp( surfNum ).Sides = 4;
 	SurfaceTmp( surfNum ).Vertex.allocate( 4 );
