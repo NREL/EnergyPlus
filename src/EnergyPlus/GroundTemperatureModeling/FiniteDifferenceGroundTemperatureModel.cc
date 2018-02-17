@@ -238,7 +238,7 @@ namespace EnergyPlus {
 		WeathSimReq = true;
 		RunPeriodInput( TotRunPers ).startJulianDate = 1;  //JulianDay( 1, 1, 0 );
 		RunPeriodInput( TotRunPers ).endJulianDate = 365;  //JulianDay( 12, 31, 0 );
-		RunPeriodInput( TotRunPers ).MonWeekDay = 0;
+		RunPeriodInput( TotRunPers ).monWeekDay = 0;
 
 		SetupEnvironmentTypes();
 

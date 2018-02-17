@@ -5569,7 +5569,7 @@ Label9999: ;
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), RunPeriodInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), RunPeriodInput, &RunPeriodData::title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -5578,7 +5578,7 @@ Label9999: ;
 
 			++Count;
 			//Loop = RP + Ptr;
-			RunPeriodInput( Loop ).Title = cAlphaArgs( 1 );
+			RunPeriodInput( Loop ).title = cAlphaArgs( 1 );
 
 			//set the start and end day of month from user input
 			// N1 , \field Begin Month
@@ -5587,8 +5587,8 @@ Label9999: ;
 			// N4 , \field End Month
 			// N5 , \field End Day of Month
 			// N6,  \field End Year
-			RunPeriodInput( Loop ).StartMonth = int( rNumericArgs( 1 ) );
-			RunPeriodInput( Loop ).StartDay = int( rNumericArgs( 2 ) );
+			RunPeriodInput( Loop ).startMonth = int( rNumericArgs( 1 ) );
+			RunPeriodInput( Loop ).startDay = int( rNumericArgs( 2 ) );
 			RunPeriodInput( Loop ).startYear = int( rNumericArgs( 3 ) );
 			RunPeriodInput( Loop ).endMonth = int( rNumericArgs( 4 ) );
 			RunPeriodInput( Loop ).endDay = int( rNumericArgs( 5 ) );
@@ -5596,8 +5596,8 @@ Label9999: ;
 			RunPeriodInput( Loop ).TreatYearsAsConsecutive = true;
 
 			if ( FullAnnualRun && Loop == 1 ) {
-				RunPeriodInput( Loop ).StartMonth = 1;
-				RunPeriodInput( Loop ).StartDay = 1;
+				RunPeriodInput( Loop ).startMonth = 1;
+				RunPeriodInput( Loop ).startDay = 1;
 				RunPeriodInput( Loop ).endMonth = 12;
 				RunPeriodInput( Loop ).endDay = 31;
 			}
@@ -5634,17 +5634,17 @@ Label9999: ;
 			}
 
 			// Validate the dates now that the weekday field has been looked at
-			if ( RunPeriodInput( Loop ).StartMonth == 2 && RunPeriodInput( Loop ).StartDay == 29 ) {
+			if ( RunPeriodInput( Loop ).startMonth == 2 && RunPeriodInput( Loop ).startDay == 29 ) {
 				// Requested start date is a leap year
 				if ( RunPeriodInput( Loop ).startYear == 0 ) { // No input starting year
-					RunPeriodInput( Loop ).startYear = findLeapYearForWeekday( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay,
+					RunPeriodInput( Loop ).startYear = findLeapYearForWeekday( RunPeriodInput( Loop ).startMonth, RunPeriodInput( Loop ).startDay,
 						RunPeriodInput( Loop).startWeekDay );
 				} else { // Have an input start year
 					if ( !isLeapYear( RunPeriodInput( Loop ).startYear ) ) { // Start year is not a leap year
 						ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", start year (" + std::to_string( RunPeriodInput( Loop ).startYear ) + ") is not a leap year but the requested start date is 2/29." );
 						ErrorsFound = true;
 					} else { // Start year is a leap year
-						WeekDay weekday = calculateDayOfWeek( RunPeriodInput( Loop ).startYear, RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay );
+						WeekDay weekday = calculateDayOfWeek( RunPeriodInput( Loop ).startYear, RunPeriodInput( Loop ).startMonth, RunPeriodInput( Loop ).startDay );
 						if ( inputWeekday ) { // Check for correctness of input
 							if ( weekday != RunPeriodInput( Loop ).startWeekDay ) {
 								ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", start weekday (" + cAlphaArgs( 2 ) + ") does not match the start year (" + std::to_string( RunPeriodInput( Loop ).startYear ) + ")" );
@@ -5657,15 +5657,15 @@ Label9999: ;
 				}
 			} else {
 				// Non leap-day start date
-				if ( !validMonthDay( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay ) ) {
-					ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", Invalid input start month/day (" + TrimSigDigits( RunPeriodInput( Loop ).StartMonth ) + '/' + TrimSigDigits( RunPeriodInput( Loop ).StartDay ) + ')' );
+				if ( !validMonthDay( RunPeriodInput( Loop ).startMonth, RunPeriodInput( Loop ).startDay ) ) {
+					ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", Invalid input start month/day (" + TrimSigDigits( RunPeriodInput( Loop ).startMonth ) + '/' + TrimSigDigits( RunPeriodInput( Loop ).startDay ) + ')' );
 					ErrorsFound = true;
 				} else { // Month/day is valid
 					if ( RunPeriodInput( Loop ).startYear == 0 ) { // No input starting year
-						RunPeriodInput( Loop ).startYear = findYearForWeekday( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay,
+						RunPeriodInput( Loop ).startYear = findYearForWeekday( RunPeriodInput( Loop ).startMonth, RunPeriodInput( Loop ).startDay,
 							RunPeriodInput( Loop).startWeekDay );
 					} else { // Have an input starting year
-						WeekDay weekday = calculateDayOfWeek( RunPeriodInput( Loop ).startYear, RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay );
+						WeekDay weekday = calculateDayOfWeek( RunPeriodInput( Loop ).startYear, RunPeriodInput( Loop ).startMonth, RunPeriodInput( Loop ).startDay );
 						if ( inputWeekday ) { // Check for correctness of input
 							if ( weekday != RunPeriodInput( Loop ).startWeekDay ) {
 								ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", start weekday (" + cAlphaArgs( 2 ) + ") does not match the start year (" + std::to_string( RunPeriodInput( Loop ).startYear ) + ")" );
@@ -5679,13 +5679,13 @@ Label9999: ;
 			}
 
 			// Compute the Julian date of the start date
-			RunPeriodInput( Loop ).startJulianDate = computeJulianDate( RunPeriodInput( Loop ).startYear, RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay );
+			RunPeriodInput( Loop ).startJulianDate = computeJulianDate( RunPeriodInput( Loop ).startYear, RunPeriodInput( Loop ).startMonth, RunPeriodInput( Loop ).startDay );
 
 			// Validate the end date
 			if ( RunPeriodInput( Loop ).endMonth == 2 && RunPeriodInput( Loop ).endDay == 29 ) {
 				// Requested end date is a leap year
 				if ( RunPeriodInput( Loop ).endYear == 0 ) { // No input end year
-					if ( isLeapYear( RunPeriodInput( Loop ).startYear ) && RunPeriodInput( Loop ).StartMonth < 3 ) {
+					if ( isLeapYear( RunPeriodInput( Loop ).startYear ) && RunPeriodInput( Loop ).startMonth < 3 ) {
 						// The run period is from some date on or before 2/29 through 2/29
 						RunPeriodInput(Loop).endYear = RunPeriodInput(Loop).startYear;
 					} else {
@@ -5712,7 +5712,7 @@ Label9999: ;
 			} else {
 				// Non leap-day end date
 				if ( !validMonthDay( RunPeriodInput( Loop ).endMonth, RunPeriodInput( Loop ).endDay ) ) {
-					ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", Invalid input end month/day (" + TrimSigDigits( RunPeriodInput( Loop ).StartMonth ) + '/' + TrimSigDigits( RunPeriodInput( Loop ).StartDay ) + ')' );
+					ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + ", Invalid input end month/day (" + TrimSigDigits( RunPeriodInput( Loop ).startMonth ) + '/' + TrimSigDigits( RunPeriodInput( Loop ).startDay ) + ')' );
 					ErrorsFound = true;
 				} else { // Month/day is valid
 					if ( RunPeriodInput( Loop ).endYear == 0 ) { // No input end year
@@ -5739,9 +5739,9 @@ Label9999: ;
 
 			// A3,  \field Use Weather File Holidays and Special Days
 			if ( lAlphaFieldBlanks( 3 ) || SameString( cAlphaArgs( 3 ), "YES" ) ) {
-				RunPeriodInput( Loop ).UseHolidays = true;
+				RunPeriodInput( Loop ).useHolidays = true;
 			} else if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
-				RunPeriodInput( Loop ).UseHolidays = false;
+				RunPeriodInput( Loop ).useHolidays = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 3 ) + " invalid [" + cAlphaArgs( 3 ) + ']' );
 				ErrorsFound = true;
@@ -5749,9 +5749,9 @@ Label9999: ;
 
 			// A4,  \field Use Weather File Daylight Saving Period
 			if ( lAlphaFieldBlanks( 4 ) || SameString( cAlphaArgs( 4 ), "YES" ) ) {
-				RunPeriodInput( Loop ).UseDST = true;
+				RunPeriodInput( Loop ).useDST = true;
 			} else if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
-				RunPeriodInput( Loop ).UseDST = false;
+				RunPeriodInput( Loop ).useDST = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 4 ) + " invalid [" + cAlphaArgs( 4 ) + ']' );
 				ErrorsFound = true;
@@ -5759,9 +5759,9 @@ Label9999: ;
 
 			// A5,  \field Apply Weekend Holiday Rule
 			if ( lAlphaFieldBlanks( 5 ) || SameString( cAlphaArgs( 5 ), "YES" ) ) {
-				RunPeriodInput( Loop ).ApplyWeekendRule = true;
+				RunPeriodInput( Loop ).applyWeekendRule = true;
 			} else if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
-				RunPeriodInput( Loop ).ApplyWeekendRule = false;
+				RunPeriodInput( Loop ).applyWeekendRule = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 5 ) + " invalid [" + cAlphaArgs( 5 ) + ']' );
 				ErrorsFound = true;
@@ -5769,9 +5769,9 @@ Label9999: ;
 
 			// A6,  \field Use Weather File Rain Indicators
 			if ( lAlphaFieldBlanks( 6 ) || SameString( cAlphaArgs( 6 ), "YES" ) ) {
-				RunPeriodInput( Loop ).UseRain = true;
+				RunPeriodInput( Loop ).useRain = true;
 			} else if ( SameString( cAlphaArgs( 6 ), "NO" ) ) {
-				RunPeriodInput( Loop ).UseRain = false;
+				RunPeriodInput( Loop ).useRain = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 6 ) + " invalid [" + cAlphaArgs( 6 ) + ']' );
 				ErrorsFound = true;
@@ -5779,9 +5779,9 @@ Label9999: ;
 
 			// A7,  \field Use Weather File Snow Indicators
 			if ( lAlphaFieldBlanks( 7 ) || SameString( cAlphaArgs( 7 ), "YES" ) ) {
-				RunPeriodInput( Loop ).UseSnow = true;
+				RunPeriodInput( Loop ).useSnow = true;
 			} else if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
-				RunPeriodInput( Loop ).UseSnow = false;
+				RunPeriodInput( Loop ).useSnow = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 7 ) + " invalid [" + cAlphaArgs( 7 ) + ']' );
 				ErrorsFound = true;
@@ -5798,9 +5798,9 @@ Label9999: ;
 			}
 
 			//calculate the annual start and end days from the user inputted month and day
-			RunPeriodInput( Loop ).MonWeekDay = 0;
-			if ( RunPeriodInput( Loop ).DayOfWeek != 0 && ! ErrorsFound ) {
-				SetupWeekDaysByMonth( RunPeriodInput( Loop ).StartMonth, RunPeriodInput( Loop ).StartDay, RunPeriodInput( Loop ).DayOfWeek, RunPeriodInput( Loop ).MonWeekDay );
+			RunPeriodInput( Loop ).monWeekDay = 0;
+			if ( RunPeriodInput( Loop ).dayOfWeek != 0 && ! ErrorsFound ) {
+				SetupWeekDaysByMonth( RunPeriodInput( Loop ).startMonth, RunPeriodInput( Loop ).startDay, RunPeriodInput( Loop ).dayOfWeek, RunPeriodInput( Loop ).monWeekDay );
 			}
 		}
 
@@ -5811,11 +5811,11 @@ Label9999: ;
 			TotRunPers = 1;
 			WeathSimReq = true;
 			RunPeriodInput.allocate( TotRunPers );
-			RunPeriodInput( 1 ).startJulianDate = JulianDay( RunPeriodInput( 1 ).StartMonth, RunPeriodInput( 1 ).StartDay, LeapYearAdd );
+			RunPeriodInput( 1 ).startJulianDate = JulianDay( RunPeriodInput( 1 ).startMonth, RunPeriodInput( 1 ).startDay, LeapYearAdd );
 			RunPeriodInput( 1 ).endJulianDate = JulianDay( RunPeriodInput( 1 ).endMonth, RunPeriodInput( 1 ).endDay, LeapYearAdd );
-			RunPeriodInput( 1 ).MonWeekDay = 0;
-			if ( RunPeriodInput( 1 ).DayOfWeek != 0 && ! ErrorsFound ) {
-				SetupWeekDaysByMonth( RunPeriodInput( 1 ).StartMonth, RunPeriodInput( 1 ).StartDay, RunPeriodInput( 1 ).DayOfWeek, RunPeriodInput( 1 ).MonWeekDay );
+			RunPeriodInput( 1 ).monWeekDay = 0;
+			if ( RunPeriodInput( 1 ).dayOfWeek != 0 && ! ErrorsFound ) {
+				SetupWeekDaysByMonth( RunPeriodInput( 1 ).startMonth, RunPeriodInput( 1 ).startDay, RunPeriodInput( 1 ).dayOfWeek, RunPeriodInput( 1 ).monWeekDay );
 			}
 		}
 	}
@@ -5891,84 +5891,84 @@ Label9999: ;
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			++Count;
-			RunPeriodDesignInput( Count ).Title = cAlphaArgs( 1 );
-			RunPeriodDesignInput( Count ).PeriodType = "User Selected WeatherFile RunPeriod (Design)";
+			RunPeriodDesignInput( Count ).title = cAlphaArgs( 1 );
+			RunPeriodDesignInput( Count ).periodType = "User Selected WeatherFile RunPeriod (Design)";
 
 			//set the start and end day of month from user input
-			RunPeriodDesignInput( Count ).StartMonth = int( rNumericArgs( 1 ) );
-			RunPeriodDesignInput( Count ).StartDay = int( rNumericArgs( 2 ) );
+			RunPeriodDesignInput( Count ).startMonth = int( rNumericArgs( 1 ) );
+			RunPeriodDesignInput( Count ).startDay = int( rNumericArgs( 2 ) );
 			RunPeriodDesignInput( Count ).endMonth = int( rNumericArgs( 3 ) );
 			RunPeriodDesignInput( Count ).endDay = int( rNumericArgs( 4 ) );
 
-			{ auto const SELECT_CASE_var( RunPeriodDesignInput( Count ).StartMonth );
+			{ auto const SELECT_CASE_var( RunPeriodDesignInput( Count ).startMonth );
 
 			if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 7 ) || ( SELECT_CASE_var == 8 ) || ( SELECT_CASE_var == 10 ) || ( SELECT_CASE_var == 12 ) ) {
-				if ( RunPeriodDesignInput( Count ).StartDay > 31 ) {
-					ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cNumericFieldNames( 2 ) + " invalid (Day of Month) [" + TrimSigDigits( RunPeriodInput( Loop ).StartDay ) + ']' );
+				if ( RunPeriodDesignInput( Count ).startDay > 31 ) {
+					ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cNumericFieldNames( 2 ) + " invalid (Day of Month) [" + TrimSigDigits( RunPeriodInput( Loop ).startDay ) + ']' );
 					ErrorsFound = true;
 				}
 			} else if ( ( SELECT_CASE_var == 4 ) || ( SELECT_CASE_var == 6 ) || ( SELECT_CASE_var == 9 ) || ( SELECT_CASE_var == 11 ) ) {
-				if ( RunPeriodDesignInput( Count ).StartDay > 30 ) {
-					ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cNumericFieldNames( 2 ) + " invalid (Day of Month) [" + TrimSigDigits( RunPeriodInput( Loop ).StartDay ) + ']' );
+				if ( RunPeriodDesignInput( Count ).startDay > 30 ) {
+					ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cNumericFieldNames( 2 ) + " invalid (Day of Month) [" + TrimSigDigits( RunPeriodInput( Loop ).startDay ) + ']' );
 					ErrorsFound = true;
 				}
 			} else if ( SELECT_CASE_var == 2 ) {
-				if ( RunPeriodDesignInput( Count ).StartDay > 28 + LeapYearAdd ) {
-					ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cNumericFieldNames( 2 ) + " invalid (Day of Month) [" + TrimSigDigits( RunPeriodInput( Loop ).StartDay ) + ']' );
+				if ( RunPeriodDesignInput( Count ).startDay > 28 + LeapYearAdd ) {
+					ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cNumericFieldNames( 2 ) + " invalid (Day of Month) [" + TrimSigDigits( RunPeriodInput( Loop ).startDay ) + ']' );
 					ErrorsFound = true;
 				}
 			} else {
-				ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cNumericFieldNames( 1 ) + " invalid (Month) [" + TrimSigDigits( RunPeriodInput( Loop ).StartMonth ) + ']' );
+				ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cNumericFieldNames( 1 ) + " invalid (Month) [" + TrimSigDigits( RunPeriodInput( Loop ).startMonth ) + ']' );
 				ErrorsFound = true;
 			}}
 
 			if ( lAlphaFieldBlanks( 2 ) ) {
-				RunPeriodDesignInput( Count ).DayOfWeek = 2; // Defaults to Monday
+				RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 			} else {
-				RunPeriodDesignInput( Count ).DayOfWeek = FindItemInList( cAlphaArgs( 2 ), ValidNames, 12 );
-				if ( RunPeriodDesignInput( Count ).DayOfWeek == 0 || RunPeriodDesignInput( Count ).DayOfWeek == 8 ) {
-					ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cAlphaFieldNames( 1 ) + " invalid (Day of Week) [" + cAlphaArgs( 1 ) + " for Start is not Valid, Monday will be Used." );
-					RunPeriodDesignInput( Count ).DayOfWeek = 2; // Defaults to Monday
+				RunPeriodDesignInput( Count ).dayOfWeek = FindItemInList( cAlphaArgs( 2 ), ValidNames, 12 );
+				if ( RunPeriodDesignInput( Count ).dayOfWeek == 0 || RunPeriodDesignInput( Count ).dayOfWeek == 8 ) {
+					ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 1 ) + " invalid (Day of Week) [" + cAlphaArgs( 1 ) + " for Start is not Valid, Monday will be Used." );
+					RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 				}
 			}
 
 			if ( lAlphaFieldBlanks( 3 ) || SameString( cAlphaArgs( 3 ), "YES" ) ) {
-				RunPeriodDesignInput( Count ).UseDST = true;
+				RunPeriodDesignInput( Count ).useDST = true;
 			} else if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
-				RunPeriodDesignInput( Count ).UseDST = false;
+				RunPeriodDesignInput( Count ).useDST = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 3 ) + " invalid [" + cAlphaArgs( 3 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( lAlphaFieldBlanks( 4 ) || SameString( cAlphaArgs( 4 ), "YES" ) ) {
-				RunPeriodDesignInput( Count ).UseRain = true;
-				RunPeriodDesignInput( Count ).UseSnow = true;
+				RunPeriodDesignInput( Count ).useRain = true;
+				RunPeriodDesignInput( Count ).useSnow = true;
 			} else if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
-				RunPeriodDesignInput( Count ).UseRain = false;
-				RunPeriodDesignInput( Count ).UseSnow = false;
+				RunPeriodDesignInput( Count ).useRain = false;
+				RunPeriodDesignInput( Count ).useSnow = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 4 ) + " invalid [" + cAlphaArgs( 4 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			//calculate the annual start and end days from the user inputted month and day
-			RunPeriodDesignInput( Count ).startJulianDate = JulianDay( RunPeriodDesignInput( Count ).StartMonth, RunPeriodDesignInput( Count ).StartDay, LeapYearAdd );
+			RunPeriodDesignInput( Count ).startJulianDate = JulianDay( RunPeriodDesignInput( Count ).startMonth, RunPeriodDesignInput( Count ).startDay, LeapYearAdd );
 			RunPeriodDesignInput( Count ).endJulianDate = JulianDay( RunPeriodDesignInput( Count ).endMonth, RunPeriodDesignInput( Count ).endDay, LeapYearAdd );
 			if ( RunPeriodDesignInput( Count ).startJulianDate <= RunPeriodDesignInput( Count ).endJulianDate ) {
-				RunPeriodDesignInput( Count ).TotalDays = ( RunPeriodDesignInput( Count ).endJulianDate - RunPeriodDesignInput( Count ).startJulianDate + 1 ) * RunPeriodDesignInput( Count ).NumSimYears;
+				RunPeriodDesignInput( Count ).totalDays = ( RunPeriodDesignInput( Count ).endJulianDate - RunPeriodDesignInput( Count ).startJulianDate + 1 ) * RunPeriodDesignInput( Count ).numSimYears;
 			} else {
-				RunPeriodDesignInput( Count ).TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - RunPeriodDesignInput( Count ).startJulianDate + 1 + RunPeriodDesignInput( Count ).endJulianDate ) * RunPeriodDesignInput( Count ).NumSimYears;
+				RunPeriodDesignInput( Count ).totalDays = ( JulianDay( 12, 31, LeapYearAdd ) - RunPeriodDesignInput( Count ).startJulianDate + 1 + RunPeriodDesignInput( Count ).endJulianDate ) * RunPeriodDesignInput( Count ).numSimYears;
 			}
-			RunPeriodDesignInput( Count ).MonWeekDay = 0;
-			if ( RunPeriodDesignInput( 1 ).DayOfWeek != 0 && ! ErrorsFound ) {
-				SetupWeekDaysByMonth( RunPeriodDesignInput( 1 ).StartMonth, RunPeriodDesignInput( 1 ).StartDay, RunPeriodDesignInput( 1 ).DayOfWeek, RunPeriodDesignInput( 1 ).MonWeekDay );
+			RunPeriodDesignInput( Count ).monWeekDay = 0;
+			if ( RunPeriodDesignInput( 1 ).dayOfWeek != 0 && ! ErrorsFound ) {
+				SetupWeekDaysByMonth( RunPeriodDesignInput( 1 ).startMonth, RunPeriodDesignInput( 1 ).startDay, RunPeriodDesignInput( 1 ).dayOfWeek, RunPeriodDesignInput( 1 ).monWeekDay );
 			}
 		}
 
@@ -5978,91 +5978,91 @@ Label9999: ;
 
 			IsNotOK = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::Title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Title" );
+			VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Title" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 			}
 			++Count;
-			RunPeriodDesignInput( Count ).Title = cAlphaArgs( 1 );
-			RunPeriodDesignInput( Count ).PeriodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs( 2 );
+			RunPeriodDesignInput( Count ).title = cAlphaArgs( 1 );
+			RunPeriodDesignInput( Count ).periodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs( 2 );
 
 			// Period Selection
 			if ( ! lAlphaFieldBlanks( 2 ) ) {
 				WhichPeriod = FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue );
 				if ( WhichPeriod != 0 ) {
-					RunPeriodDesignInput( Count ).StartDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
-					RunPeriodDesignInput( Count ).StartMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
+					RunPeriodDesignInput( Count ).startDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
+					RunPeriodDesignInput( Count ).startMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
 					RunPeriodDesignInput( Count ).startJulianDate = TypicalExtremePeriods( WhichPeriod ).StartJDay;
 					RunPeriodDesignInput( Count ).endDay = TypicalExtremePeriods( WhichPeriod ).EndDay;
 					RunPeriodDesignInput( Count ).endMonth = TypicalExtremePeriods( WhichPeriod ).EndMonth;
 					RunPeriodDesignInput( Count ).endJulianDate = TypicalExtremePeriods( WhichPeriod ).EndJDay;
-					RunPeriodDesignInput( Count ).TotalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
+					RunPeriodDesignInput( Count ).totalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
 				} else {
 					WhichPeriod = FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue1 );
 					if ( WhichPeriod != 0 ) {
-						RunPeriodDesignInput( Count ).StartDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
-						RunPeriodDesignInput( Count ).StartMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
+						RunPeriodDesignInput( Count ).startDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
+						RunPeriodDesignInput( Count ).startMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
 						RunPeriodDesignInput( Count ).startJulianDate = TypicalExtremePeriods( WhichPeriod ).StartJDay;
 						RunPeriodDesignInput( Count ).endDay = TypicalExtremePeriods( WhichPeriod ).EndDay;
 						RunPeriodDesignInput( Count ).endMonth = TypicalExtremePeriods( WhichPeriod ).EndMonth;
 						RunPeriodDesignInput( Count ).endJulianDate = TypicalExtremePeriods( WhichPeriod ).EndJDay;
-						RunPeriodDesignInput( Count ).TotalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
-						ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) + " matched to " + TypicalExtremePeriods( WhichPeriod ).MatchValue );
+						RunPeriodDesignInput( Count ).totalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
+						ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) + " matched to " + TypicalExtremePeriods( WhichPeriod ).MatchValue );
 					} else {
 						WhichPeriod = FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue2 );
 						if ( WhichPeriod != 0 ) {
-							RunPeriodDesignInput( Count ).StartDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
-							RunPeriodDesignInput( Count ).StartMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
+							RunPeriodDesignInput( Count ).startDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
+							RunPeriodDesignInput( Count ).startMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
 							RunPeriodDesignInput( Count ).startJulianDate = TypicalExtremePeriods( WhichPeriod ).StartJDay;
 							RunPeriodDesignInput( Count ).endDay = TypicalExtremePeriods( WhichPeriod ).EndDay;
 							RunPeriodDesignInput( Count ).endMonth = TypicalExtremePeriods( WhichPeriod ).EndMonth;
 							RunPeriodDesignInput( Count ).endJulianDate = TypicalExtremePeriods( WhichPeriod ).EndJDay;
-							RunPeriodDesignInput( Count ).TotalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
-							ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) + " matched to " + TypicalExtremePeriods( WhichPeriod ).MatchValue );
+							RunPeriodDesignInput( Count ).totalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
+							ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) + " matched to " + TypicalExtremePeriods( WhichPeriod ).MatchValue );
 						} else {
-							ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cAlphaFieldNames( 2 ) + " invalid (not on Weather File)=" + cAlphaArgs( 2 ) );
+							ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 2 ) + " invalid (not on Weather File)=" + cAlphaArgs( 2 ) );
 							ErrorsFound = true;
 						}
 					}
 				}
 			} else {
-				ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cAlphaFieldNames( 2 ) + " invalid (blank)." );
+				ShowSevereError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 2 ) + " invalid (blank)." );
 				ErrorsFound = true;
 			}
 
 			if ( lAlphaFieldBlanks( 3 ) ) {
-				RunPeriodDesignInput( Count ).DayOfWeek = 2; // Defaults to Monday
+				RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 			} else {
-				RunPeriodDesignInput( Count ).DayOfWeek = FindItemInList( cAlphaArgs( 3 ), ValidNames, 12 );
-				if ( RunPeriodDesignInput( Count ).DayOfWeek == 0 || RunPeriodDesignInput( Count ).DayOfWeek == 8 ) {
-					ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).Title + ' ' + cAlphaFieldNames( 3 ) + " invalid (Day of Week) [" + cAlphaArgs( 3 ) + " for Start is not Valid, Monday will be Used." );
-					RunPeriodDesignInput( Count ).DayOfWeek = 2; // Defaults to Monday
+				RunPeriodDesignInput( Count ).dayOfWeek = FindItemInList( cAlphaArgs( 3 ), ValidNames, 12 );
+				if ( RunPeriodDesignInput( Count ).dayOfWeek == 0 || RunPeriodDesignInput( Count ).dayOfWeek == 8 ) {
+					ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 3 ) + " invalid (Day of Week) [" + cAlphaArgs( 3 ) + " for Start is not Valid, Monday will be Used." );
+					RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 				}
 			}
 
 			if ( lAlphaFieldBlanks( 4 ) || SameString( cAlphaArgs( 4 ), "YES" ) ) {
-				RunPeriodDesignInput( Count ).UseDST = true;
+				RunPeriodDesignInput( Count ).useDST = true;
 			} else if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
-				RunPeriodDesignInput( Count ).UseDST = false;
+				RunPeriodDesignInput( Count ).useDST = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 4 ) + " invalid [" + cAlphaArgs( 4 ) + ']' );
 				ErrorsFound = true;
 			}
 
 			if ( lAlphaFieldBlanks( 5 ) || SameString( cAlphaArgs( 5 ), "YES" ) ) {
-				RunPeriodDesignInput( Count ).UseRain = true;
-				RunPeriodDesignInput( Count ).UseSnow = true;
+				RunPeriodDesignInput( Count ).useRain = true;
+				RunPeriodDesignInput( Count ).useSnow = true;
 			} else if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
-				RunPeriodDesignInput( Count ).UseRain = false;
-				RunPeriodDesignInput( Count ).UseSnow = false;
+				RunPeriodDesignInput( Count ).useRain = false;
+				RunPeriodDesignInput( Count ).useSnow = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 5 ) + " invalid [" + cAlphaArgs( 5 ) + ']' );
 				ErrorsFound = true;
 			}
-			RunPeriodDesignInput( 1 ).MonWeekDay = 0;
-			if ( RunPeriodDesignInput( 1 ).DayOfWeek != 0 && ! ErrorsFound ) {
-				SetupWeekDaysByMonth( RunPeriodDesignInput( 1 ).StartMonth, RunPeriodDesignInput( 1 ).StartDay, RunPeriodDesignInput( 1 ).DayOfWeek, RunPeriodDesignInput( 1 ).MonWeekDay );
+			RunPeriodDesignInput( 1 ).monWeekDay = 0;
+			if ( RunPeriodDesignInput( 1 ).dayOfWeek != 0 && ! ErrorsFound ) {
+				SetupWeekDaysByMonth( RunPeriodDesignInput( 1 ).startMonth, RunPeriodDesignInput( 1 ).startDay, RunPeriodDesignInput( 1 ).dayOfWeek, RunPeriodDesignInput( 1 ).monWeekDay );
 			}
 
 		}
@@ -9332,33 +9332,33 @@ Label9998: ;
 			auto & env = Environment( Envrn );
 			auto & runPer = RunPeriodDesignInput( Loop );
 
-			env.StartMonth = runPer.StartMonth;
-			env.StartDay = runPer.StartDay;
-			env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LeapYearAdd );
-			env.TotalDays = runPer.TotalDays;
+			env.StartMonth = runPer.startMonth;
+			env.StartDay = runPer.startDay;
+			env.StartJDay = JulianDay( runPer.startMonth, runPer.startDay, LeapYearAdd );
+			env.TotalDays = runPer.totalDays;
 			env.EndMonth = runPer.endMonth;
 			env.EndDay = runPer.endDay;
 			env.EndJDay = JulianDay( runPer.endMonth, runPer.endDay, LeapYearAdd );
-			env.NumSimYears = runPer.NumSimYears;
+			env.NumSimYears = runPer.numSimYears;
 			if ( env.StartJDay <= env.EndJDay ) {
 				env.TotalDays = ( env.EndJDay - env.StartJDay + 1 ) * env.NumSimYears;
 			} else {
 				env.TotalDays = ( JulianDay( 12, 31, LeapYearAdd ) - env.StartJDay + 1 + env.EndJDay ) * env.NumSimYears;
 			}
 			TotRunDesPersDays += env.TotalDays;
-			env.UseDST = runPer.UseDST;
-			env.UseHolidays = runPer.UseHolidays;
-			env.Title = runPer.Title;
-			env.cKindOfEnvrn = runPer.PeriodType;
+			env.UseDST = runPer.useDST;
+			env.UseHolidays = runPer.useHolidays;
+			env.Title = runPer.title;
+			env.cKindOfEnvrn = runPer.periodType;
 			env.KindOfEnvrn = ksRunPeriodDesign;
 			env.DesignDayNum = 0;
 			env.RunPeriodDesignNum = Loop;
-			env.DayOfWeek = runPer.DayOfWeek;
-			env.MonWeekDay = runPer.MonWeekDay;
+			env.DayOfWeek = runPer.dayOfWeek;
+			env.MonWeekDay = runPer.monWeekDay;
 			env.SetWeekDays = false;
-			env.ApplyWeekendRule = runPer.ApplyWeekendRule;
-			env.UseRain = runPer.UseRain;
-			env.UseSnow = runPer.UseSnow;
+			env.ApplyWeekendRule = runPer.applyWeekendRule;
+			env.UseRain = runPer.useRain;
+			env.UseSnow = runPer.useSnow;
 			++Envrn;
 		}
 
@@ -9367,11 +9367,11 @@ Label9998: ;
 			auto & env = Environment( Envrn );
 			auto & runPer = RunPeriodInput( Loop );
 
-			env.StartMonth = runPer.StartMonth;
-			env.StartDay = runPer.StartDay;
+			env.StartMonth = runPer.startMonth;
+			env.StartDay = runPer.startDay;
 			env.EndMonth = runPer.endMonth;
 			env.EndDay = runPer.endDay;
-			env.NumSimYears = runPer.NumSimYears;
+			env.NumSimYears = runPer.numSimYears;
 			if ( runPer.actualWeather ) {
 				env.CurrentYear = runPer.startYear;
 				env.IsLeapYear = isLeapYear( runPer.startYear );
@@ -9397,7 +9397,7 @@ Label9998: ;
 				}
 				env.TreatYearsAsConsecutive = false;
 				env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-				env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LocalLeapYearAdd );
+				env.StartJDay = JulianDay( runPer.startMonth, runPer.startDay, LocalLeapYearAdd );
 				env.EndJDay = JulianDay( runPer.endMonth, runPer.endDay, LocalLeapYearAdd );
 				// need message if isleapyear and wfleapyearind=0
 				if ( env.StartJDay <= env.EndJDay ) {
@@ -9413,12 +9413,12 @@ Label9998: ;
 				env.IsLeapYear = isLeapYear( env.CurrentYear );
 				env.TreatYearsAsConsecutive = true;
 				env.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-				env.StartJDay = JulianDay( runPer.StartMonth, runPer.StartDay, LeapYearAdd );
+				env.StartJDay = JulianDay( runPer.startMonth, runPer.startDay, LeapYearAdd );
 				env.EndJDay = JulianDay( runPer.endMonth, runPer.endDay, LeapYearAdd );
 				env.TotalDays = 0;
 				for ( Loop1 = 1; Loop1 <= env.NumSimYears; ++Loop1 ) {
 					if ( ! isLeapYear( runPer.BeginYear - 1 + Loop1 ) || ! WFAllowsLeapYears ) {
-						JDay1 = JulianDay( runPer.StartMonth, runPer.StartDay, 0 );
+						JDay1 = JulianDay( runPer.startMonth, runPer.startDay, 0 );
 						JDay2 = JulianDay( runPer.endMonth, runPer.endDay, 0 );
 						if ( JDay1 <= JDay2 ) {
 							if ( Loop1 == 1 ) env.RawSimDays = ( JDay2 - JDay1 + 1 );
@@ -9428,7 +9428,7 @@ Label9998: ;
 							env.TotalDays += JulianDay( 12, 31, 0 ) - JDay1 + 1 + JDay2;
 						}
 					} else { // Leap Year
-						JDay1 = JulianDay( runPer.StartMonth, runPer.StartDay, 1 );
+						JDay1 = JulianDay( runPer.startMonth, runPer.startDay, 1 );
 						JDay2 = JulianDay( runPer.endMonth, runPer.endDay, 1 );
 						if ( JDay1 <= JDay2 ) {
 							env.TotalDays += ( JDay2 - JDay1 + 1 );
@@ -9438,12 +9438,12 @@ Label9998: ;
 					}
 				}
 			}
-			env.UseDST = runPer.UseDST;
-			env.UseHolidays = runPer.UseHolidays;
-			if ( runPer.Title == BlankString ) {
+			env.UseDST = runPer.useDST;
+			env.UseHolidays = runPer.useHolidays;
+			if ( runPer.title == BlankString ) {
 				env.Title = WeatherFileLocationTitle;
 			} else {
-				env.Title = runPer.Title;
+				env.Title = runPer.title;
 			}
 			if ( env.KindOfEnvrn == ksReadAllWeatherData ) {
 				env.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
@@ -9451,12 +9451,12 @@ Label9998: ;
 				env.cKindOfEnvrn = "WeatherFileRunPeriod";
 				env.KindOfEnvrn = ksRunPeriodWeather;
 			}
-			env.DayOfWeek = runPer.DayOfWeek;
-			env.MonWeekDay = runPer.MonWeekDay;
+			env.DayOfWeek = runPer.dayOfWeek;
+			env.MonWeekDay = runPer.monWeekDay;
 			env.SetWeekDays = false;
-			env.ApplyWeekendRule = runPer.ApplyWeekendRule;
-			env.UseRain = runPer.UseRain;
-			env.UseSnow = runPer.UseSnow;
+			env.ApplyWeekendRule = runPer.applyWeekendRule;
+			env.UseRain = runPer.useRain;
+			env.UseSnow = runPer.useSnow;
 			++Envrn;
 		}
 
