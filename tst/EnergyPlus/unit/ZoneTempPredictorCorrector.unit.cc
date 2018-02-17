@@ -497,18 +497,10 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		//indexes (thermostat ones) for TempControlledZone array
-		// used to be acording to old schedule:
-
-		//int HeatZoneNum( 1 );
-		//int CoolZoneNum( 2 );
-		//int CoolHeatZoneNum( 3 );
-		//int DualZoneNum( 4 );
-
-		int HeatZoneNum( 4 );
-		int CoolZoneNum( 3 );
-		int CoolHeatZoneNum( 1 );
-		int DualZoneNum( 2 );
+		int HeatZoneNum( 1 );
+		int CoolZoneNum( 2 );
+		int CoolHeatZoneNum( 3 );
+		int DualZoneNum( 4 );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
