@@ -1138,8 +1138,8 @@ namespace SingleDuct {
 					ErrorsFound = true;
 				}
 			}
-			Sys( SysNum ).OutletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFields( 3 ) );
-			Sys( SysNum ).InletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields( 4 ) );
+			Sys( SysNum ).InletNodeNum = GetOnlySingleNode( Alphas( 3 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent, cAlphaFields( 3 ) );
+			Sys( SysNum ).OutletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, Sys( SysNum ).SysType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent, cAlphaFields( 4 ) );
 
 			Sys( SysNum ).MaxAirVolFlowRate = Numbers( 1 );
 			Sys( SysNum ).ZoneMinAirFrac = 0.0;

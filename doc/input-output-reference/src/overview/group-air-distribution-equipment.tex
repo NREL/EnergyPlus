@@ -186,13 +186,13 @@ A unique user assigned name for the single duct constant volume no reheat air te
 
 Availability schedule name for this system. Schedule value > 0 means the system is available or else the system is off. If this field is blank, the system is always available.
 
-\paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name}
-
-This is an air outlet node from the air distribution unit. This node name should be one of the supply air inlet node names of the zone served by this component.
-
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name}
 
 The air inlet node name that connects the air splitter to the individual zone air distribution unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum component.
+
+\paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name}
+
+This is an air outlet node from the air distribution unit. This node name should be one of the supply air inlet node names of the zone served by this component.
 
 \paragraph{Field: Maximum Air Flow Rate}\label{field-maximum-air-flow-rate-1}
 
@@ -213,8 +213,8 @@ An IDF example:
 AirTerminal:SingleDuct:ConstantVolume:NoReheat,
       NoReheat Zone 1,                !- Name of System
       AlwaysOnFanAvailSched,          !- Availability Schedule Name
-      Zone 1 Unit Air Outlet Node,    !- Air Outlet Node Name
       Zone 1 Unit Air Inlet Node,     !- Air Inlet Node Name
+      Zone 1 Unit Air Outlet Node,    !- Air Outlet Node Name
       0.60,                           !- Maximum Air Flow Rate {m3/s}
       ,                               !- Design Specification Outdoor Air Object Name
       ;                               !- Per Person Ventilation Rate Mode

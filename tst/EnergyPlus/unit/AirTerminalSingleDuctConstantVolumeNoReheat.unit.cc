@@ -395,8 +395,8 @@ namespace EnergyPlus {
 			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
 			"    SDCVNoReheatAT1,         !- Name",
 			"    AvailSchedule,           !- Availability Schedule Name",
-			"    Zone1NoReheatAirOutletNode,  !- Air Outlet Node Name",
 			"    Zone1NoReheatAirInletNode,   !- Air Inlet Node Name",
+			"    Zone1NoReheatAirOutletNode,  !- Air Outlet Node Name",
 			"    1.0;                    !- Maximum Air Flow Rate {m3/s}",
 
 			"  Schedule:Compact,",

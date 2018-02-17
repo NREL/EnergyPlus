@@ -40724,17 +40724,17 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
        \note If this field is blank, the system is always available.
        \type object-list
        \object-list ScheduleNames
-  A3,  \field Air Outlet Node Name
-       \required-field
-       \type node
-       \note This is an air outlet node from the air distribution unit. This node name should be one of the 
-       \note supply air inlet node names of a zone served by this component.  
-  A4,  \field Air Inlet Node Name
+  A3,  \field Air Inlet Node Name
        \required-field
        \type node
        \note The air-inlet node name that connects the air splitter to the individual zone air distribution 
        \note unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter or 
        \note AirLoopHVAC:SupplyPlenum component.
+  A4,  \field Air Outlet Node Name
+       \required-field
+       \type node
+       \note This is an air outlet node from the air distribution unit. This node name should be one of the 
+       \note supply air inlet node names of a zone served by this component.  
   N1,  \field Maximum Air Flow Rate
        \required-field
        \units m3/s
