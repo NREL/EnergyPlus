@@ -818,6 +818,7 @@ HVACSystemRootFindingAlgorithm,
        \key Bisection
        \key BisectionThenRegulaFalsi
        \key RegulaFalsiThenBisection
+       \key Alternation
        \default RegulaFalsi
   N1 ; \field Number of Iterations Before Algorithm Switch
        \note This field is used when RegulaFalsiThenBisection or BisectionThenRegulaFalsi is

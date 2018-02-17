@@ -6797,7 +6797,6 @@ namespace HVACUnitarySystem {
 		if ( !HeatingLoad && !CoolingLoad && MoistureLoad >= 0.0 ) return;
 
 		CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutputOff, LatOutputOff, HXUnitOn, _, _, CompressorONFlag );
-		Real64 NoSensibleOutput = SensOutputOff;
 		FullSensibleOutput = SensOutputOff;
 		NoLoadOutletTemp = Node( OutletNode ).Temp;
 
@@ -7110,9 +7109,12 @@ namespace HVACUnitarySystem {
 		// use the ASHRAE 90.1 method of reduced fan speed at low loads
 		if ( UnitarySystem( UnitarySysNum ).simASHRAEModel ) {
 
-			auto & SZVAVModel( UnitarySystem( UnitarySysNum ) );
-			// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-			SZVAVModel::calcSZVAVModel (SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadRatio, NoLoadOutletTemp, FullSensibleOutput, FullLoadAirOutletTemp, CompressorONFlag );
+			// check to make sure unit has the capacity to meet the load
+			if ( ( HeatingLoad && ZoneLoad < SensOutputOn ) || ( CoolingLoad && ZoneLoad > SensOutputOn ) ) {
+				auto & SZVAVModel( UnitarySystem( UnitarySysNum ) );
+				// seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
+				SZVAVModel::calcSZVAVModel( SZVAVModel, UnitarySysNum, FirstHVACIteration, CoolingLoad, HeatingLoad, ZoneLoad, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PartLoadRatio, CompressorONFlag );
+			}
 
 		} else { // not ASHRAE model
 
