@@ -1,4 +1,4 @@
-! 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf
+! 1ZoneDataCenterCRAC_wApproachTemp.idf
 ! Basic file description:  This file demonstrates a simple data center model with air-cooled IT equipment (ITE)
 !                          served by a CRAC system.
 !
@@ -26,7 +26,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,8.9;
+  Version,8.8;
 
   Timestep,6;
 
@@ -51,7 +51,7 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     Jan,                     !- Name
@@ -847,7 +847,7 @@
   ElectricEquipment:ITE:AirCooled,
     Data Center Servers,     !- Name
     Main Zone,               !- Zone Name
-    FlowFromSystem,          !- Air Flow Caclulation Method
+    FlowControlWithApproachTemperatures,
     Watts/Unit,              !- Design Power Input Calculation Method
     500,                     !- Watts per Unit {W}
     100,                     !- Number of Units
@@ -872,7 +872,12 @@
     1,                       !- Fraction of Electric Power Supply Losses to Zone
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
-    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
+    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
+    2,                       !- field Supply Approach Temperature
+    ,                        !- field Supply Approach Temperature Schedule
+    -1,                      !- field Return Approach Temperature 
+    ;                        !- field Return Approach Temperature Schedule
+
 
   Curve:Quadratic,
     ECM FanPower fFlow,      !- Name
@@ -1130,6 +1135,8 @@
   Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,Hourly;
 
   Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,Hourly;
+ 
+  Output:Variable,*,Zone ITE Adjusted Return Air Temperature,Hourly;
 
   Output:Variable,*,Zone Air Temperature,Hourly;
 
