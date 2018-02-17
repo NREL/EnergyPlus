@@ -1258,3 +1258,118 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 
 }
 
+TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
+{
+	// On/Off thermostat
+	Schedule.allocate( 3 );
+
+	DataZoneControls::NumTempControlledZones = 1;
+
+	//SingleHeatingSetPoint
+	TempControlledZone.allocate( NumTempControlledZones );
+	TempZoneThermostatSetPoint.allocate( 1 );
+	MAT.allocate( 1 );
+	ZoneThermostatSetPointLo.allocate( 1 );
+	ZoneThermostatSetPointHi.allocate( 1 );
+
+	TempControlledZone( 1 ).DeltaTCutSet = 2.0;
+	TempControlledZone( 1 ).ActualZoneNum = 1;
+	TempControlledZone( 1 ).CTSchedIndex = 1;
+	Schedule( 1 ).CurrentValue = 1;
+	TempControlType.allocate( 1 );
+	TempControlledZone( 1 ).SchIndx_SingleHeatSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx.allocate( 4 );
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleHeating.allocate( 1 );
+	SetPointSingleHeating( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 22.0;
+	MAT( 1 ) = 20.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).HeatOffFlag );
+
+	MAT( 1 ) = 23.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+
+	// SingleCoolingSetPoint
+	Schedule( 1 ).CurrentValue = 2;
+	TempControlledZone( 1 ).SchIndx_SingleCoolSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleCooling.allocate( 1 );
+	SetPointSingleCooling( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 26.0;
+	MAT( 1 ) = 25.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	MAT( 1 ) = 27.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).CoolOffFlag );
+
+	// SingleHeatCoolSetPoint
+	Schedule( 1 ).CurrentValue = 3;
+	TempControlledZone( 1 ).SchIndx_SingleHeatCoolSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleHeatCool.allocate( 1 );
+	SetPointSingleHeatCool( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 24.0;
+	MAT( 1 ) = 25.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+
+	// DualSetPointWithDeadBand : Adjust cooling setpoint
+	SetPointDualHeatCool.allocate( 1 );
+	Schedule( 1 ).CurrentValue = 4;
+	TempControlledZone( 1 ).SchIndx_DualSetPointWDeadBand = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointDualHeatCool( 1 ).HeatTempSchedIndex = 2;
+	SetPointDualHeatCool( 1 ).CoolTempSchedIndex = 3;
+	Schedule( 2 ).CurrentValue = 22.0;
+	Schedule( 3 ).CurrentValue = 26.0;
+	MAT( 1 ) = 25.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	// DualSetPointWithDeadBand : Adjust heating setpoint
+	MAT( 1 ) = 21.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	// DualSetPointWithDeadBand : Adjust cooling setpoint
+	MAT( 1 ) = 27.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_FALSE( TempControlledZone( 1 ).CoolOffFlag );
+
+	TempControlledZone( 1 ).DeltaTCutSet = 0.0;
+	MAT.deallocate( );
+	Schedule.deallocate( );
+	TempZoneThermostatSetPoint.deallocate( );
+	TempControlledZone.deallocate( );
+	TempControlType.deallocate( );
+	SetPointSingleHeating.deallocate( );
+	ZoneThermostatSetPointLo.deallocate( );
+	ZoneThermostatSetPointHi.deallocate( );
+	SetPointSingleCooling.deallocate( );
+	SetPointSingleHeatCool.deallocate( );
+	SetPointDualHeatCool.deallocate( );
+
+}
+
