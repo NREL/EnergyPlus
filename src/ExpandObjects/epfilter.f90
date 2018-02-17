@@ -23469,8 +23469,8 @@ DO iZone = 1, numCompactFanCoil
     capacityControlKind = capctrlVarFanVarFlow
   ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'VariableFanConstantFlow')) THEN
     capacityControlKind = capctrlVarFanConstFlow
-  ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'MultiSpeedFan')) THEN
-    capacityControlKind = capctrlMultiSpeedFan
+!  ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'MultiSpeedFan')) THEN
+!    capacityControlKind = capctrlMultiSpeedFan
   ELSEIF (SameString(FldVal(base +  fczCapCtrlTypeOff),'ASHRAE90VariableFan')) THEN
     capacityControlKind = capctrlASHRAE90VariableFan
   ELSE
@@ -23719,7 +23719,7 @@ DO iZone = 1, numCompactFanCoil
     CALL AddToObjFld('Air Inlet Node Name', base + fczNameOff,' Mixed Air Outlet')
     CALL AddToObjFld('Air Outlet Node Name', base + fczNameOff,' Supply Fan Outlet',.TRUE.)
     IF (isSysAvailSchedBlank) CALL AddAlwaysSchedule('1')
-  CASE (capctrlVarFanVarFlow,capctrlVarFanConstFlow,)
+  CASE (capctrlVarFanVarFlow,capctrlVarFanConstFlow)
     CALL CreateNewObj('Fan:VariableVolume')
     CALL AddToObjFld('Name', base + fczNameOff,' Supply Fan')
     IF (.NOT. isSysAvailSchedBlank) THEN
