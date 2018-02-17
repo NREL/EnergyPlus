@@ -287,7 +287,8 @@ namespace CurveManager {
 		Optional< Real64 const > Var2, // 2nd independent variable
 		Optional< Real64 const > Var3, // 3rd independent variable
 		Optional< Real64 const > Var4, // 4th independent variable
-		Optional< Real64 const > Var5 // 5th independent variable
+		Optional< Real64 const > Var5, // 5th independent variable
+		Optional< Real64 const > Var6  // 6th independent variable
 	)
 	{
 
@@ -349,7 +350,7 @@ namespace CurveManager {
 		} else if ( SELECT_CASE_var == LinearInterpolationOfTable ) {
 			CurveValue = PerformanceTableObject( CurveIndex, Var1, Var2, Var3 );
 		} else if ( SELECT_CASE_var == LagrangeInterpolationLinearExtrapolation ) {
-			CurveValue = TableLookupObject( CurveIndex, Var1, Var2, Var3, Var4, Var5 );
+			CurveValue = TableLookupObject( CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6 );
 		} else {
 			ShowFatalError( "CurveValue: Invalid Interpolation Type" );
 		}}
@@ -362,6 +363,7 @@ namespace CurveManager {
 		if ( present( Var3 ) ) PerfCurve( CurveIndex ).CurveInput3 = Var3;
 		if ( present( Var4 ) ) PerfCurve( CurveIndex ).CurveInput4 = Var4;
 		if ( present( Var5 ) ) PerfCurve( CurveIndex ).CurveInput5 = Var5;
+		if ( present( Var6 ) ) PerfCurve( CurveIndex ).CurveInput6 = Var6;
 
 		return CurveValue;
 
@@ -461,7 +463,7 @@ namespace CurveManager {
 		int NumTables; // Total tables in the input file
 		int CurveIndex; // do loop index
 		int CurveNum; // current curve number
-		Array1D_string Alphas( 13 ); // Alpha items for object
+		Array1D_string Alphas( 14 ); // Alpha items for object
 		Array1D< Real64 > Numbers( 10000 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -1911,7 +1913,7 @@ namespace CurveManager {
 			if ( NumAlphas >= 5 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 5 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 5 ) + " [" + Alphas( 5 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 5 ) + " [" + Alphas( 5 ) + "] is invalid" );
 				}
 			}
 
@@ -2041,9 +2043,9 @@ namespace CurveManager {
 			TableLookup( TableNum ).NumIndependentVars = 1;
 			TableLookup( TableNum ).NumX1Vars = size( PerfCurveTableData( TableNum ).X1 );
 			TableLookup( TableNum ).X1Var.allocate( TableLookup( TableNum ).NumX1Vars );
-			TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, size( PerfCurveTableData( TableNum ).Y ) );
+			TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, 1, size( PerfCurveTableData( TableNum ).Y ) );
 			TableLookup( TableNum ).X1Var = PerfCurveTableData( TableNum ).X1;
-			TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = PerfCurveTableData( TableNum ).Y( 1, _ );
+			TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, 1, _ ) = PerfCurveTableData( TableNum ).Y( 1, _ );
 		}
 
 		// Loop over wind pressure coefficient tables and load data
@@ -2190,9 +2192,9 @@ namespace CurveManager {
 					TableLookup( TableNum ).NumIndependentVars = 1;
 					TableLookup( TableNum ).NumX1Vars = size( PerfCurveTableData( TableNum ).X1 );
 					TableLookup( TableNum ).X1Var.allocate( TableLookup( TableNum ).NumX1Vars );
-					TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, size(PerfCurveTableData( TableNum ).Y ) );
+					TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, 1, size(PerfCurveTableData( TableNum ).Y ) );
 					TableLookup( TableNum ).X1Var = PerfCurveTableData( TableNum ).X1;
-					TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = PerfCurveTableData( TableNum ).Y( 1, _ );
+					TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, 1, _ ) = PerfCurveTableData( TableNum ).Y( 1, _ );
 				}
 			}
 		}
@@ -2295,7 +2297,7 @@ namespace CurveManager {
 			if (NumAlphas >= 5) {
 				if (!IsCurveOutputTypeValid(Alphas(5))) {
 					ShowSevereError("GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-					ShowContinueError(cAlphaFieldNames(5) + " [" + Alphas(5) + "] is invlaid");
+					ShowContinueError(cAlphaFieldNames(5) + " [" + Alphas(5) + "] is invalid");
 				}
 			}
 
@@ -2536,19 +2538,19 @@ namespace CurveManager {
 			if ( NumAlphas >= 4 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 4 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 4 ) + " [" + Alphas( 4 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 4 ) + " [" + Alphas( 4 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 5 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 5 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 5 ) + " [" + Alphas( 5 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 5 ) + " [" + Alphas( 5 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 6 ) {
 				if ( ! IsCurveOutputTypeValid( Alphas( 6 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 6 ) + " [" + Alphas( 6 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 6 ) + " [" + Alphas( 6 ) + "] is invalid" );
 				}
 			}
 
@@ -2824,10 +2826,10 @@ namespace CurveManager {
 			TableLookup( TableNum ).NumX2Vars = size( PerfCurveTableData( TableNum ).X2 );
 			TableLookup( TableNum ).X1Var.allocate( TableLookup( TableNum ).NumX1Vars );
 			TableLookup( TableNum ).X2Var.allocate( TableLookup( TableNum ).NumX2Vars );
-			TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( TableNum ).Y( _, 1 ) ), size( PerfCurveTableData( TableNum ).Y( 1, _ ) ) );
+			TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, size( PerfCurveTableData( TableNum ).Y( _, 1 ) ), size( PerfCurveTableData( TableNum ).Y( 1, _ ) ) );
 			TableLookup( TableNum ).X1Var = PerfCurveTableData( TableNum ).X1;
 			TableLookup( TableNum ).X2Var = PerfCurveTableData( TableNum ).X2;
-			TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( TableNum ).Y( _, _ );
+			TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _, _ ) = PerfCurveTableData( TableNum ).Y( _, _ );
 
 		}
 
@@ -2977,7 +2979,18 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).Var5Max = Numbers( 12 );
 				PerfCurve( CurveNum ).Var5MaxPresent = true;
 			}
-
+			if( lNumericFieldBlanks( 13 ) ) {
+				PerfCurve( CurveNum ).Var6Min = -99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var6Min = Numbers( 13 );
+				PerfCurve( CurveNum ).Var6MinPresent = true;
+			}
+			if( lNumericFieldBlanks( 14 ) ) {
+				PerfCurve( CurveNum ).Var6Max = 99999999999.0;
+			} else {
+				PerfCurve( CurveNum ).Var6Max = Numbers( 14 );
+				PerfCurve( CurveNum ).Var6MaxPresent = true;
+			}
 			if ( Numbers( 3 ) > Numbers( 4 ) ) { // error
 				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( Numbers( 3 ), 2 ) + "] > " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( Numbers( 4 ), 2 ) + ']' );
@@ -3003,49 +3016,60 @@ namespace CurveManager {
 				ShowContinueError( cNumericFieldNames( 11 ) + " [" + RoundSigDigits( Numbers( 11 ), 2 ) + "] > " + cNumericFieldNames( 12 ) + " [" + RoundSigDigits( Numbers( 12 ), 2 ) + ']' );
 				ErrorsFound = true;
 			}
+			if ( Numbers( 13 ) > Numbers( 14 ) ) { // error
+				ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 13 ) + " [" + RoundSigDigits( Numbers( 13 ), 2 ) + "] > " + cNumericFieldNames( 14 ) + " [" + RoundSigDigits( Numbers( 14 ), 2 ) + ']' );
+				ErrorsFound = true;
+			}
 			if ( NumAlphas >= 8 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 8 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 8 ) + " [" + Alphas( 8 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 8 ) + " [" + Alphas( 8 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 9 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 9 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 9 ) + " [" + Alphas( 9 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 9 ) + " [" + Alphas( 9 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 10 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 10 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 10 ) + " [" + Alphas( 10 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 10 ) + " [" + Alphas( 10 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 11 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 11 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 11 ) + " [" + Alphas( 11 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 11 ) + " [" + Alphas( 11 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 12 ) {
 				if ( ! IsCurveInputTypeValid( Alphas( 12 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 12 ) + " [" + Alphas( 12 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 12 ) + " [" + Alphas( 12 ) + "] is invalid" );
 				}
 			}
 			if ( NumAlphas >= 13 ) {
-				if ( ! IsCurveOutputTypeValid( Alphas( 13 ) ) ) {
+				if ( ! IsCurveInputTypeValid( Alphas( 13 ) ) ) {
 					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-					ShowContinueError( cAlphaFieldNames( 13 ) + " [" + Alphas( 13 ) + "] is invlaid" );
+					ShowContinueError( cAlphaFieldNames( 13 ) + " [" + Alphas( 13 ) + "] is invalid" );
+				}
+			}
+			if ( NumAlphas >= 14 ) {
+				if ( ! IsCurveOutputTypeValid( Alphas( 14 ) ) ) {
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( cAlphaFieldNames( 14 ) + " [" + Alphas( 14 ) + "] is invalid" );
 				}
 			}
 
-			if ( ! lNumericFieldBlanks( 13 ) ) {
-				PerfCurve( CurveNum ).CurveMin = Numbers( 13 ) / TableData( TableNum ).NormalPoint;
+			if ( ! lNumericFieldBlanks( 15 ) ) {
+				PerfCurve( CurveNum ).CurveMin = Numbers( 15 ) / TableData( TableNum ).NormalPoint;
 				PerfCurve( CurveNum ).CurveMinPresent = true;
 			}
-			if ( ! lNumericFieldBlanks( 14 ) ) {
-				PerfCurve( CurveNum ).CurveMax = Numbers( 14 ) / TableData( TableNum ).NormalPoint;
+			if ( ! lNumericFieldBlanks( 16 ) ) {
+				PerfCurve( CurveNum ).CurveMax = Numbers( 16 ) / TableData( TableNum ).NormalPoint;
 				PerfCurve( CurveNum ).CurveMaxPresent = true;
 			}
 
@@ -3081,10 +3105,10 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( TableLookup( TableNum ).NumIndependentVars );
 				if ( SELECT_CASE_var == 1 ) {
-					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) ) );
+					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, 1, _ ) ) );
 					TempArray2.allocate( size( TempArray1 ) );
 					TempArray1 = TableLookup( TableNum ).X1Var;
-					TempArray2 = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ );
+					TempArray2 = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, 1, _ );
 					SolveRegression( CurveNum, CurrentModuleObject, PerfCurve( CurveNum ).Name, TempArray1, TempArray2 );
 					TempArray1.deallocate();
 					TempArray2.deallocate();
@@ -3093,10 +3117,10 @@ namespace CurveManager {
 					PerfCurveTableData( TableNum ).X1.allocate( size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).Y.allocate( 1, size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
-					PerfCurveTableData( TableNum ).Y( 1, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ );
+					PerfCurveTableData( TableNum ).Y( 1, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, 1, _ );
 
 				} else if ( SELECT_CASE_var == 2 ) {
-					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ ) ) );
+					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _, _ ) ) );
 					TempArray2.allocate( size( TempArray1 ) );
 					TempArray3.allocate( size( TempArray1 ) );
 					TableDataIndex = 0;
@@ -3105,7 +3129,7 @@ namespace CurveManager {
 							++TableDataIndex;
 							TempArray1( TableDataIndex ) = TableLookup( TableNum ).X1Var( VarIndex );
 							TempArray2( TableDataIndex ) = TableLookup( TableNum ).X2Var( TempVarIndex );
-							TempArray3( TableDataIndex ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, TempVarIndex, VarIndex );
+							TempArray3( TableDataIndex ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, TempVarIndex, VarIndex );
 						}
 					}
 					SolveRegression( CurveNum, CurrentModuleObject, PerfCurve( CurveNum ).Name, TempArray1, TempArray3, TempArray2 );
@@ -3118,7 +3142,7 @@ namespace CurveManager {
 					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X2Var ), size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
 					PerfCurveTableData( TableNum ).X2 = TableLookup( TableNum ).X2Var;
-					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ );
+					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _, _ );
 				} else {
 					ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "...Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) );
@@ -3132,7 +3156,7 @@ namespace CurveManager {
 					PerfCurveTableData( TableNum ).X1.allocate( size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).Y.allocate( 1, size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
-					PerfCurveTableData( TableNum ).Y( 1, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ );
+					PerfCurveTableData( TableNum ).Y( 1, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, 1, _ );
 					// if linear interpolation of table is selected, switch interpolation type
 				} else if ( SELECT_CASE_var == 2 ) {
 					// Save array info in performance table arrays in case the performance table routine is selected in regression routine
@@ -3141,7 +3165,7 @@ namespace CurveManager {
 					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X2Var ), size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
 					PerfCurveTableData( TableNum ).X2 = TableLookup( TableNum ).X2Var;
-					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ );
+					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _, _ );
 					// if linear interpolation of table is selected, switch interpolation type
 				} else {
 					// if linear interpolation of table is selected, fatal if more than 2 independent variables
@@ -3344,9 +3368,11 @@ namespace CurveManager {
 		Real64 Var3; // Temp variables for processing table lookup data
 		Real64 Var4;
 		Real64 Var5;
+		Real64 Var6;
 		int Var3Index;
 		int Var4Index;
 		int Var5Index;
+		int Var6Index;
 		int NumIVars;
 		int TotalDataSets;
 		int NumbersOffset;
@@ -3403,10 +3429,10 @@ namespace CurveManager {
 			gio::rewind( FileNum );
 
 			{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars; ReadStat = flags.ios(); }
-			if ( NumIVars > 5 || NumIVars < 1 ) {
+			if ( NumIVars > 6 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables found in external file = " + FileName );
-				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
+				ShowFatalError( "...Only 1 to  independent variables are allowed." );
 			}
 
 			gio::rewind( FileNum );
@@ -3416,6 +3442,7 @@ namespace CurveManager {
 			if ( NumIVars == 3 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars; ReadStat = flags.ios(); };
 			if ( NumIVars == 4 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars; ReadStat = flags.ios(); };
 			if ( NumIVars == 5 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars >> TableLookup( TableNum ).NumX5Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 6 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars >> TableLookup( TableNum ).NumX5Vars >> TableLookup( TableNum ).NumX6Vars; ReadStat = flags.ios(); };
 
 			if ( ReadStat < GoodIOStatValue ) goto Label1000; //Autodesk:Uninit TotalDataSets was uninitialized after goto jump
 
@@ -3438,20 +3465,21 @@ namespace CurveManager {
 				gio::write( OutputFileInits, Format_130 );
 				gio::write( OutputFileInits, Format_150 ) << CurrentModuleObject << Alphas( 1 );
 			}
-			NumIVars = Numbers( 15 );
-			if ( NumIVars > 5 || NumIVars < 1 ) {
+			NumIVars = Numbers( 17 );
+			if ( NumIVars > 6 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables." );
 				ShowFatalError( "...Only 1 to 5 independent variables are allowed." );
 			}
 
-			BaseOffset = 15;
+			BaseOffset = 17;
 			TableLookup( TableNum ).NumIndependentVars = NumIVars;
-			TableLookup( TableNum ).NumX1Vars = Numbers( 16 );
-			if ( NumIVars > 1 ) TableLookup( TableNum ).NumX2Vars = Numbers( 17 );
-			if ( NumIVars > 2 ) TableLookup( TableNum ).NumX3Vars = Numbers( 18 );
-			if ( NumIVars > 3 ) TableLookup( TableNum ).NumX4Vars = Numbers( 19 );
-			if ( NumIVars > 4 ) TableLookup( TableNum ).NumX5Vars = Numbers( 20 );
+			TableLookup( TableNum ).NumX1Vars = Numbers( 18 );
+			if ( NumIVars > 1 ) TableLookup( TableNum ).NumX2Vars = Numbers( 19 );
+			if ( NumIVars > 2 ) TableLookup( TableNum ).NumX3Vars = Numbers( 20 );
+			if ( NumIVars > 3 ) TableLookup( TableNum ).NumX4Vars = Numbers( 21 );  // were these right before?
+			if ( NumIVars > 4 ) TableLookup( TableNum ).NumX5Vars = Numbers( 22 );
+			if ( NumIVars > 5 ) TableLookup( TableNum ).NumX6Vars = Numbers( 23 );
 		}
 
 		if ( EchoTableDataToEio ) {
@@ -3463,8 +3491,10 @@ namespace CurveManager {
 				gio::write( CharTableData, Format_160 ) << NumIVars << TableLookup( TableNum ).NumX1Vars << TableLookup( TableNum ).NumX2Vars << TableLookup( TableNum ).NumX3Vars;
 			} else if ( NumIVars == 4 ) {
 				gio::write( CharTableData, Format_160 ) << NumIVars << TableLookup( TableNum ).NumX1Vars << TableLookup( TableNum ).NumX2Vars << TableLookup( TableNum ).NumX3Vars << TableLookup( TableNum ).NumX4Vars;
-			} else {
+			} else if ( NumIVars == 5 ) {
 				gio::write( CharTableData, Format_160 ) << NumIVars << TableLookup( TableNum ).NumX1Vars << TableLookup( TableNum ).NumX2Vars << TableLookup( TableNum ).NumX3Vars << TableLookup( TableNum ).NumX4Vars << TableLookup( TableNum ).NumX5Vars;
+			} else if ( NumIVars == 6 ) {
+				gio::write( CharTableData, Format_160 ) << NumIVars << TableLookup( TableNum ).NumX1Vars << TableLookup( TableNum ).NumX2Vars << TableLookup( TableNum ).NumX3Vars << TableLookup( TableNum ).NumX4Vars << TableLookup( TableNum ).NumX5Vars << TableLookup( TableNum ).NumX6Vars;
 			}
 
 			gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
@@ -3475,6 +3505,7 @@ namespace CurveManager {
 		TableLookup( TableNum ).X3Var.allocate( TableLookup( TableNum ).NumX3Vars );
 		TableLookup( TableNum ).X4Var.allocate( TableLookup( TableNum ).NumX4Vars );
 		TableLookup( TableNum ).X5Var.allocate( TableLookup( TableNum ).NumX5Vars );
+		TableLookup( TableNum ).X6Var.allocate( TableLookup( TableNum ).NumX6Vars );
 
 		if ( NumIVars > 0 ) {
 			if ( ReadFromFile ) {
@@ -3501,6 +3532,7 @@ namespace CurveManager {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
 						TableLookup( TableNum ).X1Var( I ) = Numbers( BaseOffset + NumIVars + I );
 					}
+					std::vector< Real64 > x1values( TableLookup( TableNum ).X1Var.begin(), TableLookup( TableNum ).X1Var.end() );
 
 					if ( EchoTableDataToEio ) {
 						for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
@@ -3563,7 +3595,7 @@ namespace CurveManager {
 					}
 				}
 
-				// check to make sure XVars are in increaseing (ascending) order
+				// check to make sure XVars are in increasing (ascending) order
 				for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
 					if ( I == 1 ) continue;
 					if ( TableLookup( TableNum ).X2Var( I ) <= TableLookup( TableNum ).X2Var( I - 1 ) ) {
@@ -3723,18 +3755,68 @@ namespace CurveManager {
 								}
 							}
 
-							TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+							if ( NumIVars > 5 ) {  // something is wrong with this structure here...
+								if ( ReadFromFile ) {
+									{
+										IOFlags flags;
+										for ( I = 1; I <= TableLookup( TableNum ).NumX6Vars; ++I ) {
+											gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X6Var( I );
+										}
+										ReadStat = flags.ios();
+									}
+	
+									if ( EchoTableDataToEio ) {
+										for ( I = 1; I <= TableLookup( TableNum ).NumX6Vars; ++I ) {
+											gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X6Var( I );
+										} gio::write( OutputFileInits );
+									}
+	
+									if ( ReadStat < GoodIOStatValue ) goto Label1000;
+	
+								} else {
+									if ( NumNumbers >= BaseOffset + NumIVars + TableLookup( TableNum ).NumX1Vars + TableLookup( TableNum ).NumX2Vars + TableLookup( TableNum ).NumX3Vars + TableLookup( TableNum ).NumX4Vars + TableLookup( TableNum ).NumX5Vars + TableLookup( TableNum ).NumX6Vars ) {
+	
+										for ( I = 1; I <= TableLookup( TableNum ).NumX6Vars; ++I ) {
+											TableLookup( TableNum ).X6Var( I ) = Numbers( BaseOffset + NumIVars + TableLookup( TableNum ).NumX1Vars + TableLookup( TableNum ).NumX2Vars + TableLookup( TableNum ).NumX3Vars + TableLookup( TableNum ).NumX4Vars + TableLookup( TableNum ).NumX5Vars + I );
+										}
+	
+										if ( EchoTableDataToEio ) {
+											for ( I = 1; I <= TableLookup( TableNum ).NumX6Vars; ++I ) {
+												gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X6Var( I );
+											} gio::write( OutputFileInits );
+										}
+	
+									} else {
+										ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+										ShowContinueError( "...The number of numeric inputs is less than expected." );
+										ErrorsFound = true;
+									}
+								}
+								// check to make sure XVars are in increaseing (ascending) order
+								for ( I = 1; I <= TableLookup( TableNum ).NumX6Vars; ++I ) {
+									if ( I == 1 ) continue;
+									if ( TableLookup( TableNum ).X6Var( I ) <= TableLookup( TableNum ).X6Var( I - 1 ) ) {
+										ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+										ShowContinueError( "...The values for the independent variable X6 must be in increasing (ascending) order." );
+										ErrorsFound = true;
+										break;
+									}
+								}
+								TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX6Vars, TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+							} else {
+								TableLookup( TableNum ).TableLookupZData.allocate( 1, TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+							}
 						} else {
-							TableLookup( TableNum ).TableLookupZData.allocate( 1, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+							TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 						}
 					} else {
-						TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+						TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 					}
 				} else {
-					TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
+					TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 				}
 			} else {
-				TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, TableLookup( TableNum ).NumX1Vars );
+				TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, 1, TableLookup( TableNum ).NumX1Vars );
 			}
 		}
 
@@ -3743,8 +3825,9 @@ namespace CurveManager {
 		if ( NumIVars == 3 ) TotalDataSets = TableLookup( TableNum ).NumX3Vars;
 		if ( NumIVars == 4 ) TotalDataSets = TableLookup( TableNum ).NumX3Vars * TableLookup( TableNum ).NumX4Vars;
 		if ( NumIVars == 5 ) TotalDataSets = TableLookup( TableNum ).NumX3Vars * TableLookup( TableNum ).NumX4Vars * TableLookup( TableNum ).NumX5Vars;
+		if ( NumIVars == 6 ) TotalDataSets = TableLookup( TableNum ).NumX3Vars * TableLookup( TableNum ).NumX4Vars * TableLookup( TableNum ).NumX5Vars * TableLookup( TableNum ).NumX6Vars;
 
-		NumbersOffset = 15 + NumIVars + TableLookup( TableNum ).NumX1Vars + TableLookup( TableNum ).NumX2Vars + TableLookup( TableNum ).NumX3Vars + TableLookup( TableNum ).NumX4Vars + TableLookup( TableNum ).NumX5Vars + 1;
+		NumbersOffset = 17 + NumIVars + TableLookup( TableNum ).NumX1Vars + TableLookup( TableNum ).NumX2Vars + TableLookup( TableNum ).NumX3Vars + TableLookup( TableNum ).NumX4Vars + TableLookup( TableNum ).NumX5Vars + TableLookup( TableNum ).NumX6Vars + 1;
 
 		// initialize NumX2Vars to 1 so the DO loops work correctly
 		if ( NumIVars == 1 ) TableLookup( TableNum ).NumX2Vars = 1;
@@ -3819,6 +3902,31 @@ namespace CurveManager {
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
+				}
+			} else if ( NumIVars == 6 ) {
+				if ( ReadFromFile ) {
+			                                                                                                                       
+					{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> Var3 >> Var4 >> Var5 >> Var6; ReadStat = flags.ios(); }
+			                                                                                                                       
+					if ( EchoTableDataToEio ) {
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4 << "  " << Var5 << " " << Var6;
+						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
+					}
+			                                                                                                                       
+					if ( ReadStat < GoodIOStatValue ) goto Label1000;
+			                                                                                                                       
+				} else {
+					Var3 = Numbers( NumbersOffset );
+					Var4 = Numbers( NumbersOffset + 1 );
+					Var5 = Numbers( NumbersOffset + 2 );
+					Var6 = Numbers( NumbersOffset + 3 );
+					NumbersOffset += 4;
+			                                                                                                                       
+					if ( EchoTableDataToEio ) {
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4 << "  " << Var5 << " " << Var6;
+						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
+					}
+			                                                                                                                       
 				}
 			}
 
@@ -3912,6 +4020,36 @@ namespace CurveManager {
 				Var5Index = 1;
 			}
 
+			if ( NumIVars > 5 ) {
+				Var6Index = 0;
+				// match the independent variable values to the allowed values to find the index. Input must match allowed values.
+				for ( I = 1; I <= TableLookup( TableNum ).NumX6Vars; ++I ) {
+					if ( Var6 != TableLookup( TableNum ).X6Var( I ) ) continue;
+					Var6Index = I;
+					break;
+				}
+				if ( Var6Index == 0 && NumIVars > 5 ) {
+					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\"" );
+					ShowContinueError( "...The value of the 6th independent variable (" + RoundSigDigits( Var6, 9 ) + ") does not match the values listed as valid entries for this independent variable." );
+					ShowContinueError( "...Valid entries are: " );
+					if ( TableLookup( TableNum ).NumX6Vars >= 1 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 1 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 2 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 2 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 3 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 3 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 4 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 4 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 5 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 5 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 6 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 6 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 7 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 7 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 8 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 8 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 9 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 9 ), 9 ) );
+					if ( TableLookup( TableNum ).NumX6Vars >= 10 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X6Var( 10 ), 9 ) );
+					ShowContinueError( "...This occurs for data set = " + RoundSigDigits( DataSetCount + 1 ) + " in data file = " + FileName );
+					ErrorsFound = true;
+					Var6Index = 1;
+				}
+			} else {
+				Var6Index = 1;
+			}
+
 			// now read in X1 | X2 matrix data set
 			if ( PerfCurve( CurveNum ).X1SortOrder == ASCENDING ) {
 				if ( PerfCurve( CurveNum ).X2SortOrder == ASCENDING ) {
@@ -3921,7 +4059,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3931,7 +4069,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
+								TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
 								++NumbersOffset;
 							}
 
@@ -3946,7 +4084,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3956,7 +4094,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset ) / TableData( TableNum ).NormalPoint;
+								TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset ) / TableData( TableNum ).NormalPoint;
 								++NumbersOffset;
 							}
 
@@ -3973,7 +4111,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3983,7 +4121,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
+								TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
 								++NumbersOffset;
 							}
 
@@ -3997,7 +4135,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -4007,7 +4145,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
+								TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
 								++NumbersOffset;
 							}
 
@@ -4021,13 +4159,13 @@ namespace CurveManager {
 				// write data to eio file in ascending order
 				if ( EchoTableDataToEio ) {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
+						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I );
 					} gio::write( OutputFileInits );
 				}
 
 				// normalize the data according to the user entered normal point
 				for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-					TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) /= TableData( TableNum ).NormalPoint;
+					TableLookup( TableNum ).TableLookupZData( Var6Index, Var5Index, Var4Index, Var3Index, J, I ) /= TableData( TableNum ).NormalPoint;
 				}
 
 			}
@@ -4558,7 +4696,8 @@ Label999: ;
 		Optional< Real64 const > Var2, // 2nd independent variable
 		Optional< Real64 const > Var3, // 3rd independent variable
 		Optional< Real64 const > Var4, // 4th independent variable
-		Optional< Real64 const > Var5 // 5th independent variable
+		Optional< Real64 const > Var5, // 5th independent variable
+		Optional< Real64 const > Var6  // 6th independent variable
 	)
 	{
 
@@ -4602,21 +4741,24 @@ Label999: ;
 		Real64 V3; // 3rd independent variable after limits imposed
 		Real64 V4; // 4th independent variable after limits imposed
 		Real64 V5; // 5th independent variable after limits imposed
-
+		Real64 V6; // 6th independent variable after limits imposed
 		int NX;
 		int NY;
 		int NV3;
 		int NV4;
 		int NV5;
+		int NV6;
 		int TableIndex;
 		//REAL(r64), ALLOCATABLE, DIMENSION(:)     :: ONEDVALS
 		Array2D< Real64 > TWODVALS;
 		Array3D< Real64 > THREEDVALS;
+		Array4D< Real64 > FOURDVALS;
 		Array1D< Real64 > VALSX;
 		Array1D< Real64 > VALSY;
 		Array1D< Real64 > VALSV3;
 		Array1D< Real64 > VALSV4;
 		Array1D< Real64 > VALSV5;
+		Array1D< Real64 > VALSV6;
 		//REAL(r64), ALLOCATABLE, DIMENSION(:,:,:) :: HPVAL
 		//REAL(r64), ALLOCATABLE, DIMENSION(:,:,:,:) :: HPVALS
 		//REAL(r64), ALLOCATABLE, DIMENSION(:,:,:,:,:) :: DVLTRN
@@ -4628,11 +4770,13 @@ Label999: ;
 		int IV3;
 		int IV4;
 		int IV5;
+		int IV6;
 		int IEXTX;
 		int IEXTY;
 		int IEXTV3;
 		int IEXTV4;
 		int IEXTV5;
+		int IEXTV6;
 		int NUMPT;
 
 		TableIndex = PerfCurve( CurveIndex ).TableIndex;
@@ -4719,6 +4863,26 @@ Label999: ;
 			V5 = 0.0;
 		}
 
+		if ( present( Var6 ) ) {
+			V6 = max( min( Var6, PerfCurve( CurveIndex ).Var6Max ), PerfCurve( CurveIndex ).Var6Min );
+			if ( TableLookup( TableIndex ).NumIndependentVars < 6 ) {
+				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (6) passed to subroutine when 5 or less are required." );
+				}
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 6.0, 6.0 );
+			}
+		} else {
+			if ( TableLookup( TableIndex ).NumIndependentVars > 5 ) {
+				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Insufficient number of independent variables (5) passed to subroutine when at least 6 are required." );
+				}
+				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 5.0, 5.0 );
+			}
+			V6 = 0.0;
+		}
+
 		{ auto const SELECT_CASE_var( TableLookup( TableIndex ).NumIndependentVars );
 		if ( SELECT_CASE_var == 1 ) {
 			NX = TableLookup( TableIndex ).NumX1Vars;
@@ -4726,7 +4890,7 @@ Label999: ;
 			NUMPT = TableLookup( TableIndex ).InterpolationOrder;
 			VALSX.allocate( NX );
 			VALSX = TableLookup( TableIndex ).X1Var;
-			TableValue = DLAG( V1, VALSX( 1 ), VALSX, VALSX, TableLookup( TableIndex ).TableLookupZData( 1, 1, 1, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
+			TableValue = DLAG( V1, VALSX( 1 ), VALSX, VALSX, TableLookup( TableIndex ).TableLookupZData( 1, 1, 1, 1, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 			VALSX.deallocate();
 		} else if ( SELECT_CASE_var == 2 ) {
 			NX = TableLookup( TableIndex ).NumX1Vars;
@@ -4736,7 +4900,7 @@ Label999: ;
 			VALSX = TableLookup( TableIndex ).X1Var;
 			VALSY.allocate( NY );
 			VALSY = TableLookup( TableIndex ).X2Var;
-			TableValue = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, 1, 1, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
+			TableValue = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, 1, 1, 1, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 			VALSX.deallocate();
 			VALSY.deallocate();
 		} else if ( SELECT_CASE_var == 3 ) {
@@ -4753,7 +4917,7 @@ Label999: ;
 			TWODVALS.allocate( 1, NV3 );
 			// perform 2-D interpolation of X (V1) and Y (V2) and save in 2-D array
 			for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
-				TWODVALS( 1, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, 1, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
+				TWODVALS( 1, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, 1, 1, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 			}
 			if ( NV3 == 1 ) {
 				TableValue = TWODVALS( 1, 1 );
@@ -4782,7 +4946,7 @@ Label999: ;
 			// perform 2-D interpolation of X (V1) and Y (V2) and save in 2-D array
 			for ( IV4 = 1; IV4 <= NV4; ++IV4 ) {
 				for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
-					TWODVALS( IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
+					TWODVALS( IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, 1, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 				}
 			}
 			// final interpolation of 2-D array in V3 and V4
@@ -4813,7 +4977,7 @@ Label999: ;
 			for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
 				for ( IV4 = 1; IV4 <= NV4; ++IV4 ) {
 					for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
-						THREEDVALS( IV5, IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( IV5, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
+						THREEDVALS( IV5, IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, IV5, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 					}
 				}
 			}
@@ -4828,6 +4992,53 @@ Label999: ;
 			}
 			TWODVALS.deallocate();
 			THREEDVALS.deallocate();
+			VALSX.deallocate();
+			VALSY.deallocate();
+			VALSV3.deallocate();
+			VALSV4.deallocate();
+			VALSV5.deallocate();
+		} else if ( SELECT_CASE_var == 6 ) {
+			NX = TableLookup( TableIndex ).NumX1Vars;
+			NY = TableLookup( TableIndex ).NumX2Vars;
+			NV3 = TableLookup( TableIndex ).NumX3Vars;
+			NV4 = TableLookup( TableIndex ).NumX4Vars;
+			NV5 = TableLookup( TableIndex ).NumX5Vars;
+			NV6 = TableLookup( TableIndex ).NumX6Vars;
+			NUMPT = TableLookup( TableIndex ).InterpolationOrder;
+			VALSX.allocate( NX );
+			VALSX = TableLookup( TableIndex ).X1Var;
+			VALSY.allocate( NY );
+			VALSY = TableLookup( TableIndex ).X2Var;
+			VALSV3.allocate( NV3 );
+			VALSV3 = TableLookup( TableIndex ).X3Var;
+			VALSV4.allocate( NV4 );
+			VALSV4 = TableLookup( TableIndex ).X4Var;
+			VALSV5.allocate( NV5 );
+			VALSV5 = TableLookup( TableIndex ).X5Var;
+			VALSV6.allocate( NV6 );
+			VALSV6 = TableLookup( TableIndex ).X6Var;
+			// perform 2-D interpolation of 6D array at V1, V2, and store in 4D array
+			FOURDVALS.allocate( NV6, NV5, NV4, NV3 );
+			for ( IV6 = 1; IV6 <= NV6; ++IV6 ) {
+				for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
+					for ( IV4 = 1; IV4 <= NV4; ++IV4 ) {
+						for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
+							FOURDVALS( IV6, IV5, IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( IV6, IV5, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
+						}
+					}
+				}
+			}
+			// perform 2-D interpolation of 4D array at V3, V4, and store in 2D array
+			TWODVALS.allocate( NV6, NV5 );
+			for ( IV6 = 1; IV6 <= NV6; ++IV6 ) {
+				for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
+					TWODVALS( IV6, IV5 ) = DLAG( V3, V4, VALSV3, VALSV4, FOURDVALS( IV6, IV5, _, _ ), NV3, NV4, NUMPT, IEXTV3, IEXTV4 );
+				}
+			}
+			// perform 2-D interpolation of 2D array to find final value
+			TableValue = DLAG( V5, V6, VALSV5, VALSV6, TWODVALS, NV5, NV6, NUMPT, IEXTV5, IEXTV6 );
+			TWODVALS.deallocate();
+			FOURDVALS.deallocate();
 			VALSX.deallocate();
 			VALSY.deallocate();
 			VALSV3.deallocate();
@@ -5763,6 +5974,21 @@ Label999: ;
 		}
 		return GetCurveName;
 	}
+	double GetNormalPoint(int const CurveIndex)
+	{
+
+		if ( CurveIndex > 0 && CurveIndex <= NumCurves && PerfCurve( CurveIndex ).TableIndex > 0 ) {
+			const int tableIndex = PerfCurve( CurveIndex ).TableIndex;
+			return TableData(tableIndex).NormalPoint;
+		}
+		else {
+			std::string s = std::to_string(CurveIndex);
+			ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
+			return -1;
+		}
+		
+	}
+	
 
 	int
 	GetCurveIndex( std::string const & CurveName ) // name of the curve
@@ -6717,10 +6943,10 @@ Label999: ;
 			TableLookup( Tables( TableNum ) ).NumX2Vars = size( PerfCurveTableData( Tables( TableNum ) ).X2 );
 			TableLookup( Tables( TableNum ) ).X1Var.allocate( TableLookup( Tables( TableNum ) ).NumX1Vars );
 			TableLookup( Tables( TableNum ) ).X2Var.allocate( TableLookup( Tables( TableNum ) ).NumX2Vars );
-			TableLookup( Tables( TableNum ) ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( Tables( TableNum ) ).Y( _, 1 ) ), size( PerfCurveTableData( Tables( TableNum ) ).Y( 1, _ ) ) );
+			TableLookup( Tables( TableNum ) ).TableLookupZData.allocate( 1, 1, 1, 1, size( PerfCurveTableData( Tables( TableNum ) ).Y( _, 1 ) ), size( PerfCurveTableData( Tables( TableNum ) ).Y( 1, _ ) ) );
 			TableLookup( Tables( TableNum ) ).X1Var = PerfCurveTableData( Tables( TableNum ) ).X1;
 			TableLookup( Tables( TableNum ) ).X2Var = PerfCurveTableData( Tables( TableNum ) ).X2;
-			TableLookup( Tables( TableNum ) ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( Tables( TableNum ) ).Y( _, _ );
+			TableLookup( Tables( TableNum ) ).TableLookupZData( 1, 1, 1, 1, _, _ ) = PerfCurveTableData( Tables( TableNum ) ).Y( _, _ );
 		}
 
 		XX1.deallocate( );
@@ -6895,10 +7121,10 @@ Label999: ;
 				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 );
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars );
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars );
-				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, 1 ) ), size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( 1, _ ) ) );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData.allocate( 1, 1, 1, 1, size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, 1 ) ), size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( 1, _ ) ) );
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1;
 				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2;
-				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, _ );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData( 1, 1, 1, 1, _, _ ) = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, _ );
 			}
 		}
 

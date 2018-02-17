@@ -1715,18 +1715,34 @@ The heat transfer energy for the chilled water serving the beams, in Joules.
 
 The air terminal mixer provides a means of supplying central system air either to air inlet or supply side of a ZoneHVAC equipment such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
 
-This terminal mixer object mixes conditioned outdoor air (primary air) from DOAS air loop and recirculating (secondary air) and deliver it either to inlet or supply side of a local ZoneHVAC equipment. The terminal mixer can be connected either to the inlet or supply side of the local ZoneHVAC equipment and the connection type is specified in the input field \textit{Mixer Connection Type}. If the AirTerminal:SingleDuct:Mixer object is connected to the supply side, a mix of conditioned outdoor air from a central dedicated outdoor air system (DOAS) with conditioned recirculation air from the local ZoneHVAC equipment is supplied as a single stream to the conditioned zone at its inlet node. If the AirTerminal:SingleDuct:Mixer object is connected to the inlet side, a mix of outdoor air from the a central dedicated outdoor air system (DOAS) with un-conditioned recirculation air from a zone exhaust node is supplied to the ZoneHVAC equipment inlet node. The mixer model will sum the two air streams and average the air properties. The AirTerminal:SingleDuct:Mixer is used with the ZoneHVAC:FourPipeFanCoil, ZoneHVAC:WaterToAirHeatPump, ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:TerminalUnit:VariableRefrigerantFlow, ZoneHVAC:UnitVentilator, and AirLoopHVAC:UnitarySystem objects. The AirLoopHVAC:UnitarySystem object is used as a ZoneHVAC equipment. Since the ZoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the ZoneHVAC equipment are set to zero and the OutdoorAir:Mixer object type and object name input fields are left blank.
+This terminal mixer object mixes conditioned outdoor air (primary air) from DOAS air loop and recirculating (secondary air) and deliver it either to inlet or supply side of a local ZoneHVAC equipment. The terminal mixer can be connected either to the inlet or supply side of the local ZoneHVAC equipment and the connection type is specified in the input field \textit{Mixer Connection Type}. If the AirTerminal:SingleDuct:Mixer object is connected to the supply side, a mix of conditioned outdoor air from a central dedicated outdoor air system (DOAS) with conditioned recirculation air from the local ZoneHVAC equipment is supplied as a single stream to the conditioned zone at its inlet node. If the AirTerminal:SingleDuct:Mixer object is connected to the inlet side, a mix of outdoor air from the a central dedicated outdoor air system (DOAS) with un-conditioned recirculation air from a zone exhaust node is supplied to the ZoneHVAC equipment inlet node. The mixer model will sum the two air streams and average the air properties. The AirTerminal:SingleDuct:Mixer is used with:
+
+\begin{itemize}
+\setlength{\parskip}{0pt}
+\setlength{\itemsep}{0pt plus 2pt}
+\item ZoneHVAC:FourPipeFanCoil
+\item ZoneHVAC:WaterToAirHeatPump
+\item ZoneHVAC:PackagedTerminalAirConditioner
+\item ZoneHVAC:PackagedTerminalHeatPump
+\item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+\item ZoneHVAC:UnitVentilator 
+\item AirLoopHVAC:UnitarySystem
+\end{itemize}
+
+
+The AirLoopHVAC:UnitarySystem object must be specified as a ZoneHVAC equipment. Since the ZoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the ZoneHVAC equipment are set to zero and the OutdoorAir:Mixer object type and object name input fields are left blank.
 
 \begin{figure}[hbtp] % fig 108
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image275.png}
-\caption{Inlet Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:inlet-side-mixer-air-terminal-unit-with-fan}}
+\caption{Inlet Side Mixer Air Terminal Unit with ZoneHVAC Equipment \protect \label{fig:inlet-side-mixer-air-terminal-unit-with-ZoneHVAC-equipment}}
 \end{figure}
 \begin{figure}[hbtp] % fig 109
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image276.png}
-\caption{Supply Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:supply-side-mixer-air-terminal-unit-with-fan}}
+\caption{Supply Side Mixer Air Terminal Unit with ZoneHVAC equipment \protect \label{fig:supply-side-mixer-air-terminal-unit-with-ZoneHVAC-equipment}}
 \end{figure}
+
 
 
 \subsubsection{Inputs}\label{inputs-12-000}

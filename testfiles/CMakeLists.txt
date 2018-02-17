@@ -7,6 +7,7 @@
 # This will override any attempt to run an annual simulation.  Use DESIGN_DAY_ONLY for files without annual run periods
 
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 1ZoneDataCenterCRAC_wApproachTemp.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 2ZoneDataCenterHVAC_wEconomizer.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneEvapCooler.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
@@ -269,6 +270,7 @@ ADD_SIMULATION_TEST(IDF_FILE GSHPSimple-GLHE.idf EPW_FILE USA_IL_Chicago-OHare.I
 ADD_SIMULATION_TEST(IDF_FILE GSHP-Slinky.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE GasTurbChiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE GasTurbChillerHeatRecoveryAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE Generator_PVWatts.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Generators.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Generators_Transformer.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE GeneratorswithPV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -434,6 +436,7 @@ ADD_SIMULATION_TEST(IDF_FILE ShopWithPVandBattery.idf EPW_FILE USA_OK_Oklahoma.C
 ADD_SIMULATION_TEST(IDF_FILE ShopWithPVandStorage.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ShopWithSimplePVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SingleFamilyHouse_TwoSpeed_ZoneAirBalance.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE SingleFamilyHouse_TwoSpeed_CutoutTemperature.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SmOffPSZ-MultiModeDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SmOffPSZ.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SmOffPSZ_OnOffStagedControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -490,6 +493,7 @@ ADD_SIMULATION_TEST(IDF_FILE UnitHeaterGasElec.idf EPW_FILE USA_IL_Chicago-OHare
 ADD_SIMULATION_TEST(IDF_FILE UnitVent5Zone.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitVent5ZoneAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitVent5ZoneFixedOANoCoilOpt.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE UnitaryHybridAC_DedicatedOutsideAir.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_5ZoneWaterLoopHeatPump.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_DXCoilSystemAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_FurnaceWithDXSystemRHcontrol.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
@@ -581,7 +585,7 @@ ADD_SIMULATION_TEST(IDF_FILE SurfaceZonePropTest_LocalEnv.idf EPW_FILE USA_AZ_Ph
 ADD_SIMULATION_TEST(IDF_FILE SurfacePropTest_SurfLWR.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SolarShadingTest_ExternalFraction.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_MultiZone_LocalNode.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-
+ADD_SIMULATION_TEST(IDF_FILE SurfaceHeatSourceTerm_RefBldgSmallOfficeNew2004.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 # Additional files in subdirectories
 ADD_SIMULATION_TEST(IDF_FILE AdvancedOutput/ExerciseOutput1.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AdvancedOutput/ExerciseOutput1A-Solution.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
