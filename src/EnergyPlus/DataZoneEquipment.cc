@@ -114,34 +114,35 @@ namespace DataZoneEquipment {
 	int const VRFTerminalUnit_Num( 11 );
 	int const PurchasedAir_Num( 12 );
 	int const ZoneEvaporativeCoolerUnit_Num( 13 );
-	int const AirDistUnit_Num( 14 );
-	int const DirectAir_Num( 15 );
-	int const BBWaterConvective_Num( 16 );
-	int const BBElectricConvective_Num( 17 );
-	int const HiTempRadiant_Num( 18 );
-	int const LoTempRadiant_Num( 19 );
-	int const ZoneExhaustFan_Num( 20 );
-	int const HeatXchngr_Num( 21 );
-	int const HPWaterHeater_Num( 22 );
-	int const BBWater_Num( 23 );
-	int const ZoneDXDehumidifier_Num( 24 );
-	int const BBSteam_Num( 25 );
-	int const BBElectric_Num( 26 );
-	int const RefrigerationAirChillerSet_Num( 27 );
-	int const UserDefinedZoneHVACForcedAir_Num( 28 );
-	int const ZoneUnitarySystem_Num( 29 ); // AirloopHVAC:UnitarySystem configured as zone equipment
-	int const CoolingPanel_Num( 30 );
-	int const TotalNumZoneEquipType( 30 );
+	int const ZoneHybridEvaporativeCooler_Num(14);
+	int const AirDistUnit_Num( 15 );
+	int const DirectAir_Num( 16 );
+	int const BBWaterConvective_Num( 17 );
+	int const BBElectricConvective_Num( 18 );
+	int const HiTempRadiant_Num( 19 );
+	int const LoTempRadiant_Num(20);
+	int const ZoneExhaustFan_Num(21);
+	int const HeatXchngr_Num(22);
+	int const HPWaterHeater_Num(23);
+	int const BBWater_Num(24);
+	int const ZoneDXDehumidifier_Num(25);
+	int const BBSteam_Num(26);
+	int const BBElectric_Num(27);
+	int const RefrigerationAirChillerSet_Num(28);
+	int const UserDefinedZoneHVACForcedAir_Num(29);
+	int const ZoneUnitarySystem_Num(30); // AirloopHVAC:UnitarySystem configured as zone equipment
+	int const CoolingPanel_Num( 31 );
+	int const TotalNumZoneEquipType( 31 );
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
 
+	int const NumValidSysAvailZoneComponents( 14 );
+	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit","ZoneHVAC:HybridUnitaryHVAC" } );
+	
 	// Per Person Ventilation Rate Mode
 	int const PerPersonDCVByCurrentLevel( 1 );
 	int const PerPersonByDesignLevel( 2 );
-
-	int const NumValidSysAvailZoneComponents( 13 );
-	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -702,7 +703,11 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneEvaporativeCoolerUnit_Num;
-					} else {
+
+					} else if (SELECT_CASE_var == "ZONEHVAC:HYBRIDUNITARYHVAC") {
+						ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneHybridEvaporativeCooler_Num;
+
+					}else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
 						ShowContinueError( "..Invalid Equipment Type = " + ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) );
 						GetZoneEquipmentDataErrorsFound = true;
