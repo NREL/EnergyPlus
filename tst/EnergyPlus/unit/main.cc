@@ -47,26 +47,13 @@
 
 // EnergyPlus Unit Test Driver
 
+// Google Test Headers
 #include <gtest/gtest.h>
-#include <iostream>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <FileSystem.hh>
 
-#include <windows.h>
-
-
-//#include <CommandLineInterface.hh>
 // Google Test main
-
-//using namespace EnergyPlus;
-//extern void Test_HybridEvapCoolingModel();
 int
 main( int argc, char **argv )
 {
-//	static auto const exeDirectory = EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(EnergyPlus::FileSystem::getProgramPath()));
-//	static auto idd_location = exeDirectory + "Energy+.idd";
-//	std::cout << idd_location;
-	//Test_HybridEvapCoolingModel();
 #ifdef ENABLE_GTEST_DEBUG_MODE
 	::testing::GTEST_FLAG(break_on_failure) = true;
 	::testing::GTEST_FLAG(catch_exceptions) = false;
@@ -75,7 +62,5 @@ main( int argc, char **argv )
 	::testing::GTEST_FLAG(shuffle) = true;
 #endif
 	::testing::InitGoogleTest( &argc, argv );
-	::testing::GTEST_FLAG(filter) = "*UnitaryHybridAirConditioner*"; //EnergyPlusFixture, Test_HybridEvapCoolingModel
-	Sleep(10000);
 	return RUN_ALL_TESTS();
 }
