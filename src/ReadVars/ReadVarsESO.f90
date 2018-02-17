@@ -505,9 +505,9 @@
     write(auditunit,*) 'getting all vars from:',trim(inputfilename)
   endif
 
-  numtoskip=6
+  numtoskip=7
   read(esounit,inoutformat,end=901) line
-  if (index(line,'Program Version') == 0) numtoskip=5
+  if (index(line,'Program Version') == 0) numtoskip=6
   do i=1,numtoskip
     read(esounit,inoutformat,end=901) line
   enddo
