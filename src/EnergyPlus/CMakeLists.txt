@@ -6,12 +6,8 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 # Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
 if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
-<<<<<<< HEAD
-  configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
-  file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
-=======
   configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
->>>>>>> NREL/develop
+  file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 endif()
 
 SET( SRC

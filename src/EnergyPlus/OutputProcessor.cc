@@ -946,72 +946,6 @@ namespace OutputProcessor {
 	}
 
 	void
-<<<<<<< HEAD
-	DetermineFrequency(
-		std::string const & FreqString,
-		int & ReportFreq
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   December 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine looks at the passed in report frequency string and
-		// determines the reporting frequency.
-
-		// REFERENCES:
-		//       \field Reporting Frequency
-		//       \type choice
-		//       \key Detailed
-		//       \note Detailed lists every instance (i.e. HVAC variable timesteps)
-		//       \key Timestep
-		//       \note Timestep refers to the zone Timestep/Number of Timesteps in hour value
-		//       \note RunPeriod, Environment, and Annual are the same
-		//       \key Hourly
-		//       \key Daily
-		//       \key Monthly
-		//       \key RunPeriod
-		//       \key Environment
-		//       \key Annual
-		//       \default Hourly
-		//       \note RunPeriod, Environment, and Annual are synonymous
-
-		// Using/Aliasing
-		using DataSystemVariables::MinReportFrequency;
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Array1D_string const PossibleFreq( {-1,6}, { "deta", "time", "hour", "dail", "mont", "runp", "envi", "annu" } );
-		//=(/'detail','Timestep','Hourly','Daily','Monthly','RunPeriod','Environment','Annual'/)
-		static Array1D_string const ExactFreqString( {-1,6}, { "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Environment", "Annual" } );
-
-		static Array1D_int const FreqValues( {-1,6}, { -1, 0, 1, 2, 3, 4, 4, 4 } );
-		// note: runperiod, environment, and annual are synonymous
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		ReportFreq = ReportHourly; //Default
-		std::string::size_type const LenString = min( len( FreqString ), static_cast< std::string::size_type >( 4u ) );
-
-		std::string const FreqStringTrim( FreqString.substr( 0, LenString ) );
-		for ( int Loop = -1; Loop <= 6; ++Loop ) {
-			if ( ! UtilityRoutines::SameString( FreqStringTrim, PossibleFreq( Loop ) ) ) continue;
-			if ( ! UtilityRoutines::SameString( FreqString, ExactFreqString( Loop ) ) ) {
-				ShowWarningError( "DetermineFrequency: Entered frequency=\"" + FreqString + "\" is not an exact match to key strings." );
-				ShowContinueError( "Frequency=" + ExactFreqString( Loop ) + " will be used." );
-			}
-			ReportFreq = max( FreqValues( Loop ), MinReportFrequency );
-			break;
-		}
-
-	}
-
-	void
-=======
->>>>>>> NREL/develop
 	ProduceMinMaxString(
 		std::string & String, // Current value
 		int const DateValue, // Date of min/max
@@ -1300,15 +1234,6 @@ namespace OutputProcessor {
 		// METHODOLOGY EMPLOYED:
 		// Look it up in a list of valid variable types.
 
-<<<<<<< HEAD
-=======
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
-
->>>>>>> NREL/develop
 		// Return value
 		// na
 
@@ -1324,20 +1249,10 @@ namespace OutputProcessor {
 			return StoreType::Averaged;
 		}
 
-<<<<<<< HEAD
-		ValidateVariableType = 1;
-		Item = UtilityRoutines::FindItemInList( UtilityRoutines::MakeUPPERCase( VariableTypeKey ), StateVariables, 3 );
-		if ( Item != 0 ) return ValidateVariableType;
-
-		ValidateVariableType = 2;
-		Item = UtilityRoutines::FindItemInList( UtilityRoutines::MakeUPPERCase( VariableTypeKey ), NonStateVariables, 4 );
-		if ( Item != 0 ) return ValidateVariableType;
-=======
 		iter = std::find( nonStateVariables.begin(), nonStateVariables.end(), uppercase );
 		if ( iter != nonStateVariables.end() ) {
 			return StoreType::Summed;
 		}
->>>>>>> NREL/develop
 
 		ShowSevereError( "Invalid variable type requested=" + VariableTypeKey );
 
@@ -1583,15 +1498,9 @@ namespace OutputProcessor {
 		cCurrentModuleObject = "Meter:Custom";
 		NumCustomMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
-<<<<<<< HEAD
         //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
 		std::unordered_set< std::string > namesOfMeterCustom;
 		namesOfMeterCustom.reserve( NumCustomMeters );
-=======
-		//make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
-		std::unordered_set<std::string> namesOfMeterCustom;
-		namesOfMeterCustom.reserve(NumCustomMeters);
->>>>>>> NREL/develop
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
 			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );

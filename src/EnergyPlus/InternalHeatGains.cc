@@ -2316,7 +2316,7 @@ namespace InternalHeatGains {
 						ErrorsFound = true;
 					}
 				}
-				
+
 				{ auto const equipmentLevel( AlphaName( 4 ) );
 				if ( equipmentLevel == "WATTS/UNIT" ) {
 					ZoneITEq( Loop ).DesignTotalPower = IHGNumbers( 1 ) * IHGNumbers( 2 );
@@ -2459,35 +2459,19 @@ namespace InternalHeatGains {
 				}
 
 				// Environmental class
-<<<<<<< HEAD
-				if ( UtilityRoutines::SameString( AlphaName( 9 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( AlphaName( 10 ), "None" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassNone;
-				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A1" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "A1" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA1;
-				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A2" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "A2" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA2;
-				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A3" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "A3" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA3;
-				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A4" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "A4" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA4;
-				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "B" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "B" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassB;
-				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "C" ) ) {
-=======
-				if ( SameString( AlphaName( 10 ), "None" ) ) {
-					ZoneITEq( Loop ).Class = ITEClassNone;
-				} else if ( SameString( AlphaName( 10 ), "A1" ) ) {
-					ZoneITEq( Loop ).Class = ITEClassA1;
-				} else if ( SameString( AlphaName( 10 ), "A2" ) ) {
-					ZoneITEq( Loop ).Class = ITEClassA2;
-				} else if ( SameString( AlphaName( 10 ), "A3" ) ) {
-					ZoneITEq( Loop ).Class = ITEClassA3;
-				} else if ( SameString( AlphaName( 10 ), "A4" ) ) {
-					ZoneITEq( Loop ).Class = ITEClassA4;
-				} else if ( SameString( AlphaName( 10 ), "B" ) ) {
-					ZoneITEq( Loop ).Class = ITEClassB;
-				} else if ( SameString( AlphaName( 10 ), "C" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "C" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassC;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
@@ -2497,19 +2481,11 @@ namespace InternalHeatGains {
 				}
 
 				// Air and supply inlet connections
-<<<<<<< HEAD
-				if ( UtilityRoutines::SameString( AlphaName( 10 ), "AdjustedSupply" ) ) {
+				if ( UtilityRoutines::SameString( AlphaName( 11 ), "AdjustedSupply" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletAdjustedSupply;
-				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "ZoneAirNode" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 11 ), "ZoneAirNode" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
-				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "RoomAirModel" ) ) {
-=======
-				if ( SameString( AlphaName( 11 ), "AdjustedSupply" ) ) {
-					ZoneITEq( Loop ).AirConnectionType = ITEInletAdjustedSupply;
-				} else if ( SameString( AlphaName( 11 ), "ZoneAirNode" ) ) {
-					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
-				} else if ( SameString( AlphaName( 11 ), "RoomAirModel" ) ) {
->>>>>>> NREL/develop
+				} else if ( UtilityRoutines::SameString( AlphaName( 11 ), "RoomAirModel" ) ) {
 					// ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode" );
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
@@ -2560,7 +2536,7 @@ namespace InternalHeatGains {
 						if ( ZoneITEq( Loop ).SupplyApproachTempSch == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 20 ) + " entered=" + AlphaName( 20 ) );
 							ErrorsFound = true;
-						}						
+						}
 					} else {
 						if ( !hasSupplyApproachTemp ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
@@ -2574,7 +2550,7 @@ namespace InternalHeatGains {
 						if ( ZoneITEq( Loop ).ReturnApproachTempSch == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 20 ) + " entered=" + AlphaName( 20 ) );
 							ErrorsFound = true;
-						}	
+						}
 					} else {
 						if ( !hasReturnApproachTemp ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
@@ -2657,8 +2633,8 @@ namespace InternalHeatGains {
 					SetupOutputVariable( "Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time", OutputProcessor::Unit::hr, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeBelowRH, "Zone", "Sum", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 				}
 
-				
-				
+
+
 
 				// MJW - EMS Not in place yet
 				// if ( AnyEnergyManagementSystemInModel ) {
@@ -4085,7 +4061,7 @@ namespace InternalHeatGains {
 			}
 			if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE) {
 				ZoneITEMap[ ZoneITEq( Loop ).ZonePtr ].push_back( Loop );
-			}			
+			}
 
 			// Object report variables
 			ZoneITEq( Loop ).CPUPower = CPUPower;

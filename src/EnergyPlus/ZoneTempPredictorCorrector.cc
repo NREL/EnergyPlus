@@ -3076,8 +3076,6 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleHeating( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
-<<<<<<< HEAD
-=======
 				TempControlledZone( RelativeZoneNum ).HeatOffFlag = false;
 				DeltaT = TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 				if ( DeltaT > 0.0 ) {
@@ -3088,7 +3086,6 @@ namespace ZoneTempPredictorCorrector {
 					}
 				}
 
->>>>>>> NREL/develop
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
@@ -3308,7 +3305,7 @@ namespace ZoneTempPredictorCorrector {
 		ZoneSetPoint = 0.0;
 		LoadToHeatingSetPoint = 0.0;
 		LoadToCoolingSetPoint = 0.0;
-		
+
 
 		for ( RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum ) {
 			if ( TempControlledZone( RelativeZoneNum ).ActualZoneNum == ZoneNum ) break;
@@ -3502,7 +3499,7 @@ namespace ZoneTempPredictorCorrector {
 				LoadToHeatingSetPoint = 0.0;
 				LoadToCoolingSetPoint = 0.0;
 			}
-			
+
 			if ( LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0 ) {
 				ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 				ZoneSetPoint = ZoneThermostatSetPointLo( ZoneNum );

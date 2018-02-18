@@ -547,8 +547,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportYRMeters )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -649,67 +649,35 @@ namespace EnergyPlus {
 			int CurDayType = 10;
 
 			// TSMeter
-<<<<<<< HEAD
-			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportTimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::TimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
 				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
 
 			// TSMeter
-			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::EachCall, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
 				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
 
 			// HRMeter
-			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Hourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
 				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay" } ) ) );
 
 			// DYMeter
-			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr,
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Daily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr,
 				PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay" } ) ) );
 
 			// MNMeter
-			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, _, _, _, _, _, _ );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, _, _, _, _, _, _ );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12" } ) ) );
 
 			// SMMeter
-			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1" } ) ) );
 
 			// Bad input
-			WriteTimeStampFormatData( DataGlobals::mtr_stream, 999, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::TimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
-				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
-
-			// TSMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::EachCall, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
-				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
-
-			// HRMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Hourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
-				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay" } ) ) );
-
-			// DYMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Daily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr,
-				PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay" } ) ) );
-
-			// MNMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, _, _, _, _, _, _ ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12" } ) ) );
-
-			// SMMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1" } ) ) );
-
-			// Bad input
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, static_cast<ReportingFrequency>( 999 ), RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ ) );
->>>>>>> NREL/develop
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, static_cast<ReportingFrequency>( 999 ), RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ );
 
 			EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to WriteTimeStampFormatData: 999\n", ss->str());
 			ss->str(std::string());
@@ -734,101 +702,52 @@ namespace EnergyPlus {
 		{
 			DataGlobals::MinutesPerTimeStep = 10;
 
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			WriteReportMeterData( 1, "1", 999.9, ReportTimeStep, 0.0, 0, 0.0, 0, false );
+			WriteReportMeterData( 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportMeterData( 1, "1", 999.9, ReportEach, 0.0, 0, 0.0, 0, false );
+			WriteReportMeterData( 1, "1", 999.9, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			WriteReportMeterData( 1, "1", 616771620.98702729, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			WriteReportMeterData( 1, "1", 0, ReportTimeStep, 0.0, 0, 0.0, 0, false );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,999.9" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 999.9, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,999.9" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 0, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false ) );
->>>>>>> NREL/develop
+			WriteReportMeterData( 1, "1", 0, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
@@ -871,89 +790,46 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportRealData )
 		{
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			WriteReportRealData( 1, "1", 999.9, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 );
+			WriteReportRealData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportRealData( 1, "1", 999.9, 2, 1, ReportEach, 0.0, 0, 0.0, 0 );
+			WriteReportRealData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportRealData( 1, "1", 999.9, 2, 1, ReportHourly, 0.0, 0, 0.0, 0 );
+			WriteReportRealData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportEach, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportHourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			WriteReportRealData( 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			WriteReportRealData( 1, "1", 0, 2, 1, ReportTimeStep, 0.0, 0, 0.0, 0 );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0.0, 0, 0.0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 ) );
->>>>>>> NREL/develop
+			WriteReportRealData( 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -993,89 +869,46 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportIntegerData )
 		{
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportTimeStep, 0, 0, 0, 0 );
+			WriteReportIntegerData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportEach, 0, 0, 0, 0 );
+			WriteReportIntegerData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 999.9, 2, 1, ReportHourly, 0, 0, 0, 0 );
+			WriteReportIntegerData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportDaily, 4283136, 12210110, 4283196, 12212460 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136, 1,10,4283196,24,60" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportMonthly, 4283136, 12210110, 4283196, 12212460 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136,21, 1,10,4283196,21,24,60" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 2, 1, ReportSim, 4283136, 12210110, 4283196, 12212460 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportTimeStep, 0, 0, 0, 0 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportEach, 0, 0, 0, 0 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportHourly, 0, 0, 0, 0 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportDaily, 4283136, 12210110, 4283196, 12212460 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136, 1,10,4283196,24,60" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportMonthly, 4283136, 12210110, 4283196, 12212460 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 616771620.98702729, 1, 10, ReportSim, 4283136, 12210110, 4283196, 12212460 );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) ) );
 
-			WriteReportIntegerData( 1, "1", 0, 2, 1, ReportTimeStep, 0, 0, 0, 0 );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0, 0, 0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0, 0, 0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136, 1,10,4283196,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136,21, 1,10,4283196,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 0, 0, 0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 0, 0, 0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 0, 0, 0, 0 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136, 1,10,4283196,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 ) );
->>>>>>> NREL/develop
+			WriteReportIntegerData( 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -1115,13 +948,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_1 )
 		{
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
->>>>>>> NREL/develop
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteNumericData( 1, "1", 999 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999" } ) ) );
@@ -1341,16 +1169,7 @@ namespace EnergyPlus {
 
 			std::string const variableTypeKey = "BAD INPUT";
 
-<<<<<<< HEAD
 			auto index = ValidateVariableType( variableTypeKey );
-=======
-			EnergyPlus::sqlite = std::move( sqlite_test );
-			auto index = validateVariableType( variableTypeKey );
-			sqlite_test = std::move( EnergyPlus::sqlite );
-			// See note in SQLiteFixture.hh, can maybe move to this in the future.
-			// auto index = functionUsingSQLite( std::bind( ValidateVariableType, variableTypeKey ) );
-			// auto index = functionUsingSQLite<int>( std::bind( ValidateVariableType, variableTypeKey ) );
->>>>>>> NREL/develop
 
 			EXPECT_EQ( StoreType::Averaged, index );
 
@@ -1462,225 +1281,114 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
 
-			WriteMeterDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "meterName", OutputProcessor::Unit::W, false, false );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "meterName", OutputProcessor::Unit::W, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
 
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "meterName", OutputProcessor::Unit::J, true, false );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "meterName", OutputProcessor::Unit::J, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
 
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "meterName", OutputProcessor::Unit::W, false, true );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "meterName", OutputProcessor::Unit::W, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "4,1,meterName [W] !TimeStep" } ) ) );
 
-			WriteMeterDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "meterName", OutputProcessor::Unit::W, true, true );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "meterName", OutputProcessor::Unit::W, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "5,1,Cumulative meterName [W] !TimeStep" } ) ) );
 
-			WriteMeterDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "meterName", OutputProcessor::Unit::J, false, false );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
 
-			WriteMeterDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "meterName", OutputProcessor::Unit::J, false, false );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
 
-			WriteMeterDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "meterName", OutputProcessor::Unit::J, true, false );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "meterName", OutputProcessor::Unit::J, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
 
-			WriteMeterDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "meterName", OutputProcessor::Unit::J, false, true );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "meterName", OutputProcessor::Unit::J, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "9,1,meterName [J] !Each Call" } ) ) );
 
-			WriteMeterDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "meterName", OutputProcessor::Unit::J, true, true );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "meterName", OutputProcessor::Unit::J, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "10,1,Cumulative meterName [J] !Each Call" } ) ) );
 
-			WriteMeterDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "meterName", OutputProcessor::Unit::J, false, false );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
 
-			WriteMeterDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "meterName", OutputProcessor::Unit::None, false, false );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "meterName", OutputProcessor::Unit::None, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
 
-			WriteMeterDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "meterName", OutputProcessor::Unit::None, true, false );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "meterName", OutputProcessor::Unit::None, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
 
-			WriteMeterDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "meterName", OutputProcessor::Unit::None, false, true );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "meterName", OutputProcessor::Unit::None, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "14,1,meterName [] !Hourly" } ) ) );
 
-			WriteMeterDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "meterName", OutputProcessor::Unit::None, true, true );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "meterName", OutputProcessor::Unit::None, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "15,1,Cumulative meterName [] !Hourly" } ) ) );
 
-			WriteMeterDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "meterName", OutputProcessor::Unit::None, false, false );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "meterName", OutputProcessor::Unit::None, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			WriteMeterDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "meterName", OutputProcessor::Unit::None, false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "17,7,meterName [] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,meterName [] !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "meterName", OutputProcessor::Unit::deltaC, true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "meterName", OutputProcessor::Unit::deltaC, false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "19,7,meterName [deltaC] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "meterName", OutputProcessor::Unit::deltaC, true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "20,1,Cumulative meterName [deltaC] !Daily " } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "meterName", OutputProcessor::Unit::deltaC, false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "meterName", OutputProcessor::Unit::deltaC, false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "meterName", OutputProcessor::Unit::deltaC, true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "meterName", OutputProcessor::Unit::deltaC, false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "24,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "meterName", OutputProcessor::Unit::deltaC, true, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "25,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "meterName", OutputProcessor::Unit::deltaC, false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "meterName", OutputProcessor::Unit::deltaC, false, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "meterName", OutputProcessor::Unit::deltaC, true, false );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "meterName", OutputProcessor::Unit::deltaC, false, true );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
-
-			WriteMeterDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "meterName", OutputProcessor::Unit::deltaC, true, true );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "meterName", OutputProcessor::Unit::W, false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "meterName", OutputProcessor::Unit::J, true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "meterName", OutputProcessor::Unit::W, false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "4,1,meterName [W] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "meterName", OutputProcessor::Unit::W, true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "5,1,Cumulative meterName [W] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "meterName", OutputProcessor::Unit::J, false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "meterName", OutputProcessor::Unit::J, false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "meterName", OutputProcessor::Unit::J, true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "meterName", OutputProcessor::Unit::J, false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "9,1,meterName [J] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "meterName", OutputProcessor::Unit::J, true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "10,1,Cumulative meterName [J] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "meterName", OutputProcessor::Unit::J, false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "meterName", OutputProcessor::Unit::None, false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "meterName", OutputProcessor::Unit::None, true, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "meterName", OutputProcessor::Unit::None, false, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "14,1,meterName [] !Hourly" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "meterName", OutputProcessor::Unit::None, true, true ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "15,1,Cumulative meterName [] !Hourly" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "meterName", OutputProcessor::Unit::None, false, false ) );
-			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "meterName", OutputProcessor::Unit::None, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "meterName", OutputProcessor::Unit::None, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "meterName", OutputProcessor::Unit::deltaC, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "meterName", OutputProcessor::Unit::deltaC, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "19,7,meterName [deltaC] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "meterName", OutputProcessor::Unit::deltaC, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "20,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "meterName", OutputProcessor::Unit::deltaC, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "meterName", OutputProcessor::Unit::deltaC, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "24,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "meterName", OutputProcessor::Unit::deltaC, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "25,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "meterName", OutputProcessor::Unit::deltaC, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "meterName", OutputProcessor::Unit::deltaC, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
->>>>>>> NREL/develop
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "meterName", OutputProcessor::Unit::deltaC, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "30,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -1726,246 +1434,134 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportTimeStep, 2, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "4,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportTimeStep, 1, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "5,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportEach, 1, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportEach, 2, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportEach, 1, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportEach, 1, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "9,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportEach, 1, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "10,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "4,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "5,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "9,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
-			EXPECT_TRUE( compare_eso_stream( delimited_string( { "10,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
-
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 2, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "14,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportHourly, 1, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "15,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 2, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportDaily, 1, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 2, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportMonthly, 1, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 2, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-<<<<<<< HEAD
-			WriteReportVariableDictionaryItem( ReportSim, 1, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
-=======
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
->>>>>>> NREL/develop
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
@@ -2011,13 +1607,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData )
 		{
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
->>>>>>> NREL/develop
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
@@ -2052,13 +1643,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_2 )
 		{
-<<<<<<< HEAD
-			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-=======
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
->>>>>>> NREL/develop
+			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteNumericData( 1, "1", 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
