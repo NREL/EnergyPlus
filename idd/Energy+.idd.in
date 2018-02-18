@@ -508,7 +508,7 @@ Building,
 ShadowCalculation,
        \unique-object
        \memo This object is used to control details of the solar, shading, and daylighting models
-	   \extensible:1
+       \extensible:1
   A1 , \field Calculation Method
        \note choose calculation method. note that TimestepFrequency is only needed for certain cases
        \note and can increase execution time significantly.
@@ -558,46 +558,37 @@ ShadowCalculation,
        \key No
        \default No
        \note If Yes is chosen, the calculated external shading fraction results will be saved to an external CSV file with surface names as the column headers.
-  A6 , \field Disable Shading Within A Zone Group
-       \note If Yes, for all surfaces in a targeted Zone Group,
-       \note the shading effect by all other exterior surfaces of all zones within this Zone Group is disabled.
-       \note If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both,
-       \note specify Self-Shading Groups to limit self-shading by defining Zone Groups.
-       \note If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes,
-	   \note all self-shading effect will be disabled.
-       \type choice
-       \key Yes
-       \key No
-       \default No
-  A7 , \field Disable Shading Between Zone Groups
-       \note If Yes, for all surfaces in a targeted Zone Group,
-       \note the shading effect by other exterior surfaces of all zones in other Zone Groups is disabled.
-       \note If either Disable Shading Within A Zone Group = Yes or Disable Shading Between Zone Groups = Yes, but not both,
-       \note specify Self-Shading Groups to limit self-shading by defining Zone Groups.
-       \note If both Disable Shading Within A Zone Group and Disable Shading Between Zone Groups are Yes,
-	   \note all self-shading effect will be disabled.
-       \type choice
-       \key Yes
-       \key No
-       \default No
-  A8 , \field Shading Group 1 ZoneList Name
-       \note The zones in a self-shading group will not self-shade each other, but they will cast shadows on all other zones in the model.
-       \note Any zones not listed in a self-shading group will shade any zone in the model.
+  A6 , \field Disable Self-Shading Within Shading Zone Groups
+       \note If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to surfaces within 
+       \note the same Shading Zone Group.
+       \note If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, 
+       \note then all self-shading from exterior surfaces will be disabled.
+       \note If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored.
+       \note Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
+  A7 , \field Disable Self-Shading From Shading Zone Groups to Other Zones
+       \note If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to all other zones in the model.
+       \note If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, 
+       \note then all self-shading from exterior surfaces will be disabled.
+       \note If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored.
+       \note Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
+  A8 , \field Shading Zone Group 1 ZoneList Name
+       \note Specifies a group of zones which are controlled by the Disable Self-Shading fields.
        \type object-list
        \object-list ZoneListNames
-  A9 , \field Shading Group 2 ZoneList Name
+       \begin-extensible
+  A9 , \field Shading Zone Group 2 ZoneList Name
        \type object-list
        \object-list ZoneListNames
-  A10, \field Shading Group 3 ZoneList Name
+  A10, \field Shading Zone Group 3 ZoneList Name
        \type object-list
        \object-list ZoneListNames
-  A11, \field Shading Group 4 ZoneList Name
+  A11, \field Shading Zone Group 4 ZoneList Name
        \type object-list
        \object-list ZoneListNames
-  A12, \field Shading Group 5 ZoneList Name
+  A12, \field Shading Zone Group 5 ZoneList Name
        \type object-list
        \object-list ZoneListNames
-  A13; \field Shading Group 6 ZoneList Name
+  A13; \field Shading Zone Group 6 ZoneList Name
        \type object-list
        \object-list ZoneListNames
 	   

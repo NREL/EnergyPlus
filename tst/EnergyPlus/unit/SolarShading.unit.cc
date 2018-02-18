@@ -1468,6 +1468,4 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 		}
 	}
 
-	SolarShading::clear_state();
-
 }
