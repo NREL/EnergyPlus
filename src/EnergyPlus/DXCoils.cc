@@ -10198,6 +10198,12 @@ Label50: ;
 		InletWetBulbCalc = InletWetBulb;
 		InletHumRatCalc = InletHumRat;
 
+		if ( AirMassFlow <= 0.00001 ) {
+			TotCap = 0.0;
+			SHR = 0.0;
+			return;
+		}
+
 		//  DO WHILE (ABS(werror) .gt. Tolerance .OR. Counter == 0)
 		//   Get capacity modifying factor (function of inlet wetbulb & outside drybulb) for off-rated conditions
 		while ( true ) {

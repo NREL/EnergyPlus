@@ -71,6 +71,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -216,6 +217,7 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	DataWaterLoopNum = 1;
 	NumOfGlycols = 1;
 
+	createCoilSelectionReportObj();
 	SizeWaterCoil( CoilNum );
 
 	EXPECT_DOUBLE_EQ( 0.00159, WaterCoil( CoilNum ).DesAirVolFlowRate );
@@ -463,6 +465,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	MySizeFlag( 1 ) =  true;
 
 	// run water coil sizing 
+	createCoilSelectionReportObj();
 	SizeWaterCoil( CoilNum );
 	EXPECT_DOUBLE_EQ( 1.0, WaterCoil( CoilNum ).DesAirVolFlowRate );
 
@@ -615,6 +618,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	MySizeFlag( 1 ) = true;
 
 	// run water coil sizing
+	createCoilSelectionReportObj();
 	SizeWaterCoil( CoilNum );
 	EXPECT_DOUBLE_EQ( 1.0, WaterCoil( CoilNum ).DesAirVolFlowRate );
 
@@ -771,6 +775,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp )
 	MySizeFlag( 1 ) =  true;
 
 	// run water coil sizing 
+	createCoilSelectionReportObj();
 	SizeWaterCoil( CoilNum );
 	EXPECT_DOUBLE_EQ( 1.0, WaterCoil( CoilNum ).DesAirVolFlowRate );
 
@@ -883,7 +888,8 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	NumOfGlycols = 1;
  
  	// run water coil sizing
- 	SizeWaterCoil( CoilNum );
+ 	createCoilSelectionReportObj();
+	SizeWaterCoil( CoilNum );
  	EXPECT_DOUBLE_EQ( 1.0, WaterCoil( CoilNum ).DesAirVolFlowRate );
  
  	Real64 DesCoilCoolingLoad = 0.0;
@@ -999,7 +1005,8 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	NumOfGlycols = 1;
  
  	// run water coil sizing
- 	SizeWaterCoil( CoilNum );
+ 	createCoilSelectionReportObj();
+	SizeWaterCoil( CoilNum );
  	EXPECT_DOUBLE_EQ( 1.0, WaterCoil( CoilNum ).DesAirVolFlowRate );
  
  	Real64 DesCoilCoolingLoad = 0.0;
@@ -1095,7 +1102,8 @@ TEST_F( WaterCoilsTest, CoilCoolingWaterSimpleSizing )
  	NumOfGlycols = 1;
  
  	// run water coil sizing 
- 	SizeWaterCoil( CoilNum );
+ 	createCoilSelectionReportObj();
+	SizeWaterCoil( CoilNum );
  	EXPECT_DOUBLE_EQ( 1.0, WaterCoil( CoilNum ).DesAirVolFlowRate );
  
  	Real64 CpAirStd = 0.0;
